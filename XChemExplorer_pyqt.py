@@ -6,7 +6,7 @@ from PyQt4 import QtGui, QtCore
 import time
 import pickle
 
-sys.path.append('/dls/labxchem/data/2015/lb13385-1/processing/_PROCESSING_TEST/BLing/lib')
+sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 from XChemUtils import process
 from XChemUtils import parse
 from XChemUtils import queue
@@ -41,6 +41,7 @@ class XChemExplorer(QtGui.QApplication):
         ### for testing only!!! 
         self.visit_list=['/dls/i04-1/data/2015/lb13385-3']
         self.target='ATAD2A'
+        self.dataset_outcome_dict={}        # contains the dataset outcome buttons
 
         # Settings @ Switches
         self.explorer_active=0
@@ -57,10 +58,12 @@ class XChemExplorer(QtGui.QApplication):
         self.center_main_window()
         
         # Menu Widget
-        load = QtGui.QAction("Load Config File", self.window)
-        save = QtGui.QAction("Save Config File", self.window)
-        quit = QtGui.QAction("Quit", self.window)
-               
+        load=QtGui.QAction("Load Config File", self.window)
+        save=QtGui.QAction("Save Config File", self.window)
+        quit=QtGui.QAction("Quit", self.window)
+        quit.setShortcut('Ctrl+Q')
+        quit.triggered.connect(QtGui.qApp.quit)
+
         menu_bar = QtGui.QMenuBar()
         file = menu_bar.addMenu("&File")
         settings = menu_bar.addMenu("&Settings")
@@ -103,6 +106,7 @@ class XChemExplorer(QtGui.QApplication):
         get_data_collection_button.clicked.connect(self.button_clicked)
         data_collection_button_hbox.addWidget(get_data_collection_button)
         write_files_button=QtGui.QPushButton("Save Files from Autoprocessing in 'inital_model' Folder")
+        write_files_button.clicked.connect(self.button_clicked)
         data_collection_button_hbox.addWidget(write_files_button)
         self.tab_dict['DLS @ Data Collection'][1].addLayout(data_collection_button_hbox)
 
@@ -190,18 +194,24 @@ class XChemExplorer(QtGui.QApplication):
     def button_clicked(self):
         if self.target != '' and self.explorer_active==0:
             if self.sender().text()=='Get New Results from Autoprocessing':
-                print 'hallo'
-                self.work_thread=read_autoprocessing_results_from_disc(self.visit_list,self.target)
-
-            self.explorer_active=1
-            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-            self.connect(self.work_thread, QtCore.SIGNAL("create_widgets_for_autoprocessing_results"),
-                                                     self.create_widgets_for_autoprocessing_results)
-            self.work_thread.start()
-
-
+                dict_list=[]
+                self.create_widgets_for_autoprocessing_results(dict_list)
+### --- this works but disabled so that stuff can be tested offline ---
+#        if self.target != '' and self.explorer_active==0:
+#            if self.sender().text()=='Get New Results from Autoprocessing':
+#                self.work_thread=read_autoprocessing_results_from_disc(self.visit_list,self.target)
+#            self.explorer_active=1
+#            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+#            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+#            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#            self.connect(self.work_thread, QtCore.SIGNAL("create_widgets_for_autoprocessing_results"),
+#                                                     self.create_widgets_for_autoprocessing_results)
+#            self.work_thread.start()
+### -------------------------------------------------------------------
+            if self.sender().text()=="Save Files from Autoprocessing in 'inital_model' Folder":
+                self.work_thread=save_autoprocessing_results_to_disc(self.dataset_outcome_dict)
+                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+                self.work_thread.start()
 #                and self.sender().text()=='Get New Results from Autoprocessing':
 #            self.explorer_active=1
 #            threading.Thread(target=self.read_autoprocessing_results_from_disc, args=()).start()
@@ -269,18 +279,20 @@ class XChemExplorer(QtGui.QApplication):
         self.status_bar.showMessage(message)
 
     def thread_finished(self):
-        self.explorer_active=1
+        self.explorer_active=0
         self.update_progress_bar(0)
         self.update_status_bar('idle')
 
     def create_widgets_for_autoprocessing_results(self,dict_list):
-        data_collection_dict=dict_list[0]
-        data_collection_statistics_dict=dict_list[1]
+#        data_collection_dict=dict_list[0]
+#        data_collection_statistics_dict=dict_list[1]
 
+### --- used temporarily to be able to test stuff offline ---
 #        pickle.dump(data_collection_dict,open('data_collection_dict.p','wb'))
 #        pickle.dump(data_collection_statistics_dict,open('data_collection_statistics_dict.p','wb'))
-#        data_collection_dict = pickle.load( open( "data_collection_dict.p", "rb" ) )
-
+        data_collection_dict = pickle.load( open( "/usr/local/scripts/tobias/XChemExplorer/tmp/data_collection_dict.p", "rb" ) )
+        data_collection_statistics_dict= pickle.load( open( "/usr/local/scripts/tobias/XChemExplorer/tmp/data_collection_statistics_dict.p", "rb" ) )
+### ---------------------------------------------------------
 
         diffraction_data_column_name = ['Program',
                                         'Run',
@@ -380,6 +392,15 @@ class XChemExplorer(QtGui.QApplication):
 #        self.data_collection_scrolled_area.setWidget(scrolled_window)
         #-----------------------------------------------------------------------------------------------
 
+        dataset_outcome = { "success":                      "rgb(0,255,0)",
+                            "Failed - centring failed":     "rgb(255,0,0)",
+                            "Failed - no diffraction":      "rgb(255,0,0)",
+                            "Failed - processing barfs":    "rgb(255,0,0)",
+                            "Failed - loop empty":          "rgb(255,0,0)",
+                            "Failed - low resolution":      "rgb(255,0,0)",
+                            "Failed - no X-rays":           "rgb(255,0,0)",
+                            "Failed - unknown":             "rgb(255,0,0)"  }
+
 
         # And this is another test ------------------------------------------------------------------------
         table=QtGui.QTableWidget()
@@ -390,25 +411,101 @@ class XChemExplorer(QtGui.QApplication):
 #        table.resizeColumnsToContents()
         table.setRowCount(len(data_collection_dict))
         table.setColumnCount(3)
+        self.dataset_outcome_dict={}        # not sure if wise, but this resets any previous entries
         for row,key in enumerate(sorted(data_collection_statistics_dict)):
+            self.dataset_outcome_dict[key]=[]
             # this is the main table
             table.setItem(row, 0, QtGui.QTableWidgetItem(key))
             table.setItem(row, 1, QtGui.QTableWidgetItem(data_collection_dict[key][0][0][1]))
-            data_collection_table=QtGui.QTableWidget()
+
+            # column 3:
+            # ---------------------------------------------------------|
+            # |                                                        |
+            # | crystal images                                         |
+            # |                                                        |
+            # |--------------------------------------------------------|
+            # |         |                                              |
+            # | dataset |                                              |
+            # | outcome | table for data processing results            |
+            # | buttons |                                              |
+            # |         |                                              |
+            # |--------------------------------------------------------|
+
             cell_widget=QtGui.QWidget()
-            vbox_cell=QtGui.QVBoxLayout(cell_widget)
+            vbox_cell=QtGui.QVBoxLayout(cell_widget)        # main vbox
+
+            # crystal images
+            layout = QtGui.QGridLayout()
+            label=QtGui.QLabel('ATAD2A-x367_1_')
+            run_number=0
+            layout.addWidget(label,(run_number)*2,0)
+            for column_number,image_file in enumerate(glob.glob('/usr/local/scripts/tobias/XChemExplorer/images/*')):
+                    pixmap = QtGui.QPixmap(image_file)
+                    label = QtGui.QLabel()
+                    label.resize(320,200)
+                    label.setPixmap(pixmap.scaled(label.size(), QtCore.Qt.KeepAspectRatio))
+                    layout.addWidget(label, (run_number)*2+1, column_number)
+            vbox_cell.addLayout(layout)
+#        for key in data_collection_dict:
+#            if key=='ATAD2A-x383':
+#                layout = QtGui.QGridLayout()
+#                print len(data_collection_dict[key][1])
+#                for run_number,run in enumerate(data_collection_dict[key][0]):
+#                    label = QtGui.QLabel(run[0])
+#                    layout.addWidget(label,(run_number)*2,0)
+#                    # this nifty expression return how often a certain string appears in a list
+#                    for column_number,column in enumerate(sorted(filter(lambda x: run[0] in x,data_collection_dict[key][1]))):
+#                        print column
+#                        pixmap = QtGui.QPixmap(column)
+#                        label = QtGui.QLabel()
+#                        label.resize(320,200)
+#                        label.setPixmap(pixmap.scaled(label.size(), QtCore.Qt.KeepAspectRatio))
+#                        layout.addWidget(label, (run_number)*2+1, column_number)
+#                self.data_collection_vbox_for_table.addLayout(layout)
+
+
+
+            hbox_for_button_and_table=QtGui.QHBoxLayout()
+            # dataset outcome buttons
+            dataset_outcome_groupbox=QtGui.QGroupBox()
+            dataset_outcome_vbox=QtGui.QVBoxLayout()
+            for outcome in sorted(dataset_outcome):
+                button=QtGui.QPushButton(outcome)
+                button.setAutoExclusive(True)
+                button.setCheckable(True)
+                button.setStyleSheet("background-color: "+dataset_outcome[outcome])
+                self.dataset_outcome_dict[key].append(button)
+                if outcome=='success':
+                    button.setChecked(True)
+                dataset_outcome_vbox.addWidget(button)
+
+            dataset_outcome_groupbox.setLayout(dataset_outcome_vbox)
+            hbox_for_button_and_table.addWidget(dataset_outcome_groupbox)
+
+            # table for data processing results
+            data_collection_table=QtGui.QTableWidget()
+            data_collection_table.setRowCount(len(data_collection_statistics_dict[key]))
+            data_collection_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+            data_collection_table.setColumnCount(len(data_collection_statistics_dict[key][0])-1)
             for n,line in enumerate(data_collection_statistics_dict[key]):
                 for column,item in enumerate(line[1:]):
                     cell_text=QtGui.QTableWidgetItem()
                     cell_text.setText(str(item))
                     data_collection_table.setItem(n, column, cell_text)
-#            data_collection_table.setHorizontalHeaderLabels(diffraction_data_column_name)
-            vbox_cell.addWidget(data_collection_table)
+            data_collection_table.setHorizontalHeaderLabels(diffraction_data_column_name)
+            hbox_for_button_and_table.addWidget(data_collection_table)
+            vbox_cell.addLayout(hbox_for_button_and_table)
+
             cell_widget.setLayout(vbox_cell)
             table.setCellWidget(row, 2, cell_widget)
+#            table.stretchLastSection()
+            table.setColumnWidth(2, 1000)
 
 #            table.setItem(row, 2, vbox)
         table.setHorizontalHeaderLabels(['Sample','Date','Stuff'])
+#        table.resizeColumnsToContents()
+        table.resizeRowsToContents()
+        table.setLineWidth(10)
         self.data_collection_vbox_for_table.addWidget(table)
         #-----------------------------------------------------------------------------------------------
 
@@ -439,6 +536,18 @@ class XChemExplorer(QtGui.QApplication):
 #            label.setPixmap(pixmap)
 #            hbox_image.addWidget(label)
 #        self.data_collection_vbox_for_table.addLayout(hbox_image)
+
+class save_autoprocessing_results_to_disc(QtCore.QThread):
+    def __init__(self,dataset_outcome_dict):
+        QtCore.QThread.__init__(self)
+        self.dataset_outcome_dict=dataset_outcome_dict
+
+    def run(self):
+        for key in sorted(self.dataset_outcome_dict):
+            for button in self.dataset_outcome_dict[key]:
+                if button.isChecked():
+                    print key,button.text()
+        self.emit(QtCore.SIGNAL("finished()"))
 
 
 class read_autoprocessing_results_from_disc(QtCore.QThread):

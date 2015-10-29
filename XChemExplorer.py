@@ -1,26 +1,23 @@
 import sys
 import os
 import glob
-sys.path.append('/usr/lib64/python2.6/site-packages/gtk-2.0')
+import pickle
+sys.path.append('/usr/lib64/python2.6/site-packages/gtk-2.0')   # needs to be set at DLS; only default python has GTK
 import gtk
-#import pygtk
-#import pango
-#sys.path.append(os.getenv('TINSEL_DIR')+'/lib')
-#import GetAimless
+
 from datetime import datetime
 import threading
 import gobject 
 gtk.gdk.threads_init()
-import time
 import math
-#sys.path.append('/dls/labxchem/data/2015/lb13385-1/processing/_PROCESSING_TEST/BLing/lib')
+
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 from XChemUtils import process
 from XChemUtils import parse
 from XChemUtils import queue
 from XChemUtils import mtztools
 
-class TInsel:
+class XChemExplorer:
     def __init__(self):
         # Directories
         self.CurrentDir=os.getcwd()
@@ -69,7 +66,7 @@ class TInsel:
         self.TreeviewList=[]
         self.inital_model_treeview=[]
 
-        # flag which gets set to '1' when TInsel does something
+        # flag which gets set to '1' when XChemExplorer does something
         self.Active=0
         self.load_initial_models_first_time=0
         # text for statusbar
@@ -309,12 +306,6 @@ class TInsel:
                                                         break
 
 
-
-#            os.mkdir(self.CurrentDir+'/../analysis/initial_model/'+item[0])
-#            os.chdir(self.CurrentDir+'/../analysis/initial_model/'+item[0])
-
-
-
             else:
                 for Experiment in self.ExperimentList:
                     if Experiment[0]==button[0]:
@@ -331,7 +322,7 @@ class TInsel:
 
 
         print outCSV
-        f=open(os.path.join(self.DatabaseDir,'TInsel.csv'),'w')
+        f=open(os.path.join(self.DatabaseDir,'XChemExplorer.csv'),'w')
         f.write(outCSV)
         f.close()
 
@@ -413,11 +404,11 @@ class TInsel:
 
 
     def AutoprocessingResults(self):
-        # assumption: if a sample in TInsel.csv exists and dataset_outcome=success
+        # assumption: if a sample in XChemExplorer.csv exists and dataset_outcome=success
         #             then we will ignore it! Even if another maybe better run exists somewhere
         samples_to_ignore=[]
-        if os.path.isfile(os.path.join(self.DatabaseDir,'TInsel.csv')):
-            for line in open(os.path.join(self.DatabaseDir,'TInsel.csv')):
+        if os.path.isfile(os.path.join(self.DatabaseDir,'XChemExplorer.csv')):
+            for line in open(os.path.join(self.DatabaseDir,'XChemExplorer.csv')):
                 if line.split(',')[3].startswith('success'):
                     samples_to_ignore.append(line.split(',')[0])
 
@@ -487,6 +478,16 @@ class TInsel:
             fraction=0
             number_of_current_visit+=1
 
+        # at this point we have all the information
+        # now dump everything in a pickle file so that in case
+        # the user want to refresh, we don't have to scan the file system
+        # again
+#        pickle_dict={}
+#        for n, Experiment in enumerate(self.ExperimentList):
+#            Sample=Experiment[0]
+
+
+
         DatasetOutcome = [  "success",
                             "Failed - centring failed",
                             "Failed - no diffraction",
@@ -532,9 +533,6 @@ class TInsel:
         table = gtk.Table(len(self.ExperimentList), 2, False)
         for n, Experiment in enumerate(self.ExperimentList):
             Sample=Experiment[0]
-#            if Sample=='ATAD2A-x553': print Experiment
-            # a nested list that in the end will look like this:
-            # [ [[xtal1],[ButtonObject1,ButtonObject2,...]],[[xtal2],[ButtonObject1,ButtonObject2,...]],...]
             DatasetListTemp=[]
             DatasetListTemp.append(Sample)
             DatasetOutcomeListTemp=[]
@@ -581,29 +579,30 @@ class TInsel:
             self.DatasetList.append(DatasetListTemp)
 
 
+### --- old style: dataset outcome as row above crystal picture ---
+#            # top row: radio buttons for XDS outcome
+#            hboxOutcome = gtk.HBox()
+#            for index,outcome in enumerate(DatasetOutcome):
+#                if index==0:
+#                    OutComeReferenceButton=gtk.RadioButton(None,outcome)
+#                    DatasetOutcomeListTemp.append(OutComeReferenceButton)
+##                    hboxOutcome.add(OutComeReferenceButton)
+#                    hboxOutcome.pack_start(OutComeReferenceButton,False,False,12)
+#                else:
+#                    OutcomeButton=gtk.RadioButton(OutComeReferenceButton,outcome)
+#                    DatasetOutcomeListTemp.append(OutcomeButton)
+##                    hboxOutcome.add(OutcomeButton)
+#                    hboxOutcome.pack_start(OutcomeButton,False,False,12)
+#            vboxOverview.add(hboxOutcome)
+#            Space=gtk.Label('')
+#            vboxOverview.add(Space)
+#
+#            if SortedFiles == [None]:
+#                for q,button in enumerate(DatasetOutcomeListTemp):
+#                    if q==8:
+#                        button.set_active(True)
+### ---------------------------------------------------------------
 
-            # top row: radio buttons for XDS outcome
-            hboxOutcome = gtk.HBox()
-            for index,outcome in enumerate(DatasetOutcome):
-                if index==0:
-                    OutComeReferenceButton=gtk.RadioButton(None,outcome)
-                    DatasetOutcomeListTemp.append(OutComeReferenceButton)
-#                    hboxOutcome.add(OutComeReferenceButton)
-                    hboxOutcome.pack_start(OutComeReferenceButton,False,False,12)
-                else:
-                    OutcomeButton=gtk.RadioButton(OutComeReferenceButton,outcome)
-                    DatasetOutcomeListTemp.append(OutcomeButton)
-#                    hboxOutcome.add(OutcomeButton)
-                    hboxOutcome.pack_start(OutcomeButton,False,False,12)
-            vboxOverview.add(hboxOutcome)
-            Space=gtk.Label('')
-            vboxOverview.add(Space)
-
-            if SortedFiles == [None]:
-                for q,button in enumerate(DatasetOutcomeListTemp):
-                    if q==8:
-                        button.set_active(True)
-                    
 
             # Picture container
             for run in Experiment[2]:
@@ -628,6 +627,27 @@ class TInsel:
             # Experiment[4]     = images
 
 
+            hboxScoreAndResults=gtk.HBox()
+            # vertical arrangement of XDS Outcome
+            vboxOutcome=gtk.VBox()
+            for index,outcome in enumerate(DatasetOutcome):
+                if index==0:
+                    OutComeReferenceButton=gtk.RadioButton(None,outcome)
+                    OutComeReferenceButton.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("green"))
+                    DatasetOutcomeListTemp.append(OutComeReferenceButton)
+                    vboxOutcome.pack_start(OutComeReferenceButton,False,False,12)
+                else:
+                    OutcomeButton=gtk.RadioButton(OutComeReferenceButton,outcome)
+                    OutcomeButton.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("red"))
+                    DatasetOutcomeListTemp.append(OutcomeButton)
+                    vboxOutcome.pack_start(OutcomeButton,False,False,12)
+
+            if SortedFiles == [None]:
+                for q,button in enumerate(DatasetOutcomeListTemp):
+                    if q==8:
+                        button.set_active(True)
+            hboxScoreAndResults.add(vboxOutcome)
+
             liststore = gtk.ListStore(str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str)
             if SortedFiles != [None]:
                 for files in SortedFiles:
@@ -642,31 +662,34 @@ class TInsel:
                             continue
                     if files != None:
                         Aimless=parse().GetAimlessLog(files)
-                        rowIN=(    visit,
-                                   Aimless['AutoProc'],
-                                   Aimless['Run'],
-                                   Aimless['SpaceGroup'],
-                                   Aimless['UnitCell'],
-                                   Aimless['ResolutionLow']+'-'+Aimless['ResolutionHigh'],
-                                   Aimless['ResolutionLow']+'-'+Aimless['ResolutionLowInnerShell'],
-                                   Aimless['ResolutionHighOuterShell']+'-'+Aimless['ResolutionHigh'],
-                                   Aimless['RmergeOverall'],
-                                   Aimless['RmergeLow'],
-                                   Aimless['RmergeHigh'],
-                                   Aimless['IsigOverall'],
-                                   Aimless['IsigLow'],
-                                   Aimless['IsigHigh'],
-                                   Aimless['CompletenessOverall'],
-                                   Aimless['CompletenessLow'],
-                                   Aimless['CompletenessHigh'],
-                                   Aimless['MultiplicityOverall'],
-                                   Aimless['MultiplicityLow'],
-                                   Aimless['MultiplicityHigh'],
-                                   Aimless['Alert']  )
+                        rowIN=(    visit,                                                               '#CCCCCC',
+                                   Aimless['AutoProc'],                                                 '#CCCCCC',
+                                   Aimless['Run'],                                                      '#CCCCCC',
+                                   Aimless['SpaceGroup'],                                               '#CCCCCC',
+                                   Aimless['UnitCell'],                                                 '#CCCCCC',
+                                   Aimless['ResolutionLow']+'-'+Aimless['ResolutionHigh'],              '#CCCCCC',
+                                   Aimless['ResolutionLow']+'-'+Aimless['ResolutionLowInnerShell'],     '#CCCCCC',
+                                   Aimless['ResolutionHighOuterShell']+'-'+Aimless['ResolutionHigh'],   Aimless['Alert'],
+                                   Aimless['RmergeOverall'],                                            '#CCCCCC',
+                                   Aimless['RmergeLow'],                                                '#CCCCCC',
+                                   Aimless['RmergeHigh'],                                               '#CCCCCC',
+                                   Aimless['IsigOverall'],                                              '#CCCCCC',
+                                   Aimless['IsigLow'],                                                  '#CCCCCC',
+                                   Aimless['IsigHigh'],                                                 '#CCCCCC',
+                                   Aimless['CompletenessOverall'],                                      '#CCCCCC',
+                                   Aimless['CompletenessLow'],                                          '#CCCCCC',
+                                   Aimless['CompletenessHigh'],                                         '#CCCCCC',
+                                   Aimless['MultiplicityOverall'],                                      '#CCCCCC',
+                                   Aimless['MultiplicityLow'],                                          '#CCCCCC',
+                                   Aimless['MultiplicityHigh'],                                         '#CCCCCC'    )
                         liststore.append(rowIN)
             else:
-                rowIN=('###','###','###','###','###','###','###','###','###','###','###','###','###','###','###','###','###','###','###','###','#FF0000')
-                liststore.append(rowIN)   
+                rowIN=('###','#FF0000','###','#FF0000','###','#FF0000','###','#FF0000',
+                       '###','#FF0000','###','#FF0000','###','#FF0000','###','#FF0000',
+                       '###','#FF0000','###','#FF0000','###','#FF0000','###','#FF0000',
+                       '###','#FF0000','###','#FF0000','###','#FF0000','###','#FF0000',
+                       '###','#FF0000','###','#FF0000','###','#FF0000','###','#FF0000'  )
+                liststore.append(rowIN)
             treeview =gtk.TreeView(liststore)
             TreeviewListTemp.append(treeview)
 
@@ -678,13 +701,15 @@ class TInsel:
                 treeview.append_column(column_text)
                 column_text.pack_start(renderer_text,False)
                 column_text.add_attribute(renderer_text,"text",p)
-                column_text.add_attribute(renderer_text,"cell_background",20)
+                column_text.add_attribute(renderer_text,"cell_background",p+1)
 
             # always select the first row (which should be the one with the highest resolution)
             tree_selection = treeview.get_selection()
             tree_selection.select_path(0)
 
-            vboxOverview.add(treeview)
+#            vboxOverview.add(treeview)
+            hboxScoreAndResults.add(treeview)
+            vboxOutcome.add(hboxScoreAndResults)
             table.attach(vboxOverview, 1, 2, n, n+1)
             self.DatasetOutcomeList.append(DatasetOutcomeListTemp)
             self.TreeviewList.append(TreeviewListTemp)
@@ -989,5 +1014,5 @@ class TInsel:
 
 
 if __name__ == '__main__':
-    startGUI=TInsel()
+    startGUI=XChemExplorer()
     gtk.main()

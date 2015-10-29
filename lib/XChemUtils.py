@@ -7,46 +7,6 @@ import math
 import subprocess
 import getpass
 
-BLING_DIR='/dls/labxchem/data/2015/lb13385-1/processing/_PROCESSING_TEST/BLing/lib'
-
-class ExcelDatabase:
-
-    def __init__(self,ExcelFile):
-        if os.path.isfile(ExcelFile):
-            print '=> initializing Excel sheet'
-            # external libraries for openpyxl
-            import warnings
-            warnings.filterwarnings("ignore")
-            sys.path.append(BLING_DIR+'/external_packages/jdcal-1.0')
-            sys.path.append(BLING_DIR+'/external_packages/et_xmlfile-1.0.0')
-            sys.path.append(BLING_DIR+'/external_packages/openpyxl-2.3.0-b2')
-            from openpyxl import load_workbook
-            self.wb = load_workbook(ExcelFile,data_only=True)
-        else:
-            print'=> cannot find Excel file'
-        
-    def GetMountedXtalInfo(self):
-        sheet = self.wb.get_sheet_by_name('ISPyB output')
-        MountedXtal=[]
-        for rowNum in range(1, sheet.get_highest_row() + 1):
-            if sheet['Q' + str(rowNum)].value != None:
-                MountedXtal.append([sheet['Q' + str(rowNum)].value,sheet['S' + str(rowNum)].value])
-        Compounds=[]
-        print '=> reading Maybridge compounds'
-        sheet = self.wb.get_sheet_by_name('Maybridge library lookup')
-        for rowNum in range(1, sheet.get_highest_row() + 1):
-            Compounds.append([sheet['N' + str(rowNum)].value,sheet['L' + str(rowNum)].value])
-        print '=> reading 3D compounds'
-        sheet = self.wb.get_sheet_by_name('3D fragments')
-        for rowNum in range(1, sheet.get_highest_row() + 1):
-            Compounds.append([sheet['N' + str(rowNum)].value,sheet['L' + str(rowNum)].value])
-        ToDo=[]
-        for xtal in MountedXtal:
-            for compound in Compounds:
-                if xtal[1]==compound[0]:
-                    ToDo.append([xtal[0],xtal[1],compound[1]])
-        return ToDo
-
 
 class process:
 
@@ -264,7 +224,7 @@ class parse:
             if line.startswith('Space group:'):
                 Aimless['SpaceGroup']=line.replace('Space group: ','')[:-1]
 
-        Aimless['UnitCell']=a+' '+b+' '+c+' '+alpha+' '+beta+' '+gamma
+        Aimless['UnitCell']=int(a)+' '+int(b)+' '+int(c)+' '+int(alpha)+' '+int(beta)+' '+int(gamma)
 
         # Hex Color code:
         # red:      #FF0000
