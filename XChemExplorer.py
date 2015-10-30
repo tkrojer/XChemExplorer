@@ -614,10 +614,13 @@ class XChemExplorer:
                     if run[0][0] in image and run[0][2] in image:
                         imageGTK = gtk.Image()
                         if os.path.getsize(image) != 0:
-                            pic = gtk.gdk.pixbuf_new_from_file(image)
-                            scaled_pic=pic.scale_simple(256,192,gtk.gdk.INTERP_BILINEAR)
-                            imageGTK.set_from_pixbuf(scaled_pic)
-                            hboxImage.pack_start(imageGTK,False,False,2)
+                            try:
+                                pic = gtk.gdk.pixbuf_new_from_file(image)
+                                scaled_pic=pic.scale_simple(256,192,gtk.gdk.INTERP_BILINEAR)
+                                imageGTK.set_from_pixbuf(scaled_pic)
+                                hboxImage.pack_start(imageGTK,False,False,2)
+                            except GError:
+                                continue
                 vboxOverview.pack_start(hboxImage)
 
             # Experiment[0]     = xtalID

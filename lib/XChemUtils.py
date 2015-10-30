@@ -215,16 +215,16 @@ class parse:
             if line.startswith('Average unit cell:') and len(line.split())==9:
                 tmp = []
                 tmp.append(line.split())
-                a = tmp[0][3]
-                b = tmp[0][4]
-                c = tmp[0][5]
-                alpha = tmp[0][6]
-                beta = tmp[0][7]
-                gamma = tmp[0][8]
+                a = int(float(tmp[0][3]))
+                b = int(float(tmp[0][4]))
+                c = int(float(tmp[0][5]))
+                alpha = int(float(tmp[0][6]))
+                beta = int(float(tmp[0][7]))
+                gamma = int(float(tmp[0][8]))
             if line.startswith('Space group:'):
                 Aimless['SpaceGroup']=line.replace('Space group: ','')[:-1]
 
-        Aimless['UnitCell']=int(a)+' '+int(b)+' '+int(c)+' '+int(alpha)+' '+int(beta)+' '+int(gamma)
+        Aimless['UnitCell']=str(a)+' '+str(b)+' '+str(c)+' '+str(alpha)+' '+str(beta)+' '+str(gamma)
 
         # Hex Color code:
         # red:      #FF0000
