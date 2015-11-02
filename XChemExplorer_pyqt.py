@@ -5,6 +5,7 @@ from PyQt4 import QtGui, QtCore
 
 import time
 import pickle
+import base64
 
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 from XChemUtils import process
@@ -310,6 +311,10 @@ class XChemExplorer(QtGui.QApplication):
 #        data_collection_dict = pickle.load( open( "/usr/local/scripts/tobias/XChemExplorer/tmp/data_collection_dict.p", "rb" ) )
 #        data_collection_statistics_dict= pickle.load( open( "/usr/local/scripts/tobias/XChemExplorer/tmp/data_collection_statistics_dict.p", "rb" ) )
 ### ---------------------------------------------------------
+        fh = open("imageToSave.png", "wb")
+        fh.write(x.decode('base64'))
+        fh.close()
+
 
         diffraction_data_column_name = ['Program',
                                         'Run',
@@ -552,6 +557,7 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
         for key in sorted(self.dataset_outcome_dict):
             for button in self.dataset_outcome_dict[key]:
                 if button.isChecked():
+                    print key
                     print key,button.text()
         self.emit(QtCore.SIGNAL("finished()"))
 
@@ -575,19 +581,12 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             visit=visit_directory.split('/')[5]
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
                 xtal=collected_xtals[collected_xtals.rfind('/')+1:]
-                self.data_collection_dict[xtal]=[[],[],[]]
+                self.data_collection_dict[xtal]=[[],[],[],[]]
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), xtal)
-
-
                 run_list=[]
-
                 logfile_list=[]
                 image_list=[]
-
-
-#                if Sample in samples_to_ignore:
-#                    continue
-
+                image_string_list=[]
                 for runs in glob.glob(collected_xtals+'/*'):
                     run=runs[runs.rfind('/')+1:]
                     timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
@@ -613,13 +612,21 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                         image_list.append(image)
                     if image.endswith('_.png'):
                         image_list.append(image)
-
-#                self.data_collection_dict[xtal].append([run_list,image_list,logfile_list])
                 self.data_collection_dict[xtal][1]+=image_list
                 self.data_collection_dict[xtal][2]+=logfile_list
-
                 progress += progress_step
                 self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+                # convert images to strong and attach to
+                tmp=[]
+                for image in self.data_collection_dict[xtal][1]:
+                    print image[image.rfind('/')+1:]+'   '+image
+                    image_file=open(image,"rb")
+                    image_string=base64.b64encode(image_file.read())
+                    image_string_list.append((image[image.rfind('/')+1:],image_string))
+                self.data_collection_dict[xtal][3]+=image_string_list
+
+
 
         progress_step=100/float(len(self.data_collection_dict))
         progress=0

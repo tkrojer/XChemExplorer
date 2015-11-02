@@ -651,7 +651,8 @@ class XChemExplorer:
                         button.set_active(True)
             hboxScoreAndResults.add(vboxOutcome)
 
-            liststore = gtk.ListStore(str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str)
+            liststore = gtk.ListStore(str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,
+                                      str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str)
             if SortedFiles != [None]:
                 for files in SortedFiles:
                     for runs in Experiment[2]:
