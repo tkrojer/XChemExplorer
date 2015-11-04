@@ -122,6 +122,7 @@ class XChemExplorer(QtGui.QApplication):
         data_collection_button_hbox.addWidget(target_selection_combobox)
         self.tab_dict['DLS @ Data Collection'][1].addLayout(data_collection_button_hbox)
         self.target=str(target_selection_combobox.currentText())
+        self.target='ATAD2A'
 
 
 #        self.data_collection_widget=QtGui.QWidget()
@@ -306,15 +307,11 @@ class XChemExplorer(QtGui.QApplication):
         data_collection_statistics_dict=dict_list[1]
 
 ### --- used temporarily to be able to test stuff offline ---
-        pickle.dump(data_collection_dict,open('data_collection_dict.p','wb'))
-        pickle.dump(data_collection_statistics_dict,open('data_collection_statistics_dict.p','wb'))
-#        data_collection_dict = pickle.load( open( "/usr/local/scripts/tobias/XChemExplorer/tmp/data_collection_dict.p", "rb" ) )
-#        data_collection_statistics_dict= pickle.load( open( "/usr/local/scripts/tobias/XChemExplorer/tmp/data_collection_statistics_dict.p", "rb" ) )
+#        pickle.dump(data_collection_dict,open('data_collection_dict.p','wb'))
+#        pickle.dump(data_collection_statistics_dict,open('data_collection_statistics_dict.p','wb'))
+        data_collection_dict = pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p", "rb" ) )
+        data_collection_statistics_dict= pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_statistics_dict.p", "rb" ) )
 ### ---------------------------------------------------------
-        fh = open("imageToSave.png", "wb")
-        fh.write(x.decode('base64'))
-        fh.close()
-
 
         diffraction_data_column_name = ['Program',
                                         'Run',
@@ -415,13 +412,13 @@ class XChemExplorer(QtGui.QApplication):
         #-----------------------------------------------------------------------------------------------
 
         dataset_outcome = { "success":                      "rgb(0,255,0)",
-                            "Failed - centring failed":     "rgb(255,0,0)",
-                            "Failed - no diffraction":      "rgb(255,0,0)",
-                            "Failed - processing barfs":    "rgb(255,0,0)",
-                            "Failed - loop empty":          "rgb(255,0,0)",
-                            "Failed - low resolution":      "rgb(255,0,0)",
-                            "Failed - no X-rays":           "rgb(255,0,0)",
-                            "Failed - unknown":             "rgb(255,0,0)"  }
+                            "Failed - centring failed":     "rgb(255,204,204)",
+                            "Failed - no diffraction":      "rgb(255,204,204)",
+                            "Failed - processing barfs":    "rgb(255,204,204)",
+                            "Failed - loop empty":          "rgb(255,204,204)",
+                            "Failed - low resolution":      "rgb(255,204,204)",
+                            "Failed - no X-rays":           "rgb(255,204,204)",
+                            "Failed - unknown":             "rgb(255,204,204)"  }
 
 
         # And this is another test ------------------------------------------------------------------------
@@ -461,14 +458,54 @@ class XChemExplorer(QtGui.QApplication):
             for run_number,run in enumerate(data_collection_dict[key][0]):
                 label = QtGui.QLabel(run[0])
                 layout.addWidget(label,(run_number)*2,0)
-                # this nifty expression return how often a certain string appears in a list
-                for column_number,column in enumerate(sorted(filter(lambda x: run[0] in x,data_collection_dict[key][1]))):
-                    pixmap = QtGui.QPixmap(column)
-                    label = QtGui.QLabel()
-                    label.resize(320,200)
-                    label.setPixmap(pixmap.scaled(label.size(), QtCore.Qt.KeepAspectRatio))
-                    layout.addWidget(label, (run_number)*2+1, column_number)
-            vbox_cell.addLayout(layout)
+                if len(data_collection_dict[key][3]) != 0:
+#                    for column_number,column in enumerate(sorted(filter(lambda x: run[0] in x,data_collection_dict[key][3][0]))):
+                    for column_number,column in enumerate(sorted(data_collection_dict[key][3])):
+                        if run[0] in column[0]:
+                            pixmap = QtGui.QPixmap()
+                            pixmap.loadFromData(base64.b64decode(column[1]))
+                            label = QtGui.QLabel()
+                            label.resize(320,200)
+                            label.setPixmap(pixmap.scaled(label.size(), QtCore.Qt.KeepAspectRatio))
+                            layout.addWidget(label, (run_number)*2+1, column_number)
+                vbox_cell.addLayout(layout)
+
+#                        for image_string in sorted(data_collection_dict[key][3]):
+
+#                            print len(image_string)
+#                            print image_string[0], run[0]
+#                            if image_string[0] in run[0]:
+#                                print 'hallo'
+#                                print image_string[0]
+
+#                            print column[1]
+#                            print ''
+#                    pixmap = QtGui.QPixmap(column)
+#                    label = QtGui.QLabel()
+#                    label.resize(320,200)
+#                    label.setPixmap(pixmap.scaled(label.size(), QtCore.Qt.KeepAspectRatio))
+#                    layout.addWidget(label, (run_number)*2+1, column_number)
+#            vbox_cell.addLayout(layout)
+#            if len(data_collection_dict[key][3]) != 0:
+#                for image_string in sorted(data_collection_dict[key][3]):
+#                    print len(image_string)
+#                    print image_string[0]
+
+#                    print column
+#                    if len(data_collection_dict[key][3]) != 0:
+
+#                fh = open(os.getenv('XChemExplorer_DIR')+"/tmp/"+data_collection_dict[key][3][0][0]+".png", "wb")
+#        for key in data_collection_dict:
+#            if len(data_collection_dict[key][3]) != 0:
+
+#                    pixmap = QtGui.QPixmap(column)
+#                    label = QtGui.QLabel()
+#                    label.resize(320,200)
+#                    label.setPixmap(pixmap.scaled(label.size(), QtCore.Qt.KeepAspectRatio))
+#                    layout.addWidget(label, (run_number)*2+1, column_number)
+#            vbox_cell.addLayout(layout)
+
+
 
 
             hbox_for_button_and_table=QtGui.QHBoxLayout()
@@ -547,11 +584,29 @@ class XChemExplorer(QtGui.QApplication):
 
     def dataset_outcome_button_change_color(self):
         print self.sender().text()
+        for key in self.dataset_outcome_dict:
+            for button in self.dataset_outcome_dict[key]:
+                if button==self.sender():
+                    print key
+#        print 'hallo'
+#        print self.sender()
+
+
 
 class save_autoprocessing_results_to_disc(QtCore.QThread):
     def __init__(self,dataset_outcome_dict):
         QtCore.QThread.__init__(self)
         self.dataset_outcome_dict=dataset_outcome_dict
+
+        dataset_outcome = { "success":                      "rgb(153,255,204)",
+                            "Failed - centring failed":     "rgb(255,204,204)",
+                            "Failed - no diffraction":      "rgb(255,204,204)",
+                            "Failed - processing barfs":    "rgb(255,204,204)",
+                            "Failed - loop empty":          "rgb(255,204,204)",
+                            "Failed - low resolution":      "rgb(255,204,204)",
+                            "Failed - no X-rays":           "rgb(255,204,204)",
+                            "Failed - unknown":             "rgb(255,204,204)"  }
+
 
     def run(self):
         for key in sorted(self.dataset_outcome_dict):
@@ -628,7 +683,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 
 
 
-        progress_step=100/float(len(self.data_collection_dict))
+        if not len(self.data_collection_dict)==0:
+            progress_step=100/float(len(self.data_collection_dict))
         progress=0
         for key in sorted(self.data_collection_dict):
             self.data_collection_statistics_dict[key]=[]
