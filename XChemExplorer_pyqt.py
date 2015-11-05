@@ -6,6 +6,7 @@ from PyQt4 import QtGui, QtCore
 import time
 import pickle
 import base64
+import math
 
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 from XChemUtils import process
@@ -29,6 +30,7 @@ class XChemExplorer(QtGui.QApplication):
         self.beamline_directory=os.path.join(self.project_directory,'processing','beamline')
         self.initial_model_directory=os.path.join(self.project_directory,'processing','analysis','initial_model')
         self.refine_model_directory=os.path.join(self.project_directory,'processing','analysis','refine_model')
+        self.reference_directory=os.path.join(self.project_directory,'processing','reference')
 
 #        self.FindHitsDir=self.project_directory+'/processing/analysis/find_hits'
 #        self.DatabaseDir=self.project_directory+'/processing/database'
@@ -42,6 +44,7 @@ class XChemExplorer(QtGui.QApplication):
         self.target=''
         self.dataset_outcome_dict={}            # contains the dataset outcome buttons
         self.data_collection_table_dict={}      # contains the dataset table
+        self.data_collection_statistics_dict={}
         self.target_list=[]
         for dir in glob.glob(self.beamline_directory+'/*'):
             self.visit_list.append(os.path.realpath(dir))
@@ -105,7 +108,6 @@ class XChemExplorer(QtGui.QApplication):
 
 
         # DLS @ Data Collection Tab
-        # main vbox in tab: self.tab_dict['DLS @ Data Collection'][1]
         self.data_collection_vbox_for_table=QtGui.QVBoxLayout()
         self.tab_dict['DLS @ Data Collection'][1].addLayout(self.data_collection_vbox_for_table)
         data_collection_button_hbox=QtGui.QHBoxLayout()
@@ -125,51 +127,35 @@ class XChemExplorer(QtGui.QApplication):
         self.target='ATAD2A'
 
 
-#        self.data_collection_widget=QtGui.QWidget()
-#        self.tab_dict['DLS @ Data Collection'][1].addWidget(self.data_collection_widget)
-#        self.data_collection_vbox_for_table=QtGui.QVBoxLayout()
-#        self.data_collection_scrolled_area=QtGui.QScrollArea()
-#        self.data_collection_vbox_for_table.setSizeConstraint(QtGui.QLayout.SetMinAndMaxSize)
+        # Initial Model Tab
+        initial_model_checkbutton_hbox=QtGui.QHBoxLayout()
+        select_sample_for_dimple = QtGui.QCheckBox('(de-)select all samples for DIMPLE')
+        select_sample_for_dimple.toggle()
+#        select_sample_for_dimple.connect(self.set_run_dimple_flag)
+        initial_model_checkbutton_hbox.addWidget(select_sample_for_dimple)
+        self.tab_dict['Initial Model'][1].addLayout(initial_model_checkbutton_hbox)
+        self.initial_model_vbox_for_table=QtGui.QVBoxLayout()
+        self.tab_dict['Initial Model'][1].addLayout(self.initial_model_vbox_for_table)
+        initial_model_button_hbox=QtGui.QHBoxLayout()
+        get_initial_model_button=QtGui.QPushButton("Load Samples")
+        get_initial_model_button.clicked.connect(self.button_clicked)
+        initial_model_button_hbox.addWidget(get_initial_model_button)
+        run_dimple_button=QtGui.QPushButton("Run Dimple")
+        run_dimple_button.clicked.connect(self.button_clicked)
+        initial_model_button_hbox.addWidget(run_dimple_button)
+        refresh_inital_model_button=QtGui.QPushButton("Refresh")
+        refresh_inital_model_button.clicked.connect(self.button_clicked)
+        initial_model_button_hbox.addWidget(refresh_inital_model_button)
+        reference_file_list=self.get_reference_file_list()
+        reference_file_selection_combobox = QtGui.QComboBox()
+        for reference_file in reference_file_list:
+            reference_file_selection_combobox.addItem(reference_file[0])
+        initial_model_button_hbox.addWidget(reference_file_selection_combobox)
+        set_new_reference_button=QtGui.QPushButton("Set New Reference (if applicable)")
+        set_new_reference_button.clicked.connect(self.button_clicked)
+        initial_model_button_hbox.addWidget(set_new_reference_button)
+        self.tab_dict['Initial Model'][1].addLayout(initial_model_button_hbox)
 
-#        self.tab_dict['DLS @ Data Collection'][1].addLayout(self.data_collection_vbox_for_table)
-#        self.data_collection_scrolled_area=QtGui.QScrollArea()
-#        self.data_collection_scrolled_area.setWidget(self.tab_dict['DLS @ Data Collection'][1])
-
-#        self.tab_dict['DLS @ Data Collection'][1].addLayout(self.data_collection_vbox_for_table)
-#        data_collection_vbox.addLayout(self.data_collection_vbox_for_table)
-
-#        data_collection_button_hbox=QtGui.QHBoxLayout()
-#        get_data_collection_button=QtGui.QPushButton("Get New Results from Autoprocessing")
-#        get_data_collection_button.clicked.connect(self.button_clicked)
-#        data_collection_button_hbox.addWidget(get_data_collection_button)
-#        write_files_button=QtGui.QPushButton("Save Files from Autoprocessing in 'inital_model' Folder")
-#        data_collection_button_hbox.addWidget(write_files_button)
-#        data_collection_vbox.addLayout(data_collection_button_hbox)
-#        self.tab_dict['DLS @ Data Collection'][1].addLayout(data_collection_button_hbox)
-
-
-#        # DLS @ Data Collection Tab
-#        data_collection_vbox=QtGui.QVBoxLayout()
-#
-#        self.data_collection_vbox_for_table=QtGui.QVBoxLayout()
-##        self.data_collection_scrolled_area=QtGui.QScrollArea()
-#        self.data_collection_vbox_for_table.setSizeConstraint(QtGui.QLayout.SetMinAndMaxSize)
-#
-##        self.tab_dict['DLS @ Data Collection'][1].addLayout(self.data_collection_vbox_for_table)
-##        self.data_collection_scrolled_area=QtGui.QScrollArea()
-##        self.data_collection_scrolled_area.setWidget(self.tab_dict['DLS @ Data Collection'][1])
-#
-##        self.tab_dict['DLS @ Data Collection'][1].addLayout(self.data_collection_vbox_for_table)
-#        data_collection_vbox.addLayout(self.data_collection_vbox_for_table)
-#
-#        data_collection_button_hbox=QtGui.QHBoxLayout()
-#        get_data_collection_button=QtGui.QPushButton("Get New Results from Autoprocessing")
-#        get_data_collection_button.clicked.connect(self.button_clicked)
-#        data_collection_button_hbox.addWidget(get_data_collection_button)
-#        write_files_button=QtGui.QPushButton("Save Files from Autoprocessing in 'inital_model' Folder")
-#        data_collection_button_hbox.addWidget(write_files_button)
-#        data_collection_vbox.addLayout(data_collection_button_hbox)
-#        self.tab_dict['DLS @ Data Collection'][1].addLayout(data_collection_vbox)
 
 
 
@@ -218,17 +204,20 @@ class XChemExplorer(QtGui.QApplication):
 ### -------------------------------------------------------------------
 ### --- this works but disabled so that stuff can be tested offline ---
             if self.sender().text()=='Get New Results from Autoprocessing':
-                self.work_thread=read_autoprocessing_results_from_disc(self.visit_list,self.target)
-            self.explorer_active=1
-            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-            self.connect(self.work_thread, QtCore.SIGNAL("create_widgets_for_autoprocessing_results"),
-                                                     self.create_widgets_for_autoprocessing_results)
-            self.work_thread.start()
+                reference_file_list=self.get_reference_file_list()
+                self.work_thread=read_autoprocessing_results_from_disc(self.visit_list,self.target,reference_file_list)
+                self.explorer_active=1
+                self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+                self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+                self.connect(self.work_thread, QtCore.SIGNAL("create_widgets_for_autoprocessing_results"),
+                                                         self.create_widgets_for_autoprocessing_results)
+                self.work_thread.start()
 ### -------------------------------------------------------------------
             if self.sender().text()=="Save Files from Autoprocessing in 'inital_model' Folder":
-                self.work_thread=save_autoprocessing_results_to_disc(self.dataset_outcome_dict,self.data_collection_table_dict)
+                self.work_thread=save_autoprocessing_results_to_disc(self.dataset_outcome_dict,
+                                                                     self.data_collection_table_dict,
+                                                                     self.data_collection_statistics_dict)
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                 self.work_thread.start()
 #                and self.sender().text()=='Get New Results from Autoprocessing':
@@ -304,7 +293,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def create_widgets_for_autoprocessing_results(self,dict_list):
         data_collection_dict=dict_list[0]
-        data_collection_statistics_dict=dict_list[1]
+        self.data_collection_statistics_dict=dict_list[1]
 
         # reset the two dictionaries which contain the buttons and tables for each data collection
         self.dataset_outcome_dict={}
@@ -314,28 +303,8 @@ class XChemExplorer(QtGui.QApplication):
 #        pickle.dump(data_collection_dict,open('data_collection_dict.p','wb'))
 #        pickle.dump(data_collection_statistics_dict,open('data_collection_statistics_dict.p','wb'))
         data_collection_dict = pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p", "rb" ) )
-        data_collection_statistics_dict= pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_statistics_dict.p", "rb" ) )
+        self.data_collection_statistics_dict= pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_statistics_dict.p", "rb" ) )
 ### ---------------------------------------------------------
-
-        diffraction_data_column_name = ['Program',
-                                        'Run',
-                                        'SpaceGroup',
-                                        'Unit Cell',
-                                        'Resolution\nOverall',
-                                        'Resolution\nInner Shell',
-                                        'Resolution\nOuter Shell',
-                                        'Rmerge\nOverall',
-                                        'Rmerge\nInner Shell',
-                                        'Rmerge\nOuter Shell',
-                                        'Mn(I/sig(I))\nOverall',
-                                        'Mn(I/sig(I))\nInner Shell',
-                                        'Mn(I/sig(I))\nOuter Shell',
-                                        'Completeness\nOverall',
-                                        'Completeness\nInner Shell',
-                                        'Completeness\nOuter Shell',
-                                        'Multiplicity\nOverall',
-                                        'Multiplicity\nInner Shell',
-                                        'Multiplicity\nOuter Shell' ]
 
 
         diffraction_data_column_name = ['Program',                      (200,200,200),
@@ -381,10 +350,14 @@ class XChemExplorer(QtGui.QApplication):
         table.setRowCount(len(data_collection_dict))
         table.setColumnCount(3)
 
-        for row,key in enumerate(sorted(data_collection_statistics_dict)):
+        for row,key in enumerate(sorted(self.data_collection_statistics_dict)):
             self.dataset_outcome_dict[key]=[]
             # this is the main table
+
+            # column 1: sample ID
             table.setItem(row, 0, QtGui.QTableWidgetItem(key))
+
+            # column 2: data collection date
             table.setItem(row, 1, QtGui.QTableWidgetItem(data_collection_dict[key][0][0][1]))
 
             # column 3:
@@ -420,7 +393,7 @@ class XChemExplorer(QtGui.QApplication):
                 vbox_cell.addLayout(layout)
 
             hbox_for_button_and_table=QtGui.QHBoxLayout()
-            # dataset outcome buttons
+            # dataset outcome buttons1
             dataset_outcome_groupbox=QtGui.QGroupBox()
             dataset_outcome_vbox=QtGui.QVBoxLayout()
             for outcome in sorted(self.dataset_outcome):
@@ -437,75 +410,31 @@ class XChemExplorer(QtGui.QApplication):
             dataset_outcome_groupbox.setLayout(dataset_outcome_vbox)
             hbox_for_button_and_table.addWidget(dataset_outcome_groupbox)
 
-            # before creating the table with the results, try to guess which one to select
-            # 1. check if there are reference mtz files
-            # 1a. if so: take all logfiles forward that fit to the first one found
-            #     'fit means': same lattice and delta Vunitcell < 5%
-            # 2. if possible: select all datasets with Rmerge low < 5%
-            # 3. finally select the dataset with
-            #    max(unique_reflections*completeness*Mn(I/sig<I>)
-
-            # first read values from logfiles
-            aimless_compare_list=[]
-            for index,logfile in enumerate(self.data_collection_dict[key][2]):
-                aimless_results=parse().GetAimlessLog(logfile)
-                aimless_compare_list.append([index,
-                                         aimless_results['Lattice'],
-                                         float(aimless_results['UniqueReflectionsOverall']),
-                                         float(aimless_results['CompletenessOverall']),
-                                         float(aimless_results['IsigOverall']),
-                                         float(aimless_results['UnitCellVolume']),
-                                         float(aimless_results['RmergeLow'])]   )
-            # now get information from reference files
-            reference_file_list=self.get_reference_file_list()
-
-            # if possible, select only the ones which have the same lattice and
-            # a unit cell volume difference of less than 5%
-            select_stage_one_list = []
-            if reference_file_list != []:
-                for reference_file in reference_file_list:
-                    for aimless_file in aimless_compare_list:
-                        unitcell_difference=round((math.fabs(reference_file[4]-aimless_results[5])/reference_file[4])*100,1)
-                        if unitcell_difference < 5:
-                            select_stage_one_list.append(aimless_file)
-            else:
-                select_stage_one_list=aimless_compare_list
-
-            # if possible, select only the ones with Rmerge < 5%
-            select_stage_two_list=[]
-            for aimless_file in select_stage_one_list:
-                if aimless_file[6] < 0.05:
-                    select_stage_two_list.append(aimless_file)
-            if select_stage_two_list==[]:
-                select_stage_two_list=select_stage_one_list
-
-            # finally, select the file with the highest
-            # max(unique_reflections*completeness*Mn(I/sig<I>)
-            select_stage_three_list=[]
-            for aimless_file in select_stage_two_list:
-                select_stage_three_list.append([select_stage_two_list[0],
-                                                select_stage_two_list[2] \
-                                                * select_stage_two_list[3] \
-                                                * select_stage_two_list[4]])
-            print select_stage_three_list
-
             # table for data processing results
             data_collection_table=QtGui.QTableWidget()
-            data_collection_table.setRowCount(len(data_collection_statistics_dict[key]))
+            data_collection_table.setRowCount(len(self.data_collection_statistics_dict[key]))
             data_collection_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-            data_collection_table.setColumnCount(len(data_collection_statistics_dict[key][0])-1)
-            for n,line in enumerate(data_collection_statistics_dict[key]):
-                for column,item in enumerate(line[1:]):
+            data_collection_table.setColumnCount(len(self.data_collection_statistics_dict[key][0])-1)
+            for n,line in enumerate(self.data_collection_statistics_dict[key]):
+                for column,item in enumerate(line[2:20]):
                     cell_text=QtGui.QTableWidgetItem()
                     cell_text.setText(str(item))
                     data_collection_table.setItem(n, column, cell_text)
 #                    data_collection_table.item(n,column).setBackground(QtGui.QColor(100,100,150))
-                    print diffraction_data_column_name[1]
-                    data_collection_table.item(n,column).setBackground(QtGui.QColor(diffraction_data_column_name[1]))
-            data_collection_table.selectRow(1)
+#                    print diffraction_data_column_name[1]
+#                    data_collection_table.item(n,column).setBackground(QtGui.QColor(diffraction_data_column_name[1]))
+                    if line[27]==True:
+                        data_collection_table.selectRow(n)
             # some_list[start:stop:step]
             data_collection_table.setHorizontalHeaderLabels(diffraction_data_column_name[0::2])
             data_collection_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+
+            # this is necessary to render table properly
+#            data_collection_table.verticalHeader().setStretchLastSection(False)
+            data_collection_table.resizeRowsToContents()
+            data_collection_table.horizontalHeader().setStretchLastSection(False)
+            data_collection_table.verticalHeader().setStretchLastSection(True)
+
             hbox_for_button_and_table.addWidget(data_collection_table)
             vbox_cell.addLayout(hbox_for_button_and_table)
             self.data_collection_table_dict[key]=data_collection_table
@@ -535,24 +464,15 @@ class XChemExplorer(QtGui.QApplication):
                     unitcell_reference=mtz_reference['unitcell']
                     lattice_reference=mtz_reference['bravais_lattice']
                     unitcell_volume_reference=mtz_reference['unitcell_volume']
-                    if self.reference_file_root=='':
-                        reference_file_list.append([reference_root,
-                                                    spg_reference,
-                                                    unitcell_reference,
-                                                    lattice_reference,
-                                                    unitcell_volume_reference])
-                    else:
-                        if reference_root==self.reference_file_root:
-                            reference_file_list.append([reference_root,
-                                                        spg_reference,
-                                                        unitcell_reference,
-                                                        lattice_reference,
-                                                        unitcell_volume_reference])
+                    reference_file_list.append([reference_root,
+                                                spg_reference,
+                                                unitcell_reference,
+                                                lattice_reference,
+                                                unitcell_volume_reference])
         return reference_file_list
 
 
     def dataset_outcome_button_change_color(self):
-
 #        print self.sender().text()
         for key in self.dataset_outcome_dict:
             for button in self.dataset_outcome_dict[key]:
@@ -569,39 +489,56 @@ class XChemExplorer(QtGui.QApplication):
 #        print 'hallo'
 #        print self.sender()
 
+    def set_run_dimple_flag(self,state):
+        if state == QtCore.Qt.Checked:
+            print 'checked'
+        else:
+            print 'not checked'
+
 
 
 class save_autoprocessing_results_to_disc(QtCore.QThread):
-    def __init__(self,dataset_outcome_dict,data_collection_table_dict):
+    def __init__(self,dataset_outcome_dict,data_collection_table_dict,data_collection_statistics_dict):
         QtCore.QThread.__init__(self)
         self.dataset_outcome_dict=dataset_outcome_dict
         self.data_collection_table_dict=data_collection_table_dict
+        self.data_collection_statistics_dict=data_collection_statistics_dict
 
     def run(self):
+        if not len(self.dataset_outcome_dict)==0:
+            progress_step=100/float(len(self.dataset_outcome_dict))
+        progress=0
+
         for key in sorted(self.dataset_outcome_dict):
             for button in self.dataset_outcome_dict[key]:
                 if button.isChecked():
-                    print key
                     print key,button.text()
-#            indexes = table.selectionModel().selectedRows()
-            print self.data_collection_table_dict[key].selectionModel().selectedRows()
+
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing files from data processing to inital_model folder ->'+key)
+            indexes=self.data_collection_table_dict[key].selectionModel().selectedRows()
+#            for index in sorted(indexes):
+#                print self.data_collection_table_dict[key]
+#                print self.data_collection_statistics_dict[key][index.row()]
+#                print('Row %d is selected' % index.row())
+
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
         self.emit(QtCore.SIGNAL("finished()"))
 
 
 class read_autoprocessing_results_from_disc(QtCore.QThread):
-    def __init__(self,visit_list,target):
+    def __init__(self,visit_list,target,reference_file_list):
         QtCore.QThread.__init__(self)
         self.visit_list=visit_list
         self.target=target
+        self.reference_file_list=reference_file_list
         self.data_collection_dict={}
         self.data_collection_statistics_dict={}
 
-#        self.data_collection_run_dict={}
-#        self.data_collection_image_dict={}
-#        self.data_collection_logfile_dict={}
-
     def run(self):
+        number_of_visits_to_search=len(self.visit_list)
+        search_cycle=1
         for visit_directory in sorted(self.visit_list):
             progress_step=100/float(len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))))
             progress=0
@@ -609,7 +546,9 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
                 xtal=collected_xtals[collected_xtals.rfind('/')+1:]
                 self.data_collection_dict[xtal]=[[],[],[],[]]
-                self.emit(QtCore.SIGNAL('update_status_bar(QString)'), xtal)
+                self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 1 of 3: searching visit '+ \
+                                                                       str(search_cycle)+' of '+str(number_of_visits_to_search)+ \
+                                                                       ' ('+visit+'/'+xtal+')')
                 run_list=[]
                 logfile_list=[]
                 image_list=[]
@@ -635,8 +574,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                 for image in glob.glob(visit_directory+'/jpegs/'+self.target+'/'+xtal+'/*'):
                     if image.endswith('t.png'):
                         image_list.append(image)
-                    if image.endswith('thumb.jpeg'):
-                        image_list.append(image)
+#                    if image.endswith('thumb.jpeg'):
+#                        image_list.append(image)
                     if image.endswith('_.png'):
                         image_list.append(image)
                 self.data_collection_dict[xtal][1]+=image_list
@@ -647,62 +586,121 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                 # convert images to strong and attach to
                 tmp=[]
                 for image in self.data_collection_dict[xtal][1]:
-                    print image[image.rfind('/')+1:]+'   '+image
                     image_file=open(image,"rb")
                     image_string=base64.b64encode(image_file.read())
                     image_string_list.append((image[image.rfind('/')+1:],image_string))
                 self.data_collection_dict[xtal][3]+=image_string_list
 
-
+            search_cycle+=1
 
         if not len(self.data_collection_dict)==0:
             progress_step=100/float(len(self.data_collection_dict))
         progress=0
-        for key in sorted(self.data_collection_dict):
-            self.data_collection_statistics_dict[key]=[]
-            if not self.data_collection_dict[key][2]==[]:
-                for logfile in self.data_collection_dict[key][2]:
-                    self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'parsing aimless logfiles of '+key)
+        for sample in sorted(self.data_collection_dict):
+            self.data_collection_statistics_dict[sample]=[]
+            if not self.data_collection_dict[sample][2]==[]:
+                for index,logfile in enumerate(self.data_collection_dict[sample][2]):
+                    self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 2 of 3: parsing aimless logfiles ->'+sample)
                     aimless_results=parse().GetAimlessLog(logfile)
-                    self.data_collection_statistics_dict[key].append([
-                                logfile,
-                                aimless_results['AutoProc'],
-                                aimless_results['Run'],
-                                aimless_results['SpaceGroup'],
-                                aimless_results['UnitCell'],
-                                aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionHigh'],
-                                aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionLowInnerShell'],
-                                aimless_results['ResolutionHighOuterShell']+'-'+aimless_results['ResolutionHigh'],
-                                aimless_results['RmergeOverall'],
-                                aimless_results['RmergeLow'],
-                                aimless_results['RmergeHigh'],
-                                aimless_results['IsigOverall'],
-                                aimless_results['IsigLow'],
-                                aimless_results['IsigHigh'],
-                                aimless_results['CompletenessOverall'],
-                                aimless_results['CompletenessLow'],
-                                aimless_results['CompletenessHigh'],
-                                aimless_results['MultiplicityOverall'],
-                                aimless_results['MultiplicityLow'],
-                                aimless_results['MultiplicityHigh'] ])
+                    self.data_collection_statistics_dict[sample].append([
+                                index,                                                                                      # 0
+                                logfile,                                                                                    # 1
+                                aimless_results['AutoProc'],                                                                # 2
+                                aimless_results['Run'],                                                                     # 3
+                                aimless_results['SpaceGroup'],                                                              # 4
+                                aimless_results['UnitCell'],                                                                # 5
+                                aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionHigh'],                     # 6
+                                aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionLowInnerShell'],            # 7
+                                aimless_results['ResolutionHighOuterShell']+'-'+aimless_results['ResolutionHigh'],          # 8
+                                aimless_results['RmergeOverall'],                                                           # 9
+                                aimless_results['RmergeLow'],                                                               # 10
+                                aimless_results['RmergeHigh'],                                                              # 11
+                                aimless_results['IsigOverall'],                                                             # 12
+                                aimless_results['IsigLow'],                                                                 # 13
+                                aimless_results['IsigHigh'],                                                                # 14
+                                aimless_results['CompletenessOverall'],                                                     # 15
+                                aimless_results['CompletenessLow'],                                                         # 16
+                                aimless_results['CompletenessHigh'],                                                        # 17
+                                aimless_results['MultiplicityOverall'],                                                     # 18
+                                aimless_results['MultiplicityLow'],                                                         # 19
+                                aimless_results['MultiplicityHigh'],                                                        # 20
+                                aimless_results['Lattice'],                                                                 # 21
+                                float(aimless_results['UniqueReflectionsOverall']),                                         # 22
+                                float(aimless_results['CompletenessOverall']),                                              # 23
+                                float(aimless_results['IsigOverall']),                                                      # 24
+                                float(aimless_results['UnitCellVolume']),                                                   # 25
+                                float(aimless_results['RmergeLow']),                                                        # 26
+                                False                                                                                       # 27
+                                        ])
             else:
-                self.data_collection_statistics_dict[key]+='###'*20
+                self.data_collection_statistics_dict[sample]+='###'*20
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
-#            print self.data_collection_dict[key]
-#        print self.data_collection_dict['ATAD2A-x367']
-#        print ''
-#        print self.data_collection_dict['ATAD2A-x367'][0]
-#        print ''
-#        print self.data_collection_dict['ATAD2A-x367'][1]
-#        print ''
-#        print self.data_collection_dict['ATAD2A-x367'][2]
-#        return
 
 
-#        hbox_status.addWidget(self.status_bar)
-#        hbox_status.addWidget(self.progress_bar)
+        # before creating the table with the results, try to guess which one to select
+        # 1. check if there are reference mtz files
+        # 1a. if so: take all logfiles forward that fit to the first one found
+        #     'fit means': same lattice and delta Vunitcell < 5%
+        # 2. if possible: select all datasets with Rmerge low < 5%
+        # 3. finally select the dataset with
+        #    max(unique_reflections*completeness*Mn(I/sig<I>)
+
+        if not len(self.data_collection_statistics_dict)==0:
+            progress_step=100/float(len(self.data_collection_statistics_dict))
+        progress=0
+
+        # if possible, select only the ones which have the same lattice and
+        # a unit cell volume difference of less than 5%
+        for sample in sorted(self.data_collection_statistics_dict):
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 3 of 3: selecting "best" aimless logfile ->'+sample)
+            if self.data_collection_statistics_dict[sample][0]=='#':
+                continue
+            select_stage_one_list = []
+            found=0
+            if self.reference_file_list != []:
+                for reference_file in self.reference_file_list:
+                    for aimless_file in self.data_collection_statistics_dict[sample]:
+                        try:
+                            unitcell_difference=round((math.fabs(reference_file[4]-aimless_file[25])/reference_file[4])*100,1)
+                            if unitcell_difference < 5 and reference_file[3]==aimless_file[21]:
+                                select_stage_one_list.append(aimless_file)
+                                found=1
+                        except IndexError:
+                            pass
+                if not found:                                                   # in case no file fullfils the criteria
+                    for aimless_file in self.data_collection_statistics_dict[sample]:
+                        if aimless_file != []:
+                            select_stage_one_list.append(aimless_file)
+            else:                                                               # in case no reference files are available
+                for aimless_file in self.data_collection_statistics_dict[sample]:
+                    if aimless_file != []:
+                        select_stage_one_list.append(aimless_file)
+
+            # if possible, select only the ones with Rmerge < 5%
+            select_stage_two_list=[]
+            for aimless_file in select_stage_one_list:
+                if aimless_file[26] < 0.05:
+                    select_stage_two_list.append(aimless_file)
+            if select_stage_two_list==[]:
+                select_stage_two_list=select_stage_one_list
+
+            # finally, select the file with the highest
+            # max(unique_reflections*completeness*Mn(I/sig<I>)
+            select_stage_three_list=[]
+            for aimless_file in select_stage_two_list:
+                select_stage_three_list.append([aimless_file[0],
+                                                aimless_file[22] \
+                                                * aimless_file[23] \
+                                                * aimless_file[24]])
+            if select_stage_three_list != []:
+                best_file_index=max(select_stage_three_list,key=lambda x: x[1])[0]
+                for index,results in enumerate(self.data_collection_statistics_dict[sample]):
+                    if index==best_file_index:
+                        self.data_collection_statistics_dict[sample][index][27]=True
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
         self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results'), [self.data_collection_dict,
                                                                                self.data_collection_statistics_dict])

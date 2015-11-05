@@ -230,12 +230,12 @@ class parse:
                 Aimless['SpaceGroup']=line.replace('Space group: ','')[:-1]
                 Aimless['Lattice']=self.get_lattice_from_space_group(Aimless['SpaceGroup'])
                 if a != 'n/a' and b != 'n/a' and c != 'n/a' and \
-                   alpha != 'n/a' and beta != 'n/a' and gamma != 'n/a' and lattice != 'n/a':
+                   alpha != 'n/a' and beta != 'n/a' and gamma != 'n/a' and Aimless['Lattice'] != 'n/a':
                     Aimless['UnitCellVolume']=self.calc_unitcell_volume_from_logfile(float(a),float(b),float(c),
                                                                                  math.radians(float(alpha)),
                                                                                  math.radians(float(beta)),
                                                                                  math.radians(float(gamma)),
-                                                                                 lattice)
+                                                                                 Aimless['Lattice'])
         Aimless['UnitCell']=str(a)+' '+str(b)+' '+str(c)+' '+str(alpha)+' '+str(beta)+' '+str(gamma)
 
         # Hex Color code:
@@ -283,15 +283,6 @@ class parse:
 
 
     def calc_unitcell_volume_from_logfile(self,a,b,c,alpha,beta,gamma,lattice):
-        spg_number=self.get_spg_number_from_mtz()
-        lattice=self.get_bravais_lattice_from_spg_number(spg_number)
-        unitcell=self.get_unit_cell_from_mtz()
-        a=float(unitcell[0])
-        b=float(unitcell[1])
-        c=float(unitcell[2])
-        alpha=math.radians(float(unitcell[3]))
-        beta= math.radians(float(unitcell[4]))
-        gamma=math.radians(float(unitcell[5]))
         unitcell_volume=0
         if lattice=='triclinic':
             unitcell_volume=a*b*c* \
