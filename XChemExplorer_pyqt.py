@@ -89,7 +89,7 @@ class XChemExplorer(QtGui.QApplication):
                         'DLS @ Data Collection',
                         'Initial Model',
                         'PANDDAs',
-                        'Summary',
+                        'Summary & Refine',
                         'Queue Control',
                         'Settings'  ]
         self.tab_dict={}
@@ -100,11 +100,21 @@ class XChemExplorer(QtGui.QApplication):
             self.tab_dict[page]=[tab,vbox]
 
         # Mounted Crystals Tab
-        self.mounted_crystals_widget=QtGui.QWidget()
-        self.tab_dict['Mounted Crystals'][1].addWidget(self.mounted_crystals_widget)
-        get_mounted_crystals_button=QtGui.QPushButton("\nLoad Samples\n")
+        self.mounted_crystals_vbox_for_table=QtGui.QVBoxLayout()
+        self.tab_dict['Mounted Crystals'][1].addLayout(self.mounted_crystals_vbox_for_table)
+        mounted_crystals_button_hbox=QtGui.QHBoxLayout()
+
+
+        get_mounted_crystals_button=QtGui.QPushButton("Load Samples From Datasource")
         get_mounted_crystals_button.clicked.connect(self.button_clicked)
-        self.tab_dict['Mounted Crystals'][1].addWidget(get_mounted_crystals_button)
+        mounted_crystals_button_hbox.addWidget(get_mounted_crystals_button)
+
+        create_png_of_soaked_compound_button=QtGui.QPushButton("Create PNG file of Soaked Compound")
+        create_png_of_soaked_compound_button.clicked.connect(self.button_clicked)
+        mounted_crystals_button_hbox.addWidget(create_png_of_soaked_compound_button)
+
+
+        self.tab_dict['Mounted Crystals'][1].addLayout(mounted_crystals_button_hbox)
 
 
         # DLS @ Data Collection Tab
@@ -156,7 +166,20 @@ class XChemExplorer(QtGui.QApplication):
         initial_model_button_hbox.addWidget(set_new_reference_button)
         self.tab_dict['Initial Model'][1].addLayout(initial_model_button_hbox)
 
-
+        # Summary & Refine Tab
+        self.summary_vbox_for_table=QtGui.QVBoxLayout()
+        self.tab_dict['Summary & Refine'][1].addLayout(self.summary_vbox_for_table)
+        summary_button_hbox=QtGui.QHBoxLayout()
+        load_all_samples_button=QtGui.QPushButton("Load All Samples")
+        load_all_samples_button.clicked.connect(self.button_clicked)
+        summary_button_hbox.addWidget(load_all_samples_button)
+        refresh_all_samples_button=QtGui.QPushButton("Refresh All Samples")
+        refresh_all_samples_button.clicked.connect(self.button_clicked)
+        summary_button_hbox.addWidget(refresh_all_samples_button)
+        open_cootl_button=QtGui.QPushButton("Open COOT")
+        open_cootl_button.clicked.connect(self.button_clicked)
+        summary_button_hbox.addWidget(open_cootl_button)
+        self.tab_dict['Summary & Refine'][1].addLayout(summary_button_hbox)
 
 
         self.status_bar=QtGui.QStatusBar()
@@ -220,6 +243,11 @@ class XChemExplorer(QtGui.QApplication):
                                                                      self.data_collection_statistics_dict)
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                 self.work_thread.start()
+
+            if self.sender().text()=="Load All Samples":
+                print 'hallo'
+
+
 #                and self.sender().text()=='Get New Results from Autoprocessing':
 #            self.explorer_active=1
 #            threading.Thread(target=self.read_autoprocessing_results_from_disc, args=()).start()
