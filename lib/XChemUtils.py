@@ -161,6 +161,9 @@ class parse:
                     'MultiplicityOverall': 'n/a',
                     'MultiplicityLow': 'n/a',
                     'MultiplicityHigh': 'n/a',
+                    'UniqueReflectionsOverall': 'n/a',
+                    'Lattice': 'n/a',
+                    'UnitCellVolume': 0,
                     'Alert': '#FF0000' }
 
         spg='n/a'
@@ -221,9 +224,18 @@ class parse:
                 alpha = int(float(tmp[0][6]))
                 beta = int(float(tmp[0][7]))
                 gamma = int(float(tmp[0][8]))
+            if line.startswith('Total number unique') and len(line.split())==6:
+                Aimless['UniqueReflectionsOverall']=line.split()[3]
             if line.startswith('Space group:'):
                 Aimless['SpaceGroup']=line.replace('Space group: ','')[:-1]
-
+                Aimless['Lattice']=self.get_lattice_from_space_group(Aimless['SpaceGroup'])
+                if a != 'n/a' and b != 'n/a' and c != 'n/a' and \
+                   alpha != 'n/a' and beta != 'n/a' and gamma != 'n/a' and lattice != 'n/a':
+                    Aimless['UnitCellVolume']=self.calc_unitcell_volume_from_logfile(float(a),float(b),float(c),
+                                                                                 math.radians(float(alpha)),
+                                                                                 math.radians(float(beta)),
+                                                                                 math.radians(float(gamma)),
+                                                                                 lattice)
         Aimless['UnitCell']=str(a)+' '+str(b)+' '+str(c)+' '+str(alpha)+' '+str(beta)+' '+str(gamma)
 
         # Hex Color code:
@@ -244,6 +256,56 @@ class parse:
                 Aimless['Alert'] = '#00FF00'
 
         return Aimless
+
+    def get_lattice_from_space_group(self,logfile_spacegroup):
+        lattice_type='n/a'
+        self.space_group_dict=   {  'triclinic':    ['P1'],
+                                    'monoclinic':   ['P2','P21','C121'],
+                                    'orthorhombic': ['P222','P2122','P2212','P2221',
+                                                     'P21212','P21221','P22121','P212121',
+                                                     'C222','C2221'],
+                                    'tetragonal':   ['P4','P41','P42','P43','I4','I41',
+                                                     'P422','P4212','P4122','P41212','P4222',
+                                                     'P42212','P4322','P43212','I422','I4122' ],
+                                    'hexagonal':    ['P3','P31','P32',
+                                                     'P312','P321','P3112','P3121','P3212','P3221',
+                                                     'P6','P61','P65','P62','P64','P63',
+                                                     'P622','P6122','P6522','P6222','P6422','P6322'    ],
+                                    'rhombohedral': ['H3','H32'],
+                                    'cubic':        ['P23','F23','I23','P213','I213',
+                                                     'P432','P4232','F432','F4132','I432','P4332','P4132','I4132' ] }
+        for lattice in self.space_group_dict:
+            for spacegroup in self.space_group_dict[lattice]:
+                if logfile_spacegroup.replace(' ','')==spacegroup:
+                    lattice_type=lattice
+                    break
+        return lattice_type
+
+
+    def calc_unitcell_volume_from_logfile(self,a,b,c,alpha,beta,gamma,lattice):
+        spg_number=self.get_spg_number_from_mtz()
+        lattice=self.get_bravais_lattice_from_spg_number(spg_number)
+        unitcell=self.get_unit_cell_from_mtz()
+        a=float(unitcell[0])
+        b=float(unitcell[1])
+        c=float(unitcell[2])
+        alpha=math.radians(float(unitcell[3]))
+        beta= math.radians(float(unitcell[4]))
+        gamma=math.radians(float(unitcell[5]))
+        unitcell_volume=0
+        if lattice=='triclinic':
+            unitcell_volume=a*b*c* \
+                            math.sqrt((1-math.cos(alpha)**2-math.cos(beta)**2-math.cos(gamma)**2) \
+                                      +2*(math.cos(alpha)*math.cos(beta)*math.cos(gamma)))
+        if lattice=='monoclinic':
+            unitcell_volume=round(a*b*c*math.sin(beta),1)
+        if lattice=='orthorhombic' or lattice=='tetragonal' or lattice=='cubic':
+            unitcell_volume=round(a*b*c,1)
+        if lattice=='hexagonal' or lattice=='rhombohedral':
+            unitcell_volume=round(a*b*c*(math.sin(math.radians(60))),1)
+        return unitcell_volume
+
+
 
     def PDBheader(self,pdbfile):
         PDBinfo = { 'Rcryst':         'n/a',
@@ -289,7 +351,8 @@ class mtztools:
                                     'hexagonal':    [143,144,145,149,150,151,152,153,154,168,169,170,
                                                      171,172,173,177,178,179,180,181,182],
                                     'rhombohedral': [146,155],
-                                    'cubic':        [195,196,197,198,199]  }
+                                    'cubic':        [195,196,197,198,199,
+                                                     207,208,209,210,211,212,213,214]  }
 
     def get_bravais_lattice_from_spg_number(self,number):
         lattice=''
