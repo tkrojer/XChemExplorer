@@ -501,6 +501,16 @@ class queue:
                 for job in jobs_in_queue:
                     os.system('qdel '+job[0])
 
+class data_source:
+
+    def __init__(self,data_source_file):
+        self.data_source_file=data_source_file
+    def read_data_source_for_coot(self):
+        print 'hallo'
+    def update_data_source_from_coot(self):
+        print 'hallo'
+    def update_data_source(self):
+        print 'hallo'
 
 
 

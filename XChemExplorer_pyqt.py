@@ -31,6 +31,19 @@ class XChemExplorer(QtGui.QApplication):
         self.initial_model_directory=os.path.join(self.project_directory,'processing','analysis','initial_model')
         self.refine_model_directory=os.path.join(self.project_directory,'processing','analysis','refine_model')
         self.reference_directory=os.path.join(self.project_directory,'processing','reference')
+        self.database_directory=os.path.join(self.project_directory,'database')
+        self.data_source_file='XChemExplorer.csv'
+
+        self.settings =     {'current_directory':       self.current_directory,
+                             'project_directory':       self.project_directory,
+                             'beamline_directory':      self.beamline_directory,
+                             'initial_model_directory': self.initial_model_directory,
+                             'refine_model_directory':  self.refine_model_directory,
+                             'reference_directory':     self.reference_directory,
+                             'data_source':             os.path.join(self.database_directory,self.data_source_file) }
+
+
+
 
 #        self.FindHitsDir=self.project_directory+'/processing/analysis/find_hits'
 #        self.DatabaseDir=self.project_directory+'/processing/database'
@@ -56,6 +69,7 @@ class XChemExplorer(QtGui.QApplication):
 
         # Settings @ Switches
         self.explorer_active=0
+        self.coot_running=0
         self.progress_bar_start=0
         self.progress_bar_step=0
 
@@ -147,7 +161,7 @@ class XChemExplorer(QtGui.QApplication):
         self.initial_model_vbox_for_table=QtGui.QVBoxLayout()
         self.tab_dict['Initial Model'][1].addLayout(self.initial_model_vbox_for_table)
         initial_model_button_hbox=QtGui.QHBoxLayout()
-        get_initial_model_button=QtGui.QPushButton("Load Samples")
+        get_initial_model_button=QtGui.QPushButton("Check for inital Refinement")
         get_initial_model_button.clicked.connect(self.button_clicked)
         initial_model_button_hbox.addWidget(get_initial_model_button)
         run_dimple_button=QtGui.QPushButton("Run Dimple")
@@ -247,6 +261,19 @@ class XChemExplorer(QtGui.QApplication):
             if self.sender().text()=="Load All Samples":
                 print 'hallo'
 
+            if self.sender().text()=="Check for inital Refinement":
+                reference_file_list=self.get_reference_file_list()
+                self.work_thread=read_intial_refinement_results(self.initial_model_directory,reference_file_list)
+
+            if self.sender().text()=="Open COOT":
+                print 'found'
+                if not self.coot_running:
+                    print 'starting coot'
+                    self.work_thread=start_COOT(self.settings)
+                    self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+                    self.work_thread.start()
+
+
 
 #                and self.sender().text()=='Get New Results from Autoprocessing':
 #            self.explorer_active=1
@@ -319,6 +346,27 @@ class XChemExplorer(QtGui.QApplication):
         self.update_progress_bar(0)
         self.update_status_bar('idle')
 
+    def create_table_for_dimple(self):
+
+        dimple_table_column_name = [    'SampleID',
+                                        'Run\nDimple',
+                                        'Resolution',
+                                        'Rcryst',
+                                        'Rfree',
+                                        'Space Group\nautoprocessing',
+                                        'Space Group\nreference',
+                                        'Difference\nUnit Cell Volume (%)',
+                                        'Unit Cell\nautoprocessing',
+                                        'Unit Cell\nreference',
+                                        'Reference File'    ]
+
+        table=QtGui.QTableWidget()
+        table.setSortingEnabled(True)
+        table.setRowCount(XXX)
+        table.setColumnCount(XXX)
+
+
+
     def create_widgets_for_autoprocessing_results(self,dict_list):
         data_collection_dict=dict_list[0]
         self.data_collection_statistics_dict=dict_list[1]
@@ -335,26 +383,25 @@ class XChemExplorer(QtGui.QApplication):
 ### ---------------------------------------------------------
 
 
-        diffraction_data_column_name = ['Program',                      (200,200,200),
-                                        'Run',                          (200,200,200),
-                                        'SpaceGroup',                   (200,200,200),
-                                        'Unit Cell',                    (200,200,200),
-                                        'Resolution\nOverall',          (200,200,200),
-                                        'Resolution\nInner Shell',      (200,200,200),
-                                        'Resolution\nOuter Shell',      (200,200,200),
-                                        'Rmerge\nOverall',              (200,200,200),
-                                        'Rmerge\nInner Shell',          (200,200,200),
-                                        'Rmerge\nOuter Shell',          (200,200,200),
-                                        'Mn(I/sig(I))\nOverall',        (200,200,200),
-                                        'Mn(I/sig(I))\nInner Shell',    (200,200,200),
-                                        'Mn(I/sig(I))\nOuter Shell',    (200,200,200),
-                                        'Completeness\nOverall',        (200,200,200),
-                                        'Completeness\nInner Shell',    (200,200,200),
-                                        'Completeness\nOuter Shell',    (200,200,200),
-                                        'Multiplicity\nOverall',        (200,200,200),
-                                        'Multiplicity\nInner Shell',    (200,200,200),
-                                        'Multiplicity\nOuter Shell',    (200,200,200)  ]
-
+        diffraction_data_column_name = ['Program',                       (255,0,40),
+                                        'Run',                           (100,230,40),
+                                        'SpaceGroup',                    (100,230,40),
+                                        'Unit Cell',                     (100,230,40),
+                                        'Resolution\nOverall',           (100,230,40),
+                                        'Resolution\nInner Shell',       (100,230,40),
+                                        'Resolution\nOuter Shell',       (100,230,40),
+                                        'Rmerge\nOverall',               (100,230,40),
+                                        'Rmerge\nInner Shell',           (100,230,40),
+                                        'Rmerge\nOuter Shell',           (100,230,40),
+                                        'Mn(I/sig(I))\nOverall',         (100,230,40),
+                                        'Mn(I/sig(I))\nInner Shell',     (100,230,40),
+                                        'Mn(I/sig(I))\nOuter Shell',     (100,230,40),
+                                        'Completeness\nOverall',         (100,230,40),
+                                        'Completeness\nInner Shell',     (100,230,40),
+                                        'Completeness\nOuter Shell',     (100,230,40),
+                                        'Multiplicity\nOverall',         (100,230,40),
+                                        'Multiplicity\nInner Shell',     (100,230,40),
+                                        'Multiplicity\nOuter Shell',     (100,230,40)  ]
 
 
         self.dataset_outcome = {    "success":                      "rgb(0,255,0)",
@@ -367,7 +414,6 @@ class XChemExplorer(QtGui.QApplication):
                                     "Failed - unknown":             "rgb(255,204,204)"  }
 
 
-        # And this is another test ------------------------------------------------------------------------
         table=QtGui.QTableWidget()
         table.setSortingEnabled(True)
 #        table.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -434,7 +480,6 @@ class XChemExplorer(QtGui.QApplication):
                 if outcome=='success':
                     button.setChecked(True)
                 dataset_outcome_vbox.addWidget(button)
-
             dataset_outcome_groupbox.setLayout(dataset_outcome_vbox)
             hbox_for_button_and_table.addWidget(dataset_outcome_groupbox)
 
@@ -449,8 +494,13 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text.setText(str(item))
                     data_collection_table.setItem(n, column, cell_text)
 #                    data_collection_table.item(n,column).setBackground(QtGui.QColor(100,100,150))
-#                    print diffraction_data_column_name[1]
-#                    data_collection_table.item(n,column).setBackground(QtGui.QColor(diffraction_data_column_name[1]))
+                    r=diffraction_data_column_name[2*column+1][0]
+                    g=diffraction_data_column_name[2*column+1][1]
+                    b=diffraction_data_column_name[2*column+1][2]
+                    data_collection_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
+#                    print 'hallo'
+#                    print diffraction_data_column_name[2*column+1]
+#                    data_collection_table.item(n,column).setBackground(QtGui.QColor(diffraction_data_column_name[2*column+1]))
                     if line[27]==True:
                         data_collection_table.selectRow(n)
             # some_list[start:stop:step]
@@ -479,6 +529,34 @@ class XChemExplorer(QtGui.QApplication):
         table.setLineWidth(10)
         self.data_collection_vbox_for_table.addWidget(table)
         #-----------------------------------------------------------------------------------------------
+
+    def create_initial_model_table(self,initial_model_list):
+
+            initial_model_table=QtGui.QTableWidget()
+            initial_model_table.setRowCount(len(initial_model_list))
+            initial_model_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+            initial_model_table.setColumnCount(len(initial_model_list[0]))
+            for n,line in enumerate(initial_model_list):
+                for column,item in enumerate(line):
+                    cell_text=QtGui.QTableWidgetItem()
+                    cell_text.setText(str(item))
+                    initial_model_table.setItem(n, column, cell_text)
+#                    initial_model_table.item(n,column).setBackground(QtGui.QColor(100,100,150))
+                    r=diffraction_data_column_name[2*column+1][0]
+                    g=diffraction_data_column_name[2*column+1][1]
+                    b=diffraction_data_column_name[2*column+1][2]
+                    initial_model_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
+#                    print 'hallo'
+#                    print diffraction_data_column_name[2*column+1]
+#                    initial_model_table.item(n,column).setBackground(QtGui.QColor(diffraction_data_column_name[2*column+1]))
+
+
+                    if line[27]==True:
+                        initial_model_table.selectRow(n)
+            # some_list[start:stop:step]
+            initial_model_table.setHorizontalHeaderLabels(diffraction_data_column_name[0::2])
+            initial_model_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+
 
     def get_reference_file_list(self):
         # check available reference files
@@ -524,6 +602,90 @@ class XChemExplorer(QtGui.QApplication):
             print 'not checked'
 
 
+class start_COOT(QtCore.QThread):
+
+    def __init__(self,settings):
+        QtCore.QThread.__init__(self)
+        self.settings=settings
+
+    def run(self):
+        pickle.dump(self.settings,open('XChemExplorer_settings.pkl','wb'))
+        os.system('coot --no-guano --no-state-script --script %s' %(os.getenv('XChemExplorer_DIR')+'/lib/XChemCoot.py'))
+
+
+class read_intial_refinement_results(QtCore.QThread):
+
+    def __init__(self,initial_model_directory,reference_file_list):
+        QtCore.QThread.__init__(self)
+        self.initial_model_directory=initial_model_directory
+        self.reference_file_list=reference_file_list
+
+    def run(self):
+
+        progress_step=100/float(len(glob.glob(self.initial_model_directory+'/*')))
+        progress=0
+
+        initial_model_list=[]
+
+        for sample in sorted(glob.glob(self.initial_model_directory+'/*')):
+
+            run_dimple=True
+            resolution_high=''
+            Rcryst='pending'
+            Rfree='pending'
+            spg_autoproc=''
+            unitcell_autoproc=''
+            spg_reference=''
+            unitcell_reference=''
+            unitcell_difference=''
+            reference=''
+            alert='#E0E0E0'
+
+            if os.path.isfile(self.initial_model_directory+'/'+sample+'.mtz'):
+                mtz_autoproc=mtztools(self.initial_model_directory+'/'+sample+'.mtz').get_all_values_as_dict()
+                resolution_high=mtz_autoproc['resolution_high']
+                spg_autoproc=mtz_autoproc['spacegroup']
+                unitcell_autoproc=mtz_autoproc['unitcell']
+                lattice_autoproc=mtz_autoproc['bravais_lattice']
+                unitcell_volume_autoproc=mtz_autoproc['unitcell_volume']
+                # check which reference file is most similar
+                for o,reference_file in enumerate(self.reference_file_list):
+                    unitcell_difference=round((math.fabs(reference_file[4]-unitcell_volume_autoproc)/reference_file[4])*100,1)
+                    # reference file is accepted when different in unitcell volume < 5%
+                    # and both files have the same lattice type
+                    if unitcell_difference < 5 and lattice_autoproc==reference_file[3]:
+                        spg_reference=reference_file[1]
+                        unitcell_reference=reference_file[2]
+                        reference=reference_file[0]
+                        break
+            if os.path.isdir(self.initial_model_directory+'/Dimple'):
+                    if os.path.isfile(self.initial_model_directory+'/Dimple/dimple/final.pdb'):
+                        pdb=parse().PDBheader(self.initial_model_directory+'/Dimple/dimple/final.pdb')
+                        Rcryst=pdb['Rcryst']
+                        Rfree=pdb['Rfree']
+                        alert=pdb['Alert']
+                    elif os.path.isfile(self.initial_model_directory+'/dimple_run_in_progress'):
+                        Rcryst='in progress'
+                        Rfree='in progress'
+                        alert='#00CCFF'
+
+            initial_model_list.append( [ sample,
+                                  run_dimple,
+                                  resolution_high,
+                                  Rcryst,
+                                  Rfree,
+                                  spg_autoproc,
+                                  spg_reference,
+                                  unitcell_difference,
+                                  unitcell_autoproc,
+                                  unitcell_reference,
+                                  reference,
+                                  alert ] )
+
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+
 
 class save_autoprocessing_results_to_disc(QtCore.QThread):
     def __init__(self,dataset_outcome_dict,data_collection_table_dict,data_collection_statistics_dict):
@@ -551,6 +713,9 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+        self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results'), [self.data_collection_dict,
+                                                                               self.data_collection_statistics_dict])
 
         self.emit(QtCore.SIGNAL("finished()"))
 
@@ -732,34 +897,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 
         self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results'), [self.data_collection_dict,
                                                                                self.data_collection_statistics_dict])
-#myPixmap = QtGui.QPixmap(_fromUtf8('image.jpg'))
-#myScaledPixmap = myPixmap.scaled(self.label.size(), Qt.KeepAspectRatio)
-#self.label.setPixmap(myScaledPixmap)
 
-
-#def main():
-#    app = QApplication(sys.argv)
-#    w = MyWindow()
-#    w.show()
-#    sys.exit(app.exec_())
-
-#class MyWindow(QWidget):
-#    def __init__(self, *args):
-#        QWidget.__init__(self, *args)
-#
-#        tablemodel = MyTableModel(my_array, self)
-#        tableview = QTableView()
-#        tableview.setModel(tablemodel)
-#
-#        layout = QVBoxLayout(self)
-#        layout.addWidget(tableview)
-#        self.setLayout(layout)
-
-
+        
 if __name__ == "__main__":
     app=XChemExplorer(sys.argv)
 
-#app = QtGui.QApplication(sys.argv)
-#MainWindow()
-##frame.show()
-#sys.exit(app.exec_())  
