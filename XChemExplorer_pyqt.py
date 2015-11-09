@@ -58,6 +58,9 @@ class XChemExplorer(QtGui.QApplication):
         self.dataset_outcome_dict={}            # contains the dataset outcome buttons
         self.data_collection_table_dict={}      # contains the dataset table
         self.data_collection_statistics_dict={}
+        self.initial_model_dimple_dict={}       # contains toggle button if dimple should be run
+        self.reference_file_list=[]
+
         self.target_list=[]
         for dir in glob.glob(self.beamline_directory+'/*'):
             self.visit_list.append(os.path.realpath(dir))
@@ -170,9 +173,9 @@ class XChemExplorer(QtGui.QApplication):
         refresh_inital_model_button=QtGui.QPushButton("Refresh")
         refresh_inital_model_button.clicked.connect(self.button_clicked)
         initial_model_button_hbox.addWidget(refresh_inital_model_button)
-        reference_file_list=self.get_reference_file_list()
+        self.reference_file_list=self.get_reference_file_list()
         reference_file_selection_combobox = QtGui.QComboBox()
-        for reference_file in reference_file_list:
+        for reference_file in self.reference_file_list:
             reference_file_selection_combobox.addItem(reference_file[0])
         initial_model_button_hbox.addWidget(reference_file_selection_combobox)
         set_new_reference_button=QtGui.QPushButton("Set New Reference (if applicable)")
@@ -241,8 +244,8 @@ class XChemExplorer(QtGui.QApplication):
 ### -------------------------------------------------------------------
 ### --- this works but disabled so that stuff can be tested offline ---
             if self.sender().text()=='Get New Results from Autoprocessing':
-                reference_file_list=self.get_reference_file_list()
-                self.work_thread=read_autoprocessing_results_from_disc(self.visit_list,self.target,reference_file_list)
+#                reference_file_list=self.get_reference_file_list()
+                self.work_thread=read_autoprocessing_results_from_disc(self.visit_list,self.target,self.reference_file_list)
                 self.explorer_active=1
                 self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
                 self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
@@ -262,8 +265,8 @@ class XChemExplorer(QtGui.QApplication):
                 print 'hallo'
 
             if self.sender().text()=="Check for inital Refinement":
-                reference_file_list=self.get_reference_file_list()
-                self.work_thread=read_intial_refinement_results(self.initial_model_directory,reference_file_list)
+#                reference_file_list=self.get_reference_file_list()
+                self.work_thread=read_intial_refinement_results(self.initial_model_directory,self.reference_file_list)
 
             if self.sender().text()=="Open COOT":
                 print 'found'
@@ -404,14 +407,14 @@ class XChemExplorer(QtGui.QApplication):
                                         'Multiplicity\nOuter Shell',     (100,230,40)  ]
 
 
-        self.dataset_outcome = {    "success":                      "rgb(0,255,0)",
-                                    "Failed - centring failed":     "rgb(255,204,204)",
-                                    "Failed - no diffraction":      "rgb(255,204,204)",
-                                    "Failed - processing barfs":    "rgb(255,204,204)",
-                                    "Failed - loop empty":          "rgb(255,204,204)",
-                                    "Failed - low resolution":      "rgb(255,204,204)",
-                                    "Failed - no X-rays":           "rgb(255,204,204)",
-                                    "Failed - unknown":             "rgb(255,204,204)"  }
+        self.dataset_outcome = {    "success":                      "rgb(200,200,200)",
+                                    "Failed - centring failed":     "rgb(200,200,200)",
+                                    "Failed - no diffraction":      "rgb(200,200,200)",
+                                    "Failed - processing barfs":    "rgb(200,200,200)",
+                                    "Failed - loop empty":          "rgb(200,200,200)",
+                                    "Failed - low resolution":      "rgb(200,200,200)",
+                                    "Failed - no X-rays":           "rgb(200,200,200)",
+                                    "Failed - unknown":             "rgb(200,200,200)"  }
 
 
         table=QtGui.QTableWidget()
@@ -479,6 +482,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.dataset_outcome_dict[key].append(button)
                 if outcome=='success':
                     button.setChecked(True)
+                    button.setStyleSheet("background-color: rgb(0,255,0)")
                 dataset_outcome_vbox.addWidget(button)
             dataset_outcome_groupbox.setLayout(dataset_outcome_vbox)
             hbox_for_button_and_table.addWidget(dataset_outcome_groupbox)
@@ -510,6 +514,7 @@ class XChemExplorer(QtGui.QApplication):
             # this is necessary to render table properly
 #            data_collection_table.verticalHeader().setStretchLastSection(False)
             data_collection_table.resizeRowsToContents()
+            data_collection_table.resizeColumnsToContents()
             data_collection_table.horizontalHeader().setStretchLastSection(False)
             data_collection_table.verticalHeader().setStretchLastSection(True)
 
@@ -532,30 +537,48 @@ class XChemExplorer(QtGui.QApplication):
 
     def create_initial_model_table(self,initial_model_list):
 
-            initial_model_table=QtGui.QTableWidget()
-            initial_model_table.setRowCount(len(initial_model_list))
-            initial_model_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-            initial_model_table.setColumnCount(len(initial_model_list[0]))
-            for n,line in enumerate(initial_model_list):
-                for column,item in enumerate(line):
+        self.initial_model_dimple_dict={}
+        initial_model_column_name = [   'SampleID',
+                                        'Run\nDimple',
+                                        'Resolution',
+                                        'Rcryst',
+                                        'Rfree',
+                                        'Space Group\nautoprocessing',
+                                        'Space Group\nreference',
+                                        'Difference\nUnit Cell Volume (%)',
+                                        'Unit Cell\nautoprocessing',
+                                        'Unit Cell\nreference',
+                                        'Reference File'    ]
+
+        initial_model_table=QtGui.QTableWidget()
+        initial_model_table.setRowCount(len(initial_model_list))
+        initial_model_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        initial_model_table.setColumnCount(len(initial_model_list[0]))
+        for n,line in enumerate(initial_model_list):
+            for column,item in enumerate(line[:-1]):
+                if column==1:
+                    run_dimple = QtGui.QCheckBox()
+                    run_dimple.toggle()
+                    initial_model_table.setCellWidget(n, column, run_dimple)
+                    self.initial_model_dimple_dict[line[0]]=run_dimple
+                if column==10:
+                    # don't need to connect, because only the displayed text will be read out
+                    reference_file_selection_combobox = QtGui.QComboBox()
+                    for reference_file in self.reference_file_list:
+                        reference_file_selection_combobox.addItem(reference_file[0])
+                    initial_model_table.setCellWidget(n, column, reference_file_selection_combobox)
+                    reference_file_selection_combobox.setItem(line[10])
+                else:
                     cell_text=QtGui.QTableWidgetItem()
                     cell_text.setText(str(item))
                     initial_model_table.setItem(n, column, cell_text)
-#                    initial_model_table.item(n,column).setBackground(QtGui.QColor(100,100,150))
-                    r=diffraction_data_column_name[2*column+1][0]
-                    g=diffraction_data_column_name[2*column+1][1]
-                    b=diffraction_data_column_name[2*column+1][2]
-                    initial_model_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
-#                    print 'hallo'
-#                    print diffraction_data_column_name[2*column+1]
-#                    initial_model_table.item(n,column).setBackground(QtGui.QColor(diffraction_data_column_name[2*column+1]))
-
-
-                    if line[27]==True:
-                        initial_model_table.selectRow(n)
-            # some_list[start:stop:step]
-            initial_model_table.setHorizontalHeaderLabels(diffraction_data_column_name[0::2])
-            initial_model_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+#                r=item
+#                g=item
+#                b=item
+#                initial_model_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
+        initial_model_table.setHorizontalHeaderLabels(initial_model_column_name)
+        initial_model_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.initial_model_vbox_for_table.addWidget(initial_model_table)
 
 
     def get_reference_file_list(self):
@@ -586,9 +609,11 @@ class XChemExplorer(QtGui.QApplication):
                     dataset=key
         for button in self.dataset_outcome_dict[dataset]:
             if button==self.sender():
-                print 'hallo'
-                button.setStyleSheet("background-color: rgb(0,0,255)")
-                button.setStyleSheet("border-style: inset")
+                if str(self.sender().text()).startswith('success'):
+                    button.setStyleSheet("background-color: rgb(0,255,0)")
+                else:
+                    button.setStyleSheet("background-color: rgb(255,0,0)")
+#                button.setStyleSheet("border-style: inset")
             else:
                 print self.dataset_outcome[str(button.text())]
                 button.setStyleSheet("background-color: "+self.dataset_outcome[str(button.text())])
@@ -667,7 +692,7 @@ class read_intial_refinement_results(QtCore.QThread):
                     elif os.path.isfile(self.initial_model_directory+'/dimple_run_in_progress'):
                         Rcryst='in progress'
                         Rfree='in progress'
-                        alert='#00CCFF'
+                        alert=(51,153,255)
 
             initial_model_list.append( [ sample,
                                   run_dimple,
@@ -898,7 +923,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
         self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results'), [self.data_collection_dict,
                                                                                self.data_collection_statistics_dict])
 
-        
+
 if __name__ == "__main__":
     app=XChemExplorer(sys.argv)
 
