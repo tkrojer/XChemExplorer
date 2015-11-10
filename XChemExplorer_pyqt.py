@@ -566,11 +566,14 @@ class XChemExplorer(QtGui.QApplication):
                                         'Unit Cell\nautoprocessing',
                                         'Unit Cell\nreference',
                                         'Reference File'    ]
+        for x in initial_model_list:
+            print x
 
         initial_model_table=QtGui.QTableWidget()
         initial_model_table.setRowCount(len(initial_model_list))
         initial_model_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         initial_model_table.setColumnCount(len(initial_model_list[0]))
+        initial_model_table.setSortingEnabled(True)
         for n,line in enumerate(initial_model_list):
             for column,item in enumerate(line[:-1]):
                 if column==1:
