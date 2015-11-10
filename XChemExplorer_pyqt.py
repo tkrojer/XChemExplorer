@@ -868,25 +868,25 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                     self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 2 of 3: parsing aimless logfiles ->'+sample)
                     aimless_results=parse().GetAimlessLog(logfile)
 
-        diffraction_data_column_name = ['Program',                       (255,0,40),
-                                        'Run',                           (100,230,40),
-                                        'SpaceGroup',                    (100,230,40),
-                                        'Unit Cell',                     (100,230,40),
-                                        'Resolution\nOverall',           (100,230,40),
-                                        'Resolution\nInner Shell',       (100,230,40),
-                                        'Resolution\nOuter Shell',       (100,230,40),
-                                        'Rmerge\nOverall',               (100,230,40),
-                                        'Rmerge\nInner Shell',           (100,230,40),
-                                        'Rmerge\nOuter Shell',           (100,230,40),
-                                        'Mn(I/sig(I))\nOverall',         (100,230,40),
-                                        'Mn(I/sig(I))\nInner Shell',     (100,230,40),
-                                        'Mn(I/sig(I))\nOuter Shell',     (100,230,40),
-                                        'Completeness\nOverall',         (100,230,40),
-                                        'Completeness\nInner Shell',     (100,230,40),
-                                        'Completeness\nOuter Shell',     (100,230,40),
-                                        'Multiplicity\nOverall',         (100,230,40),
-                                        'Multiplicity\nInner Shell',     (100,230,40),
-                                        'Multiplicity\nOuter Shell',     (100,230,40)  ]
+#        diffraction_data_column_name = ['Program',                       (255,0,40),
+#                                        'Run',                           (100,230,40),
+#                                        'SpaceGroup',                    (100,230,40),
+#                                        'Unit Cell',                     (100,230,40),
+#                                        'Resolution\nOverall',           (100,230,40),
+#                                        'Resolution\nInner Shell',       (100,230,40),
+#                                        'Resolution\nOuter Shell',       (100,230,40),
+#                                        'Rmerge\nOverall',               (100,230,40),
+#                                        'Rmerge\nInner Shell',           (100,230,40),
+#                                        'Rmerge\nOuter Shell',           (100,230,40),
+#                                        'Mn(I/sig(I))\nOverall',         (100,230,40),
+#                                        'Mn(I/sig(I))\nInner Shell',     (100,230,40),
+#                                        'Mn(I/sig(I))\nOuter Shell',     (100,230,40),
+#                                        'Completeness\nOverall',         (100,230,40),
+#                                        'Completeness\nInner Shell',     (100,230,40),
+#                                        'Completeness\nOuter Shell',     (100,230,40),
+#                                        'Multiplicity\nOverall',         (100,230,40),
+#                                        'Multiplicity\nInner Shell',     (100,230,40),
+#                                        'Multiplicity\nOuter Shell',     (100,230,40)  ]
 
                     self.data_collection_statistics_dict[sample].append([
                                 index,                                                                                      # 0
