@@ -269,6 +269,8 @@ class XChemExplorer(QtGui.QApplication):
             if self.sender().text()=="Check for inital Refinement":
 #                reference_file_list=self.get_reference_file_list()
                 self.work_thread=read_intial_refinement_results(self.initial_model_directory,self.reference_file_list)
+                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+                self.work_thread.start()
 
             if self.sender().text()=="Open COOT":
                 print 'found'
@@ -351,24 +353,27 @@ class XChemExplorer(QtGui.QApplication):
         self.update_progress_bar(0)
         self.update_status_bar('idle')
 
-    def create_table_for_dimple(self):
+#    def create_table_for_dimple(self):
+#
+#        dimple_table_column_name = [    'SampleID',
+#                                        'Run\nDimple',
+#                                        'Resolution',
+#                                        'Rcryst',
+#                                        'Rfree',
+#                                        'Space Group\nautoprocessing',
+#                                        'Space Group\nreference',
+#                                        'Difference\nUnit Cell Volume (%)',
+#                                        'Unit Cell\nautoprocessing',
+#                                        'Unit Cell\nreference',
+#                                        'Reference File'    ]
+#
+#
+#        table=QtGui.QTableWidget()
+#        table.setSortingEnabled(True)
+#        table.setRowCount(len(self.initial_model_directory+'/*'))
+#        table.setColumnCount(11)
 
-        dimple_table_column_name = [    'SampleID',
-                                        'Run\nDimple',
-                                        'Resolution',
-                                        'Rcryst',
-                                        'Rfree',
-                                        'Space Group\nautoprocessing',
-                                        'Space Group\nreference',
-                                        'Difference\nUnit Cell Volume (%)',
-                                        'Unit Cell\nautoprocessing',
-                                        'Unit Cell\nreference',
-                                        'Reference File'    ]
 
-        table=QtGui.QTableWidget()
-        table.setSortingEnabled(True)
-        table.setRowCount(XXX)
-        table.setColumnCount(XXX)
 
 
 
