@@ -392,8 +392,8 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_table_dict={}
 
 ### --- used temporarily to be able to test stuff offline ---
-        pickle.dump(data_collection_dict,open('data_collection_dict.p','wb'))
-        pickle.dump(self.data_collection_statistics_dict,open('data_collection_statistics_dict.p','wb'))
+#        pickle.dump(data_collection_dict,open('data_collection_dict.p','wb'))
+#        pickle.dump(self.data_collection_statistics_dict,open('data_collection_statistics_dict.p','wb'))
 #        data_collection_dict = pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p", "rb" ) )
 #        self.data_collection_statistics_dict= pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_statistics_dict.p", "rb" ) )
 ### ---------------------------------------------------------
@@ -533,6 +533,13 @@ class XChemExplorer(QtGui.QApplication):
             data_collection_table.setRowCount(len(self.data_collection_statistics_dict[key]))
             data_collection_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
             data_collection_table.setColumnCount(len(diffraction_data_column_name))
+
+#        font = QtGui.QFont()
+#        font.setFamily(_fromUtf8("Verdana"))
+#        self.simple_table.setFont(font)
+#        font =  self.horizontalHeader().font()
+#        font.setPointSize(12)
+#        self.setFont(font)
 
             for n,sample in enumerate(self.data_collection_statistics_dict[key]):
                 for column,header in enumerate(diffraction_data_column_name):
