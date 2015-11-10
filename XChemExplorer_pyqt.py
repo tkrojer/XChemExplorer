@@ -565,8 +565,8 @@ class XChemExplorer(QtGui.QApplication):
                                         'Rfree',
                                         'Space Group\nautoprocessing',
                                         'Space Group\nreference',
-                                        'Reference File',
                                         'Difference\nUnit Cell Volume (%)',
+                                        'Reference File',
                                         'Unit Cell\nautoprocessing',
                                         'Unit Cell\nreference'  ]
 
@@ -584,13 +584,13 @@ class XChemExplorer(QtGui.QApplication):
                     print line[1]
                     run_dimple.setChecked(line[1])
                     self.initial_model_dimple_dict[line[0]]=run_dimple
-                elif column==7:
+                elif column==8:
                     # don't need to connect, because only the displayed text will be read out
                     reference_file_selection_combobox = QtGui.QComboBox()
                     for reference_file in self.reference_file_list:
                         reference_file_selection_combobox.addItem(reference_file[0])
                     initial_model_table.setCellWidget(n, column, reference_file_selection_combobox)
-                    index = reference_file_selection_combobox.findText(str(line[10]), QtCore.Qt.MatchFixedString)
+                    index = reference_file_selection_combobox.findText(str(line[8]), QtCore.Qt.MatchFixedString)
                     reference_file_selection_combobox.setCurrentIndex(index)
                 else:
                     cell_text=QtGui.QTableWidgetItem()
@@ -730,8 +730,8 @@ class read_intial_refinement_results(QtCore.QThread):
                                         Rfree,
                                         spg_autoproc,
                                         spg_reference,
-                                        reference,
                                         unitcell_difference,
+                                        reference,
                                         unitcell_autoproc,
                                         unitcell_reference,
                                         alert ] )
