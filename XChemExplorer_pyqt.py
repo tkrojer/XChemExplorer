@@ -673,7 +673,9 @@ class read_intial_refinement_results(QtCore.QThread):
 
         initial_model_list=[]
 
-        for sample in sorted(glob.glob(self.initial_model_directory+'/*')):
+        for sample_dir in sorted(glob.glob(self.initial_model_directory+'/*')):
+
+            sample=sample_dir[sample_dir.rfind('/')+1:]
 
             run_dimple=True
             resolution_high=''
