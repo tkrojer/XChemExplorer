@@ -575,6 +575,7 @@ class XChemExplorer(QtGui.QApplication):
         initial_model_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         initial_model_table.setColumnCount(len(initial_model_list[0]))
         initial_model_table.setSortingEnabled(True)
+        initial_model_table.setTextAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignLeft)
         for n,line in enumerate(initial_model_list):
             for column,item in enumerate(line[:-1]):
                 if column==1:
