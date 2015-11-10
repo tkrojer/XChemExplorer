@@ -542,13 +542,13 @@ class XChemExplorer(QtGui.QApplication):
                                 cell_text=QtGui.QTableWidgetItem()
                                 cell_text.setText(str(item))
                                 data_collection_table.setItem(n, column, cell_text)
-                                r=line[2][[0]
-                                g=line[2][[1]
-                                b=line[2][[2]
+                                r=line[2][0]
+                                g=line[2][1]
+                                b=line[2][2]
                                 data_collection_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
                                 break
                         if len(line)==2:
-                            if line[0]=='best file']
+                            if line[0]=='best file':
                                 if line[1]==True:
                                     data_collection_table.selectRow(n)
 
