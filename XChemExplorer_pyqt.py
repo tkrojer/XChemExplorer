@@ -535,26 +535,28 @@ class XChemExplorer(QtGui.QApplication):
             data_collection_table.setColumnCount(len(diffraction_data_column_name))
 
             for n,sample in enumerate(self.data_collection_statistics_dict[key]):
-                for column,item in enumerate(diffraction_data_column_name):
-                    for line in self.data_collection_statistics_dict[key]:
+                for column,header in enumerate(diffraction_data_column_name):
+                    for item in self.data_collection_statistics_dict[key]:
+                        for entry in item:
+                            if isinstance(entry, list):
 #                        print len(line),line
-                        if len(line)==3:
-                            print line[0]
-                            print line[1]
-                            print line[2]
-                            if line[0]==item:
-                                cell_text=QtGui.QTableWidgetItem()
-                                cell_text.setText(str(line[1]))
-                                data_collection_table.setItem(n, column, cell_text)
-#                                r=line[2][0]
-#                                g=line[2][1]
-#                                b=line[2][2]
+                                if len(entry)==3:
+                                    print entry[0]
+                                    print entry[1]
+                                    print entry[2]
+                                    if entry[0]==header:
+                                        cell_text=QtGui.QTableWidgetItem()
+                                        cell_text.setText(str(entry[1]))
+                                        data_collection_table.setItem(n, column, cell_text)
+#                                r=entry[2][0]
+#                                g=entry[2][1]
+#                                b=entry[2][2]
 #                                data_collection_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
-                                break
-                        if len(line)==2:
-                            if line[0]=='best file':
-                                if line[1]==True:
-                                    data_collection_table.selectRow(n)
+#                                break
+                                if len(entry)==2:
+                                    if entry[0]=='best file':
+                                    if entry[1]==True:
+                                        data_collection_table.selectRow(n)
 
 #                for column,item in enumerate(line[2:20]):
 #                    cell_text=QtGui.QTableWidgetItem()
