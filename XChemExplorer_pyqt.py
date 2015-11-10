@@ -392,8 +392,8 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_table_dict={}
 
 ### --- used temporarily to be able to test stuff offline ---
-#        pickle.dump(data_collection_dict,open('data_collection_dict.p','wb'))
-#        pickle.dump(data_collection_statistics_dict,open('data_collection_statistics_dict.p','wb'))
+        pickle.dump(data_collection_dict,open('data_collection_dict.p','wb'))
+        pickle.dump(data_collection_statistics_dict,open('data_collection_statistics_dict.p','wb'))
 #        data_collection_dict = pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p", "rb" ) )
 #        self.data_collection_statistics_dict= pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_statistics_dict.p", "rb" ) )
 ### ---------------------------------------------------------
@@ -537,6 +537,7 @@ class XChemExplorer(QtGui.QApplication):
             for n,sample in enumerate(self.data_collection_statistics_dict[key]):
                 for column,item in enumerate(diffraction_data_column_name):
                     for line in self.data_collection_statistics_dict[key]:
+                        print len(line),line
                         if len(line)==3:
                             if line[0]==item:
                                 cell_text=QtGui.QTableWidgetItem()
