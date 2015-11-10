@@ -511,7 +511,7 @@ class XChemExplorer(QtGui.QApplication):
             data_collection_table=QtGui.QTableWidget()
             data_collection_table.setRowCount(len(self.data_collection_statistics_dict[key]))
             data_collection_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-            data_collection_table.setColumnCount(len(self.data_collection_statistics_dict[key][0])-1)
+            data_collection_table.setColumnCount(len(self.data_collection_statistics_dict[key][0])-5)
             for n,line in enumerate(self.data_collection_statistics_dict[key]):
                 for column,item in enumerate(line[2:20]):
                     cell_text=QtGui.QTableWidgetItem()
@@ -565,15 +565,15 @@ class XChemExplorer(QtGui.QApplication):
                                         'Rfree',
                                         'Space Group\nautoprocessing',
                                         'Space Group\nreference',
+                                        'Reference File',
                                         'Difference\nUnit Cell Volume (%)',
                                         'Unit Cell\nautoprocessing',
-                                        'Unit Cell\nreference',
-                                        'Reference File'    ]
+                                        'Unit Cell\nreference'  ]
 
         initial_model_table=QtGui.QTableWidget()
         initial_model_table.setRowCount(len(initial_model_list))
         initial_model_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        initial_model_table.setColumnCount(len(initial_model_list[0]))
+        initial_model_table.setColumnCount(len(initial_model_list[0])-1)
         initial_model_table.setSortingEnabled(True)
         for n,line in enumerate(initial_model_list):
             for column,item in enumerate(line[:-1]):
@@ -584,7 +584,7 @@ class XChemExplorer(QtGui.QApplication):
                     print line[1]
                     run_dimple.setChecked(line[1])
                     self.initial_model_dimple_dict[line[0]]=run_dimple
-                elif column==10:
+                elif column==7:
                     # don't need to connect, because only the displayed text will be read out
                     reference_file_selection_combobox = QtGui.QComboBox()
                     for reference_file in self.reference_file_list:
@@ -724,17 +724,17 @@ class read_intial_refinement_results(QtCore.QThread):
                         alert=(51,153,255)
 
             initial_model_list.append( [ sample,
-                                  run_dimple,
-                                  resolution_high,
-                                  Rcryst,
-                                  Rfree,
-                                  spg_autoproc,
-                                  spg_reference,
-                                  unitcell_difference,
-                                  unitcell_autoproc,
-                                  unitcell_reference,
-                                  reference,
-                                  alert ] )
+                                        run_dimple,
+                                        resolution_high,
+                                        Rcryst,
+                                        Rfree,
+                                        spg_autoproc,
+                                        spg_reference,
+                                        reference,
+                                        unitcell_difference,
+                                        unitcell_autoproc,
+                                        unitcell_reference,
+                                        alert ] )
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
