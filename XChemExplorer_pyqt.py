@@ -723,6 +723,7 @@ class read_intial_refinement_results(QtCore.QThread):
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+        self.emit(QtCore.SIGNAL('create_initial_model_table'), initial_model_list)
 
 
 
