@@ -538,7 +538,7 @@ class XChemExplorer(QtGui.QApplication):
                 for column,item in enumerate(diffraction_data_column_name):
                     for line in self.data_collection_statistics_dict[key]:
                         if len(line)==3:
-                            if line[0]==item
+                            if line[0]==item:
                                 cell_text=QtGui.QTableWidgetItem()
                                 cell_text.setText(str(item))
                                 data_collection_table.setItem(n, column, cell_text)
