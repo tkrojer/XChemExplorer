@@ -393,7 +393,7 @@ class XChemExplorer(QtGui.QApplication):
 
 ### --- used temporarily to be able to test stuff offline ---
         pickle.dump(data_collection_dict,open('data_collection_dict.p','wb'))
-        pickle.dump(data_collection_statistics_dict,open('data_collection_statistics_dict.p','wb'))
+        pickle.dump(self.data_collection_statistics_dict,open('data_collection_statistics_dict.p','wb'))
 #        data_collection_dict = pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p", "rb" ) )
 #        self.data_collection_statistics_dict= pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_statistics_dict.p", "rb" ) )
 ### ---------------------------------------------------------
