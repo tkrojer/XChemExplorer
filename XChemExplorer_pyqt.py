@@ -394,8 +394,8 @@ class XChemExplorer(QtGui.QApplication):
 ### --- used temporarily to be able to test stuff offline ---
 #        pickle.dump(data_collection_dict,open('data_collection_dict.p','wb'))
 #        pickle.dump(data_collection_statistics_dict,open('data_collection_statistics_dict.p','wb'))
-        data_collection_dict = pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p", "rb" ) )
-        self.data_collection_statistics_dict= pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_statistics_dict.p", "rb" ) )
+#        data_collection_dict = pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p", "rb" ) )
+#        self.data_collection_statistics_dict= pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_statistics_dict.p", "rb" ) )
 ### ---------------------------------------------------------
 
 
@@ -867,6 +867,59 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                 for index,logfile in enumerate(self.data_collection_dict[sample][2]):
                     self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 2 of 3: parsing aimless logfiles ->'+sample)
                     aimless_results=parse().GetAimlessLog(logfile)
+
+        diffraction_data_column_name = ['Program',                       (255,0,40),
+                                        'Run',                           (100,230,40),
+                                        'SpaceGroup',                    (100,230,40),
+                                        'Unit Cell',                     (100,230,40),
+                                        'Resolution\nOverall',           (100,230,40),
+                                        'Resolution\nInner Shell',       (100,230,40),
+                                        'Resolution\nOuter Shell',       (100,230,40),
+                                        'Rmerge\nOverall',               (100,230,40),
+                                        'Rmerge\nInner Shell',           (100,230,40),
+                                        'Rmerge\nOuter Shell',           (100,230,40),
+                                        'Mn(I/sig(I))\nOverall',         (100,230,40),
+                                        'Mn(I/sig(I))\nInner Shell',     (100,230,40),
+                                        'Mn(I/sig(I))\nOuter Shell',     (100,230,40),
+                                        'Completeness\nOverall',         (100,230,40),
+                                        'Completeness\nInner Shell',     (100,230,40),
+                                        'Completeness\nOuter Shell',     (100,230,40),
+                                        'Multiplicity\nOverall',         (100,230,40),
+                                        'Multiplicity\nInner Shell',     (100,230,40),
+                                        'Multiplicity\nOuter Shell',     (100,230,40)  ]
+
+                    self.data_collection_statistics_dict[sample].append([
+                                index,                                                                                      # 0
+                                logfile,                                                                                    # 1
+                                ['Program', aimless_results['AutoProc'],    (255,0,40)],
+                                ['Run',     aimless_results['Run'],         (100,230,40)],
+                                ['SpaceGroup',aimless_results['SpaceGroup'],(100,230,40)],
+                                ['Unit Cell',    aimless_results['UnitCell'],(100,230,40)],
+                                ['Resolution\nOverall',aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionHigh'],(100,230,40)],
+                                ['Resolution\nInner Shell', aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionLowInnerShell'],(100,230,40)],
+                                ['Resolution\nOuter Shell', aimless_results['ResolutionHighOuterShell']+'-'+aimless_results['ResolutionHigh'],(100,230,40)],
+                                ['Rmerge\nOverall',aimless_results['RmergeOverall'],(100,230,40)],
+                                ['Rmerge\nInner Shell', aimless_results['RmergeLow'],(100,230,40)],
+                                ['Rmerge\nOuter Shell', aimless_results['RmergeHigh'],(100,230,40)],
+                                aimless_results['IsigOverall'],(100,230,40)                                                             # 12
+                                aimless_results['IsigLow'],(100,230,40)                                                                 # 13
+                                aimless_results['IsigHigh'],(100,230,40)                                                                # 14
+                                aimless_results['CompletenessOverall'],(100,230,40)                                                     # 15
+                                aimless_results['CompletenessLow'],(100,230,40)                                                         # 16
+                                aimless_results['CompletenessHigh'],(100,230,40)                                                        # 17
+                                aimless_results['MultiplicityOverall'],(100,230,40)                                                     # 18
+                                aimless_results['MultiplicityLow'],(100,230,40)                                                         # 19
+                                aimless_results['MultiplicityHigh'],(100,230,40)                                                        # 20
+                                aimless_results['Lattice'],                                                                 # 21
+                                float(aimless_results['UniqueReflectionsOverall']),                                         # 22
+                                float(aimless_results['CompletenessOverall']),                                              # 23
+                                float(aimless_results['IsigOverall']),                                                      # 24
+                                float(aimless_results['UnitCellVolume']),                                                   # 25
+                                float(aimless_results['RmergeLow']),                                                        # 26
+                                False                                                                                       # 27
+                                        ])
+
+
                     self.data_collection_statistics_dict[sample].append([
                                 index,                                                                                      # 0
                                 logfile,                                                                                    # 1
