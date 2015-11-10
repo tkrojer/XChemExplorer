@@ -583,7 +583,6 @@ class XChemExplorer(QtGui.QApplication):
                     initial_model_table.setCellWidget(n, column, run_dimple)
                     print line[1]
                     run_dimple.setChecked(line[1])
-                    run_dimple.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                     self.initial_model_dimple_dict[line[0]]=run_dimple
                 elif column==10:
                     # don't need to connect, because only the displayed text will be read out
@@ -605,6 +604,7 @@ class XChemExplorer(QtGui.QApplication):
         initial_model_table.setHorizontalHeaderLabels(initial_model_column_name)
         initial_model_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         initial_model_table.resizeColumnsToContents()
+        initial_model_table.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.initial_model_vbox_for_table.addWidget(initial_model_table)
 
 
