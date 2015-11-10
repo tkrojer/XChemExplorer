@@ -268,8 +268,10 @@ class XChemExplorer(QtGui.QApplication):
 
             if self.sender().text()=="Check for inital Refinement":
 #                reference_file_list=self.get_reference_file_list()
+                print "checking for initial refinement"
                 self.work_thread=read_intial_refinement_results(self.initial_model_directory,self.reference_file_list)
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+                self.connect(self.work_thread, QtCore.SIGNAL("create_initial_model_table"),self.create_initial_model_table)
                 self.work_thread.start()
 
             if self.sender().text()=="Open COOT":
