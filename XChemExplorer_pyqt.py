@@ -26,13 +26,22 @@ class XChemExplorer(QtGui.QApplication):
 
         # Settings @ Directories
         self.current_directory=os.getcwd()
-        self.project_directory='/'+os.path.join(*self.current_directory.split('/')[1:6])    # need splat operator: *
-        self.beamline_directory=os.path.join(self.project_directory,'processing','beamline')
-        self.initial_model_directory=os.path.join(self.project_directory,'processing','analysis','initial_model')
-        self.refine_model_directory=os.path.join(self.project_directory,'processing','analysis','refine_model')
-        self.reference_directory=os.path.join(self.project_directory,'processing','reference')
-        self.database_directory=os.path.join(self.project_directory,'database')
-        self.data_source_file='XChemExplorer.csv'
+        if 'labxchem' in self.current_directory:
+            self.project_directory='/'+os.path.join(*self.current_directory.split('/')[1:6])    # need splat operator: *
+            self.beamline_directory=os.path.join(self.project_directory,'processing','beamline')
+            self.initial_model_directory=os.path.join(self.project_directory,'processing','analysis','initial_model')
+            self.refine_model_directory=os.path.join(self.project_directory,'processing','analysis','refine_model')
+            self.reference_directory=os.path.join(self.project_directory,'processing','reference')
+            self.database_directory=os.path.join(self.project_directory,'database')
+            self.data_source_file='XChemExplorer.csv'
+        else:
+            self.project_directory=self.current_directory
+            self.beamline_directory=self.current_directory
+            self.initial_model_directory=self.current_directory
+            self.refine_model_directory=self.current_directory
+            self.reference_directory=self.current_directory
+            self.database_directory=self.current_directory
+            self.data_source_file=''
 
         self.settings =     {'current_directory':       self.current_directory,
                              'project_directory':       self.project_directory,
@@ -80,7 +89,7 @@ class XChemExplorer(QtGui.QApplication):
         # GUI setup
         self.window=QtGui.QWidget()
 
-        self.window.setGeometry(0,0, 1200,800)
+        self.window.setGeometry(0,0, 1400,1000)
         self.window.setWindowTitle("XChemExplorer")
         self.center_main_window()
         
@@ -199,6 +208,10 @@ class XChemExplorer(QtGui.QApplication):
         open_cootl_button.clicked.connect(self.button_clicked)
         summary_button_hbox.addWidget(open_cootl_button)
         self.tab_dict['Summary & Refine'][1].addLayout(summary_button_hbox)
+
+        # Settings Tab
+        self.data_collection_vbox_for_settings=QtGui.QVBoxLayout()
+        self.tab_dict['Settings'][1].addLayout(self.data_collection_vbox_for_settings)
 
 
         self.status_bar=QtGui.QStatusBar()
@@ -394,8 +407,8 @@ class XChemExplorer(QtGui.QApplication):
 ### --- used temporarily to be able to test stuff offline ---
 #        pickle.dump(data_collection_dict,open('data_collection_dict.p','wb'))
 #        pickle.dump(self.data_collection_statistics_dict,open('data_collection_statistics_dict.p','wb'))
-#        data_collection_dict = pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p", "rb" ) )
-#        self.data_collection_statistics_dict= pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_statistics_dict.p", "rb" ) )
+        data_collection_dict = pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p", "rb" ) )
+        self.data_collection_statistics_dict= pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_statistics_dict.p", "rb" ) )
 ### ---------------------------------------------------------
 
 
@@ -534,53 +547,34 @@ class XChemExplorer(QtGui.QApplication):
             data_collection_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
             data_collection_table.setColumnCount(len(diffraction_data_column_name))
 
-#        font = QtGui.QFont()
-#        font.setFamily(_fromUtf8("Verdana"))
-#        self.simple_table.setFont(font)
-#        font =  self.horizontalHeader().font()
-#        font.setPointSize(12)
-#        self.setFont(font)
+            font = QtGui.QFont()
+#            font.setFamily(_fromUtf8("Verdana"))
+#            font =  self.horizontalHeader().font()
+            font.setPointSize(8)
+#            self.setFont(font)
+            data_collection_table.setFont(font)
 
             for n,sample in enumerate(self.data_collection_statistics_dict[key]):
                 for column,header in enumerate(diffraction_data_column_name):
-                    for item in self.data_collection_statistics_dict[key]:
-                        for entry in item:
-                            if isinstance(entry, list):
-#                        print len(line),line
-                                if len(entry)==3:
-                                    print entry[0]
-                                    print entry[1]
-                                    print entry[2]
-                                    if entry[0]==header:
-                                        cell_text=QtGui.QTableWidgetItem()
-                                        cell_text.setText(str(entry[1]))
-                                        data_collection_table.setItem(n, column, cell_text)
-#                                r=entry[2][0]
-#                                g=entry[2][1]
-#                                b=entry[2][2]
-#                                data_collection_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
-#                                break
-                                if len(entry)==2:
-                                    if entry[0]=='best file':
-                                        if entry[1]==True:
-                                            data_collection_table.selectRow(n)
-
-#                for column,item in enumerate(line[2:20]):
-#                    cell_text=QtGui.QTableWidgetItem()
-#                    cell_text.setText(str(item))
-#                    data_collection_table.setItem(n, column, cell_text)
-#                    data_collection_table.item(n,column).setBackground(QtGui.QColor(100,100,150))
-#                    r=diffraction_data_column_name[2*column+1][0]
-#                    g=diffraction_data_column_name[2*column+1][1]
-#                    b=diffraction_data_column_name[2*column+1][2]
-#                    data_collection_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
-#                    print 'hallo'
-#                    print diffraction_data_column_name[2*column+1]
-#                    data_collection_table.item(n,column).setBackground(QtGui.QColor(diffraction_data_column_name[2*column+1]))
-#                    if line[27]==True:
-#                        data_collection_table.selectRow(n)
+#                    for item in self.data_collection_statistics_dict[key]:
+                    for item in sample:
+                        if isinstance(item, list):
+                            if len(item)==3:
+                                if item[0]==header:
+                                    cell_text=QtGui.QTableWidgetItem()
+                                    cell_text.setText(str(item[1]))
+                                    cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                                    r=item[2][0]
+                                    g=item[2][1]
+                                    b=item[2][2]
+                                    data_collection_table.setItem(n, column, cell_text)
+                                    data_collection_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
+                            if len(item)==2:
+                                if item[0]=='best file':
+                                    if item[1]==True:
+                                        data_collection_table.selectRow(n)
             # some_list[start:stop:step]
-            data_collection_table.setHorizontalHeaderLabels(diffraction_data_column_name[0::2])
+            data_collection_table.setHorizontalHeaderLabels(diffraction_data_column_name)
             data_collection_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
 
             # this is necessary to render table properly
