@@ -604,7 +604,6 @@ class XChemExplorer(QtGui.QApplication):
         initial_model_table.setHorizontalHeaderLabels(initial_model_column_name)
         initial_model_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         initial_model_table.resizeColumnsToContents()
-        initial_model_table.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.initial_model_vbox_for_table.addWidget(initial_model_table)
 
 
