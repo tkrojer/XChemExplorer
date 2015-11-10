@@ -555,8 +555,8 @@ class XChemExplorer(QtGui.QApplication):
 #                                break
                                 if len(entry)==2:
                                     if entry[0]=='best file':
-                                    if entry[1]==True:
-                                        data_collection_table.selectRow(n)
+                                        if entry[1]==True:
+                                            data_collection_table.selectRow(n)
 
 #                for column,item in enumerate(line[2:20]):
 #                    cell_text=QtGui.QTableWidgetItem()
