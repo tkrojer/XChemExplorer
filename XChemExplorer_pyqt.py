@@ -419,6 +419,27 @@ class XChemExplorer(QtGui.QApplication):
                                         'Multiplicity\nInner Shell',     (100,230,40),
                                         'Multiplicity\nOuter Shell',     (100,230,40)  ]
 
+        diffraction_data_column_name = ['Program',
+                                        'Run',
+                                        'SpaceGroup',
+                                        'Unit Cell',
+                                        'Resolution\nOverall',
+                                        'Resolution\nInner Shell',
+                                        'Resolution\nOuter Shell',
+                                        'Rmerge\nOverall',
+                                        'Rmerge\nInner Shell',
+                                        'Rmerge\nOuter Shell',
+                                        'Mn(I/sig(I))\nOverall',
+                                        'Mn(I/sig(I))\nInner Shell',
+                                        'Mn(I/sig(I))\nOuter Shell',
+                                        'Completeness\nOverall',
+                                        'Completeness\nInner Shell',
+                                        'Completeness\nOuter Shell',
+                                        'Multiplicity\nOverall',
+                                        'Multiplicity\nInner Shell',
+                                        'Multiplicity\nOuter Shell',    ]
+
+
 
         self.dataset_outcome = {    "success":                      "rgb(200,200,200)",
                                     "Failed - centring failed":     "rgb(200,200,200)",
@@ -511,22 +532,40 @@ class XChemExplorer(QtGui.QApplication):
             data_collection_table=QtGui.QTableWidget()
             data_collection_table.setRowCount(len(self.data_collection_statistics_dict[key]))
             data_collection_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-            data_collection_table.setColumnCount(len(self.data_collection_statistics_dict[key][0])-5)
-            for n,line in enumerate(self.data_collection_statistics_dict[key]):
-                for column,item in enumerate(line[2:20]):
-                    cell_text=QtGui.QTableWidgetItem()
-                    cell_text.setText(str(item))
-                    data_collection_table.setItem(n, column, cell_text)
+            data_collection_table.setColumnCount(len(diffraction_data_column_name))
+
+            for n,sample in enumerate(self.data_collection_statistics_dict[key]):
+                for column,item in enumerate(diffraction_data_column_name):
+                    for line in self.data_collection_statistics_dict[key]:
+                        if len(line)==3:
+                            if line[0]==item
+                                cell_text=QtGui.QTableWidgetItem()
+                                cell_text.setText(str(item))
+                                data_collection_table.setItem(n, column, cell_text)
+                                r=line[2][[0]
+                                g=line[2][[1]
+                                b=line[2][[2]
+                                data_collection_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
+                                break
+                        if len(line)==2:
+                            if line[0]=='best file']
+                                if line[1]==True:
+                                    data_collection_table.selectRow(n)
+
+#                for column,item in enumerate(line[2:20]):
+#                    cell_text=QtGui.QTableWidgetItem()
+#                    cell_text.setText(str(item))
+#                    data_collection_table.setItem(n, column, cell_text)
 #                    data_collection_table.item(n,column).setBackground(QtGui.QColor(100,100,150))
-                    r=diffraction_data_column_name[2*column+1][0]
-                    g=diffraction_data_column_name[2*column+1][1]
-                    b=diffraction_data_column_name[2*column+1][2]
-                    data_collection_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
+#                    r=diffraction_data_column_name[2*column+1][0]
+#                    g=diffraction_data_column_name[2*column+1][1]
+#                    b=diffraction_data_column_name[2*column+1][2]
+#                    data_collection_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
 #                    print 'hallo'
 #                    print diffraction_data_column_name[2*column+1]
 #                    data_collection_table.item(n,column).setBackground(QtGui.QColor(diffraction_data_column_name[2*column+1]))
-                    if line[27]==True:
-                        data_collection_table.selectRow(n)
+#                    if line[27]==True:
+#                        data_collection_table.selectRow(n)
             # some_list[start:stop:step]
             data_collection_table.setHorizontalHeaderLabels(diffraction_data_column_name[0::2])
             data_collection_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
@@ -888,36 +927,36 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 #                                        'Multiplicity\nInner Shell',     (100,230,40),
 #                                        'Multiplicity\nOuter Shell',     (100,230,40)  ]
 
-#                    self.data_collection_statistics_dict[sample].append([
-#                                index,                                                                                      # 0
-#                                logfile,                                                                                    # 1
-#                                ['Program', aimless_results['AutoProc'],    (255,0,40)],
-#                                ['Run',     aimless_results['Run'],         (100,230,40)],
-#                                ['SpaceGroup',aimless_results['SpaceGroup'],(100,230,40)],
-#                                ['Unit Cell',    aimless_results['UnitCell'],(100,230,40)],
-#                                ['Resolution\nOverall',aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionHigh'],(100,230,40)],
-#                                ['Resolution\nInner Shell', aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionLowInnerShell'],(100,230,40)],
-#                                ['Resolution\nOuter Shell', aimless_results['ResolutionHighOuterShell']+'-'+aimless_results['ResolutionHigh'],(100,230,40)],
-#                                ['Rmerge\nOverall',aimless_results['RmergeOverall'],(100,230,40)],
-#                                ['Rmerge\nInner Shell', aimless_results['RmergeLow'],(100,230,40)],
-#                                ['Rmerge\nOuter Shell', aimless_results['RmergeHigh'],(100,230,40)],
-#                                aimless_results['IsigOverall'],(100,230,40)                                                             # 12
-#                                aimless_results['IsigLow'],(100,230,40)                                                                 # 13
-#                                aimless_results['IsigHigh'],(100,230,40)                                                                # 14
-#                                aimless_results['CompletenessOverall'],(100,230,40)                                                     # 15
-#                                aimless_results['CompletenessLow'],(100,230,40)                                                         # 16
-#                                aimless_results['CompletenessHigh'],(100,230,40)                                                        # 17
-#                                aimless_results['MultiplicityOverall'],(100,230,40)                                                     # 18
-#                                aimless_results['MultiplicityLow'],(100,230,40)                                                         # 19
-#                                aimless_results['MultiplicityHigh'],(100,230,40)                                                        # 20
-#                                aimless_results['Lattice'],                                                                 # 21
-#                                float(aimless_results['UniqueReflectionsOverall']),                                         # 22
-#                                float(aimless_results['CompletenessOverall']),                                              # 23
-#                                float(aimless_results['IsigOverall']),                                                      # 24
-#                                float(aimless_results['UnitCellVolume']),                                                   # 25
-#                                float(aimless_results['RmergeLow']),                                                        # 26
-#                                False                                                                                       # 27
-#                                        ])
+                    self.data_collection_statistics_dict[sample].append([
+                        index,                                                                                      # 0
+                        logfile,                                                                                    # 1
+                        ['Program',                     aimless_results['AutoProc'],                                                        (255,0,40)],
+                        ['Run',                         aimless_results['Run'],                                                             (100,230,40)],
+                        ['SpaceGroup',                  aimless_results['SpaceGroup'],                                                      (100,230,40)],
+                        ['Unit Cell',                   aimless_results['UnitCell'],                                                        (100,230,40)],
+                        ['Resolution\nOverall',         aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionHigh'],             (100,230,40)],
+                        ['Resolution\nInner Shell',     aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionLowInnerShell'],    (100,230,40)],
+                        ['Resolution\nOuter Shell',     aimless_results['ResolutionHighOuterShell']+'-'+aimless_results['ResolutionHigh'],  (100,230,40)],
+                        ['Rmerge\nOverall',             aimless_results['RmergeOverall'],                                                   (100,230,40)],
+                        ['Rmerge\nInner Shell',         aimless_results['RmergeLow'],                                                       (100,230,40)],
+                        ['Rmerge\nOuter Shell',         aimless_results['RmergeHigh'],                                                      (100,230,40)],
+                        ['Mn(I/sig(I))\nOverall',       aimless_results['IsigOverall'],                                                     (100,230,40)],
+                        ['Mn(I/sig(I))\nInner Shell',   aimless_results['IsigLow'],                                                         (100,230,40)],
+                        ['Mn(I/sig(I))\nOuter Shell',   aimless_results['IsigHigh'],                                                        (100,230,40)],
+                        ['Completeness\nOverall',       aimless_results['CompletenessOverall'],                                             (100,230,40)],
+                        ['Completeness\nInner Shell',   aimless_results['CompletenessLow'],                                                 (100,230,40)],
+                        ['Completeness\nOuter Shell',   aimless_results['CompletenessHigh'],                                                (100,230,40)],
+                        ['Multiplicity\nOverall',       aimless_results['MultiplicityOverall'],                                             (100,230,40)],
+                        ['Multiplicity\nInner Shell',   aimless_results['MultiplicityLow'],                                                 (100,230,40)],
+                        ['Multiplicity\nOuter Shell',   aimless_results['MultiplicityHigh'],                                                (100,230,40)],
+                        aimless_results['Lattice'],                                                                 # 21
+                        float(aimless_results['UniqueReflectionsOverall']),                                         # 22
+                        float(aimless_results['CompletenessOverall']),                                              # 23
+                        float(aimless_results['IsigOverall']),                                                      # 24
+                        float(aimless_results['UnitCellVolume']),                                                   # 25
+                        float(aimless_results['RmergeLow']),                                                        # 26
+                        ['best file',False]                                                                                       # 27
+                                        ])
 
 
                     self.data_collection_statistics_dict[sample].append([
