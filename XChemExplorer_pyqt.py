@@ -152,6 +152,7 @@ class XChemExplorer(QtGui.QApplication):
         data_collection_button_hbox.addWidget(target_selection_combobox)
         self.tab_dict['DLS @ Data Collection'][1].addLayout(data_collection_button_hbox)
         self.target=str(target_selection_combobox.currentText())
+        print self.target
         self.target='ATAD2A'
 
 
@@ -583,7 +584,8 @@ class XChemExplorer(QtGui.QApplication):
                     for reference_file in self.reference_file_list:
                         reference_file_selection_combobox.addItem(reference_file[0])
                     initial_model_table.setCellWidget(n, column, reference_file_selection_combobox)
-                    reference_file_selection_combobox.setItem(line[10])
+                    index = reference_file_selection_combobox.findText(str(line[10]), QtCore.Qt.MatchFixedString)
+                    reference_file_selection_combobox.setCurrentIndex(index)
                 else:
                     cell_text=QtGui.QTableWidgetItem()
                     cell_text.setText(str(item))
