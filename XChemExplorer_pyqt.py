@@ -583,6 +583,7 @@ class XChemExplorer(QtGui.QApplication):
                     run_dimple = QtGui.QCheckBox()
                     run_dimple.toggle()
                     initial_model_table.setCellWidget(n, column, run_dimple)
+                    run_dimple.setChecked(line[1])
                     self.initial_model_dimple_dict[line[0]]=run_dimple
                 if column==10:
                     # don't need to connect, because only the displayed text will be read out
@@ -602,6 +603,7 @@ class XChemExplorer(QtGui.QApplication):
 #                initial_model_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
         initial_model_table.setHorizontalHeaderLabels(initial_model_column_name)
         initial_model_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        initial_model_table.resizeColumnsToContents()
         self.initial_model_vbox_for_table.addWidget(initial_model_table)
 
 
