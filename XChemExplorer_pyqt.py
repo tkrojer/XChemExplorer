@@ -569,8 +569,6 @@ class XChemExplorer(QtGui.QApplication):
                                         'Unit Cell\nautoprocessing',
                                         'Unit Cell\nreference',
                                         'Reference File'    ]
-        for x in initial_model_list:
-            print x
 
         initial_model_table=QtGui.QTableWidget()
         initial_model_table.setRowCount(len(initial_model_list))
@@ -583,9 +581,10 @@ class XChemExplorer(QtGui.QApplication):
                     run_dimple = QtGui.QCheckBox()
                     run_dimple.toggle()
                     initial_model_table.setCellWidget(n, column, run_dimple)
+                    print line[1]
                     run_dimple.setChecked(line[1])
                     self.initial_model_dimple_dict[line[0]]=run_dimple
-                if column==10:
+                elif column==10:
                     # don't need to connect, because only the displayed text will be read out
                     reference_file_selection_combobox = QtGui.QComboBox()
                     for reference_file in self.reference_file_list:
