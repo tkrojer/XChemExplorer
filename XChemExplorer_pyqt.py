@@ -689,8 +689,8 @@ class read_intial_refinement_results(QtCore.QThread):
             reference=''
             alert='#E0E0E0'
 
-            if os.path.isfile(self.initial_model_directory+'/'+sample+'.mtz'):
-                mtz_autoproc=mtztools(self.initial_model_directory+'/'+sample+'.mtz').get_all_values_as_dict()
+            if os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'.mtz')):
+                mtz_autoproc=mtztools(os.path.join(self.initial_model_directory,sample,sample+'.mtz')).get_all_values_as_dict()
                 resolution_high=mtz_autoproc['resolution_high']
                 spg_autoproc=mtz_autoproc['spacegroup']
                 unitcell_autoproc=mtz_autoproc['unitcell']
@@ -706,13 +706,13 @@ class read_intial_refinement_results(QtCore.QThread):
                         unitcell_reference=reference_file[2]
                         reference=reference_file[0]
                         break
-            if os.path.isdir(self.initial_model_directory+'/Dimple'):
-                    if os.path.isfile(self.initial_model_directory+'/Dimple/dimple/final.pdb'):
-                        pdb=parse().PDBheader(self.initial_model_directory+'/Dimple/dimple/final.pdb')
+            if os.path.isdir(os.path.join(self.initial_model_directory,sample,'Dimple')):
+                    if os.path.isfile(os.path.join(self.initial_model_directory,sample,'Dimple','dimple','final.pdb')):
+                        pdb=parse().PDBheader(os.path.join(self.initial_model_directory,sample,'Dimple','dimple','final.pdb'))
                         Rcryst=pdb['Rcryst']
                         Rfree=pdb['Rfree']
                         alert=pdb['Alert']
-                    elif os.path.isfile(self.initial_model_directory+'/dimple_run_in_progress'):
+                    elif os.path.isfile(os.path.join(self.initial_model_directory,sample,'/dimple_run_in_progress')):
                         Rcryst='in progress'
                         Rfree='in progress'
                         alert=(51,153,255)
