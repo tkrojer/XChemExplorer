@@ -270,6 +270,9 @@ class XChemExplorer(QtGui.QApplication):
             if self.sender().text()=="Check for inital Refinement":
 #                reference_file_list=self.get_reference_file_list()
                 print "checking for initial refinement"
+                self.explorer_active=1
+                self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+                self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
                 self.work_thread=read_intial_refinement_results(self.initial_model_directory,self.reference_file_list)
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                 self.connect(self.work_thread, QtCore.SIGNAL("create_initial_model_table"),self.create_initial_model_table)
@@ -676,6 +679,7 @@ class read_intial_refinement_results(QtCore.QThread):
         for sample_dir in sorted(glob.glob(self.initial_model_directory+'/*')):
 
             sample=sample_dir[sample_dir.rfind('/')+1:]
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'parsing initial_models folder ->'+sample)
 
             run_dimple=True
             resolution_high=''
