@@ -104,6 +104,7 @@ class XChemExplorer(QtGui.QApplication):
         tab_widget = QtGui.QTabWidget()
         tab_list = [    'Mounted Crystals',
                         'DLS @ Data Collection',
+                        'DLS @ Summary',
                         'Initial Model',
                         'PANDDAs',
                         'Summary & Refine',
@@ -221,6 +222,7 @@ class XChemExplorer(QtGui.QApplication):
         self.window.show()
 
     def target_selection_combobox_activated(self,text):
+        print text
         self.target=text
 
     def buttonClicked(self):
@@ -473,6 +475,7 @@ class XChemExplorer(QtGui.QApplication):
             # dataset outcome buttons1
             dataset_outcome_groupbox=QtGui.QGroupBox()
             dataset_outcome_vbox=QtGui.QVBoxLayout()
+            found_successful_data_collection=1
             for outcome in sorted(self.dataset_outcome):
                 button=QtGui.QPushButton(outcome)
                 button.setAutoExclusive(True)
@@ -483,7 +486,13 @@ class XChemExplorer(QtGui.QApplication):
                 if outcome=='success':
                     button.setChecked(True)
                     button.setStyleSheet("background-color: rgb(0,255,0)")
+                    found_successful_data_collection=1
                 dataset_outcome_vbox.addWidget(button)
+            if not found_successful_data_collection:
+                for button in self.dataset_outcome_dict[key]:
+                    if button.text()=='Failed - unknown':
+                        button.setChecked(True)
+                        button.setStyleSheet("background-color: rgb(255,0,0)")
             dataset_outcome_groupbox.setLayout(dataset_outcome_vbox)
             hbox_for_button_and_table.addWidget(dataset_outcome_groupbox)
 
@@ -723,24 +732,40 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
         if not len(self.dataset_outcome_dict)==0:
             progress_step=100/float(len(self.dataset_outcome_dict))
         progress=0
-
+        csv_out=''
         for key in sorted(self.dataset_outcome_dict):
+            outcome=''
             for button in self.dataset_outcome_dict[key]:
                 if button.isChecked():
                     print key,button.text()
+                    outcome=button.text()
+            csv_out+=str(key)+','+outcome+','
+            if outcome=='success':
+                indexes=self.data_collection_table_dict[key].selectionModel().selectedRows()
+                for index in sorted(indexes):
+                    # csv out
+                    for item in self.data_collection_statistics_dict[key][index.row()]:
+                        csv_out+=str(item)+','
+                    csv_out+='\n'
+
+#                    print self.data_collection_table_dict[key]
+                    print self.data_collection_statistics_dict[key][index.row()]
+                    print self.data_collection_statistics_dict[key][index.row()]
+
+                    if 'xia2' in self.data_collection_statistics_dict[key][index.row()][1]:
+#                        print self.data_collection_statistics_dict[key][index.row()][1]
+                        print os.path.join(*self.data_collection_statistics_dict[key][index.row()][1].split('/')[:13])
+#                print('Row %d is selected' % index.row())
+                    if 'fast_dp' in self.data_collection_statistics_dict[key][index.row()][1]:
+#                        print self.data_collection_statistics_dict[key][index.row()][1]
+                        print os.path.join(*self.data_collection_statistics_dict[key][index.row()][1].split('/')[:12])
+
 
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing files from data processing to inital_model folder ->'+key)
-            indexes=self.data_collection_table_dict[key].selectionModel().selectedRows()
-#            for index in sorted(indexes):
-#                print self.data_collection_table_dict[key]
-#                print self.data_collection_statistics_dict[key][index.row()]
-#                print('Row %d is selected' % index.row())
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-
-        self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results'), [self.data_collection_dict,
-                                                                               self.data_collection_statistics_dict])
+        print csv_out
 
         self.emit(QtCore.SIGNAL("finished()"))
 
@@ -816,6 +841,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
         progress=0
         for sample in sorted(self.data_collection_dict):
             self.data_collection_statistics_dict[sample]=[]
+            print sample,self.data_collection_dict[sample][2]
             if not self.data_collection_dict[sample][2]==[]:
                 for index,logfile in enumerate(self.data_collection_dict[sample][2]):
                     self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 2 of 3: parsing aimless logfiles ->'+sample)
@@ -852,6 +878,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                                         ])
             else:
                 self.data_collection_statistics_dict[sample]+='###'*20
+                print sample
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
@@ -874,6 +901,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
         for sample in sorted(self.data_collection_statistics_dict):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 3 of 3: selecting "best" aimless logfile ->'+sample)
             if self.data_collection_statistics_dict[sample][0]=='#':
+                print sample
                 continue
             select_stage_one_list = []
             found=0
