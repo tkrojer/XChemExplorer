@@ -271,9 +271,9 @@ class XChemExplorer(QtGui.QApplication):
 #                reference_file_list=self.get_reference_file_list()
                 print "checking for initial refinement"
                 self.explorer_active=1
+                self.work_thread=read_intial_refinement_results(self.initial_model_directory,self.reference_file_list)
                 self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
                 self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-                self.work_thread=read_intial_refinement_results(self.initial_model_directory,self.reference_file_list)
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                 self.connect(self.work_thread, QtCore.SIGNAL("create_initial_model_table"),self.create_initial_model_table)
                 self.work_thread.start()
