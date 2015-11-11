@@ -528,7 +528,7 @@ class XChemExplorer(QtGui.QApplication):
                 button.setStyleSheet("background-color: "+self.dataset_outcome[outcome])
                 button.clicked.connect(self.dataset_outcome_button_change_color)
 #                self.add.setStyleSheet("font-size:40px;background-color:#666666; border: 2px solid #555555")
-                button.add.setStyleSheet("font-size:9px)
+                button.add.setStyleSheet("font-size:9px")
                 self.dataset_outcome_dict[key].append(button)
                 if outcome=='success':
                     button.setChecked(True)
@@ -1066,7 +1066,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                 best_file_index=max(select_stage_three_list,key=lambda x: x[1])[0]
                 for index,results in enumerate(self.data_collection_statistics_dict[sample]):
                     if index==best_file_index:
-                        self.data_collection_statistics_dict[sample][index][27]=True
+                        self.data_collection_statistics_dict[sample][index][27]=['best file',True]
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
