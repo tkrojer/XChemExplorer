@@ -525,10 +525,10 @@ class XChemExplorer(QtGui.QApplication):
                 button=QtGui.QPushButton(outcome)
                 button.setAutoExclusive(True)
                 button.setCheckable(True)
-                button.setStyleSheet("background-color: "+self.dataset_outcome[outcome])
+                button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[outcome])
                 button.clicked.connect(self.dataset_outcome_button_change_color)
 #                self.add.setStyleSheet("font-size:40px;background-color:#666666; border: 2px solid #555555")
-                button.setStyleSheet("font-size:9px")
+#                button.setStyleSheet("font-size:9px")
                 self.dataset_outcome_dict[key].append(button)
                 if outcome=='success':
                     button.setChecked(True)
