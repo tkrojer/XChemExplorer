@@ -479,10 +479,14 @@ class XChemExplorer(QtGui.QApplication):
             # this is the main table
 
             # column 1: sample ID
-            table.setItem(row, 0, QtGui.QTableWidgetItem(key))
+            sample_ID=QtGui.QTableWidgetItem(key)
+            sample_ID.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+            table.setItem(row, 0, sample_ID)
 
             # column 2: data collection date
-            table.setItem(row, 1, QtGui.QTableWidgetItem(data_collection_dict[key][0][0][1]))
+            data_collection_date_time=QtGui.QTableWidgetItem(data_collection_dict[key][0][0][1])
+            data_collection_date_time.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+            table.setItem(row, 1, data_collection_date_time)
 
             # column 3:
             # ---------------------------------------------------------|
