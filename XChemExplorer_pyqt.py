@@ -577,6 +577,8 @@ class XChemExplorer(QtGui.QApplication):
                                         data_collection_table.selectRow(n)
             # some_list[start:stop:step]
             data_collection_table.setHorizontalHeaderLabels(diffraction_data_column_name)
+            data_collection_table.horizontalHeader().setFont(font)
+#            table.horizontalHeaderItem(1).setTextAlignment(Qt.AlignHCenter)
             data_collection_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
 
             # this is necessary to render table properly
