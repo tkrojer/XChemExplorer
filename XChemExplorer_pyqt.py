@@ -453,20 +453,6 @@ class XChemExplorer(QtGui.QApplication):
                                         'Multiplicity\nOuter Shell',    ]
 
 
-        diffraction_data_column_name = ['Program',
-                                        'Run',
-                                        'Resolution\nInner Shell',
-                                        'Resolution\nOuter Shell',
-                                        'Completeness\nInner Shell',
-                                        'SpaceGroup',
-                                        'Unit Cell',
-                                        'Resolution\nOverall',
-                                        'Completeness\nOuter Shell',
-                                        'Multiplicity\nOverall',
-                                        'Multiplicity\nInner Shell',
-                                        'Multiplicity\nOuter Shell',    ]
-
-
 
         self.dataset_outcome = {    "success":                      "rgb(200,200,200)",
                                     "Failed - centring failed":     "rgb(200,200,200)",
