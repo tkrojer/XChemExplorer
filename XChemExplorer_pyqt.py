@@ -686,13 +686,15 @@ class XChemExplorer(QtGui.QApplication):
         for button in self.dataset_outcome_dict[dataset]:
             if button==self.sender():
                 if str(self.sender().text()).startswith('success'):
-                    button.setStyleSheet("background-color: rgb(0,255,0)")
+                    button.setStyleSheet("font-size:9px;background-color: rgb(0,255,0)")
                 else:
-                    button.setStyleSheet("background-color: rgb(255,0,0)")
+                    button.setStyleSheet("font-size:9px;background-color: rgb(255,0,0)")
 #                button.setStyleSheet("border-style: inset")
             else:
                 print self.dataset_outcome[str(button.text())]
-                button.setStyleSheet("background-color: "+self.dataset_outcome[str(button.text())])
+                button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[str(button.text())])
+
+#        button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[outcome])
 #        print 'hallo'
 #        print self.sender()
 
