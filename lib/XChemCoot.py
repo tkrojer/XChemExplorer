@@ -3,14 +3,16 @@ import sys
 import os
 import glob
 import pickle
+import subprocess
 
 # SParkle libraries
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 sys.path.append(os.getenv('CCP4')+'/lib/python2.7/site-packages')
 
 from XChemUtils import data_source
+import XChemRefine
 
-#import SPutils
+import SPutils
 #import SPmodel
 #import SPrefine
 #import SPdatabase
@@ -35,6 +37,13 @@ class GUI(object):
 
     def __init__(self):
 
+        # check if qstat is available
+        try:
+            subprocess.call(['qstat'])
+            self.queueing_system_available=True
+        except OSError:
+            self.queueing_system_available=False
+
         # read in settings file from XChemExplorer to set the relevant paths
         self.settings = pickle.load(open("XChemExplorer_settings.pkl","rb"))
 
@@ -52,17 +61,25 @@ class GUI(object):
         self.selection_criteria =   [   'All Datasets',
                                         'Datasets under refinement',
                                         'ligand confirmed',
-                                        'finished models']
+                                        'finished models'   ]
+        # this decides which samples will be looked at
         self.selection_mode = ''
+
+
+        # Todo list:
+        # 0: sampleID
+        # 1: compoundID
+        # 2: dataset outcome
+
 
         # the Folder is kind of a legacy thing because my inital idea was to have separate folders
         # for Data Processing and Refinement
-        self.project_directory = self.settings['project_directory']
+        self.project_directory = self.settings['initial_model_directory']
 #        self.DataPath = DataPath
         self.Serial=0
         self.Refine=None
 #        self.Action = Action
-        self.ActionPath = ''    # self.ActionPath is were stuff is actually done; depending on Action it's either the ProjectPath or DataPath
+#        self.ActionPath = ''    # self.ActionPath is were stuff is actually done; depending on Action it's either the ProjectPath or DataPath
 #        self .Todo=[]
 #        tmp=[]
 #        for folders in glob.glob(self.refine_model_directory+'/*'):
@@ -73,9 +90,6 @@ class GUI(object):
 #                tmp.append(os.path.join(self.refine_model_directory,sample,refine.mtz)
 
 
-
-
-
 #        self.User = User
 #        self.Password = Password
         self.index = -1
@@ -84,7 +98,6 @@ class GUI(object):
 
         self.xtalID=''
         self.compoundID=''
-        self.datasetID=''
         self.datasetOutcome=''
 
         # some COOT settings
@@ -106,13 +119,6 @@ class GUI(object):
                                     'LigandCCcolor':                'gray',
                                     'LigandCC':                     'n/a'   }
 
-#        if (self.User or self.Password) == '':
-#            Alert = ('\nyou did not provide your SCARAB\n'
-#                       'username and/or password\n'
-#                       'so you will not be able to\n'
-#                       'update the model table\n')
-#            coot.info_dialog(Alert)
-
         # default refmac parameters
         self.RefmacParams={ 'HKLIN': '', 'HKLOUT': '',
                             'XYZIN': '', 'XYZOUT': '',
@@ -127,7 +133,7 @@ class GUI(object):
                             'TWIN':   ''    }
 
 
-                
+
     def StartGUI(self):
 
         self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
@@ -211,11 +217,6 @@ class GUI(object):
         self.image.set_from_pixbuf(self.pic)
         self.vbox.pack_start(self.image)
 
-        # button to load reference structure
-#        self.RefModelButton = gtk.CheckButton("show reference structure (reference4cootSP.pdb)")
-#        self.RefModelButton.connect("toggled", self.RefModelButtonCallback)
-#        self.vbox.add(self.RefModelButton)
-
         # define main buttons
         self.PREVbutton = gtk.Button(label="<<<")
         self.NEXTbutton = gtk.Button(label=">>>")
@@ -233,11 +234,10 @@ class GUI(object):
         self.RefinementParamsButton = gtk.Button(label="refinement parameters")
 #        self.AdjustDataProcessingButton = gtk.Button(label="adjust data processing")
 
-
         self.cb = gtk.combo_box_new_text()
         self.cb.connect("changed", self.ChooseXtal)
-        for item in self.Todo:
-            self.cb.append_text('%s' %item[0])
+#        for item in self.Todo:
+#            self.cb.append_text('%s' %item[0])
         self.vbox.add(self.cb)
 
         # Buttons
@@ -250,22 +250,7 @@ class GUI(object):
         self.PREVbutton.connect("clicked", self.ChangeXtal,-1)
         self.NEXTbutton.connect("clicked", self.ChangeXtal,+1)
 
-#        if self.Action == 'Review':
-
-#            self.hbox2 = gtk.HBox()
-#            self.hbox2.pack_start(self.PREPAREforREFINEMENTbutton)
-#            self.PREPAREforREFINEMENTbutton.connect("clicked",self.PREPAREforREFINEMENT)
-#            self.vbox.pack_start(self.hbox2)
-
-#            self.hbox3 = gtk.HBox()
-#            self.hbox3.pack_start(self.NODATACOLLECTIONFAILEDbutton)
-#            self.NODATACOLLECTIONFAILEDbutton.connect("clicked",self.update_data_source,"Failed - no diffraction")
-#            self.vbox.pack_start(self.hbox3)
-
-#            self.hbox4 = gtk.HBox()
-#            self.hbox4.pack_start(self.NODATAPROCESSINGFAILEDbutton)
-#            self.NODATAPROCESSINGFAILEDbutton.connect("clicked",self.update_data_source,"Failed - processing barfs")
-#            self.vbox.pack_start(self.hbox4)
+        # things concerning the dataset outcome
 
         self.hbox5 = gtk.HBox()
         self.hbox5.pack_start(self.NOREFINEMENTFAILEDbutton)
@@ -310,10 +295,10 @@ class GUI(object):
         self.NOLIGANDFAILEDbutton.connect("clicked",self.update_data_source,"Failed - no ligand")
         self.vbox.pack_start(self.hbox4)
 
-        self.hbox6 = gtk.HBox()
-        self.hbox6.pack_start(self.VALIDATEbutton)
-        self.VALIDATEbutton.connect("clicked",self.Validate)
-        self.vbox.pack_start(self.hbox6)
+#        self.hbox6 = gtk.HBox()
+#        self.hbox6.pack_start(self.VALIDATEbutton)
+#        self.VALIDATEbutton.connect("clicked",self.Validate)
+#        self.vbox.pack_start(self.hbox6)
 
 #            self.hbox7 = gtk.HBox()
 #            self.hbox7.pack_start(self.DEPOSITbutton)
@@ -351,77 +336,62 @@ class GUI(object):
         if self.Todo[self.index][2]==None:
             self.compoundID='None'
         else:
-            self.compoundID=self.Todo[self.index][2]
-        self.datasetID=self.Todo[self.index][3]
-        self.datasetOutcome=self.Todo[self.index][4]
+            self.compoundID=self.Todo[self.index][1]
+        self.datasetOutcome=self.Todo[self.index][2]
         self.RefreshData()
 
     def update_data_source(self,widget,data=None):
-        data_source(self.data_source_file).update_data_source_from_coot()
-#        if self.Database != None:
-#            SPdatabase.initDB().UpdateXDSoutcome(self.Todo[self.index][3],data)
-#        else:
-#            SPdatabase.initDB().UpdateXDSoutcomeNoDB(self.ProjectPath,self.xtalID,data)
+        print 'hallo'
+#        data_source(self.data_source_file).update_data_source_from_coot()
 
     def RefreshData(self):
         # initialize Refinement library
-        self.Refine=SPrefine.Refine(self.ProjectPath,self.xtalID,self.compoundID)
+        self.Refine=XChemRefine.Refine(self.project_directory,self.xtalID,self.compoundID)
         self.Serial=self.Refine.GetSerial()
 
-        if self.Action=='Review':
-            self.QualityIndicators=SPutils.ParseFiles(self.DataPath,self.xtalID).UpdateQualityIndicators()
-            if '<samplename>' in self.DataPath:
-                self.ActionPath=self.DataPath.replace('<samplename>',self.xtalID)
-                newestPDB=max(glob.iglob(self.ActionPath+'/*.pdb'), key=os.path.getctime)
-                PDBin=newestPDB[newestPDB.rfind('/')+1:]
-            else:
-                self.ActionPath=self.DataPath+'/'+self.xtalID
-                PDBin='refine.pdb'
-        else:
-            self.QualityIndicators=SPutils.ParseFiles(self.ProjectPath,self.xtalID).UpdateQualityIndicators()
-            self.ActionPath=self.ProjectPath+'/'+self.xtalID
-            PDBin='refine.pdb'
-#            self.Serial=self.Refine.GetSerial()
-            # if the structure was previously refined, try to read the parameters
-            if self.Serial > 1: self.RefmacParams=self.Refine.ParamsFromPreviousCycle(self.Serial-1)
-            self.Refine.GetRefinementHistory()
-            try:
-                self.pic2 = gtk.gdk.pixbuf_new_from_file(self.ActionPath+'/RefinementHistory.png')
-                self.image2.set_from_pixbuf(self.pic2)
-            except gobject.GError:
-                self.pic2 = gtk.gdk.pixbuf_new_from_file(os.getenv('SPARKLE_DIR')+'/image/NO_REFINEMENT_HISTORY_AVAILABLE.png')
-                self.image2.set_from_pixbuf(self.pic2)
+        self.QualityIndicators=SPutils.ParseFiles(self.project_directory,self.xtalID).UpdateQualityIndicators()
+        PDBin='refine.pdb'
+        # if the structure was previously refined, try to read the parameters
+        if self.Serial > 1: self.RefmacParams=self.Refine.ParamsFromPreviousCycle(self.Serial-1)
+        self.Refine.GetRefinementHistory()
+        try:
+            self.pic2 = gtk.gdk.pixbuf_new_from_file(os.path.join(self.project_directory,self.xtalID,'RefinementHistory.png'))
+            self.image2.set_from_pixbuf(self.pic2)
+        except gobject.GError:
+            self.pic2 = gtk.gdk.pixbuf_new_from_file(os.getenv('XChemExplorer_DIR')+'/image/NO_REFINEMENT_HISTORY_AVAILABLE.png')
+            self.image2.set_from_pixbuf(self.pic2)
 
         # update pdb & maps
         # - get a list of all molecules which are currently opened in COOT
         # - remove all molecules/ maps before loading a new set
-        if len(coot_utils_SP.molecule_number_list()) > 0:
-            for item in coot_utils_SP.molecule_number_list():
-                if not coot.molecule_name(item).endswith('reference.pdb'): coot.close_molecule(item)
+        if len(coot_utils_XChem.molecule_number_list()) > 0:
+            for item in coot_utils_XChem.molecule_number_list():
+#                if not coot.molecule_name(item).endswith('reference.pdb'): coot.close_molecule(item)
+                coot.close_molecule(item)
         coot.set_nomenclature_errors_on_read("ignore")
         # read protein molecule after ligand so that this one is the active molecule
         #coot.handle_read_draw_molecule_with_recentre(Pdb[0],0)
         # read ligand pdb+cif
-        coot.handle_read_draw_molecule_with_recentre(self.ActionPath+'/'+PDBin,0)
-        for item in coot_utils_SP.molecule_number_list():
-            if coot.molecule_name(item).endswith(PDBin):
+        coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,'refine.pdb'),0)
+        for item in coot_utils_XChem.molecule_number_list():
+            if coot.molecule_name(item).endswith('refine.pdb'):
                 coot.set_show_symmetry_master(1)    # master switch to show symmetry molecules
                 coot.set_show_symmetry_molecule(item,1) # show symm for model
-        if os.path.isfile(self.ActionPath+'/'+self.compoundID+'.pdb'):
-            coot.handle_read_draw_molecule_with_recentre(self.ActionPath+'/'+self.compoundID+'.pdb',0)
-            coot.read_cif_dictionary(self.ActionPath+'/'+self.compoundID+'.cif')
+        if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.pdb')):
+            coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.pdb'),0)
+            coot.read_cif_dictionary(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.cif'))
 
         # read fofo maps
         # - read ccp4 map: 0 - 2fofc map, 1 - fofc.map
-        if os.path.isfile(self.ActionPath+'/2fofc.map'):
+        if os.path.isfile(os.path.join(self.project_directory,self.xtalID,'2fofc.map')):
             coot.set_default_initial_contour_level_for_difference_map(3)
-            coot.handle_read_ccp4_map(self.ActionPath+'/fofc.map',1)
+            coot.handle_read_ccp4_map(os.path.join(self.project_directory,self.xtalID,'fofc.map'),1)
             coot.set_default_initial_contour_level_for_map(1)
-            coot.handle_read_ccp4_map(self.ActionPath+'/2fofc.map',0)
+            coot.handle_read_ccp4_map(os.path.join(self.project_directory,self.xtalID,'2fofc.map'),0)
             coot.set_last_map_colour(0,0,1)
         else:
             # try to open mtz file with same name as pdb file
-            coot.auto_read_make_and_draw_maps(self.ActionPath+'/'+PDBin.replace('.pdb','.mtz'))
+            coot.auto_read_make_and_draw_maps(os.path.join(self.project_directory,self.xtalID,'refine.mtz'))
 
         # update Quality Indicator table
         self.RRfreeValue.set_label(self.QualityIndicators['R']+' / '+self.QualityIndicators['RRfree'])
@@ -438,18 +408,12 @@ class GUI(object):
         self.LigandCCBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['LigandCCcolor']))
 
         try:
-            pic = gtk.gdk.pixbuf_new_from_file(self.ActionPath+'/'+self.compoundID+'.png')
+            pic = gtk.gdk.pixbuf_new_from_file(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.png'))
             self.image.set_from_pixbuf(pic)
         except gobject.GError:
-            pic = gtk.gdk.pixbuf_new_from_file(os.getenv('SPARKLE_DIR')+'/image/NO_COMPOUND_IMAGE_AVAILABLE.png')
+            pic = gtk.gdk.pixbuf_new_from_file(os.getenv('XChemExplorer_DIR')+'/image/NO_COMPOUND_IMAGE_AVAILABLE.png')
             self.image.set_from_pixbuf(pic)
 
-
-    def PREPAREforREFINEMENT(self,widget):
-        if self.Serial==1:
-            self.Refine.PrepareForRefinement(self.DataPath)
-#            SPrefine.Refine(self.ProjectPath,self.xtalID,self.compoundID).PrepareForRefinement()
-            SPdatabase.initDB().UpdateXDSoutcome(self.datasetID,'Under evaluation')
 
     def REFINE(self,widget):
         self.Refine.RunRefmac(self.Serial,self.RefmacParams)
@@ -458,38 +422,35 @@ class GUI(object):
         print '\n==> cootSP: changing refinement parameters'
         self.RefmacParams=self.Refine.RefinementParams(self.RefmacParams)
 
-    def CreateUpdateModel(self,widget):
-        SPmodel.GUI(self.User,self.Password,self.xtalID,self.datasetID,self.ProjectPath,self.compoundID).SingleClickUpdate()
-    
-    def Prepare4Deposition(self,widget):
-        print '\n==> cootSP: current model = %s' %SPdatabase.scarab().GetModels(self.Todo[self.index][3])[0][0]
-        print '\n==> cootSP: starting prepare4deposition GUI...'
-        print '\n==> cootSP: ... be patient, we\'re asking many questions...\n'
-        prepare4deposition.Prepare4Deposition(SPdatabase.initDB().GetModels(self.Todo[self.index][3])[0][0])
+#    def Prepare4Deposition(self,widget):
+#        print '\n==> cootSP: current model = %s' %SPdatabase.scarab().GetModels(self.Todo[self.index][3])[0][0]
+#        print '\n==> cootSP: starting prepare4deposition GUI...'
+#        print '\n==> cootSP: ... be patient, we\'re asking many questions...\n'
+#        prepare4deposition.Prepare4Deposition(SPdatabase.initDB().GetModels(self.Todo[self.index][3])[0][0])
 
-    def Validate(self,widget):
-        SPvalidate.Validate('SParkle',self.ProjectPath+'/'+self.xtalID)
-    
-    def RefModelButtonCallback(self, widget):
-        if widget.get_active():
-            print '\n==> cootSP: loading reference.pdb - %s/Reference/reference4cootSP.pdb' %self.ProjectPath
-            coot.handle_read_draw_molecule_with_recentre(self.ProjectPath+'/Reference/reference4cootSP.pdb',0)
-        else:
-            for item in coot_utils_SP.molecule_number_list():
-                if coot.molecule_name(item).endswith('reference4cootSP.pdb'): coot.close_molecule(item)
-
-    def AdjustDataProcessing(self,widget):
-        SPProcess.DataProcessing(self.ProjectPath,self.xtalID).openGUI()
-
+#    def Validate(self,widget):
+#        SPvalidate.Validate('SParkle',self.ProjectPath+'/'+self.xtalID)
 
     def set_selection_mode(self,widget):
         self.selection_mode = widget.get_active_text()
 
     def get_samples_to_look_at(self,widget):
-        if self.selection_mode != '':
-            # first (re-)reset self.Todo
-            self.Todo=[]
+        self.Todo=[]
+        try:
+            # get todo_list from datasource
             self.Todo=data_source(self.data_source_file).read_data_source_for_coot(self.selection_criteria)
+        except:
+            # if not available, then parse file system
+            for samples in glob.glob(self.refine_model_directory+'/*'):
+                xtalID=samples[samples.rfind('/')+1:]
+                print xtalID
+#
+                if os.path.isfile(os.path.join(self.refine_model_directory,xtalID,'refine.pdb')):
+#                 if os.path.isfile(os.path.join(self.refine_model_directory,xtalID,'*cif')):
+                    compoundID=None
+                    self.Todo.append([xtalID,compoundID,None])
+        for item in self.Todo:
+            self.cb.append_text('%s' %item[0])
 
 
 if __name__=='__main__':

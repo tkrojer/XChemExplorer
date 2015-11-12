@@ -14,16 +14,15 @@ class process:
         self.project_directory=dimple['project_directory']
         self.delete_old=dimple['delete_old']
         self.xtalID=dimple['xtalID']
-        self.compoundID=dimple['compoundID']
-        self.smiles=dimple['smiles']
         self.reference=dimple['reference']
+        self.queueing_system_available=dimple['queueing_system_available']
 
         self.mtz_free=self.xtalID+'.free.mtz'
         # need to set $CCP4_SCR, because the default directory in /home/zqr16691/tmp fills up easily 
         # and then dimple will not run
-        if not os.path.isdir(self.project_directory[:self.project_directory.find('processing')+11]+'/tmp'):
-            os.mkdir(self.project_directory[:self.project_directory.find('processing')+11]+'/tmp')
-        self.ccp4_scratch=self.project_directory[:self.project_directory.find('processing')+11]+'/tmp'
+#        if not os.path.isdir(self.project_directory[:self.project_directory.find('processing')+11]+'/tmp'):
+#            os.mkdir(self.project_directory[:self.project_directory.find('processing')+11]+'/tmp')
+#        self.ccp4_scratch=self.project_directory[:self.project_directory.find('processing')+11]+'/tmp'
 
 
     def get_Rfree(self):
@@ -70,42 +69,36 @@ class process:
             self.get_Rfree()
             os.chdir('%s/%s/Dimple' %(self.project_directory,self.xtalID))
 
-        if self.smiles != []:
-#            ligand='ligand_smiles="%s"' %self.smiles[0][0]
-            ligand="acedrg -i '%s' -r LIG -o %s\n" %(self.smiles,self.compoundID)
+        if self.queueing_system_available:
+            pbs_line='#PBS -joe -N dimple'
         else:
-            ligand=''
+            pbs_line=''
+
+
         Cmds = (
-                '#!/bin/csh\n'
-                '#PBS -joe -N test\n'
+                '#!'+os.getenv('SHELL')+'\n'
+                '%s\n' %pbs_line+
                 '\n'
                 'cd %s/%s/Dimple\n' %(self.project_directory,self.xtalID) +
                 '\n'
-                '#module load ccp4/6.5.007\n'
-                'module load ccp4\n'
-                '#ccp4/6.5-update1\n'
-                '\n'
-                'export CCP4_SCR='+self.ccp4_scratch+'\n'
+#                'export CCP4_SCR='+self.ccp4_scratch+'\n'
                 '\n'
                 'dimple ../%s.free.mtz %s.pdb dimple' %(self.xtalID,self.reference) +
                 '\n'
-                'cd dimple/dimple\n'
+                'cd %s/%s\n' %(self.project_directory,self.xtalID) +
                 '\n'
-                'fft hklin final.mtz mapout 2fofc.map << EOF\n'
+                'ln -s Dimple/dimple/final.pdb refine.pdb\n'
+                'ln -s Dimple/dimple/final.mtz refine.mtz\n'
+                '\n'
+                'fft hklin refine.mtz mapout 2fofc.map << EOF\n'
                 ' labin F1=2FOFCWT PHI=PH2FOFCWT\n'
                 'EOF\n'
                 '\n'
-                'fft hklin final.mtz mapout fofc.map << EOF\n'
+                'fft hklin refine.mtz mapout fofc.map << EOF\n'
                 ' labin F1=FOFCWT PHI=PH2FOFCWT\n'
                 'EOF\n'
                 '\n'
-                '%s\n' %ligand +
-                '\n'
-                '#ln -s ../../%s.png .\n' %self.compoundID+
-                '\n'
-                'cd %s/%s\n' %(self.project_directory,self.xtalID) +
-                '\n'
-                '/bin/rm dimple_run_in_progress\n' 
+                '/bin/rm dimple_run_in_progress\n'
                 )
         self.Run(Cmds)
 
@@ -118,7 +111,11 @@ class process:
         f = open('%s.sh' %self.xtalID,'w')
         f.write(Cmds)
         f.close()
-        os.system('qsub %s.sh' %self.xtalID)
+        if self.queueing_system_available:
+            os.system('qsub %s.sh' %self.xtalID)
+        else:
+            os.system('chmod +x %s.sh' %self.xtalID)
+            os.system('./%s.sh' %self.xtalID)
 
 #def MakePng(DataPath,xtalID,compoundID,smiles):
 #    os.chdir('%s/%s' %(DataPath,xtalID))

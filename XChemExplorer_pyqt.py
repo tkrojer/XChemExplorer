@@ -7,6 +7,7 @@ import time
 import pickle
 import base64
 import math
+import subprocess
 
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 from XChemUtils import process
@@ -49,6 +50,7 @@ class XChemExplorer(QtGui.QApplication):
                              'initial_model_directory': self.initial_model_directory,
                              'refine_model_directory':  self.refine_model_directory,
                              'reference_directory':     self.reference_directory,
+                             'database_directory':      self.database_directory,
                              'data_source':             os.path.join(self.database_directory,self.data_source_file) }
 
 
@@ -84,25 +86,33 @@ class XChemExplorer(QtGui.QApplication):
         self.coot_running=0
         self.progress_bar_start=0
         self.progress_bar_step=0
-
+        # check if qstat is available
+        try:
+            subprocess.call(['qstat'])
+            self.queueing_system_available=True
+        except OSError:
+            self.queueing_system_available=False
 
         # GUI setup
         self.window=QtGui.QWidget()
-
         self.window.setGeometry(0,0, 1400,1000)
         self.window.setWindowTitle("XChemExplorer")
         self.center_main_window()
         
         # Menu Widget
-        load=QtGui.QAction("Load Config File", self.window)
+        load=QtGui.QAction("Open Config File", self.window)
+        load.setShortcut('Ctrl+O')
+        load.triggered.connect(self.open_config_file)
         save=QtGui.QAction("Save Config File", self.window)
+        save.setShortcut('Ctrl+S')
+        save.triggered.connect(self.save_config_file)
         quit=QtGui.QAction("Quit", self.window)
         quit.setShortcut('Ctrl+Q')
         quit.triggered.connect(QtGui.qApp.quit)
 
         menu_bar = QtGui.QMenuBar()
         file = menu_bar.addMenu("&File")
-        settings = menu_bar.addMenu("&Settings")
+#        settings = menu_bar.addMenu("&Settings")
         help = menu_bar.addMenu("&Help")
         
         file.addAction(load)
@@ -212,7 +222,56 @@ class XChemExplorer(QtGui.QApplication):
         # Settings Tab
         self.data_collection_vbox_for_settings=QtGui.QVBoxLayout()
         self.tab_dict['Settings'][1].addLayout(self.data_collection_vbox_for_settings)
-
+        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('Project Directory:'))
+        settings_hbox_project_directory=QtGui.QHBoxLayout()
+        self.project_directory_label=QtGui.QLabel(self.project_directory)
+        settings_hbox_project_directory.addWidget(self.project_directory_label)
+        settings_buttoon_project_directory=QtGui.QPushButton('Select Project Directory')
+        settings_buttoon_project_directory.clicked.connect(self.settings_button_clicked)
+        settings_hbox_project_directory.addWidget(settings_buttoon_project_directory)
+        self.data_collection_vbox_for_settings.addLayout(settings_hbox_project_directory)
+        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nInitial Model Directory:'))
+        settings_hbox_initial_model_directory=QtGui.QHBoxLayout()
+        self.initial_model_directory_label=QtGui.QLabel(self.initial_model_directory)
+        settings_hbox_initial_model_directory.addWidget(self.initial_model_directory_label)
+        settings_buttoon_initial_model_directory=QtGui.QPushButton('Select Initial Model Directory')
+        settings_buttoon_initial_model_directory.clicked.connect(self.settings_button_clicked)
+        settings_hbox_initial_model_directory.addWidget(settings_buttoon_initial_model_directory)
+        self.data_collection_vbox_for_settings.addLayout(settings_hbox_initial_model_directory)
+        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nRefine Model Directory:'))
+        settings_hbox_refine_model_directory=QtGui.QHBoxLayout()
+        self.refine_model_directory_label=QtGui.QLabel(self.refine_model_directory)
+        settings_hbox_refine_model_directory.addWidget(self.refine_model_directory_label)
+        settings_buttoon_refine_model_directory=QtGui.QPushButton('Select Refine Model Directory')
+        settings_buttoon_refine_model_directory.clicked.connect(self.settings_button_clicked)
+        settings_hbox_refine_model_directory.addWidget(settings_buttoon_refine_model_directory)
+        self.data_collection_vbox_for_settings.addLayout(settings_hbox_refine_model_directory)
+        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nReference Structure Directory:'))
+        settings_hbox_reference_directory=QtGui.QHBoxLayout()
+        self.reference_directory_label=QtGui.QLabel(self.reference_directory)
+        settings_hbox_reference_directory.addWidget(self.reference_directory_label)
+        settings_buttoon_reference_directory=QtGui.QPushButton('Select Reference Structure Directory')
+        settings_buttoon_reference_directory.clicked.connect(self.settings_button_clicked)
+        settings_hbox_reference_directory.addWidget(settings_buttoon_reference_directory)
+        self.data_collection_vbox_for_settings.addLayout(settings_hbox_reference_directory)
+        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nData Source Directory:'))
+        settings_hbox_database_directory=QtGui.QHBoxLayout()
+        self.database_directory_label=QtGui.QLabel(self.database_directory)
+        settings_hbox_database_directory.addWidget(self.database_directory_label)
+        settings_buttoon_database_directory=QtGui.QPushButton('Select Data Source Directory')
+        settings_buttoon_database_directory.clicked.connect(self.settings_button_clicked)
+        settings_hbox_database_directory.addWidget(settings_buttoon_database_directory)
+        self.data_collection_vbox_for_settings.addLayout(settings_hbox_database_directory)
+        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nBeamline Directory:'))
+        settings_hbox_beamline_directory=QtGui.QHBoxLayout()
+        self.beamline_directory_label=QtGui.QLabel(self.beamline_directory)
+        settings_hbox_beamline_directory.addWidget(self.beamline_directory_label)
+        settings_buttoon_beamline_directory=QtGui.QPushButton('Select Beamline Directory')
+        settings_buttoon_beamline_directory.clicked.connect(self.settings_button_clicked)
+        settings_hbox_beamline_directory.addWidget(settings_buttoon_beamline_directory)
+        self.data_collection_vbox_for_settings.addLayout(settings_hbox_beamline_directory)
+        self.data_collection_vbox_for_settings.addStretch(1)
+        # ----------------------------------------------------
 
         self.status_bar=QtGui.QStatusBar()
         self.progress_bar=QtGui.QProgressBar()
@@ -235,21 +294,79 @@ class XChemExplorer(QtGui.QApplication):
 #        self.window.setStatusBar(statusBar)
         self.window.show()
 
+    def open_config_file(self):
+        file_name = QtGui.QFileDialog.getOpenFileName(self.window,'Open file', self.current_directory)
+        try:
+            self.settings = pickle.load(open(file_name,"rb"))
+            self.project_directory=self.settings['project_directory']
+            self.beamline_directory=self.settings['beamline_directory']
+            self.initial_model_directory=self.settings['initial_model_directory']
+            self.refine_model_directory=self.settings['refine_model_directory']
+            self.reference_directory=self.settings['reference_directory']
+            self.database_directory=self.settings['database_directory']
+            self.project_directory_label.setText(self.project_directory)
+            self.initial_model_directory_label.setText(self.initial_model_directory)
+            self.refine_model_directory_label.setText(self.refine_model_directory)
+            self.reference_directory_label.setText(self.reference_directory)
+            self.database_directory_label.setText(self.database_directory)
+            self.beamline_directory_label.setText(self.beamline_directory)
+            self.reference_file_list=self.get_reference_file_list()
+        except KeyError:
+            self.update_status_bar('Sorry, this is not a XChemExplorer config file!')
+
+        print self.reference_directory
+
+    def save_config_file(self):
+        file_name = QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.current_directory)
+        pickle.dump(self.settings,open(file_name,'wb'))
+
+
+
+#        print 'hallo'
+#        file_name = QtGui.QFileDialog.getOpenFileName(self.window,'Open file', self.current_directory)
+#        try:
+#            self.settings = pickle.load(open(file_name,"rb"))
+#        except KeyError:
+#            self.update_status_bar('Sorry, this is not a XChemExplorer config file!')
+
+
     def target_selection_combobox_activated(self,text):
         print text
         self.target=text
 
-    def buttonClicked(self):
-        print 'hallo'
-#        self.statusBar().showMessage('HALLLO')
-        self.statusBar().showMessage('HALLLO')
-#        sender = self.sender()
-#        self.statusBar().showMessage(sender.text() + ' was pressed')    
-    
     def center_main_window(self):
         screen = QtGui.QDesktopWidget().screenGeometry()
         size = self.window.geometry()
         self.window.move((screen.width()-size.width())/2, (screen.height()-size.height())/2)
+
+    def settings_button_clicked(self):
+        if self.sender().text()=='Select Project Directory':
+            self.project_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
+            self.project_directory_label.setText(self.project_directory)
+        if self.sender().text()=='Select Initial Model Directory':
+            self.initial_model_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
+            self.initial_model_directory_label.setText(self.initial_model_directory)
+        if self.sender().text()=='Select Refine Model Directory':
+            self.refine_model_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
+            self.refine_model_directory_label.setText(self.refine_model_directory)
+        if self.sender().text()=='Select Reference Structure Directory':
+            self.reference_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
+            self.reference_directory_label.setText(self.reference_directory)
+        if self.sender().text()=='Select Data Source Directory':
+            self.database_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
+            self.database_directory_label.setText(self.database_directory)
+        if self.sender().text()=='Select Beamline Directory':
+            self.beamline_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
+            self.beamline_directory_label.setText(self.beamline_directory)
+        self.settings =     {'current_directory':       self.current_directory,
+                             'project_directory':       self.project_directory,
+                             'beamline_directory':      self.beamline_directory,
+                             'initial_model_directory': self.initial_model_directory,
+                             'refine_model_directory':  self.refine_model_directory,
+                             'reference_directory':     self.reference_directory,
+                             'database_directory':      self.database_directory,
+                             'data_source':             os.path.join(self.database_directory,self.data_source_file) }
+
 
     def button_clicked(self):
         if self.target != '' and self.explorer_active==0:
@@ -298,6 +415,16 @@ class XChemExplorer(QtGui.QApplication):
                     self.work_thread=start_COOT(self.settings)
                     self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                     self.work_thread.start()
+
+            if self.sender().text()=="Run Dimple":
+                self.explorer_active=1
+                self.work_thread=run_dimple_on_selected_samples(self.settings,
+                                                                self.initial_model_dimple_dict,
+                                                                self.queueing_system_available  )
+                self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+                self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+                self.work_thread.start()
 
 
 
@@ -372,29 +499,6 @@ class XChemExplorer(QtGui.QApplication):
         self.update_progress_bar(0)
         self.update_status_bar('idle')
 
-#    def create_table_for_dimple(self):
-#
-#        dimple_table_column_name = [    'SampleID',
-#                                        'Run\nDimple',
-#                                        'Resolution',
-#                                        'Rcryst',
-#                                        'Rfree',
-#                                        'Space Group\nautoprocessing',
-#                                        'Space Group\nreference',
-#                                        'Difference\nUnit Cell Volume (%)',
-#                                        'Unit Cell\nautoprocessing',
-#                                        'Unit Cell\nreference',
-#                                        'Reference File'    ]
-#
-#
-#        table=QtGui.QTableWidget()
-#        table.setSortingEnabled(True)
-#        table.setRowCount(len(self.initial_model_directory+'/*'))
-#        table.setColumnCount(11)
-
-
-
-
 
     def create_widgets_for_autoprocessing_results(self,dict_list):
         data_collection_dict=dict_list[0]
@@ -407,8 +511,10 @@ class XChemExplorer(QtGui.QApplication):
 ### --- used temporarily to be able to test stuff offline ---
 #        pickle.dump(data_collection_dict,open('data_collection_dict.p','wb'))
 #        pickle.dump(self.data_collection_statistics_dict,open('data_collection_statistics_dict.p','wb'))
-#        data_collection_dict = pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p", "rb" ) )
-#        self.data_collection_statistics_dict= pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_statistics_dict.p", "rb" ) )
+        if os.path.isfile(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p"):
+            data_collection_dict = pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p", "rb" ) )
+        if os.path.isfile(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_statistics_dict.p"):
+            self.data_collection_statistics_dict= pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_statistics_dict.p", "rb" ) )
 ### ---------------------------------------------------------
 
 
@@ -635,9 +741,8 @@ class XChemExplorer(QtGui.QApplication):
                     run_dimple = QtGui.QCheckBox()
                     run_dimple.toggle()
                     initial_model_table.setCellWidget(n, column, run_dimple)
-                    print line[1]
                     run_dimple.setChecked(line[1])
-                    self.initial_model_dimple_dict[line[0]]=run_dimple
+#                    self.initial_model_dimple_dict[line[0]]=run_dimple
                 elif column==8:
                     # don't need to connect, because only the displayed text will be read out
                     reference_file_selection_combobox = QtGui.QComboBox()
@@ -651,6 +756,7 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text.setText(str(item))
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                     initial_model_table.setItem(n, column, cell_text)
+            self.initial_model_dimple_dict[line[0]]=[run_dimple,reference_file_selection_combobox]
 #                r=item
 #                g=item
 #                b=item
@@ -659,7 +765,6 @@ class XChemExplorer(QtGui.QApplication):
         initial_model_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         initial_model_table.resizeColumnsToContents()
         self.initial_model_vbox_for_table.addWidget(initial_model_table)
-
 
     def get_reference_file_list(self):
         # check available reference files
@@ -708,6 +813,36 @@ class XChemExplorer(QtGui.QApplication):
         else:
             print 'not checked'
 
+class run_dimple_on_selected_samples(QtCore.QThread):
+    def __init__(self,settings,initial_model_dimple_dict,queueing_system_available):
+        QtCore.QThread.__init__(self)
+        self.initial_model_directory=settings['initial_model_directory']
+        self.reference_directory=settings['reference_directory']
+        self.initial_model_dimple_dict=initial_model_dimple_dict
+        self.queueing_system_available=queueing_system_available
+
+    def run(self):
+        if len(self.initial_model_dimple_dict) != 0:
+            progress_step=100/float(len(self.initial_model_dimple_dict))
+        progress=0
+
+        for sample in sorted(self.initial_model_dimple_dict):
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running dimple -> '+sample)
+#            print sample,self.initial_model_dimple_dict[sample][0].isChecked(),\
+#                str(self.initial_model_dimple_dict[sample][1].currentText())
+            dimple_commands={   'project_directory': self.initial_model_directory,
+                                'delete_old': self.initial_model_dimple_dict[sample][0].isChecked(),
+                                'xtalID': sample,
+                                'compoundID': '',
+                                'smiles': '',
+                                'reference': self.reference_directory+'/'+
+                                             str(self.initial_model_dimple_dict[sample][1].currentText()),
+                                'queueing_system_available': self.queueing_system_available }
+            process(dimple_commands).dimple()
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+        self.emit(QtCore.SIGNAL("finished()"))
+
 
 class start_COOT(QtCore.QThread):
 
@@ -737,7 +872,7 @@ class read_intial_refinement_results(QtCore.QThread):
         for sample_dir in sorted(glob.glob(self.initial_model_directory+'/*')):
 
             sample=sample_dir[sample_dir.rfind('/')+1:]
-            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'parsing initial_models folder ->'+sample)
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'parsing initial_models folder -> '+sample)
 
             run_dimple=True
             resolution_high=''
@@ -860,6 +995,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
         number_of_visits_to_search=len(self.visit_list)
         search_cycle=1
         for visit_directory in sorted(self.visit_list):
+            if len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*')))==0:
+                break
             progress_step=100/float(len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))))
             progress=0
             visit=visit_directory.split('/')[5]
