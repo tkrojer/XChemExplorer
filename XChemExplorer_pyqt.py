@@ -137,14 +137,57 @@ class XChemExplorer(QtGui.QApplication):
             self.tab_dict[page]=[tab,vbox]
 
         # Mounted Crystals Tab
+        mounted_crystal_list=[]
+        mounted_crystal_column_name=[   'Sample ID',
+                                        'Compound ID',
+                                        'Smiles',
+                                        'Compound Name',
+                                        'Tag'           ]
+
+        for i in range(20): mounted_crystal_list.append(['','','','',''])
+
+        self.mounted_crystal_table=QtGui.QTableWidget()
+        self.mounted_crystal_table.setRowCount(20)
+        self.mounted_crystal_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.mounted_crystal_table.setColumnCount(len(mounted_crystal_column_name))
+        self.mounted_crystal_table.setSortingEnabled(True)
+        for row,line in enumerate(mounted_crystal_list):
+            for column,item in enumerate(line):
+                cell_text=QtGui.QTableWidgetItem()
+                cell_text.setText(str(item))
+                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                self.mounted_crystal_table.setItem(row, column, cell_text)
+        self.mounted_crystal_table.setHorizontalHeaderLabels(mounted_crystal_column_name)
+        self.mounted_crystal_table.setColumnWidth(0,250)
+        self.mounted_crystal_table.setColumnWidth(1,250)
+        self.mounted_crystal_table.setColumnWidth(2,250)
+        self.mounted_crystal_table.setColumnWidth(3,250)
+        self.mounted_crystal_table.setColumnWidth(4,250)
+#        self.mounted_crystal_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+#        self.mounted_crystal_table.resizeColumnsToContents()
+
+        
+        
+        
+        
+        
+        
         self.mounted_crystals_vbox_for_table=QtGui.QVBoxLayout()
         self.tab_dict['Mounted Crystals'][1].addLayout(self.mounted_crystals_vbox_for_table)
+        self.mounted_crystals_vbox_for_table.addWidget(self.mounted_crystal_table)
+
         mounted_crystals_button_hbox=QtGui.QHBoxLayout()
 
 
         get_mounted_crystals_button=QtGui.QPushButton("Load Samples From Datasource")
         get_mounted_crystals_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(get_mounted_crystals_button)
+
+        save_mounted_crystals_button=QtGui.QPushButton("Save Samples To Datasource")
+        save_mounted_crystals_button.clicked.connect(self.button_clicked)
+        mounted_crystals_button_hbox.addWidget(save_mounted_crystals_button)
+
+
 
         create_png_of_soaked_compound_button=QtGui.QPushButton("Create PNG file of Soaked Compound")
         create_png_of_soaked_compound_button.clicked.connect(self.button_clicked)
@@ -426,6 +469,35 @@ class XChemExplorer(QtGui.QApplication):
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                 self.work_thread.start()
 
+            if self.sender().text()=="Load Samples From Datasource":
+                row=0
+                for n,line in enumerate(open(os.getenv('XChemExplorer_DIR')+"/tmp/SoakerDB.csv")):
+                    row+=1
+                    if str(line.split(',')[0]).startswith('SampleID'):
+                        row=n-1
+                        continue
+                    for column in range(len(line.split(','))):
+                        cell_text=QtGui.QTableWidgetItem()
+                        cell_text.setText(str(line.split(',')[column]))
+                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                        self.mounted_crystal_table.setItem(row, column, cell_text)
+
+            if self.sender().text()=="Save Samples To Datasource":
+                allRows = self.mounted_crystal_table.rowCount()
+                out=''
+                for row in range(allRows):
+                    for i in range(5):
+                        if self.mounted_crystal_table.item(row,i).text()=='':
+                            print 'hallo'
+                            break
+                        else:
+                            out+=self.mounted_crystal_table.item(row,i).text()+','
+                    out+='\n'
+                print out
+
+#			twi0 = self.ui.tableWidget.item(row,0)
+#			twi1 = self.ui.tableWidget.cellWidget(row,1)
+#			twi2 = self.ui.tableWidget.cellWidget(row,2)
 
 
 #                and self.sender().text()=='Get New Results from Autoprocessing':

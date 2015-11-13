@@ -44,6 +44,16 @@ class GUI(object):
         except OSError:
             self.queueing_system_available=False
 
+        # also check for:
+        # phenix.molprobity
+        # subprocess.call(['refmac5','end'])
+        # mmtbx.validate_ligands
+        # ...
+        # maybe write extra class which checks for various external programs
+        # and returns a dictionary
+
+
+
         # read in settings file from XChemExplorer to set the relevant paths
         self.settings = pickle.load(open("XChemExplorer_settings.pkl","rb"))
 
