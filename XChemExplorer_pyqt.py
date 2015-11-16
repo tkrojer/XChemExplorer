@@ -1069,7 +1069,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             #data_collection_dict = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
             self.tmp = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
             print 'pickle file is here'
-            print self.tmp
+            for stuff in self.tmp:
+                print stuff
 
 ### ---------------------------------------------------------
 
