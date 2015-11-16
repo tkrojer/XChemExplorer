@@ -573,8 +573,9 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def create_widgets_for_autoprocessing_results(self,data_collection_dict):
-#        data_collection_dict=dict_list[0]
-        self.data_collection_statistics_dict=data_collection_dict[5]
+        self.data_collection_statistics_dict={}
+        for key in data_collection_dict:
+            self.data_collection_statistics_dict[key]=data_collection_dict[4]
 
         # reset the two dictionaries which contain the buttons and tables for each data collection
         self.dataset_outcome_dict={}
