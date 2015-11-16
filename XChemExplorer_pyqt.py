@@ -1070,8 +1070,6 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             summary = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
             self.data_collection_dict_collected=summary[0]
 
-### ---------------------------------------------------------
-
     def run(self):
         number_of_visits_to_search=len(self.visit_list)
         search_cycle=1
@@ -1083,7 +1081,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             visit=visit_directory.split('/')[5]
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
                 xtal=collected_xtals[collected_xtals.rfind('/')+1:]
-                self.data_collection_dict[xtal]=[[],[],[],[],[]]
+                self.data_collection_dict[xtal]=[[],[],[],[]]
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 1 of 3: searching visit '+ \
                                                                        str(search_cycle)+' of '+str(number_of_visits_to_search)+ \
                                                                        ' ('+visit+'/'+xtal+')')
@@ -1100,11 +1098,11 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                                 if runs_in_collected_dict[0]==run:
                                     run_is_in_pickle_file=True
                     if run_is_in_pickle_file:
-                        self.data_collection_dict[xtal][0]=self.data_collection_dict_collected[xtal][0]
-                        self.data_collection_dict[xtal][1]=self.data_collection_dict_collected[xtal][1]
-                        self.data_collection_dict[xtal][2]=self.data_collection_dict_collected[xtal][2]
-                        self.data_collection_dict[xtal][3]=self.data_collection_dict_collected[xtal][3]
-                        self.data_collection_dict[xtal][4]=self.data_collection_dict_collected[xtal][4]
+                        self.data_collection_dict[xtal][0].append(self.data_collection_dict_collected[xtal][0])
+                        self.data_collection_dict[xtal][1]+=self.data_collection_dict_collected[xtal][1]
+                        self.data_collection_dict[xtal][2]+=self.data_collection_dict_collected[xtal][2]
+                        self.data_collection_dict[xtal][3]+=self.data_collection_dict_collected[xtal][3]
+#                        self.data_collection_dict[xtal][4]=self.data_collection_dict_collected[xtal][4]
                         print 'already done'
                         continue
                     timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
