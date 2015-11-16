@@ -582,7 +582,7 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_table_dict={}
 
 ### --- used temporarily to be able to test stuff offline ---
-        pickle.dump(dict_list,open(os.path.join(self.database_directory,'data_collection_summary.pkl'),'wb'))
+        #pickle.dump(dict_list,open(os.path.join(self.database_directory,'data_collection_summary.pkl'),'wb'))
 #        pickle.dump(self.data_collection_statistics_dict,open('data_collection_statistics_dict.p','wb'))
 #        if os.path.isfile(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p"):
 #            data_collection_dict = pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p", "rb" ) )
@@ -1019,6 +1019,7 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
 
 #if not os.path.isdir(os.path.join(self.initial_model_directory,key)):
 #    os.mkdir(os.path.join(self.initial_model_directory,key))
+                    os.symlink('0-coot.state.scm','temp.link')
 #if not os.path.isdir(os.path.join(self.initial_model_directory,key,'autoprocessing')):
 #    os.mkdir(os.path.join(self.initial_model_directory,key,'autoprocessing'))
 
