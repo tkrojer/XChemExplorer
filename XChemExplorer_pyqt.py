@@ -1100,8 +1100,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                         if stuff==xtal:
                             #and run==self.tmp[stuff][0][1]:
 #                            print 'OK'
-                            for more_stuff in self.tmp[stuff][0][0]:
-                                print more_stuff
+                            for more_stuff in self.tmp[stuff][0]:
+                                print more_stuff[0][0]
 #                                if more_stuff[0]==run:
 #                                    continue
                     timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
