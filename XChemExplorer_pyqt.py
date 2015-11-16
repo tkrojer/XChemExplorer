@@ -572,9 +572,9 @@ class XChemExplorer(QtGui.QApplication):
         self.update_status_bar('idle')
 
 
-    def create_widgets_for_autoprocessing_results(self,dict_list):
-        data_collection_dict=dict_list[0]
-        self.data_collection_statistics_dict=dict_list[1]
+    def create_widgets_for_autoprocessing_results(self,data_collection_dict):
+#        data_collection_dict=dict_list[0]
+        self.data_collection_statistics_dict=data_collection_dict[5]
 
         # reset the two dictionaries which contain the buttons and tables for each data collection
         self.dataset_outcome_dict={}
@@ -583,10 +583,10 @@ class XChemExplorer(QtGui.QApplication):
 ### --- used temporarily to be able to test stuff offline ---
 #        pickle.dump(data_collection_dict,open('data_collection_dict.p','wb'))
 #        pickle.dump(self.data_collection_statistics_dict,open('data_collection_statistics_dict.p','wb'))
-        if os.path.isfile(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p"):
-            data_collection_dict = pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p", "rb" ) )
-        if os.path.isfile(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_statistics_dict.p"):
-            self.data_collection_statistics_dict= pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_statistics_dict.p", "rb" ) )
+#        if os.path.isfile(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p"):
+#            data_collection_dict = pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p", "rb" ) )
+#        if os.path.isfile(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_statistics_dict.p"):
+#            self.data_collection_statistics_dict= pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_statistics_dict.p", "rb" ) )
 ### ---------------------------------------------------------
 
 
@@ -1287,9 +1287,9 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
+            # add the data_collection_statistics_dict to the main dictionary
             self.data_collection_dict[sample][4]=self.data_collection_statistics_dict
-        self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results'), [self.data_collection_dict,
-                                                                               self.data_collection_statistics_dict])
+        self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results'), self.data_collection_dict)
 
 
 if __name__ == "__main__":
