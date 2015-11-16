@@ -215,7 +215,7 @@ class XChemExplorer(QtGui.QApplication):
         self.tab_dict['DLS @ Data Collection'][1].addLayout(data_collection_button_hbox)
         self.target=str(target_selection_combobox.currentText())
         print self.target
-        self.target='ATAD2A'
+#        self.target='ATAD2A'
 
 
         # Initial Model Tab
