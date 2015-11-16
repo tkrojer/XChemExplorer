@@ -1046,7 +1046,7 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
                         print os.path.join(*self.data_collection_statistics_dict[key][index.row()][1].split('/')[:12])
 
 
-            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing files from data processing to inital_model folder ->'+key)
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing files from data processing to inital_model folder -> '+key)
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
@@ -1098,12 +1098,13 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                                 if runs_in_collected_dict[0]==run:
                                     run_is_in_pickle_file=True
                     if run_is_in_pickle_file:
-                        self.data_collection_dict[xtal][0].append(self.data_collection_dict_collected[xtal][0])
+#                        self.data_collection_dict[xtal][0].append(self.data_collection_dict_collected[xtal][0])
+                        self.data_collection_dict[xtal][0]+=self.data_collection_dict_collected[xtal][0]
                         self.data_collection_dict[xtal][1]+=self.data_collection_dict_collected[xtal][1]
                         self.data_collection_dict[xtal][2]+=self.data_collection_dict_collected[xtal][2]
                         self.data_collection_dict[xtal][3]+=self.data_collection_dict_collected[xtal][3]
 #                        self.data_collection_dict[xtal][4]=self.data_collection_dict_collected[xtal][4]
-                        print 'already done'
+#                        print 'already done'
                         continue
                     timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
                     run_list.append([(run,timestamp,visit)])
@@ -1241,8 +1242,6 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
  #               print sample
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-
-
 
         # before creating the table with the results, try to guess which one to select
         # 1. check if there are reference mtz files
