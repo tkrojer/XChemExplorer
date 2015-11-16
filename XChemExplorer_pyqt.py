@@ -581,7 +581,7 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_table_dict={}
 
 ### --- used temporarily to be able to test stuff offline ---
-        pickle.dump(dict_list,open(os.path.join(self.reference_directory,'data_collection_summary.pkl'),'wb'))
+        pickle.dump(dict_list,open(os.path.join(self.database_directory,'data_collection_summary.pkl'),'wb'))
 #        pickle.dump(self.data_collection_statistics_dict,open('data_collection_statistics_dict.p','wb'))
 #        if os.path.isfile(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p"):
 #            data_collection_dict = pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p", "rb" ) )
@@ -1062,6 +1062,12 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
         self.reference_file_list=reference_file_list
         self.data_collection_dict={}
         self.data_collection_statistics_dict={}
+        self.tmp={}
+        if os.path.isfile(os.path.join(self.database_directory,'data_collection_summary.pkl')):
+            #data_collection_dict = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
+            self.tmp = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
+
+### ---------------------------------------------------------
 
     def run(self):
         number_of_visits_to_search=len(self.visit_list)
@@ -1073,6 +1079,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             progress=0
             visit=visit_directory.split('/')[5]
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
+                if xtal in self.tmp:
+                    print 'its here!!!!!!!!!!!!!!!!!!!!!!!!!'
                 xtal=collected_xtals[collected_xtals.rfind('/')+1:]
                 self.data_collection_dict[xtal]=[[],[],[],[],[]]
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 1 of 3: searching visit '+ \
