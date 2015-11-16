@@ -33,7 +33,7 @@ class XChemExplorer(QtGui.QApplication):
             self.initial_model_directory=os.path.join(self.project_directory,'processing','analysis','initial_model')
             self.refine_model_directory=os.path.join(self.project_directory,'processing','analysis','refine_model')
             self.reference_directory=os.path.join(self.project_directory,'processing','reference')
-            self.database_directory=os.path.join(self.project_directory,'database')
+            self.database_directory=os.path.join(self.project_directory,'processing','database')
             self.data_source_file='XChemExplorer.csv'
         else:
             self.project_directory=self.current_directory
