@@ -1064,14 +1064,11 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
         self.data_collection_dict={}
         self.data_collection_statistics_dict={}
         self.database_directory=database_directory
-        self.tmp={}
+        self.data_collection_dict_collected={}
         if os.path.isfile(os.path.join(self.database_directory,'data_collection_summary.pkl')):
             #data_collection_dict = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
-            x = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
-            self.tmp=x[0]
-            print 'pickle file is here'
-            for stuff in self.tmp:
-                print stuff
+            summary = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
+            self.data_collection_dict_collected=x[0]
 
 ### ---------------------------------------------------------
 
@@ -1097,15 +1094,13 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                 for runs in glob.glob(collected_xtals+'/*'):
                     run_is_in_pickle_file=False
                     run=runs[runs.rfind('/')+1:]
-                    for stuff in self.tmp:
-                        if stuff==xtal:
-                            #and run==self.tmp[stuff][0][1]:
-#                            print 'OK'
-                            for more_stuff in self.tmp[stuff][0]:
-                                print more_stuff[0]
-                                if more_stuff[0]==run:
+                    for xtals_in_collected_dict in self.data_collection_dict_collected:
+                        if xtals_in_collected_dict==xtal:
+                            for runs_in_collected_dict in self.data_collection_dict_collected[xtals_in_collected_dict][0]:
+                                if runs_in_collected_dict[0]==run:
                                     run_is_in_pickle_file=True
                     if run_is_in_pickle_file:
+                        print 'already done'
                         continue
                     timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
                     run_list.append([(run,timestamp,visit)])
