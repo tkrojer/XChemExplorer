@@ -421,7 +421,7 @@ class XChemExplorer(QtGui.QApplication):
 ### --- this works but disabled so that stuff can be tested offline ---
             if self.sender().text()=='Get New Results from Autoprocessing':
 #                reference_file_list=self.get_reference_file_list()
-                self.work_thread=read_autoprocessing_results_from_disc(self.visit_list,self.target,self.reference_file_list)
+                self.work_thread=read_autoprocessing_results_from_disc(self.visit_list,self.target,self.reference_file_list,self.database_directory)
                 self.explorer_active=1
                 self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
                 self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
@@ -1055,13 +1055,14 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
 
 
 class read_autoprocessing_results_from_disc(QtCore.QThread):
-    def __init__(self,visit_list,target,reference_file_list):
+    def __init__(self,visit_list,target,reference_file_list,database_directory):
         QtCore.QThread.__init__(self)
         self.visit_list=visit_list
         self.target=target
         self.reference_file_list=reference_file_list
         self.data_collection_dict={}
         self.data_collection_statistics_dict={}
+        self.database_directory=database_directory
         self.tmp={}
         if os.path.isfile(os.path.join(self.database_directory,'data_collection_summary.pkl')):
             #data_collection_dict = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
