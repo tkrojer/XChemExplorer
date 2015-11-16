@@ -591,29 +591,9 @@ class XChemExplorer(QtGui.QApplication):
 ### ---------------------------------------------------------
 
 
-        diffraction_data_column_name = ['Program',                       (255,0,40),
-                                        'Run',                           (100,230,40),
-                                        'SpaceGroup',                    (100,230,40),
-                                        'Unit Cell',                     (100,230,40),
-                                        'Resolution\nOverall',           (100,230,40),
-                                        'Resolution\nInner Shell',       (100,230,40),
-                                        'Resolution\nOuter Shell',       (100,230,40),
-                                        'Rmerge\nOverall',               (100,230,40),
-                                        'Rmerge\nInner Shell',           (100,230,40),
-                                        'Rmerge\nOuter Shell',           (100,230,40),
-                                        'Mn(I/sig(I))\nOverall',         (100,230,40),
-                                        'Mn(I/sig(I))\nInner Shell',     (100,230,40),
-                                        'Mn(I/sig(I))\nOuter Shell',     (100,230,40),
-                                        'Completeness\nOverall',         (100,230,40),
-                                        'Completeness\nInner Shell',     (100,230,40),
-                                        'Completeness\nOuter Shell',     (100,230,40),
-                                        'Multiplicity\nOverall',         (100,230,40),
-                                        'Multiplicity\nInner Shell',     (100,230,40),
-                                        'Multiplicity\nOuter Shell',     (100,230,40)  ]
-
         diffraction_data_column_name = ['Program',
                                         'Run',
-                                        'SpaceGroup',
+                                        'Space\nGroup',
                                         'Unit Cell',
                                         'Resolution\nOverall',
                                         'Resolution\nInner Shell',
@@ -1037,6 +1017,12 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
                     print self.data_collection_statistics_dict[key][index.row()]
                     print self.data_collection_statistics_dict[key][index.row()]
 
+if not os.path.isdir(os.path.join(self.initial_model_directory,key)):
+    os.mkdir(os.path.join(self.initial_model_directory,key))
+if not os.path.isdir(os.path.join(self.initial_model_directory,key,'autoprocessing')):
+    os.mkdir(os.path.join(self.initial_model_directory,key,'autoprocessing'))
+
+
                     if 'xia2' in self.data_collection_statistics_dict[key][index.row()][1]:
 #                        print self.data_collection_statistics_dict[key][index.row()][1]
                         print os.path.join(*self.data_collection_statistics_dict[key][index.row()][1].split('/')[:13])
@@ -1178,25 +1164,25 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                     self.data_collection_statistics_dict[sample].append([
                         index,                                                                                      # 0
                         logfile,                                                                                    # 1
-                        ['Program',                     aimless_results['AutoProc'],                                                        (255,0,40)],
-                        ['Run',                         aimless_results['Run'],                                                             (100,230,40)],
-                        ['SpaceGroup',                  aimless_results['SpaceGroup'],                                                      (100,230,40)],
-                        ['Unit Cell',                   aimless_results['UnitCell'],                                                        (100,230,40)],
-                        ['Resolution\nOverall',         aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionHigh'],             (100,230,40)],
-                        ['Resolution\nInner Shell',     aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionLowInnerShell'],    (100,230,40)],
-                        ['Resolution\nOuter Shell',     aimless_results['ResolutionHighOuterShell']+'-'+aimless_results['ResolutionHigh'],  (100,230,40)],
-                        ['Rmerge\nOverall',             aimless_results['RmergeOverall'],                                                   (100,230,40)],
-                        ['Rmerge\nInner Shell',         aimless_results['RmergeLow'],                                                       (100,230,40)],
-                        ['Rmerge\nOuter Shell',         aimless_results['RmergeHigh'],                                                      (100,230,40)],
-                        ['Mn(I/sig(I))\nOverall',       aimless_results['IsigOverall'],                                                     (100,230,40)],
-                        ['Mn(I/sig(I))\nInner Shell',   aimless_results['IsigLow'],                                                         (100,230,40)],
-                        ['Mn(I/sig(I))\nOuter Shell',   aimless_results['IsigHigh'],                                                        (100,230,40)],
-                        ['Completeness\nOverall',       aimless_results['CompletenessOverall'],                                             (100,230,40)],
-                        ['Completeness\nInner Shell',   aimless_results['CompletenessLow'],                                                 (100,230,40)],
-                        ['Completeness\nOuter Shell',   aimless_results['CompletenessHigh'],                                                (100,230,40)],
-                        ['Multiplicity\nOverall',       aimless_results['MultiplicityOverall'],                                             (100,230,40)],
-                        ['Multiplicity\nInner Shell',   aimless_results['MultiplicityLow'],                                                 (100,230,40)],
-                        ['Multiplicity\nOuter Shell',   aimless_results['MultiplicityHigh'],                                                (100,230,40)],
+                        ['Program',                     aimless_results['AutoProc'],                                                        (200,200,200)],
+                        ['Run',                         aimless_results['Run'],                                                             (200,200,200)],
+                        ['Space\nGroup',                aimless_results['SpaceGroup'],                                                      (200,200,200)],
+                        ['Unit Cell',                   aimless_results['UnitCell'],                                                        (200,200,200)],
+                        ['Resolution\nOverall',         aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionHigh'],             (200,200,200)],
+                        ['Resolution\nInner Shell',     aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionLowInnerShell'],    (200,200,200)],
+                        ['Resolution\nOuter Shell',     aimless_results['ResolutionHighOuterShell']+'-'+aimless_results['ResolutionHigh'],  (200,200,200)],
+                        ['Rmerge\nOverall',             aimless_results['RmergeOverall'],                                                   (200,200,200)],
+                        ['Rmerge\nInner Shell',         aimless_results['RmergeLow'],                                                       (200,200,200)],
+                        ['Rmerge\nOuter Shell',         aimless_results['RmergeHigh'],                                                      (200,200,200)],
+                        ['Mn(I/sig(I))\nOverall',       aimless_results['IsigOverall'],                                                     (200,200,200)],
+                        ['Mn(I/sig(I))\nInner Shell',   aimless_results['IsigLow'],                                                         (200,200,200)],
+                        ['Mn(I/sig(I))\nOuter Shell',   aimless_results['IsigHigh'],                                                        (200,200,200)],
+                        ['Completeness\nOverall',       aimless_results['CompletenessOverall'],                                             (200,200,200)],
+                        ['Completeness\nInner Shell',   aimless_results['CompletenessLow'],                                                 (200,200,200)],
+                        ['Completeness\nOuter Shell',   aimless_results['CompletenessHigh'],                                                (200,200,200)],
+                        ['Multiplicity\nOverall',       aimless_results['MultiplicityOverall'],                                             (200,200,200)],
+                        ['Multiplicity\nInner Shell',   aimless_results['MultiplicityLow'],                                                 (200,200,200)],
+                        ['Multiplicity\nOuter Shell',   aimless_results['MultiplicityHigh'],                                                (200,200,200)],
                         aimless_results['Lattice'],                                                                 # 21
                         float(aimless_results['UniqueReflectionsOverall']),                                         # 22
                         float(aimless_results['CompletenessOverall']),                                              # 23
