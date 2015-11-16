@@ -572,21 +572,16 @@ class XChemExplorer(QtGui.QApplication):
         self.update_status_bar('idle')
 
 
-    def create_widgets_for_autoprocessing_results(self,data_collection_dict):
-        self.data_collection_statistics_dict={}
-        for key in data_collection_dict:
-            self.data_collection_statistics_dict[key]=data_collection_dict[key][4]
-
-        for key in self.data_collection_statistics_dict:
-            print self.data_collection_statistics_dict[key]
-
+    def create_widgets_for_autoprocessing_results(self,dict_list):
+        data_collection_dict=dict_list[0]
+        self.data_collection_statistics_dict=dict_list[1]
 
         # reset the two dictionaries which contain the buttons and tables for each data collection
         self.dataset_outcome_dict={}
         self.data_collection_table_dict={}
 
 ### --- used temporarily to be able to test stuff offline ---
-#        pickle.dump(data_collection_dict,open('data_collection_dict.p','wb'))
+        pickle.dump(dict_list,open(os.path.join(self.reference_directory,'data_collection_summary.pkl'),'wb'))
 #        pickle.dump(self.data_collection_statistics_dict,open('data_collection_statistics_dict.p','wb'))
 #        if os.path.isfile(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p"):
 #            data_collection_dict = pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p", "rb" ) )
@@ -1292,9 +1287,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
-            # add the data_collection_statistics_dict to the main dictionary
-            self.data_collection_dict[sample][4]=self.data_collection_statistics_dict
-        self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results'), self.data_collection_dict)
+        self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results'), [self.data_collection_dict,
+                                                                            self.data_collection_statistics_dict])
 
 
 if __name__ == "__main__":
