@@ -1101,9 +1101,9 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                             #and run==self.tmp[stuff][0][1]:
 #                            print 'OK'
                             for more_stuff in self.tmp[stuff][0][0]:
-                                print more_stuff[0]
-                                if more_stuff[0]==run:
-                                    continue
+                                print more_stuff
+#                                if more_stuff[0]==run:
+#                                    continue
                     timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
                     run_list.append([(run,timestamp,visit)])
                     self.data_collection_dict[xtal][0].append([run,timestamp,visit])
