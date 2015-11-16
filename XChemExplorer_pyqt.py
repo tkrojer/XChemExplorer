@@ -1068,6 +1068,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
         if os.path.isfile(os.path.join(self.database_directory,'data_collection_summary.pkl')):
             #data_collection_dict = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
             self.tmp = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
+            print 'pickle file is here'
+            print self.tmp
 
 ### ---------------------------------------------------------
 
