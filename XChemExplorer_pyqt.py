@@ -374,8 +374,9 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def target_selection_combobox_activated(self,text):
-        print text
-        self.target=text
+        #str(self.initial_model_dimple_dict[sample][1].currentText()
+        print str(text)
+        self.target=str(text)
 
     def center_main_window(self):
         screen = QtGui.QDesktopWidget().screenGeometry()
