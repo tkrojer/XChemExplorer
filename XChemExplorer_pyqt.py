@@ -1086,9 +1086,6 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             visit=visit_directory.split('/')[5]
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
                 xtal=collected_xtals[collected_xtals.rfind('/')+1:]
-                for stuff in self.tmp:
-                    if stuff==xtal:
-                        print 'its here!!!!!!!!!!!!!!!!!!!!!!!!!'
                 self.data_collection_dict[xtal]=[[],[],[],[],[]]
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 1 of 3: searching visit '+ \
                                                                        str(search_cycle)+' of '+str(number_of_visits_to_search)+ \
@@ -1099,6 +1096,9 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                 image_string_list=[]
                 for runs in glob.glob(collected_xtals+'/*'):
                     run=runs[runs.rfind('/')+1:]
+                    for stuff in self.tmp:
+                        if stuff==xtal and run==self.tmp[stuff][0][1]:
+                            print 'OK'
                     timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
                     run_list.append([(run,timestamp,visit)])
                     self.data_collection_dict[xtal][0].append([run,timestamp,visit])
