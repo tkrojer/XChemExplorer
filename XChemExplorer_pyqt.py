@@ -1097,8 +1097,10 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                 for runs in glob.glob(collected_xtals+'/*'):
                     run=runs[runs.rfind('/')+1:]
                     for stuff in self.tmp:
-                        if stuff==xtal and run==self.tmp[stuff][0][1]:
+                        if stuff==xtal:
+                            #and run==self.tmp[stuff][0][1]:
                             print 'OK'
+                            print self.tmp[stuff][0]
                     timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
                     run_list.append([(run,timestamp,visit)])
                     self.data_collection_dict[xtal][0].append([run,timestamp,visit])
