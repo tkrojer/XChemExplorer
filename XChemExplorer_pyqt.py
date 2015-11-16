@@ -1017,10 +1017,10 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
                     print self.data_collection_statistics_dict[key][index.row()]
                     print self.data_collection_statistics_dict[key][index.row()]
 
-if not os.path.isdir(os.path.join(self.initial_model_directory,key)):
-    os.mkdir(os.path.join(self.initial_model_directory,key))
-if not os.path.isdir(os.path.join(self.initial_model_directory,key,'autoprocessing')):
-    os.mkdir(os.path.join(self.initial_model_directory,key,'autoprocessing'))
+#if not os.path.isdir(os.path.join(self.initial_model_directory,key)):
+#    os.mkdir(os.path.join(self.initial_model_directory,key))
+#if not os.path.isdir(os.path.join(self.initial_model_directory,key,'autoprocessing')):
+#    os.mkdir(os.path.join(self.initial_model_directory,key,'autoprocessing'))
 
 
                     if 'xia2' in self.data_collection_statistics_dict[key][index.row()][1]:
@@ -1161,7 +1161,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 #                                        'Multiplicity\nInner Shell',     (100,230,40),
 #                                        'Multiplicity\nOuter Shell',     (100,230,40)  ]
 
-                    self.data_collection_statistics_dict[sample].append([
+                    try:
+                        self.data_collection_statistics_dict[sample].append([
                         index,                                                                                      # 0
                         logfile,                                                                                    # 1
                         ['Program',                     aimless_results['AutoProc'],                                                        (200,200,200)],
@@ -1189,6 +1190,37 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                         float(aimless_results['IsigOverall']),                                                      # 24
                         float(aimless_results['UnitCellVolume']),                                                   # 25
                         float(aimless_results['RmergeLow']),                                                        # 26
+                        ['best file',False]                                                                                       # 27
+                                        ])
+                    except ValueError:
+                        self.data_collection_statistics_dict[sample].append([
+                        index,                                                                                      # 0
+                        logfile,                                                                                    # 1
+                        ['Program',                     aimless_results['AutoProc'],                                                        (200,200,200)],
+                        ['Run',                         aimless_results['Run'],                                                             (200,200,200)],
+                        ['Space\nGroup',                aimless_results['SpaceGroup'],                                                      (200,200,200)],
+                        ['Unit Cell',                   aimless_results['UnitCell'],                                                        (200,200,200)],
+                        ['Resolution\nOverall',         aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionHigh'],             (200,200,200)],
+                        ['Resolution\nInner Shell',     aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionLowInnerShell'],    (200,200,200)],
+                        ['Resolution\nOuter Shell',     aimless_results['ResolutionHighOuterShell']+'-'+aimless_results['ResolutionHigh'],  (200,200,200)],
+                        ['Rmerge\nOverall',             aimless_results['RmergeOverall'],                                                   (200,200,200)],
+                        ['Rmerge\nInner Shell',         aimless_results['RmergeLow'],                                                       (200,200,200)],
+                        ['Rmerge\nOuter Shell',         aimless_results['RmergeHigh'],                                                      (200,200,200)],
+                        ['Mn(I/sig(I))\nOverall',       aimless_results['IsigOverall'],                                                     (200,200,200)],
+                        ['Mn(I/sig(I))\nInner Shell',   aimless_results['IsigLow'],                                                         (200,200,200)],
+                        ['Mn(I/sig(I))\nOuter Shell',   aimless_results['IsigHigh'],                                                        (200,200,200)],
+                        ['Completeness\nOverall',       aimless_results['CompletenessOverall'],                                             (200,200,200)],
+                        ['Completeness\nInner Shell',   aimless_results['CompletenessLow'],                                                 (200,200,200)],
+                        ['Completeness\nOuter Shell',   aimless_results['CompletenessHigh'],                                                (200,200,200)],
+                        ['Multiplicity\nOverall',       aimless_results['MultiplicityOverall'],                                             (200,200,200)],
+                        ['Multiplicity\nInner Shell',   aimless_results['MultiplicityLow'],                                                 (200,200,200)],
+                        ['Multiplicity\nOuter Shell',   aimless_results['MultiplicityHigh'],                                                (200,200,200)],
+                        aimless_results['Lattice'],                                                                 # 21
+                        0.0,                                         # 22
+                        0.0,                                              # 23
+                        0.0,                                                      # 24
+                        0.0,                                                   # 25
+                        100.0,                                                        # 26
                         ['best file',False]                                                                                       # 27
                                         ])
 
