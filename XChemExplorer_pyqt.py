@@ -1100,6 +1100,11 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                                 if runs_in_collected_dict[0]==run:
                                     run_is_in_pickle_file=True
                     if run_is_in_pickle_file:
+                        self.data_collection_dict[xtal][0]=self.data_collection_dict_collected[xtal][0]
+                        self.data_collection_dict[xtal][1]=self.data_collection_dict_collected[xtal][1]
+                        self.data_collection_dict[xtal][2]=self.data_collection_dict_collected[xtal][2]
+                        self.data_collection_dict[xtal][3]=self.data_collection_dict_collected[xtal][3]
+                        self.data_collection_dict[xtal][4]=self.data_collection_dict_collected[xtal][4]
                         print 'already done'
                         continue
                     timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
