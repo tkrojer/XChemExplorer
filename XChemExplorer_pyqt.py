@@ -1095,6 +1095,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                 image_list=[]
                 image_string_list=[]
                 for runs in glob.glob(collected_xtals+'/*'):
+                    run_is_in_pickle_file=False
                     run=runs[runs.rfind('/')+1:]
                     for stuff in self.tmp:
                         if stuff==xtal:
@@ -1103,7 +1104,9 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                             for more_stuff in self.tmp[stuff][0]:
                                 print more_stuff[0]
                                 if more_stuff[0]==run:
-                                    continue
+                                    run_is_in_pickle_file=True
+                    if run_is_in_pickle_file:
+                        continue
                     timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
                     run_list.append([(run,timestamp,visit)])
                     self.data_collection_dict[xtal][0].append([run,timestamp,visit])
