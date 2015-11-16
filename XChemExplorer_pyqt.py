@@ -577,6 +577,10 @@ class XChemExplorer(QtGui.QApplication):
         for key in data_collection_dict:
             self.data_collection_statistics_dict[key]=data_collection_dict[key][4]
 
+        for key in self.data_collection_statistics_dict:
+            print self.data_collection_statistics_dict[key]
+
+
         # reset the two dictionaries which contain the buttons and tables for each data collection
         self.dataset_outcome_dict={}
         self.data_collection_table_dict={}
