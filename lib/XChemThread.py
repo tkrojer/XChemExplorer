@@ -276,14 +276,14 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                 self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
                 # convert images to strong and attach to
-                tmp=[]
                 for image in self.data_collection_dict[xtal][1]:
-#                    try:
-                    if image in self.data_collection_dict_collected[xtal][1]:#
-                        continue
-                    image_file=open(image,"rb")
-                    image_string=base64.b64encode(image_file.read())
-                    image_string_list.append((image[image.rfind('/')+1:],image_string))
+                    try:
+                        if image in self.data_collection_dict_collected[xtal][1]:#
+                            continue
+                    except KeyError:
+                        image_file=open(image,"rb")
+                        image_string=base64.b64encode(image_file.read())
+                        image_string_list.append((image[image.rfind('/')+1:],image_string))
                 self.data_collection_dict[xtal][3]+=image_string_list
 
             search_cycle+=1
@@ -383,7 +383,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
         for sample in sorted(self.data_collection_statistics_dict):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 3 of 3: selecting "best" aimless logfile ->'+sample)
             if self.data_collection_statistics_dict[sample][0]=='#':
-                print sample
+#                print sample
                 continue
             select_stage_one_list = []
             found=0
