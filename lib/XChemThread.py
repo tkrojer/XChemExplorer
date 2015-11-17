@@ -16,6 +16,183 @@ from XChemUtils import queue
 from XChemUtils import mtztools
 
 
+class run_dimple_on_selected_samples(QtCore.QThread):
+    def __init__(self,settings,initial_model_dimple_dict,queueing_system_available):
+        QtCore.QThread.__init__(self)
+        self.initial_model_directory=settings['initial_model_directory']
+        self.reference_directory=settings['reference_directory']
+        self.initial_model_dimple_dict=initial_model_dimple_dict
+        self.queueing_system_available=queueing_system_available
+
+    def run(self):
+        if len(self.initial_model_dimple_dict) != 0:
+            progress_step=100/float(len(self.initial_model_dimple_dict))
+        progress=0
+
+        for sample in sorted(self.initial_model_dimple_dict):
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running dimple -> '+sample)
+#            print sample,self.initial_model_dimple_dict[sample][0].isChecked(),\
+#                str(self.initial_model_dimple_dict[sample][1].currentText())
+            dimple_commands={   'project_directory': self.initial_model_directory,
+                                'delete_old': self.initial_model_dimple_dict[sample][0].isChecked(),
+                                'xtalID': sample,
+                                'compoundID': '',
+                                'smiles': '',
+                                'reference': self.reference_directory+'/'+
+                                             str(self.initial_model_dimple_dict[sample][1].currentText()),
+                                'queueing_system_available': self.queueing_system_available }
+            process(dimple_commands).dimple()
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+        self.emit(QtCore.SIGNAL("finished()"))
+
+
+class start_COOT(QtCore.QThread):
+
+    def __init__(self,settings):
+        QtCore.QThread.__init__(self)
+        self.settings=settings
+
+    def run(self):
+        pickle.dump(self.settings,open('XChemExplorer_settings.pkl','wb'))
+        os.system('coot --no-guano --no-state-script --script %s' %(os.getenv('XChemExplorer_DIR')+'/lib/XChemCoot.py'))
+
+
+class read_intial_refinement_results(QtCore.QThread):
+
+    def __init__(self,initial_model_directory,reference_file_list):
+        QtCore.QThread.__init__(self)
+        self.initial_model_directory=initial_model_directory
+        self.reference_file_list=reference_file_list
+
+    def run(self):
+
+        progress_step=100/float(len(glob.glob(self.initial_model_directory+'/*')))
+        progress=0
+
+        initial_model_list=[]
+
+        for sample_dir in sorted(glob.glob(self.initial_model_directory+'/*')):
+
+            sample=sample_dir[sample_dir.rfind('/')+1:]
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'parsing initial_models folder -> '+sample)
+
+            run_dimple=True
+            resolution_high=''
+            Rcryst='pending'
+            Rfree='pending'
+            spg_autoproc=''
+            unitcell_autoproc=''
+            spg_reference=''
+            unitcell_reference=''
+            unitcell_difference=''
+            reference=''
+            alert='#E0E0E0'
+
+            if os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'.mtz')):
+                mtz_autoproc=mtztools(os.path.join(self.initial_model_directory,sample,sample+'.mtz')).get_all_values_as_dict()
+                resolution_high=mtz_autoproc['resolution_high']
+                spg_autoproc=mtz_autoproc['spacegroup']
+                unitcell_autoproc=mtz_autoproc['unitcell']
+                lattice_autoproc=mtz_autoproc['bravais_lattice']
+                unitcell_volume_autoproc=mtz_autoproc['unitcell_volume']
+                # check which reference file is most similar
+                for o,reference_file in enumerate(self.reference_file_list):
+                    unitcell_difference=round((math.fabs(reference_file[4]-unitcell_volume_autoproc)/reference_file[4])*100,1)
+                    # reference file is accepted when different in unitcell volume < 5%
+                    # and both files have the same lattice type
+                    if unitcell_difference < 5 and lattice_autoproc==reference_file[3]:
+                        spg_reference=reference_file[1]
+                        unitcell_reference=reference_file[2]
+                        reference=reference_file[0]
+                        break
+            if os.path.isdir(os.path.join(self.initial_model_directory,sample,'Dimple')):
+                    if os.path.isfile(os.path.join(self.initial_model_directory,sample,'Dimple','dimple','final.pdb')):
+                        pdb=parse().PDBheader(os.path.join(self.initial_model_directory,sample,'Dimple','dimple','final.pdb'))
+                        Rcryst=pdb['Rcryst']
+                        Rfree=pdb['Rfree']
+                        alert=pdb['Alert']
+                    elif os.path.isfile(os.path.join(self.initial_model_directory,sample,'/dimple_run_in_progress')):
+                        Rcryst='in progress'
+                        Rfree='in progress'
+                        alert=(51,153,255)
+
+            initial_model_list.append( [ sample,
+                                        run_dimple,
+                                        resolution_high,
+                                        Rcryst,
+                                        Rfree,
+                                        spg_autoproc,
+                                        spg_reference,
+                                        unitcell_difference,
+                                        reference,
+                                        unitcell_autoproc,
+                                        unitcell_reference,
+                                        alert ] )
+
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+        self.emit(QtCore.SIGNAL('create_initial_model_table'), initial_model_list)
+
+
+
+class save_autoprocessing_results_to_disc(QtCore.QThread):
+    def __init__(self,dataset_outcome_dict,data_collection_table_dict,data_collection_statistics_dict):
+        QtCore.QThread.__init__(self)
+        self.dataset_outcome_dict=dataset_outcome_dict
+        self.data_collection_table_dict=data_collection_table_dict
+        self.data_collection_statistics_dict=data_collection_statistics_dict
+
+    def run(self):
+        if not len(self.dataset_outcome_dict)==0:
+            progress_step=100/float(len(self.dataset_outcome_dict))
+        progress=0
+        csv_out=''
+        for key in sorted(self.dataset_outcome_dict):
+            outcome=''
+            for button in self.dataset_outcome_dict[key]:
+                if button.isChecked():
+                    print key,button.text()
+                    outcome=button.text()
+            csv_out+=str(key)+','+outcome+','
+            if outcome=='success':
+                indexes=self.data_collection_table_dict[key].selectionModel().selectedRows()
+                for index in sorted(indexes):
+                    # csv out
+                    for item in self.data_collection_statistics_dict[key][index.row()]:
+                        csv_out+=str(item)+','
+                    csv_out+='\n'
+
+#                    print self.data_collection_table_dict[key]
+                    print self.data_collection_statistics_dict[key][index.row()]
+                    print self.data_collection_statistics_dict[key][index.row()]
+
+#if not os.path.isdir(os.path.join(self.initial_model_directory,key)):
+#    os.mkdir(os.path.join(self.initial_model_directory,key))
+                    os.symlink('0-coot.state.scm','temp.link')
+#if not os.path.isdir(os.path.join(self.initial_model_directory,key,'autoprocessing')):
+#    os.mkdir(os.path.join(self.initial_model_directory,key,'autoprocessing'))
+
+
+                    if 'xia2' in self.data_collection_statistics_dict[key][index.row()][1]:
+#                        print self.data_collection_statistics_dict[key][index.row()][1]
+                        print os.path.join(*self.data_collection_statistics_dict[key][index.row()][1].split('/')[:13])
+#                print('Row %d is selected' % index.row())
+                    if 'fast_dp' in self.data_collection_statistics_dict[key][index.row()][1]:
+#                        print self.data_collection_statistics_dict[key][index.row()][1]
+                        print os.path.join(*self.data_collection_statistics_dict[key][index.row()][1].split('/')[:12])
+
+
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing files from data processing to inital_model folder -> '+key)
+
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+        print csv_out
+
+        self.emit(QtCore.SIGNAL("finished()"))
+
+
+
 class read_autoprocessing_results_from_disc(QtCore.QThread):
     def __init__(self,visit_list,target,reference_file_list,database_directory):
         QtCore.QThread.__init__(self)
@@ -101,8 +278,9 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                 # convert images to strong and attach to
                 tmp=[]
                 for image in self.data_collection_dict[xtal][1]:
-#                    if image in self.data_collection_dict_collected[xtal][1]:
-#                        continue
+                    try:
+                        if image in self.data_collection_dict_collected[xtal][1]:
+                            continue
                     image_file=open(image,"rb")
                     image_string=base64.b64encode(image_file.read())
                     image_string_list.append((image[image.rfind('/')+1:],image_string))
