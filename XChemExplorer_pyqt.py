@@ -14,6 +14,7 @@ from XChemUtils import process
 from XChemUtils import parse
 from XChemUtils import queue
 from XChemUtils import mtztools
+import XChemThread
 
 
 class XChemExplorer(QtGui.QApplication):
