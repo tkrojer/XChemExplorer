@@ -203,10 +203,12 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
         self.data_collection_statistics_dict={}
         self.database_directory=database_directory
         self.data_collection_dict_collected={}
+        self.data_collection_statistics_dict_collected={}
         if os.path.isfile(os.path.join(self.database_directory,'data_collection_summary.pkl')):
             #data_collection_dict = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
             summary = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
             self.data_collection_dict_collected=summary[0]
+            self.data_collection_statistics_dict_collected=summary[1]
 
     def run(self):
         number_of_visits_to_search=len(self.visit_list)
@@ -292,14 +294,20 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             progress_step=100/float(len(self.data_collection_dict))
         progress=0
         for sample in sorted(self.data_collection_dict):
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 2 of 3: parsing aimless logfiles -> '+sample)
             self.data_collection_statistics_dict[sample]=[]
 #            print sample,self.data_collection_dict[sample][2]
             if not self.data_collection_dict[sample][2]==[]:
                 for index,logfile in enumerate(self.data_collection_dict[sample][2]):
-                    self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 2 of 3: parsing aimless logfiles -> '+sample)
-                    aimless_results=parse().GetAimlessLog(logfile)
-                    try:
-                        self.data_collection_statistics_dict[sample].append([
+                    for entry in self.data_collection_statistics_dict_collected[sample]:
+                        if logfile==entry[1]:
+                            already_parsed=True
+                    if already_parsed:
+                        continue
+                    else:
+                        aimless_results=parse().GetAimlessLog(logfile)
+                        try:
+                            self.data_collection_statistics_dict[sample].append([
                         index,                                                                                      # 0
                         logfile,                                                                                    # 1
                         ['Program',                     aimless_results['AutoProc'],                                                        (200,200,200)],
@@ -329,8 +337,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                         float(aimless_results['RmergeLow']),                                                        # 26
                         ['best file',False]                                                                                       # 27
                                         ])
-                    except ValueError:
-                        self.data_collection_statistics_dict[sample].append([
+                        except ValueError:
+                            self.data_collection_statistics_dict[sample].append([
                         index,                                                                                      # 0
                         logfile,                                                                                    # 1
                         ['Program',                     aimless_results['AutoProc'],                                                        (200,200,200)],
