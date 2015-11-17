@@ -98,18 +98,18 @@ class data_source:
         # 2. create missing columns
 
         if self.data_source_type=='sqlite':
-            sample_dict={}
-con = sqlite3.connect('soakDBDataFile.sqlite')
-
-con.row_factory = sqlite3.Row
-cur = con.cursor()
-cur.execute("SELECT * FROM mainTable")
-
-#r=c.fetchone()
-for column in cur.description:
-    print column[0]
-
-
+#            sample_dict={}
+            existing_columns=[]
+            con=sqlite3.connect(self.data_source_file)
+            con.row_factory = sqlite3.Row
+            cur = con.cursor()
+            cur.execute("SELECT * FROM mainTable")
+            for column in cur.description:
+                existing_columns.append(column[0])
+            for column in self.column_list:
+                if column not in existing_columns:
+                    cur.execute("alter table mainTable add column '%s' 'TEXT'" % column)
+                    con.commit()
 #rows = cur.fetchall()
 
 #for row in rows:

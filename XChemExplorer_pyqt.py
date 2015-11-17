@@ -1225,40 +1225,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                         ['best file',False]                                                                                       # 27
                                         ])
 
-
-#                    self.data_collection_statistics_dict[sample].append([
-#                                index,                                                                                      # 0
-#                                logfile,                                                                                    # 1
-#                                aimless_results['AutoProc'],                                                                # 2
-#                                aimless_results['Run'],                                                                     # 3
-#                                aimless_results['SpaceGroup'],                                                              # 4
-#                                aimless_results['UnitCell'],                                                                # 5
-#                                aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionHigh'],                     # 6
-#                                aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionLowInnerShell'],            # 7
-#                                aimless_results['ResolutionHighOuterShell']+'-'+aimless_results['ResolutionHigh'],          # 8
-#                                aimless_results['RmergeOverall'],                                                           # 9
-#                                aimless_results['RmergeLow'],                                                               # 10
-#                                aimless_results['RmergeHigh'],                                                              # 11
-#                                aimless_results['IsigOverall'],                                                             # 12
-#                                aimless_results['IsigLow'],                                                                 # 13
-#                                aimless_results['IsigHigh'],                                                                # 14
-#                                aimless_results['CompletenessOverall'],                                                     # 15
-#                                aimless_results['CompletenessLow'],                                                         # 16
-#                                aimless_results['CompletenessHigh'],                                                        # 17
-#                                aimless_results['MultiplicityOverall'],                                                     # 18
-#                                aimless_results['MultiplicityLow'],                                                         # 19
-#                                aimless_results['MultiplicityHigh'],                                                        # 20
-#                                aimless_results['Lattice'],                                                                 # 21
-#                                float(aimless_results['UniqueReflectionsOverall']),                                         # 22
-#                                float(aimless_results['CompletenessOverall']),                                              # 23
-#                                float(aimless_results['IsigOverall']),                                                      # 24
-#                                float(aimless_results['UnitCellVolume']),                                                   # 25
-#                                float(aimless_results['RmergeLow']),                                                        # 26
-#                                False                                                                                       # 27
-#                                        ])
             else:
                 self.data_collection_statistics_dict[sample]+='###'*20
- #               print sample
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
