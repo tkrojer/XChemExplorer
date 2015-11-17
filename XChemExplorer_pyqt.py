@@ -694,16 +694,29 @@ class XChemExplorer(QtGui.QApplication):
 #                self.add.setStyleSheet("font-size:40px;background-color:#666666; border: 2px solid #555555")
 #                button.setStyleSheet("font-size:9px")
                 self.dataset_outcome_dict[key].append(button)
-                if outcome=='success':
-                    button.setChecked(True)
-                    button.setStyleSheet("background-color: rgb(0,255,0)")
-                    found_successful_data_collection=1
                 dataset_outcome_vbox.addWidget(button)
-            if not found_successful_data_collection:
+
+            if not str(self.data_collection_statistics_dict[key][0][0]).startswith('#'):
+                for button in self.dataset_outcome_dict[key]:
+                    if button.text()=='success':
+                        button.setChecked(True)
+                        button.setStyleSheet("background-color: rgb(0,255,0)")
+            else:
                 for button in self.dataset_outcome_dict[key]:
                     if button.text()=='Failed - unknown':
                         button.setChecked(True)
                         button.setStyleSheet("background-color: rgb(255,0,0)")
+
+#                if outcome=='success':
+#                    button.setChecked(True)
+#                    button.setStyleSheet("background-color: rgb(0,255,0)")
+#                    found_successful_data_collection=1
+#
+#            if not found_successful_data_collection:
+#                for button in self.dataset_outcome_dict[key]:
+#                    if button.text()=='Failed - unknown':
+#                        button.setChecked(True)
+#                        button.setStyleSheet("background-color: rgb(255,0,0)")
             dataset_outcome_groupbox.setLayout(dataset_outcome_vbox)
             hbox_for_button_and_table.addWidget(dataset_outcome_groupbox)
 
