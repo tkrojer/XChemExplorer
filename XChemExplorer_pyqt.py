@@ -735,6 +735,7 @@ class XChemExplorer(QtGui.QApplication):
 
             data_processing_success=True
             for n,sample in enumerate(self.data_collection_statistics_dict[key]):
+                # failed data processing
                 if str(self.data_collection_statistics_dict[key][0][0]).startswith('#'):
                     for column,header in enumerate(diffraction_data_column_name):
                         cell_text=QtGui.QTableWidgetItem()
@@ -742,6 +743,9 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         data_collection_table.setItem(n, column, cell_text)
                     data_processing_success=False
+                if not data_processing_success:
+                    break               # otherwise a table with 60 lines appears
+                # successful data processing
                 if data_processing_success:
                     for column,header in enumerate(diffraction_data_column_name):
 #                    for item in self.data_collection_statistics_dict[key]:
