@@ -280,7 +280,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                 # convert images to strong and attach to
                 for image in self.data_collection_dict[xtal][1]:
                     try:
-                        if image in self.data_collection_dict_collected[xtal][1]:#
+                        if image in self.data_collection_dict_collected[xtal][1]:
                             continue
                     except KeyError:
                         image_file=open(image,"rb")
@@ -299,10 +299,11 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 #            print sample,self.data_collection_dict[sample][2]
             if not self.data_collection_dict[sample][2]==[]:
                 for index,logfile in enumerate(self.data_collection_dict[sample][2]):
-                    for entry in self.data_collection_statistics_dict_collected[sample]:
-                        if logfile==entry[1]:
-                            self.data_collection_statistics_dict[sample].append(entry)
-                            already_parsed=True
+                    if sample in self.data_collection_statistics_dict_collected:
+                        for entry in self.data_collection_statistics_dict_collected[sample]:
+                            if logfile==entry[1]:
+                                self.data_collection_statistics_dict[sample].append(entry)
+                                already_parsed=True
                     if already_parsed:
 #                        print 'hallo'
                         continue
