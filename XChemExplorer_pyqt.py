@@ -1066,6 +1066,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             progress_step=100/float(len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))))
             progress=0
             visit=visit_directory.split('/')[5]
+            print visit_directory
+            print visit_directory.split('/')[5]
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
                 xtal=collected_xtals[collected_xtals.rfind('/')+1:]
                 self.data_collection_dict[xtal]=[[],[],[],[]]
