@@ -370,7 +370,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                                         ])
 
             else:
-                self.data_collection_statistics_dict[sample]+='###'*20
+                self.data_collection_statistics_dict[sample]+='###'*27
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
@@ -390,6 +390,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
         # a unit cell volume difference of less than 5%
         for sample in sorted(self.data_collection_statistics_dict):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 3 of 3: selecting "best" aimless logfile ->'+sample)
+            print sample,self.data_collection_statistics_dict[sample][0]
             if self.data_collection_statistics_dict[sample][0]=='#':
 #                print sample
                 continue
