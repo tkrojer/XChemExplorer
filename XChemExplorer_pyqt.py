@@ -422,7 +422,7 @@ class XChemExplorer(QtGui.QApplication):
 ### --- this works but disabled so that stuff can be tested offline ---
             if self.sender().text()=='Get New Results from Autoprocessing':
 #                reference_file_list=self.get_reference_file_list()
-                self.work_thread=XChem.Thread.read_autoprocessing_results_from_disc(self.visit_list,self.target,self.reference_file_list,self.database_directory)
+                self.work_thread=XChemThread.read_autoprocessing_results_from_disc(self.visit_list,self.target,self.reference_file_list,self.database_directory)
                 self.explorer_active=1
                 self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
                 self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
