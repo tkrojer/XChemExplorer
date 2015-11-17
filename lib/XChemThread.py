@@ -391,8 +391,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
         # a unit cell volume difference of less than 5%
         for sample in sorted(self.data_collection_statistics_dict):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 3 of 3: selecting "best" aimless logfile ->'+sample)
-            print sample
-            print self.data_collection_statistics_dict[sample]
+#            print sample
+#            print self.data_collection_statistics_dict[sample]
             if self.data_collection_statistics_dict[sample][0]=='#':
 #                print sample
                 continue
