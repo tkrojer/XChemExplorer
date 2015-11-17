@@ -266,12 +266,18 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                                 logfile_list.append(path+'/'+file_name)
                                 continue
                 for image in glob.glob(visit_directory+'/jpegs/'+self.target+'/'+xtal+'/*'):
-                    if image.endswith('t.png'):
-                        image_list.append(image)
+                    image_already_in_dict=False
+                    if xtal in self.data_collection_dict_collected:
+                        for collected_images in self.data_collection_dict_collected[xtal]:
+                            if image==collected_images:
+                                image_already_in_dict=True
+                    if not image_already_in_dict:
+                        if image.endswith('t.png'):
+                            image_list.append(image)
 #                    if image.endswith('thumb.jpeg'):
 #                        image_list.append(image)
-                    if image.endswith('_.png'):
-                        image_list.append(image)
+                        if image.endswith('_.png'):
+                            image_list.append(image)
                 self.data_collection_dict[xtal][1]+=image_list
                 self.data_collection_dict[xtal][2]+=logfile_list
                 progress += progress_step
