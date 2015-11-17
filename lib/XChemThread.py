@@ -101,8 +101,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                 # convert images to strong and attach to
                 tmp=[]
                 for image in self.data_collection_dict[xtal][1]:
-                    if image in self.data_collection_dict_collected[xtal][1]:
-                        continue
+#                    if image in self.data_collection_dict_collected[xtal][1]:
+#                        continue
                     image_file=open(image,"rb")
                     image_string=base64.b64encode(image_file.read())
                     image_string_list.append((image[image.rfind('/')+1:],image_string))
