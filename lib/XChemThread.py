@@ -301,6 +301,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                 for index,logfile in enumerate(self.data_collection_dict[sample][2]):
                     for entry in self.data_collection_statistics_dict_collected[sample]:
                         if logfile==entry[1]:
+                            self.data_collection_statistics_dict[sample].append(entry)
                             already_parsed=True
                     if already_parsed:
                         continue
