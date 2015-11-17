@@ -752,6 +752,8 @@ class XChemExplorer(QtGui.QApplication):
                                 if item[0]=='best file':
                                     if item[1]==True:
                                         data_collection_table.selectRow(n)
+                        else:
+                            print self.data_collection_statistics_dict[key]
             # some_list[start:stop:step]
             data_collection_table.setHorizontalHeaderLabels(diffraction_data_column_name)
             data_collection_table.horizontalHeader().setFont(font)
