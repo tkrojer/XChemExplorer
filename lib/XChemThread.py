@@ -299,6 +299,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 #            print sample,self.data_collection_dict[sample][2]
             if not self.data_collection_dict[sample][2]==[]:
                 for index,logfile in enumerate(self.data_collection_dict[sample][2]):
+                    already_parsed=False
                     if sample in self.data_collection_statistics_dict_collected:
                         for entry in self.data_collection_statistics_dict_collected[sample]:
                             if logfile==entry[1]:
