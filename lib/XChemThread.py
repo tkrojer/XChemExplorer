@@ -430,5 +430,9 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
+        # save everything so that it's quicker to reload and is available outside DLS
+        pickle.dump([self.data_collection_dict,self.data_collection_statistics_dict],
+                    open(  os.path.join(self.database_directory,'data_collection_summary.pkl'),'wb'))
+
         self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results'), [self.data_collection_dict,
                                                                             self.data_collection_statistics_dict])
