@@ -733,27 +733,34 @@ class XChemExplorer(QtGui.QApplication):
 #            self.setFont(font)
             data_collection_table.setFont(font)
 
+            data_processing_success=True
             for n,sample in enumerate(self.data_collection_statistics_dict[key]):
-                for column,header in enumerate(diffraction_data_column_name):
+                if str(self.data_collection_statistics_dict[key][0][0]).startswith('#'):
+                    for column,header in enumerate(diffraction_data_column_name):
+                        cell_text=QtGui.QTableWidgetItem()
+                        cell_text.setText('#')
+                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                        data_collection_table.setItem(n, column, cell_text)
+                    data_processing_success=False
+                if data_processing_success:
+                    for column,header in enumerate(diffraction_data_column_name):
 #                    for item in self.data_collection_statistics_dict[key]:
-                    for item in sample:
-                        if isinstance(item, list):
-                            if len(item)==3:
-                                if item[0]==header:
-                                    cell_text=QtGui.QTableWidgetItem()
-                                    cell_text.setText(str(item[1]))
-                                    cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                                    r=item[2][0]
-                                    g=item[2][1]
-                                    b=item[2][2]
-                                    data_collection_table.setItem(n, column, cell_text)
-                                    data_collection_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
-                            if len(item)==2:
-                                if item[0]=='best file':
-                                    if item[1]==True:
-                                        data_collection_table.selectRow(n)
-                        else:
-                            print self.data_collection_statistics_dict[key]
+                        for item in sample:
+                            if isinstance(item, list):
+                                if len(item)==3:
+                                    if item[0]==header:
+                                        cell_text=QtGui.QTableWidgetItem()
+                                        cell_text.setText(str(item[1]))
+                                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                                        r=item[2][0]
+                                        g=item[2][1]
+                                        b=item[2][2]
+                                        data_collection_table.setItem(n, column, cell_text)
+                                        data_collection_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
+                                if len(item)==2:
+                                    if item[0]=='best file':
+                                        if item[1]==True:
+                                            data_collection_table.selectRow(n)
             # some_list[start:stop:step]
             data_collection_table.setHorizontalHeaderLabels(diffraction_data_column_name)
             data_collection_table.horizontalHeader().setFont(font)
