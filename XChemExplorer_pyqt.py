@@ -696,7 +696,7 @@ class XChemExplorer(QtGui.QApplication):
                     #label = QtGui.QLabel(run[0]+' ('+run[1]+' @ '+run[2]+')')
                     label = QtGui.QLabel(str(run))
                     layout.addWidget(label,(run_number)*2,0)
-                    layout.setSizePolicy ( QSizePolicy.Expanding, QSizePolicy.Expanding)
+                    label.setSizePolicy ( QSizePolicy.Expanding, QSizePolicy.Expanding)
                     column_number=0
                     for column in sorted(data_collection_dict[key][3]):
                         if run[0] in column[0]:
