@@ -508,42 +508,69 @@ class external_software:
             'refmac5':                  False,
             'phenix.molprobity':        False,
             'mmtbx.validate_ligands':   False,
-            'obabel':                   False
+            'obabel':                   False,
+            'acedrg':                   False
         }
 
     def check(self):
+
+        print 'Searching for external software:'
 
         FNULL = open(os.devnull, 'w')
 
         try:
             subprocess.call(['qstat'], stdout=FNULL, stderr=subprocess.STDOUT)
             self.available_programs['qstat']=True
+            status='found'
         except OSError:
             self.available_programs['qstat']=False
+            status='not found'
+        print '-checking for qstat: '+status
 
         try:
             subprocess.call(['refmac5','end'], stdout=FNULL, stderr=subprocess.STDOUT)
             self.available_programs['refmac5']=True
+            status='found'
         except OSError:
             self.available_programs['refmac5']=False
+            status='not found'
+        print '-checking for refmac5: '+status
 
         try:
             subprocess.call(['phenix.molprobity'], stdout=FNULL, stderr=subprocess.STDOUT)
             self.available_programs['phenix.molprobity']=True
+            status='found'
         except OSError:
             self.available_programs['phenix.molprobity']=False
+            status='not found'
+        print '-checking for phenix.molprobity: '+status
 
         try:
             subprocess.call(['mmtbx.validate_ligands'], stdout=FNULL, stderr=subprocess.STDOUT)
             self.available_programs['mmtbx.validate_ligands']=True
+            status='found'
         except OSError:
             self.available_programs['mmtbx.validate_ligands']=False
+            status='not found'
+        print '-checking for mmtbx.validate_ligands: '+status
 
         try:
             subprocess.call(['obabel'], stdout=FNULL, stderr=subprocess.STDOUT)
             self.available_programs['obabel']=True
+            status='found'
         except OSError:
             self.available_programs['obabel']=False
+            status='not found'
+        print '-checking for obabel: '+status
+
+        try:
+            subprocess.call(['acedrg'], stdout=FNULL, stderr=subprocess.STDOUT)
+            self.available_programs['acedrg']=True
+            status='found'
+        except OSError:
+            self.available_programs['acedrg']=False
+            status='not found'
+        print '-checking for acedrg: '+status
 
         return self.available_programs
 

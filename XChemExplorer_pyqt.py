@@ -144,12 +144,10 @@ class XChemExplorer(QtGui.QApplication):
                                         'Smiles',
                                         'Compound Name',
                                         'Tag'           ]
-
         for i in range(20): mounted_crystal_list.append(['','','','',''])
-
         self.mounted_crystal_table=QtGui.QTableWidget()
         self.mounted_crystal_table.setRowCount(20)
-        self.mounted_crystal_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+#        self.mounted_crystal_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.mounted_crystal_table.setColumnCount(len(mounted_crystal_column_name))
         self.mounted_crystal_table.setSortingEnabled(True)
         for row,line in enumerate(mounted_crystal_list):
@@ -166,34 +164,20 @@ class XChemExplorer(QtGui.QApplication):
         self.mounted_crystal_table.setColumnWidth(4,250)
 #        self.mounted_crystal_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
 #        self.mounted_crystal_table.resizeColumnsToContents()
-
-        
-        
-        
-        
-        
-        
         self.mounted_crystals_vbox_for_table=QtGui.QVBoxLayout()
         self.tab_dict['Mounted Crystals'][1].addLayout(self.mounted_crystals_vbox_for_table)
         self.mounted_crystals_vbox_for_table.addWidget(self.mounted_crystal_table)
 
         mounted_crystals_button_hbox=QtGui.QHBoxLayout()
-
-
         get_mounted_crystals_button=QtGui.QPushButton("Load Samples From Datasource")
         get_mounted_crystals_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(get_mounted_crystals_button)
-
         save_mounted_crystals_button=QtGui.QPushButton("Save Samples To Datasource")
         save_mounted_crystals_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(save_mounted_crystals_button)
-
-
-
-        create_png_of_soaked_compound_button=QtGui.QPushButton("Create PNG file of Soaked Compound")
+        create_png_of_soaked_compound_button=QtGui.QPushButton("Create PDB/CIF/PNG files of Compound")
         create_png_of_soaked_compound_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(create_png_of_soaked_compound_button)
-
 
         self.tab_dict['Mounted Crystals'][1].addLayout(mounted_crystals_button_hbox)
 
@@ -215,8 +199,46 @@ class XChemExplorer(QtGui.QApplication):
         data_collection_button_hbox.addWidget(target_selection_combobox)
         self.tab_dict['DLS @ Data Collection'][1].addLayout(data_collection_button_hbox)
         self.target=str(target_selection_combobox.currentText())
-        print self.target
+#        print self.target
 #        self.target='ATAD2A'
+
+        # DLS @ Summary
+        data_collection_summary_column_name=[   'Sample ID',
+                                                'Program',
+                                                'Space\nGroup',
+                                                'Dataset\nOutcome',
+                                                'Resolution\nOverall',
+                                                'Rmerge\nInner Shell',
+                                                'Mn(I/sig(I))\nOuter Shell',
+                                                'Completeness\nOverall'         ]
+
+
+        data_collection_summary_list.append(['']*len(data_collection_summary_column_name))
+        self.data_collection_summary_table=QtGui.QTableWidget()
+        self.data_collection_summary_table.setRowCount(len(data_collection_summary_list))
+#        self.data_collection_summary_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.data_collection_summary_table.setColumnCount(len(data_collection_summary_column_name))
+        self.data_collection_summary_table.setSortingEnabled(True)
+        for row,line in enumerate(data_collection_summary_list):
+            for column,item in enumerate(line):
+                cell_text=QtGui.QTableWidgetItem()
+                cell_text.setText(str(item))
+                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                self.data_collection_summary_table.setItem(row, column, cell_text)
+
+        self.data_collection_summarys_vbox_for_table=QtGui.QVBoxLayout()
+        self.tab_dict['DLS @ Summary'][1].addLayout(self.data_collection_summarys_vbox_for_table)
+        self.data_collection_summarys_vbox_for_table.addWidget(self.data_collection_summary_table)
+
+
+
+
+
+
+
+
+
+
 
 
         # Initial Model Tab
@@ -670,7 +692,8 @@ class XChemExplorer(QtGui.QApplication):
                 #label = QtGui.QLabel(run[0]+' ('+run[1]+' @ '+run[2]+')')
                 #layout.addWidget(label,(run_number)*2,0)
                 if len(data_collection_dict[key][3]) != 0:
-                    label = QtGui.QLabel(run[0]+' ('+run[1]+' @ '+run[2]+')')
+                    #label = QtGui.QLabel(run[0]+' ('+run[1]+' @ '+run[2]+')')
+                    label = QtGui.QLabel(run)
                     layout.addWidget(label,(run_number)*2,0)
                     for column_number,column in enumerate(sorted(data_collection_dict[key][3])):
                         if run[0] in column[0]:

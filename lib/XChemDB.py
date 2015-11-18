@@ -90,7 +90,9 @@ class data_source:
             'RefinementLigandCC',
             'RefinementRmsdBonds',
             'RefinementRmsdAngles',
-            'RefinementOutcome'
+            'RefinementOutcome',
+
+            'AssayIC50'
 
         ]
 
