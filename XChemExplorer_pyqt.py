@@ -204,14 +204,14 @@ class XChemExplorer(QtGui.QApplication):
 
         # DLS @ Summary
         data_collection_summary_list=[]
-        self.data_collection_summary_column_name=[   'Sample ID',
-                                                'Program',
-                                                'Space\nGroup',
-                                                'Dataset\nOutcome',
-                                                'Resolution\nOverall',
-                                                'Rmerge\nInner Shell',
-                                                'Mn(I/sig(I))\nOuter Shell',
-                                                'Completeness\nOverall'         ]
+        self.data_collection_summary_column_name=[      'Sample ID',
+                                                        'Program',
+                                                        'Space\nGroup',
+                                                        'Dataset\nOutcome',
+                                                        'Resolution\nOverall',
+                                                        'Rmerge\nInner Shell',
+                                                        'Mn(I/sig(I))\nOuter Shell',
+                                                        'Completeness\nOverall'         ]
 
 
         data_collection_summary_list.append(['']*len(self.data_collection_summary_column_name))
@@ -928,7 +928,7 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_summary_table.setRowCount(0)
 
         self.data_collection_summary_table.setRowCount(len(self.data_collection_statistics_dict))
-        for key in self.data_collection_statistics_dict:
+        for row,key in enumerate(sorted(self.data_collection_statistics_dict)):
             selected_processing_result=0
             for n,sample in enumerate(self.data_collection_statistics_dict[key]):
                 # check which row was auto-selected
@@ -942,20 +942,35 @@ class XChemExplorer(QtGui.QApplication):
             print self.data_collection_statistics_dict[key][selected_processing_result]
 
             for column,header in enumerate(self.data_collection_summary_column_name):
-                print self.data_collection_statistics_dict[key][selected_processing_result]
+                cell_text=QtGui.QTableWidgetItem()
+                if header=='Sample ID':
+                    cell_text.setText(str(key))
+
                 for item in self.data_collection_statistics_dict[key][selected_processing_result]:
-#                        for item in sample:
                     if isinstance(item, list):
                         if len(item)==3:
                             if item[0]==header:
-                                cell_text=QtGui.QTableWidgetItem()
                                 cell_text.setText(str(item[1]))
-                                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                                r=item[2][0]
-                                g=item[2][1]
-                                b=item[2][2]
-                                self.data_collection_summary_table.setItem(n, column, cell_text)
-                                self.data_collection_summary_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
+
+
+
+                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                self.data_collection_summary_table.setItem(n, column, cell_text)
+
+#                print self.data_collection_statistics_dict[key][selected_processing_result]
+#                for item in self.data_collection_statistics_dict[key][selected_processing_result]:
+#                        for item in sample:
+#                    if isinstance(item, list):
+#                        if len(item)==3:
+#                            if item[0]==header:
+#                                cell_text=QtGui.QTableWidgetItem()
+#                                cell_text.setText(str(item[1]))
+#                                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+#                                r=item[2][0]
+#                                g=item[2][1]
+#                                b=item[2][2]
+#                                self.data_collection_summary_table.setItem(n, column, cell_text)
+#                                self.data_collection_summary_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
 #                                if len(item)==2:
 #                                    if item[0]=='best file':
 #                                        if item[1]==True:
