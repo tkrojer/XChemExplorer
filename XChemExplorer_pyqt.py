@@ -803,7 +803,7 @@ class XChemExplorer(QtGui.QApplication):
             data_collection_table.resizeColumnsToContents()
             data_collection_table.horizontalHeader().setStretchLastSection(False)
             data_collection_table.verticalHeader().setStretchLastSection(True)
-
+            data_collection_table.verticalHeader().sectionClicked.connect(self.onSectionClicked)
             hbox_for_button_and_table.addWidget(data_collection_table)
             vbox_cell.addLayout(hbox_for_button_and_table)
             self.data_collection_table_dict[key]=data_collection_table
@@ -975,6 +975,8 @@ class XChemExplorer(QtGui.QApplication):
                 cell_text=QtGui.QTableWidgetItem()
                 cell_text.setText(outcome)
                 self.data_collection_summary_table.setItem(row, 3, cell_text)
+            data_collection_table.resizeRowsToContents()
+            data_collection_table.resizeColumnsToContents()
 
 #        for i in range(10): print i
 #	    for row in xrange(0,allRows):
@@ -987,6 +989,8 @@ class XChemExplorer(QtGui.QApplication):
 #        for index in sorted(indexes):
 #            print index.row()
 
+    def onSectionClicked(self, logicalIndex):
+        print("onSectionClicked:", logicalIndex)
 
 
 if __name__ == "__main__":
