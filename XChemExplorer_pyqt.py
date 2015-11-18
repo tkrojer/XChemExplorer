@@ -456,7 +456,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.work_thread.start()
 ### -------------------------------------------------------------------
             if self.sender().text()=="Save Files from Autoprocessing in 'inital_model' Folder":
-                self.work_thread=save_autoprocessing_results_to_disc(self.dataset_outcome_dict,
+                self.work_thread=XChemThread.save_autoprocessing_results_to_disc(self.dataset_outcome_dict,
                                                                      self.data_collection_table_dict,
                                                                      self.data_collection_statistics_dict)
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
@@ -469,7 +469,7 @@ class XChemExplorer(QtGui.QApplication):
 #                reference_file_list=self.get_reference_file_list()
                 print "checking for initial refinement"
                 self.explorer_active=1
-                self.work_thread=read_intial_refinement_results(self.initial_model_directory,self.reference_file_list)
+                self.work_thread=XChemThread.read_intial_refinement_results(self.initial_model_directory,self.reference_file_list)
                 self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
                 self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
@@ -480,13 +480,13 @@ class XChemExplorer(QtGui.QApplication):
                 print 'found'
                 if not self.coot_running:
                     print 'starting coot'
-                    self.work_thread=start_COOT(self.settings)
+                    self.work_thread=XChemThread.start_COOT(self.settings)
                     self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                     self.work_thread.start()
 
             if self.sender().text()=="Run Dimple":
                 self.explorer_active=1
-                self.work_thread=run_dimple_on_selected_samples(self.settings,
+                self.work_thread=XChemThread.run_dimple_on_selected_samples(self.settings,
                                                                 self.initial_model_dimple_dict,
                                                                 self.queueing_system_available  )
                 self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
@@ -520,69 +520,6 @@ class XChemExplorer(QtGui.QApplication):
                     out+='\n'
                 print out
 
-#			twi0 = self.ui.tableWidget.item(row,0)
-#			twi1 = self.ui.tableWidget.cellWidget(row,1)
-#			twi2 = self.ui.tableWidget.cellWidget(row,2)
-
-
-#                and self.sender().text()=='Get New Results from Autoprocessing':
-#            self.explorer_active=1
-#            threading.Thread(target=self.read_autoprocessing_results_from_disc, args=()).start()
-#            self.status_bar.showMessage('COOL')
-#            self.task='read_autoprocessing_results_from_disc()'
-#            self.workThread=read_autoprocessing_results_from_disc(self.visit_list,self.target)
-#            self.connect(self.workThread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-#            self.connect(self.workThread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-#            self.workThread.start()
-#            self.get_autoprocessing_results=self.read_autoprocessing_results_from_disc()
-#            self.read_autoprocessing_results_from_disc()
-
-#        elif self.target != '' and data=='load_mounted_crystals' and self.explorer_active==0:
-#            self.explorer_active=1
-#            threading.Thread(target=self.load_mounted_crystals, args=()).start()
-#        elif self.target != '' and data=='load_samples' and self.explorer_active==0 \
-#             and self.load_initial_models_first_time==0:
-#            self.explorer_active=1
-#            threading.Thread(target=self.InitialRefinement, args=()).start()
-#            self.load_initial_models_first_time=1
-#        elif self.target != '' and data=='write_files' and self.explorer_active==0:
-#            self.explorer_active=1
-#            threading.Thread(target=self.WRITEFILES, args=()).start()
-#        elif self.target != '' and data=='run_dimple' and self.explorer_active==0:
-#            self.explorer_active=1
-#            threading.Thread(target=self.RunDimple, args=()).start()
-#        elif self.target != '' and data=='refresh_inital_refinement' and self.explorer_active==0:
-#            self.initial_model_liststore.clear()
-#            self.initial_model_scrolled.remove(self.initial_model_treeview)
-#            self.explorer_active=1
-#            threading.Thread(target=self.InitialRefinement, args=()).start()
-#        elif data=='get_queue_jobs' and self.explorer_active==0:
-#            self.explorer_active=1
-#            threading.Thread(target=self.show_queue_jobs, args=()).start()
-#        elif data=='refresh_queue_jobs' and self.explorer_active==0:
-#            self.explorer_active=1
-#            self.queue_jobs_liststore.clear()
-#            self.queue_control_scrolled.remove(self.queue_jobs_treeview)
-#            threading.Thread(target=self.show_queue_jobs, args=()).start()
-#        elif data=='remove_queue_jobs' and self.explorer_active==0:
-#            self.explorer_active=1
-#            threading.Thread(target=self.remove_queue_jobs, args=()).start()
-#        elif data=='cancel':
-#            self.window.destroy()
-#            quit()
-#        elif data=='initial_refinement_set_reference' and self.explorer_active==0:
-#            self.explorer_active=1
-#            try:
-#                if self.reference_file_root != '':
-#                    self.initial_model_liststore.clear()
-#                    self.initial_model_scrolled.remove(self.initial_model_treeview)
-#                    self.explorer_active=1
-#                    threading.Thread(target=self.InitialRefinement, args=()).start()
-#            except AttributeError:
-#                print 'no samples loaded'
-#        else:
-#            buff = '-> please select a target first'
-#            self.status_bar.push(self.context_id, buff)
 
 
     def update_progress_bar(self,progress):
@@ -604,15 +541,6 @@ class XChemExplorer(QtGui.QApplication):
         # reset the two dictionaries which contain the buttons and tables for each data collection
         self.dataset_outcome_dict={}
         self.data_collection_table_dict={}
-
-### --- used temporarily to be able to test stuff offline ---
-        #pickle.dump(dict_list,open(os.path.join(self.database_directory,'data_collection_summary.pkl'),'wb'))
-#        pickle.dump(self.data_collection_statistics_dict,open('data_collection_statistics_dict.p','wb'))
-#        if os.path.isfile(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p"):
-#            data_collection_dict = pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_dict.p", "rb" ) )
-#        if os.path.isfile(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_statistics_dict.p"):
-#            self.data_collection_statistics_dict= pickle.load( open(os.getenv('XChemExplorer_DIR')+"/tmp/data_collection_statistics_dict.p", "rb" ) )
-### ---------------------------------------------------------
 
 
         diffraction_data_column_name = ['Program',
@@ -710,7 +638,8 @@ class XChemExplorer(QtGui.QApplication):
                 vbox_cell.addLayout(layout)
 
             hbox_for_button_and_table=QtGui.QHBoxLayout()
-            # dataset outcome buttons1
+
+            # dataset outcome buttons
             dataset_outcome_groupbox=QtGui.QGroupBox()
             dataset_outcome_vbox=QtGui.QVBoxLayout()
             found_successful_data_collection=1
@@ -720,8 +649,6 @@ class XChemExplorer(QtGui.QApplication):
                 button.setCheckable(True)
                 button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[outcome])
                 button.clicked.connect(self.dataset_outcome_button_change_color)
-#                self.add.setStyleSheet("font-size:40px;background-color:#666666; border: 2px solid #555555")
-#                button.setStyleSheet("font-size:9px")
                 self.dataset_outcome_dict[key].append(button)
                 dataset_outcome_vbox.addWidget(button)
 
@@ -736,16 +663,6 @@ class XChemExplorer(QtGui.QApplication):
                         button.setChecked(True)
                         button.setStyleSheet("background-color: rgb(255,0,0)")
 
-#                if outcome=='success':
-#                    button.setChecked(True)
-#                    button.setStyleSheet("background-color: rgb(0,255,0)")
-#                    found_successful_data_collection=1
-#
-#            if not found_successful_data_collection:
-#                for button in self.dataset_outcome_dict[key]:
-#                    if button.text()=='Failed - unknown':
-#                        button.setChecked(True)
-#                        button.setStyleSheet("background-color: rgb(255,0,0)")
             dataset_outcome_groupbox.setLayout(dataset_outcome_vbox)
             hbox_for_button_and_table.addWidget(dataset_outcome_groupbox)
 
@@ -917,9 +834,6 @@ class XChemExplorer(QtGui.QApplication):
                 print self.dataset_outcome[str(button.text())]
                 button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[str(button.text())])
         self.update_outcome_data_collection_summary_table(dataset,outcome)
-#        button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[outcome])
-#        print 'hallo'
-#        print self.sender()
 
     def set_run_dimple_flag(self,state):
         if state == QtCore.Qt.Checked:
@@ -981,17 +895,6 @@ class XChemExplorer(QtGui.QApplication):
             self.data_collection_summary_table.resizeRowsToContents()
             self.data_collection_summary_table.resizeColumnsToContents()
 
-#        for i in range(10): print i
-#	    for row in xrange(0,allRows):
-#			print self.data_collection_summary_table.item(row,0).text()
-
-#			twi1 = self.ui.tableWidget.cellWidget(row,1)
-#			twi2 = self.ui.tableWidget.cellWidget(row,2)
-#			print twi0.text()+' '+twi1.currentText()+' '+twi2.currentText()
-#        indexes=self.data_collection_summary_table.selectionModel().selectedRows()
-#        for index in sorted(indexes):
-#            print index.row()
-
     def update_selected_autoproc_data_collection_summary_table(self):
         for key in self.data_collection_table_dict:
             if self.data_collection_table_dict[key]==self.sender():
@@ -1017,29 +920,8 @@ class XChemExplorer(QtGui.QApplication):
                             if len(item)==3:
                                 if item[0]==header:
                                     cell_text.setText(str(item[1]))
-
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                     self.data_collection_summary_table.setItem(row, column, cell_text)
-
-
-
-
-
-
-
-
-
-
-#                cell_text=QtGui.QTableWidgetItem()
-#                cell_text.setText(outcome)
-#                self.data_collection_summary_table.setItem(row, 3, cell_text)
-#            data_collection_table.resizeRowsToContents()
-#            data_collection_table.resizeColumnsToContents()
-
-
-
-#        items = self.selectedItems()
-#        print(str(items[0].text()))
 
 
 if __name__ == "__main__":
