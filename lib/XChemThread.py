@@ -338,6 +338,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 
             search_cycle+=1
 
+        print self.data_collection_dict['ATAD2A-x367'][0]
+
         if not len(self.data_collection_dict)==0:
             progress_step=100/float(len(self.data_collection_dict))
         progress=0
@@ -357,7 +359,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 #                        print 'hallo'
                         continue
                     else:
-                        print 'hallo ',logfile,self.data_collection_dict[sample][2]
+#                        print 'hallo ',logfile,self.data_collection_dict[sample][2]
                         aimless_results=parse().GetAimlessLog(logfile)
                         try:
                             self.data_collection_statistics_dict[sample].append([
