@@ -972,6 +972,7 @@ class XChemExplorer(QtGui.QApplication):
         for row in range(rows_in_table):
             if self.data_collection_summary_table.item(row,0).text()==sample:
                 print self.data_collection_summary_table.item(row,0).text()
+                cell_text=QtGui.QTableWidgetItem()
                 cell_text.setText(outcome)
                 self.data_collection_summary_table.setItem(row, 3, cell_text)
 
