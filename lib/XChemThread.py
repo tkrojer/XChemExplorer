@@ -243,7 +243,6 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                                 if runs_in_collected_dict[0]==run:
                                     run_is_in_pickle_file=True
                     if run_is_in_pickle_file:
-#                        self.data_collection_dict[xtal][0].append(self.data_collection_dict_collected[xtal][0])
                         for stuff in self.data_collection_dict_collected[xtal][0]:
                             if stuff[0]==run:
                                 self.data_collection_dict[xtal][0]+=stuff
@@ -254,10 +253,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                             if run in stuff:
                                 self.data_collection_dict[xtal][2]+=stuff
                         for stuff in self.data_collection_dict_collected[xtal][3]:
-                            print stuff[0]
-                        self.data_collection_dict[xtal][3]+=self.data_collection_dict_collected[xtal][3]
-#                        self.data_collection_dict[xtal][4]=self.data_collection_dict_collected[xtal][4]
-#                        print 'already done'
+                            if run in stuff[0]:
+                                self.data_collection_dict[xtal][3]+=stuff
                         continue
                     timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
                     run_list.append([(run,timestamp,visit)])
