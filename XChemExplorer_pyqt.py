@@ -967,9 +967,10 @@ class XChemExplorer(QtGui.QApplication):
 
     def update_data_collection_summary_table(self,sample,outcome):
         print 'hallo update'
-	    allRows = self.data_collection_summary_table.rowCount()
-	    for row in xrange(0,allRows):
-			print self.data_collection_summary_table.item(row,0).text()
+#	    allRows = self.data_collection_summary_table.rowCount()
+#	    for row in xrange(0,allRows):
+#			print self.data_collection_summary_table.item(row,0).text()
+
 #			twi1 = self.ui.tableWidget.cellWidget(row,1)
 #			twi2 = self.ui.tableWidget.cellWidget(row,2)
 #			print twi0.text()+' '+twi1.currentText()+' '+twi2.currentText()
