@@ -804,7 +804,7 @@ class XChemExplorer(QtGui.QApplication):
             data_collection_table.horizontalHeader().setStretchLastSection(False)
             data_collection_table.verticalHeader().setStretchLastSection(True)
 #            data_collection_table.verticalHeader().sectionClicked.connect(self.onSectionClicked)
-            data_collection_table.selectionChanged.connect(self.onSectionClicked)
+            data_collection_table.itemSelectionChanged.connect(self.print_row)
             hbox_for_button_and_table.addWidget(data_collection_table)
             vbox_cell.addLayout(hbox_for_button_and_table)
             self.data_collection_table_dict[key]=data_collection_table
@@ -992,6 +992,10 @@ class XChemExplorer(QtGui.QApplication):
 
     def onSectionClicked(self, logicalIndex):
         print("onSectionClicked:", logicalIndex)
+
+    def print_row(self):
+        items = self.selectedItems()
+        print(str(items[0].text()))
 
 
 if __name__ == "__main__":
