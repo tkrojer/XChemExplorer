@@ -696,7 +696,8 @@ class XChemExplorer(QtGui.QApplication):
                     #label = QtGui.QLabel(run[0]+' ('+run[1]+' @ '+run[2]+')')
                     label = QtGui.QLabel(str(run))
                     layout.addWidget(label,(run_number)*2,0)
-                    for column_number,column in enumerate(sorted(data_collection_dict[key][3])):
+                    column_number=0
+                    for column in sorted(data_collection_dict[key][3]):
                         if run[0] in column[0]:
                             pixmap = QtGui.QPixmap()
                             pixmap.loadFromData(base64.b64decode(column[1]))
@@ -704,6 +705,7 @@ class XChemExplorer(QtGui.QApplication):
                             label.resize(320,200)
                             label.setPixmap(pixmap.scaled(label.size(), QtCore.Qt.KeepAspectRatio))
                             layout.addWidget(label, (run_number)*2+1, column_number)
+                            column_number+=1
                 vbox_cell.addLayout(layout)
 
             hbox_for_button_and_table=QtGui.QHBoxLayout()
