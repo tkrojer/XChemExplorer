@@ -226,7 +226,7 @@ class XChemExplorer(QtGui.QApplication):
                 cell_text.setText(str(item))
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.data_collection_summary_table.setItem(row, column, cell_text)
-
+        self.data_collection_summary_table.setHorizontalHeaderLabels(data_collection_summary_column_name)
         self.data_collection_summarys_vbox_for_table=QtGui.QVBoxLayout()
         self.tab_dict['DLS @ Summary'][1].addLayout(self.data_collection_summarys_vbox_for_table)
         self.data_collection_summarys_vbox_for_table.addWidget(self.data_collection_summary_table)
