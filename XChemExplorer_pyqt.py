@@ -992,11 +992,14 @@ class XChemExplorer(QtGui.QApplication):
     def broadcast_new_selection(self):
         print 'hallo row'
 #        print self.sender()
-        indexes=self.sender().selectionModel().selectedRows()
-        for index in sorted(indexes):
-            #print index
-            for item in self.data_collection_statistics_dict[key][index.row()]:
-                print item
+        for widget in self.data_collection_table_dict:
+            if widget==self.sender():
+                print 'found'
+#        indexes=self.sender().selectionModel().selectedRows()
+#        for index in sorted(indexes):
+#            #print index
+#            for item in self.data_collection_statistics_dict[key][index.row()]:
+#                print item
 
 
 
