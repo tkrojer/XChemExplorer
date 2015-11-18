@@ -971,12 +971,12 @@ class XChemExplorer(QtGui.QApplication):
         rows_in_table=self.data_collection_summary_table.rowCount()
         for row in range(rows_in_table):
             if self.data_collection_summary_table.item(row,0).text()==sample:
-                print self.data_collection_summary_table.item(row,0).text()
+#                print self.data_collection_summary_table.item(row,0).text()
                 cell_text=QtGui.QTableWidgetItem()
                 cell_text.setText(outcome)
                 self.data_collection_summary_table.setItem(row, 3, cell_text)
-            data_collection_table.resizeRowsToContents()
-            data_collection_table.resizeColumnsToContents()
+            self.data_collection_summary_table.resizeRowsToContents()
+            self.data_collection_summary_table.resizeColumnsToContents()
 
 #        for i in range(10): print i
 #	    for row in xrange(0,allRows):
