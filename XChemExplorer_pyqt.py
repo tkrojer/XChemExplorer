@@ -943,19 +943,19 @@ class XChemExplorer(QtGui.QApplication):
 
             for column,header in enumerate(self.data_collection_summary_column_name):
                 print self.data_collection_statistics_dict[key][selected_processing_result]
-                    for item in self.data_collection_statistics_dict[key][selected_processing_result]:
+                for item in self.data_collection_statistics_dict[key][selected_processing_result]:
 #                        for item in sample:
-                        if isinstance(item, list):
-                            if len(item)==3:
-                                if item[0]==header:
-                                    cell_text=QtGui.QTableWidgetItem()
-                                    cell_text.setText(str(item[1]))
-                                    cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                                    r=item[2][0]
-                                    g=item[2][1]
-                                    b=item[2][2]
-                                    self.data_collection_summary_table.setItem(n, column, cell_text)
-                                    data_collection_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
+                    if isinstance(item, list):
+                        if len(item)==3:
+                            if item[0]==header:
+                                cell_text=QtGui.QTableWidgetItem()
+                                cell_text.setText(str(item[1]))
+                                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                                r=item[2][0]
+                                g=item[2][1]
+                                b=item[2][2]
+                                self.data_collection_summary_table.setItem(n, column, cell_text)
+                                data_collection_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
 #                                if len(item)==2:
 #                                    if item[0]=='best file':
 #                                        if item[1]==True:
