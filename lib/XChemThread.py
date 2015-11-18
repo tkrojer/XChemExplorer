@@ -218,10 +218,12 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                 break
             progress_step=100/float(len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))))
             progress=0
+
             if 'attic' in visit_directory:
                 visit=visit_directory.split('/')[6]
             else:
                 visit=visit_directory.split('/')[5]
+
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
                 xtal=collected_xtals[collected_xtals.rfind('/')+1:]
                 self.data_collection_dict[xtal]=[[],[],[],[]]
@@ -242,6 +244,9 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                                     run_is_in_pickle_file=True
                     if run_is_in_pickle_file:
 #                        self.data_collection_dict[xtal][0].append(self.data_collection_dict_collected[xtal][0])
+                        for stuff in self.data_collection_dict_collected[xtal][0]:
+                            print stuff
+                            print stuff[0]
                         self.data_collection_dict[xtal][0]+=self.data_collection_dict_collected[xtal][0]
                         self.data_collection_dict[xtal][1]+=self.data_collection_dict_collected[xtal][1]
                         self.data_collection_dict[xtal][2]+=self.data_collection_dict_collected[xtal][2]
