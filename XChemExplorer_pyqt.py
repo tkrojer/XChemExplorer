@@ -997,26 +997,22 @@ class XChemExplorer(QtGui.QApplication):
 
         indexes=self.sender().selectionModel().selectedRows()
         for index in sorted(indexes):
-            print index.row()
-#            for item in self.data_collection_statistics_dict[sample][index.row()]:
-#                print item
+            selected_processing_result=index.row()
 
+        rows_in_table=self.data_collection_summary_table.rowCount()
+        for row in range(rows_in_table):
+            if self.data_collection_summary_table.item(row,0).text()==sample:
+                print self.data_collection_summary_table.item(row,0).text()
+                for column,header in enumerate(self.data_collection_summary_column_name):
+                    cell_text=QtGui.QTableWidgetItem()
+                    for item in self.data_collection_statistics_dict[sample][selected_processing_result]:
+                        if isinstance(item, list):
+                            if len(item)==3:
+                                if item[0]==header:
+                                    cell_text.setText(str(item[1]))
 
-
-#        rows_in_table=self.data_collection_summary_table.rowCount()
-#        for row in range(rows_in_table):
-#            if self.data_collection_summary_table.item(row,0).text()==sample:
-#                print self.data_collection_summary_table.item(row,0).text()
-#                for column,header in enumerate(self.data_collection_summary_column_name):
-#                    cell_text=QtGui.QTableWidgetItem()
-#                    for item in self.data_collection_statistics_dict[key][selected_processing_result]:
-#                        if isinstance(item, list):
-#                            if len(item)==3:
-#                                if item[0]==header:
-#                                    cell_text.setText(str(item[1]))
-#
-#                    cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-#                    self.data_collection_summary_table.setItem(row, column, cell_text)
+                    cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                    self.data_collection_summary_table.setItem(row, column, cell_text)
 
 
 
