@@ -246,7 +246,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                         for stuff in self.data_collection_dict_collected[xtal][0]:
                             if stuff[0]==run:
                                 #self.data_collection_dict[xtal][0]+=stuff
-                                run_list.append(stuff)
+                                #run_list.append(stuff)
+                                run_list+=stuff
                         for stuff in self.data_collection_dict_collected[xtal][1]:
                             if run in stuff:
                                 #self.data_collection_dict[xtal][1]+=stuff
