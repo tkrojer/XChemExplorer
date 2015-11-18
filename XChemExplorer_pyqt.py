@@ -968,9 +968,10 @@ class XChemExplorer(QtGui.QApplication):
     def update_data_collection_summary_table(self,sample,outcome):
         print 'hallo update'
 #	    allRows=self.data_collection_summary_table.rowCount()
-        temp=self.data_collection_summary_table.rowCount()
-        for row in range(temp):
-            print self.data_collection_summary_table.item(row,0).text()
+        rows_in_table=self.data_collection_summary_table.rowCount()
+        for row in range(rows_in_table):
+            if self.data_collection_summary_table.item(row,0).text()==sample:
+                print self.data_collection_summary_table.item(row,0).text()
 #        for i in range(10): print i
 #	    for row in xrange(0,allRows):
 #			print self.data_collection_summary_table.item(row,0).text()
