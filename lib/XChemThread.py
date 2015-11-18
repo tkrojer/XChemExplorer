@@ -265,34 +265,68 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                             if file_name.endswith('aimless.log') and self.target in path:
                                 logfile_list.append(path+'/'+file_name)
                                 continue
-                for image in glob.glob(visit_directory+'/jpegs/'+self.target+'/'+xtal+'/*'):
-                    image_already_in_dict=False
-                    if xtal in self.data_collection_dict_collected:
-                        for collected_images in self.data_collection_dict_collected[xtal]:
-                            if image==collected_images:
-                                image_already_in_dict=True
-                    if not image_already_in_dict:
-                        if image.endswith('t.png'):
-                            image_list.append(image)
-#                    if image.endswith('thumb.jpeg'):
-#                        image_list.append(image)
-                        if image.endswith('_.png'):
-                            image_list.append(image)
+
+                    for image in glob.glob(os.path.join(visit_directory,'jpegs',self.target,xtal,'*')):
+                        if run in image:
+                            if image.endswith('t.png') or image.endswith('_.png'):
+                                image_list.append(image)
+                                image_file=open(image,"rb")
+                                image_string=base64.b64encode(image_file.read())
+                                image_string_list.append((image[image.rfind('/')+1:],image_string))
+
+
                 self.data_collection_dict[xtal][1]+=image_list
                 self.data_collection_dict[xtal][2]+=logfile_list
+                self.data_collection_dict[xtal][3]+=image_string_list
                 progress += progress_step
                 self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
+
+
+#                        image_already_in_dict=False
+#                        if xtal in self.data_collection_dict_collected:
+#                            for collected_images in self.data_collection_dict_collected[xtal]:
+#                                if image==collected_images:
+#                                    image_already_in_dict=True
+#                        if not image_already_in_dict:
+#                            if image.endswith('t.png'):
+#                                image_list.append(image)
+#                    if image.endswith('thumb.jpeg'):
+#                        image_list.append(image)
+#                            if image.endswith('_.png'):
+#                                image_list.append(image)
+
+
+
+#                    for image in glob.glob(os.path.join(visit_directory,'jpegs',self.target,xtal,'*')):
+#                        image_already_in_dict=False
+#                        if xtal in self.data_collection_dict_collected:
+#                            for collected_images in self.data_collection_dict_collected[xtal]:
+#                                if image==collected_images:
+#                                    image_already_in_dict=True
+#                        if not image_already_in_dict:
+#                            if image.endswith('t.png'):
+#                                image_list.append(image)
+#                    if image.endswith('thumb.jpeg'):
+#                        image_list.append(image)
+#                            if image.endswith('_.png'):
+#                                image_list.append(image)
+
+#                self.data_collection_dict[xtal][1]+=image_list
+#                self.data_collection_dict[xtal][2]+=logfile_list
+#                progress += progress_step
+#                self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
                 # convert images to strong and attach to
-                for image in self.data_collection_dict[xtal][1]:
-                    try:
-                        if image in self.data_collection_dict_collected[xtal][1]:
-                            continue
-                    except KeyError:
-                        image_file=open(image,"rb")
-                        image_string=base64.b64encode(image_file.read())
-                        image_string_list.append((image[image.rfind('/')+1:],image_string))
-                self.data_collection_dict[xtal][3]+=image_string_list
+#                for image in self.data_collection_dict[xtal][1]:
+#                    try:
+#                        if image in self.data_collection_dict_collected[xtal][1]:
+#                            continue
+#                    except KeyError:
+#                        image_file=open(image,"rb")
+#                        image_string=base64.b64encode(image_file.read())
+#                        image_string_list.append((image[image.rfind('/')+1:],image_string))
+#                self.data_collection_dict[xtal][3]+=image_string_list
 
             search_cycle+=1
 
