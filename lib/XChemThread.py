@@ -245,9 +245,9 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                     if run_is_in_pickle_file:
                         for stuff in self.data_collection_dict_collected[xtal][0]:
                             if stuff[0]==run:
-                                #self.data_collection_dict[xtal][0]+=stuff
+                                self.data_collection_dict[xtal][0]+=stuff
                                 #run_list.append(stuff)
-                                run_list+=stuff
+                                #run_list+=stuff
                         for stuff in self.data_collection_dict_collected[xtal][1]:
                             if run in stuff:
                                 #self.data_collection_dict[xtal][1]+=stuff
@@ -344,7 +344,11 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 
             search_cycle+=1
 
-        print self.data_collection_dict['ATAD2A-x367'][0]
+        print 'hallo'
+        print len(self.data_collection_dict['ATAD2A-x367'][0])
+        print len(self.data_collection_dict['ATAD2A-x367'][1])
+        print len(self.data_collection_dict['ATAD2A-x367'][2])
+        print len(self.data_collection_dict['ATAD2A-x367'][3])
 
         if not len(self.data_collection_dict)==0:
             progress_step=100/float(len(self.data_collection_dict))
