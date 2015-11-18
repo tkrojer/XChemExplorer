@@ -955,7 +955,7 @@ class XChemExplorer(QtGui.QApplication):
                                 g=item[2][1]
                                 b=item[2][2]
                                 self.data_collection_summary_table.setItem(n, column, cell_text)
-                                data_collection_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
+                                self.data_collection_summary_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
 #                                if len(item)==2:
 #                                    if item[0]=='best file':
 #                                        if item[1]==True:
