@@ -939,7 +939,7 @@ class XChemExplorer(QtGui.QApplication):
                                 if item[1]==True:
                                     selected_processing_result=n
 
-            print self.data_collection_statistics_dict[key][selected_processing_result]
+#            print self.data_collection_statistics_dict[key][selected_processing_result]
 
             for column,header in enumerate(self.data_collection_summary_column_name):
                 cell_text=QtGui.QTableWidgetItem()
@@ -955,7 +955,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                self.data_collection_summary_table.setItem(n, column, cell_text)
+                self.data_collection_summary_table.setItem(row, column, cell_text)
 
 #                print self.data_collection_statistics_dict[key][selected_processing_result]
 #                for item in self.data_collection_statistics_dict[key][selected_processing_result]:
