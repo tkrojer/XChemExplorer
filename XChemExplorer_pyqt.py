@@ -803,7 +803,7 @@ class XChemExplorer(QtGui.QApplication):
             data_collection_table.resizeColumnsToContents()
             data_collection_table.horizontalHeader().setStretchLastSection(False)
             data_collection_table.verticalHeader().setStretchLastSection(True)
-            data_collection_table.itemSelectionChanged.connect(self.broadcast_new_selection)
+            data_collection_table.itemSelectionChanged.connect(self.update_selected_autoproc_data_collection_summary_table)
             hbox_for_button_and_table.addWidget(data_collection_table)
             vbox_cell.addLayout(hbox_for_button_and_table)
             self.data_collection_table_dict[key]=data_collection_table
@@ -913,7 +913,7 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 print self.dataset_outcome[str(button.text())]
                 button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[str(button.text())])
-        self.update_data_collection_summary_table(dataset,outcome)
+        self.update_outcome_data_collection_summary_table(dataset,outcome)
 #        button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[outcome])
 #        print 'hallo'
 #        print self.sender()
@@ -965,8 +965,8 @@ class XChemExplorer(QtGui.QApplication):
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.data_collection_summary_table.setItem(row, column, cell_text)
 
-    def update_data_collection_summary_table(self,sample,outcome):
-        print 'hallo update'
+    def update_outcome_data_collection_summary_table(self,sample,outcome):
+#        print 'hallo update'
 #	    allRows=self.data_collection_summary_table.rowCount()
         rows_in_table=self.data_collection_summary_table.rowCount()
         for row in range(rows_in_table):
@@ -989,23 +989,50 @@ class XChemExplorer(QtGui.QApplication):
 #        for index in sorted(indexes):
 #            print index.row()
 
-    def broadcast_new_selection(self):
-        print 'hallo row'
-        print self.sender()
+    def update_selected_autoproc_data_collection_summary_table(self):
         for key in self.data_collection_table_dict:
             if self.data_collection_table_dict[key]==self.sender():
                 sample=key
                 break
 
-#            print widget
-#        print self.sender()
-#            if widget==self.sender():
-#                print 'found'
         indexes=self.sender().selectionModel().selectedRows()
-        for index in sorted(indexes):
-            #print index
-            for item in self.data_collection_statistics_dict[sample][index.row()]:
-                print item
+        print index.row()
+#        for index in sorted(indexes):
+#
+#            for item in self.data_collection_statistics_dict[sample][index.row()]:
+#                print item
+
+
+
+#        rows_in_table=self.data_collection_summary_table.rowCount()
+#        for row in range(rows_in_table):
+#            if self.data_collection_summary_table.item(row,0).text()==sample:
+#                print self.data_collection_summary_table.item(row,0).text()
+#                for column,header in enumerate(self.data_collection_summary_column_name):
+#                    cell_text=QtGui.QTableWidgetItem()
+#                    for item in self.data_collection_statistics_dict[key][selected_processing_result]:
+#                        if isinstance(item, list):
+#                            if len(item)==3:
+#                                if item[0]==header:
+#                                    cell_text.setText(str(item[1]))
+#
+#                    cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+#                    self.data_collection_summary_table.setItem(row, column, cell_text)
+
+
+
+
+
+
+
+
+
+
+#                cell_text=QtGui.QTableWidgetItem()
+#                cell_text.setText(outcome)
+#                self.data_collection_summary_table.setItem(row, 3, cell_text)
+#            data_collection_table.resizeRowsToContents()
+#            data_collection_table.resizeColumnsToContents()
 
 
 
