@@ -203,6 +203,7 @@ class XChemExplorer(QtGui.QApplication):
 #        self.target='ATAD2A'
 
         # DLS @ Summary
+        data_collection_summary_list=[]
         data_collection_summary_column_name=[   'Sample ID',
                                                 'Program',
                                                 'Space\nGroup',
