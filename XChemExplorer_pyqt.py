@@ -931,13 +931,16 @@ class XChemExplorer(QtGui.QApplication):
             for n,sample in enumerate(self.data_collection_statistics_dict[key]):
                 # check which row was auto-selected
                 for item in sample:
-                    if len(item)==2:
-                        if item[0]=='best file':
-                            if item[1]==True:
-                                selected_processing_result=n
+                    if isinstance(item, list):
+                        if len(item)==2:
+                            if item[0]=='best file':
+                                if item[1]==True:
+                                    selected_processing_result=n
 
-                for column,header in enumerate(self.data_collection_summary_column_name):
-                    print self.data_collection_statistics_dict[key][selected_processing_result]
+            print self.data_collection_statistics_dict[key][selected_processing_result]
+
+#                for column,header in enumerate(self.data_collection_summary_column_name):
+#                    print self.data_collection_statistics_dict[key][selected_processing_result]
 ##                    for item in self.data_collection_statistics_dict[key]:
 #                        for item in sample:
 #                            if isinstance(item, list):
