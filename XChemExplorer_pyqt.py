@@ -994,16 +994,18 @@ class XChemExplorer(QtGui.QApplication):
         print self.sender()
         for key in self.data_collection_table_dict:
             if self.data_collection_table_dict[key]==self.sender():
-                print found
+                sample=key
+                break
+
 #            print widget
 #        print self.sender()
 #            if widget==self.sender():
 #                print 'found'
-#        indexes=self.sender().selectionModel().selectedRows()
-#        for index in sorted(indexes):
-#            #print index
-#            for item in self.data_collection_statistics_dict[key][index.row()]:
-#                print item
+        indexes=self.sender().selectionModel().selectedRows()
+        for index in sorted(indexes):
+            #print index
+            for item in self.data_collection_statistics_dict[sample][index.row()]:
+                print item
 
 
 
