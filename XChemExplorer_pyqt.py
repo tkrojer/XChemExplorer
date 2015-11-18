@@ -897,12 +897,14 @@ class XChemExplorer(QtGui.QApplication):
 
     def dataset_outcome_button_change_color(self):
 #        print self.sender().text()
+        outcome=''
         for key in self.dataset_outcome_dict:
             for button in self.dataset_outcome_dict[key]:
                 if button==self.sender():
                     dataset=key
         for button in self.dataset_outcome_dict[dataset]:
             if button==self.sender():
+                outcome=self.sender().text()
                 if str(self.sender().text()).startswith('success'):
                     button.setStyleSheet("font-size:9px;background-color: rgb(0,255,0)")
                 else:
@@ -911,7 +913,7 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 print self.dataset_outcome[str(button.text())]
                 button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[str(button.text())])
-
+        self.update_data_collection_summary_table(dataset,outcome)
 #        button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[outcome])
 #        print 'hallo'
 #        print self.sender()
@@ -965,24 +967,11 @@ class XChemExplorer(QtGui.QApplication):
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.data_collection_summary_table.setItem(row, column, cell_text)
 
-#                print self.data_collection_statistics_dict[key][selected_processing_result]
-#                for item in self.data_collection_statistics_dict[key][selected_processing_result]:
-#                        for item in sample:
-#                    if isinstance(item, list):
-#                        if len(item)==3:
-#                            if item[0]==header:
-#                                cell_text=QtGui.QTableWidgetItem()
-#                                cell_text.setText(str(item[1]))
-#                                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-#                                r=item[2][0]
-#                                g=item[2][1]
-#                                b=item[2][2]
-#                                self.data_collection_summary_table.setItem(n, column, cell_text)
-#                                self.data_collection_summary_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
-#                                if len(item)==2:
-#                                    if item[0]=='best file':
-#                                        if item[1]==True:
-#                                            data_collection_table.selectRow(n)
+    def update_data_collection_summary_table(self,sample,outcome):
+        print 'hallo'
+        indexes=self.data_collection_summary_table.selectionModel().selectedRows()
+        for index in sorted(indexes):
+            print index.row()
 
 
 if __name__ == "__main__":
