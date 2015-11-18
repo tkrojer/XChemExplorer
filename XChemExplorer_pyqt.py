@@ -667,9 +667,11 @@ class XChemExplorer(QtGui.QApplication):
             # crystal images
             layout = QtGui.QGridLayout()
             for run_number,run in enumerate(data_collection_dict[key][0]):
-                label = QtGui.QLabel(run[0])
-                layout.addWidget(label,(run_number)*2,0)
+                #label = QtGui.QLabel(run[0]+' ('+run[1]+' @ '+run[2]+')')
+                #layout.addWidget(label,(run_number)*2,0)
                 if len(data_collection_dict[key][3]) != 0:
+                    label = QtGui.QLabel(run[0]+' ('+run[1]+' @ '+run[2]+')')
+                    layout.addWidget(label,(run_number)*2,0)
                     for column_number,column in enumerate(sorted(data_collection_dict[key][3])):
                         if run[0] in column[0]:
                             pixmap = QtGui.QPixmap()
