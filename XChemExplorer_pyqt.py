@@ -694,7 +694,7 @@ class XChemExplorer(QtGui.QApplication):
                 #layout.addWidget(label,(run_number)*2,0)
                 if len(data_collection_dict[key][3]) != 0:
                     #label = QtGui.QLabel(run[0]+' ('+run[1]+' @ '+run[2]+')')
-                    label = QtGui.QLabel(run)
+                    label = QtGui.QLabel(str(run))
                     layout.addWidget(label,(run_number)*2,0)
                     for column_number,column in enumerate(sorted(data_collection_dict[key][3])):
                         if run[0] in column[0]:
