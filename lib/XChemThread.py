@@ -356,6 +356,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 #                        print 'hallo'
                         continue
                     else:
+                        print 'hallo ',logfile
                         aimless_results=parse().GetAimlessLog(logfile)
                         try:
                             self.data_collection_statistics_dict[sample].append([
