@@ -929,6 +929,13 @@ class XChemExplorer(QtGui.QApplication):
 
         self.data_collection_summary_table.setRowCount(len(self.data_collection_statistics_dict))
         for row,key in enumerate(sorted(self.data_collection_statistics_dict)):
+            # find which dataset_outcome_button is checked
+            outcome=''
+            for button in self.dataset_outcome_dict[key]:
+                if button.isChecked():
+                    outcome=button.text()
+
+            # find which autoprocessing run was thought to be the best
             selected_processing_result=0
             for n,sample in enumerate(self.data_collection_statistics_dict[key]):
                 # check which row was auto-selected
@@ -945,7 +952,8 @@ class XChemExplorer(QtGui.QApplication):
                 cell_text=QtGui.QTableWidgetItem()
                 if header=='Sample ID':
                     cell_text.setText(str(key))
-
+                if header=='Dataset\nOutcome':
+                    cell_text.setText(outcome)
                 for item in self.data_collection_statistics_dict[key][selected_processing_result]:
                     if isinstance(item, list):
                         if len(item)==3:
