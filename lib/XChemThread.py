@@ -245,9 +245,10 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                     if run_is_in_pickle_file:
 #                        self.data_collection_dict[xtal][0].append(self.data_collection_dict_collected[xtal][0])
                         for stuff in self.data_collection_dict_collected[xtal][0]:
+                            if stuff[0]==run:
+                                self.data_collection_dict[xtal][0]+=stuff
+                        for stuff in self.data_collection_dict[xtal][1]:
                             print stuff
-                            print stuff[0]
-                        self.data_collection_dict[xtal][0]+=self.data_collection_dict_collected[xtal][0]
                         self.data_collection_dict[xtal][1]+=self.data_collection_dict_collected[xtal][1]
                         self.data_collection_dict[xtal][2]+=self.data_collection_dict_collected[xtal][2]
                         self.data_collection_dict[xtal][3]+=self.data_collection_dict_collected[xtal][3]
