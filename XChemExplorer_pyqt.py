@@ -996,7 +996,7 @@ class XChemExplorer(QtGui.QApplication):
                 break
 
         index=self.sender().selectionModel().selectedRows()
-        print index.row()
+        print index
 #        for index in sorted(indexes):
 #
 #            for item in self.data_collection_statistics_dict[sample][index.row()]:
