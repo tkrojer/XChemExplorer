@@ -256,7 +256,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                                 #self.data_collection_dict[xtal][2]+=stuff
                                 #self.data_collection_dict[xtal][2].append(stuff)
                                 logfile_list.append(stuff)
-                        print self.data_collection_dict[xtal][2]
+#                        print self.data_collection_dict[xtal][2]
                         for stuff in self.data_collection_dict_collected[xtal][3]:
                             if run in stuff[0]:
                                 #self.data_collection_dict[xtal][3]+=stuff
@@ -343,7 +343,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 
             search_cycle+=1
 
-#        print self.data_collection_dict['ATAD2A-x367'][2]
+        print self.data_collection_dict['ATAD2A-x367'][2]
 
         if not len(self.data_collection_dict)==0:
             progress_step=100/float(len(self.data_collection_dict))
