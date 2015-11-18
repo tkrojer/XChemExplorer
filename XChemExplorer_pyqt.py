@@ -992,8 +992,8 @@ class XChemExplorer(QtGui.QApplication):
     def broadcast_new_selection(self,data_collection_table):
         print 'hallo row'
         indexes=data_collection_table.selectionModel().selectedRows()
-            for index in sorted(indexes):
-                print index
+        for index in sorted(indexes):
+            print index
 
 #        items = self.selectedItems()
 #        print(str(items[0].text()))
