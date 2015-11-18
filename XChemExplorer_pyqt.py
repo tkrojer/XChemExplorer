@@ -803,7 +803,8 @@ class XChemExplorer(QtGui.QApplication):
             data_collection_table.resizeColumnsToContents()
             data_collection_table.horizontalHeader().setStretchLastSection(False)
             data_collection_table.verticalHeader().setStretchLastSection(True)
-            data_collection_table.verticalHeader().sectionClicked.connect(self.onSectionClicked)
+#            data_collection_table.verticalHeader().sectionClicked.connect(self.onSectionClicked)
+            data_collection_table.selectionChanged.connect(self.onSectionClicked)
             hbox_for_button_and_table.addWidget(data_collection_table)
             vbox_cell.addLayout(hbox_for_button_and_table)
             self.data_collection_table_dict[key]=data_collection_table
