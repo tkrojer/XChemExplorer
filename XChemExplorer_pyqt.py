@@ -994,8 +994,9 @@ class XChemExplorer(QtGui.QApplication):
         print("onSectionClicked:", logicalIndex)
 
     def print_row(self):
-        items = self.selectedItems()
-        print(str(items[0].text()))
+        print 'hallo row'
+#        items = self.selectedItems()
+#        print(str(items[0].text()))
 
 
 if __name__ == "__main__":
