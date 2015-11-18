@@ -803,7 +803,7 @@ class XChemExplorer(QtGui.QApplication):
             data_collection_table.resizeColumnsToContents()
             data_collection_table.horizontalHeader().setStretchLastSection(False)
             data_collection_table.verticalHeader().setStretchLastSection(True)
-            data_collection_table.itemSelectionChanged.connect(self.broadcast_new_selection(data_collection_table))
+            data_collection_table.itemSelectionChanged.connect(self.broadcast_new_selection)
             hbox_for_button_and_table.addWidget(data_collection_table)
             vbox_cell.addLayout(hbox_for_button_and_table)
             self.data_collection_table_dict[key]=data_collection_table
@@ -989,11 +989,12 @@ class XChemExplorer(QtGui.QApplication):
 #        for index in sorted(indexes):
 #            print index.row()
 
-    def broadcast_new_selection(self,data_collection_table):
+    def broadcast_new_selection(self):
         print 'hallo row'
-        indexes=data_collection_table.selectionModel().selectedRows()
-        for index in sorted(indexes):
-            print index
+        print self.sender()
+#        indexes=data_collection_table.selectionModel().selectedRows()
+#        for index in sorted(indexes):
+#            print index
 
 #        items = self.selectedItems()
 #        print(str(items[0].text()))
