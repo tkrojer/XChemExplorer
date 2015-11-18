@@ -971,8 +971,8 @@ class XChemExplorer(QtGui.QApplication):
 #        for index in sorted(indexes):
 #            print index.row()
 
-		allRows = self.data_collection_summary_table.rowCount()
-		for row in xrange(0,allRows):
+	    allRows = self.data_collection_summary_table.rowCount()
+	    for row in xrange(0,allRows):
 			print self.data_collection_summary_table.item(row,0).text()
 #			twi1 = self.ui.tableWidget.cellWidget(row,1)
 #			twi2 = self.ui.tableWidget.cellWidget(row,2)
