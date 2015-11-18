@@ -204,7 +204,7 @@ class XChemExplorer(QtGui.QApplication):
 
         # DLS @ Summary
         data_collection_summary_list=[]
-        data_collection_summary_column_name=[   'Sample ID',
+        self.data_collection_summary_column_name=[   'Sample ID',
                                                 'Program',
                                                 'Space\nGroup',
                                                 'Dataset\nOutcome',
@@ -819,6 +819,9 @@ class XChemExplorer(QtGui.QApplication):
         table.resizeRowsToContents()
         table.setLineWidth(10)
         self.data_collection_vbox_for_table.addWidget(table)
+
+        self.populate_data_collection_summary_table()
+    
         #-----------------------------------------------------------------------------------------------
 
     def create_initial_model_table(self,initial_model_list):
@@ -919,8 +922,39 @@ class XChemExplorer(QtGui.QApplication):
         else:
             print 'not checked'
 
+    def populate_data_collection_summary_table(self):
+        # 1. get length of table
+        # 2. delete all entries
 
+        for key in self.data_collection_statistics_dict:
+            selected_processing_result=0
+            for n,sample in enumerate(self.data_collection_statistics_dict[key]):
+                # check which row was auto-selected
+                for item in sample:
+                    if len(item)==2:
+                        if item[0]=='best file':
+                            if item[1]==True:
+                                selected_processing_result=n
 
+                for column,header in enumerate(self.data_collection_summary_column_name):
+                    print self.data_collection_statistics_dict[key][selected_processing_result]
+##                    for item in self.data_collection_statistics_dict[key]:
+#                        for item in sample:
+#                            if isinstance(item, list):
+#                                if len(item)==3:
+#                                    if item[0]==header:
+#                                        cell_text=QtGui.QTableWidgetItem()
+#                                        cell_text.setText(str(item[1]))
+#                                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+#                                        r=item[2][0]
+#                                        g=item[2][1]
+#                                        b=item[2][2]
+#                                        data_collection_table.setItem(n, column, cell_text)
+#                                        data_collection_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
+#                                if len(item)==2:
+#                                    if item[0]=='best file':
+#                                        if item[1]==True:
+#                                            data_collection_table.selectRow(n)
 
 
 if __name__ == "__main__":
