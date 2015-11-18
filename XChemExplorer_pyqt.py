@@ -1005,6 +1005,10 @@ class XChemExplorer(QtGui.QApplication):
                 print self.data_collection_summary_table.item(row,0).text()
                 for column,header in enumerate(self.data_collection_summary_column_name):
                     cell_text=QtGui.QTableWidgetItem()
+                    if header=='Sample ID':
+                        continue
+                    if header=='Dataset\nOutcome':
+                        continue
                     for item in self.data_collection_statistics_dict[sample][selected_processing_result]:
                         if isinstance(item, list):
                             if len(item)==3:
