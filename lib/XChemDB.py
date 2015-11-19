@@ -1,6 +1,9 @@
 import sqlite3
 import os
 
+sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
+from XChemUtils import parse
+
 class data_source:
 
     def __init__(self,data_source_file):
