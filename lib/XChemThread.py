@@ -185,14 +185,14 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
                 # link files
                 if 'xia2' in path_to_logfile:
                     os.chdir(os.path.join(self.initial_model_directory,sample))
-                        for datafile in glob.glob('autoprocessing/*/DataFiles/*'):
-                            if datafile.endswith('free.mtz'):
-                                os.symlink(datafile,sample+'.mtz')
-                                break
-                        for logfile in glob.glob('autoprocessing/*/LogFiles/*'):
-                            if logfile.endswith('aimless.log'):
-                                os.symlink(logfile,sample+'.mtz')
-                                break
+                    for datafile in glob.glob('autoprocessing/*/DataFiles/*'):
+                        if datafile.endswith('free.mtz'):
+                            os.symlink(datafile,sample+'.mtz')
+                            break
+                    for logfile in glob.glob('autoprocessing/*/LogFiles/*'):
+                        if logfile.endswith('aimless.log'):
+                            os.symlink(logfile,sample+'.mtz')
+                            break
                 if 'fast_dp' in path_to_logfile:
                     os.chdir(os.path.join(self.initial_model_directory,sample,'autoprocessing','fast_dp'))
                     os.system("ctruncate -hklin fast_dp.mtz "
