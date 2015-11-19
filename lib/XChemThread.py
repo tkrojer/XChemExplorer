@@ -165,6 +165,28 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
                     logfile=self.data_collection_statistics_dict[sample][index.row()][1]
             data_source.save_autoprocessing_results_to_data_source(sample,str(outcome),logfile)
 
+            # create all the directories if necessary
+#            if not os.path.isdir(os.path.join(self.initial_model_directory,sample)):
+#                os.mkdir(os.path.join(self.initial_model_directory,sample))
+#            if not os.path.isdir(os.path.join(self.initial_model_directory,sample,'autoprocessing')):
+#                os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing'))
+
+
+            if 'xia2' in self.data_collection_statistics_dict[key][index.row()][1]:
+                print self.data_collection_statistics_dict[key][index.row()][1]
+                print os.path.join(*self.data_collection_statistics_dict[key][index.row()][1].split('/')[:13])
+            if 'fast_dp' in self.data_collection_statistics_dict[key][index.row()][1]:
+                print self.data_collection_statistics_dict[key][index.row()][1]
+                print os.path.join(*self.data_collection_statistics_dict[key][index.row()][1].split('/')[:12])
+
+
+
+#                                os.symlink('0-coot.state.scm','temp.link')
+#            if not os.path.isdir(os.path.join(self.initial_model_directory,key,'autoprocessing')):
+#                os.mkdir(os.path.join(self.initial_model_directory,key,'autoprocessing'))
+
+
+
 #            if outcome=='success':
 #                indexes=self.data_collection_table_dict[key].selectionModel().selectedRows()
 #                for index in sorted(indexes):

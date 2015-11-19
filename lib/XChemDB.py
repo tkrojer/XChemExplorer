@@ -283,17 +283,16 @@ class data_source:
                         for column,field in enumerate(line.split(',')):
                             if field==item[0]:
                                 column_list.append(column)
-            print 'SampleColumn',sample_column
+
            # find sample line
             row_to_change=None
             if sample_column != None:
                 for row,line in enumerate(open(self.data_source_file)):
-#                    print len(line.split(','))
                     if len(line.split(',')) >= sample_column:
                         print line.split(',')[sample_column]
                         if line.split(',')[sample_column].replace(' ','')==sample:
                             row_to_change=row
-            print 'Row to Change',row_to_change
+
             csv_out=''
             if row_to_change==None:
                 for line in open(self.data_source_file):
@@ -319,15 +318,6 @@ class data_source:
             f.close()
 
 
-
-#            print csv_out
-## new sample
-#                        for column,field in enumerate(line.split(',')):
-#                            if field==item:
-#                                column_list.append(column)
-
-
-            print 'hallo'
     def read_data_source_for_coot(self):
         print 'hallo'
     def update_data_source_from_coot(self):
