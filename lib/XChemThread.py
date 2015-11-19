@@ -164,7 +164,7 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
                 for index in sorted(indexes):
                     logfile=self.data_collection_statistics_dict[sample][index.row()][1]
             print sample,outcome,logfile
-            data_source.save_autoprocessing_results_to_data_source(sample,outcome,logfile)
+            data_source.save_autoprocessing_results_to_data_source(sample,str(outcome),logfile)
 
 #            if outcome=='success':
 #                indexes=self.data_collection_table_dict[key].selectionModel().selectedRows()
