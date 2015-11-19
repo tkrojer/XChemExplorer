@@ -284,16 +284,23 @@ class data_source:
                             if field==item[0]:
                                 column_list.append(column)
 
-            print column_list
-            # find sample line
-#            row_to_change=None
-#            if sample_column != None:
-#                for row,line in enumerate(open(self.data_source_file)):
-#                    if len(line.split(',')) >= sample_column:
-#                        if line.split(',')[sample_column]==sample:
-#                            row_to_change=row
-#
-#            if row_to_change==None:
+           # find sample line
+            row_to_change=None
+            if sample_column != None:
+                for row,line in enumerate(open(self.data_source_file)):
+                    if len(line.split(',')) >= sample_column:
+                        if line.split(',')[sample_column]==sample:
+                            row_to_change=row
+
+            csv_out=''
+            if row_to_change==None:
+                for line in open(self.data_source_file):
+                    csv_out+=line
+                csv_list=(','*max(column_list)).split(',')
+                for n,item in enumerate(column_list):
+                    csv_list[item]=columns_to_update[n][1]
+                csv_out+=str(csv_list).translate(None,"[']")
+            print csv_out
 ## new sample
 #                        for column,field in enumerate(line.split(',')):
 #                            if field==item:
