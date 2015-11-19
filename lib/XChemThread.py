@@ -154,7 +154,7 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
                 if button.isChecked():
                     print key,button.text()
                     outcome=button.text()
-            csv_out+=str(key)+','+outcome+','
+#            csv_out+=str(key)+','+outcome+','
             if outcome=='success':
                 indexes=self.data_collection_table_dict[key].selectionModel().selectedRows()
                 for index in sorted(indexes):
