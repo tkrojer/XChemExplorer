@@ -139,13 +139,14 @@ class read_intial_refinement_results(QtCore.QThread):
 
 class save_autoprocessing_results_to_disc(QtCore.QThread):
     def __init__(self,dataset_outcome_dict,data_collection_table_dict,data_collection_statistics_dict,
-                 database_directory,data_source_file):
+                 database_directory,data_source_file,initial_model_directory):
         QtCore.QThread.__init__(self)
         self.dataset_outcome_dict=dataset_outcome_dict
         self.data_collection_table_dict=data_collection_table_dict
         self.data_collection_statistics_dict=data_collection_statistics_dict
         self.database_directory=database_directory
         self.data_source_file=data_source_file
+        self.initial_model_directory=initial_model_directory
 
     def run(self):
         if not len(self.dataset_outcome_dict)==0:
