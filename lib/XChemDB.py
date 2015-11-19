@@ -247,7 +247,7 @@ class data_source:
                             sample_column=column
             # find sample line
             row_to_change=None
-            if sample_column != None
+            if sample_column != None:
                 for row,line in enumerate(open(self.data_source_file)):
                     if len(line.split(',')) >= sample_column:
                         if line.split(',')[sample_column]==sample:
