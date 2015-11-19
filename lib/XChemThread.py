@@ -147,20 +147,18 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
         if not len(self.dataset_outcome_dict)==0:
             progress_step=100/float(len(self.dataset_outcome_dict))
         progress=0
-        for key in sorted(self.dataset_outcome_dict):
+        for sample in sorted(self.dataset_outcome_dict):
             outcome=''
-            for button in self.dataset_outcome_dict[key]:
+            for button in self.dataset_outcome_dict[sample]:
                 if button.isChecked():
                     outcome=button.text()
-            indexes=self.data_collection_table_dict[key].selectionModel().selectedRows()
-            print indexes
-            for index in sorted(indexes):
-#                print index
-                sample=key
-                logile=self.data_collection_statistics_dict[key][index.row()][1]
-
-
-                print sample,outcome,logile
+            indexes=self.data_collection_table_dict[sample].selectionModel().selectedRows()
+            if indexes == []:       # i.e. no logfile exists
+                logfile=None
+            else:
+                for index in sorted(indexes):
+                    logfile=self.data_collection_statistics_dict[key][index.row()][1]
+            print sample,outcome,logfile
 
 #            if outcome=='success':
 #                indexes=self.data_collection_table_dict[key].selectionModel().selectedRows()
