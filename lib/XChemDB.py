@@ -299,8 +299,11 @@ class data_source:
                 csv_list=(','*max(column_list)).split(',')
                 for n,item in enumerate(column_list):
                     csv_list[item]=columns_to_update[n][1]
-                csv_out+=str(csv_list).translate(None,"[']")
-            print csv_out
+                csv_out+=str(csv_list).translate(None,"[']")+'\n'
+                f=open(self.data_source_file,'w')
+                f.write(csv_out)
+                f.close()
+#            print csv_out
 ## new sample
 #                        for column,field in enumerate(line.split(',')):
 #                            if field==item:
