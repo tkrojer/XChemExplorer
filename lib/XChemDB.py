@@ -283,7 +283,7 @@ class data_source:
                         for column,field in enumerate(line.split(',')):
                             if field==item[0]:
                                 column_list.append(column)
-
+            print 'SampleColumn',sample_column
            # find sample line
             row_to_change=None
             if sample_column != None:
@@ -291,7 +291,7 @@ class data_source:
                     if len(line.split(',')) >= sample_column:
                         if line.split(',')[sample_column]==sample:
                             row_to_change=row
-
+            print 'Row to Change',row_to_change
             csv_out=''
             if row_to_change==None:
                 for line in open(self.data_source_file):
