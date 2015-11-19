@@ -153,8 +153,9 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
                 if button.isChecked():
                     outcome=button.text()
             indexes=self.data_collection_table_dict[key].selectionModel().selectedRows()
+            print indexes
             for index in sorted(indexes):
-                print index
+#                print index
                 sample=key
                 logile=self.data_collection_statistics_dict[key][index.row()][1]
 
