@@ -192,7 +192,7 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
 #                        print os.path.join(*self.data_collection_statistics_dict[key][index.row()][1].split('/')[:12])
 
 
-            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing files from data processing to inital_model folder -> '+key)
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing files from data processing to inital_model folder -> '+sample)
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
