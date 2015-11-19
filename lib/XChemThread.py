@@ -154,6 +154,7 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
         progress=0
         data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
         for sample in sorted(self.dataset_outcome_dict):
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing files from data processing to inital_model folder -> '+sample)
             outcome=''
             for button in self.dataset_outcome_dict[sample]:
                 if button.isChecked():
@@ -202,8 +203,6 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
                     os.chdir(os.path.join(self.initial_model_directory,sample))
                     os.symlink('autoprocessing/fast_dp/aimless.log',sample+'.log')
                     os.symlink('autoprocessing/fast_dp/ctruncate.mtz',sample+'.mtz')
-
-            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing files from data processing to inital_model folder -> '+sample)
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
