@@ -157,7 +157,7 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
                 logfile=None
             else:
                 for index in sorted(indexes):
-                    logfile=self.data_collection_statistics_dict[key][index.row()][1]
+                    logfile=self.data_collection_statistics_dict[sample][index.row()][1]
             print sample,outcome,logfile
 
 #            if outcome=='success':
