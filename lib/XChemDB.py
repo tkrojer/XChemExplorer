@@ -110,7 +110,7 @@ class data_source:
             for column in self.column_list:
                 csv_header+=str(column)+','
             csv_header+='\n'
-            f=open(self.data_source_file)
+            f=open(self.data_source_file,'w')
             f.write(csv_header)
             f.close()
 
