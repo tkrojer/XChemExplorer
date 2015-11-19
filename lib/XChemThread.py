@@ -14,6 +14,7 @@ from XChemUtils import process
 from XChemUtils import parse
 from XChemUtils import queue
 from XChemUtils import mtztools
+import XChemDB
 
 
 class run_dimple_on_selected_samples(QtCore.QThread):
@@ -137,16 +138,20 @@ class read_intial_refinement_results(QtCore.QThread):
 
 
 class save_autoprocessing_results_to_disc(QtCore.QThread):
-    def __init__(self,dataset_outcome_dict,data_collection_table_dict,data_collection_statistics_dict):
+    def __init__(self,dataset_outcome_dict,data_collection_table_dict,data_collection_statistics_dict,
+                 database_directory,data_source_file):
         QtCore.QThread.__init__(self)
         self.dataset_outcome_dict=dataset_outcome_dict
         self.data_collection_table_dict=data_collection_table_dict
         self.data_collection_statistics_dict=data_collection_statistics_dict
+        self.database_directory=database_directory
+        self.data_source_file=data_source_file
 
     def run(self):
         if not len(self.dataset_outcome_dict)==0:
             progress_step=100/float(len(self.dataset_outcome_dict))
         progress=0
+        data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
         for sample in sorted(self.dataset_outcome_dict):
             outcome=''
             for button in self.dataset_outcome_dict[sample]:

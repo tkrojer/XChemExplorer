@@ -1,4 +1,5 @@
 import sqlite3
+import os
 
 class data_source:
 
@@ -88,9 +89,9 @@ class data_source:
             'DataProcessingMultiplicityOverall',
             'DataProcessingMultiplicityLow',
             'DataProcessingMultiplicityHigh',
-            'DataProcessingPathToLogfile'
+            'DataProcessingPathToLogfile',
 
-            'PANDDAstuff'
+            'PANDDAstuff',
 
             'RefinementRcryst',
             'RefinementRfree',
@@ -102,6 +103,16 @@ class data_source:
             'AssayIC50'
 
         ]
+
+        # if file does not exist, create one
+        if not os.path.isfile(self.data_source_file):
+            csv_header=''
+            for column in self.column_list:
+                csv_header+=str(column)+','
+            csv_header+='\n'
+            f=open(self.data_source_file)
+            f.write(csv_header)
+            f.close()
 
         # 1. check data source if all columns exist
         # 2. create missing columns
@@ -200,8 +211,55 @@ class data_source:
 #            for column in self.cursor.description:
 #                print column
 
-    def save_autoprocessing_results_to_data_source(self):
+    def save_autoprocessing_results_to_data_source(self,sample,outcome,logfile):
+        columns_to_update=  [
+            'DataCollectionBeamline',
+            'DataCollectionDate',
+            'DataCollectionOutcome',
+            'DataCollectionRun',
+            'DataCollectionComment',
+            'DataProcessingProgram',
+            'DataProcessingSpaceGroup',
+            'DataProcessingUnitCell',
+            'DataProcessingResolutionOverall',
+            'DataProcessingResolutionLow',
+            'DataProcessingResolutionHigh',
+            'DataProcessingRmergeOverall',
+            'DataProcessingRmergeLow',
+            'DataProcessingRmergeHigh',
+            'DataProcessingIsigOverall',
+            'DataProcessingIsigLow',
+            'DataProcessingIsigHigh',
+            'DataProcessingCompletenessOverall',
+            'DataProcessingCompletenessLow',
+            'DataProcessingCompletenessHigh',
+            'DataProcessingMultiplicityOverall',
+            'DataProcessingMultiplicityLow',
+            'DataProcessingMultiplicityHigh',
+            'DataProcessingPathToLogfile'
+            ]
         if self.data_source_type=='csv':
+            sample_column=None
+            for n,line in enumerate(open(self.data_source_file)):
+                if n==0:
+                    for column,item in enumerate(line.split(',')):
+                        if item=='CrystalName':
+                            sample_column=column
+            # find sample line
+            row_to_change=None
+            if sample_column != None
+                for row,line in enumerate(open(self.data_source_file)):
+                    if len(line.split(',')) >= sample_column:
+                        if line.split(',')[sample_column]==sample:
+                            row_to_change=row
+
+            if row_to_change==None:
+# new sample
+                        for column,field in enumerate(line.split(',')):
+                            if field==item:
+                                column_list.append(column)
+
+
             print 'hallo'
     def read_data_source_for_coot(self):
         print 'hallo'
