@@ -202,7 +202,7 @@ class data_source:
 
     def save_autoprocessing_results_to_data_source(self):
         if self.data_source_type=='csv':
-
+            print 'hallo'
     def read_data_source_for_coot(self):
         print 'hallo'
     def update_data_source_from_coot(self):
