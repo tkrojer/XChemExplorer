@@ -227,8 +227,8 @@ class data_source:
                 ['DataProcessingSpaceGroup',            aimless_results['SpaceGroup']],
                 ['DataProcessingUnitCell',              aimless_results['UnitCell']],
                 ['DataProcessingResolutionOverall',     aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionHigh']],
-                ['DataProcessingResolutionLow',         aimless_results['RmergeLow']],
-                ['DataProcessingResolutionHigh',        aimless_results['RmergeHigh']],
+                ['DataProcessingResolutionLow',         aimless_results['ResolutionLow']],
+                ['DataProcessingResolutionHigh',        aimless_results['ResolutionHigh']],
                 ['DataProcessingRmergeOverall',         aimless_results['RmergeOverall']],
                 ['DataProcessingRmergeLow',             aimless_results['RmergeLow']],
                 ['DataProcessingRmergeHigh',            aimless_results['RmergeHigh']],
@@ -300,9 +300,23 @@ class data_source:
                 for n,item in enumerate(column_list):
                     csv_list[item]=columns_to_update[n][1]
                 csv_out+=str(csv_list).translate(None,"[']")+'\n'
-                f=open(self.data_source_file,'w')
-                f.write(csv_out)
-                f.close()
+            else:
+                for row,line in enumerate(open(self.data_source_file)):
+                    if row == row_to_change:
+                        if len(line.split(',')) < max(column_list):
+                            line+=(','*int(max(column_list)-len(x.split(','))))
+                        csv_list=line.split(',')
+                        for n,item in enumerate(column_list):
+                            csv_list[item]=columns_to_update[n][1]
+                        csv_out+=str(csv_list).translate(None,"[']")+'\n'
+                    else:
+                        csv_out+=line
+            f=open(self.data_source_file,'w')
+            f.write(csv_out)
+            f.close()
+
+
+
 #            print csv_out
 ## new sample
 #                        for column,field in enumerate(line.split(',')):
