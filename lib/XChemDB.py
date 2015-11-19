@@ -297,6 +297,7 @@ class data_source:
                 for line in open(self.data_source_file):
                     csv_out+=line
                 csv_list=(','*max(column_list)).split(',')
+                csv_list[sample_column]=sample
                 for n,item in enumerate(column_list):
                     csv_list[item]=columns_to_update[n][1]
                 csv_out+=str(csv_list).translate(None,"[']")+'\n'
