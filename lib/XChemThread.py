@@ -151,13 +151,12 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
             outcome=''
             for button in self.dataset_outcome_dict[key]:
                 if button.isChecked():
-                    print key,button.text()
                     outcome=button.text()
             indexes=self.data_collection_table_dict[key].selectionModel().selectedRows()
             for index in sorted(indexes):
                 sample=key
                 logile=self.data_collection_statistics_dict[key][index.row()][1]
-                print sample,logile
+                print sample,outcome,logile
 
 #            if outcome=='success':
 #                indexes=self.data_collection_table_dict[key].selectionModel().selectedRows()
@@ -195,7 +194,6 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-        print csv_out
 
         self.emit(QtCore.SIGNAL("finished()"))
 
