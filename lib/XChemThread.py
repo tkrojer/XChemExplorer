@@ -154,8 +154,11 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
                     outcome=button.text()
             indexes=self.data_collection_table_dict[key].selectionModel().selectedRows()
             for index in sorted(indexes):
+                print index
                 sample=key
                 logile=self.data_collection_statistics_dict[key][index.row()][1]
+
+
                 print sample,outcome,logile
 
 #            if outcome=='success':
