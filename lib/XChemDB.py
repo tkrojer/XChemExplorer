@@ -1,5 +1,5 @@
 import sqlite3
-import os
+import os,sys
 
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 from XChemUtils import parse
