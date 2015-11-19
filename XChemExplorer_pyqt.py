@@ -898,8 +898,8 @@ class XChemExplorer(QtGui.QApplication):
                 cell_text=QtGui.QTableWidgetItem()
                 cell_text.setText(outcome)
                 self.data_collection_summary_table.setItem(row, 3, cell_text)
-            self.data_collection_summary_table.resizeRowsToContents()
-            self.data_collection_summary_table.resizeColumnsToContents()
+#            self.data_collection_summary_table.resizeRowsToContents()
+#            self.data_collection_summary_table.resizeColumnsToContents()
 
     def update_selected_autoproc_data_collection_summary_table(self):
         for key in self.data_collection_table_dict:
