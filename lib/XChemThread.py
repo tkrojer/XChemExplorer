@@ -192,13 +192,14 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
                             break
                     for logfile in glob.glob('autoprocessing/*/LogFiles/*'):
                         if logfile.endswith('aimless.log'):
-                            os.symlink(logfile,sample+'.mtz')
+                            os.symlink(logfile,sample+'.log')
                             break
                 if 'fast_dp' in path_to_logfile:
                     os.chdir(os.path.join(self.initial_model_directory,sample,'autoprocessing','fast_dp'))
                     os.system("ctruncate -hklin fast_dp.mtz "
                               "-hklout ctruncate.mtz -colin '/*/*/[IMEAN,SIGIMEAN]' "
-                              "> autoprocessing/fast_dp/ctruncate.log")
+                              "> ctruncate.log")
+                    os.chdir(os.path.join(self.initial_model_directory,sample))
                     os.symlink('autoprocessing/fast_dp/aimless.log',sample+'.log')
                     os.symlink('autoprocessing/fast_dp/ctruncate.mtz',sample+'.mtz')
 
