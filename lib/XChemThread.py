@@ -147,7 +147,7 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
         if not len(self.dataset_outcome_dict)==0:
             progress_step=100/float(len(self.dataset_outcome_dict))
         progress=0
-        csv_out=''
+#        csv_out=''
         for key in sorted(self.dataset_outcome_dict):
             outcome=''
             for button in self.dataset_outcome_dict[key]:
@@ -158,14 +158,15 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
             if outcome=='success':
                 indexes=self.data_collection_table_dict[key].selectionModel().selectedRows()
                 for index in sorted(indexes):
+                    print self.data_collection_statistics_dict[key][index.row()]
                     # csv out
-                    for item in self.data_collection_statistics_dict[key][index.row()]:
-                        csv_out+=str(item)+','
-                    csv_out+='\n'
+#                    for item in self.data_collection_statistics_dict[key][index.row()]:
+#                        csv_out+=str(item)+','
+#                    csv_out+='\n'
 
 #                    print self.data_collection_table_dict[key]
-                    print self.data_collection_statistics_dict[key][index.row()]
-                    print self.data_collection_statistics_dict[key][index.row()]
+#                    print self.data_collection_statistics_dict[key][index.row()]
+#                    print self.data_collection_statistics_dict[key][index.row()]
 
 #if not os.path.isdir(os.path.join(self.initial_model_directory,key)):
 #    os.mkdir(os.path.join(self.initial_model_directory,key))

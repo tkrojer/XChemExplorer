@@ -200,6 +200,8 @@ class data_source:
 #            for column in self.cursor.description:
 #                print column
 
+    def save_autoprocessing_results_to_data_source(self):
+        if self.data_source_type=='csv':
 
     def read_data_source_for_coot(self):
         print 'hallo'
