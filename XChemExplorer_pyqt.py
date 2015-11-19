@@ -15,7 +15,7 @@ from XChemUtils import parse
 from XChemUtils import queue
 from XChemUtils import mtztools
 import XChemThread
-
+import XChemDB
 
 class XChemExplorer(QtGui.QApplication):
     def __init__(self,args):
@@ -232,16 +232,6 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_summarys_vbox_for_table.addWidget(self.data_collection_summary_table)
 
 
-
-
-
-
-
-
-
-
-
-
         # Initial Model Tab
         initial_model_checkbutton_hbox=QtGui.QHBoxLayout()
         select_sample_for_dimple = QtGui.QCheckBox('(de-)select all samples for DIMPLE')
@@ -321,14 +311,23 @@ class XChemExplorer(QtGui.QApplication):
         settings_buttoon_reference_directory.clicked.connect(self.settings_button_clicked)
         settings_hbox_reference_directory.addWidget(settings_buttoon_reference_directory)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_reference_directory)
-        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nData Source Directory:'))
+        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nData Source:'))
         settings_hbox_database_directory=QtGui.QHBoxLayout()
+
         self.database_directory_label=QtGui.QLabel(self.database_directory)
         settings_hbox_database_directory.addWidget(self.database_directory_label)
         settings_buttoon_database_directory=QtGui.QPushButton('Select Data Source Directory')
         settings_buttoon_database_directory.clicked.connect(self.settings_button_clicked)
         settings_hbox_database_directory.addWidget(settings_buttoon_database_directory)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_database_directory)
+
+        settings_hbox_data_source_file=QtGui.QHBoxLayout()
+        self.data_source_file_label=QtGui.QLabel(self.data_source_file)
+        settings_hbox_data_source_file.addWidget(self.data_source_file_label)
+        settings_buttoon_data_source_file=QtGui.QPushButton('Select Data Source File')
+        settings_buttoon_data_source_file.clicked.connect(self.settings_button_clicked)
+        settings_hbox_data_source_file.addWidget(settings_buttoon_data_source_file)
+        self.data_collection_vbox_for_settings.addLayout(settings_hbox_data_source_file)
         self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nBeamline Directory:'))
         settings_hbox_beamline_directory=QtGui.QHBoxLayout()
         self.beamline_directory_label=QtGui.QLabel(self.beamline_directory)
@@ -423,6 +422,12 @@ class XChemExplorer(QtGui.QApplication):
         if self.sender().text()=='Select Data Source Directory':
             self.database_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.database_directory_label.setText(self.database_directory)
+        if self.sender().text()=='Select Data Source File':
+            filepath=str(QtGui.QFileDialog.getOpenFileName(self.window,'Select File', self.database_directory))
+            self.data_source_file =   filepath.split('/')[-1]
+            self.database_directory = filepath[:filepath.rfind('/')]
+            self.data_source_file_label.setText(self.data_source_file)
+            self.database_directory_label.setText(str(self.database_directory))
         if self.sender().text()=='Select Beamline Directory':
             self.beamline_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.beamline_directory_label.setText(self.beamline_directory)
@@ -433,7 +438,7 @@ class XChemExplorer(QtGui.QApplication):
                              'refine_model_directory':  self.refine_model_directory,
                              'reference_directory':     self.reference_directory,
                              'database_directory':      self.database_directory,
-                             'data_source':             os.path.join(self.database_directory,self.data_source_file) }
+                             'data_source':             self.data_source_file }
 
 
     def button_clicked(self):
@@ -494,18 +499,19 @@ class XChemExplorer(QtGui.QApplication):
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                 self.work_thread.start()
 
+        else:
             if self.sender().text()=="Load Samples From Datasource":
-                row=0
-                for n,line in enumerate(open(os.getenv('XChemExplorer_DIR')+"/tmp/SoakerDB.csv")):
-                    row+=1
-                    if str(line.split(',')[0]).startswith('SampleID'):
-                        row=n-1
-                        continue
-                    for column in range(len(line.split(','))):
+                data=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
+                print len(data)
+                self.mounted_crystal_table.setRowCount(0)
+                self.mounted_crystal_table.setRowCount(len(data))
+                for n,row in enumerate(data):
+                    for column in range(len(row)):
+                        print str(row[column])
                         cell_text=QtGui.QTableWidgetItem()
-                        cell_text.setText(str(line.split(',')[column]))
+                        cell_text.setText(str(row[column]))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                        self.mounted_crystal_table.setItem(row, column, cell_text)
+                        self.mounted_crystal_table.setItem(n, column, cell_text)
 
             if self.sender().text()=="Save Samples To Datasource":
                 allRows = self.mounted_crystal_table.rowCount()

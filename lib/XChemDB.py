@@ -58,10 +58,15 @@ class data_source:
 
 #            'SampleID',
 #            'Visit',
-            'DataCollectionBeamline'
+
+            'CompoundName',
+            'CrystalTag',
+
+            'DataCollectionBeamline',
             'DataCollectionDate',
             'DataCollectionOutcome',
             'DataCollectionRun',
+            'DataCollectionComment',
 
 
 
@@ -85,6 +90,8 @@ class data_source:
             'DataProcessingMultiplicityHigh',
             'DataProcessingPathToLogfile'
 
+            'PANDDAstuff'
+
             'RefinementRcryst',
             'RefinementRfree',
             'RefinementLigandCC',
@@ -99,19 +106,43 @@ class data_source:
         # 1. check data source if all columns exist
         # 2. create missing columns
 
+        existing_columns=[]
+
         if self.data_source_type=='sqlite':
 #            sample_dict={}
-            existing_columns=[]
-            con=sqlite3.connect(self.data_source_file)
-            con.row_factory = sqlite3.Row
-            cur = con.cursor()
-            cur.execute("SELECT * FROM mainTable")
-            for column in cur.description:
+            self.connect=sqlite3.connect(self.data_source_file)
+            self.connect.row_factory = sqlite3.Row
+            self.cursor = self.connect.cursor()
+            self.cursor.execute("SELECT * FROM mainTable")
+            for column in self.cursor.description:
                 existing_columns.append(column[0])
             for column in self.column_list:
                 if column not in existing_columns:
-                    cur.execute("alter table mainTable add column '%s' 'TEXT'" % column)
-                    con.commit()
+                    self.cursor.execute("alter table mainTable add column '%s' 'TEXT'" % column)
+                    self.connect.commit()
+
+        if self.data_source_type=='csv':
+            for n,line in enumerate(open(self.data_source_file)):
+                if n==0:
+                    for item in line.split(','):
+                        existing_columns.append(item.replace('\r','').replace('\n',''))
+                break
+            new_columns=''
+            for column in self.column_list:
+                if column not in existing_columns:
+                    new_columns+=column+','
+            csv_content=''
+            for n,line in enumerate(open(self.data_source_file)):
+                if n==0:
+                    csv_content+=line.replace('\r','').replace('\n','')+','+new_columns+'\n'
+                else:
+                    csv_content+=line
+            f=open(self.data_source_file,'w')
+            f.write(csv_content)
+            f.close()
+
+
+
 #rows = cur.fetchall()
 
 #for row in rows:
@@ -123,6 +154,51 @@ class data_source:
 #    print key,sample_dict[key]
 
 
+    def load_samples_from_data_source(self):
+
+        data=[]
+
+        columns_of_interest=[   'CrystalName',
+                                'CompoundName',
+                                'CompoundCode',
+                                'CompoundSMILES',
+                                'CrystalTag'        ]
+
+        # first find the index of the columns of interest in the header
+        if self.data_source_type=='csv':
+            data=[]
+            column_list=[]
+            for n,line in enumerate(open(self.data_source_file)):
+                if n==0:
+                    for item in columns_of_interest:
+                        for column,field in enumerate(line.split(',')):
+                            if field==item:
+                                column_list.append(column)
+                else:
+                    line_list=[]
+                    for item in column_list:
+                        found=False
+                        for column,field in enumerate(line.split(',')):
+                            if column==item:
+                                line_list.append(field)
+                                found=True
+                        if not found:
+                            line_list.append('')
+                    data.append(tuple(line_list))
+            return data
+#
+#                        if column in column_list:
+#                    print len(line.split(','))
+
+        if self.data_source_type=='sqlite':
+            self.cursor.execute("SELECT "+str(columns_of_interest).translate(None,"'[]")+" FROM mainTable")
+            data = self.cursor.fetchall()
+            return data
+#            for row in rows:
+#                print row
+
+#            for column in self.cursor.description:
+#                print column
 
 
     def read_data_source_for_coot(self):
