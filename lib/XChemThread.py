@@ -166,59 +166,40 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
             data_source.save_autoprocessing_results_to_data_source(sample,str(outcome),logfile)
 
             # create all the directories if necessary
-#            if not os.path.isdir(os.path.join(self.initial_model_directory,sample)):
-#                os.mkdir(os.path.join(self.initial_model_directory,sample))
-#            if not os.path.isdir(os.path.join(self.initial_model_directory,sample,'autoprocessing')):
-#                os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing'))
+            if not os.path.isdir(os.path.join(self.initial_model_directory,sample)):
+                os.mkdir(os.path.join(self.initial_model_directory,sample))
+            if not os.path.isdir(os.path.join(self.initial_model_directory,sample,'autoprocessing')):
+                os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing'))
 
             if logfile != None:
                 path_to_logfile=self.data_collection_statistics_dict[sample][index.row()][1]
-                if 'xia2' in self.data_collection_statistics_dict[sample][index.row()][1]:
+                # copy files
+                if 'xia2' in path_to_logfile:
                     path_to_procdir=os.path.join(*path_to_logfile.split('/')[:len(path_to_logfile.split('/'))-2])
                     print path_to_procdir
-                if 'fast_dp' in self.data_collection_statistics_dict[sample][index.row()][1]:
+                if 'fast_dp' in path_to_logfile:
                     path_to_procdir=os.path.join(*path_to_logfile.split('/')[:len(path_to_logfile.split('/'))-1])
                     print path_to_procdir
+                os.system('/bin/cp -R '+path_to_procdir+' '+os.path.join(self.initial_model_directory,sample,'autoprocessing'))
 
-
-
-#                                os.symlink('0-coot.state.scm','temp.link')
-#            if not os.path.isdir(os.path.join(self.initial_model_directory,key,'autoprocessing')):
-#                os.mkdir(os.path.join(self.initial_model_directory,key,'autoprocessing'))
-
-
-
-#            if outcome=='success':
-#                indexes=self.data_collection_table_dict[key].selectionModel().selectedRows()
-#                for index in sorted(indexes):
-#                    sample=key
-#                    logile=self.data_collection_statistics_dict[key][index.row()][1]
-#
-#                    print self.data_collection_statistics_dict[key][index.row()]
-                    # csv out
-#                    for item in self.data_collection_statistics_dict[key][index.row()]:
-#                        csv_out+=str(item)+','
-#                    csv_out+='\n'
-
-#                    print self.data_collection_table_dict[key]
-#                    print self.data_collection_statistics_dict[key][index.row()]
-#                    print self.data_collection_statistics_dict[key][index.row()]
-
-#if not os.path.isdir(os.path.join(self.initial_model_directory,key)):
-#    os.mkdir(os.path.join(self.initial_model_directory,key))
-#                    os.symlink('0-coot.state.scm','temp.link')
-#if not os.path.isdir(os.path.join(self.initial_model_directory,key,'autoprocessing')):
-#    os.mkdir(os.path.join(self.initial_model_directory,key,'autoprocessing'))
-
-
-#                    if 'xia2' in self.data_collection_statistics_dict[key][index.row()][1]:
-#                        print self.data_collection_statistics_dict[key][index.row()][1]
-#                        print os.path.join(*self.data_collection_statistics_dict[key][index.row()][1].split('/')[:13])
-#                print('Row %d is selected' % index.row())
-#                    if 'fast_dp' in self.data_collection_statistics_dict[key][index.row()][1]:
-#                        print self.data_collection_statistics_dict[key][index.row()][1]
-#                        print os.path.join(*self.data_collection_statistics_dict[key][index.row()][1].split('/')[:12])
-
+                # link files
+                if 'xia2' in path_to_logfile:
+                    os.chdir(os.path.join(self.initial_model_directory,sample))
+                        for datafile in glob.glob('autoprocessing/*/DataFiles/*'):
+                            if datafile.endswith('free.mtz'):
+                                os.symlink(datafile,sample+'.mtz')
+                                break
+                        for logfile in glob.glob('autoprocessing/*/LogFiles/*'):
+                            if logfile.endswith('aimless.log'):
+                                os.symlink(logfile,sample+'.mtz')
+                                break
+                if 'fast_dp' in path_to_logfile:
+                    os.chdir(os.path.join(self.initial_model_directory,sample,'autoprocessing','fast_dp'))
+                    os.system("ctruncate -hklin fast_dp.mtz "
+                              "-hklout ctruncate.mtz -colin '/*/*/[IMEAN,SIGIMEAN]' "
+                              "> autoprocessing/fast_dp/ctruncate.log")
+                    os.symlink('autoprocessing/fast_dp/aimless.log',sample+'.log')
+                    os.symlink('autoprocessing/fast_dp/ctruncate.mtz',sample+'.mtz')
 
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing files from data processing to inital_model folder -> '+sample)
 
