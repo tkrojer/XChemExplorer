@@ -177,7 +177,7 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
 
 #if not os.path.isdir(os.path.join(self.initial_model_directory,key)):
 #    os.mkdir(os.path.join(self.initial_model_directory,key))
-                    os.symlink('0-coot.state.scm','temp.link')
+#                    os.symlink('0-coot.state.scm','temp.link')
 #if not os.path.isdir(os.path.join(self.initial_model_directory,key,'autoprocessing')):
 #    os.mkdir(os.path.join(self.initial_model_directory,key,'autoprocessing'))
 
