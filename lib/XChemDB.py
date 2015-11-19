@@ -291,7 +291,7 @@ class data_source:
 #                    print len(line.split(','))
                     if len(line.split(',')) >= sample_column:
                         print line.split(',')[sample_column]
-                        if line.split(',')[sample_column]==sample:
+                        if line.split(',')[sample_column].replace(' ','')==sample:
                             row_to_change=row
             print 'Row to Change',row_to_change
             csv_out=''
