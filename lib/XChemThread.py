@@ -172,12 +172,13 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
 #                os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing'))
 
             if logfile != None:
+                path_to_logfile=self.data_collection_statistics_dict[sample][index.row()][1]
                 if 'xia2' in self.data_collection_statistics_dict[sample][index.row()][1]:
-                    print self.data_collection_statistics_dict[sample][index.row()][1]
-                    print os.path.join(*self.data_collection_statistics_dict[sample][index.row()][1].split('/')[:13])
+                    path_to_procdir=os.path.join(*path_to_logfile.split('/')[:len(path_to_logfile.split('/'))-2])
+                    print path_to_procdir
                 if 'fast_dp' in self.data_collection_statistics_dict[sample][index.row()][1]:
-                    print self.data_collection_statistics_dict[sample][index.row()][1]
-                    print os.path.join(*self.data_collection_statistics_dict[sample][index.row()][1].split('/')[:12])
+                    path_to_procdir=os.path.join(*path_to_logfile.split('/')[:len(path_to_logfile.split('/'))-1])
+                    print path_to_procdir
 
 
 

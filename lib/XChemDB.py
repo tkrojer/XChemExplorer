@@ -289,7 +289,6 @@ class data_source:
             if sample_column != None:
                 for row,line in enumerate(open(self.data_source_file)):
                     if len(line.split(',')) >= sample_column:
-                        print line.split(',')[sample_column]
                         if line.split(',')[sample_column].replace(' ','')==sample:
                             row_to_change=row
 
