@@ -212,52 +212,63 @@ class data_source:
 #                print column
 
     def save_autoprocessing_results_to_data_source(self,sample,outcome,logfile):
+        aimless_results=parse().GetAimlessLog(logfile)
         columns_to_update=  [
-            'DataCollectionBeamline',
-            'DataCollectionDate',
-            'DataCollectionOutcome',
-            'DataCollectionRun',
-            'DataCollectionComment',
-            'DataProcessingProgram',
-            'DataProcessingSpaceGroup',
-            'DataProcessingUnitCell',
-            'DataProcessingResolutionOverall',
-            'DataProcessingResolutionLow',
-            'DataProcessingResolutionHigh',
-            'DataProcessingRmergeOverall',
-            'DataProcessingRmergeLow',
-            'DataProcessingRmergeHigh',
-            'DataProcessingIsigOverall',
-            'DataProcessingIsigLow',
-            'DataProcessingIsigHigh',
-            'DataProcessingCompletenessOverall',
-            'DataProcessingCompletenessLow',
-            'DataProcessingCompletenessHigh',
-            'DataProcessingMultiplicityOverall',
-            'DataProcessingMultiplicityLow',
-            'DataProcessingMultiplicityHigh',
-            'DataProcessingPathToLogfile'
+            ['DataCollectionBeamline',              'n/a'],
+            ['DataCollectionDate',                  'n/a'],
+            ['DataCollectionOutcome',               outcome],
+            ['DataCollectionRun',                   aimless_results['Run']],
+            ['DataCollectionComment',               'n/a'],
+            ['DataProcessingProgram',               aimless_results['AutoProc']],
+            ['DataProcessingSpaceGroup',            aimless_results['SpaceGroup']],
+            ['DataProcessingUnitCell',              aimless_results['UnitCell']],
+            ['DataProcessingResolutionOverall',     aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionHigh']],
+            ['DataProcessingResolutionLow',         aimless_results['RmergeLow']],
+            ['DataProcessingResolutionHigh',        aimless_results['RmergeHigh']],
+            ['DataProcessingRmergeOverall',         aimless_results['RmergeOverall']],
+            ['DataProcessingRmergeLow',             aimless_results['RmergeLow']],
+            ['DataProcessingRmergeHigh',            aimless_results['RmergeHigh']],
+            ['DataProcessingIsigOverall',           aimless_results['IsigOverall']],
+            ['DataProcessingIsigLow',               aimless_results['IsigLow']],
+            ['DataProcessingIsigHigh',              aimless_results['IsigHigh']],
+            ['DataProcessingCompletenessOverall',   aimless_results['CompletenessOverall']],
+            ['DataProcessingCompletenessLow',       aimless_results['CompletenessLow']],
+            ['DataProcessingCompletenessHigh',      aimless_results['CompletenessHigh']],
+            ['DataProcessingMultiplicityOverall',   aimless_results['MultiplicityOverall']],
+            ['DataProcessingMultiplicityLow',       aimless_results['MultiplicityLow']],
+            ['DataProcessingMultiplicityHigh',      aimless_results['MultiplicityHigh']],
+            ['DataProcessingPathToLogfile',         logfile]
             ]
+
+
+
         if self.data_source_type=='csv':
             sample_column=None
+            column_list=[]
             for n,line in enumerate(open(self.data_source_file)):
                 if n==0:
                     for column,item in enumerate(line.split(',')):
                         if item=='CrystalName':
                             sample_column=column
-            # find sample line
-            row_to_change=None
-            if sample_column != None:
-                for row,line in enumerate(open(self.data_source_file)):
-                    if len(line.split(',')) >= sample_column:
-                        if line.split(',')[sample_column]==sample:
-                            row_to_change=row
-
-            if row_to_change==None:
-# new sample
+                    for item in columns_to_update:
                         for column,field in enumerate(line.split(',')):
-                            if field==item:
+                            if field==item[0]:
                                 column_list.append(column)
+
+            print column_list
+            # find sample line
+#            row_to_change=None
+#            if sample_column != None:
+#                for row,line in enumerate(open(self.data_source_file)):
+#                    if len(line.split(',')) >= sample_column:
+#                        if line.split(',')[sample_column]==sample:
+#                            row_to_change=row
+#
+#            if row_to_change==None:
+## new sample
+#                        for column,field in enumerate(line.split(',')):
+#                            if field==item:
+#                                column_list.append(column)
 
 
             print 'hallo'
