@@ -231,12 +231,9 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             self.data_collection_statistics_dict_collected=summary[1]
 
     def run(self):
-        print 'hallo'
-        print self.visit_list
         number_of_visits_to_search=len(self.visit_list)
         search_cycle=1
         for visit_directory in sorted(self.visit_list):
-            print visit_directory
             if len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*')))==0:
                 continue
             progress_step=100/float(len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))))
