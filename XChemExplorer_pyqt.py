@@ -442,16 +442,13 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def button_clicked(self):
-        if self.target != '' and self.explorer_active==0:
-### --- for offline testing -------------------------------------------
-#            if self.sender().text()=='Get New Results from Autoprocessing':
-#                dict_list=[]
-#                self.create_widgets_for_autoprocessing_results(dict_list)
-### -------------------------------------------------------------------
-### --- this works but disabled so that stuff can be tested offline ---
+#        if self.target != '' and self.explorer_active==0:
+        if self.explorer_active==0:
             if self.sender().text()=='Get New Results from Autoprocessing':
-#                reference_file_list=self.get_reference_file_list()
-                self.work_thread=XChemThread.read_autoprocessing_results_from_disc(self.visit_list,self.target,self.reference_file_list,self.database_directory)
+                self.work_thread=XChemThread.read_autoprocessing_results_from_disc(self.visit_list,
+                                                                                   self.target,
+                                                                                   self.reference_file_list,
+                                                                                   self.database_directory)
                 self.explorer_active=1
                 self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
                 self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
@@ -459,7 +456,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.connect(self.work_thread, QtCore.SIGNAL("create_widgets_for_autoprocessing_results"),
                                                          self.create_widgets_for_autoprocessing_results)
                 self.work_thread.start()
-### -------------------------------------------------------------------
+
             if self.sender().text()=="Save Files from Autoprocessing in 'inital_model' Folder":
                 self.work_thread=XChemThread.save_autoprocessing_results_to_disc(self.dataset_outcome_dict,
                                                                      self.data_collection_table_dict,
@@ -477,8 +474,6 @@ class XChemExplorer(QtGui.QApplication):
                 print 'hallo'
 
             if self.sender().text()=="Check for inital Refinement":
-#                reference_file_list=self.get_reference_file_list()
-                print "checking for initial refinement"
                 self.explorer_active=1
                 self.work_thread=XChemThread.read_intial_refinement_results(self.initial_model_directory,self.reference_file_list)
                 self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
@@ -505,7 +500,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                 self.work_thread.start()
 
-        else:
+        elif:
             if self.sender().text()=="Load Samples From Datasource":
                 data=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
                 print len(data)
