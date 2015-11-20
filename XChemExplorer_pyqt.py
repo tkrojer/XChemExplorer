@@ -17,6 +17,7 @@ from XChemUtils import mtztools
 from XChemUtils import external_software
 import XChemThread
 import XChemDB
+import XChemDialogs
 
 class XChemExplorer(QtGui.QApplication):
     def __init__(self,args):
@@ -156,24 +157,30 @@ class XChemExplorer(QtGui.QApplication):
                                         'Tag'           ]
         for i in range(20): mounted_crystal_list.append(['','','','',''])
         self.mounted_crystal_table=QtGui.QTableWidget()
-        self.mounted_crystal_table.setRowCount(20)
+#        self.mounted_crystal_table.setRowCount(20)
 #        self.mounted_crystal_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.mounted_crystal_table.setColumnCount(len(mounted_crystal_column_name))
         self.mounted_crystal_table.setSortingEnabled(True)
-        for row,line in enumerate(mounted_crystal_list):
-            for column,item in enumerate(line):
-                cell_text=QtGui.QTableWidgetItem()
-                cell_text.setText(str(item))
-                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                self.mounted_crystal_table.setItem(row, column, cell_text)
-        self.mounted_crystal_table.setHorizontalHeaderLabels(mounted_crystal_column_name)
-        self.mounted_crystal_table.setColumnWidth(0,250)
-        self.mounted_crystal_table.setColumnWidth(1,250)
-        self.mounted_crystal_table.setColumnWidth(2,250)
-        self.mounted_crystal_table.setColumnWidth(3,250)
-        self.mounted_crystal_table.setColumnWidth(4,250)
-#        self.mounted_crystal_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-#        self.mounted_crystal_table.resizeColumnsToContents()
+
+        # read in all the columns in the data_source file
+
+#        column_indices_to_diaplay=[]
+
+#        for row,line in enumerate(mounted_crystal_list):
+#            for column,item in enumerate(line):
+#                if item in columns to show:
+#                cell_text=QtGui.QTableWidgetItem()
+#                cell_text.setText(str(item))
+#                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+#                self.mounted_crystal_table.setItem(row, column, cell_text)
+#        self.mounted_crystal_table.setHorizontalHeaderLabels(mounted_crystal_column_name)
+#        self.mounted_crystal_table.setColumnWidth(0,250)
+#        self.mounted_crystal_table.setColumnWidth(1,250)
+#        self.mounted_crystal_table.setColumnWidth(2,250)
+#        self.mounted_crystal_table.setColumnWidth(3,250)
+#        self.mounted_crystal_table.setColumnWidth(4,250)
+##        self.mounted_crystal_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+##        self.mounted_crystal_table.resizeColumnsToContents()
         self.mounted_crystals_vbox_for_table=QtGui.QVBoxLayout()
         self.tab_dict['Data Source'][1].addLayout(self.mounted_crystals_vbox_for_table)
         self.mounted_crystals_vbox_for_table.addWidget(self.mounted_crystal_table)
@@ -189,10 +196,13 @@ class XChemExplorer(QtGui.QApplication):
         create_png_of_soaked_compound_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(create_png_of_soaked_compound_button)
 
-        create_create_new_data_source_button=QtGui.QPushButton("Create New CSV Data Source")
-        create_create_new_data_source_button.clicked.connect(self.button_clicked)
-        mounted_crystals_button_hbox.addWidget(create_create_new_data_source_button)
+        create_new_data_source_button=QtGui.QPushButton("Create New CSV Data Source")
+        create_new_data_source_button.clicked.connect(self.button_clicked)
+        mounted_crystals_button_hbox.addWidget(create_new_data_source_button)
 
+        select_data_source_columns_to_display_button=QtGui.QPushButton("Select Columns")
+        select_data_source_columns_to_display_button.clicked.connect(self.button_clicked)
+        mounted_crystals_button_hbox.addWidget(select_data_source_columns_to_display_button)
 
         self.tab_dict['Data Source'][1].addLayout(mounted_crystals_button_hbox)
 
@@ -501,6 +511,12 @@ class XChemExplorer(QtGui.QApplication):
                 print 'hallo'
 
             if self.sender().text()=="Check for inital Refinement":
+                # first check if there is already content in the table and if so
+                # delete checkbox and combobox widgets
+                if self.initial_model_dimple_dict != {}:
+                    for key in self.initial_model_dimple_dict:
+                        print key, self.initial_model_dimple_dict[key]
+
                 self.explorer_active=1
                 self.work_thread=XChemThread.read_intial_refinement_results(self.initial_model_directory,self.reference_file_list)
                 self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
@@ -534,7 +550,7 @@ class XChemExplorer(QtGui.QApplication):
 
             if self.sender().text()=="Load Samples From Datasource":
                 data=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
-                print len(data)
+#                print len(data)
                 self.mounted_crystal_table.setRowCount(0)
                 self.mounted_crystal_table.setRowCount(len(data))
                 for n,row in enumerate(data):
@@ -553,7 +569,7 @@ class XChemExplorer(QtGui.QApplication):
                 else:
                     file_name=file_name+'.csv'
                 print file_name
-                XChemDB.data_source(os.path.join(file_name))
+                XChemDB.data_source(os.path.join(file_name)).create_empty_data_source_file()
 
 
             if self.sender().text()=="Save Samples To Datasource":
@@ -569,6 +585,9 @@ class XChemExplorer(QtGui.QApplication):
                     out+='\n'
                 print out
 
+            if self.sender().text()=="Select Columns":
+                print 'hallo'
+                XChemDialogs.Select().select_columns_from_data_source_dialog()
 
 
     def update_progress_bar(self,progress):

@@ -6,6 +6,7 @@ import glob
 import math
 import subprocess
 import getpass
+import shutil
 
 
 class process:
@@ -532,7 +533,7 @@ class external_software:
         except OSError:
             self.available_programs['qstat']=False
             status='not found'
-        print '-checking for qstat: '+status
+        print '{0:40} {1:10}'.format('-checking for qstat:', status)
 
         try:
             subprocess.call(['refmac5','end'], stdout=FNULL, stderr=subprocess.STDOUT)
@@ -541,7 +542,7 @@ class external_software:
         except OSError:
             self.available_programs['refmac5']=False
             status='not found'
-        print '-checking for refmac5: '+status
+        print '{0:40} {1:10}'.format('-checking for refmac5:', status)
 
         try:
             subprocess.call(['phenix.molprobity'], stdout=FNULL, stderr=subprocess.STDOUT)
@@ -550,7 +551,7 @@ class external_software:
         except OSError:
             self.available_programs['phenix.molprobity']=False
             status='not found'
-        print '-checking for phenix.molprobity: '+status
+        print '{0:40} {1:10}'.format('-checking for phenix.molprobity:', status)
 
         try:
             subprocess.call(['mmtbx.validate_ligands'], stdout=FNULL, stderr=subprocess.STDOUT)
@@ -559,7 +560,7 @@ class external_software:
         except OSError:
             self.available_programs['mmtbx.validate_ligands']=False
             status='not found'
-        print '-checking for mmtbx.validate_ligands: '+status
+        print '{0:40} {1:10}'.format('-checking for mmtbx.validate_ligands:', status)
 
         try:
             subprocess.call(['obabel'], stdout=FNULL, stderr=subprocess.STDOUT)
@@ -568,16 +569,17 @@ class external_software:
         except OSError:
             self.available_programs['obabel']=False
             status='not found'
-        print '-checking for obabel: '+status
+        print '{0:40} {1:10}'.format('-checking for obabel:', status)
 
         try:
             subprocess.call(['acedrg'], stdout=FNULL, stderr=subprocess.STDOUT)
             self.available_programs['acedrg']=True
+            shutil.rmtree('AcedrgOut_TMP')
             status='found'
         except OSError:
             self.available_programs['acedrg']=False
             status='not found'
-        print '-checking for acedrg: '+status
+        print '{0:40} {1:10}'.format('-checking for acedrg:', status)
 
         return self.available_programs
 

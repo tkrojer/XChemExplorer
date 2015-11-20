@@ -1,3 +1,4 @@
+import sys
 from PyQt4 import QtGui, QtCore
 
 
@@ -16,8 +17,14 @@ class Select(QtGui.QApplication):
         self.window.setWindowTitle("Select Columns")
         self.center_dialog_window()
 
+        column_checkbutton_hbox=QtGui.QHBoxLayout()
+        select_column_button = QtGui.QCheckBox('XXX button name XXX')
+        select_column_button.toggle()
+#        select_column_button.connect(self.set_run_dimple_flag)
+        column_checkbutton_hbox.addWidget(select_sample_for_dimple)
 
-        self.window.setLayout(vbox_main)
+        self.window.addLayout(column_checkbutton_hbox)
+
 
         self.window.show()
 

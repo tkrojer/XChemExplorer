@@ -112,23 +112,115 @@ class data_source:
 
         ]
 
-        # if file does not exist, create one
-        if not os.path.isfile(self.data_source_file):
-            csv_header=''
-            for column in self.column_list:
-                csv_header+=str(column)+','
-            csv_header+='\n'
-            f=open(self.data_source_file,'w')
-            f.write(csv_header)
-            f.close()
+
+        #   [column_name in DB, column_name shown in XCE]
+
+        self.column_list=[
+            # from Lab36
+            ['ID',                                   'ID'],
+            ['LabVisit',                             'LabVisit'],
+            ['LibraryPlate',                         'LibraryPlate'],
+            ['SourceWell',                           'SourceWell'],
+            ['LibraryName',                          'LibraryName'],
+            ['CompoundSMILES',                       'CompoundSMILES'],
+            ['CompoundCode',                         'CompoundCode'],
+            ['CrystalPlate',                         'CrystalPlate'],
+            ['CrystalWell',                          'CrystalWell'],
+            ['EchoX',                                'EchoX'],
+            ['EchoY',                                'EchoY'],
+            ['DropVolume',                           'DropVolume'],
+            ['ProteinName',                          'ProteinName'],
+            ['BatchNumber',                          'BatchNumber'],
+            ['CompoundStockConcentration',           'CompoundStockConcentration'],
+            ['CompoundConcentration',                'CompoundConcentration'],
+            ['SolventFraction',                      'SolventFraction'],
+            ['SoakTransferVol',                      'SoakTransferVol'],
+            ['SoakStatus',                           'SoakStatus'],
+            ['SoakTimestamp',                        'SoakTimestamp'],
+            ['CryoStockFraction',                    'CryoStockFraction'],
+            ['CryoFraction',                         'CryoFraction'],
+            ['CryoWell',                             'CryoWell'],
+            ['CryoTransferVolume',                   'CryoTransferVolume'],
+            ['CryoStatus',                           'CryoStatus'],
+            ['CryoTimestamp',                        'CryoTimestamp'],
+            ['SoakingTime',                          'SoakingTime'],
+            ['HarvestStatus',                        'HarvestStatus'],
+            ['CrystalName',                          'CrystalName'],
+            ['Puck',                                 'Puck'],
+            ['PuckPosition',                         'PuckPosition'],
+            ['PinBarcode',                           'PinBarcode'],
+            ['MountingResult',                       'MountingResult'],
+            ['MountingArrivalTime',                  'MountingArrivalTime'],
+            ['MountedTimestamp',                     'MountedTimestamp'],
+            ['MountingTime',                         'MountingTime'],
+            ['ispybStatus',                          'ispybStatus'],
+            ['DataCollectionVisit',                  'DataCollectionVisit'],
+            # from XChemExplorer
+            ['CompoundName',                         'CompoundName'],
+            ['CrystalTag',                           'CrystalTag'],
+            ['DataCollectionBeamline',               'DataCollectionBeamline'],
+            ['DataCollectionDate',                   'DataCollectionDate'],
+            ['DataCollectionOutcome',                'DataCollectionOutcome'],
+            ['DataCollectionRun',                    'DataCollectionRun'],
+            ['DataCollectionComment',                'DataCollectionComment'],
+            ['DataProcessingProgram',                'DataProcessingProgram'],
+            ['DataProcessingSpaceGroup',             'DataProcessingSpaceGroup'],
+            ['DataProcessingUnitCell',               'DataProcessingUnitCell'],
+            ['DataProcessingResolutionOverall',      'DataProcessingResolutionOverall'],
+            ['DataProcessingResolutionLow',          'DataProcessingResolutionLow'],
+            ['DataProcessingResolutionHigh',         'DataProcessingResolutionHigh'],
+            ['DataProcessingRmergeOverall',          'DataProcessingRmergeOverall'],
+            ['DataProcessingRmergeLow',              'DataProcessingRmergeLow'],
+            ['DataProcessingRmergeHigh',             'DataProcessingRmergeHigh'],
+            ['DataProcessingIsigOverall',            'DataProcessingIsigOverall'],
+            ['DataProcessingIsigLow',                'DataProcessingIsigLow'],
+            ['DataProcessingIsigHigh',               'DataProcessingIsigHigh'],
+            ['DataProcessingCompletenessOverall',    'DataProcessingCompletenessOverall'],
+            ['DataProcessingCompletenessLow',        'DataProcessingCompletenessLow'],
+            ['DataProcessingCompletenessHigh',       'DataProcessingCompletenessHigh'],
+            ['DataProcessingMultiplicityOverall',    'DataProcessingMultiplicityOverall'],
+            ['DataProcessingMultiplicityLow',        'DataProcessingMultiplicityLow'],
+            ['DataProcessingMultiplicityHigh',       'DataProcessingMultiplicityHigh'],
+            ['DataProcessingPathToLogfile',          'DataProcessingPathToLogfile'],
+            ['PANDDAstuff',                          'PANDDAstuff'],
+            ['RefinementRcryst',                     'RefinementRcryst'],
+            ['RefinementRfree',                      'RefinementRfree'],
+            ['RefinementLigandCC',                   'RefinementLigandCC'],
+            ['RefinementRmsdBonds',                  'RefinementRmsdBonds'],
+            ['RefinementRmsdAngles',                 'RefinementRmsdAngles'],
+            ['RefinementOutcome',                    'RefinementOutcome'],
+            ['RefinementMTZfree',                    'RefinementMTZfree'],
+            ['RefinementCIF',                        'RefinementCIF'],
+            ['RefinementPDB_latest',                 'RefinementPDB_latest'],
+            ['RefinementMTZ_latest',                 'RefinementMTZ_latest'],
+            ['RefinementComment',                    'RefinementComment'],
+            ['AssayIC50'                             'AssayIC50']
+        ]
+
+
+
+    def create_empty_data_source_file(self):
+
+        if self.data_source_type=='csv':
+            if not os.path.isfile(self.data_source_file):
+                csv_header=''
+                for column in self.column_list:
+                    csv_header+=str(column)+','
+                csv_header+='\n'
+                f=open(self.data_source_file,'w')
+                f.write(csv_header)
+                f.close()
+
+
+
+    def load_samples_from_data_source(self):
 
         # 1. check data source if all columns exist
-        # 2. create missing columns
+        # 2. append missing columns
 
         existing_columns=[]
 
         if self.data_source_type=='sqlite':
-#            sample_dict={}
             self.connect=sqlite3.connect(self.data_source_file)
             self.connect.row_factory = sqlite3.Row
             self.cursor = self.connect.cursor()
@@ -160,28 +252,12 @@ class data_source:
             f.write(csv_content)
             f.close()
 
-
-
-#rows = cur.fetchall()
-
-#for row in rows:
-#    print row["CompoundSMILES"]
-#    print row
-#    sample_dict[row["ID"]]=[row["CompoundCode"],row["CompoundSMILES"]]
-#print sample_dict
-#for key in sample_dict:
-#    print key,sample_dict[key]
-
-
-    def load_samples_from_data_source(self):
-
-        data=[]
-
-        columns_of_interest=[   'CrystalName',
-                                'CompoundName',
-                                'CompoundCode',
-                                'CompoundSMILES',
-                                'CrystalTag'        ]
+    # from now on we read all of them and decide in the main GUI which ones to display
+#        columns_of_interest=[   'CrystalName',
+#                                'CompoundName',
+#                                'CompoundCode',
+#                                'CompoundSMILES',
+#                                'CrystalTag'        ]
 
         # first find the index of the columns of interest in the header
         if self.data_source_type=='csv':
