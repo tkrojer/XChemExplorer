@@ -43,7 +43,7 @@ class run_dimple_on_selected_samples(QtCore.QThread):
                                 'reference': self.reference_directory+'/'+
                                              str(self.initial_model_dimple_dict[sample][1].currentText()),
                                 'queueing_system_available': self.queueing_system_available,
-                                'ccp4_scrarch': self.ccp4_scratch_directory     }
+                                'ccp4_scratch': self.ccp4_scratch_directory     }
             process(dimple_commands).dimple()
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
