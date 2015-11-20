@@ -231,9 +231,11 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             self.data_collection_statistics_dict_collected=summary[1]
 
     def run(self):
+        print 'hallo'
         number_of_visits_to_search=len(self.visit_list)
         search_cycle=1
         for visit_directory in sorted(self.visit_list):
+            print visit_directory
             if len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*')))==0:
                 break
             progress_step=100/float(len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))))
@@ -245,6 +247,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                 visit=visit_directory.split('/')[5]
 
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
+                print collected_xtals
                 xtal=collected_xtals[collected_xtals.rfind('/')+1:]
                 self.data_collection_dict[xtal]=[[],[],[],[]]
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 1 of 3: searching visit '+ \
