@@ -500,7 +500,6 @@ class XChemExplorer(QtGui.QApplication):
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                 self.work_thread.start()
 
-        elif:
             if self.sender().text()=="Load Samples From Datasource":
                 data=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
                 print len(data)
