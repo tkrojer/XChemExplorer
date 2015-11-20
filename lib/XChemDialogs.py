@@ -11,9 +11,8 @@ class Select(QtGui.QApplication):
 
 
     def select_columns_from_data_source_dialog(self):
-        print 'hallo'
         self.window=QtGui.QWidget()
-        self.window.setGeometry(0,0, 1400,1000)
+        self.window.setGeometry(0,0, 800,600)
         self.window.setWindowTitle("Select Columns")
         self.center_dialog_window()
 
@@ -29,4 +28,4 @@ class Select(QtGui.QApplication):
 
 
 if __name__ == "__main__":
-    app=XChemExplorer(sys.argv)
+    app=Select(sys.argv)

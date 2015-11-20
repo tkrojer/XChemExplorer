@@ -72,6 +72,7 @@ class XChemExplorer(QtGui.QApplication):
         self.initial_model_dimple_dict={}       # contains toggle button if dimple should be run
         self.reference_file_list=[]
 
+
         self.target_list=[]
         for dir in glob.glob(self.beamline_directory+'/*'):
             self.visit_list.append(os.path.realpath(dir))
@@ -484,6 +485,10 @@ class XChemExplorer(QtGui.QApplication):
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                 self.connect(self.work_thread, QtCore.SIGNAL("create_initial_model_table"),self.create_initial_model_table)
                 self.work_thread.start()
+
+            if self.sender().text()=="Check for inital Refinement":
+                for key in self.initial_model_dimple_dict:
+                    print key, self.initial_model_dimple_dict[key]
 
             if self.sender().text()=="Open COOT":
                 print 'found'
