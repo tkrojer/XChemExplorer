@@ -24,7 +24,6 @@ class XChemExplorer(QtGui.QApplication):
 
         # checking for external software packages
         self.external_software=external_software().check()
-        print self.external_software
 
         # Settings @ Directories
         self.current_directory=os.getcwd()
@@ -129,7 +128,7 @@ class XChemExplorer(QtGui.QApplication):
         
         # Tab widget
         tab_widget = QtGui.QTabWidget()
-        tab_list = [    'Mounted Crystals',
+        tab_list = [    'Data Source',
                         'DLS @ Data Collection',
                         'DLS @ Summary',
                         'Initial Model',
@@ -144,7 +143,7 @@ class XChemExplorer(QtGui.QApplication):
             tab_widget.addTab(tab,page)
             self.tab_dict[page]=[tab,vbox]
 
-        # Mounted Crystals Tab
+        # Data Source Tab
         mounted_crystal_list=[]
         mounted_crystal_column_name=[   'Sample ID',
                                         'Compound ID',
@@ -172,7 +171,7 @@ class XChemExplorer(QtGui.QApplication):
 #        self.mounted_crystal_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
 #        self.mounted_crystal_table.resizeColumnsToContents()
         self.mounted_crystals_vbox_for_table=QtGui.QVBoxLayout()
-        self.tab_dict['Mounted Crystals'][1].addLayout(self.mounted_crystals_vbox_for_table)
+        self.tab_dict['Data Source'][1].addLayout(self.mounted_crystals_vbox_for_table)
         self.mounted_crystals_vbox_for_table.addWidget(self.mounted_crystal_table)
 
         mounted_crystals_button_hbox=QtGui.QHBoxLayout()
@@ -186,7 +185,7 @@ class XChemExplorer(QtGui.QApplication):
         create_png_of_soaked_compound_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(create_png_of_soaked_compound_button)
 
-        self.tab_dict['Mounted Crystals'][1].addLayout(mounted_crystals_button_hbox)
+        self.tab_dict['Data Source'][1].addLayout(mounted_crystals_button_hbox)
 
 
         # DLS @ Data Collection Tab
@@ -361,10 +360,7 @@ class XChemExplorer(QtGui.QApplication):
         self.window.setLayout(vbox_main)
 
         self.status_bar.showMessage('Ready')
-        self.timer = QtCore.QBasicTimer()
-#        self.window.addWidget(vbox)
-#        statusBar=QtGui.QStatusBar()
-#        self.window.setStatusBar(statusBar)
+#        self.timer = QtCore.QBasicTimer()
         self.window.show()
 
     def open_config_file(self):
@@ -935,6 +931,9 @@ class XChemExplorer(QtGui.QApplication):
                                     cell_text.setText(str(item[1]))
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                     self.data_collection_summary_table.setItem(row, column, cell_text)
+
+
+
 
 
 if __name__ == "__main__":
