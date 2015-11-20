@@ -35,7 +35,7 @@ class XChemExplorer(QtGui.QApplication):
             self.reference_directory=os.path.join(self.project_directory,'processing','reference')
             self.database_directory=os.path.join(self.project_directory,'processing','database')
             self.data_source_file='XChemExplorer.csv'
-            self.ccp4_scratch_directory=os.path.join(self.project_directory,'tmp')
+            self.ccp4_scratch_directory=os.path.join(self.project_directory,'processing','tmp')
         else:
             self.project_directory=self.current_directory
             self.beamline_directory=self.current_directory
