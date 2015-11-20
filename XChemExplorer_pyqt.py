@@ -897,7 +897,7 @@ class XChemExplorer(QtGui.QApplication):
 #                                                unitcell_volume_reference])
 
                 if os.path.isfile(os.path.join(self.reference_directory,reference_root+'.pdb')):
-                    pdb_reference=parse.PDBinfo(os.path.join(self.reference_directory,reference_root+'.pdb'))
+                    pdb_reference=parse.PDBheader(os.path.join(self.reference_directory,reference_root+'.pdb'))
                     spg_reference=pdb_reference['SpaceGroup']
                     unitcell_reference=pdb_reference['UnitCell']
                     lattice_reference=pdb_reference['Lattice']
