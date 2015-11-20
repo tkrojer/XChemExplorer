@@ -238,7 +238,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
         for visit_directory in sorted(self.visit_list):
             print visit_directory
             if len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*')))==0:
-                break
+                continue
             progress_step=100/float(len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))))
             progress=0
 
