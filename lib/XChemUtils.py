@@ -28,7 +28,7 @@ class process:
 
     def get_Rfree(self):
         if not os.path.isfile(self.project_directory+'/'+self.xtalID+'/'+self.mtz_free):
-            if os.path.isfile(os.path.join(self.reference+'.mtz'))
+            if os.path.isfile(os.path.join(self.reference+'.mtz')):
                 Cmds = (
                     '#!/bin/csh\n'
                     '\n'
