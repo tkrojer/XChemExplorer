@@ -28,7 +28,8 @@ class process:
 
     def get_Rfree(self):
         if not os.path.isfile(self.project_directory+'/'+self.xtalID+'/'+self.mtz_free):
-            Cmds = (
+            if os.path.isfile(os.path.join(self.reference+'.mtz'))
+                Cmds = (
                     '#!/bin/csh\n'
                     '\n'
                     'cd %s/%s\n' %(self.project_directory,self.xtalID) +
@@ -46,6 +47,21 @@ class process:
                     'EOF\n'
                     '\n'
                     'freerflag hklin cad.mtz hklout %s.free.mtz << EOF > freerflag.log\n' %self.xtalID +
+                    '   COMPLETE FREE=FreeR_flag\n'
+                    '   END\n'
+                    'EOF\n'
+                    )
+            else:
+                Cmds = (
+                    '#!/bin/csh\n'
+                    '\n'
+                    'cd %s/%s\n' %(self.project_directory,self.xtalID) +
+                    '\n'
+                    'pointless hklin %s.mtz hklref %s.mtz hklout %s.reind.mtz << EOF > pointless.log\n' %(self.xtalID,self.reference,self.xtalID)+
+                    ' tolerance 5\n'
+                    'EOF\n'
+                    '\n'
+                    'freerflag hklin %s.reind.mtz hklout %s.free.mtz << EOF > freerflag.log\n' %(self.xtalID,self.xtalID) +
                     '   COMPLETE FREE=FreeR_flag\n'
                     '   END\n'
                     'EOF\n'
