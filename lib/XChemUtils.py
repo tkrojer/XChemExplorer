@@ -301,15 +301,33 @@ class parse:
             unitcell_volume=round(a*b*c*(math.sin(math.radians(60))),1)
         return unitcell_volume
 
+#    def get_all_values_as_dict(self):
+#        info = {    'unitcell':         'n/a',
+#                    'spacegroup':       'n/a',
+#                    'unitcell_volume':  'n/a',
+#                    'bravais_lattice':  'n/a'   }
+
+
+
 
 
     def PDBheader(self,pdbfile):
-        PDBinfo = { 'Rcryst':         'n/a',
-                    'Rfree':          'n/a',
-                    'SpaceGroup':     'n/a',
-                    'UnitCell':       'n/a',
-                    'ResolutionHigh': 'n/a',
+        PDBinfo = { 'Rcryst':           'n/a',
+                    'Rfree':            'n/a',
+                    'SpaceGroup':       'n/a',
+                    'UnitCell':         'n/a',
+                    'ResolutionHigh':   'n/a',
+                    'Lattice':          'n/a',
+                    'UnitCellVolume':       0,
                     'Alert':          '#E0E0E0' }
+
+        a='n/a'
+        b='n/a'
+        c='n/a'
+        alpha='n/a'
+        beta='n/a'
+        gamma='n/a'
+
         if os.path.isfile(pdbfile):
             for line in open(pdbfile):
                 if line.startswith('REMARK   3   R VALUE     (WORKING + TEST SET) :'):
@@ -331,9 +349,28 @@ class parse:
                 if line.startswith('REMARK   3   RESOLUTION RANGE HIGH (ANGSTROMS) :'):
                     PDBinfo['ResolutionHigh']=line.split()[7]
                 if line.startswith('CRYST1'):
+                    a=int(float(line.split()[1]))
+                    b=int(float(line.split()[2]))
+                    c=int(float(line.split()[3]))
+                    alpha=int(float(line.split()[4]))
+                    beta=int(float(line.split()[5]))
+                    gamma=int(float(line.split()[6]))
+
                     PDBinfo['UnitCell']=line.split()[1]+' '+line.split()[2]+' '+line.split()[3]+' '+ \
                                         line.split()[4]+' '+line.split()[5]+' '+line.split()[6]
                     PDBinfo['SpaceGroup']=line[55:len(line)-1].replace(' ','')
+                    
+                    PDBinfo['Lattice']=self.get_lattice_from_space_group(PDBinfo['SpaceGroup'])
+                    if a != 'n/a' and b != 'n/a' and c != 'n/a' and \
+                     alpha != 'n/a' and beta != 'n/a' and gamma != 'n/a' and PDBinfo['Lattice'] != 'n/a':
+                        PDBinfo['UnitCellVolume']=self.calc_unitcell_volume_from_logfile(float(a),float(b),float(c),
+                                                                                 math.radians(float(alpha)),
+                                                                                 math.radians(float(beta)),
+                                                                                 math.radians(float(gamma)),
+                                                                                 PDBinfo['Lattice'])
+
+                    
+                    
         return PDBinfo
 
 class mtztools:

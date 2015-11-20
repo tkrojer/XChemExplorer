@@ -37,6 +37,21 @@ class XChemExplorer(QtGui.QApplication):
             self.database_directory=os.path.join(self.project_directory,'processing','database')
             self.data_source_file='XChemExplorer.csv'
             self.ccp4_scratch_directory=os.path.join(self.project_directory,'processing','tmp')
+
+            if not os.path.isdir(self.beamline_directory):
+                os.mkdir(self.beamline_directory)
+            if not os.path.isdir(os.path.join(self.project_directory,'processing','analysis')):
+                os.mkdir(os.path.join(self.project_directory,'processing','analysis'))
+            if not os.path.isdir(self.initial_model_directory):
+                os.mkdir(self.initial_model_directory)
+            if not os.path.isdir(self.reference_directory):
+                os.mkdir(self.reference_directory)
+            if not os.path.isdir(self.database_directory):
+                os.mkdir(self.database_directory)
+            if not os.path.isdir(self.ccp4_scratch_directory):
+                os.mkdir(self.ccp4_scratch_directory)
+
+
         else:
             self.project_directory=self.current_directory
             self.beamline_directory=self.current_directory
@@ -869,17 +884,32 @@ class XChemExplorer(QtGui.QApplication):
         for files in glob.glob(self.reference_directory+'/*'):
             if files.endswith('.pdb'):
                 reference_root=files[files.rfind('/')+1:files.rfind('.')]
-                if os.path.isfile(self.reference_directory+'/'+reference_root+'.mtz'):
-                    mtz_reference=mtztools(self.reference_directory+'/'+reference_root+'.mtz').get_all_values_as_dict()
-                    spg_reference=mtz_reference['spacegroup']
-                    unitcell_reference=mtz_reference['unitcell']
-                    lattice_reference=mtz_reference['bravais_lattice']
-                    unitcell_volume_reference=mtz_reference['unitcell_volume']
+#                if os.path.isfile(self.reference_directory+'/'+reference_root+'.mtz'):
+#                    mtz_reference=mtztools(self.reference_directory+'/'+reference_root+'.mtz').get_all_values_as_dict()
+#                    spg_reference=mtz_reference['spacegroup']
+#                    unitcell_reference=mtz_reference['unitcell']
+#                    lattice_reference=mtz_reference['bravais_lattice']
+#                    unitcell_volume_reference=mtz_reference['unitcell_volume']
+#                    reference_file_list.append([reference_root,
+#                                                spg_reference,
+#                                                unitcell_reference,
+#                                                lattice_reference,
+#                                                unitcell_volume_reference])
+
+                if os.path.isfile(os.path.join(self.reference_directory,reference_root+'.pdb')):
+                    pdb_reference=parse.PDBinfo(os.path.join(self.reference_directory,reference_root+'.pdb'))
+                    spg_reference=pdb_reference['SpaceGroup']
+                    unitcell_reference=pdb_reference['UnitCell']
+                    lattice_reference=pdb_reference['Lattice']
+                    unitcell_volume_reference=pdb_reference['UnitCellVolume']
                     reference_file_list.append([reference_root,
                                                 spg_reference,
                                                 unitcell_reference,
                                                 lattice_reference,
                                                 unitcell_volume_reference])
+
+
+
         return reference_file_list
 
 
