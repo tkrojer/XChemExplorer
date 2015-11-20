@@ -365,12 +365,6 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 
             search_cycle+=1
 
-        print 'hallo'
-        print self.data_collection_dict['ATAD2A-x367'][0]
-        print len(self.data_collection_dict['ATAD2A-x367'][0])
-        print len(self.data_collection_dict['ATAD2A-x367'][1])
-        print len(self.data_collection_dict['ATAD2A-x367'][2])
-        print len(self.data_collection_dict['ATAD2A-x367'][3])
 
         if not len(self.data_collection_dict)==0:
             progress_step=100/float(len(self.data_collection_dict))
