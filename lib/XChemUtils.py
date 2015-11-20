@@ -76,7 +76,7 @@ class process:
 
         if 'csh' in os.getenv('SHELL'):
             ccp4_scratch='setenv CCP4_SCR '+self.ccp4_scratch_directory+'\n'
-        elif 'csh' in os.getenv('SHELL'):
+        elif 'bash' in os.getenv('SHELL'):
             ccp4_scratch='export CCP4_SCR='+self.ccp4_scratch_directory+'\n'
         else:
             ccp4_scratch=''
