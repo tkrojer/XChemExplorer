@@ -14,17 +14,17 @@ from XChemUtils import process
 from XChemUtils import parse
 from XChemUtils import queue
 from XChemUtils import mtztools
+from XChemUtils import external_software
 import XChemThread
 import XChemDB
 
 class XChemExplorer(QtGui.QApplication):
     def __init__(self,args):
         QtGui.QApplication.__init__(self,args)
-        self.start_GUI()
-        self.exec_()
 
-
-    def start_GUI(self):
+        # checking for external software packages
+        self.external_software=external_software().check()
+        print self.external_software
 
         # Settings @ Directories
         self.current_directory=os.getcwd()
@@ -93,6 +93,13 @@ class XChemExplorer(QtGui.QApplication):
             self.queueing_system_available=True
         except OSError:
             self.queueing_system_available=False
+
+        self.start_GUI()
+        self.exec_()
+
+
+    def start_GUI(self):
+
 
         # GUI setup
         self.window=QtGui.QWidget()
@@ -494,7 +501,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.explorer_active=1
                 self.work_thread=XChemThread.run_dimple_on_selected_samples(self.settings,
                                                                 self.initial_model_dimple_dict,
-                                                                self.queueing_system_available  )
+                                                                self.external_software  )
                 self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
                 self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)

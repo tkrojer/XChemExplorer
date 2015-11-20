@@ -102,6 +102,11 @@ class data_source:
             'RefinementRmsdBonds',
             'RefinementRmsdAngles',
             'RefinementOutcome',
+            'RefinementMTZfree',
+            'RefinementCIF',
+            'RefinementPDB_latest',
+            'RefinementMTZ_latest',
+            'RefinementComment',
 
             'AssayIC50'
 

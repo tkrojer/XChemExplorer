@@ -18,12 +18,12 @@ import XChemDB
 
 
 class run_dimple_on_selected_samples(QtCore.QThread):
-    def __init__(self,settings,initial_model_dimple_dict,queueing_system_available):
+    def __init__(self,settings,initial_model_dimple_dict,external_software):
         QtCore.QThread.__init__(self)
         self.initial_model_directory=settings['initial_model_directory']
         self.reference_directory=settings['reference_directory']
         self.initial_model_dimple_dict=initial_model_dimple_dict
-        self.queueing_system_available=queueing_system_available
+        self.queueing_system_available=external_software['qstat']
 
     def run(self):
         if len(self.initial_model_dimple_dict) != 0:
