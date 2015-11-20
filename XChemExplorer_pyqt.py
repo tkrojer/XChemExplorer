@@ -35,6 +35,7 @@ class XChemExplorer(QtGui.QApplication):
             self.reference_directory=os.path.join(self.project_directory,'processing','reference')
             self.database_directory=os.path.join(self.project_directory,'processing','database')
             self.data_source_file='XChemExplorer.csv'
+            self.ccp4_scratch_directory=os.path.join(self.project_directory,'tmp')
         else:
             self.project_directory=self.current_directory
             self.beamline_directory=self.current_directory
@@ -43,6 +44,7 @@ class XChemExplorer(QtGui.QApplication):
             self.reference_directory=self.current_directory
             self.database_directory=self.current_directory
             self.data_source_file=''
+            self.ccp4_scratch_directory=os.getenv('CCP4_SCR')
 
         self.settings =     {'current_directory':       self.current_directory,
                              'project_directory':       self.project_directory,
@@ -51,7 +53,8 @@ class XChemExplorer(QtGui.QApplication):
                              'refine_model_directory':  self.refine_model_directory,
                              'reference_directory':     self.reference_directory,
                              'database_directory':      self.database_directory,
-                             'data_source':             os.path.join(self.database_directory,self.data_source_file) }
+                             'data_source':             os.path.join(self.database_directory,self.data_source_file),
+                             'ccp4_scratch':            self.ccp4_scratch_directory   }
 
 
 
@@ -185,6 +188,11 @@ class XChemExplorer(QtGui.QApplication):
         create_png_of_soaked_compound_button=QtGui.QPushButton("Create PDB/CIF/PNG files of Compound")
         create_png_of_soaked_compound_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(create_png_of_soaked_compound_button)
+
+        create_create_new_data_source_button=QtGui.QPushButton("Create New CSV Data Source")
+        create_create_new_data_source_button.clicked.connect(self.button_clicked)
+        mounted_crystals_button_hbox.addWidget(create_create_new_data_source_button)
+
 
         self.tab_dict['Data Source'][1].addLayout(mounted_crystals_button_hbox)
 
@@ -335,6 +343,7 @@ class XChemExplorer(QtGui.QApplication):
         settings_buttoon_data_source_file.clicked.connect(self.settings_button_clicked)
         settings_hbox_data_source_file.addWidget(settings_buttoon_data_source_file)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_data_source_file)
+        
         self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nBeamline Directory:'))
         settings_hbox_beamline_directory=QtGui.QHBoxLayout()
         self.beamline_directory_label=QtGui.QLabel(self.beamline_directory)
@@ -343,6 +352,16 @@ class XChemExplorer(QtGui.QApplication):
         settings_buttoon_beamline_directory.clicked.connect(self.settings_button_clicked)
         settings_hbox_beamline_directory.addWidget(settings_buttoon_beamline_directory)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_beamline_directory)
+
+        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nCCP4_SCR Directory:'))
+        settings_hbox_ccp4_scratch_directory=QtGui.QHBoxLayout()
+        self.ccp4_scratch_directory_label=QtGui.QLabel(self.ccp4_scratch_directory)
+        settings_hbox_ccp4_scratch_directory.addWidget(self.ccp4_scratch_directory_label)
+        settings_buttoon_ccp4_scratch_directory=QtGui.QPushButton('Select CCP4_SCR Directory')
+        settings_buttoon_ccp4_scratch_directory.clicked.connect(self.settings_button_clicked)
+        settings_hbox_ccp4_scratch_directory.addWidget(settings_buttoon_ccp4_scratch_directory)
+        self.data_collection_vbox_for_settings.addLayout(settings_hbox_ccp4_scratch_directory)
+
         self.data_collection_vbox_for_settings.addStretch(1)
         # ----------------------------------------------------
 
@@ -435,6 +454,9 @@ class XChemExplorer(QtGui.QApplication):
         if self.sender().text()=='Select Beamline Directory':
             self.beamline_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.beamline_directory_label.setText(self.beamline_directory)
+        if self.sender().text()=='Select CCP4_SCR Directory':
+            self.ccp4_scratch_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
+            self.ccp4_scratch_directory_label.setText(self.ccp4_scratch_directory)
         self.settings =     {'current_directory':       self.current_directory,
                              'project_directory':       self.project_directory,
                              'beamline_directory':      self.beamline_directory,
@@ -442,7 +464,8 @@ class XChemExplorer(QtGui.QApplication):
                              'refine_model_directory':  self.refine_model_directory,
                              'reference_directory':     self.reference_directory,
                              'database_directory':      self.database_directory,
-                             'data_source':             self.data_source_file }
+                             'data_source':             self.data_source_file,
+                             'ccp4_scratch':            self.ccp4_scratch_directory }
 
 
     def button_clicked(self):
@@ -486,7 +509,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.connect(self.work_thread, QtCore.SIGNAL("create_initial_model_table"),self.create_initial_model_table)
                 self.work_thread.start()
 
-            if self.sender().text()=="Check for inital Refinement":
+            if self.sender().text()=="Refresh":
                 for key in self.initial_model_dimple_dict:
                     print key, self.initial_model_dimple_dict[key]
 
@@ -502,7 +525,8 @@ class XChemExplorer(QtGui.QApplication):
                 self.explorer_active=1
                 self.work_thread=XChemThread.run_dimple_on_selected_samples(self.settings,
                                                                 self.initial_model_dimple_dict,
-                                                                self.external_software  )
+                                                                self.external_software,
+                                                                self.ccp4_scratch_directory )
                 self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
                 self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
@@ -520,6 +544,17 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text.setText(str(row[column]))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.mounted_crystal_table.setItem(n, column, cell_text)
+
+            if self.sender().text()=="Create New CSV Data Source":
+                file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
+                #make sure that the file always has .csv extension
+                if file_name.rfind('.') != -1:
+                   file_name=file_name[:file_name.rfind('.')]+'.csv'
+                else:
+                    file_name=file_name+'.csv'
+                print file_name
+                XChemDB.data_source(os.path.join(file_name))
+
 
             if self.sender().text()=="Save Samples To Datasource":
                 allRows = self.mounted_crystal_table.rowCount()

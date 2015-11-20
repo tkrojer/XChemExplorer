@@ -16,7 +16,7 @@ class process:
         self.xtalID=dimple['xtalID']
         self.reference=dimple['reference']
         self.queueing_system_available=dimple['queueing_system_available']
-
+        self.ccp4_scratch_directory=dimple['ccp4_scratch']
         self.mtz_free=self.xtalID+'.free.mtz'
         # need to set $CCP4_SCR, because the default directory in /home/zqr16691/tmp fills up easily 
         # and then dimple will not run
@@ -74,6 +74,13 @@ class process:
         else:
             pbs_line=''
 
+        if 'csh' in os.getenv('SHELL'):
+            ccp4_scratch='setenv CCP4_SCR '+self.ccp4_scratch_directory+'\n'
+        elif 'csh' in os.getenv('SHELL'):
+            ccp4_scratch='export CCP4_SCR='+self.ccp4_scratch_directory+'\n'
+        else:
+            ccp4_scratch=''
+
 
         Cmds = (
                 '#!'+os.getenv('SHELL')+'\n'
@@ -81,7 +88,7 @@ class process:
                 '\n'
                 'cd %s/%s/Dimple\n' %(self.project_directory,self.xtalID) +
                 '\n'
-#                'export CCP4_SCR='+self.ccp4_scratch+'\n'
+                +ccp4_scratch+
                 '\n'
                 'dimple ../%s.free.mtz %s.pdb dimple' %(self.xtalID,self.reference) +
                 '\n'
