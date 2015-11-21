@@ -30,7 +30,7 @@ class process:
         if not os.path.isfile(self.project_directory+'/'+self.xtalID+'/'+self.mtz_free):
             if os.path.isfile(os.path.join(self.reference+'.mtz')):
                 Cmds = (
-                    '#!/bin/csh\n'
+                    '#!'+os.getenv('SHELL')+'\n'
                     '\n'
                     'cd %s/%s\n' %(self.project_directory,self.xtalID) +
                     '\n'
@@ -53,7 +53,7 @@ class process:
                     )
             else:
                 Cmds = (
-                    '#!/bin/csh\n'
+                    '#!'+os.getenv('SHELL')+'\n'
                     '\n'
                     'cd %s/%s\n' %(self.project_directory,self.xtalID) +
                     '\n'
@@ -141,22 +141,32 @@ class process:
             os.system('chmod +x %s.sh' %self.xtalID)
             os.system('./%s.sh' %self.xtalID)
 
-#def MakePng(DataPath,xtalID,compoundID,smiles):
-#    os.chdir('%s/%s' %(DataPath,xtalID))
-#    os.system('rm -f %s.png' %smiles)
-#    Cmds = (
-#            'echo "xtalID: %s"\n' %xtalID +
-#            '\n'
-#            'echo "======== generating 2D image of compound ======="\n'
-#            '\n'
-#            'module load openbabel\n'
-#            '\n'
-#            'obabel -:"%s" -O temp.png' %smiles+
-#            '\n'
-#            'convert temp.png -background white label:"%s" -gravity Center -append %s.png\n' %(compoundID,compoundID)+
-#            '/bin/rm temp.png\n'
-#            )
-#    os.system(Cmds)
+class helpers:
+
+    def make_png(self,initial_model_directory,sample,compoundID,smiles):
+
+        if not os.path.isdir(os.path.join(initial_model_directory,sample)):
+            os.mkdir(os.path.join(initial_model_directory,sample))
+        if not os.path.isdir(os.path.join(initial_model_directory,sample,'compound')):
+            os.mkdir(os.path.join(initial_model_directory,sample,'compound'))
+
+        if 'dls' in os.getcwd():
+            obabel='module load openbabel\n'
+        else:
+            obabel=''
+
+        os.chdir(os.path.join(initial_model_directory,sample,'compound'))
+
+        Cmds = (
+            '#!'+os.getenv('SHELL')+'\n'
+            '\n'
+            +obabel+
+            '\n'
+            'obabel -:"%s" -O %s.png\n' %(smiles,compoundID)+
+            '\n'
+            'acedrg -i "%s" -o %s\n' %(smiles,compoundID)
+            )
+        os.system(Cmds)
 
 class parse:
 
@@ -574,6 +584,9 @@ class external_software:
         }
 
     def check(self):
+
+        if 'dls' in os.getcwd():
+            os.system('module load all')
 
         print 'Searching for external software:'
 

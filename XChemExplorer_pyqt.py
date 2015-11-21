@@ -1,19 +1,19 @@
 import os, sys, glob
-from datetime import datetime
+#from datetime import datetime
 from PyQt4 import QtGui, QtCore
 #from PyQt4.QtCore import QThread, SIGNAL
 
-import time
+#import time
 import pickle
 import base64
-import math
+#import math
 import subprocess
 
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
-from XChemUtils import process
+#from XChemUtils import process
 from XChemUtils import parse
-from XChemUtils import queue
-from XChemUtils import mtztools
+#from XChemUtils import queue
+#from XChemUtils import mtztools
 from XChemUtils import external_software
 import XChemThread
 import XChemDB
@@ -90,7 +90,8 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_statistics_dict={}
         self.initial_model_dimple_dict={}       # contains toggle button if dimple should be run
         self.reference_file_list=[]
-
+        self.all_columns_in_data_source=XChemDB.data_source(os.path.join(self.database_directory,
+                                                                         self.data_source_file)).return_column_list()
 
         self.target_list=[]
         for dir in glob.glob(self.beamline_directory+'/*'):
@@ -164,38 +165,15 @@ class XChemExplorer(QtGui.QApplication):
             self.tab_dict[page]=[tab,vbox]
 
         # Data Source Tab
-        mounted_crystal_list=[]
-        mounted_crystal_column_name=[   'Sample ID',
-                                        'Compound ID',
-                                        'Smiles',
-                                        'Compound Name',
-                                        'Tag'           ]
-        for i in range(20): mounted_crystal_list.append(['','','','',''])
+        self.data_source_columns_to_display=[   'Sample ID',
+                                                'Compound ID',
+                                                'Smiles',
+                                                'Compound Name',
+                                                'Tag'           ]
         self.mounted_crystal_table=QtGui.QTableWidget()
-#        self.mounted_crystal_table.setRowCount(20)
-#        self.mounted_crystal_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.mounted_crystal_table.setColumnCount(len(mounted_crystal_column_name))
         self.mounted_crystal_table.setSortingEnabled(True)
-
-        # read in all the columns in the data_source file
-
-#        column_indices_to_diaplay=[]
-
-#        for row,line in enumerate(mounted_crystal_list):
-#            for column,item in enumerate(line):
-#                if item in columns to show:
-#                cell_text=QtGui.QTableWidgetItem()
-#                cell_text.setText(str(item))
-#                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-#                self.mounted_crystal_table.setItem(row, column, cell_text)
-#        self.mounted_crystal_table.setHorizontalHeaderLabels(mounted_crystal_column_name)
 #        self.mounted_crystal_table.setColumnWidth(0,250)
-#        self.mounted_crystal_table.setColumnWidth(1,250)
-#        self.mounted_crystal_table.setColumnWidth(2,250)
-#        self.mounted_crystal_table.setColumnWidth(3,250)
-#        self.mounted_crystal_table.setColumnWidth(4,250)
-##        self.mounted_crystal_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-##        self.mounted_crystal_table.resizeColumnsToContents()
+        self.mounted_crystal_table.resizeColumnsToContents()
         self.mounted_crystals_vbox_for_table=QtGui.QVBoxLayout()
         self.tab_dict['Data Source'][1].addLayout(self.mounted_crystals_vbox_for_table)
         self.mounted_crystals_vbox_for_table.addWidget(self.mounted_crystal_table)
@@ -436,14 +414,6 @@ class XChemExplorer(QtGui.QApplication):
 
 
 
-#        print 'hallo'
-#        file_name = QtGui.QFileDialog.getOpenFileName(self.window,'Open file', self.current_directory)
-#        try:
-#            self.settings = pickle.load(open(file_name,"rb"))
-#        except KeyError:
-#            self.update_status_bar('Sorry, this is not a XChemExplorer config file!')
-
-
     def target_selection_combobox_activated(self,text):
         #str(self.initial_model_dimple_dict[sample][1].currentText()
         print str(text)
@@ -564,17 +534,11 @@ class XChemExplorer(QtGui.QApplication):
                 self.work_thread.start()
 
             if self.sender().text()=="Load Samples From Datasource":
-                data=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
-#                print len(data)
-                self.mounted_crystal_table.setRowCount(0)
-                self.mounted_crystal_table.setRowCount(len(data))
-                for n,row in enumerate(data):
-                    for column in range(len(row)):
-                        print str(row[column])
-                        cell_text=QtGui.QTableWidgetItem()
-                        cell_text.setText(str(row[column]))
-                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                        self.mounted_crystal_table.setItem(n, column, cell_text)
+                content=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
+                header=content[0]
+                data=content[1]
+                self.populate_data_source_table(header,data)
+
 
             if self.sender().text()=="Create New CSV Data Source":
                 file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
@@ -602,7 +566,25 @@ class XChemExplorer(QtGui.QApplication):
 
             if self.sender().text()=="Select Columns":
                 print 'hallo'
-                XChemDialogs.Select().select_columns_from_data_source_dialog()
+                # QDialog is the kind of widget that will help here, but for now I park this
+#                self.dialogTextBrowser = XChemDialogs.select_data_source_columns()
+#                self.dialogTextBrowser.exec_()
+
+            if self.sender().text()=="Create PDB/CIF/PNG files of Compound":
+                allRows = self.mounted_crystal_table.rowCount()
+#                out=''
+                for row in range(allRows):
+                    print self.mounted_crystal_table.item(row,0).text()
+#                    for i in range(5):
+#                        print
+#                        if self.mounted_crystal_table.item(row,i).text()=='':
+#                            print 'hallo'
+#                            break
+#                        else:
+#                            out+=self.mounted_crystal_table.item(row,i).text()+','
+#                    out+='\n'
+#                   print out
+
 
 
     def update_progress_bar(self,progress):
@@ -1021,7 +1003,35 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                     self.data_collection_summary_table.setItem(row, column, cell_text)
 
+    def populate_data_source_table(self,header,data):
+        self.mounted_crystal_table.setColumnCount(len(self.data_source_columns_to_display))
+        self.mounted_crystal_table.setRowCount(0)
+        self.mounted_crystal_table.setRowCount(len(data))
 
+        # maybe I coded some garbage before, but I need to find out which column name in the
+        # data source corresponds to the actually displayed column name in the table
+        # reason being that the unique column ID for DB may not be nice to look at
+        columns_to_show=[]
+        for column in self.data_source_columns_to_display:
+            print column
+            for n,all_column in enumerate(self.all_columns_in_data_source):
+                if column==all_column[1]:
+                    columns_to_show.append(n)
+                    break
+
+        for x,row in enumerate(data):
+            print row
+            y=0
+            for item in columns_to_show:
+                cell_text=QtGui.QTableWidgetItem()
+                if row[item]==None:
+                    cell_text.setText('')
+                else:
+                    cell_text.setText(str(row[item]))
+                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                self.mounted_crystal_table.setItem(x, y, cell_text)
+                y+=1
+        self.mounted_crystal_table.setHorizontalHeaderLabels(self.data_source_columns_to_display)
 
 
 

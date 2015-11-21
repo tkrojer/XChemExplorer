@@ -122,8 +122,8 @@ class data_source:
             ['LibraryPlate',                         'LibraryPlate'],
             ['SourceWell',                           'SourceWell'],
             ['LibraryName',                          'LibraryName'],
-            ['CompoundSMILES',                       'CompoundSMILES'],
-            ['CompoundCode',                         'CompoundCode'],
+            ['CompoundSMILES',                       'Smiles'],
+            ['CompoundCode',                         'Compound ID'],
             ['CrystalPlate',                         'CrystalPlate'],
             ['CrystalWell',                          'CrystalWell'],
             ['EchoX',                                'EchoX'],
@@ -145,7 +145,7 @@ class data_source:
             ['CryoTimestamp',                        'CryoTimestamp'],
             ['SoakingTime',                          'SoakingTime'],
             ['HarvestStatus',                        'HarvestStatus'],
-            ['CrystalName',                          'CrystalName'],
+            ['CrystalName',                          'Sample ID'],
             ['Puck',                                 'Puck'],
             ['PuckPosition',                         'PuckPosition'],
             ['PinBarcode',                           'PinBarcode'],
@@ -156,8 +156,8 @@ class data_source:
             ['ispybStatus',                          'ispybStatus'],
             ['DataCollectionVisit',                  'DataCollectionVisit'],
             # from XChemExplorer
-            ['CompoundName',                         'CompoundName'],
-            ['CrystalTag',                           'CrystalTag'],
+            ['CompoundName',                         'Compound Name'],
+            ['CrystalTag',                           'Tag'],
             ['DataCollectionBeamline',               'DataCollectionBeamline'],
             ['DataCollectionDate',                   'DataCollectionDate'],
             ['DataCollectionOutcome',                'DataCollectionOutcome'],
@@ -194,9 +194,12 @@ class data_source:
             ['RefinementPDB_latest',                 'RefinementPDB_latest'],
             ['RefinementMTZ_latest',                 'RefinementMTZ_latest'],
             ['RefinementComment',                    'RefinementComment'],
-            ['AssayIC50'                             'AssayIC50']
+            ['AssayIC50',                            'AssayIC50']
         ]
 
+
+    def return_column_list(self):
+        return self.column_list
 
 
     def create_empty_data_source_file(self):
@@ -205,7 +208,7 @@ class data_source:
             if not os.path.isfile(self.data_source_file):
                 csv_header=''
                 for column in self.column_list:
-                    csv_header+=str(column)+','
+                    csv_header+=str(column[0])+','
                 csv_header+='\n'
                 f=open(self.data_source_file,'w')
                 f.write(csv_header)
@@ -228,8 +231,8 @@ class data_source:
             for column in self.cursor.description:
                 existing_columns.append(column[0])
             for column in self.column_list:
-                if column not in existing_columns:
-                    self.cursor.execute("alter table mainTable add column '%s' 'TEXT'" % column)
+                if column[0] not in existing_columns:
+                    self.cursor.execute("alter table mainTable add column '%s' 'TEXT'" % column[0])
                     self.connect.commit()
 
         if self.data_source_type=='csv':
@@ -240,8 +243,8 @@ class data_source:
                 break
             new_columns=''
             for column in self.column_list:
-                if column not in existing_columns:
-                    new_columns+=column+','
+                if column[0] not in existing_columns:
+                    new_columns+=column[0]+','
             csv_content=''
             for n,line in enumerate(open(self.data_source_file)):
                 if n==0:
@@ -259,36 +262,67 @@ class data_source:
 #                                'CompoundSMILES',
 #                                'CrystalTag'        ]
 
-        # first find the index of the columns of interest in the header
+        header=[]
+        data=[]
         if self.data_source_type=='csv':
-            data=[]
-            column_list=[]
             for n,line in enumerate(open(self.data_source_file)):
                 if n==0:
-                    for item in columns_of_interest:
-                        for column,field in enumerate(line.split(',')):
-                            if field==item:
-                                column_list.append(column)
+                    for field in line.split(','):
+                        header.append(field)
                 else:
-                    line_list=[]
-                    for item in column_list:
-                        found=False
-                        for column,field in enumerate(line.split(',')):
-                            if column==item:
-                                line_list.append(field)
-                                found=True
-                        if not found:
-                            line_list.append('')
-                    data.append(tuple(line_list))
-            return data
+                    tmp=[]
+                    for field in line.split(','):
+                        if '\n' in field or '\r' in field:
+                            continue
+                        else:
+                            tmp.append(field)
+                    if not all(element=='' for element in tmp):     # e.g. Mac OSX numbers adds lots of emtpy lines
+                        data.append(tuple(tmp))
+
+
+
+        if self.data_source_type=='sqlite':
+            self.cursor.execute("SELECT * FROM mainTable")
+            for column in self.cursor.description:
+                header.append(column[0])
+            data = self.cursor.fetchall()
+#            print header
+#            for i in data:
+#                print data
+
+        return ([header,data])
+
+
+        # first find the index of the columns of interest in the header
+#        if self.data_source_type=='csv':
+#            data=[]
+#            column_list=[]
+#            for n,line in enumerate(open(self.data_source_file)):
+#                if n==0:
+#                    for item in columns_of_interest:
+#                        for column,field in enumerate(line.split(',')):
+#                            if field==item:
+#                                column_list.append(column)
+#                else:
+#                    line_list=[]
+#                    for item in column_list:
+#                        found=False
+#                        for column,field in enumerate(line.split(',')):
+#                            if column==item:
+#                                line_list.append(field)
+#                                found=True
+#                        if not found:
+#                            line_list.append('')
+#                    data.append(tuple(line_list))
+#            return data
 #
 #                        if column in column_list:
 #                    print len(line.split(','))
 
-        if self.data_source_type=='sqlite':
-            self.cursor.execute("SELECT "+str(columns_of_interest).translate(None,"'[]")+" FROM mainTable")
-            data = self.cursor.fetchall()
-            return data
+#        if self.data_source_type=='sqlite':
+#            self.cursor.execute("SELECT "+str(columns_of_interest).translate(None,"'[]")+" FROM mainTable")
+#            data = self.cursor.fetchall()
+#            return data
 #            for row in rows:
 #                print row
 
