@@ -280,6 +280,22 @@ class XChemExplorer(QtGui.QApplication):
         self.tab_dict['Initial Model'][1].addLayout(initial_model_button_hbox)
 
         # Summary & Refine Tab
+
+        # prgress table
+        # Sample ID
+        # tag
+        # compound
+        # dataset outcome
+        # space group
+        # resolution
+        # R/Rfree
+        # PANDDAs/ Averaging
+        # Refinement outcome
+        # ligand CC
+
+
+
+
         self.summary_vbox_for_table=QtGui.QVBoxLayout()
         self.tab_dict['Summary & Refine'][1].addLayout(self.summary_vbox_for_table)
         summary_button_hbox=QtGui.QHBoxLayout()
