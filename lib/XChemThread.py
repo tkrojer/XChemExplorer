@@ -14,7 +14,32 @@ from XChemUtils import process
 from XChemUtils import parse
 from XChemUtils import queue
 from XChemUtils import mtztools
+from XChemUtils import helpers
 import XChemDB
+
+
+class create_png_and_cif_of_compound(QtCore.QThread):
+    def __init__(self,external_software,initial_model_directory,compound_list):
+        QtCore.QThread.__init__(self)
+        self.external_software=external_software
+        self.initial_model_directory=initial_model_directory
+        self.compound_list=compound_list
+
+    def run(self):
+        progress_step=100/float(len(self.compound_list))
+        progress=0
+        for item in self.compound_list:
+            sampleID=item[0]
+            compoundID=item[1]
+            smiles=item[2]
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'creating cif/png -> '+sampleID)
+            if compoundID=='' or compoundID==None:
+                compoundID='compound'
+            helpers().make_png(self.initial_model_directory,sampleID,compoundID,smiles)
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+        self.emit(QtCore.SIGNAL("finished()"))
+
 
 
 class run_dimple_on_selected_samples(QtCore.QThread):
@@ -63,16 +88,18 @@ class start_COOT(QtCore.QThread):
 
 class read_intial_refinement_results(QtCore.QThread):
 
-    def __init__(self,initial_model_directory,reference_file_list):
+    def __init__(self,initial_model_directory,reference_file_list,data_source):
         QtCore.QThread.__init__(self)
         self.initial_model_directory=initial_model_directory
         self.reference_file_list=reference_file_list
+        self.data_source=data_source
 
     def run(self):
 
         progress_step=100/float(len(glob.glob(self.initial_model_directory+'/*')))
         progress=0
 
+        db=XChemDB.data_source(self.data_source)
         initial_model_list=[]
 
         for sample_dir in sorted(glob.glob(self.initial_model_directory+'/*')):
@@ -80,7 +107,7 @@ class read_intial_refinement_results(QtCore.QThread):
             sample=sample_dir[sample_dir.rfind('/')+1:]
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'parsing initial_models folder -> '+sample)
 
-            run_dimple=True
+            run_dimple=False
             resolution_high=''
             Rcryst='pending'
             Rfree='pending'
@@ -91,6 +118,7 @@ class read_intial_refinement_results(QtCore.QThread):
             unitcell_difference=''
             reference=''
             alert='#E0E0E0'
+            outcome='Analysis Pending'
 
             if os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'.mtz')):
                 mtz_autoproc=mtztools(os.path.join(self.initial_model_directory,sample,sample+'.mtz')).get_all_values_as_dict()
@@ -119,6 +147,35 @@ class read_intial_refinement_results(QtCore.QThread):
                         Rcryst='in progress'
                         Rfree='in progress'
                         alert=(51,153,255)
+
+            if Rcryst=='pending':
+                run_dimple=True
+                outcome='n/a'
+
+            pdb_latest=''
+            if os.path.isfile(os.path.join(self.initial_model_directory,sample,'refine.pdb')):
+                pdb_latest=os.path.realpath(os.path.join(self.initial_model_directory,sample,'refine.pdb'))
+
+            mtz_latest=''
+            if os.path.isfile(os.path.join(self.initial_model_directory,sample,'refine.mtz')):
+                mtz_latest=os.path.realpath(os.path.join(self.initial_model_directory,sample,'refine.mtz'))
+
+            mtz_free=''
+            if os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'free.mtz')):
+                mtz_free=os.path.realpath(os.path.join(self.initial_model_directory,sample,sample+'free.mtz'))
+
+            # update data source
+            refinement_db_dict={
+                        'RefinementRcryst':         Rcryst,
+                        'RefinementRfree':          Rfree,
+                        'RefinementRmsdBonds':      'n/a',
+                        'RefinementRmsdAngles':     'n/a',
+                        'RefinementOutcome':        outcome,
+                        'RefinementMTZfree':        mtz_free,
+                        'RefinementPDB_latest':     pdb_latest,
+                        'RefinementMTZ_latest':     mtz_latest          }
+
+            db.update_table(sample,refinement_db_dict)
 
             initial_model_list.append( [ sample,
                                         run_dimple,

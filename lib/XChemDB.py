@@ -16,103 +16,6 @@ class data_source:
         if self.data_source_file.endswith('.csv'):
             self.data_source_type='csv'
 
-
-        self.column_list=[
-            # from Lab36
-            'ID',
-            'LabVisit',
-            'LibraryPlate',
-            'SourceWell',
-            'LibraryName',
-            'CompoundSMILES',
-            'CompoundCode',
-            'CrystalPlate',
-            'CrystalWell',
-            'EchoX',
-            'EchoY',
-            'DropVolume',
-            'ProteinName',
-            'BatchNumber',
-            'CompoundStockConcentration',
-            'CompoundConcentration',
-            'SolventFraction',
-            'SoakTransferVol',
-            'SoakStatus',
-            'SoakTimestamp',
-            'CryoStockFraction',
-            'CryoFraction',
-            'CryoWell',
-            'CryoTransferVolume',
-            'CryoStatus',
-            'CryoTimestamp',
-            'SoakingTime',
-            'HarvestStatus',
-            'CrystalName',
-            'Puck',
-            'PuckPosition',
-            'PinBarcode',
-            'MountingResult',
-            'MountingArrivalTime',
-            'MountedTimestamp',
-            'MountingTime',
-            'ispybStatus',
-            'DataCollectionVisit',
-            # from XChemExplorer
-
-
-#            'SampleID',
-#            'Visit',
-
-            'CompoundName',
-            'CrystalTag',
-
-            'DataCollectionBeamline',
-            'DataCollectionDate',
-            'DataCollectionOutcome',
-            'DataCollectionRun',
-            'DataCollectionComment',
-
-
-
-            'DataProcessingProgram',
-            'DataProcessingSpaceGroup',
-            'DataProcessingUnitCell',
-            'DataProcessingResolutionOverall',
-            'DataProcessingResolutionLow',
-            'DataProcessingResolutionHigh',
-            'DataProcessingRmergeOverall',
-            'DataProcessingRmergeLow',
-            'DataProcessingRmergeHigh',
-            'DataProcessingIsigOverall',
-            'DataProcessingIsigLow',
-            'DataProcessingIsigHigh',
-            'DataProcessingCompletenessOverall',
-            'DataProcessingCompletenessLow',
-            'DataProcessingCompletenessHigh',
-            'DataProcessingMultiplicityOverall',
-            'DataProcessingMultiplicityLow',
-            'DataProcessingMultiplicityHigh',
-            'DataProcessingPathToLogfile',
-
-            'PANDDAstuff',
-
-            'RefinementRcryst',
-            'RefinementRfree',
-            'RefinementLigandCC',
-            'RefinementRmsdBonds',
-            'RefinementRmsdAngles',
-            'RefinementOutcome',
-            'RefinementMTZfree',
-            'RefinementCIF',
-            'RefinementPDB_latest',
-            'RefinementMTZ_latest',
-            'RefinementComment',
-
-            'AssayIC50'
-
-        ]
-
-
         #   [column_name in DB, column_name shown in XCE]
 
         self.column_list=[
@@ -399,13 +302,7 @@ class data_source:
                             if field==item[0]:
                                 column_list.append(column)
 
-           # find sample line
-            row_to_change=None
-            if sample_column != None:
-                for row,line in enumerate(open(self.data_source_file)):
-                    if len(line.split(',')) >= sample_column:
-                        if line.split(',')[sample_column].replace(' ','')==sample:
-                            row_to_change=row
+            row_to_change=self.csv_get_sample_row(sample)
 
             csv_out=''
             if row_to_change==None:
@@ -432,8 +329,81 @@ class data_source:
             f.close()
 
 
-    def read_data_source_for_coot(self):
-        print 'hallo'
+    def csv_get_sample_row(self,sample):
+            sample_column=None
+            for n,line in enumerate(open(self.data_source_file)):
+                if n==0:
+                    for column,item in enumerate(line.split(',')):
+                        if item=='CrystalName':
+                            sample_column=column
+                            break
+           # find sample line
+            row_to_change=None
+            if sample_column != None:
+                for row,line in enumerate(open(self.data_source_file)):
+                    if len(line.split(',')) >= sample_column:
+                        if line.split(',')[sample_column].replace(' ','')==sample:
+                            row_to_change=row
+            return row_to_change
+
+    def csv_columns_to_update(self,db_list):
+        column_list=[]
+        for n,line in enumerate(open(self.data_source_file)):
+            if n==0:
+                for item in db_list:
+                    for column,field in enumerate(line.split(',')):
+                        if field==item[0]:
+                            column_list.append(column)
+
+        return column_list
+
+
+    def update_table(self,sample,db_dict):
+        if self.data_source_type=='csv':
+            # translate dict to list, so that it has same format as above
+            db_list=[]
+            for key in db_dict:
+                db_list.append([key,db_dict[key]])
+            row_to_change=self.csv_get_sample_row(sample)
+            column_list=self.csv_columns_to_update(db_list)
+            csv_out=''
+            if row_to_change != None:
+                for row,line in enumerate(open(self.data_source_file)):
+                    if row == row_to_change:
+                        # this is just in case these fields are not yet filled out
+                        # and the commas don't extend all the way
+                        if len(line.split(',')) < max(column_list):
+                            line+=(','*int(max(column_list)-len(x.split(','))))
+                        csv_list=line.split(',')
+                        for n,item in enumerate(column_list):
+                            csv_list[item]=db_list[n][1]
+                        csv_out+=str(csv_list).translate(None,"[']")+'\n'
+                    else:
+                        csv_out+=line
+            f=open(self.data_source_file,'w')
+            f.write(csv_out)
+            f.close()
+
+
+    def get_samples_for_coot(self,RefinementOutcome):
+        # 0: sampleID
+        # 1: compoundID
+        # 2: dataset outcome
+        sample_list_for_coot=[]
+        colums_for_coot=[['RefinementOutcome',  None],
+                         ['CrystalName',        None],
+                         ['CompoundCode',       None]]
+        column_list=self.csv_columns_to_update(colums_for_coot)
+        print column_list
+        for n,line in enumerate(open(self.data_source_file)):
+            if len(line.split(',')) >= max(column_list):
+                # replace(' ','') because there may of may not be spaces in unknown places
+                # probably depending if manipulated with EXCEL, NUMBERS...
+                if str(line.split(',')[column_list[0]]).replace(' ','')==RefinementOutcome.replace(' ',''):
+                    sample_list_for_coot.append([line.split(',')[column_list[1]],
+                                                 line.split(',')[column_list[2]]])
+        return sample_list_for_coot
+
     def update_data_source_from_coot(self):
         print 'hallo'
     def update_data_source(self):

@@ -150,6 +150,9 @@ class helpers:
         if not os.path.isdir(os.path.join(initial_model_directory,sample,'compound')):
             os.mkdir(os.path.join(initial_model_directory,sample,'compound'))
 
+#        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif')):
+#            pass
+
         if 'dls' in os.getcwd():
             obabel='module load openbabel\n'
         else:
@@ -166,6 +169,7 @@ class helpers:
             '\n'
             'acedrg -i "%s" -o %s\n' %(smiles,compoundID)
             )
+        print Cmds
         os.system(Cmds)
 
 class parse:

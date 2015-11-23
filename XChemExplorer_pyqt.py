@@ -70,7 +70,8 @@ class XChemExplorer(QtGui.QApplication):
                              'reference_directory':     self.reference_directory,
                              'database_directory':      self.database_directory,
                              'data_source':             os.path.join(self.database_directory,self.data_source_file),
-                             'ccp4_scratch':            self.ccp4_scratch_directory   }
+                             'ccp4_scratch':            self.ccp4_scratch_directory,
+                             'external_software':       self.external_software  }
 
 
 
@@ -412,12 +413,16 @@ class XChemExplorer(QtGui.QApplication):
             self.refine_model_directory=self.settings['refine_model_directory']
             self.reference_directory=self.settings['reference_directory']
             self.database_directory=self.settings['database_directory']
+            self.data_source_file=self.settings['data_source']
+            self.ccp4_scratch_directory=self.settings['ccp4_scratch']
             self.project_directory_label.setText(self.project_directory)
             self.initial_model_directory_label.setText(self.initial_model_directory)
             self.refine_model_directory_label.setText(self.refine_model_directory)
             self.reference_directory_label.setText(self.reference_directory)
             self.database_directory_label.setText(self.database_directory)
             self.beamline_directory_label.setText(self.beamline_directory)
+            self.data_source_file_label.setText(self.data_source_file)
+            self.ccp4_scratch_directory_label.setText(self.ccp4_scratch_directory)
             self.reference_file_list=self.get_reference_file_list()
         except KeyError:
             self.update_status_bar('Sorry, this is not a XChemExplorer config file!')
@@ -519,7 +524,10 @@ class XChemExplorer(QtGui.QApplication):
                         print key, self.initial_model_dimple_dict[key]
 
                 self.explorer_active=1
-                self.work_thread=XChemThread.read_intial_refinement_results(self.initial_model_directory,self.reference_file_list)
+                self.work_thread=XChemThread.read_intial_refinement_results(self.initial_model_directory,
+                                                                            self.reference_file_list,
+                                                                            os.path.join(self.database_directory,
+                                                                                         self.data_source_file))
                 self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
                 self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
@@ -587,10 +595,42 @@ class XChemExplorer(QtGui.QApplication):
 #                self.dialogTextBrowser.exec_()
 
             if self.sender().text()=="Create PDB/CIF/PNG files of Compound":
+                columns_to_read=['Sample ID',
+                                 'Compound ID',
+                                 'Smiles']
+                # it's a bit pointless now to search for the position of the columns,
+                # but later I may want to give the user the option to change the column order
+                headercount = self.mounted_crystal_table.columnCount()
+                column_positions=[]
+                for item in columns_to_read:
+                    for x in range(headercount):
+                        headertext = self.mounted_crystal_table.horizontalHeaderItem(x).text()
+                        if headertext==item:
+                            column_positions.append(x)
+                            break
                 allRows = self.mounted_crystal_table.rowCount()
-#                out=''
+                compound_list=[]
                 for row in range(allRows):
-                    print self.mounted_crystal_table.item(row,0).text()
+                    if self.mounted_crystal_table.item(row,column_positions[2]).text() != '':
+                        compound_list.append([str(self.mounted_crystal_table.item(row,column_positions[0]).text()),
+                                              str(self.mounted_crystal_table.item(row,column_positions[1]).text()),
+                                              str(self.mounted_crystal_table.item(row,column_positions[2]).text())] )
+                if compound_list != []:
+                    self.explorer_active=1
+                    self.work_thread=XChemThread.create_png_and_cif_of_compound(self.external_software,
+                                                                                self.initial_model_directory,
+                                                                                compound_list)
+                    self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+                    self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+                    self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+                    self.work_thread.start()
+
+
+
+
+
+
+#                    print self.mounted_crystal_table.item(row,0).text()
 #                    for i in range(5):
 #                        print
 #                        if self.mounted_crystal_table.item(row,i).text()=='':

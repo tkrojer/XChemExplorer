@@ -9,7 +9,7 @@ import subprocess
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 sys.path.append(os.getenv('CCP4')+'/lib/python2.7/site-packages')
 
-from XChemUtils import data_source
+import XChemDB
 import XChemRefine
 
 import SPutils
@@ -37,38 +37,20 @@ class GUI(object):
 
     def __init__(self):
 
-        # check if qstat is available
-        try:
-            subprocess.call(['qstat'])
-            self.queueing_system_available=True
-        except OSError:
-            self.queueing_system_available=False
-
-        # also check for:
-        # phenix.molprobity
-        # subprocess.call(['refmac5','end'])
-        # mmtbx.validate_ligands
-        # ...
-        # maybe write extra class which checks for various external programs
-        # and returns a dictionary
-
-
-
         # read in settings file from XChemExplorer to set the relevant paths
         self.settings = pickle.load(open("XChemExplorer_settings.pkl","rb"))
 
-#        self.settings =     {'current_directory':       self.current_directory,
-#                             'project_directory':       self.project_directory,
-#                             'beamline_directory':      self.beamline_directory,
-#                             'initial_model_directory': self.initial_model_directory,
-#                             'refine_model_directory':  self.refine_model_directory,
-#                             'reference_directory':     self.reference_directory    }
-
+        print self.settings
+#        self.external_software=self.settings['external_software']
         self.refine_model_directory=self.settings['refine_model_directory']
-
+        self.database_directory=self.settings['database_directory']
         self.data_source_file=self.settings['data_source']
 
+        self.db=XChemDB.data_source(self.data_source_file)
+
+
         self.selection_criteria =   [   'All Datasets',
+                                        'Analysis Pending',
                                         'Datasets under refinement',
                                         'ligand confirmed',
                                         'finished models'   ]
@@ -79,7 +61,6 @@ class GUI(object):
         # Todo list:
         # 0: sampleID
         # 1: compoundID
-        # 2: dataset outcome
 
 
         # the Folder is kind of a legacy thing because my inital idea was to have separate folders
@@ -108,7 +89,7 @@ class GUI(object):
 
         self.xtalID=''
         self.compoundID=''
-        self.datasetOutcome=''
+#        self.datasetOutcome=''
 
         # some COOT settings
         coot.set_map_radius(15)
@@ -343,11 +324,11 @@ class GUI(object):
 #        print '\n==> cootSP: current xtal = %s' %widget.get_active_text()
         # update current xtal
         self.xtalID=self.Todo[self.index][0]
-        if self.Todo[self.index][2]==None:
-            self.compoundID='None'
-        else:
-            self.compoundID=self.Todo[self.index][1]
-        self.datasetOutcome=self.Todo[self.index][2]
+#        if self.Todo[self.index][2]==None:
+#            self.compoundID='None'
+#        else:
+#            self.compoundID=self.Todo[self.index][1]
+#        self.datasetOutcome=self.Todo[self.index][2]
         self.RefreshData()
 
     def update_data_source(self,widget,data=None):
@@ -445,10 +426,13 @@ class GUI(object):
         self.selection_mode = widget.get_active_text()
 
     def get_samples_to_look_at(self,widget):
-        self.Todo=[]
+        print 'hallo'
+        self.Todo=self.db.get_samples_for_coot(self.selection_mode)
+
         try:
             # get todo_list from datasource
-            self.Todo=data_source(self.data_source_file).read_data_source_for_coot(self.selection_criteria)
+            self.Todo=self.db.get_samples_for_coot(self.selection_mode)
+            print self.Todo
         except:
             # if not available, then parse file system
             for samples in glob.glob(self.refine_model_directory+'/*'):
