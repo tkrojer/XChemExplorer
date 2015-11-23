@@ -18,22 +18,22 @@ class Refine(object):
         self.compoundID = compoundID
         self.prefix = 'refine'
 
-    def PrepareForRefinement(self,DataPath):
-        # if user decides to keep it all in one directory: never mind!
-        if self.ProjectPath==DataPath:
-            return None
-        # check if xtalID folder exists
-        # if no: create folder & link free.mtz + cif/pdb/png file of ligands
-        if os.path.isdir(self.ProjectPath+'/'+self.xtalID):
-            coot.info_dialog(self.xtalID+' is already under refinement!')
-            return None
-        else:
-            os.mkdir(self.ProjectPath+'/'+self.xtalID)
-            os.system('ln -s '+DataPath+'/'+self.xtalID+'/*.pdb '+self.ProjectPath+'/'+self.xtalID)
-            os.system('ln -s '+DataPath+'/'+self.xtalID+'/*.mtz '+self.ProjectPath+'/'+self.xtalID)
-            os.system('ln -s '+DataPath+'/'+self.xtalID+'/*.map '+self.ProjectPath+'/'+self.xtalID)
-            os.system('ln -s '+DataPath+'/'+self.xtalID+'/'+self.compoundID+'.cif '+self.ProjectPath+'/'+self.xtalID)
-            os.system('ln -s '+DataPath+'/'+self.xtalID+'/'+self.compoundID+'.png '+self.ProjectPath+'/'+self.xtalID)
+#    def PrepareForRefinement(self,DataPath):
+#        # if user decides to keep it all in one directory: never mind!
+#        if self.ProjectPath==DataPath:
+#            return None
+#        # check if xtalID folder exists
+#        # if no: create folder & link free.mtz + cif/pdb/png file of ligands
+#        if os.path.isdir(self.ProjectPath+'/'+self.xtalID):
+#            coot.info_dialog(self.xtalID+' is already under refinement!')
+#            return None
+#        else:
+#            os.mkdir(self.ProjectPath+'/'+self.xtalID)
+#            os.system('ln -s '+DataPath+'/'+self.xtalID+'/*.pdb '+self.ProjectPath+'/'+self.xtalID)
+#            os.system('ln -s '+DataPath+'/'+self.xtalID+'/*.mtz '+self.ProjectPath+'/'+self.xtalID)
+#            os.system('ln -s '+DataPath+'/'+self.xtalID+'/*.map '+self.ProjectPath+'/'+self.xtalID)
+#            os.system('ln -s '+DataPath+'/'+self.xtalID+'/'+self.compoundID+'.cif '+self.ProjectPath+'/'+self.xtalID)
+#            os.system('ln -s '+DataPath+'/'+self.xtalID+'/'+self.compoundID+'.png '+self.ProjectPath+'/'+self.xtalID)
 
     def GetSerial(self):
         # check if there were already previous refinements
@@ -53,19 +53,21 @@ class Refine(object):
         return Serial
 
 
-    def RunRefmac(self,Serial,RefmacParams):
+    def RunRefmac(self,Serial,RefmacParams,external_software):
         Serial=str(Serial)
         findTLS=''
         TLSphenix=''
         # first check if refinement is ongoing and exit if yes
-        if os.path.isfile(self.ProjectPath+'/'+self.xtalID+'/REFINEMENT_IN_PROGRESS'):
+        if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'REFINEMENT_IN_PROGRESS')):
             coot.info_dialog('*** REFINEMENT IN PROGRESS ***')
             return None
 
-        RefmacParams['HKLIN']='HKLIN '+self.ProjectPath+'/'+self.xtalID+'/'+self.xtalID+'.free.mtz \\\n'
-        RefmacParams['HKLOUT']='HKLOUT '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'/refine_'+Serial+'.mtz \\\n'
-        RefmacParams['XYZIN']='XYZIN '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'/in.pdb \\\n'
-        RefmacParams['XYZOUT']='XYZOUT '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'/refine_'+Serial+'.pdb \\\n'
+        RefmacParams['HKLIN']='HKLIN '+os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'.free.mtz \\\n')
+        RefmacParams['HKLOUT']='HKLOUT '+os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refine_'+Serial+'.mtz \\\n')
+        RefmacParams['XYZIN']='XYZIN '+os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'in.pdb \\\n')
+        RefmacParams['XYZOUT']='XYZOUT '+os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refine_'+Serial+'.pdb \\\n')
+
+
         if os.path.isfile(self.ProjectPath+'/'+self.xtalID+'/'+self.compoundID+'.cif'):
             RefmacParams['LIBIN']='LIBIN '+self.ProjectPath+'/'+self.xtalID+'/'+self.compoundID+'.cif \\\n'
             RefmacParams['LIBOUT']='LIBOUT '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'/refine_'+Serial+'.cif \\\n'
@@ -187,9 +189,11 @@ class Refine(object):
         cmd = open(self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'/refmac.csh','w')
         cmd.write(refmacCmds)
         cmd.close()
-        print '\n==> cootSP: writing input script for refinement'
-        os.system('ssh %s@artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(getpass.getuser(),self.ProjectPath,self.xtalID,Serial))
-        print '\n==> cootSP: submitting job to cluster'
+
+        if external_software['qstat']:
+            os.system('qsub refmac.csh"')
+        else:
+            os.system('./refmac.csh &')
 
 
 

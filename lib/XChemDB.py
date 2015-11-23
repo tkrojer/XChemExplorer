@@ -358,12 +358,8 @@ class data_source:
         return column_list
 
 
-    def update_table(self,sample,db_dict):
+    def update_table(self,sample,db_list):
         if self.data_source_type=='csv':
-            # translate dict to list, so that it has same format as above
-            db_list=[]
-            for key in db_dict:
-                db_list.append([key,db_dict[key]])
             row_to_change=self.csv_get_sample_row(sample)
             column_list=self.csv_columns_to_update(db_list)
             csv_out=''
@@ -400,8 +396,8 @@ class data_source:
                 # replace(' ','') because there may of may not be spaces in unknown places
                 # probably depending if manipulated with EXCEL, NUMBERS...
                 if str(line.split(',')[column_list[0]]).replace(' ','')==RefinementOutcome.replace(' ',''):
-                    sample_list_for_coot.append([line.split(',')[column_list[1]],
-                                                 line.split(',')[column_list[2]]])
+                    sample_list_for_coot.append([str(line.split(',')[column_list[1]]).replace(' ',''),
+                                                 str(line.split(',')[column_list[2]]).replace(' ','')])
         return sample_list_for_coot
 
     def update_data_source_from_coot(self):

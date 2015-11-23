@@ -73,9 +73,6 @@ class XChemExplorer(QtGui.QApplication):
                              'ccp4_scratch':            self.ccp4_scratch_directory,
                              'external_software':       self.external_software  }
 
-
-
-
 #        self.FindHitsDir=self.project_directory+'/processing/analysis/find_hits'
 #        self.DatabaseDir=self.project_directory+'/processing/database'
 #        self.reference_directory=self.project_directory+'/processing/reference'
@@ -406,15 +403,15 @@ class XChemExplorer(QtGui.QApplication):
     def open_config_file(self):
         file_name = QtGui.QFileDialog.getOpenFileName(self.window,'Open file', self.current_directory)
         try:
-            self.settings = pickle.load(open(file_name,"rb"))
-            self.project_directory=self.settings['project_directory']
-            self.beamline_directory=self.settings['beamline_directory']
-            self.initial_model_directory=self.settings['initial_model_directory']
-            self.refine_model_directory=self.settings['refine_model_directory']
-            self.reference_directory=self.settings['reference_directory']
-            self.database_directory=self.settings['database_directory']
-            self.data_source_file=self.settings['data_source']
-            self.ccp4_scratch_directory=self.settings['ccp4_scratch']
+            pickled_settings = pickle.load(open(file_name,"rb"))
+            self.project_directory=pickled_settings['project_directory']
+            self.beamline_directory=pickled_settings['beamline_directory']
+            self.initial_model_directory=pickled_settings['initial_model_directory']
+            self.refine_model_directory=pickled_settings['refine_model_directory']
+            self.reference_directory=pickled_settings['reference_directory']
+            self.database_directory=pickled_settings['database_directory']
+            self.data_source_file=pickled_settings['data_source']
+            self.ccp4_scratch_directory=pickled_settings['ccp4_scratch']
             self.project_directory_label.setText(self.project_directory)
             self.initial_model_directory_label.setText(self.initial_model_directory)
             self.refine_model_directory_label.setText(self.refine_model_directory)
@@ -426,8 +423,6 @@ class XChemExplorer(QtGui.QApplication):
             self.reference_file_list=self.get_reference_file_list()
         except KeyError:
             self.update_status_bar('Sorry, this is not a XChemExplorer config file!')
-
-        print self.reference_directory
 
     def save_config_file(self):
         file_name = QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.current_directory)

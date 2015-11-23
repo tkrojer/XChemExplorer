@@ -40,8 +40,9 @@ class GUI(object):
         # read in settings file from XChemExplorer to set the relevant paths
         self.settings = pickle.load(open("XChemExplorer_settings.pkl","rb"))
 
-        print self.settings
-#        self.external_software=self.settings['external_software']
+        self.external_software=self.settings['external_software']
+        for key in self.external_software:
+            print key,self.external_software[key]
         self.refine_model_directory=self.settings['refine_model_directory']
         self.database_directory=self.settings['database_directory']
         self.data_source_file=self.settings['data_source']
@@ -245,12 +246,12 @@ class GUI(object):
 
         self.hbox5 = gtk.HBox()
         self.hbox5.pack_start(self.NOREFINEMENTFAILEDbutton)
-        self.NOREFINEMENTFAILEDbutton.connect("clicked",self.update_data_source,"Failed - refinement fails")
+        self.NOREFINEMENTFAILEDbutton.connect("clicked",self.update_data_source,"Refinement Failed")
         self.vbox.pack_start(self.hbox5)
 
         self.hbox6 = gtk.HBox()
         self.hbox6.pack_start(self.NOLIGANDFAILEDbutton)
-        self.NOLIGANDFAILEDbutton.connect("clicked",self.update_data_source,"Failed - no ligand")
+        self.NOLIGANDFAILEDbutton.connect("clicked",self.update_data_source,"No Ligand Bound")
         self.vbox.pack_start(self.hbox6)
 
 #        elif self.Action == 'Refine':
@@ -281,10 +282,10 @@ class GUI(object):
 #            self.MODELbutton.connect("clicked",self.CreateUpdateModel)
 #            self.vbox.pack_start(self.hbox3a)
 
-        self.hbox4 = gtk.HBox()
-        self.hbox4.pack_start(self.NOLIGANDFAILEDbutton)
-        self.NOLIGANDFAILEDbutton.connect("clicked",self.update_data_source,"Failed - no ligand")
-        self.vbox.pack_start(self.hbox4)
+#        self.hbox4 = gtk.HBox()
+#        self.hbox4.pack_start(self.NOLIGANDFAILEDbutton)
+#        self.NOLIGANDFAILEDbutton.connect("clicked",self.update_data_source,"Failed - no ligand")
+#        self.vbox.pack_start(self.hbox4)
 
 #        self.hbox6 = gtk.HBox()
 #        self.hbox6.pack_start(self.VALIDATEbutton)
@@ -332,7 +333,9 @@ class GUI(object):
         self.RefreshData()
 
     def update_data_source(self,widget,data=None):
-        print 'hallo'
+        refinement_db_list=[ ['RefinementOutcome',data]  ]
+        self.db.update_table(self.xtalID,refinement_db_list)
+
 #        data_source(self.data_source_file).update_data_source_from_coot()
 
     def RefreshData(self):
@@ -407,7 +410,7 @@ class GUI(object):
 
 
     def REFINE(self,widget):
-        self.Refine.RunRefmac(self.Serial,self.RefmacParams)
+        self.Refine.RunRefmac(self.Serial,self.RefmacParams,self.external_software)
     
     def RefinementParams(self,widget):
         print '\n==> cootSP: changing refinement parameters'
