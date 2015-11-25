@@ -100,6 +100,8 @@ class read_intial_refinement_results(QtCore.QThread):
         progress=0
 
         db=XChemDB.data_source(self.data_source)
+        db.XChemDB.create_missing_columns()
+
         initial_model_list=[]
 
         for sample_dir in sorted(glob.glob(self.initial_model_directory+'/*')):

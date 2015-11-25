@@ -100,30 +100,7 @@ class data_source:
             ['AssayIC50',                            'AssayIC50']
         ]
 
-
-    def return_column_list(self):
-        return self.column_list
-
-
-    def create_empty_data_source_file(self):
-
-        if self.data_source_type=='csv':
-            if not os.path.isfile(self.data_source_file):
-                csv_header=''
-                for column in self.column_list:
-                    csv_header+=str(column[0])+','
-                csv_header+='\n'
-                f=open(self.data_source_file,'w')
-                f.write(csv_header)
-                f.close()
-
-
-
-    def load_samples_from_data_source(self):
-
-        # 1. check data source if all columns exist
-        # 2. append missing columns
-
+    def create_missing_columns(self):
         existing_columns=[]
 
         if self.data_source_type=='sqlite':
@@ -157,6 +134,32 @@ class data_source:
             f=open(self.data_source_file,'w')
             f.write(csv_content)
             f.close()
+
+
+
+    def return_column_list(self):
+        return self.column_list
+
+
+    def create_empty_data_source_file(self):
+
+        if self.data_source_type=='csv':
+            if not os.path.isfile(self.data_source_file):
+                csv_header=''
+                for column in self.column_list:
+                    csv_header+=str(column[0])+','
+                csv_header+='\n'
+                f=open(self.data_source_file,'w')
+                f.write(csv_header)
+                f.close()
+
+
+
+    def load_samples_from_data_source(self):
+
+        # 1. check data source if all columns exist
+        # 2. append missing columns
+
 
     # from now on we read all of them and decide in the main GUI which ones to display
 #        columns_of_interest=[   'CrystalName',
