@@ -165,17 +165,17 @@ class read_intial_refinement_results(QtCore.QThread):
                 mtz_free=os.path.realpath(os.path.join(self.initial_model_directory,sample,sample+'free.mtz'))
 
             # update data source
-            refinement_db_dict={
-                        'RefinementRcryst':         Rcryst,
-                        'RefinementRfree':          Rfree,
-                        'RefinementRmsdBonds':      'n/a',
-                        'RefinementRmsdAngles':     'n/a',
-                        'RefinementOutcome':        outcome,
-                        'RefinementMTZfree':        mtz_free,
-                        'RefinementPDB_latest':     pdb_latest,
-                        'RefinementMTZ_latest':     mtz_latest          }
+            refinement_db_list=[
+                        ['RefinementRcryst',         Rcryst],
+                        ['RefinementRfree',          Rfree],
+                        ['RefinementRmsdBonds',      'n/a'],
+                        ['RefinementRmsdAngles',     'n/a'],
+                        ['RefinementOutcome',        outcome],
+                        ['RefinementMTZfree',        mtz_free],
+                        ['RefinementPDB_latest',     pdb_latest],
+                        ['RefinementMTZ_latest',     mtz_latest]          ]
 
-            db.update_table(sample,refinement_db_dict)
+            db.update_table(sample,refinement_db_list)
 
             initial_model_list.append( [ sample,
                                         run_dimple,
