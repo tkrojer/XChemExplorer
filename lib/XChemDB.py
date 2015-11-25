@@ -374,6 +374,10 @@ class data_source:
                         print csv_list
                         print db_list
                         for n,item in enumerate(column_list):
+                            print item
+                            print n
+                            print csv_list[item]
+                            print db_list[n]
                             csv_list[item]=db_list[n][1]
                         csv_out+=str(csv_list).translate(None,"[']")+'\n'
                     else:
