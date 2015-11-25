@@ -369,7 +369,7 @@ class data_source:
                         # this is just in case these fields are not yet filled out
                         # and the commas don't extend all the way
                         if len(line.split(',')) < max(column_list):
-                            line+=(','*int(max(column_list)-len(x.split(','))))
+                            line+=(','*int(max(column_list)-len(line.split(','))))
                         csv_list=line.split(',')
                         for n,item in enumerate(column_list):
                             csv_list[item]=db_list[n][1]

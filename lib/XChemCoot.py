@@ -12,7 +12,7 @@ sys.path.append(os.getenv('CCP4')+'/lib/python2.7/site-packages')
 import XChemDB
 import XChemRefine
 
-import SPutils
+import XChemUtils
 #import SPmodel
 #import SPrefine
 #import SPdatabase
@@ -343,7 +343,7 @@ class GUI(object):
         self.Refine=XChemRefine.Refine(self.project_directory,self.xtalID,self.compoundID)
         self.Serial=self.Refine.GetSerial()
 
-        self.QualityIndicators=SPutils.ParseFiles(self.project_directory,self.xtalID).UpdateQualityIndicators()
+        self.QualityIndicators=XChemUtils.ParseFiles(self.project_directory,self.xtalID).UpdateQualityIndicators()
         PDBin='refine.pdb'
         # if the structure was previously refined, try to read the parameters
         if self.Serial > 1: self.RefmacParams=self.Refine.ParamsFromPreviousCycle(self.Serial-1)

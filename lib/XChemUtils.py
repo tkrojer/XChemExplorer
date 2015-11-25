@@ -46,10 +46,11 @@ class process:
                     '   END\n'
                     'EOF\n'
                     '\n'
-                    'freerflag hklin cad.mtz hklout %s.free.mtz << EOF > freerflag.log\n' %self.xtalID +
-                    '   COMPLETE FREE=FreeR_flag\n'
-                    '   END\n'
-                    'EOF\n'
+                    '#freerflag hklin cad.mtz hklout %s.free.mtz << EOF > freerflag.log\n' %self.xtalID +
+                    '#   COMPLETE FREE=FreeR_flag\n'
+                    '#   END\n'
+                    '#EOF\n'
+                    'uniqueify -f FreeR_flag cad.mtz %s.free.mtz\n' %self.xtalID'
                     )
             else:
                 Cmds = (
@@ -654,5 +655,210 @@ class external_software:
         return self.available_programs
 
 
+class ParseFiles:
+
+    def __init__(self,DataPath,xtalID):
+        # probably need to read in compoundID, because for custom projects, need to take newest pdb file
+        # that has not same root as compoundID
+        self.DataPath = DataPath
+        self.xtalID = xtalID
+
+        if '<samplename>' in DataPath:
+            self.newestPDB = max(glob.iglob(self.DataPath.replace('<samplename>',xtalID)+'/*.pdb'), key=os.path.getctime)
+        else:
+            self.newestPDB = self.DataPath+'/'+self.xtalID+'/refine.pdb'
+
+    def UpdateQualityIndicators(self):
+
+        QualityIndicators = {  'R':                            '-',
+                                    'RRfree':                       '-',
+                                    'RRfreeColor':                  'gray',
+                                    'Resolution':                   'n/a',
+                                    'ResolutionColor':              'gray',
+                                    'MolprobityScore':              'n/a',
+                                    'MolprobityScoreColor':         'gray',
+                                    'RamachandranOutliers':         'n/a',
+                                    'RamachandranOutliersColor':    'gray',
+                                    'RamachandranFavored':          'n/a',
+                                    'RamachandranFavoredColor':     'gray',
+                                    'LigandCCcolor':                'gray',
+                                    'LigandCC':                     'n/a'   }
+
+        # R, Rfree, Resolution
+        found = 0
+        if os.path.isfile(self.newestPDB):
+            for line in open(self.newestPDB):
+                if line.startswith('REMARK   3   R VALUE     (WORKING + TEST SET) :'):
+                    QualityIndicators['R'] = line.split()[9]
+                if line.startswith('REMARK   3   FREE R VALUE                     :'):
+                    QualityIndicators['RRfree'] = line.split()[6]
+                    if float(line.split()[6]) < 0.3:                             QualityIndicators['RRfreeColor'] = 'green'
+                    if float(line.split()[6]) >= 0.3 and float(line.split()[6]): QualityIndicators['RRfreeColor'] = 'orange'
+                    if float(line.split()[6]) >= 0.4:                            QualityIndicators['RRfreeColor'] = 'red'
+                if line.startswith('REMARK   3   RESOLUTION RANGE HIGH (ANGSTROMS) :'):
+                    QualityIndicators['Resolution'] = line.split()[7]
+                    if float(line.split()[7]) < 2.4:                                   QualityIndicators['ResolutionColor'] = 'green'
+                    if float(line.split()[7]) >= 2.4 and float(line.split()[7]) < 2.8: QualityIndicators['ResolutionColor'] = 'orange'
+                    if float(line.split()[7]) >= 2.8:                                  QualityIndicators['ResolutionColor'] = 'red'
+
+        # Molprobity
+        if os.path.isfile(self.DataPath+'/'+self.xtalID+'/validation_summary.txt'):
+            for line in open(self.DataPath+'/'+self.xtalID+'/validation_summary.txt'):
+                if line.startswith('  Molprobity score      ='):
+                    QualityIndicators['MolprobityScore'] = line.split()[3]
+                    if float(line.split()[3]) < 2:                                 QualityIndicators['MolprobityScoreColor'] = 'green'
+                    if float(line.split()[3]) >= 2 and float(line.split()[3]) < 3: QualityIndicators['MolprobityScoreColor'] = 'orange'
+                    if float(line.split()[3]) >= 3:                                QualityIndicators['MolprobityScoreColor'] = 'red'
+                if line.startswith('  Ramachandran outliers ='):
+                    QualityIndicators['RamachandranOutliers'] = line.split()[3]
+                    if float(line.split()[3]) < 0.3:                                 QualityIndicators['RamachandranOutliersColor'] = 'green'
+                    if float(line.split()[3]) >= 0.3 and float(line.split()[3]) < 1: QualityIndicators['RamachandranOutliersColor'] = 'orange'
+                    if float(line.split()[3]) >= 1:                                  QualityIndicators['RamachandranOutliersColor'] = 'red'
+                if line.startswith('               favored  ='):
+                    QualityIndicators['RamachandranFavored'] = line.split()[2]
+                    if float(line.split()[2]) < 90:                                  QualityIndicators['RamachandranFavoredColor'] = 'red'
+                    if float(line.split()[2]) >= 90 and float(line.split()[2]) < 98: QualityIndicators['RamachandranFavoredColor'] = 'orange'
+                    if float(line.split()[2]) >= 98:                                 QualityIndicators['RamachandranFavoredColor'] = 'green'
+
+        # LigandCC
+        if os.path.isfile(self.DataPath+'/'+self.xtalID+'/validate_ligands.txt'):
+            for line in open(self.DataPath+'/'+self.xtalID+'/validate_ligands.txt'):
+                if line.startswith('|  LIG'):
+                    QualityIndicators['LigandCC'] = line.split()[6]
+                    if float(line.split()[6]) < 0.8:                                   QualityIndicators['LigandCCcolor'] = 'red'
+                    if float(line.split()[6]) >= 0.8 and float(line.split()[6]) < 0.9: QualityIndicators['LigandCCcolor'] = 'orange'
+                    if float(line.split()[6]) >= 0.9:                                  QualityIndicators['LigandCCcolor'] = 'green'
+
+        return QualityIndicators
+
+class pdbtools(object):
+
+    def __init__(self,pdb):
+        self.pdb = pdb
+        self.AminoAcids = ['ALA','ARG','ASN','ASP','CYS','GLU','GLN','GLY','HIS',
+                           'ILE','LEU','LYS','MET','PHE','PRO','SER','THR','TRP','TYR','VAL']
+        self.Solvents = ['DMS','EDO','GOL','HOH']
+        self.Ions = ['NA','MG','CL','K','SO4','PO4','CA']
+        self.AAdict = {'ALA':'A','ARG':'R','ASN':'N','ASP':'D','CYS':'C','GLU':'E','GLN':'Q',
+                       'GLY':'G','HIS':'H','ILE':'I','LEU':'L','LYS':'K','MET':'M','PHE':'F',
+                       'PRO':'P','SER':'S','THR':'T','TRP':'W','TYR':'Y','VAL':'V'}
+
+
+    def GetSequence(self):
+        chain = []
+        Sequence=''
+        # need to count residue numbers in case of alternative conformations
+        ResiNum=[]
+        for line in open(self.pdb):
+            if line.startswith('ATOM') and line[17:20] in self.AminoAcids:
+                if line[21:22] not in chain:
+                    chain.append(line[21:22])
+                    Sequence=Sequence+'\n>chain%s.\n' %line[21:22]
+                    ResiNum=[]
+                if line[13:15]=='CA' and line[22:27] not in ResiNum:
+                    Sequence=Sequence+self.AAdict[line[17:20]]
+                    ResiNum.append(line[22:27])
+        return Sequence
+
+
+    def GetProteinChains(self):
+        chain = []
+        for line in open(self.pdb):
+            if line.startswith('ATOM'):
+                if line[17:20] in self.AminoAcids:
+                    if line[21:22] not in chain: chain.append(line[21:22])
+        return chain
+
+
+    def GetSymm(self):
+        unitcell = []
+        a=''
+        b=''
+        c=''
+        alpha=''
+        beta=''
+        gamma=''
+        spg=''
+        for line in open(self.pdb):
+            if line.startswith('CRYST1'):
+                a=line.split()[1]
+                b=line.split()[2]
+                c=line.split()[3]
+                alpha=line.split()[4]
+                beta=line.split()[5]
+                gamma=line.split()[6]
+                spg=line[55:len(line)-1]
+        return [a,b,c,alpha,beta,gamma,spg]
+
+
+    def MatthewsCoefficient(self,sequence):
+        chain=self.GetProteinChains()
+        symm=self.GetSymm()
+        nres=0
+        for char in sequence:
+            if char != ' ': nres+=1
+
+        cmd = (
+            '#!/bin/csh -f\n'
+            'matthews_coef << eof\n'
+            ' cell %s\n' %(symm[0]+' '+symm[1]+' '+symm[2]+' '+symm[3]+' '+symm[4]+' '+symm[5])+
+            ' symm %s\n' %symm[6].replace(' ','')+
+            ' nres %s\n' %nres+
+            ' auto\n'
+            ' end\n'
+            'eof\n'
+            )
+        Log = subprocess.check_output(cmd, shell=True)
+        MatthewsCoeff='n/a'
+        Solvent='n/a'
+        found=0
+        for line in Log.split(os.linesep):
+            if found:
+                if int(line.split()[0]) == len(chain):
+                    MatthewsCoeff=line.split()[1]
+                    Solvent=line.split()[2]
+                    break
+            if line.startswith('_______________'):
+                found=1
+
+        return [MatthewsCoeff,Solvent]
+
+
+    def find_ligands(self):
+        Ligands = []
+        # need to count residue numbers in case of alternative conformations
+        ResiNum=[]
+        for line in open(self.pdb):
+            if (line.startswith('ATOM') or line.startswith('HETATM')) \
+                    and line[17:20].replace(' ','') not in self.AminoAcids+self.Solvents+self.Ions:
+                if [line[17:20],line[21:22],line[23:26]] not in Ligands:
+                    Ligands.append([line[17:20],line[21:22],line[23:26]])
+        return Ligands
+
+    def save_ligands_to_pdb(self):
+        Ligands=self.find_ligands()
+        if not Ligands == []:
+            for n,item in enumerate(Ligands):
+                pdb=''
+                for line in open(self.pdb):
+                    if (line.startswith('ATOM') or line.startswith('HETATM')) and line[17:20]==item[0] and line[21:22]==item[1] and line[23:26]==item[2]:
+                        pdb=pdb+line
+                f=open('ligand_%s.pdb' %n,'w')
+                f.write(pdb)
+                f.close()
+        return Ligands
+
+    def get_xyz_coordinated_of_residue(self,chain,number):
+        X=0.0
+        Y=0.0
+        Z=0.0
+        # pdb definition see: http://www.wwpdb.org/documentation/file-format-content/format33/sect9.html#ATOM
+        for line in open(self.pdb):
+            if (line.startswith('ATOM') or line.startswith('HETATM')) and line[21:22]==chain and line[22:26].replace(' ','')==str(number):
+                X=float(line[30:38])
+                Y=float(line[38:46])
+                Z=float(line[46:54])
+                break
+        return X,Y,Z
 
 
