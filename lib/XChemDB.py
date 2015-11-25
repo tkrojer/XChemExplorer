@@ -371,6 +371,8 @@ class data_source:
                         if len(line.split(',')) < max(column_list):
                             line+=(','*int(max(column_list)-len(line.split(','))))
                         csv_list=line.split(',')
+                        print csv_list
+                        print db_list
                         for n,item in enumerate(column_list):
                             csv_list[item]=db_list[n][1]
                         csv_out+=str(csv_list).translate(None,"[']")+'\n'
