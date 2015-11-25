@@ -99,8 +99,8 @@ class read_intial_refinement_results(QtCore.QThread):
         progress_step=100/float(len(glob.glob(self.initial_model_directory+'/*')))
         progress=0
 
-        db=XChemDB.data_source(self.data_source)
-        db.create_missing_columns()
+#        db=XChemDB.data_source(self.data_source)
+#        db.create_missing_columns()
 
         initial_model_list=[]
 
@@ -177,7 +177,7 @@ class read_intial_refinement_results(QtCore.QThread):
                         ['RefinementPDB_latest',     pdb_latest],
                         ['RefinementMTZ_latest',     mtz_latest]          ]
 
-            db.update_table(sample,refinement_db_list)
+#            db.update_table(sample,refinement_db_list)
 
             initial_model_list.append( [ sample,
                                         run_dimple,

@@ -121,19 +121,56 @@ class data_source:
                     for item in line.split(','):
                         existing_columns.append(item.replace('\r','').replace('\n',''))
                 break
-            new_columns=''
+
+            columns_to_add=[]
             for column in self.column_list:
                 if column[0] not in existing_columns:
-                    new_columns+=column[0]+','
-            csv_content=''
-            for n,line in enumerate(open(self.data_source_file)):
-                if n==0:
-                    csv_content+=line.replace('\r','').replace('\n','')+','+new_columns+'\n'
-                else:
-                    csv_content+=line
-            f=open(self.data_source_file,'w')
-            f.write(csv_content)
-            f.close()
+                    columns_to_add.append(column[0])
+
+
+#            new_columns=''
+#            for column in self.column_list:
+#                if column[0] not in existing_columns:
+#                    new_columns+=column[0]+','
+#            csv_content=''
+#            for n,line in enumerate(open(self.data_source_file)):
+#                if n==0:
+#                    csv_content+=line.replace('\r','').replace('\n','')+','+new_columns+'\n'
+#                else:
+#                    csv_content+=line
+
+            # read header line and convert to list
+#            for n,line in enumerate(open(self.data_source_file)):
+#                if n==0:
+#                 header_list=line.split(',')
+#
+#            csv_header=''
+#            for n,item in enumerate(header_list):
+#                if item not in columns_to_add:
+#                    csv_content+=item.replace('\r','').replace('\n','')+','
+#
+#
+#
+#            for column in self.column_list:
+#                if column[0] not in existing_columns:
+#                    for n,line in enumerate(open(self.data_source_file)):
+#                        if n==0:
+#                            for item in line.split(','):
+#                                i
+#
+#                    new_columns+=column[0]+','
+#            csv_content=''
+#            for n,line in enumerate(open(self.data_source_file)):
+#                if n==0:
+#                    csv_content+=line.replace('\r','').replace('\n','')+','+new_columns+'\n'
+#                else:
+#                    csv_content+=line
+#
+#
+#
+#            f=open(self.data_source_file,'w')
+#            f.write(csv_content)
+#            f.close()
 
 
 
