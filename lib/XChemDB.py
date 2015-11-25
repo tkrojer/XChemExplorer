@@ -140,14 +140,18 @@ class data_source:
 #                    csv_content+=line
 
             # read header line and convert to list
-#            for n,line in enumerate(open(self.data_source_file)):
-#                if n==0:
-#                 header_list=line.split(',')
-#
-#            csv_header=''
-#            for n,item in enumerate(header_list):
-#                if item not in columns_to_add:
-#                    csv_content+=item.replace('\r','').replace('\n','')+','
+            for n,line in enumerate(open(self.data_source_file)):
+                if n==0:
+                 header_list=line.split(',')
+
+            for column in columns_to_add:
+                for item in header_list:
+
+
+            csv_header=''
+            for n,item in enumerate(header_list):
+                if item not in columns_to_add:
+                    csv_content+=item.replace('\r','').replace('\n','')+','
 #
 #
 #
