@@ -1078,7 +1078,7 @@ class XChemExplorer(QtGui.QApplication):
                             if item[0]==header:
                                 cell_text.setText(str(item[1]))
 
-                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+#                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.data_collection_summary_table.setItem(row, column, cell_text)
 
     def update_outcome_data_collection_summary_table(self,sample,outcome):
