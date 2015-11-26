@@ -397,7 +397,6 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                             puck_position=[item[1],item[2]]
                             break
 
-                print logfile_list
                 self.data_collection_dict[xtal][1]+=image_list
                 self.data_collection_dict[xtal][2]+=logfile_list
                 self.data_collection_dict[xtal][3]+=image_string_list
