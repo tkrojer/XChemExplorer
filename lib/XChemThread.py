@@ -306,7 +306,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 
             # dewar configuration:
             dewar_configuration=[]
-            for xml in glob.glob(os.path.join(visit_directory,'xml','exptTableParams-*.xml'):
+            for xml in glob.glob(os.path.join(visit_directory,'xml','exptTableParams-*.xml')):
                 prefix=''
                 container_reference=''
                 sample_location=''
