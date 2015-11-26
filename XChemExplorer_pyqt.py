@@ -1018,9 +1018,26 @@ class XChemExplorer(QtGui.QApplication):
             tmp=[]
             for runs in self.data_collection_dict[key][0]:
                 tmp.append(runs[1])
-            print max(tmp)
+            latest_run=''
+            for n,run in enumerate(self.data_collection_dict[key][0]):
+                if run[1]==max(tmp):
+                    latest_run=run[0]
+            if latest_run != '':
+                for image in self.data_collection_dict[key][3]:
+                    if latest_run in image[0]:
+                        print latest_run,image[0]
 
 
+
+#                    for column in sorted(self.data_collection_dict[key][3]):
+#                        if run[0] in column[0]:
+#                            pixmap = QtGui.QPixmap()
+#                            pixmap.loadFromData(base64.b64decode(column[1]))
+#                            label = QtGui.QLabel()
+#                            label.resize(320,200)
+#                            label.setPixmap(pixmap.scaled(label.size(), QtCore.Qt.KeepAspectRatio))
+#                            layout.addWidget(label, (run_number)*2+1, column_number)
+#                            column_number+=1
 
 
             for column,header in enumerate(self.data_collection_summary_column_name):
