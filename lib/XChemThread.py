@@ -320,6 +320,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                 dewar_configuration.append([prefix,container_reference,sample_location])
 
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
+                # this step is only relevant when several samples are reviewed in one session
                 if 'tmp' in collected_xtals or 'results' in collected_xtals:
                     print xtal
                     continue
@@ -395,6 +396,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                             puck_position=[item[1],item[2]]
                             break
 
+                print logfile_list
                 self.data_collection_dict[xtal][1]+=image_list
                 self.data_collection_dict[xtal][2]+=logfile_list
                 self.data_collection_dict[xtal][3]+=image_string_list
