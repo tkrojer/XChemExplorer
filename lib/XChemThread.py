@@ -318,7 +318,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                         container_reference=line[line.find('>')+1:line.rfind('<')]
                     if 'sample_location' in line:
                         sample_location=line[line.find('>')+1:line.rfind('<')]
-                    dewar_configuration.append([prefix,container_reference,sample_location])
+                dewar_configuration.append([prefix,container_reference,sample_location])
 
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
 #                print collected_xtals
