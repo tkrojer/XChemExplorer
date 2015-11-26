@@ -322,7 +322,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
 #                print collected_xtals
                 xtal=collected_xtals[collected_xtals.rfind('/')+1:]
-                print xtal
+                if xtal.startswith('m'):
+                    print xtal
                 self.data_collection_dict[xtal]=[[],[],[],[],[]]
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 1 of 3: searching visit '+ \
                                                                        str(search_cycle)+' of '+str(number_of_visits_to_search)+ \
