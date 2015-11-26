@@ -1056,9 +1056,11 @@ class XChemExplorer(QtGui.QApplication):
                     if len(images_to_show) > image_number:
                         pixmap = QtGui.QPixmap()
                         pixmap.loadFromData(base64.b64decode(images_to_show[image_number][1]))
-                        cell_text = QtGui.QLabel()
-                        cell_text.resize(80,50)
-                        cell_text.setPixmap(pixmap.scaled(cell_text.size(), QtCore.Qt.KeepAspectRatio))
+                        image = QtGui.QLabel()
+                        image.resize(80,50)
+                        image.setPixmap(pixmap.scaled(cell_text.size(), QtCore.Qt.KeepAspectRatio))
+                        self.data_collection_summary_table.setCellWidget(row, column, image)
+                        continue
                     else:
                         cell_text.setText('')
                     image_number+=1
@@ -1078,7 +1080,7 @@ class XChemExplorer(QtGui.QApplication):
                             if item[0]==header:
                                 cell_text.setText(str(item[1]))
 
-#                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.data_collection_summary_table.setItem(row, column, cell_text)
 
     def update_outcome_data_collection_summary_table(self,sample,outcome):
