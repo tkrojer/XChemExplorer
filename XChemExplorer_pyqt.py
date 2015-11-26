@@ -1020,13 +1020,12 @@ class XChemExplorer(QtGui.QApplication):
                 if header=='Puck':
                     puck='n/a'
                     if len(self.data_collection_dict[key])==5:
-                        puck=self.data_collection_dict[key][4][1]
+                        puck=self.data_collection_dict[key][4][0]
                     cell_text.setText(puck)
                 if header=='Position':
                     position='n/a'
                     if len(self.data_collection_dict[key])==5:
-                        print self.data_collection_dict[key][4]
-                        position=self.data_collection_dict[key][4][2]
+                        position=self.data_collection_dict[key][4][1]
                     cell_text.setText(position)
                 for item in self.data_collection_statistics_dict[key][selected_processing_result]:
                     if isinstance(item, list):
