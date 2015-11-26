@@ -1044,7 +1044,6 @@ class XChemExplorer(QtGui.QApplication):
 #                            label.setPixmap(pixmap.scaled(label.size(), QtCore.Qt.KeepAspectRatio))
 #                            layout.addWidget(label, (run_number)*2+1, column_number)
 #                            column_number+=1
-self.setCellWidget(row, col, image)
 
             image_number=0
             for column,header in enumerate(self.data_collection_summary_column_name):
