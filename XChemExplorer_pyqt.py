@@ -1083,6 +1083,9 @@ class XChemExplorer(QtGui.QApplication):
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.data_collection_summary_table.setItem(row, column, cell_text)
 
+        self.data_collection_summary_table.resizeColumnsToContents()
+
+
     def update_outcome_data_collection_summary_table(self,sample,outcome):
 #        print 'hallo update'
 #	    allRows=self.data_collection_summary_table.rowCount()
