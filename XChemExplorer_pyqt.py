@@ -116,7 +116,7 @@ class XChemExplorer(QtGui.QApplication):
         try:
             if args[0]=='-h' or args[0]=='--help':
                 print 'help'
-            if args[0].startswith('/dls'):
+            if args[0].startswith('/home'):
                 self.beamline_directory=args[0]
                 self.target='*'
         except IndexError:
