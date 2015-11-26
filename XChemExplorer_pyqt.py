@@ -1022,9 +1022,11 @@ class XChemExplorer(QtGui.QApplication):
             for n,run in enumerate(self.data_collection_dict[key][0]):
                 if run[1]==max(tmp):
                     latest_run=run[0]
+            images_to_show=[]
             if latest_run != '':
                 for image in self.data_collection_dict[key][3]:
-                    if latest_run in image[0]:
+                    if latest_run in image[0] and image[0].endswith('t.png'):
+                        images_to_show.append(image)
                         print latest_run,image[0]
 
 
