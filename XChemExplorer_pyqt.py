@@ -1017,7 +1017,7 @@ class XChemExplorer(QtGui.QApplication):
             # take all images from latest run and put in table
             tmp=[]
             for runs_in_collected_dict in self.data_collection_dict[key][0]:
-                tmp.append(run[1])
+                tmp.append(runs[1])
             print max(tmp)
 
 
