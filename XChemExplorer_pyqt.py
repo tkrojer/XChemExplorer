@@ -764,6 +764,7 @@ class XChemExplorer(QtGui.QApplication):
                 button.setAutoExclusive(True)
                 button.setCheckable(True)
                 button.setStyleSheet("font-size:5px;background-color: "+self.dataset_outcome[outcome])
+                button.setFixedHeight(10)
                 button.clicked.connect(self.dataset_outcome_button_change_color)
                 self.dataset_outcome_dict[key].append(button)
                 dataset_outcome_vbox.addWidget(button)
