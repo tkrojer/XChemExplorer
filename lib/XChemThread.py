@@ -330,6 +330,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                 logfile_list=[]
                 image_list=[]
                 image_string_list=[]
+                puck_position=[]
                 for runs in glob.glob(collected_xtals+'/*'):
                     run_is_in_pickle_file=False
                     run=runs[runs.rfind('/')+1:]
@@ -359,6 +360,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                             if run in stuff[0]:
                                 #self.data_collection_dict[xtal][3]+=stuff
                                 image_string_list.append(stuff)
+                        if len(self.data_collection_dict_collected[xtal])==5:
+                            puck_position=self.data_collection_dict_collected[xtal][4]
                         continue
                     timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
                     run_list.append([(run,timestamp,visit)])
@@ -385,7 +388,6 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                                 image_string=base64.b64encode(image_file.read())
                                 image_string_list.append((image[image.rfind('/')+1:],image_string))
 
-                    puck_position=[]
                     for item in dewar_configuration:
                         if item[0]==xtal:
                             puck_position=[item[1],item[2]]
