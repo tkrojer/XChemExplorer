@@ -763,7 +763,7 @@ class XChemExplorer(QtGui.QApplication):
                 button=QtGui.QPushButton(outcome)
                 button.setAutoExclusive(True)
                 button.setCheckable(True)
-                button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[outcome])
+                button.setStyleSheet("font-size:5px;background-color: "+self.dataset_outcome[outcome])
                 button.clicked.connect(self.dataset_outcome_button_change_color)
                 self.dataset_outcome_dict[key].append(button)
                 dataset_outcome_vbox.addWidget(button)
@@ -791,7 +791,8 @@ class XChemExplorer(QtGui.QApplication):
             font = QtGui.QFont()
 #            font.setFamily(_fromUtf8("Verdana"))
 #            font =  self.horizontalHeader().font()
-            font.setPointSize(8)
+#            font.setPointSize(8)
+            font.setPointSize(5)
 #            self.setFont(font)
             data_collection_table.setFont(font)
 
