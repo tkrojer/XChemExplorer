@@ -366,7 +366,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                         if len(self.data_collection_dict_collected[xtal])==5:
                             puck_position=self.data_collection_dict_collected[xtal][4]
                         continue
-                    print runs
+
                     timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
                     run_list.append([(run,timestamp,visit)])
                     self.data_collection_dict[xtal][0].append([run,timestamp,visit])
@@ -380,7 +380,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                         if 'multi-xia2' in dirs:
                             dirs.remove('multi-xia2')
                         for file_name in files:
-                            if file_name.endswith('aimless.log') and self.target in path:
+                            if file_name.endswith('aimless.log') and (self.target in path or self.target=='*'):
                                 logfile_list.append(path+'/'+file_name)
                                 continue
 
