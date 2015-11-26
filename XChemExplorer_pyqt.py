@@ -22,13 +22,6 @@ import XChemDialogs
 class XChemExplorer(QtGui.QApplication):
     def __init__(self,args):
         QtGui.QApplication.__init__(self,args)
-        try:
-            if args[0]=='-h' or args[0]=='--help':
-                print 'help'
-            if args[0].startswith('/usr/local/scripts/'):
-                print 'realtime stuff'
-        except IndexError:
-            pass
 
         # checking for external software packages
         self.external_software=external_software().check()
@@ -119,6 +112,16 @@ class XChemExplorer(QtGui.QApplication):
             self.queueing_system_available=True
         except OSError:
             self.queueing_system_available=False
+
+        try:
+            if args[0]=='-h' or args[0]=='--help':
+                print 'help'
+            if args[0].startswith('/dls'):
+                self.beamline_directory=args[0]
+                self.target='*'
+        except IndexError:
+            pass
+
 
         self.start_GUI()
         self.exec_()
@@ -1058,6 +1061,14 @@ class XChemExplorer(QtGui.QApplication):
         indexes=self.sender().selectionModel().selectedRows()
         for index in sorted(indexes):
             selected_processing_result=index.row()
+
+        # find latest run
+        # take all images from latest run and put in table
+        tmp=[]
+        for runs_in_collected_dict in self.data_collection_dict[key][0]:
+            tmp.append(run[1])
+        print max(tmp)
+
 
         rows_in_table=self.data_collection_summary_table.rowCount()
         for row in range(rows_in_table):
