@@ -132,7 +132,7 @@ class XChemExplorer(QtGui.QApplication):
 
         # GUI setup
         self.window=QtGui.QWidget()
-        self.window.setGeometry(0,0, 1400,1000)
+        self.window.setGeometry(0,0, 1800,1100)
         self.window.setWindowTitle("XChemExplorer")
         self.center_main_window()
         
@@ -235,6 +235,10 @@ class XChemExplorer(QtGui.QApplication):
                                                         'Puck',
                                                         'Position',
                                                         'Date',
+                                                        'image1',
+                                                        'image2',
+                                                        'image3',
+                                                        'image4',
                                                         'Program',
                                                         'Space\nGroup',
                                                         'Dataset\nOutcome',
@@ -1040,14 +1044,25 @@ class XChemExplorer(QtGui.QApplication):
 #                            label.setPixmap(pixmap.scaled(label.size(), QtCore.Qt.KeepAspectRatio))
 #                            layout.addWidget(label, (run_number)*2+1, column_number)
 #                            column_number+=1
+self.setCellWidget(row, col, image)
 
-
+            image_number=0
             for column,header in enumerate(self.data_collection_summary_column_name):
                 cell_text=QtGui.QTableWidgetItem()
                 if header=='Sample ID':
                     cell_text.setText(str(key))
                 if header=='Dataset\nOutcome':
                     cell_text.setText(outcome)
+                if header.startswith('image'):
+                    if len(images_to_show) > image_number:
+                        pixmap = QtGui.QPixmap()
+                        pixmap.loadFromData(base64.b64decode(images_to_show[image_number][1]))
+                        cell_text = QtGui.QLabel()
+                        cell_text.resize(80,50)
+                        cell_text.setPixmap(pixmap.scaled(cell_text.size(), QtCore.Qt.KeepAspectRatio))
+                    else:
+                        cell_text.setText('')
+                    image_number+=1
                 if header=='Puck':
                     puck='n/a'
                     if len(self.data_collection_dict[key])==5:
