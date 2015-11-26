@@ -1058,7 +1058,7 @@ class XChemExplorer(QtGui.QApplication):
                         pixmap.loadFromData(base64.b64decode(images_to_show[image_number][1]))
                         image = QtGui.QLabel()
                         image.resize(80,50)
-                        image.setPixmap(pixmap.scaled(cell_text.size(), QtCore.Qt.KeepAspectRatio))
+                        image.setPixmap(pixmap.scaled(image.size(), QtCore.Qt.KeepAspectRatio))
                         self.data_collection_summary_table.setCellWidget(row, column, image)
                         continue
                     else:
