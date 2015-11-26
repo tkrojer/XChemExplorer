@@ -1063,10 +1063,10 @@ class XChemExplorer(QtGui.QApplication):
                         image.resize(80,50)
                         image.setPixmap(pixmap.scaled(image.size(), QtCore.Qt.KeepAspectRatio))
                         self.data_collection_summary_table.setCellWidget(row, column, image)
+                        image_number+=1
                         continue
                     else:
                         cell_text.setText('')
-                    image_number+=1
                 if header=='Puck':
                     puck='n/a'
                     if len(self.data_collection_dict[key])==5:
