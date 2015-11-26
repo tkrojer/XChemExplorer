@@ -93,6 +93,16 @@ class XChemExplorer(QtGui.QApplication):
                                                                          self.data_source_file)).return_column_list()
 
         self.target_list=[]
+
+        try:
+            if args[0]=='-h' or args[0]=='--help':
+                print 'help'
+            if args[0].startswith('/'):
+                self.beamline_directory=args[0]
+                self.target_list.append('*')
+        except IndexError:
+            pass
+
         for dir in glob.glob(self.beamline_directory+'/*'):
             self.visit_list.append(os.path.realpath(dir))
             for target in glob.glob(os.path.realpath(dir)+'/processed/*'):
@@ -112,15 +122,6 @@ class XChemExplorer(QtGui.QApplication):
             self.queueing_system_available=True
         except OSError:
             self.queueing_system_available=False
-
-        try:
-            if args[0]=='-h' or args[0]=='--help':
-                print 'help'
-            if args[0].startswith('/home'):
-                self.beamline_directory=args[0]
-                self.target='*'
-        except IndexError:
-            pass
 
 
         self.start_GUI()
