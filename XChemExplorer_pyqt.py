@@ -1013,6 +1013,15 @@ class XChemExplorer(QtGui.QApplication):
                                     selected_processing_result=n
 
 #            print self.data_collection_statistics_dict[key][selected_processing_result]
+            # find latest run
+            # take all images from latest run and put in table
+            tmp=[]
+            for runs_in_collected_dict in self.data_collection_dict[key][0]:
+                tmp.append(run[1])
+            print max(tmp)
+
+
+
 
             for column,header in enumerate(self.data_collection_summary_column_name):
                 cell_text=QtGui.QTableWidgetItem()
@@ -1061,13 +1070,6 @@ class XChemExplorer(QtGui.QApplication):
         indexes=self.sender().selectionModel().selectedRows()
         for index in sorted(indexes):
             selected_processing_result=index.row()
-
-        # find latest run
-        # take all images from latest run and put in table
-        tmp=[]
-        for runs_in_collected_dict in self.data_collection_dict[key][0]:
-            tmp.append(run[1])
-        print max(tmp)
 
 
         rows_in_table=self.data_collection_summary_table.rowCount()
