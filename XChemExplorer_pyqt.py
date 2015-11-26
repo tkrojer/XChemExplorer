@@ -22,6 +22,13 @@ import XChemDialogs
 class XChemExplorer(QtGui.QApplication):
     def __init__(self,args):
         QtGui.QApplication.__init__(self,args)
+        try:
+            if args[0]=='-h' or args[0]=='--help':
+                print 'help'
+            if args[0].startswith('/usr/local/scripts/'):
+                print 'realtime stuff'
+        except IndexError:
+            pass
 
         # checking for external software packages
         self.external_software=external_software().check()
@@ -85,6 +92,7 @@ class XChemExplorer(QtGui.QApplication):
         self.target=''
         self.dataset_outcome_dict={}            # contains the dataset outcome buttons
         self.data_collection_table_dict={}      # contains the dataset table
+        self.data_collection_dict={}
         self.data_collection_statistics_dict={}
         self.initial_model_dimple_dict={}       # contains toggle button if dimple should be run
         self.reference_file_list=[]
@@ -221,6 +229,9 @@ class XChemExplorer(QtGui.QApplication):
         # DLS @ Summary
         data_collection_summary_list=[]
         self.data_collection_summary_column_name=[      'Sample ID',
+                                                        'Puck',
+                                                        'position',
+                                                        'Date',
                                                         'Program',
                                                         'Space\nGroup',
                                                         'Dataset\nOutcome',
@@ -651,7 +662,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def create_widgets_for_autoprocessing_results(self,dict_list):
-        data_collection_dict=dict_list[0]
+        self.data_collection_dict=dict_list[0]
         self.data_collection_statistics_dict=dict_list[1]
 
         # reset the two dictionaries which contain the buttons and tables for each data collection
@@ -698,7 +709,7 @@ class XChemExplorer(QtGui.QApplication):
 #        table.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.MinimumExpanding)
 #        table.resizeColumnsToContents()
 
-        table.setRowCount(len(data_collection_dict))
+        table.setRowCount(len(self.data_collection_dict))
         table.setColumnCount(3)
 
         for row,key in enumerate(sorted(self.data_collection_statistics_dict)):
@@ -711,7 +722,7 @@ class XChemExplorer(QtGui.QApplication):
             table.setItem(row, 0, sample_ID)
 
             # column 2: data collection date
-            data_collection_date_time=QtGui.QTableWidgetItem(data_collection_dict[key][0][0][1])
+            data_collection_date_time=QtGui.QTableWidgetItem(self.data_collection_dict[key][0][0][1])
             data_collection_date_time.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
             table.setItem(row, 1, data_collection_date_time)
 
@@ -733,16 +744,16 @@ class XChemExplorer(QtGui.QApplication):
 
             # crystal images
             layout = QtGui.QGridLayout()
-            for run_number,run in enumerate(data_collection_dict[key][0]):
+            for run_number,run in enumerate(self.data_collection_dict[key][0]):
                 #label = QtGui.QLabel(run[0]+' ('+run[1]+' @ '+run[2]+')')
                 #layout.addWidget(label,(run_number)*2,0)
-                if len(data_collection_dict[key][3]) != 0:
+                if len(self.data_collection_dict[key][3]) != 0:
                     #label = QtGui.QLabel(run[0]+' ('+run[1]+' @ '+run[2]+')')
                     label = QtGui.QLabel(str(run))
                     layout.addWidget(label,(run_number)*2,0)
                     label.setSizePolicy ( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
                     column_number=0
-                    for column in sorted(data_collection_dict[key][3]):
+                    for column in sorted(self.data_collection_dict[key][3]):
                         if run[0] in column[0]:
                             pixmap = QtGui.QPixmap()
                             pixmap.loadFromData(base64.b64decode(column[1]))
@@ -1006,6 +1017,12 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text.setText(str(key))
                 if header=='Dataset\nOutcome':
                     cell_text.setText(outcome)
+                if header=='Puck':
+                    if len(self.data_collection_dict[key])==5:
+                        print self.data_collection_dict[key][4]
+                    cell_text.setText('n/a')
+                if header=='Puck':
+                    cell_text.setText('n/a')
                 for item in self.data_collection_statistics_dict[key][selected_processing_result]:
                     if isinstance(item, list):
                         if len(item)==3:
@@ -1041,7 +1058,7 @@ class XChemExplorer(QtGui.QApplication):
         rows_in_table=self.data_collection_summary_table.rowCount()
         for row in range(rows_in_table):
             if self.data_collection_summary_table.item(row,0).text()==sample:
-                print self.data_collection_summary_table.item(row,0).text()
+#                print self.data_collection_summary_table.item(row,0).text()
                 for column,header in enumerate(self.data_collection_summary_column_name):
                     cell_text=QtGui.QTableWidgetItem()
                     if header=='Sample ID':
@@ -1089,5 +1106,5 @@ class XChemExplorer(QtGui.QApplication):
 
 
 if __name__ == "__main__":
-    app=XChemExplorer(sys.argv)
+    app=XChemExplorer(sys.argv[1:])
 

@@ -293,6 +293,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
         number_of_visits_to_search=len(self.visit_list)
         search_cycle=1
         for visit_directory in sorted(self.visit_list):
+
             if len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*')))==0:
                 continue
             progress_step=100/float(len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))))
@@ -303,10 +304,25 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             else:
                 visit=visit_directory.split('/')[5]
 
+            # dewar configuration:
+            dewar_configuration=[]
+            for xml in glob.glob(os.path.join(visit_directory,'xml','exptTableParams-*.xml'):
+                prefix=''
+                container_reference=''
+                sample_location=''
+                for line in open(xml):
+                    if 'prefix' in line:
+                        prefix=line[line.find('>')+1:line.rfind('<')]
+                    if 'container_reference' in line:
+                        container_reference=line[line.find('>')+1:line.rfind('<')]
+                    if 'sample_location' in line:
+                        sample_location=line[line.find('>')+1:line.rfind('<')]
+                    dewar_configuration.append([prefix,container_reference,sample_location])
+
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
-                print collected_xtals
+#                print collected_xtals
                 xtal=collected_xtals[collected_xtals.rfind('/')+1:]
-                self.data_collection_dict[xtal]=[[],[],[],[]]
+                self.data_collection_dict[xtal]=[[],[],[],[],[]]
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 1 of 3: searching visit '+ \
                                                                        str(search_cycle)+' of '+str(number_of_visits_to_search)+ \
                                                                        ' ('+visit+'/'+xtal+')')
@@ -369,10 +385,16 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                                 image_string=base64.b64encode(image_file.read())
                                 image_string_list.append((image[image.rfind('/')+1:],image_string))
 
+                    puck_position=[]
+                    for item in dewar_configuration:
+                        if item[0]==xtal:
+                            puck_position=[item[1],item[2]]
+                            break
 
                 self.data_collection_dict[xtal][1]+=image_list
                 self.data_collection_dict[xtal][2]+=logfile_list
                 self.data_collection_dict[xtal][3]+=image_string_list
+                self.data_collection_dict[xtal][4]=puck_position
                 progress += progress_step
                 self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
