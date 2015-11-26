@@ -731,6 +731,7 @@ class XChemExplorer(QtGui.QApplication):
             table.setItem(row, 0, sample_ID)
 
             # column 2: data collection date
+            print key
             data_collection_date_time=QtGui.QTableWidgetItem(self.data_collection_dict[key][0][0][1])
             data_collection_date_time.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
             table.setItem(row, 1, data_collection_date_time)
@@ -1085,8 +1086,8 @@ class XChemExplorer(QtGui.QApplication):
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.data_collection_summary_table.setItem(row, column, cell_text)
 
+        self.data_collection_summary_table.resizeRowsToContents()
         self.data_collection_summary_table.resizeColumnsToContents()
-
 
     def update_outcome_data_collection_summary_table(self,sample,outcome):
 #        print 'hallo update'
