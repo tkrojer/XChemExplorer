@@ -230,7 +230,7 @@ class XChemExplorer(QtGui.QApplication):
         data_collection_summary_list=[]
         self.data_collection_summary_column_name=[      'Sample ID',
                                                         'Puck',
-                                                        'position',
+                                                        'Position',
                                                         'Date',
                                                         'Program',
                                                         'Space\nGroup',
@@ -1018,11 +1018,15 @@ class XChemExplorer(QtGui.QApplication):
                 if header=='Dataset\nOutcome':
                     cell_text.setText(outcome)
                 if header=='Puck':
+                    puck='n/a'
                     if len(self.data_collection_dict[key])==5:
-                        print self.data_collection_dict[key][4]
-                    cell_text.setText('n/a')
-                if header=='Puck':
-                    cell_text.setText('n/a')
+                        puck=self.data_collection_dict[key][4][1]
+                    cell_text.setText(puck)
+                if header=='Position':
+                    position='n/a'
+                    if len(self.data_collection_dict[key])==5:
+                        puck=self.data_collection_dict[key][4][2]
+                    cell_text.setText(position)
                 for item in self.data_collection_statistics_dict[key][selected_processing_result]:
                     if isinstance(item, list):
                         if len(item)==3:
