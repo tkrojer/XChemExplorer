@@ -592,7 +592,8 @@ class external_software:
     def check(self):
 
         if 'dls' in os.getcwd():
-            os.system('module load all')
+            os.system('module load global/cluster')
+            os.system('module load openbabel')
 
         print 'Searching for external software:'
 
