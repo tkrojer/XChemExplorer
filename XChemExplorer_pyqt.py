@@ -731,7 +731,6 @@ class XChemExplorer(QtGui.QApplication):
             table.setItem(row, 0, sample_ID)
 
             # column 2: data collection date
-            print key
             data_collection_date_time=QtGui.QTableWidgetItem(self.data_collection_dict[key][0][0][1])
             data_collection_date_time.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
             table.setItem(row, 1, data_collection_date_time)
@@ -1034,10 +1033,6 @@ class XChemExplorer(QtGui.QApplication):
                 for image in self.data_collection_dict[key][3]:
                     if latest_run in image[0] and image[0].endswith('t.png'):
                         images_to_show.append(image)
-                        print latest_run,image[0]
-
-
-
 #                    for column in sorted(self.data_collection_dict[key][3]):
 #                        if run[0] in column[0]:
 #                            pixmap = QtGui.QPixmap()
@@ -1141,14 +1136,14 @@ class XChemExplorer(QtGui.QApplication):
         # reason being that the unique column ID for DB may not be nice to look at
         columns_to_show=[]
         for column in self.data_source_columns_to_display:
-            print column
+#            print column
             for n,all_column in enumerate(self.all_columns_in_data_source):
                 if column==all_column[1]:
                     columns_to_show.append(n)
                     break
 
         for x,row in enumerate(data):
-            print row
+#            print row
             y=0
             for item in columns_to_show:
                 cell_text=QtGui.QTableWidgetItem()
