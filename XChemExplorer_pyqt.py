@@ -9,7 +9,7 @@ import base64
 #import math
 import subprocess
 
-sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
+sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR')),'lib')
 #from XChemUtils import process
 from XChemUtils import parse
 #from XChemUtils import queue
@@ -18,6 +18,13 @@ from XChemUtils import external_software
 import XChemThread
 import XChemDB
 import XChemDialogs
+
+sys.path.append('/dls_sw/apps/albula/3.1/dectris/albula/3.1/python')
+try:
+    import dectris.albula
+except ImportError:
+    pass
+
 
 class XChemExplorer(QtGui.QApplication):
     def __init__(self,args):
@@ -236,17 +243,19 @@ class XChemExplorer(QtGui.QApplication):
                                                         'Puck',
                                                         'Position',
                                                         'Date',
-                                                        'image1',
-                                                        'image2',
-                                                        'image3',
-                                                        'image4',
+                                                        'img1',
+                                                        'img2',
+                                                        'img3',
+                                                        'img4',
                                                         'Program',
                                                         'Space\nGroup',
                                                         'Dataset\nOutcome',
                                                         'Resolution\nOverall',
                                                         'Rmerge\nInner Shell',
                                                         'Mn(I/sig(I))\nOuter Shell',
-                                                        'Completeness\nOverall'         ]
+                                                        'Completeness\nOverall',
+                                                        'Show Diffraction\nImage'
+                                                        ]
 
 
         data_collection_summary_list.append(['']*len(self.data_collection_summary_column_name))
@@ -639,6 +648,8 @@ class XChemExplorer(QtGui.QApplication):
                     self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
                     self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                     self.work_thread.start()
+            if self.sender().text().startswith('Show'):
+                print self.sender().text()
 
 
 
@@ -1050,7 +1061,7 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text.setText(str(key))
                 if header=='Dataset\nOutcome':
                     cell_text.setText(outcome)
-                if header.startswith('image'):
+                if header.startswith('img'):
                     if len(images_to_show) > image_number:
                         pixmap = QtGui.QPixmap()
                         pixmap.loadFromData(base64.b64decode(images_to_show[image_number][1]))
@@ -1072,6 +1083,10 @@ class XChemExplorer(QtGui.QApplication):
                     if len(self.data_collection_dict[key])==5:
                         position=self.data_collection_dict[key][4][1]
                     cell_text.setText(position)
+                if header.startswith('Show'):
+                    start_albula_button=QtGui.QPushButton("Show "+latest_run+'0001.cbf')
+                    start_albula_button.clicked.connect(self.button_clicked)
+                    self.data_collection_summary_table.setCellWidget(row,column,start_albula_button)
                 for item in self.data_collection_statistics_dict[key][selected_processing_result]:
                     if isinstance(item, list):
                         if len(item)==3:
