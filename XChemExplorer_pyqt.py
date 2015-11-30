@@ -20,11 +20,11 @@ import XChemDB
 import XChemDialogs
 
 sys.path.append('/dls_sw/apps/albula/3.1/dectris/albula/3.1/python')
-try:
-    print 'albula'
-    import dectris.albula
-except ImportError:
-    pass
+import dectris.albula
+#try:
+#    import dectris.albula
+#except ImportError:
+#    pass
 
 
 class XChemExplorer(QtGui.QApplication):
