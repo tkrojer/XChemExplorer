@@ -650,8 +650,11 @@ class XChemExplorer(QtGui.QApplication):
                     self.work_thread.start()
             if str(self.sender().text()).startswith('Show'):
                 print str(self.sender().text())
-                print
-                print os.path.join(self.beamline_directory,self.target)
+                diffraction_image=str(self.sender().text()).split()[1]
+                xtal=diffraction_image[:diffraction_image.find('_')]
+                print diffraction_image
+                print xtal
+                print os.path.join(self.beamline_directory,self.target,xtal,diffraction_image)
 
 
 
