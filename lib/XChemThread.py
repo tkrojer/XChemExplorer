@@ -384,10 +384,10 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 #                                logfile_list.append(path+'/'+file_name)
 #                                continue
                     for file_name in glob.glob(os.path.join(runs,'xia2','*','LogFiles','*')):
-                        if file_name.endswith('aimless.log') and (self.target in path or self.target=='*'):
+                        if file_name.endswith('aimless.log') and (self.target in file_name or self.target=='*'):
                             logfile_list.append(file_name)
                     for file_name in glob.glob(os.path.join(runs,'fast_dp','*')):
-                        if file_name.endswith('aimless.log') and (self.target in path or self.target=='*'):
+                        if file_name.endswith('aimless.log') and (self.target in file_name or self.target=='*'):
                             logfile_list.append(file_name)
 
 
