@@ -123,6 +123,8 @@ class XChemExplorer(QtGui.QApplication):
         self.coot_running=0
         self.progress_bar_start=0
         self.progress_bar_step=0
+        self.albula = None
+        self.show_diffraction_image = None
         # check if qstat is available
         try:
             subprocess.call(['qstat'])
@@ -650,11 +652,13 @@ class XChemExplorer(QtGui.QApplication):
                     self.work_thread.start()
             if str(self.sender().text()).startswith('Show'):
                 print str(self.sender().text())
-                diffraction_image=str(self.sender().text()).split()[1]
+                visit=str(self.sender().text()).split()[0]
+                diffraction_image=str(self.sender().text()).split()[2]
                 xtal=diffraction_image[:diffraction_image.find('_')]
                 print diffraction_image
                 print xtal
-                print os.path.join(self.beamline_directory,self.target,xtal,diffraction_image)
+                print visit
+                print os.path.join(self.beamline_directory,vitit,self.target,xtal,diffraction_image)
 
 
 
@@ -1041,9 +1045,11 @@ class XChemExplorer(QtGui.QApplication):
             for runs in self.data_collection_dict[key][0]:
                 tmp.append(runs[1])
             latest_run=''
+            visit=''
             for n,run in enumerate(self.data_collection_dict[key][0]):
                 if run[1]==max(tmp):
                     latest_run=run[0]
+                    visit=run[2]
             images_to_show=[]
             if latest_run != '':
                 for image in self.data_collection_dict[key][3]:
@@ -1089,7 +1095,7 @@ class XChemExplorer(QtGui.QApplication):
                         position=self.data_collection_dict[key][4][1]
                     cell_text.setText(position)
                 if header.startswith('Show'):
-                    start_albula_button=QtGui.QPushButton("Show "+latest_run+'0001.cbf')
+                    start_albula_button=QtGui.QPushButton(visit+" = "+latest_run+'0001.cbf')
                     start_albula_button.clicked.connect(self.button_clicked)
                     self.data_collection_summary_table.setCellWidget(row,column,start_albula_button)
                 for item in self.data_collection_statistics_dict[key][selected_processing_result]:
