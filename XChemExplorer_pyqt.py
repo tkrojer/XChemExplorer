@@ -648,8 +648,10 @@ class XChemExplorer(QtGui.QApplication):
                     self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
                     self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                     self.work_thread.start()
-            if self.sender().text().startswith('Show'):
-                print self.sender().text()
+            if str(self.sender().text()).startswith('Show'):
+                print str(self.sender().text())
+                print
+                print os.path.join(self.beamline_directory,self.target)
 
 
 
