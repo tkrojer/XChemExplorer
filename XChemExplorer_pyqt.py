@@ -652,8 +652,8 @@ class XChemExplorer(QtGui.QApplication):
                     self.work_thread.start()
             if str(self.sender().text()).startswith('Show'):
                 print str(self.sender().text())
-                visit=str(self.sender().text()).split()[0]
-                diffraction_image=str(self.sender().text()).split()[2]
+                visit=str(self.sender().text()).split()[1]
+                diffraction_image=str(self.sender().text()).split()[3]
                 xtal=diffraction_image[:diffraction_image.find('_')]
                 print diffraction_image
                 print xtal
@@ -1095,7 +1095,7 @@ class XChemExplorer(QtGui.QApplication):
                         position=self.data_collection_dict[key][4][1]
                     cell_text.setText(position)
                 if header.startswith('Show'):
-                    start_albula_button=QtGui.QPushButton(visit+" = "+latest_run+'0001.cbf')
+                    start_albula_button=QtGui.QPushButton('Show: '+visit+" @ "+latest_run+'0001.cbf')
                     start_albula_button.clicked.connect(self.button_clicked)
                     self.data_collection_summary_table.setCellWidget(row,column,start_albula_button)
                 for item in self.data_collection_statistics_dict[key][selected_processing_result]:
