@@ -9,7 +9,7 @@ import base64
 #import math
 import subprocess
 
-sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR')),'lib')
+sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 #from XChemUtils import process
 from XChemUtils import parse
 #from XChemUtils import queue
