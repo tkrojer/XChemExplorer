@@ -658,7 +658,7 @@ class XChemExplorer(QtGui.QApplication):
                 print diffraction_image
                 print xtal
                 print visit
-                print os.path.join(self.beamline_directory,vitit,self.target,xtal,diffraction_image)
+                print os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image)
 
 
 
