@@ -602,7 +602,7 @@ class external_software:
         FNULL = open(os.devnull, 'w')
 
         try:
-            subprocess.call(['qsub'], stdout=FNULL, stderr=subprocess.STDOUT)
+            subprocess.call(['qstat'], stdout=FNULL, stderr=subprocess.STDOUT)
             self.available_programs['qsub']=True
             status='found'
         except OSError:
