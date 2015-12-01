@@ -1,7 +1,7 @@
 import os, sys, glob
 
-sys.path.append('/dls_sw/apps/albula/3.1/dectris/albula/3.1/python')
-import dectris.albula
+#sys.path.append('/dls_sw/apps/albula/3.1/dectris/albula/3.1/python')
+#import dectris.albula
 #try:
 #    import dectris.albula
 #except ImportError:
@@ -694,12 +694,12 @@ class XChemExplorer(QtGui.QApplication):
                 print visit
                 print os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image)
 
-                try:
-                    self.show_diffraction_image.loadFile('')
-                except dectris.albula.viewer.DNoObject:
-                    self.albula = dectris.albula.openMainFrame()
-                    self.show_diffraction_image = self.albula.openSubFrame()
-                    self.show_diffraction_image.loadFile(os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image))
+ #               try:
+ #                   self.show_diffraction_image.loadFile('')
+ #               except dectris.albula.viewer.DNoObject:
+ #                   self.albula = dectris.albula.openMainFrame()
+ #                   self.show_diffraction_image = self.albula.openSubFrame()
+ #                   self.show_diffraction_image.loadFile(os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image))
 
 #                self.albula = dectris.albula.openMainFrame()
 #                self.show_diffraction_image = self.albula.openSubFrame()
