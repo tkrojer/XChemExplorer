@@ -370,7 +370,7 @@ class XChemExplorer(QtGui.QApplication):
         self.adjust_allowed_unit_cell_difference_label=QtGui.QLabel('Max. Allowed Unit Cell Difference (%):')
         settings_hbox_adjust_allowed_unit_cell_difference.addWidget(self.adjust_allowed_unit_cell_difference_label)
         self.adjust_allowed_unit_cell_difference = QtGui.QLineEdit()
-        self.adjust_allowed_unit_cell_difference.setText(self.allowed_unitcell_difference_percent)
+        self.adjust_allowed_unit_cell_difference.setText(str(self.allowed_unitcell_difference_percent))
         settings_hbox_adjust_allowed_unit_cell_difference.addWidget(self.adjust_allowed_unit_cell_difference)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_adjust_allowed_unit_cell_difference)
 
