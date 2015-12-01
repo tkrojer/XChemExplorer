@@ -158,8 +158,8 @@ class read_intial_refinement_results(QtCore.QThread):
             if Rcryst=='pending':
                 run_dimple=True
                 outcome='n/a'
-                
-            if found_suitable_reference=True
+
+            if found_suitable_reference==True:
                 run_dimple=True
             else:
                 run_dimple=False
