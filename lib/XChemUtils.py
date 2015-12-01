@@ -66,7 +66,7 @@ class process:
                     '#   COMPLETE FREE=FreeR_flag\n'
                     '#   END\n'
                     '#EOF\n'
-                    'uniqueify -f FreeR_flag %s.reind.mtz %s.free.mtz\n' %(self.xtalID,self.xtalID)
+                    'uniqueify %s.reind.mtz %s.free.mtz\n' %(self.xtalID,self.xtalID)
                     )
             os.chdir('%s/%s' %(self.project_directory,self.xtalID))
             os.system(Cmds)
