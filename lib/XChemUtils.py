@@ -27,7 +27,7 @@ class process:
 
 
     def get_Rfree(self):
-        if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.mtz_free):
+        if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.mtz_free)):
             if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.reference+'.mtz')):
                 Cmds = (
                     '#!'+os.getenv('SHELL')+'\n'
