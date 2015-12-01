@@ -494,42 +494,53 @@ class XChemExplorer(QtGui.QApplication):
         if self.sender().text()=='Select Project Directory':
             self.project_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.project_directory_label.setText(self.project_directory)
+            self.settings['project_directory']=self.project_directory
         if self.sender().text()=='Select Initial Model Directory':
             self.initial_model_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.initial_model_directory_label.setText(self.initial_model_directory)
+            self.settings['initial_model_directory']=self.initial_model_directory
         if self.sender().text()=='Select Refine Model Directory':
             self.refine_model_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.refine_model_directory_label.setText(self.refine_model_directory)
+            self.settings['refine_model_directory']=self.refine_model_directory
         if self.sender().text()=='Select Reference Structure Directory':
             self.reference_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.reference_directory_label.setText(self.reference_directory)
+            self.settings['reference_directory']=self.reference_directory
         if self.sender().text()=='Select Data Source Directory':
             self.database_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.database_directory_label.setText(self.database_directory)
+            self.settings['database_directory']=self.database_directory
         if self.sender().text()=='Select Data Source File':
             filepath=str(QtGui.QFileDialog.getOpenFileName(self.window,'Select File', self.database_directory))
             self.data_source_file =   filepath.split('/')[-1]
             self.database_directory = filepath[:filepath.rfind('/')]
             self.data_source_file_label.setText(self.data_source_file)
             self.database_directory_label.setText(str(self.database_directory))
+            self.settings['database_directory']=self.database_directory
+            self.settings['data_source']=self.data_source_file
         if self.sender().text()=='Select Beamline Directory':
             self.beamline_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.beamline_directory_label.setText(self.beamline_directory)
+            self.settings['beamline_directory']=self.beamline_directory
         if self.sender().text()=='Select CCP4_SCR Directory':
             self.ccp4_scratch_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.ccp4_scratch_directory_label.setText(self.ccp4_scratch_directory)
-        self.settings =     {'current_directory':       self.current_directory,
-                             'project_directory':       self.project_directory,
-                             'beamline_directory':      self.beamline_directory,
-                             'initial_model_directory': self.initial_model_directory,
-                             'refine_model_directory':  self.refine_model_directory,
-                             'reference_directory':     self.reference_directory,
-                             'database_directory':      self.database_directory,
-                             'data_source':             self.data_source_file,
-                             'ccp4_scratch':            self.ccp4_scratch_directory }
+            self.settings['ccp4_scratch']=self.ccp4_scratch_directory
+#        self.settings =     {'current_directory':       self.current_directory,
+#                             'project_directory':       self.project_directory,
+#                             'beamline_directory':      self.beamline_directory,
+#                             'initial_model_directory': self.initial_model_directory,
+#                             'refine_model_directory':  self.refine_model_directory,
+#                             'reference_directory':     self.reference_directory,
+#                             'database_directory':      self.database_directory,
+#                             'data_source':             self.data_source_file,
+#                             'ccp4_scratch':            self.ccp4_scratch_directory }
 
     def change_allowed_unitcell_difference_percent(self,text):
-        print text
+        self.allowed_unitcell_difference_percent=int(text)
+        self.settings['unitcell_difference']=self.adjust_allowed_unit_cell_difference
+
 
     def button_clicked(self):
 #        if self.target != '' and self.explorer_active==0:
