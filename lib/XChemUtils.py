@@ -62,11 +62,11 @@ class process:
                     ' tolerance 5\n'
                     'EOF\n'
                     '\n'
-                    '#freerflag hklin %s.reind.mtz hklout %s.free.mtz << EOF > freerflag.log\n' %(self.xtalID,self.xtalID) +
-                    '#   COMPLETE FREE=FreeR_flag\n'
-                    '#   END\n'
-                    '#EOF\n'
-                    'uniqueify %s.reind.mtz %s.free.mtz\n' %(self.xtalID,self.xtalID)
+                    'freerflag hklin %s.reind.mtz hklout %s.temp.mtz << EOF > freerflag.log\n' %(self.xtalID,self.xtalID) +
+                    '   COMPLETE FREE=FreeR_flag\n'
+                    '   END\n'
+                    'EOF\n'
+                    'uniqueify %s.temp.mtz %s.free.mtz\n' %(self.xtalID,self.xtalID)
                     )
             os.chdir('%s/%s' %(self.project_directory,self.xtalID))
             os.system(Cmds)
