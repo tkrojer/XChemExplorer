@@ -139,6 +139,8 @@ class read_intial_refinement_results(QtCore.QThread):
                         unitcell_reference=reference_file[2]
                         reference=reference_file[0]
                         break
+            else:
+                continue    # do not add to table if no mtz file is present
             if os.path.isdir(os.path.join(self.initial_model_directory,sample,'Dimple')):
                     if os.path.isfile(os.path.join(self.initial_model_directory,sample,'Dimple','dimple','final.pdb')):
                         pdb=parse().PDBheader(os.path.join(self.initial_model_directory,sample,'Dimple','dimple','final.pdb'))
