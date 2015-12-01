@@ -367,12 +367,13 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_initial_model_directory)
 
         settings_hbox_adjust_allowed_unit_cell_difference=QtGui.QHBoxLayout()
-        self.adjust_allowed_unit_cell_difference_label=QtGui.QLabel('Max. Allowed Unit Cell Difference (%):')
+        self.adjust_allowed_unit_cell_difference_label=QtGui.QLabel('Max. Allowed Unit Cell Difference between Reference and Target (%):')
         settings_hbox_adjust_allowed_unit_cell_difference.addWidget(self.adjust_allowed_unit_cell_difference_label)
         settings_hbox_adjust_allowed_unit_cell_difference.addStretch(1)
         self.adjust_allowed_unit_cell_difference = QtGui.QLineEdit()
         self.adjust_allowed_unit_cell_difference.setFixedWidth(200)
         self.adjust_allowed_unit_cell_difference.setText(str(self.allowed_unitcell_difference_percent))
+        self.adjust_allowed_unit_cell_difference.textChanged[str].connect(self.change_allowed_unitcell_difference_percent)
         settings_hbox_adjust_allowed_unit_cell_difference.addWidget(self.adjust_allowed_unit_cell_difference)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_adjust_allowed_unit_cell_difference)
 
@@ -527,6 +528,8 @@ class XChemExplorer(QtGui.QApplication):
                              'data_source':             self.data_source_file,
                              'ccp4_scratch':            self.ccp4_scratch_directory }
 
+    def change_allowed_unitcell_difference_percent(self,text):
+        print text
 
     def button_clicked(self):
 #        if self.target != '' and self.explorer_active==0:
