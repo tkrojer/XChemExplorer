@@ -74,7 +74,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
         # general settings
-        self.allowed_unitcell_difference_percent=12
+        self.allowed_unitcell_difference_percent=5
 
         self.settings =     {'current_directory':       self.current_directory,
                              'project_directory':       self.project_directory,
@@ -369,7 +369,9 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_adjust_allowed_unit_cell_difference=QtGui.QHBoxLayout()
         self.adjust_allowed_unit_cell_difference_label=QtGui.QLabel('Max. Allowed Unit Cell Difference (%):')
         settings_hbox_adjust_allowed_unit_cell_difference.addWidget(self.adjust_allowed_unit_cell_difference_label)
+        settings_hbox_adjust_allowed_unit_cell_difference.addStretch(1)
         self.adjust_allowed_unit_cell_difference = QtGui.QLineEdit()
+        self.adjust_allowed_unit_cell_difference.setFixedWidth(200)
         self.adjust_allowed_unit_cell_difference.setText(str(self.allowed_unitcell_difference_percent))
         settings_hbox_adjust_allowed_unit_cell_difference.addWidget(self.adjust_allowed_unit_cell_difference)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_adjust_allowed_unit_cell_difference)
