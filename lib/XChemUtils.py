@@ -27,8 +27,8 @@ class process:
 
 
     def get_Rfree(self):
-        if not os.path.isfile(self.project_directory+'/'+self.xtalID+'/'+self.mtz_free):
-            if os.path.isfile(os.path.join(self.reference+'.mtz')):
+        if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.mtz_free):
+            if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.reference+'.mtz')):
                 Cmds = (
                     '#!'+os.getenv('SHELL')+'\n'
                     '\n'
@@ -62,11 +62,11 @@ class process:
                     ' tolerance 5\n'
                     'EOF\n'
                     '\n'
-                    'freerflag hklin %s.reind.mtz hklout %s.free.mtz << EOF > freerflag.log\n' %(self.xtalID,self.xtalID) +
-                    '   COMPLETE FREE=FreeR_flag\n'
-                    '   END\n'
-                    'EOF\n'
-                    'uniqueify -f FreeR_flag cad.mtz %s.free.mtz\n' %self.xtalID
+                    '#freerflag hklin %s.reind.mtz hklout %s.free.mtz << EOF > freerflag.log\n' %(self.xtalID,self.xtalID) +
+                    '#   COMPLETE FREE=FreeR_flag\n'
+                    '#   END\n'
+                    '#EOF\n'
+                    'uniqueify -f FreeR_flag %s.reind.mtz %s.free.mtz\n' %(self.xtalID,self.xtalID)
                     )
             os.chdir('%s/%s' %(self.project_directory,self.xtalID))
             os.system(Cmds)
