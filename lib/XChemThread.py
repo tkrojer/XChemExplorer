@@ -88,11 +88,12 @@ class start_COOT(QtCore.QThread):
 
 class read_intial_refinement_results(QtCore.QThread):
 
-    def __init__(self,initial_model_directory,reference_file_list,data_source):
+    def __init__(self,initial_model_directory,reference_file_list,data_source,allowed_unitcell_difference_percent):
         QtCore.QThread.__init__(self)
         self.initial_model_directory=initial_model_directory
         self.reference_file_list=reference_file_list
         self.data_source=data_source
+        self.allowed_unitcell_difference_percent=allowed_unitcell_difference_percent
 
     def run(self):
 
@@ -134,7 +135,7 @@ class read_intial_refinement_results(QtCore.QThread):
                     unitcell_difference=round((math.fabs(reference_file[4]-unitcell_volume_autoproc)/reference_file[4])*100,1)
                     # reference file is accepted when different in unitcell volume < 5%
                     # and both files have the same lattice type
-                    if unitcell_difference < 5 and lattice_autoproc==reference_file[3]:
+                    if unitcell_difference < self.allowed_unitcell_difference_percent and lattice_autoproc==reference_file[3]:
                         spg_reference=reference_file[1]
                         unitcell_reference=reference_file[2]
                         reference=reference_file[0]

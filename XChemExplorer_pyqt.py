@@ -72,6 +72,10 @@ class XChemExplorer(QtGui.QApplication):
             self.data_source_file=''
             self.ccp4_scratch_directory=os.getenv('CCP4_SCR')
 
+
+        # general settings
+        self.allowed_unitcell_difference_percent=5
+
         self.settings =     {'current_directory':       self.current_directory,
                              'project_directory':       self.project_directory,
                              'beamline_directory':      self.beamline_directory,
@@ -81,7 +85,8 @@ class XChemExplorer(QtGui.QApplication):
                              'database_directory':      self.database_directory,
                              'data_source':             os.path.join(self.database_directory,self.data_source_file),
                              'ccp4_scratch':            self.ccp4_scratch_directory,
-                             'external_software':       self.external_software  }
+                             'external_software':       self.external_software,
+                             'unitcell_difference':     self.allowed_unitcell_difference_percent    }
 
 #        self.FindHitsDir=self.project_directory+'/processing/analysis/find_hits'
 #        self.DatabaseDir=self.project_directory+'/processing/database'
@@ -556,7 +561,8 @@ class XChemExplorer(QtGui.QApplication):
                 self.work_thread=XChemThread.read_intial_refinement_results(self.initial_model_directory,
                                                                             self.reference_file_list,
                                                                             os.path.join(self.database_directory,
-                                                                                         self.data_source_file))
+                                                                                         self.data_source_file),
+                                                                            self.allowed_unitcell_difference_percent)
                 self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
                 self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
@@ -663,16 +669,16 @@ class XChemExplorer(QtGui.QApplication):
                 print visit
                 print os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image)
 
-#                try:
-#                    self.show_diffraction_image.loadFile('')
-#                except dectris.albula.viewer.DNoObject:
-#                    self.albula = dectris.albula.openMainFrame()
-#                    self.show_diffraction_image = self.albula.openSubFrame()
-#                    self.show_diffraction_image.loadFile(os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image))
+                try:
+                    self.show_diffraction_image.loadFile('')
+                except dectris.albula.viewer.DNoObject:
+                    self.albula = dectris.albula.openMainFrame()
+                    self.show_diffraction_image = self.albula.openSubFrame()
+                    self.show_diffraction_image.loadFile(os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image))
 
-                self.albula = dectris.albula.openMainFrame()
-                self.show_diffraction_image = self.albula.openSubFrame()
-                self.show_diffraction_image.loadFile(os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image))
+#                self.albula = dectris.albula.openMainFrame()
+#                self.show_diffraction_image = self.albula.openSubFrame()
+#                self.show_diffraction_image.loadFile(os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image))
 
 
 
