@@ -32,9 +32,9 @@ class process:
                 Cmds = (
                     '#!'+os.getenv('SHELL')+'\n'
                     '\n'
-                    'cd %s/%s\n' %(self.project_directory,self.xtalID) +
+                    'cd %s/%s/Dimple\n' %(self.project_directory,self.xtalID) +
                     '\n'
-                    'pointless hklin %s.mtz hklref %s.mtz hklout %s.reind.mtz << EOF > pointless.log\n' %(self.xtalID,self.reference,self.xtalID)+
+                    'pointless hklin ../%s.mtz hklref %s.mtz hklout %s.reind.mtz << EOF > pointless.log\n' %(self.xtalID,self.reference,self.xtalID)+
                     ' tolerance 5\n'
                     'EOF\n'
                     '\n'
@@ -56,21 +56,23 @@ class process:
                 Cmds = (
                     '#!'+os.getenv('SHELL')+'\n'
                     '\n'
-                    'cd %s/%s\n' %(self.project_directory,self.xtalID) +
+                    'cd %s/%s/Dimple\n' %(self.project_directory,self.xtalID) +
                     '\n'
                     'pointless hklin %s.mtz xyzin %s.pdb hklout %s.reind.mtz << EOF > pointless.log\n' %(self.xtalID,self.reference,self.xtalID)+
                     ' tolerance 5\n'
                     'EOF\n'
                     '\n'
-                    'freerflag hklin %s.reind.mtz hklout %s.temp.mtz << EOF > freerflag.log\n' %(self.xtalID,self.xtalID) +
-                    '   COMPLETE FREE=FreeR_flag\n'
+                    'cad hklin1 %s.reind.mtz hklout cad.mtz << EOF > cad.log\n' %self.xtalID +
+                    '   labin file_number 1 E1=F E2=SIGF E3=IMEAN E4=SIGIMEAN\n'
+                    '   labout file_number 1 E1=F E2=SIGF E3=IMEAN E4=SIGIMEAN\n'
                     '   END\n'
                     'EOF\n'
-                    'uniqueify -f FreeR_flag  %s.temp.mtz %s.free.mtz\n' %(self.xtalID,self.xtalID)
+                    '\n'
+                    'uniqueify cad.mtz %s.free.mtz\n' %self.xtalID
                     )
-            os.chdir('%s/%s' %(self.project_directory,self.xtalID))
+            os.chdir(os.path.join(self.project_directory,self.xtalID))
             os.system(Cmds)
-
+            os.symlink(os.path.join('Dimple',self.xtalID+'.free.mtz'),self.xtalID+'.free.mtz')
 
     def dimple(self):
         os.chdir('%s/%s' %(self.project_directory,self.xtalID))
