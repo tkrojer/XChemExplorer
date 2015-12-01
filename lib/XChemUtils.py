@@ -50,7 +50,7 @@ class process:
                     '#   COMPLETE FREE=FreeR_flag\n'
                     '#   END\n'
                     '#EOF\n'
-                    'uniqueify -f FreeR_flag cad.mtz %s.free.mtz\n' %self.xtalID
+                    'uniqueify -f FreeR_flag cad.mtz ../%s.free.mtz\n' %self.xtalID
                     )
             else:
                 Cmds = (
@@ -68,11 +68,11 @@ class process:
                     '   END\n'
                     'EOF\n'
                     '\n'
-                    'uniqueify cad.mtz %s.free.mtz\n' %self.xtalID
+                    'uniqueify cad.mtz ../%s.free.mtz\n' %self.xtalID
                     )
             os.chdir(os.path.join(self.project_directory,self.xtalID))
             os.system(Cmds)
-            os.symlink(os.path.join('Dimple',self.xtalID+'.free.mtz'),self.xtalID+'.free.mtz')
+#            os.symlink(os.path.join('Dimple',self.xtalID+'.free.mtz'),self.xtalID+'.free.mtz')
 
     def dimple(self):
         os.chdir('%s/%s' %(self.project_directory,self.xtalID))
