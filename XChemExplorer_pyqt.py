@@ -365,6 +365,15 @@ class XChemExplorer(QtGui.QApplication):
         settings_buttoon_initial_model_directory.clicked.connect(self.settings_button_clicked)
         settings_hbox_initial_model_directory.addWidget(settings_buttoon_initial_model_directory)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_initial_model_directory)
+
+        settings_hbox_adjust_allowed_unit_cell_difference=QtGui.QHBoxLayout()
+        self.adjust_allowed_unit_cell_difference_label=QtGui.QLabel('Max. Allowed Unit Cell Difference (%):')
+        settings_hbox_adjust_allowed_unit_cell_difference.addWidget(self.adjust_allowed_unit_cell_difference_label)
+        self.adjust_allowed_unit_cell_difference = QtGui.QLineEdit()
+        self.adjust_allowed_unit_cell_difference.setText(self.allowed_unitcell_difference_percent)
+        settings_hbox_adjust_allowed_unit_cell_difference.addWidget(self.adjust_allowed_unit_cell_difference)
+        self.data_collection_vbox_for_settings.addLayout(settings_hbox_adjust_allowed_unit_cell_difference)
+
         self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nRefine Model Directory:'))
         settings_hbox_refine_model_directory=QtGui.QHBoxLayout()
         self.refine_model_directory_label=QtGui.QLabel(self.refine_model_directory)
