@@ -462,6 +462,7 @@ class XChemExplorer(QtGui.QApplication):
             self.database_directory=pickled_settings['database_directory']
             self.data_source_file=pickled_settings['data_source']
             self.ccp4_scratch_directory=pickled_settings['ccp4_scratch']
+            self.adjust_allowed_unit_cell_difference=pickled_settings['unitcell_difference']
             self.project_directory_label.setText(self.project_directory)
             self.initial_model_directory_label.setText(self.initial_model_directory)
             self.refine_model_directory_label.setText(self.refine_model_directory)
@@ -470,6 +471,7 @@ class XChemExplorer(QtGui.QApplication):
             self.beamline_directory_label.setText(self.beamline_directory)
             self.data_source_file_label.setText(self.data_source_file)
             self.ccp4_scratch_directory_label.setText(self.ccp4_scratch_directory)
+            self.adjust_allowed_unit_cell_difference.setText(str(self.allowed_unitcell_difference_percent))
             self.reference_file_list=self.get_reference_file_list()
         except KeyError:
             self.update_status_bar('Sorry, this is not a XChemExplorer config file!')
