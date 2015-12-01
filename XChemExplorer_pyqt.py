@@ -462,7 +462,7 @@ class XChemExplorer(QtGui.QApplication):
             self.database_directory=pickled_settings['database_directory']
             self.data_source_file=pickled_settings['data_source']
             self.ccp4_scratch_directory=pickled_settings['ccp4_scratch']
-            self.adjust_allowed_unit_cell_difference=pickled_settings['unitcell_difference']
+            self.allowed_unitcell_difference_percent=pickled_settings['unitcell_difference']
             self.project_directory_label.setText(self.project_directory)
             self.initial_model_directory_label.setText(self.initial_model_directory)
             self.refine_model_directory_label.setText(self.refine_model_directory)
