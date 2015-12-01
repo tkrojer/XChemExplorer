@@ -123,6 +123,7 @@ class read_intial_refinement_results(QtCore.QThread):
             alert='#E0E0E0'
             outcome='Analysis Pending'
 
+            found_suitable_reference=False
             if os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'.mtz')):
                 mtz_autoproc=mtztools(os.path.join(self.initial_model_directory,sample,sample+'.mtz')).get_all_values_as_dict()
                 resolution_high=mtz_autoproc['resolution_high']
@@ -139,6 +140,7 @@ class read_intial_refinement_results(QtCore.QThread):
                         spg_reference=reference_file[1]
                         unitcell_reference=reference_file[2]
                         reference=reference_file[0]
+                        found_suitable_reference=True
                         break
             else:
                 continue    # do not add to table if no mtz file is present
@@ -156,6 +158,11 @@ class read_intial_refinement_results(QtCore.QThread):
             if Rcryst=='pending':
                 run_dimple=True
                 outcome='n/a'
+                
+            if found_suitable_reference=True
+                run_dimple=True
+            else:
+                run_dimple=False
 
             pdb_latest=''
             if os.path.isfile(os.path.join(self.initial_model_directory,sample,'refine.pdb')):
