@@ -58,7 +58,7 @@ class process:
                     '\n'
                     'cd %s/%s\n' %(self.project_directory,self.xtalID) +
                     '\n'
-                    'pointless hklin %s.mtz hklref %s.mtz hklout %s.reind.mtz << EOF > pointless.log\n' %(self.xtalID,self.reference,self.xtalID)+
+                    'pointless hklin %s.mtz xyzin %s.pdb hklout %s.reind.mtz << EOF > pointless.log\n' %(self.xtalID,self.reference,self.xtalID)+
                     ' tolerance 5\n'
                     'EOF\n'
                     '\n'
