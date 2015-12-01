@@ -57,22 +57,24 @@ class run_dimple_on_selected_samples(QtCore.QThread):
         progress=0
 
         for sample in sorted(self.initial_model_dimple_dict):
-            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running dimple -> '+sample)
+            print sample,self.initial_model_dimple_dict[sample][0].isChecked()
+#            if self.initial_model_dimple_dict[sample][0].isChecked():
+#            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running dimple -> '+sample)
 #            print sample,self.initial_model_dimple_dict[sample][0].isChecked(),\
 #                str(self.initial_model_dimple_dict[sample][1].currentText())
-            dimple_commands={   'project_directory': self.initial_model_directory,
-                                'delete_old': self.initial_model_dimple_dict[sample][0].isChecked(),
-                                'xtalID': sample,
-                                'compoundID': '',
-                                'smiles': '',
-                                'reference': self.reference_directory+'/'+
-                                             str(self.initial_model_dimple_dict[sample][1].currentText()),
-                                'queueing_system_available': self.queueing_system_available,
-                                'ccp4_scratch': self.ccp4_scratch_directory     }
-            process(dimple_commands).dimple()
-            progress += progress_step
-            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-        self.emit(QtCore.SIGNAL("finished()"))
+#            dimple_commands={   'project_directory': self.initial_model_directory,
+#                                'delete_old': self.initial_model_dimple_dict[sample][0].isChecked(),
+#                                'xtalID': sample,
+#                                'compoundID': '',
+#                                'smiles': '',
+#                                'reference': self.reference_directory+'/'+
+#                                             str(self.initial_model_dimple_dict[sample][1].currentText()),
+#                                'queueing_system_available': self.queueing_system_available,
+#                                'ccp4_scratch': self.ccp4_scratch_directory     }
+#            process(dimple_commands).dimple()
+#            progress += progress_step
+#            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+#        self.emit(QtCore.SIGNAL("finished()"))
 
 
 class start_COOT(QtCore.QThread):
