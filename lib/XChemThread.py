@@ -48,7 +48,7 @@ class run_dimple_on_selected_samples(QtCore.QThread):
         self.initial_model_directory=settings['initial_model_directory']
         self.reference_directory=settings['reference_directory']
         self.initial_model_dimple_dict=initial_model_dimple_dict
-        self.queueing_system_available=external_software['qstat']
+        self.queueing_system_available=external_software['qsub']
         self.ccp4_scratch_directory=ccp4_scratch
 
     def run(self):

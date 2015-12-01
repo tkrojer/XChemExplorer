@@ -583,7 +583,7 @@ class external_software:
 
     def __init__(self):
         self.available_programs={
-            'qstat':                    False,
+            'qsub':                     False,
             'refmac5':                  False,
             'phenix.molprobity':        False,
             'mmtbx.validate_ligands':   False,
@@ -602,13 +602,13 @@ class external_software:
         FNULL = open(os.devnull, 'w')
 
         try:
-            subprocess.call(['qstat'], stdout=FNULL, stderr=subprocess.STDOUT)
-            self.available_programs['qstat']=True
+            subprocess.call(['qsub'], stdout=FNULL, stderr=subprocess.STDOUT)
+            self.available_programs['qsub']=True
             status='found'
         except OSError:
-            self.available_programs['qstat']=False
+            self.available_programs['qsub']=False
             status='not found'
-        print '{0:40} {1:10}'.format('-checking for qstat:', status)
+        print '{0:40} {1:10}'.format('-checking for qsub:', status)
 
         try:
             subprocess.call(['refmac5','end'], stdout=FNULL, stderr=subprocess.STDOUT)
