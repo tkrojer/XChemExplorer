@@ -74,7 +74,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
         # general settings
-        self.allowed_unitcell_difference_percent=5
+        self.allowed_unitcell_difference_percent=12
 
         self.settings =     {'current_directory':       self.current_directory,
                              'project_directory':       self.project_directory,
