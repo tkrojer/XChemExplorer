@@ -16,13 +16,13 @@ class data_source:
         if self.data_source_file.endswith('.csv'):
             self.data_source_type='csv'
 
-        #   [column_name in DB, column_name shown in XCE]
+        #   [column_name in DB, column_name shown in XCE, SQLite column type (Integer,Text,PKEY...)]
 
         self.column_list=[
             # from Lab36
-            ['ID',                                   'ID'],
-            ['LabVisit',                             'LabVisit'],
-            ['LibraryPlate',                         'LibraryPlate'],
+            ['ID',                                   'ID',                              'INTEGER PRIMARY KEY'],
+            ['LabVisit',                             'LabVisit',                        'TEXT'],
+            ['LibraryPlate',                         'LibraryPlate',                    'TEXT'],
             ['SourceWell',                           'SourceWell'],
             ['LibraryName',                          'LibraryName'],
             ['CompoundSMILES',                       'Smiles'],
@@ -193,6 +193,16 @@ class data_source:
                 f=open(self.data_source_file,'w')
                 f.write(csv_header)
                 f.close()
+
+        con=sqlite3.connect(self.data_source_file)     # creates sqlite file
+        with con:
+            cur = con.cursor()
+            for column in self.column_list:
+                cur.execute("CREATE TABLE Cars(Id INT, Name TEXT, Price INT)")
+
+#   create table PUCK_Table(PUCK_ID INTEGER PRIMARY KEY, PUCK_NAME TEXT, PUCK_LOCATION TEXT);
+#   INSERT INTO SAMPLE_Table VALUES(1, 'ATAD2A-x001',1,'D001X75','MOUNTED','2015-11-30 12:00:00',1);
+#   select SAMPLE_NAME from SAMPLE_Table,PUCK_Table where PUCK_Table.PUCK_ID=SAMPLE_Table.PUCK_ID and PUCK_Table.PUCK_NAME='DLS565';
 
 
 
