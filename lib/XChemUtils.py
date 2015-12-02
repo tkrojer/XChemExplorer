@@ -70,6 +70,7 @@ class process:
                     '\n'
                     'uniqueify cad.mtz ../%s.free.mtz\n' %self.xtalID
                     )
+            print Cmds
             os.chdir(os.path.join(self.project_directory,self.xtalID))
             os.system(Cmds)
 #            os.symlink(os.path.join('Dimple',self.xtalID+'.free.mtz'),self.xtalID+'.free.mtz')
@@ -128,6 +129,7 @@ class process:
                 '\n'
                 '/bin/rm dimple_run_in_progress\n'
                 )
+
         self.Run(Cmds)
 
 
