@@ -1,5 +1,8 @@
 import sqlite3
 import os,sys
+import csv
+
+# committed on: 03/12/2015
 
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 from XChemUtils import parse
@@ -10,122 +13,133 @@ class data_source:
 
         self.data_source_file=data_source_file
 
-        self.data_source_type=None
-        if self.data_source_file.endswith('.sqlite'):
-            self.data_source_type='sqlite'
-        if self.data_source_file.endswith('.csv'):
-            self.data_source_type='csv'
+#        self.data_source_type=None
+#        if self.data_source_file.endswith('.sqlite'):
+#            self.data_source_type='sqlite'
+#        if self.data_source_file.endswith('.csv'):
+#            self.data_source_type='csv'
 
         #   [column_name in DB, column_name shown in XCE, SQLite column type (Integer,Text,PKEY...)]
 
         self.column_list=[
+            # SQLite column name                    XCE column name                             SQLite type
             # from Lab36
-            ['ID',                                   'ID',                              'INTEGER PRIMARY KEY'],
-            ['LabVisit',                             'LabVisit',                        'TEXT'],
-            ['LibraryPlate',                         'LibraryPlate',                    'TEXT'],
-            ['SourceWell',                           'SourceWell'],
-            ['LibraryName',                          'LibraryName'],
-            ['CompoundSMILES',                       'Smiles'],
-            ['CompoundCode',                         'Compound ID'],
-            ['CrystalPlate',                         'CrystalPlate'],
-            ['CrystalWell',                          'CrystalWell'],
-            ['EchoX',                                'EchoX'],
-            ['EchoY',                                'EchoY'],
-            ['DropVolume',                           'DropVolume'],
-            ['ProteinName',                          'ProteinName'],
-            ['BatchNumber',                          'BatchNumber'],
-            ['CompoundStockConcentration',           'CompoundStockConcentration'],
-            ['CompoundConcentration',                'CompoundConcentration'],
-            ['SolventFraction',                      'SolventFraction'],
-            ['SoakTransferVol',                      'SoakTransferVol'],
-            ['SoakStatus',                           'SoakStatus'],
-            ['SoakTimestamp',                        'SoakTimestamp'],
-            ['CryoStockFraction',                    'CryoStockFraction'],
-            ['CryoFraction',                         'CryoFraction'],
-            ['CryoWell',                             'CryoWell'],
-            ['CryoTransferVolume',                   'CryoTransferVolume'],
-            ['CryoStatus',                           'CryoStatus'],
-            ['CryoTimestamp',                        'CryoTimestamp'],
-            ['SoakingTime',                          'SoakingTime'],
-            ['HarvestStatus',                        'HarvestStatus'],
-            ['CrystalName',                          'Sample ID'],
-            ['Puck',                                 'Puck'],
-            ['PuckPosition',                         'PuckPosition'],
-            ['PinBarcode',                           'PinBarcode'],
-            ['MountingResult',                       'MountingResult'],
-            ['MountingArrivalTime',                  'MountingArrivalTime'],
-            ['MountedTimestamp',                     'MountedTimestamp'],
-            ['MountingTime',                         'MountingTime'],
-            ['ispybStatus',                          'ispybStatus'],
-            ['DataCollectionVisit',                  'DataCollectionVisit'],
+            ['ID',                                   'ID',                                      'INTEGER PRIMARY KEY'],
+            ['LabVisit',                             'LabVisit',                                'TEXT'],
+            ['LibraryPlate',                         'LibraryPlate',                            'TEXT'],
+            ['SourceWell',                           'SourceWell',                              'TEXT'],
+            ['LibraryName',                          'LibraryName',                             'TEXT'],
+            ['CompoundSMILES',                       'Smiles',                                  'TEXT'],
+            ['CompoundCode',                         'Compound ID',                             'TEXT'],
+            ['CrystalPlate',                         'CrystalPlate',                            'TEXT'],
+            ['CrystalWell',                          'CrystalWell',                             'TEXT'],
+            ['EchoX',                                'EchoX',                                   'TEXT'],
+            ['EchoY',                                'EchoY',                                   'TEXT'],
+            ['DropVolume',                           'DropVolume',                              'TEXT'],
+            ['ProteinName',                          'ProteinName',                             'TEXT'],
+            ['BatchNumber',                          'BatchNumber',                             'TEXT'],
+            ['CompoundStockConcentration',           'CompoundStockConcentration',              'TEXT'],
+            ['CompoundConcentration',                'CompoundConcentration',                   'TEXT'],
+            ['SolventFraction',                      'SolventFraction',                         'TEXT'],
+            ['SoakTransferVol',                      'SoakTransferVol',                         'TEXT'],
+            ['SoakStatus',                           'SoakStatus',                              'TEXT'],
+            ['SoakTimestamp',                        'SoakTimestamp',                           'TEXT'],
+            ['CryoStockFraction',                    'CryoStockFraction',                       'TEXT'],
+            ['CryoFraction',                         'CryoFraction',                            'TEXT'],
+            ['CryoWell',                             'CryoWell',                                'TEXT'],
+            ['CryoTransferVolume',                   'CryoTransferVolume',                      'TEXT'],
+            ['CryoStatus',                           'CryoStatus',                              'TEXT'],
+            ['CryoTimestamp',                        'CryoTimestamp',                           'TEXT'],
+            ['SoakingTime',                          'SoakingTime',                             'TEXT'],
+            ['HarvestStatus',                        'HarvestStatus',                           'TEXT'],
+            ['CrystalName',                          'Sample ID',                               'TEXT'],
+            ['Puck',                                 'Puck',                                    'TEXT'],
+            ['PuckPosition',                         'PuckPosition',                            'TEXT'],
+            ['PinBarcode',                           'PinBarcode',                              'TEXT'],
+            ['MountingResult',                       'MountingResult',                          'TEXT'],
+            ['MountingArrivalTime',                  'MountingArrivalTime',                     'TEXT'],
+            ['MountedTimestamp',                     'MountedTimestamp',                        'TEXT'],
+            ['MountingTime',                         'MountingTime',                            'TEXT'],
+            ['ispybStatus',                          'ispybStatus',                             'TEXT'],
+            ['DataCollectionVisit',                  'DataCollectionVisit',                     'TEXT'],
             # from XChemExplorer
-            ['CompoundName',                         'Compound Name'],
-            ['CrystalTag',                           'Tag'],
-            ['DataCollectionBeamline',               'DataCollectionBeamline'],
-            ['DataCollectionDate',                   'DataCollectionDate'],
-            ['DataCollectionOutcome',                'DataCollectionOutcome'],
-            ['DataCollectionRun',                    'DataCollectionRun'],
-            ['DataCollectionComment',                'DataCollectionComment'],
-            ['DataProcessingProgram',                'DataProcessingProgram'],
-            ['DataProcessingSpaceGroup',             'DataProcessingSpaceGroup'],
-            ['DataProcessingUnitCell',               'DataProcessingUnitCell'],
-            ['DataProcessingResolutionOverall',      'DataProcessingResolutionOverall'],
-            ['DataProcessingResolutionLow',          'DataProcessingResolutionLow'],
-            ['DataProcessingResolutionHigh',         'DataProcessingResolutionHigh'],
-            ['DataProcessingRmergeOverall',          'DataProcessingRmergeOverall'],
-            ['DataProcessingRmergeLow',              'DataProcessingRmergeLow'],
-            ['DataProcessingRmergeHigh',             'DataProcessingRmergeHigh'],
-            ['DataProcessingIsigOverall',            'DataProcessingIsigOverall'],
-            ['DataProcessingIsigLow',                'DataProcessingIsigLow'],
-            ['DataProcessingIsigHigh',               'DataProcessingIsigHigh'],
-            ['DataProcessingCompletenessOverall',    'DataProcessingCompletenessOverall'],
-            ['DataProcessingCompletenessLow',        'DataProcessingCompletenessLow'],
-            ['DataProcessingCompletenessHigh',       'DataProcessingCompletenessHigh'],
-            ['DataProcessingMultiplicityOverall',    'DataProcessingMultiplicityOverall'],
-            ['DataProcessingMultiplicityLow',        'DataProcessingMultiplicityLow'],
-            ['DataProcessingMultiplicityHigh',       'DataProcessingMultiplicityHigh'],
-            ['DataProcessingPathToLogfile',          'DataProcessingPathToLogfile'],
-            ['PANDDAstuff',                          'PANDDAstuff'],
-            ['RefinementRcryst',                     'RefinementRcryst'],
-            ['RefinementRfree',                      'RefinementRfree'],
-            ['RefinementLigandCC',                   'RefinementLigandCC'],
-            ['RefinementRmsdBonds',                  'RefinementRmsdBonds'],
-            ['RefinementRmsdAngles',                 'RefinementRmsdAngles'],
-            ['RefinementOutcome',                    'RefinementOutcome'],
-            ['RefinementMTZfree',                    'RefinementMTZfree'],
-            ['RefinementCIF',                        'RefinementCIF'],
-            ['RefinementPDB_latest',                 'RefinementPDB_latest'],
-            ['RefinementMTZ_latest',                 'RefinementMTZ_latest'],
-            ['RefinementComment',                    'RefinementComment'],
-            ['AssayIC50',                            'AssayIC50']
+            ['CompoundName',                         'Compound Name',                           'TEXT'],
+            ['CrystalTag',                           'Tag',                                     'TEXT'],
+            ['DataCollectionBeamline',               'DataCollectionBeamline',                  'TEXT'],
+            ['DataCollectionDate',                   'DataCollectionDate',                      'TEXT'],
+            ['DataCollectionOutcome',                'DataCollectionOutcome',                   'TEXT'],
+            ['DataCollectionRun',                    'DataCollectionRun',                       'TEXT'],
+            ['DataCollectionComment',                'DataCollectionComment',                   'TEXT'],
+            ['DataProcessingProgram',                'DataProcessingProgram',                   'TEXT'],
+            ['DataProcessingSpaceGroup',             'DataProcessingSpaceGroup',                'TEXT'],
+            ['DataProcessingUnitCell',               'DataProcessingUnitCell',                  'TEXT'],
+            ['DataProcessingResolutionOverall',      'DataProcessingResolutionOverall',         'TEXT'],
+            ['DataProcessingResolutionLow',          'DataProcessingResolutionLow',             'TEXT'],
+            ['DataProcessingResolutionHigh',         'DataProcessingResolutionHigh',            'TEXT'],
+            ['DataProcessingRmergeOverall',          'DataProcessingRmergeOverall',             'TEXT'],
+            ['DataProcessingRmergeLow',              'DataProcessingRmergeLow',                 'TEXT'],
+            ['DataProcessingRmergeHigh',             'DataProcessingRmergeHigh',                'TEXT'],
+            ['DataProcessingIsigOverall',            'DataProcessingIsigOverall',               'TEXT'],
+            ['DataProcessingIsigLow',                'DataProcessingIsigLow',                   'TEXT'],
+            ['DataProcessingIsigHigh',               'DataProcessingIsigHigh',                  'TEXT'],
+            ['DataProcessingCompletenessOverall',    'DataProcessingCompletenessOverall',       'TEXT'],
+            ['DataProcessingCompletenessLow',        'DataProcessingCompletenessLow',           'TEXT'],
+            ['DataProcessingCompletenessHigh',       'DataProcessingCompletenessHigh',          'TEXT'],
+            ['DataProcessingMultiplicityOverall',    'DataProcessingMultiplicityOverall',       'TEXT'],
+            ['DataProcessingMultiplicityLow',        'DataProcessingMultiplicityLow',           'TEXT'],
+            ['DataProcessingMultiplicityHigh',       'DataProcessingMultiplicityHigh',          'TEXT'],
+            ['DataProcessingPathToLogfile',          'DataProcessingPathToLogfile',             'TEXT'],
+            ['PANDDAstuff',                          'PANDDAstuff',                             'TEXT'],
+            ['RefinementRcryst',                     'RefinementRcryst',                        'TEXT'],
+            ['RefinementRfree',                      'RefinementRfree',                         'TEXT'],
+            ['RefinementLigandCC',                   'RefinementLigandCC',                      'TEXT'],
+            ['RefinementRmsdBonds',                  'RefinementRmsdBonds',                     'TEXT'],
+            ['RefinementRmsdAngles',                 'RefinementRmsdAngles',                    'TEXT'],
+            ['RefinementOutcome',                    'RefinementOutcome',                       'TEXT'],
+            ['RefinementMTZfree',                    'RefinementMTZfree',                       'TEXT'],
+            ['RefinementCIF',                        'RefinementCIF',                           'TEXT'],
+            ['RefinementPDB_latest',                 'RefinementPDB_latest',                    'TEXT'],
+            ['RefinementMTZ_latest',                 'RefinementMTZ_latest',                    'TEXT'],
+            ['RefinementComment',                    'RefinementComment',                       'TEXT'],
+            ['AssayIC50',                            'AssayIC50',                               'TEXT']
         ]
 
     def create_missing_columns(self):
         existing_columns=[]
+        connect=sqlite3.connect(self.data_source_file)
+        connect.row_factory = sqlite3.Row
+        cursor = connect.cursor()
+        cursor.execute("SELECT * FROM mainTable")
+        for column in cursor.description:
+            existing_columns.append(column[0])
+        for column in self.column_list:
+            if column[0] not in existing_columns:
+                cursor.execute("alter table mainTable add column '"+column[0]+"' '"+column[2]+"'")
+                connect.commit()
 
-        if self.data_source_type=='sqlite':
-            self.connect=sqlite3.connect(self.data_source_file)
-            self.connect.row_factory = sqlite3.Row
-            self.cursor = self.connect.cursor()
-            self.cursor.execute("SELECT * FROM mainTable")
-            for column in self.cursor.description:
-                existing_columns.append(column[0])
-            for column in self.column_list:
-                if column[0] not in existing_columns:
-                    self.cursor.execute("alter table mainTable add column '%s' 'TEXT'" % column[0])
-                    self.connect.commit()
-
-        if self.data_source_type=='csv':
-            for n,line in enumerate(open(self.data_source_file)):
-                if n==0:
-                    for item in line.split(','):
-                        existing_columns.append(item.replace('\r','').replace('\n',''))
-                break
-
-            columns_to_add=[]
-            for column in self.column_list:
-                if column[0] not in existing_columns:
-                    columns_to_add.append(column[0])
+#        if self.data_source_type=='sqlite':
+#            self.connect=sqlite3.connect(self.data_source_file)
+#            self.connect.row_factory = sqlite3.Row
+#            self.cursor = self.connect.cursor()
+#            self.cursor.execute("SELECT * FROM mainTable")
+#            for column in self.cursor.description:
+#                existing_columns.append(column[0])
+#            for column in self.column_list:
+#                if column[0] not in existing_columns:
+#                    self.cursor.execute("alter table mainTable add column '%s' 'TEXT'" % column[0])
+#                    self.connect.commit()
+#
+#        if self.data_source_type=='csv':
+#            for n,line in enumerate(open(self.data_source_file)):
+#                if n==0:
+#                    for item in line.split(','):
+#                        existing_columns.append(item.replace('\r','').replace('\n',''))
+#                break
+#
+#            columns_to_add=[]
+#            for column in self.column_list:
+#                if column[0] not in existing_columns:
+#                    columns_to_add.append(column[0])
 
 
 #            new_columns=''
@@ -184,29 +198,112 @@ class data_source:
 
     def create_empty_data_source_file(self):
 
-        if self.data_source_type=='csv':
-            if not os.path.isfile(self.data_source_file):
-                csv_header=''
-                for column in self.column_list:
-                    csv_header+=str(column[0])+','
-                csv_header+='\n'
-                f=open(self.data_source_file,'w')
-                f.write(csv_header)
-                f.close()
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        with connect:
+            cursor = connect.cursor()
+            cursor.execute("CREATE TABLE mainTable("+self.column_list[0][0]+' '+self.column_list[0][2]+")")
+            for i in range(1,len(self.column_list)):
+                cursor.execute("alter table mainTable add column '"+self.column_list[i][0]+"' '"+self.column_list[i][2]+"'")
+            connect.commit()
 
-        con=sqlite3.connect(self.data_source_file)     # creates sqlite file
-        with con:
-            cur = con.cursor()
-            for column in self.column_list:
-                cur.execute("CREATE TABLE Cars(Id INT, Name TEXT, Price INT)")
+    def get_all_samples_in_data_source_as_list(self):
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+        cursor.execute("SELECT CrystalName FROM mainTable")
+        existing_samples_in_db=[]
+        samples = cursor.fetchall()
+        for sample in samples:
+            existing_samples_in_db.append(str(sample[0]))
+        return existing_samples_in_db
 
-#   create table PUCK_Table(PUCK_ID INTEGER PRIMARY KEY, PUCK_NAME TEXT, PUCK_LOCATION TEXT);
-#   INSERT INTO SAMPLE_Table VALUES(1, 'ATAD2A-x001',1,'D001X75','MOUNTED','2015-11-30 12:00:00',1);
-#   select SAMPLE_NAME from SAMPLE_Table,PUCK_Table where PUCK_Table.PUCK_ID=SAMPLE_Table.PUCK_ID and PUCK_Table.PUCK_NAME='DLS565';
+    def check_if_sample_exists_in_data_source(self,sampleID):
+        sample_exists=False
+        existing_samples_in_db=self.get_all_samples_in_data_source_as_list()
+        if sampleID in existing_samples_in_db:
+            sample_exists=True
+        return sample_exists
 
+    def import_csv_file(self,csv_file):
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+        available_columns=[]
+        cursor.execute("SELECT * FROM mainTable")
+        for column in cursor.description:           # only update existing columns in data source
+            available_columns.append(column[0])
+        with open(csv_file,'rb') as csv_import: # `with` statement available in 2.5+
+            # csv.DictReader uses first line in file for column headings by default
+            csv_dict = csv.DictReader(csv_import) # comma is default delimiter
+            for line in csv_dict:
+                sampleID=line['CrystalName']
+                if self.check_if_sample_exists_in_data_source(sampleID):
+                    update_string=''
+                    for key,value in line.iteritems():
+                        if key=='ID' or key=='CrystalName':
+                            continue
+                        if key not in available_columns:
+                            continue
+                        if not str(value).replace(' ','')=='':  # ignore if nothing in csv field
+                            update_string+=str(key)+'='+"'"+str(value)+"'"+','
+                    cursor.execute("UPDATE mainTable SET "+update_string[:-1]+" WHERE CrystalName="+"'"+sampleID+"'")
+                else:
+                    column_string=''
+                    value_string=''
+                    for key,value in line.iteritems():
+                        if key=='ID':
+                            continue
+                        if key not in available_columns:
+                            continue
+                        if not str(value).replace(' ','')=='':  # ignore if nothing in csv field
+                            value_string+="'"+value+"'"+','
+                            column_string+=key+','
+                    print "INSERT INTO mainTable ("+column_string[:-1]+") VALUES ("+value_string[:-1]+")"
+                    cursor.execute("INSERT INTO mainTable ("+column_string[:-1]+") VALUES ("+value_string[:-1]+")")
+        connect.commit()
+
+    def update_data_source(self,sampleID,data_dict):
+        connect=sqlite3.connect(self.data_source_file)
+        cursor = connect.cursor()
+        update_string=''
+        for key in data_dict:
+            value=data_dict[key]
+            print value
+            if key=='ID' or key=='CrystalName':
+                continue
+            if not str(value).replace(' ','')=='':  # ignore empty fields
+                update_string+=str(key)+'='+"'"+str(value)+"'"+','
+        if update_string != '':
+            cursor.execute("UPDATE mainTable SET "+update_string[:-1]+" WHERE CrystalName="+"'"+sampleID+"'")
+            connect.commit()
+
+
+
+
+    def export_to_csv_file(self,csv_file):
+        connect=sqlite3.connect(self.data_source_file)
+        cursor = connect.cursor()
+        cursor.execute("SELECT * FROM mainTable")
+        header=()
+        for column in cursor.description:
+            header+=(column[0],)
+        rows = cursor.fetchall()
+        csvWriter = csv.writer(open(csv_file, "w"))
+        csvWriter.writerows([header]+rows)
+#        print cursor.description
+#        print header
 
 
     def load_samples_from_data_source(self):
+        header=[]
+        data=[]
+        connect=sqlite3.connect(self.data_source_file)
+        cursor = connect.cursor()
+        cursor.execute("SELECT * FROM mainTable")
+        for column in cursor.description:
+            header.append(column[0])
+        data = cursor.fetchall()
+        return ([header,data])
+
+
 
         # 1. check data source if all columns exist
         # 2. append missing columns
@@ -219,35 +316,35 @@ class data_source:
 #                                'CompoundSMILES',
 #                                'CrystalTag'        ]
 
-        header=[]
-        data=[]
-        if self.data_source_type=='csv':
-            for n,line in enumerate(open(self.data_source_file)):
-                if n==0:
-                    for field in line.split(','):
-                        header.append(field)
-                else:
-                    tmp=[]
-                    for field in line.split(','):
-                        if '\n' in field or '\r' in field:
-                            continue
-                        else:
-                            tmp.append(field)
-                    if not all(element=='' for element in tmp):     # e.g. Mac OSX numbers adds lots of emtpy lines
-                        data.append(tuple(tmp))
+#        header=[]
+#        data=[]
+#        if self.data_source_type=='csv':
+#            for n,line in enumerate(open(self.data_source_file)):
+#                if n==0:
+#                    for field in line.split(','):
+#                        header.append(field)
+#                else:
+#                    tmp=[]
+#                    for field in line.split(','):
+#                        if '\n' in field or '\r' in field:
+#                            continue
+#                        else:
+#                            tmp.append(field)
+#                    if not all(element=='' for element in tmp):     # e.g. Mac OSX numbers adds lots of emtpy lines
+#                        data.append(tuple(tmp))
 
 
 
-        if self.data_source_type=='sqlite':
-            self.cursor.execute("SELECT * FROM mainTable")
-            for column in self.cursor.description:
-                header.append(column[0])
-            data = self.cursor.fetchall()
-#            print header
-#            for i in data:
+#        if self.data_source_type=='sqlite':
+#            self.cursor.execute("SELECT * FROM mainTable")
+#            for column in self.cursor.description:
+#                header.append(column[0])
+#            data = self.cursor.fetchall()
+##            print header
+##            for i in data:
 #                print data
 
-        return ([header,data])
+#        return ([header,data])
 
 
         # first find the index of the columns of interest in the header
@@ -286,159 +383,63 @@ class data_source:
 #            for column in self.cursor.description:
 #                print column
 
-    def save_autoprocessing_results_to_data_source(self,sample,outcome,logfile):
+    def get_data_dict_to_save_autoprocessing_results_to_data_source(self,sample,outcome,logfile):
         if logfile != None:
             aimless_results=parse().GetAimlessLog(logfile)
-            columns_to_update=  [
-                ['DataCollectionBeamline',              'n/a'],
-                ['DataCollectionDate',                  'n/a'],
-                ['DataCollectionOutcome',               outcome],
-                ['DataCollectionRun',                   aimless_results['Run']],
-                ['DataCollectionComment',               'n/a'],
-                ['DataProcessingProgram',               aimless_results['AutoProc']],
-                ['DataProcessingSpaceGroup',            aimless_results['SpaceGroup']],
-                ['DataProcessingUnitCell',              aimless_results['UnitCell']],
-                ['DataProcessingResolutionOverall',     aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionHigh']],
-                ['DataProcessingResolutionLow',         aimless_results['ResolutionLow']],
-                ['DataProcessingResolutionHigh',        aimless_results['ResolutionHigh']],
-                ['DataProcessingRmergeOverall',         aimless_results['RmergeOverall']],
-                ['DataProcessingRmergeLow',             aimless_results['RmergeLow']],
-                ['DataProcessingRmergeHigh',            aimless_results['RmergeHigh']],
-                ['DataProcessingIsigOverall',           aimless_results['IsigOverall']],
-                ['DataProcessingIsigLow',               aimless_results['IsigLow']],
-                ['DataProcessingIsigHigh',              aimless_results['IsigHigh']],
-                ['DataProcessingCompletenessOverall',   aimless_results['CompletenessOverall']],
-                ['DataProcessingCompletenessLow',       aimless_results['CompletenessLow']],
-                ['DataProcessingCompletenessHigh',      aimless_results['CompletenessHigh']],
-                ['DataProcessingMultiplicityOverall',   aimless_results['MultiplicityOverall']],
-                ['DataProcessingMultiplicityLow',       aimless_results['MultiplicityLow']],
-                ['DataProcessingMultiplicityHigh',      aimless_results['MultiplicityHigh']],
-                ['DataProcessingPathToLogfile',         logfile]    ]
+            data_dict =  {
+                'DataCollectionBeamline':               'n/a',
+                'DataCollectionDate':                   'n/a',
+                'DataCollectionOutcome':                outcome,
+                'DataCollectionRun':                    aimless_results['Run'],
+                'DataCollectionComment':                'n/a',
+                'DataProcessingProgram':                aimless_results['AutoProc'],
+                'DataProcessingSpaceGroup':             aimless_results['SpaceGroup'],
+                'DataProcessingUnitCell':               aimless_results['UnitCell'],
+                'DataProcessingResolutionOverall':      aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionHigh'],
+                'DataProcessingResolutionLow':          aimless_results['ResolutionLow'],
+                'DataProcessingResolutionHigh':         aimless_results['ResolutionHigh'],
+                'DataProcessingRmergeOverall':          aimless_results['RmergeOverall'],
+                'DataProcessingRmergeLow':              aimless_results['RmergeLow'],
+                'DataProcessingRmergeHigh':             aimless_results['RmergeHigh'],
+                'DataProcessingIsigOverall':            aimless_results['IsigOverall'],
+                'DataProcessingIsigLow':                aimless_results['IsigLow'],
+                'DataProcessingIsigHigh':               aimless_results['IsigHigh'],
+                'DataProcessingCompletenessOverall':    aimless_results['CompletenessOverall'],
+                'DataProcessingCompletenessLow':        aimless_results['CompletenessLow'],
+                'DataProcessingCompletenessHigh':       aimless_results['CompletenessHigh'],
+                'DataProcessingMultiplicityOverall':    aimless_results['MultiplicityOverall'],
+                'DataProcessingMultiplicityLow':        aimless_results['MultiplicityLow'],
+                'DataProcessingMultiplicityHigh':       aimless_results['MultiplicityHigh'],
+                'DataProcessingPathToLogfile':          logfile    }
         else:
-            columns_to_update=  [
-                ['DataCollectionBeamline',              'n/a'],
-                ['DataCollectionDate',                  'n/a'],
-                ['DataCollectionOutcome',               outcome],
-                ['DataCollectionRun',                   'n/a'],
-                ['DataCollectionComment',               'n/a'],
-                ['DataProcessingProgram',               'n/a'],
-                ['DataProcessingSpaceGroup',            'n/a'],
-                ['DataProcessingUnitCell',              'n/a'],
-                ['DataProcessingResolutionOverall',     'n/a'],
-                ['DataProcessingResolutionLow',         'n/a'],
-                ['DataProcessingResolutionHigh',        'n/a'],
-                ['DataProcessingRmergeOverall',         'n/a'],
-                ['DataProcessingRmergeLow',             'n/a'],
-                ['DataProcessingRmergeHigh',            'n/a'],
-                ['DataProcessingIsigOverall',           'n/a'],
-                ['DataProcessingIsigLow',               'n/a'],
-                ['DataProcessingIsigHigh',              'n/a'],
-                ['DataProcessingCompletenessOverall',   'n/a'],
-                ['DataProcessingCompletenessLow',       'n/a'],
-                ['DataProcessingCompletenessHigh',      'n/a'],
-                ['DataProcessingMultiplicityOverall',   'n/a'],
-                ['DataProcessingMultiplicityLow',       'n/a'],
-                ['DataProcessingMultiplicityHigh',      'n/a'],
-                ['DataProcessingPathToLogfile',         'n/a']    ]
+            data_dict=  {
+                'DataCollectionBeamline':              'n/a',
+                'DataCollectionDate':                  'n/a',
+                'DataCollectionOutcome':               outcome,
+                'DataCollectionRun':                   'n/a',
+                'DataCollectionComment':               'n/a',
+                'DataProcessingProgram':               'n/a',
+                'DataProcessingSpaceGroup':            'n/a',
+                'DataProcessingUnitCell':              'n/a',
+                'DataProcessingResolutionOverall':     'n/a',
+                'DataProcessingResolutionLow':         'n/a',
+                'DataProcessingResolutionHigh':        'n/a',
+                'DataProcessingRmergeOverall':         'n/a',
+                'DataProcessingRmergeLow':             'n/a',
+                'DataProcessingRmergeHigh':            'n/a',
+                'DataProcessingIsigOverall':           'n/a',
+                'DataProcessingIsigLow':               'n/a',
+                'DataProcessingIsigHigh':              'n/a',
+                'DataProcessingCompletenessOverall':   'n/a',
+                'DataProcessingCompletenessLow':       'n/a',
+                'DataProcessingCompletenessHigh':      'n/a',
+                'DataProcessingMultiplicityOverall':   'n/a',
+                'DataProcessingMultiplicityLow':       'n/a',
+                'DataProcessingMultiplicityHigh':      'n/a',
+                'DataProcessingPathToLogfile':         'n/a'    }
 
+        return data_dict
 
-
-        if self.data_source_type=='csv':
-            sample_column=None
-            column_list=[]
-            for n,line in enumerate(open(self.data_source_file)):
-                if n==0:
-                    for column,item in enumerate(line.split(',')):
-                        if item=='CrystalName':
-                            sample_column=column
-                    for item in columns_to_update:
-                        for column,field in enumerate(line.split(',')):
-                            if field==item[0]:
-                                column_list.append(column)
-
-            row_to_change=self.csv_get_sample_row(sample)
-
-            csv_out=''
-            if row_to_change==None:
-                for line in open(self.data_source_file):
-                    csv_out+=line
-                csv_list=(','*max(column_list)).split(',')
-                csv_list[sample_column]=sample
-                for n,item in enumerate(column_list):
-                    csv_list[item]=columns_to_update[n][1]
-                csv_out+=str(csv_list).translate(None,"[']")+'\n'
-            else:
-                for row,line in enumerate(open(self.data_source_file)):
-                    if row == row_to_change:
-                        if len(line.split(',')) < max(column_list):
-                            line+=(','*int(max(column_list)-len(x.split(','))))
-                        csv_list=line.split(',')
-                        for n,item in enumerate(column_list):
-                            csv_list[item]=columns_to_update[n][1]
-                        csv_out+=str(csv_list).translate(None,"[']")+'\n'
-                    else:
-                        csv_out+=line
-            f=open(self.data_source_file,'w')
-            f.write(csv_out)
-            f.close()
-
-
-    def csv_get_sample_row(self,sample):
-            sample_column=None
-            for n,line in enumerate(open(self.data_source_file)):
-                if n==0:
-                    for column,item in enumerate(line.split(',')):
-                        if item=='CrystalName':
-                            sample_column=column
-                            break
-           # find sample line
-            row_to_change=None
-            if sample_column != None:
-                for row,line in enumerate(open(self.data_source_file)):
-                    if len(line.split(',')) >= sample_column:
-                        if line.split(',')[sample_column].replace(' ','')==sample:
-                            row_to_change=row
-            return row_to_change
-
-    def csv_columns_to_update(self,db_list):
-        column_list=[]
-        for n,line in enumerate(open(self.data_source_file)):
-            if n==0:
-                for item in db_list:
-                    for column,field in enumerate(line.split(',')):
-                        if field==item[0]:
-                            column_list.append(column)
-
-        return column_list
-
-
-    def update_table(self,sample,db_list):
-        if self.data_source_type=='csv':
-            row_to_change=self.csv_get_sample_row(sample)
-            column_list=self.csv_columns_to_update(db_list)
-            csv_out=''
-            if row_to_change != None:
-                for row,line in enumerate(open(self.data_source_file)):
-                    if row == row_to_change:
-                        # this is just in case these fields are not yet filled out
-                        # and the commas don't extend all the way
-                        if len(line.split(',')) < max(column_list):
-                            line+=(','*int(max(column_list)-len(line.split(','))))
-                        csv_list=line.split(',')
-                        print csv_list
-                        print db_list
-                        for n,item in enumerate(column_list):
-                            print item
-                            print n
-                            print csv_list[item]
-                            print db_list[n]
-                            csv_list[item]=db_list[n][1]
-                        csv_out+=str(csv_list).translate(None,"[']")+'\n'
-                    else:
-                        csv_out+=line
-            f=open(self.data_source_file,'w')
-            f.write(csv_out)
-            f.close()
 
 
     def get_samples_for_coot(self,RefinementOutcome):
@@ -461,8 +462,6 @@ class data_source:
         return sample_list_for_coot
 
     def update_data_source_from_coot(self):
-        print 'hallo'
-    def update_data_source(self):
         print 'hallo'
     def convert_sqlite_to_csv(self):
         print 'hallo'

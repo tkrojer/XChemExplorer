@@ -1,4 +1,7 @@
 import os, sys, glob
+import getopt
+
+# commited on: 03/12/2015
 
 #sys.path.append('/dls_sw/apps/albula/3.1/dectris/albula/3.1/python')
 #import dectris.albula
@@ -28,6 +31,11 @@ import XChemDB
 import XChemDialogs
 
 
+# Note: on startup: urge user to specify a data source
+# change possible command line argument to  -b --beamline
+#                                           -c --config
+#
+
 
 class XChemExplorer(QtGui.QApplication):
     def __init__(self,args):
@@ -45,7 +53,9 @@ class XChemExplorer(QtGui.QApplication):
             self.refine_model_directory=os.path.join(self.project_directory,'processing','analysis','refine_model')
             self.reference_directory=os.path.join(self.project_directory,'processing','reference')
             self.database_directory=os.path.join(self.project_directory,'processing','database')
-            self.data_source_file='XChemExplorer.csv'
+            self.data_source_file=''
+            if os.path.isfile(os.path.join(self.database_directory,'SoakerDB.sqlite')):
+                self.data_source_file='SoakerDB.sqlite'
             self.ccp4_scratch_directory=os.path.join(self.project_directory,'processing','tmp')
 
             if not os.path.isdir(self.beamline_directory):
@@ -109,14 +119,30 @@ class XChemExplorer(QtGui.QApplication):
 
         self.target_list=[]
 
+#        try:
+#            if args[0]=='-h' or args[0]=='--help':
+#                print 'help'
+#            if args[0].startswith('/'):
+#                self.beamline_directory=args[0]
+#                self.target_list.append('*')
+#        except IndexError:
+#            pass
+
+        # command line arguments
         try:
-            if args[0]=='-h' or args[0]=='--help':
-                print 'help'
-            if args[0].startswith('/'):
-                self.beamline_directory=args[0]
-                self.target_list.append('*')
-        except IndexError:
+            opts, args = getopt.getopt(sys.argv[1:], 'm:p:h', ['miner=', 'params=', 'help'])
+        except getopt.GetoptError:
             pass
+        for opt, arg in opts:
+            if opt in ('-h', '--help'):
+                usage()
+                sys.exit(2)
+            elif opt in ('-m', '--miner'):
+                miner_name = arg
+            elif opt in ('-p', '--params'):
+                params = arg
+
+
 
         for dir in glob.glob(self.beamline_directory+'/*'):
             self.visit_list.append(os.path.realpath(dir))
@@ -133,12 +159,6 @@ class XChemExplorer(QtGui.QApplication):
         self.progress_bar_step=0
         self.albula = None
         self.show_diffraction_image = None
-        # check if qstat is available
-        try:
-            subprocess.call(['qstat'])
-            self.queueing_system_available=True
-        except OSError:
-            self.queueing_system_available=False
 
 
         self.start_GUI()
@@ -216,9 +236,18 @@ class XChemExplorer(QtGui.QApplication):
         create_png_of_soaked_compound_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(create_png_of_soaked_compound_button)
 
-        create_new_data_source_button=QtGui.QPushButton("Create New CSV Data Source")
+        create_new_data_source_button=QtGui.QPushButton("Create New Data Source (SQLite)")
         create_new_data_source_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(create_new_data_source_button)
+
+        import_csv_into_data_source_button=QtGui.QPushButton("Import CSV file into Data Source")
+        import_csv_into_data_source_button.clicked.connect(self.button_clicked)
+        mounted_crystals_button_hbox.addWidget(import_csv_into_data_source_button)
+
+        export_csv_from_data_source_button=QtGui.QPushButton("Export CSV file from Data Source")
+        export_csv_from_data_source_button.clicked.connect(self.button_clicked)
+        mounted_crystals_button_hbox.addWidget(export_csv_from_data_source_button)
+
 
         select_data_source_columns_to_display_button=QtGui.QPushButton("Select Columns")
         select_data_source_columns_to_display_button.clicked.connect(self.button_clicked)
@@ -626,29 +655,61 @@ class XChemExplorer(QtGui.QApplication):
                 self.populate_data_source_table(header,data)
 
 
-            if self.sender().text()=="Create New CSV Data Source":
+            if self.sender().text()=="Create New Data Source (SQLite)":
                 file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
                 #make sure that the file always has .csv extension
+                if file_name.rfind('.') != -1:
+                   file_name=file_name[:file_name.rfind('.')]+'.sqlite'
+                else:
+                    file_name=file_name+'.sqlite'
+                XChemDB.data_source(os.path.join(file_name)).create_empty_data_source_file()
+                if self.data_source_file=='':
+                    self.database_directory=file_name[:file_name.rfind('/')]
+                    self.data_source_file=file_name[file_name.rfind('/')+1:]
+                    self.data_source_file_label.setText(self.data_source_file)
+                    self.database_directory_label.setText(str(self.database_directory))
+                    self.settings['database_directory']=self.database_directory
+                    self.settings['data_source']=self.data_source_file
+
+            if self.sender().text()=="Import CSV file into Data Source":
+                if self.data_source_file=='':
+                    self.update_status_bar('Please load a data soure file first')
+                else:
+                    file_name = QtGui.QFileDialog.getOpenFileName(self.window,'Open file', self.database_directory)
+                    print self.data_source_file
+                    XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).import_csv_file(file_name)
+                    print file_name
+
+            if self.sender().text()=="Export CSV file from Data Source":
+                file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
                 if file_name.rfind('.') != -1:
                    file_name=file_name[:file_name.rfind('.')]+'.csv'
                 else:
                     file_name=file_name+'.csv'
                 print file_name
-                XChemDB.data_source(os.path.join(file_name)).create_empty_data_source_file()
-
+                XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).export_to_csv_file(file_name)
 
             if self.sender().text()=="Save Samples To Datasource":
+                # first translate all columns in table in SQLite tablenames
+                columns_in_data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).return_column_list()
+                column_dict={}
+                for item in self.data_source_columns_to_display:
+                    for column_name in columns_in_data_source:
+                        if column_name[1]==item:
+                            column_dict[item]=column_name[0]
+
                 allRows = self.mounted_crystal_table.rowCount()
-                out=''
                 for row in range(allRows):
-                    for i in range(5):
-                        if self.mounted_crystal_table.item(row,i).text()=='':
-                            print 'hallo'
-                            break
-                        else:
-                            out+=self.mounted_crystal_table.item(row,i).text()+','
-                    out+='\n'
-                print out
+                    data_dict={}
+                    sampleID=str(self.mounted_crystal_table.item(row,0).text())      # this must be the case
+                    for i in range(1,len(self.data_source_columns_to_display)):
+                        if self.mounted_crystal_table.item(row,i).text() != '':
+                            headertext = str(self.mounted_crystal_table.horizontalHeaderItem(i).text())
+                            column_to_update=column_dict[headertext]
+                            data_dict[column_to_update]=str(self.mounted_crystal_table.item(row,i).text())
+                    print sampleID,data_dict
+                    XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).update_data_source(sampleID,data_dict)
+
 
             if self.sender().text()=="Select Columns":
                 print 'hallo'
@@ -1216,12 +1277,14 @@ class XChemExplorer(QtGui.QApplication):
         for x,row in enumerate(data):
 #            print row
             y=0
-            for item in columns_to_show:
+            for q,item in enumerate(columns_to_show):
                 cell_text=QtGui.QTableWidgetItem()
                 if row[item]==None:
                     cell_text.setText('')
                 else:
                     cell_text.setText(str(row[item]))
+                if self.data_source_columns_to_display[q]=='Sample ID':     # assumption is that column 0 is always sampleID
+                    cell_text.setFlags(QtCore.Qt.ItemIsEnabled)             # and this field cannot be changed
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.mounted_crystal_table.setItem(x, y, cell_text)
                 y+=1

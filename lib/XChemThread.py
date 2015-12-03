@@ -3,6 +3,8 @@ from datetime import datetime
 from PyQt4 import QtGui, QtCore
 #from PyQt4.QtCore import QThread, SIGNAL
 
+# last commited: 03/12/2015
+
 import time
 import pickle
 import base64
@@ -235,7 +237,10 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
             else:
                 for index in sorted(indexes):
                     logfile=self.data_collection_statistics_dict[sample][index.row()][1]
-            data_source.save_autoprocessing_results_to_data_source(sample,str(outcome),logfile)
+            if self.data_source_file != '':
+                data_dict=data_source.get_data_dict_to_save_autoprocessing_results_to_data_source(sample,str(outcome),logfile)
+                data_source.update_data_source(sample,data_dict)
+#                data_source.save_autoprocessing_results_to_data_source(sample,str(outcome),logfile)
 
             # create all the directories if necessary
             if not os.path.isdir(os.path.join(self.initial_model_directory,sample)):

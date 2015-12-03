@@ -8,6 +8,7 @@ import subprocess
 import getpass
 import shutil
 
+# last commited: 03/12/2015
 
 class process:
 
@@ -594,10 +595,6 @@ class external_software:
         }
 
     def check(self):
-
-        if 'dls' in os.getcwd():
-            os.system('module load global/cluster')
-            os.system('module load openbabel')
 
         print 'Searching for external software:'
 
