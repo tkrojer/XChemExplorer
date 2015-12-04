@@ -1,7 +1,7 @@
 import os, sys, glob
 import getopt
 
-# commited on: 03/12/2015
+# commited on: 04/12/2015
 
 #sys.path.append('/dls_sw/apps/albula/3.1/dectris/albula/3.1/python')
 #import dectris.albula
@@ -110,6 +110,7 @@ class XChemExplorer(QtGui.QApplication):
         self.target=''
         self.dataset_outcome_dict={}            # contains the dataset outcome buttons
         self.data_collection_table_dict={}      # contains the dataset table
+        self.dataset_outcome_combobox_dict={}
         self.data_collection_dict={}
         self.data_collection_statistics_dict={}
         self.initial_model_dimple_dict={}       # contains toggle button if dimple should be run
@@ -159,6 +160,15 @@ class XChemExplorer(QtGui.QApplication):
         self.progress_bar_step=0
         self.albula = None
         self.show_diffraction_image = None
+
+        self.dataset_outcome = {    "success":                      "rgb(200,200,200)",
+                                    "Failed - centring failed":     "rgb(200,200,200)",
+                                    "Failed - no diffraction":      "rgb(200,200,200)",
+                                    "Failed - processing barfs":    "rgb(200,200,200)",
+                                    "Failed - loop empty":          "rgb(200,200,200)",
+                                    "Failed - low resolution":      "rgb(200,200,200)",
+                                    "Failed - no X-rays":           "rgb(200,200,200)",
+                                    "Failed - unknown":             "rgb(200,200,200)"  }
 
 
         self.start_GUI()
@@ -827,14 +837,6 @@ class XChemExplorer(QtGui.QApplication):
 
 
 
-        self.dataset_outcome = {    "success":                      "rgb(200,200,200)",
-                                    "Failed - centring failed":     "rgb(200,200,200)",
-                                    "Failed - no diffraction":      "rgb(200,200,200)",
-                                    "Failed - processing barfs":    "rgb(200,200,200)",
-                                    "Failed - loop empty":          "rgb(200,200,200)",
-                                    "Failed - low resolution":      "rgb(200,200,200)",
-                                    "Failed - no X-rays":           "rgb(200,200,200)",
-                                    "Failed - unknown":             "rgb(200,200,200)"  }
 
 
         table=QtGui.QTableWidget()
@@ -1114,6 +1116,13 @@ class XChemExplorer(QtGui.QApplication):
                 button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[str(button.text())])
         self.update_outcome_data_collection_summary_table(dataset,outcome)
 
+    def dataset_outcome_combobox_change_outcome(self,text):
+        #str(self.initial_model_dimple_dict[sample][1].currentText()
+        print str(text)
+        self.target=str(text)
+
+
+
     def set_run_dimple_flag(self,state):
         if state == QtCore.Qt.Checked:
             print 'checked'
@@ -1177,7 +1186,20 @@ class XChemExplorer(QtGui.QApplication):
                 if header=='Sample ID':
                     cell_text.setText(str(key))
                 if header=='Dataset\nOutcome':
-                    cell_text.setText(outcome)
+
+                    dataset_outcome_combobox = QtGui.QComboBox()
+                    for outcome in self.dataset_outcome:
+                        dataset_outcome_combobox.addItem(outcome)
+                    self.data_collection_summary_table.setCellWidget(row, column, dataset_outcome_combobox)
+
+                    index = dataset_outcome_combobox.findText(str(outcome), QtCore.Qt.MatchFixedString)
+                    reference_file_selection_combobox.setCurrentIndex(index)
+
+                    dataset_outcome_combobox.activated[str].connect(self.dataset_outcome_combobox_change_outcome)
+                    self.dataset_outcome_combobox_dict[key]=dataset_outcome_combobox
+                    #cell_text.setText(outcome)
+                    continue
+
                 if header.startswith('img'):
                     if len(images_to_show) > image_number:
                         pixmap = QtGui.QPixmap()
