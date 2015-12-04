@@ -1116,13 +1116,31 @@ class XChemExplorer(QtGui.QApplication):
                 button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[str(button.text())])
         self.update_outcome_data_collection_summary_table(dataset,outcome)
 
+        # change combobox in summary table
+        dataset_outcome_combobox=self.dataset_outcome_combobox_dict[dataset]
+        index = dataset_outcome_combobox.findText(str(outcome), QtCore.Qt.MatchFixedString)
+        dataset_outcome_combobox.setCurrentIndex(index)
+
+
     def dataset_outcome_combobox_change_outcome(self,text):
+        outcome=str(text)
         for key in self.dataset_outcome_combobox_dict:
             if self.dataset_outcome_combobox_dict[key]==self.sender():
-                print key
-        #str(self.initial_model_dimple_dict[sample][1].currentText()
-        print str(text)
-    
+                dataset=key
+
+#        for button in self.dataset_outcome_dict[dataset]:
+#            if button==self.sender():
+#                outcome=self.sender().text()
+#                if str(self.sender().text()).startswith('success'):
+#                    button.setStyleSheet("font-size:9px;background-color: rgb(0,255,0)")
+#                else:
+#                    button.setStyleSheet("font-size:9px;background-color: rgb(255,0,0)")
+#            else:
+#                print self.dataset_outcome[str(button.text())]
+#                button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[str(button.text())])
+#        self.update_outcome_data_collection_summary_table(dataset,outcome)
+
+
 
 
 
