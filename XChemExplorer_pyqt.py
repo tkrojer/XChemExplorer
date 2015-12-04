@@ -1130,16 +1130,16 @@ class XChemExplorer(QtGui.QApplication):
 
         for button in self.dataset_outcome_dict[dataset]:
             print str(button.text())
-#            if button==self.sender():
-#                outcome=self.sender().text()
-#                if str(self.sender().text()).startswith('success'):
-#                    button.setStyleSheet("font-size:9px;background-color: rgb(0,255,0)")
-#                else:
-#                    button.setStyleSheet("font-size:9px;background-color: rgb(255,0,0)")
-#            else:
-#                print self.dataset_outcome[str(button.text())]
-#                button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[str(button.text())])
-#        self.update_outcome_data_collection_summary_table(dataset,outcome)
+            if str(button.text())==outcome:
+                if str(self.sender().text()).startswith('success'):
+                    button.setStyleSheet("font-size:9px;background-color: rgb(0,255,0)")
+                else:
+                    button.setStyleSheet("font-size:9px;background-color: rgb(255,0,0)")
+            else:
+
+                button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[str(button.text())])
+
+        self.update_outcome_data_collection_summary_table(dataset,outcome)
 
 
 
