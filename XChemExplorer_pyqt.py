@@ -1131,7 +1131,7 @@ class XChemExplorer(QtGui.QApplication):
         for button in self.dataset_outcome_dict[dataset]:
             print str(button.text())
             if str(button.text())==outcome:
-                if str(self.sender().text()).startswith('success'):
+                if outcome.startswith('success'):
                     button.setStyleSheet("font-size:9px;background-color: rgb(0,255,0)")
                 else:
                     button.setStyleSheet("font-size:9px;background-color: rgb(255,0,0)")
