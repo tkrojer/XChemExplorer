@@ -1193,7 +1193,7 @@ class XChemExplorer(QtGui.QApplication):
                     self.data_collection_summary_table.setCellWidget(row, column, dataset_outcome_combobox)
 
                     index = dataset_outcome_combobox.findText(str(outcome), QtCore.Qt.MatchFixedString)
-                    reference_file_selection_combobox.setCurrentIndex(index)
+                    dataset_outcome_combobox.setCurrentIndex(index)
 
                     dataset_outcome_combobox.activated[str].connect(self.dataset_outcome_combobox_change_outcome)
                     self.dataset_outcome_combobox_dict[key]=dataset_outcome_combobox
