@@ -1114,7 +1114,7 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 print self.dataset_outcome[str(button.text())]
                 button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[str(button.text())])
-        self.update_outcome_data_collection_summary_table(dataset,outcome)
+#        self.update_outcome_data_collection_summary_table(dataset,outcome)
 
         # change combobox in summary table
         dataset_outcome_combobox=self.dataset_outcome_combobox_dict[dataset]
@@ -1139,7 +1139,7 @@ class XChemExplorer(QtGui.QApplication):
 
                 button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[str(button.text())])
 
-        self.update_outcome_data_collection_summary_table(dataset,outcome)
+#        self.update_outcome_data_collection_summary_table(dataset,outcome)
 
 
 
