@@ -1117,9 +1117,12 @@ class XChemExplorer(QtGui.QApplication):
         self.update_outcome_data_collection_summary_table(dataset,outcome)
 
     def dataset_outcome_combobox_change_outcome(self,text):
+        for key in self.dataset_outcome_combobox_dict:
+            if self.dataset_outcome_combobox_dict[key]==self.sender():
+                print key
         #str(self.initial_model_dimple_dict[sample][1].currentText()
         print str(text)
-        self.target=str(text)
+    
 
 
 
