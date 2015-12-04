@@ -1188,8 +1188,8 @@ class XChemExplorer(QtGui.QApplication):
                 if header=='Dataset\nOutcome':
 
                     dataset_outcome_combobox = QtGui.QComboBox()
-                    for outcome in self.dataset_outcome:
-                        dataset_outcome_combobox.addItem(outcome)
+                    for outcomeItem in self.dataset_outcome:
+                        dataset_outcome_combobox.addItem(outcomeItem)
                     self.data_collection_summary_table.setCellWidget(row, column, dataset_outcome_combobox)
 
                     index = dataset_outcome_combobox.findText(str(outcome), QtCore.Qt.MatchFixedString)
