@@ -1128,7 +1128,8 @@ class XChemExplorer(QtGui.QApplication):
             if self.dataset_outcome_combobox_dict[key]==self.sender():
                 dataset=key
 
-#        for button in self.dataset_outcome_dict[dataset]:
+        for button in self.dataset_outcome_dict[dataset]:
+            print str(button.text())
 #            if button==self.sender():
 #                outcome=self.sender().text()
 #                if str(self.sender().text()).startswith('success'):
