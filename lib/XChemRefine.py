@@ -18,33 +18,17 @@ class Refine(object):
         self.compoundID = compoundID
         self.prefix = 'refine'
 
-#    def PrepareForRefinement(self,DataPath):
-#        # if user decides to keep it all in one directory: never mind!
-#        if self.ProjectPath==DataPath:
-#            return None
-#        # check if xtalID folder exists
-#        # if no: create folder & link free.mtz + cif/pdb/png file of ligands
-#        if os.path.isdir(self.ProjectPath+'/'+self.xtalID):
-#            coot.info_dialog(self.xtalID+' is already under refinement!')
-#            return None
-#        else:
-#            os.mkdir(self.ProjectPath+'/'+self.xtalID)
-#            os.system('ln -s '+DataPath+'/'+self.xtalID+'/*.pdb '+self.ProjectPath+'/'+self.xtalID)
-#            os.system('ln -s '+DataPath+'/'+self.xtalID+'/*.mtz '+self.ProjectPath+'/'+self.xtalID)
-#            os.system('ln -s '+DataPath+'/'+self.xtalID+'/*.map '+self.ProjectPath+'/'+self.xtalID)
-#            os.system('ln -s '+DataPath+'/'+self.xtalID+'/'+self.compoundID+'.cif '+self.ProjectPath+'/'+self.xtalID)
-#            os.system('ln -s '+DataPath+'/'+self.xtalID+'/'+self.compoundID+'.png '+self.ProjectPath+'/'+self.xtalID)
-
     def GetSerial(self):
         # check if there were already previous refinements
         # if no: create a folder Refine_1
         # if yes: create a folder Refine_<max+1>
         temp = []
         found = 0
-        if os.path.isdir(self.ProjectPath+'/'+self.xtalID):
-            for item in glob.glob(self.ProjectPath+'/'+self.xtalID+'/*'):
-                if item.startswith(self.ProjectPath+'/'+self.xtalID+'/Refine_'):
-                        temp.append(int(item[item.find('_')+1:]))
+        if os.path.isdir(os.path.join(self.ProjectPath,self.xtalID)):
+            for item in glob.glob(os.path.join(self.ProjectPath,self.xtalID,'*')):
+                if item.startswith(os.path.join(self.ProjectPath,self.xtalID,'Refine_')):
+                        print int(item[item.rfind('_')+1:])
+                        temp.append(int(item[item.rfind('_')+1:]))
                         found = 1
         if found:
             Serial = max(temp) + 1
@@ -54,9 +38,13 @@ class Refine(object):
 
 
     def RunRefmac(self,Serial,RefmacParams,external_software):
+        print self.ProjectPath,self.xtalID,self.compoundID
         Serial=str(Serial)
         findTLS=''
         TLSphenix=''
+
+        self.queueing_system_available=external_software['qsub']
+
         # first check if refinement is ongoing and exit if yes
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'REFINEMENT_IN_PROGRESS')):
             coot.info_dialog('*** REFINEMENT IN PROGRESS ***')
@@ -68,7 +56,7 @@ class Refine(object):
         RefmacParams['XYZOUT']='XYZOUT '+os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refine_'+Serial+'.pdb \\\n')
 
 
-        if os.path.isfile(self.ProjectPath+'/'+self.xtalID+'/'+self.compoundID+'.cif'):
+        if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.compoundID+'.cif')):
             RefmacParams['LIBIN']='LIBIN '+self.ProjectPath+'/'+self.xtalID+'/'+self.compoundID+'.cif \\\n'
             RefmacParams['LIBOUT']='LIBOUT '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'/refine_'+Serial+'.cif \\\n'
         if RefmacParams['TLS'].startswith('refi'):
@@ -78,26 +66,38 @@ class Refine(object):
             TLSphenix=' phenix.tls '
 
         # make new refinement folder
-        os.mkdir(self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial)
+        print    os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial)
+        os.mkdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
 
         # now take protein pdb file and write it to newly create Refine_<serial> folder
         # note: the user has to make sure that the ligand file was merged into main file
-        for item in coot_utils_SP.molecule_number_list():
-            print coot.molecule_name(item),self.prefix+'.pdb'
+        for item in coot_utils_XChem.molecule_number_list():
             if coot.molecule_name(item).endswith(self.prefix+'.pdb'):
                 coot.write_pdb_file(item,self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'/in.pdb')
 
         # we write 'REFINEMENT_IN_PROGRESS' immediately to avoid unncessary refiment
-        os.chdir(self.ProjectPath+'/'+self.xtalID)
+        os.chdir(os.path.join(self.ProjectPath,self.xtalID))
 
         os.system('/bin/rm refine.pdb refine.mtz validation_summary.txt validate_ligands.txt 2fofc.map fofc.map refine_molprobity.log')
-#        for i in ['refine.pdb','refine.mtz','validation_summary.txt','validate_ligands.txt','2fofc.map','fofc.map']:
-#            os.remove(i)
+
+        if self.queueing_system_available:
+            pbs_line='#PBS -joe -N dimple'
+        else:
+            pbs_line=''
+
+#        if 'csh' in os.getenv('SHELL'):
+#            ccp4_scratch='setenv CCP4_SCR '+self.ccp4_scratch_directory+'\n'
+#        elif 'bash' in os.getenv('SHELL'):
+#            ccp4_scratch='export CCP4_SCR='+self.ccp4_scratch_directory+'\n'
+#        else:
+#            ccp4_scratch=''
+
+
         os.system('touch REFINEMENT_IN_PROGRESS')
 
         refmacCmds = (
-            '#!/bin/csh\n'
-            '#PBS -joe -N REFMAC\n'
+            '#!'+os.getenv('SHELL')+'\n'
+            '%s\n' %pbs_line+
             'cd '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'\n'
             +findTLS+
             'refmac5 '
@@ -153,15 +153,15 @@ class Refine(object):
             'END\n'
             'EOF\n'
             '\n'
-            'phenix.molprobity refine_%s.pdb refine_%s.mtz\n' %(Serial,Serial)+
-            '/bin/mv molprobity.out refine_molprobity.log\n'
-            'mmtbx.validate_ligands refine_%s.pdb refine_%s.mtz LIG > validate_ligands.txt\n' %(Serial,Serial)+
+            '#phenix.molprobity refine_%s.pdb refine_%s.mtz\n' %(Serial,Serial)+
+            '#/bin/mv molprobity.out refine_molprobity.log\n'
+            '#mmtbx.validate_ligands refine_%s.pdb refine_%s.mtz LIG > validate_ligands.txt\n' %(Serial,Serial)+
             'cd '+self.ProjectPath+'/'+self.xtalID+'\n'
             'ln -s %s/%s/Refine_%s/refine_%s.pdb refine.pdb\n' %(self.ProjectPath,self.xtalID,Serial,Serial)+
             'ln -s %s/%s/Refine_%s/refine_%s.mtz refine.mtz\n' %(self.ProjectPath,self.xtalID,Serial,Serial)+
-            'ln -s Refine_%s/validate_ligands.txt .\n' %Serial+
-            'ln -s Refine_%s/refine_molprobity.log .\n' %Serial+
-            'mmtbx.validation_summary refine.pdb > validation_summary.txt\n'
+            '#ln -s Refine_%s/validate_ligands.txt .\n' %Serial+
+            '#ln -s Refine_%s/refine_molprobity.log .\n' %Serial+
+            '#mmtbx.validation_summary refine.pdb > validation_summary.txt\n'
             '\n'
             'fft hklin refine.mtz mapout 2fofc.map << EOF\n'
             'labin F1=FWT PHI=PHWT\n'
@@ -186,13 +186,15 @@ class Refine(object):
             '#\n'
            )
 
-        cmd = open(self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'/refmac.csh','w')
+        cmd = open(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refmac.csh'),'w')
         cmd.write(refmacCmds)
         cmd.close()
 
-        if external_software['qstat']:
+        os.chdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
+        if external_software['qsub']:
             os.system('qsub refmac.csh"')
         else:
+            os.system('chmod +x refmac.csh')
             os.system('./refmac.csh &')
 
 
@@ -342,61 +344,44 @@ class Refine(object):
         return RefmacParams
 
     def GetRefinementHistory(self):
-        RefinementHistory=''
+#        RefinementHistory=''
         RefinementCycle = []
-        found = 0
-        for item in glob.glob(self.ProjectPath+'/'+self.xtalID+'/*'):
-            if item.startswith(self.ProjectPath+'/'+self.xtalID+'/Refine_'):
-                    RefinementCycle.append(int(item[item.find('_')+1:]))
-                    found = 1
+        RcrystList=[]
+        RfreeList=[]
+
+        found = False
+        for item in glob.glob(os.path.join(self.ProjectPath,self.xtalID,'*')):
+            if item.startswith(os.path.join(self.ProjectPath,self.xtalID,'Refine_')):
+                    print item[item.rfind('_')+1:]
+                    RefinementCycle.append(int(item[item.rfind('_')+1:]))
+                    found = True
         if found:
             for cycle in sorted(RefinementCycle):
-                R=0
-                Rfree=0
-                LigandCC=0
+#                Rcryst=0
+#                Rfree=0
+#                LigandCC=0
                 try:
                     newestPDB = max(glob.iglob(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(cycle)+'/refine_'+str(cycle)+'.pdb'), key=os.path.getctime)
                     for line in open(newestPDB):
-                        if line.startswith('REMARK   3   R VALUE     (WORKING + TEST SET) :'): R = line.split()[9]
-                        if line.startswith('REMARK   3   FREE R VALUE                     :'): Rfree = line.split()[6]
-                    if os.path.isfile(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(cycle)+'/validate_ligands.txt'):
-                        for line in open(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(cycle)+'/validate_ligands.txt'):
-                                if line.startswith('|  LIG'): LigandCC = line.split()[6]
-                    RefinementHistory=RefinementHistory+str(cycle).rjust(10)+str(R).rjust(10)+str(Rfree).rjust(10)+str(LigandCC).rjust(10)+'\n'
+                        if line.startswith('REMARK   3   R VALUE     (WORKING + TEST SET) :'):
+                            Rcryst = line.split()[9]
+                            RcrystList.append(Rcryst)
+                        if line.startswith('REMARK   3   FREE R VALUE                     :'):
+                            Rfree = line.split()[6]
+                            RfreeList.append(Rfree)
+#                    if os.path.isfile(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(cycle)+'/validate_ligands.txt'):
+#                        for line in open(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(cycle)+'/validate_ligands.txt'):
+#                                if line.startswith('|  LIG'): LigandCC = line.split()[6]
+#                    RefinementHistory=RefinementHistory+str(cycle).rjust(10)+str(R).rjust(10)+str(Rfree).rjust(10)+str(LigandCC).rjust(10)+'\n'
                 except ValueError:
-                    RefinementHistory=RefinementHistory+str(cycle).rjust(10)+str(R).rjust(10)+str(Rfree).rjust(10)+str(LigandCC).rjust(10)+'\n'
-            f=open(self.ProjectPath+'/'+self.xtalID+'/RefinementHistory.txt','w')
-            f.write(RefinementHistory)
-            f.close()
-            gnuIN = (   'set term png size 300,225\n'
-                        'set output "RefinementHistory.png"\n'
-                        'set key right bottom\n'
-                        'set xlabel "Cycle"\n'
-                        'set ylabel "R/Rfree"\n'
-                        'set yrange [0:0.35]\n'
-                        'set y2label "ligand CC"\n'
-                        'set y2range [0:1]\n'
-                        'set ytics nomirror\n'
-                        'set y2tics\n'
-                        'set tics out\n'
-                        'set xtics 1\n'
-                        'set style line 1 lt 1 lw 2 linecolor rgb "red"\n'
-                        'set style line 2 lt 1 lw 2 linecolor rgb "green"\n'
-                        'set style line 3 lt 1 lw 2 linecolor rgb "blue"\n'
-                        'plot "RefinementHistory.txt" using 1:2  title "R" axes x1y1 with line ls 1,'
-                        '     "RefinementHistory.txt" using 1:3  title "Rfree" axes x1y1 with line ls 2,'
-                        '     "RefinementHistory.txt" using 1:4  title "ligand CC" axes x2y2 with line ls 3\n'
-            )
-            f=open(self.ProjectPath+'/'+self.xtalID+'/RefinementHistory.gnu','w')
-            f.write(gnuIN)
-            f.close()
-            os.chdir(self.ProjectPath+'/'+self.xtalID)
-            os.system('gnuplot RefinementHistory.gnu')
+                    RcrystList.append(0)
+                    RfreeList.append(0)
+#                    RefinementHistory=RefinementHistory+str(cycle).rjust(10)+str(R).rjust(10)+str(Rfree).rjust(10)+str(LigandCC).rjust(10)+'\n'
+        else:
+            RefinementCycle = [0]
+            RcrystList=[0]
+            RfreeList=[0]
 
-
-
-
-
-
+        return(RefinementCycle,RcrystList,RfreeList)
 
 

@@ -19,7 +19,9 @@ class process:
         self.reference=dimple['reference']
         self.queueing_system_available=dimple['queueing_system_available']
         self.ccp4_scratch_directory=dimple['ccp4_scratch']
-        self.mtz_free=self.xtalID+'.free.mtz'
+        self.fileroot_in=dimple['fileroot_in']
+        self.mtz_free=self.fileroot_in+'.free.mtz'
+        self.mtz_in=self.fileroot_in+'.mtz'
         # need to set $CCP4_SCR, because the default directory in /home/zqr16691/tmp fills up easily 
         # and then dimple will not run
 #        if not os.path.isdir(self.project_directory[:self.project_directory.find('processing')+11]+'/tmp'):
@@ -35,7 +37,7 @@ class process:
                     '\n'
                     'cd %s/%s/Dimple\n' %(self.project_directory,self.xtalID) +
                     '\n'
-                    'pointless hklin ../%s.mtz hklref %s.mtz hklout %s.reind.mtz << EOF > pointless.log\n' %(self.xtalID,self.reference,self.xtalID)+
+                    'pointless hklin ../%s hklref %s.mtz hklout %s.reind.mtz << EOF > pointless.log\n' %(self.mtz_in,self.reference,self.xtalID)+
                     ' tolerance 5\n'
                     'EOF\n'
                     '\n'
@@ -47,11 +49,11 @@ class process:
                     '   END\n'
                     'EOF\n'
                     '\n'
-                    '#freerflag hklin cad.mtz hklout %s.free.mtz << EOF > freerflag.log\n' %self.xtalID +
+                    '#freerflag hklin cad.mtz hklout %s << EOF > freerflag.log\n' %self.mtz_free +
                     '#   COMPLETE FREE=FreeR_flag\n'
                     '#   END\n'
                     '#EOF\n'
-                    'uniqueify -f FreeR_flag cad.mtz ../%s.free.mtz\n' %self.xtalID
+                    'uniqueify -f FreeR_flag cad.mtz ../%s\n' %self.mtz_free
                     )
             else:
                 Cmds = (
@@ -59,7 +61,7 @@ class process:
                     '\n'
                     'cd %s/%s/Dimple\n' %(self.project_directory,self.xtalID) +
                     '\n'
-                    'pointless hklin ../%s.mtz xyzin %s.pdb hklout %s.reind.mtz << EOF > pointless.log\n' %(self.xtalID,self.reference,self.xtalID)+
+                    'pointless hklin ../%s xyzin %s.pdb hklout %s.reind.mtz << EOF > pointless.log\n' %(self.mtz_in,self.reference,self.xtalID)+
                     ' tolerance 5\n'
                     'EOF\n'
                     '\n'
@@ -69,7 +71,7 @@ class process:
                     '   END\n'
                     'EOF\n'
                     '\n'
-                    'uniqueify cad.mtz ../%s.free.mtz\n' %self.xtalID
+                    'uniqueify cad.mtz ../%s\n' %self.mtz_free
                     )
             print Cmds
             os.chdir(os.path.join(self.project_directory,self.xtalID))
@@ -113,7 +115,7 @@ class process:
                 '\n'
                 +ccp4_scratch+
                 '\n'
-                'dimple ../%s.free.mtz %s.pdb dimple' %(self.xtalID,self.reference) +
+                'dimple ../%s %s.pdb dimple' %(self.mtz_free,self.reference) +
                 '\n'
                 'cd %s/%s\n' %(self.project_directory,self.xtalID) +
                 '\n'
@@ -178,6 +180,15 @@ class helpers:
             )
         print Cmds
         os.system(Cmds)
+        os.chdir(os.path.join(initial_model_directory,sample))
+        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.pdb')):
+            os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.pdb'))
+        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif')):
+            os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif'))
+        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png')):
+            os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png'))
+
+
 
 class parse:
 
@@ -864,4 +875,39 @@ class pdbtools(object):
                 break
         return X,Y,Z
 
+
+class reference:
+
+    def __init__(self,sample_mtz,reference_file_list):
+        self.sample_mtz=sample_mtz
+        self.reference_file_list=reference_file_list
+
+    def find_suitable_reference(self,allowed_unitcell_difference_percent):
+        found_suitable_reference=False
+        unitcell_reference='n/a'
+        reference=''
+        spg_reference='n/a'
+        unitcell_difference='n/a'
+        resolution_high='n/a'
+        spg_autoproc='n/a'
+        if os.path.isfile(self.sample_mtz):
+            mtz_autoproc=mtztools(self.sample_mtz).get_all_values_as_dict()
+            resolution_high=mtz_autoproc['resolution_high']
+            spg_autoproc=mtz_autoproc['spacegroup']
+            unitcell_autoproc=mtz_autoproc['unitcell']
+            lattice_autoproc=mtz_autoproc['bravais_lattice']
+            unitcell_volume_autoproc=mtz_autoproc['unitcell_volume']
+            # check which reference file is most similar
+            for o,reference_file in enumerate(self.reference_file_list):
+                unitcell_difference=round((math.fabs(reference_file[4]-unitcell_volume_autoproc)/reference_file[4])*100,1)
+                # reference file is accepted when different in unitcell volume < 5%
+                # and both files have the same lattice type
+                if unitcell_difference < allowed_unitcell_difference_percent and lattice_autoproc==reference_file[3]:
+                    spg_reference=reference_file[1]
+                    unitcell_reference=reference_file[2]
+                    reference=reference_file[0]
+                    found_suitable_reference=True
+                    break
+        return (spg_reference,unitcell_reference,reference,found_suitable_reference,
+                resolution_high,spg_autoproc,unitcell_autoproc,unitcell_difference)
 

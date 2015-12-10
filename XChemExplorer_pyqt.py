@@ -26,21 +26,15 @@ from XChemUtils import parse
 #from XChemUtils import queue
 #from XChemUtils import mtztools
 from XChemUtils import external_software
+from XChemUtils import reference
 import XChemThread
 import XChemDB
 import XChemDialogs
 
 
-# Note: on startup: urge user to specify a data source
-# change possible command line argument to  -b --beamline
-#                                           -c --config
-#
-
-
 class XChemExplorer(QtGui.QApplication):
     def __init__(self,args):
         QtGui.QApplication.__init__(self,args)
-
         # checking for external software packages
         self.external_software=external_software().check()
 
@@ -85,6 +79,7 @@ class XChemExplorer(QtGui.QApplication):
 
         # general settings
         self.allowed_unitcell_difference_percent=5
+        self.filename_root='${samplename}'
 
         self.settings =     {'current_directory':       self.current_directory,
                              'project_directory':       self.project_directory,
@@ -95,8 +90,8 @@ class XChemExplorer(QtGui.QApplication):
                              'database_directory':      self.database_directory,
                              'data_source':             os.path.join(self.database_directory,self.data_source_file),
                              'ccp4_scratch':            self.ccp4_scratch_directory,
-                             'external_software':       self.external_software,
-                             'unitcell_difference':     self.allowed_unitcell_difference_percent    }
+                             'unitcell_difference':     self.allowed_unitcell_difference_percent,
+                             'filename_root':           self.filename_root  }
 
 #        self.FindHitsDir=self.project_directory+'/processing/analysis/find_hits'
 #        self.DatabaseDir=self.project_directory+'/processing/database'
@@ -118,32 +113,41 @@ class XChemExplorer(QtGui.QApplication):
         self.all_columns_in_data_source=XChemDB.data_source(os.path.join(self.database_directory,
                                                                          self.data_source_file)).return_column_list()
 
-        self.target_list=[]
-
-#        try:
-#            if args[0]=='-h' or args[0]=='--help':
-#                print 'help'
-#            if args[0].startswith('/'):
-#                self.beamline_directory=args[0]
-#                self.target_list.append('*')
-#        except IndexError:
-#            pass
+        self.target_list=['*']      # always give the option to read in all targets
 
         # command line arguments
         try:
-            opts, args = getopt.getopt(sys.argv[1:], 'm:p:h', ['miner=', 'params=', 'help'])
-        except getopt.GetoptError:
-            pass
-        for opt, arg in opts:
-            if opt in ('-h', '--help'):
-                usage()
-                sys.exit(2)
-            elif opt in ('-m', '--miner'):
-                miner_name = arg
-            elif opt in ('-p', '--params'):
-                params = arg
-
-
+            opts, args = getopt.getopt(sys.argv[1:], "hc:b:d:", ["help", "config=","beamline=","datasource="])
+        except getopt.GetoptError as err:
+            # print help information and exit:
+            print 'Sorry, command line option does not exist'
+            sys.exit()
+        for o, a in opts:
+            if o in ("-h", "--help"):
+                print 'avail able command line options:'
+                print '-c,--config:     config file'
+                print '-b,--beamline:   beamline directory'
+                print '-d,--datasource: data source file'
+                sys.exit()
+            elif o in ("-c", "--config"):
+                pickled_settings = pickle.load(open(os.path.abspath(a),"rb"))
+                self.beamline_directory=pickled_settings['beamline_directory']
+                self.settings['beamline_directory']=self.beamline_directory
+                self.initial_model_directory=pickled_settings['initial_model_directory']
+                self.settings['initial_model_directory']=self.initial_model_directory
+                self.database_directory=pickled_settings['database_directory']
+                self.settings['database_directory']=self.database_directory
+                self.data_source_file=pickled_settings['data_source']
+                self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
+                self.ccp4_scratch_directory=pickled_settings['ccp4_scratch']
+                self.settings['ccp4_scratch']=self.ccp4_scratch_directory
+                self.allowed_unitcell_difference_percent=pickled_settings['unitcell_difference']
+            elif o in ("-b", "--beamline"):
+                self.beamline_directory=os.path.abspath(a)
+            elif o in ("-d", "--datasource"):
+                tmp=os.path.abspath(a)
+                self.database_directory=tmp[:tmp.rfind('/')]
+                self.data_source_file=tmp[tmp.rfind('/')+1:]
 
         for dir in glob.glob(self.beamline_directory+'/*'):
             self.visit_list.append(os.path.realpath(dir))
@@ -212,7 +216,7 @@ class XChemExplorer(QtGui.QApplication):
                         'Initial Model',
                         'PANDDAs',
                         'Summary & Refine',
-                        'Queue Control',
+                        #'Queue Control',
                         'Settings'  ]
         self.tab_dict={}
         for page in tab_list:
@@ -234,7 +238,6 @@ class XChemExplorer(QtGui.QApplication):
         self.mounted_crystals_vbox_for_table=QtGui.QVBoxLayout()
         self.tab_dict['Data Source'][1].addLayout(self.mounted_crystals_vbox_for_table)
         self.mounted_crystals_vbox_for_table.addWidget(self.mounted_crystal_table)
-
         mounted_crystals_button_hbox=QtGui.QHBoxLayout()
         get_mounted_crystals_button=QtGui.QPushButton("Load Samples From Datasource")
         get_mounted_crystals_button.clicked.connect(self.button_clicked)
@@ -245,26 +248,19 @@ class XChemExplorer(QtGui.QApplication):
         create_png_of_soaked_compound_button=QtGui.QPushButton("Create PDB/CIF/PNG files of Compound")
         create_png_of_soaked_compound_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(create_png_of_soaked_compound_button)
-
         create_new_data_source_button=QtGui.QPushButton("Create New Data Source (SQLite)")
         create_new_data_source_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(create_new_data_source_button)
-
         import_csv_into_data_source_button=QtGui.QPushButton("Import CSV file into Data Source")
         import_csv_into_data_source_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(import_csv_into_data_source_button)
-
         export_csv_from_data_source_button=QtGui.QPushButton("Export CSV file from Data Source")
         export_csv_from_data_source_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(export_csv_from_data_source_button)
-
-
         select_data_source_columns_to_display_button=QtGui.QPushButton("Select Columns")
         select_data_source_columns_to_display_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(select_data_source_columns_to_display_button)
-
         self.tab_dict['Data Source'][1].addLayout(mounted_crystals_button_hbox)
-
 
         # DLS @ Data Collection Tab
         self.data_collection_vbox_for_table=QtGui.QVBoxLayout()
@@ -283,8 +279,6 @@ class XChemExplorer(QtGui.QApplication):
         data_collection_button_hbox.addWidget(target_selection_combobox)
         self.tab_dict['DLS @ Data Collection'][1].addLayout(data_collection_button_hbox)
         self.target=str(target_selection_combobox.currentText())
-#        print self.target
-#        self.target='ATAD2A'
 
         # DLS @ Summary
         data_collection_summary_list=[]
@@ -305,7 +299,6 @@ class XChemExplorer(QtGui.QApplication):
                                                         'Completeness\nOverall',
                                                         'Show Diffraction\nImage'
                                                         ]
-
 
         data_collection_summary_list.append(['']*len(self.data_collection_summary_column_name))
         self.data_collection_summary_table=QtGui.QTableWidget()
@@ -329,10 +322,27 @@ class XChemExplorer(QtGui.QApplication):
         initial_model_checkbutton_hbox=QtGui.QHBoxLayout()
         select_sample_for_dimple = QtGui.QCheckBox('(de-)select all samples for DIMPLE')
         select_sample_for_dimple.toggle()
-#        select_sample_for_dimple.connect(self.set_run_dimple_flag)
+        select_sample_for_dimple.setChecked(False)
+        select_sample_for_dimple.stateChanged.connect(self.set_run_dimple_flag)
         initial_model_checkbutton_hbox.addWidget(select_sample_for_dimple)
         self.tab_dict['Initial Model'][1].addLayout(initial_model_checkbutton_hbox)
         self.initial_model_vbox_for_table=QtGui.QVBoxLayout()
+        self.initial_model_column_name = [  'SampleID',
+                                            'Run\nDimple',
+                                            'Resolution',
+                                            'Rcryst',
+                                            'Rfree',
+                                            'Space Group\nautoprocessing',
+                                            'Space Group\nreference',
+                                            'Difference\nUnit Cell Volume (%)',
+                                            'Reference File',
+                                            'Unit Cell\nautoprocessing',
+                                            'Unit Cell\nreference'  ]
+        self.initial_model_table=QtGui.QTableWidget()
+        self.initial_model_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.initial_model_table.setSortingEnabled(True)
+        self.initial_model_table.setHorizontalHeaderLabels(self.initial_model_column_name)
+        self.initial_model_vbox_for_table.addWidget(self.initial_model_table)
         self.tab_dict['Initial Model'][1].addLayout(self.initial_model_vbox_for_table)
         initial_model_button_hbox=QtGui.QHBoxLayout()
         get_initial_model_button=QtGui.QPushButton("Check for inital Refinement")
@@ -344,11 +354,12 @@ class XChemExplorer(QtGui.QApplication):
         refresh_inital_model_button=QtGui.QPushButton("Refresh")
         refresh_inital_model_button.clicked.connect(self.button_clicked)
         initial_model_button_hbox.addWidget(refresh_inital_model_button)
-        self.reference_file_list=self.get_reference_file_list()
-        reference_file_selection_combobox = QtGui.QComboBox()
-        for reference_file in self.reference_file_list:
-            reference_file_selection_combobox.addItem(reference_file[0])
-        initial_model_button_hbox.addWidget(reference_file_selection_combobox)
+        self.reference_file_list=self.get_reference_file_list(' ')
+        self.reference_file_selection_combobox = QtGui.QComboBox()
+        self.populate_reference_combobox(self.reference_file_selection_combobox)
+#        for reference_file in self.reference_file_list:
+#            reference_file_selection_combobox.addItem(reference_file[0])
+        initial_model_button_hbox.addWidget(self.reference_file_selection_combobox)
         set_new_reference_button=QtGui.QPushButton("Set New Reference (if applicable)")
         set_new_reference_button.clicked.connect(self.button_clicked)
         initial_model_button_hbox.addWidget(set_new_reference_button)
@@ -368,10 +379,21 @@ class XChemExplorer(QtGui.QApplication):
         # Refinement outcome
         # ligand CC
 
-
-
-
         self.summary_vbox_for_table=QtGui.QVBoxLayout()
+        self.summary_column_name=[ 'Sample ID',
+                                    'Compound ID',
+                                    'Compound\nImage',
+                                    'DataCollection\nOutcome',
+                                    'DataProcessing\nSpaceGroup',
+                                    'DataProcessing\nResolutionHigh',
+                                    'Refinement\nOutcome',
+                                    'Refinement\nRcryst',
+                                    'Refinement\nRfree' ]
+        self.summary_table=QtGui.QTableWidget()
+        self.summary_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.summary_table.setSortingEnabled(True)
+        self.summary_table.setHorizontalHeaderLabels(self.summary_column_name)
+        self.summary_vbox_for_table.addWidget(self.summary_table)
         self.tab_dict['Summary & Refine'][1].addLayout(self.summary_vbox_for_table)
         summary_button_hbox=QtGui.QHBoxLayout()
         load_all_samples_button=QtGui.QPushButton("Load All Samples")
@@ -388,14 +410,14 @@ class XChemExplorer(QtGui.QApplication):
         # Settings Tab
         self.data_collection_vbox_for_settings=QtGui.QVBoxLayout()
         self.tab_dict['Settings'][1].addLayout(self.data_collection_vbox_for_settings)
-        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('Project Directory:'))
-        settings_hbox_project_directory=QtGui.QHBoxLayout()
-        self.project_directory_label=QtGui.QLabel(self.project_directory)
-        settings_hbox_project_directory.addWidget(self.project_directory_label)
-        settings_buttoon_project_directory=QtGui.QPushButton('Select Project Directory')
-        settings_buttoon_project_directory.clicked.connect(self.settings_button_clicked)
-        settings_hbox_project_directory.addWidget(settings_buttoon_project_directory)
-        self.data_collection_vbox_for_settings.addLayout(settings_hbox_project_directory)
+#        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('Project Directory:'))
+#        settings_hbox_project_directory=QtGui.QHBoxLayout()
+#        self.project_directory_label=QtGui.QLabel(self.project_directory)
+#        settings_hbox_project_directory.addWidget(self.project_directory_label)
+#        settings_buttoon_project_directory=QtGui.QPushButton('Select Project Directory')
+#        settings_buttoon_project_directory.clicked.connect(self.settings_button_clicked)
+#        settings_hbox_project_directory.addWidget(settings_buttoon_project_directory)
+#        self.data_collection_vbox_for_settings.addLayout(settings_hbox_project_directory)
         self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nInitial Model Directory:'))
         settings_hbox_initial_model_directory=QtGui.QHBoxLayout()
         self.initial_model_directory_label=QtGui.QLabel(self.initial_model_directory)
@@ -404,6 +426,17 @@ class XChemExplorer(QtGui.QApplication):
         settings_buttoon_initial_model_directory.clicked.connect(self.settings_button_clicked)
         settings_hbox_initial_model_directory.addWidget(settings_buttoon_initial_model_directory)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_initial_model_directory)
+
+        settings_hbox_filename_root=QtGui.QHBoxLayout()
+        self.filename_root_label=QtGui.QLabel('filename root:')
+        settings_hbox_filename_root.addWidget(self.filename_root_label)
+        settings_hbox_filename_root.addStretch(1)
+        self.filename_root_input = QtGui.QLineEdit()
+        self.filename_root_input.setFixedWidth(400)
+        self.filename_root_input.setText(str(self.filename_root))
+        self.filename_root_input.textChanged[str].connect(self.change_filename_root)
+        settings_hbox_filename_root.addWidget(self.filename_root_input)
+        self.data_collection_vbox_for_settings.addLayout(settings_hbox_filename_root)
 
         settings_hbox_adjust_allowed_unit_cell_difference=QtGui.QHBoxLayout()
         self.adjust_allowed_unit_cell_difference_label=QtGui.QLabel('Max. Allowed Unit Cell Difference between Reference and Target (%):')
@@ -416,14 +449,15 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_adjust_allowed_unit_cell_difference.addWidget(self.adjust_allowed_unit_cell_difference)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_adjust_allowed_unit_cell_difference)
 
-        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nRefine Model Directory:'))
-        settings_hbox_refine_model_directory=QtGui.QHBoxLayout()
-        self.refine_model_directory_label=QtGui.QLabel(self.refine_model_directory)
-        settings_hbox_refine_model_directory.addWidget(self.refine_model_directory_label)
-        settings_buttoon_refine_model_directory=QtGui.QPushButton('Select Refine Model Directory')
-        settings_buttoon_refine_model_directory.clicked.connect(self.settings_button_clicked)
-        settings_hbox_refine_model_directory.addWidget(settings_buttoon_refine_model_directory)
-        self.data_collection_vbox_for_settings.addLayout(settings_hbox_refine_model_directory)
+#        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nRefine Model Directory:'))
+#        settings_hbox_refine_model_directory=QtGui.QHBoxLayout()
+#        self.refine_model_directory_label=QtGui.QLabel(self.refine_model_directory)
+#        settings_hbox_refine_model_directory.addWidget(self.refine_model_directory_label)
+#        settings_buttoon_refine_model_directory=QtGui.QPushButton('Select Refine Model Directory')
+#        settings_buttoon_refine_model_directory.clicked.connect(self.settings_button_clicked)
+#        settings_hbox_refine_model_directory.addWidget(settings_buttoon_refine_model_directory)
+#        self.data_collection_vbox_for_settings.addLayout(settings_hbox_refine_model_directory)
+
         self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nReference Structure Directory:'))
         settings_hbox_reference_directory=QtGui.QHBoxLayout()
         self.reference_directory_label=QtGui.QLabel(self.reference_directory)
@@ -489,29 +523,51 @@ class XChemExplorer(QtGui.QApplication):
 #        self.timer = QtCore.QBasicTimer()
         self.window.show()
 
+    def populate_reference_combobox(self,comboxbox):
+        comboxbox.clear()
+        for reference_file in self.reference_file_list:
+            comboxbox.addItem(reference_file[0])
+
+
     def open_config_file(self):
         file_name = QtGui.QFileDialog.getOpenFileName(self.window,'Open file', self.current_directory)
+
         try:
             pickled_settings = pickle.load(open(file_name,"rb"))
-            self.project_directory=pickled_settings['project_directory']
+#            self.project_directory=pickled_settings['project_directory']
+#            self.settings['project_directory']=self.project_directory
             self.beamline_directory=pickled_settings['beamline_directory']
+            self.settings['beamline_directory']=self.beamline_directory
             self.initial_model_directory=pickled_settings['initial_model_directory']
-            self.refine_model_directory=pickled_settings['refine_model_directory']
-            self.reference_directory=pickled_settings['reference_directory']
+            self.settings['initial_model_directory']=self.initial_model_directory
+#            self.refine_model_directory=pickled_settings['refine_model_directory']
+#            self.settings['refine_model_directory']=self.refine_model_directory
             self.database_directory=pickled_settings['database_directory']
+            self.settings['database_directory']=self.database_directory
             self.data_source_file=pickled_settings['data_source']
+            self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
             self.ccp4_scratch_directory=pickled_settings['ccp4_scratch']
+            self.settings['ccp4_scratch']=self.ccp4_scratch_directory
             self.allowed_unitcell_difference_percent=pickled_settings['unitcell_difference']
-            self.project_directory_label.setText(self.project_directory)
+
+
+            reference_directory_temp=pickled_settings['reference_directory']
+            if reference_directory_temp != self.reference_directory:
+                self.reference_directory=reference_directory_temp
+                self.update_reference_files(' ')
+
+#            self.project_directory_label.setText(self.project_directory)
             self.initial_model_directory_label.setText(self.initial_model_directory)
-            self.refine_model_directory_label.setText(self.refine_model_directory)
+#            self.refine_model_directory_label.setText(self.refine_model_directory)
             self.reference_directory_label.setText(self.reference_directory)
             self.database_directory_label.setText(self.database_directory)
             self.beamline_directory_label.setText(self.beamline_directory)
             self.data_source_file_label.setText(self.data_source_file)
             self.ccp4_scratch_directory_label.setText(self.ccp4_scratch_directory)
             self.adjust_allowed_unit_cell_difference.setText(str(self.allowed_unitcell_difference_percent))
-            self.reference_file_list=self.get_reference_file_list()
+            self.reference_file_list=self.get_reference_file_list(' ')
+
+
         except KeyError:
             self.update_status_bar('Sorry, this is not a XChemExplorer config file!')
 
@@ -519,11 +575,23 @@ class XChemExplorer(QtGui.QApplication):
         file_name = QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.current_directory)
         pickle.dump(self.settings,open(file_name,'wb'))
 
-
+    def update_reference_files(self,reference_root):
+        self.reference_file_list=self.get_reference_file_list(reference_root)
+        self.populate_reference_combobox(self.reference_file_selection_combobox)
+        if self.initial_model_dimple_dict != {}:
+            self.explorer_active=1
+            self.work_thread=XChemThread.read_intial_refinement_results(self.initial_model_directory,
+                                                                        self.reference_file_list,
+                                                                        os.path.join(self.database_directory,
+                                                                                     self.data_source_file),
+                                                                        self.allowed_unitcell_difference_percent)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.connect(self.work_thread, QtCore.SIGNAL("create_initial_model_table"),self.create_initial_model_table)
+            self.work_thread.start()
 
     def target_selection_combobox_activated(self,text):
-        #str(self.initial_model_dimple_dict[sample][1].currentText()
-        print str(text)
         self.target=str(text)
 
     def center_main_window(self):
@@ -545,7 +613,10 @@ class XChemExplorer(QtGui.QApplication):
             self.refine_model_directory_label.setText(self.refine_model_directory)
             self.settings['refine_model_directory']=self.refine_model_directory
         if self.sender().text()=='Select Reference Structure Directory':
-            self.reference_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
+            reference_directory_temp = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
+            if reference_directory_temp != self.reference_directory:
+                self.reference_directory=reference_directory_temp
+                self.update_reference_files(' ')
             self.reference_directory_label.setText(self.reference_directory)
             self.settings['reference_directory']=self.reference_directory
         if self.sender().text()=='Select Data Source Directory':
@@ -568,23 +639,18 @@ class XChemExplorer(QtGui.QApplication):
             self.ccp4_scratch_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.ccp4_scratch_directory_label.setText(self.ccp4_scratch_directory)
             self.settings['ccp4_scratch']=self.ccp4_scratch_directory
-#        self.settings =     {'current_directory':       self.current_directory,
-#                             'project_directory':       self.project_directory,
-#                             'beamline_directory':      self.beamline_directory,
-#                             'initial_model_directory': self.initial_model_directory,
-#                             'refine_model_directory':  self.refine_model_directory,
-#                             'reference_directory':     self.reference_directory,
-#                             'database_directory':      self.database_directory,
-#                             'data_source':             self.data_source_file,
-#                             'ccp4_scratch':            self.ccp4_scratch_directory }
 
     def change_allowed_unitcell_difference_percent(self,text):
         self.allowed_unitcell_difference_percent=int(text)
         self.settings['unitcell_difference']=self.adjust_allowed_unit_cell_difference
 
+    def change_filename_root(self,text):
+        self.filename_root=str(text)
+        self.settings['filename_root']=self.filename_root
+
+
 
     def button_clicked(self):
-#        if self.target != '' and self.explorer_active==0:
         if self.explorer_active==0:
             if self.sender().text()=='Get New Results from Autoprocessing':
                 print 'target: ',self.target
@@ -613,8 +679,11 @@ class XChemExplorer(QtGui.QApplication):
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                 self.work_thread.start()
 
-            if self.sender().text()=="Load All Samples":
-                print 'hallo'
+            if self.sender().text()=="Load All Samples" or self.sender().text()=="Refresh All Samples":
+                content=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
+                header=content[0]
+                data=content[1]
+                self.populate_summary_table(header,data)
 
             if self.sender().text()=="Check for inital Refinement":
                 # first check if there is already content in the table and if so
@@ -652,11 +721,25 @@ class XChemExplorer(QtGui.QApplication):
                 self.work_thread=XChemThread.run_dimple_on_selected_samples(self.settings,
                                                                 self.initial_model_dimple_dict,
                                                                 self.external_software,
-                                                                self.ccp4_scratch_directory )
+                                                                self.ccp4_scratch_directory,
+                                                                self.filename_root  )
                 self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
                 self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                 self.work_thread.start()
+
+            if self.sender().text()=='Set New Reference (if applicable)':
+                reference_root=str(self.reference_file_selection_combobox.currentText())
+                self.update_reference_files(reference_root)
+
+
+#                if self.initial_model_dimple_dict != {}
+#                    for key in self.initial_model_dimple_dict:
+#
+#                    self.initial_model_dimple_dict[key][0].setChecked(True)
+### thing that I forgot: if reference directory is chosen -> update reference file list
+### if difference between old and new recalculate already if references appeared in initial_model table
+
 
             if self.sender().text()=="Load Samples From Datasource":
                 content=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
@@ -723,6 +806,9 @@ class XChemExplorer(QtGui.QApplication):
 
             if self.sender().text()=="Select Columns":
                 print 'hallo'
+#                testx = XChemDialogs.select_columns_to_show([os.path.join(self.database_directory,self.data_source_file),
+#                                                            self.data_source_columns_to_display]).show_columns()
+#                print testx
                 # QDialog is the kind of widget that will help here, but for now I park this
 #                self.dialogTextBrowser = XChemDialogs.select_data_source_columns()
 #                self.dialogTextBrowser.exec_()
@@ -1013,85 +1099,71 @@ class XChemExplorer(QtGui.QApplication):
     def create_initial_model_table(self,initial_model_list):
 
         self.initial_model_dimple_dict={}
-        initial_model_column_name = [   'SampleID',
-                                        'Run\nDimple',
-                                        'Resolution',
-                                        'Rcryst',
-                                        'Rfree',
-                                        'Space Group\nautoprocessing',
-                                        'Space Group\nreference',
-                                        'Difference\nUnit Cell Volume (%)',
-                                        'Reference File',
-                                        'Unit Cell\nautoprocessing',
-                                        'Unit Cell\nreference'  ]
+        self.initial_model_table.setColumnCount(len(initial_model_list[0])-1)
+        self.initial_model_table.setRowCount(0)
+        self.initial_model_table.setRowCount(len(initial_model_list))
 
-        initial_model_table=QtGui.QTableWidget()
-        initial_model_table.setRowCount(len(initial_model_list))
-        initial_model_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        initial_model_table.setColumnCount(len(initial_model_list[0])-1)
-        initial_model_table.setSortingEnabled(True)
         for n,line in enumerate(initial_model_list):
             for column,item in enumerate(line[:-1]):
                 if column==1:
                     run_dimple = QtGui.QCheckBox()
                     run_dimple.toggle()
-                    initial_model_table.setCellWidget(n, column, run_dimple)
+                    self.initial_model_table.setCellWidget(n, column, run_dimple)
                     run_dimple.setChecked(line[1])
 #                    self.initial_model_dimple_dict[line[0]]=run_dimple
                 elif column==8:
                     # don't need to connect, because only the displayed text will be read out
                     reference_file_selection_combobox = QtGui.QComboBox()
-                    for reference_file in self.reference_file_list:
-                        reference_file_selection_combobox.addItem(reference_file[0])
-                    initial_model_table.setCellWidget(n, column, reference_file_selection_combobox)
+#                    for reference_file in self.reference_file_list:
+#                        reference_file_selection_combobox.addItem(reference_file[0])
+                    self.populate_reference_combobox(reference_file_selection_combobox)
+                    self.initial_model_table.setCellWidget(n, column, reference_file_selection_combobox)
                     index = reference_file_selection_combobox.findText(str(line[8]), QtCore.Qt.MatchFixedString)
                     reference_file_selection_combobox.setCurrentIndex(index)
                 else:
                     cell_text=QtGui.QTableWidgetItem()
                     cell_text.setText(str(item))
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                    initial_model_table.setItem(n, column, cell_text)
+                    self.initial_model_table.setItem(n, column, cell_text)
             self.initial_model_dimple_dict[line[0]]=[run_dimple,reference_file_selection_combobox]
 #                r=item
 #                g=item
 #                b=item
 #                initial_model_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
-        initial_model_table.setHorizontalHeaderLabels(initial_model_column_name)
-        initial_model_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        initial_model_table.resizeColumnsToContents()
-        self.initial_model_vbox_for_table.addWidget(initial_model_table)
+        self.initial_model_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.initial_model_table.resizeColumnsToContents()
+        self.initial_model_table.setHorizontalHeaderLabels(self.initial_model_column_name)
 
-    def get_reference_file_list(self):
+
+    def get_reference_file_list(self,reference_root):
         # check available reference files
         reference_file_list=[]
-        for files in glob.glob(self.reference_directory+'/*'):
-            if files.endswith('.pdb'):
-                reference_root=files[files.rfind('/')+1:files.rfind('.')]
-#                if os.path.isfile(self.reference_directory+'/'+reference_root+'.mtz'):
-#                    mtz_reference=mtztools(self.reference_directory+'/'+reference_root+'.mtz').get_all_values_as_dict()
-#                    spg_reference=mtz_reference['spacegroup']
-#                    unitcell_reference=mtz_reference['unitcell']
-#                    lattice_reference=mtz_reference['bravais_lattice']
-#                    unitcell_volume_reference=mtz_reference['unitcell_volume']
-#                    reference_file_list.append([reference_root,
-#                                                spg_reference,
-#                                                unitcell_reference,
-#                                                lattice_reference,
-#                                                unitcell_volume_reference])
-
-                if os.path.isfile(os.path.join(self.reference_directory,reference_root+'.pdb')):
-                    pdb_reference=parse().PDBheader(os.path.join(self.reference_directory,reference_root+'.pdb'))
-                    spg_reference=pdb_reference['SpaceGroup']
-                    unitcell_reference=pdb_reference['UnitCell']
-                    lattice_reference=pdb_reference['Lattice']
-                    unitcell_volume_reference=pdb_reference['UnitCellVolume']
-                    reference_file_list.append([reference_root,
-                                                spg_reference,
-                                                unitcell_reference,
-                                                lattice_reference,
-                                                unitcell_volume_reference])
-
-
+        if os.path.isfile(os.path.join(self.reference_directory,reference_root+'.pdb')):
+            pdb_reference=parse().PDBheader(os.path.join(self.reference_directory,reference_root+'.pdb'))
+            spg_reference=pdb_reference['SpaceGroup']
+            unitcell_reference=pdb_reference['UnitCell']
+            lattice_reference=pdb_reference['Lattice']
+            unitcell_volume_reference=pdb_reference['UnitCellVolume']
+            reference_file_list.append([reference_root,
+                                        spg_reference,
+                                        unitcell_reference,
+                                        lattice_reference,
+                                        unitcell_volume_reference])
+        else:
+            for files in glob.glob(self.reference_directory+'/*'):
+                if files.endswith('.pdb'):
+                    reference_root=files[files.rfind('/')+1:files.rfind('.')]
+                    if os.path.isfile(os.path.join(self.reference_directory,reference_root+'.pdb')):
+                        pdb_reference=parse().PDBheader(os.path.join(self.reference_directory,reference_root+'.pdb'))
+                        spg_reference=pdb_reference['SpaceGroup']
+                        unitcell_reference=pdb_reference['UnitCell']
+                        lattice_reference=pdb_reference['Lattice']
+                        unitcell_volume_reference=pdb_reference['UnitCellVolume']
+                        reference_file_list.append([reference_root,
+                                                    spg_reference,
+                                                    unitcell_reference,
+                                                    lattice_reference,
+                                                    unitcell_volume_reference])
 
         return reference_file_list
 
@@ -1147,9 +1219,13 @@ class XChemExplorer(QtGui.QApplication):
 
     def set_run_dimple_flag(self,state):
         if state == QtCore.Qt.Checked:
-            print 'checked'
+            for key in self.initial_model_dimple_dict:
+                self.initial_model_dimple_dict[key][0].setChecked(True)
         else:
-            print 'not checked'
+            for key in self.initial_model_dimple_dict:
+                self.initial_model_dimple_dict[key][0].setChecked(False)
+
+
 
     def populate_data_collection_summary_table(self):
         # 1. get length of table
@@ -1333,6 +1409,40 @@ class XChemExplorer(QtGui.QApplication):
                 self.mounted_crystal_table.setItem(x, y, cell_text)
                 y+=1
         self.mounted_crystal_table.setHorizontalHeaderLabels(self.data_source_columns_to_display)
+
+
+    def populate_summary_table(self,header,data):
+        self.summary_table.setColumnCount(len(self.summary_column_name))
+        self.summary_table.setRowCount(0)
+        self.summary_table.setRowCount(len(data))
+
+        # maybe I coded some garbage before, but I need to find out which column name in the
+        # data source corresponds to the actually displayed column name in the table
+        # reason being that the unique column ID for DB may not be nice to look at
+        columns_to_show=[]
+        for column in self.summary_column_name:
+#            print column
+            for n,all_column in enumerate(self.all_columns_in_data_source):
+                if column==all_column[1]:
+                    columns_to_show.append(n)
+                    break
+            if column=='Compound\nImage':
+                columns_to_show.append('Image')
+
+        for x,row in enumerate(data):
+            for y,item in enumerate(columns_to_show):
+                cell_text=QtGui.QTableWidgetItem()
+                if item=='Image':
+                    cell_text.setText('')
+                elif row[item]==None:
+                    cell_text.setText('')
+                else:
+                    cell_text.setText(str(row[item]))
+                if self.summary_column_name[y]=='Sample ID':     # assumption is that column 0 is always sampleID
+                    cell_text.setFlags(QtCore.Qt.ItemIsEnabled)             # and this field cannot be changed
+                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                self.summary_table.setItem(x, y, cell_text)
+        self.summary_table.setHorizontalHeaderLabels(self.summary_column_name)
 
 
 

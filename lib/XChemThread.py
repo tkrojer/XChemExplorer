@@ -17,6 +17,7 @@ from XChemUtils import parse
 from XChemUtils import queue
 from XChemUtils import mtztools
 from XChemUtils import helpers
+from XChemUtils import reference
 import XChemDB
 
 
@@ -45,13 +46,14 @@ class create_png_and_cif_of_compound(QtCore.QThread):
 
 
 class run_dimple_on_selected_samples(QtCore.QThread):
-    def __init__(self,settings,initial_model_dimple_dict,external_software,ccp4_scratch):
+    def __init__(self,settings,initial_model_dimple_dict,external_software,ccp4_scratch,filename_root):
         QtCore.QThread.__init__(self)
         self.initial_model_directory=settings['initial_model_directory']
         self.reference_directory=settings['reference_directory']
         self.initial_model_dimple_dict=initial_model_dimple_dict
         self.queueing_system_available=external_software['qsub']
         self.ccp4_scratch_directory=ccp4_scratch
+        self.filename_root=filename_root
 
     def run(self):
         if len(self.initial_model_dimple_dict) != 0:
@@ -69,7 +71,8 @@ class run_dimple_on_selected_samples(QtCore.QThread):
                                     'reference': self.reference_directory+'/'+
                                                  str(self.initial_model_dimple_dict[sample][1].currentText()),
                                     'queueing_system_available': self.queueing_system_available,
-                                    'ccp4_scratch': self.ccp4_scratch_directory     }
+                                    'ccp4_scratch': self.ccp4_scratch_directory,
+                                    'fileroot_in':  self.filename_root.replace('${samplename}',sample)  }
                 process(dimple_commands).dimple()
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
@@ -83,6 +86,7 @@ class start_COOT(QtCore.QThread):
         self.settings=settings
 
     def run(self):
+        print self.settings
         pickle.dump(self.settings,open('XChemExplorer_settings.pkl','wb'))
         os.system('coot --no-guano --no-state-script --script %s' %(os.getenv('XChemExplorer_DIR')+'/lib/XChemCoot.py'))
 
@@ -101,8 +105,9 @@ class read_intial_refinement_results(QtCore.QThread):
         progress_step=100/float(len(glob.glob(self.initial_model_directory+'/*')))
         progress=0
 
-#        db=XChemDB.data_source(self.data_source)
-#        db.create_missing_columns()
+        print self.data_source
+        db=XChemDB.data_source(self.data_source)
+        db.create_missing_columns()
 
         initial_model_list=[]
 
@@ -120,31 +125,41 @@ class read_intial_refinement_results(QtCore.QThread):
             spg_reference=''
             unitcell_reference=''
             unitcell_difference=''
-            reference=''
+            reference_file=''
             alert='#E0E0E0'
             outcome='Analysis Pending'
 
-            found_suitable_reference=False
-            if os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'.mtz')):
-                mtz_autoproc=mtztools(os.path.join(self.initial_model_directory,sample,sample+'.mtz')).get_all_values_as_dict()
-                resolution_high=mtz_autoproc['resolution_high']
-                spg_autoproc=mtz_autoproc['spacegroup']
-                unitcell_autoproc=mtz_autoproc['unitcell']
-                lattice_autoproc=mtz_autoproc['bravais_lattice']
-                unitcell_volume_autoproc=mtz_autoproc['unitcell_volume']
-                # check which reference file is most similar
-                for o,reference_file in enumerate(self.reference_file_list):
-                    unitcell_difference=round((math.fabs(reference_file[4]-unitcell_volume_autoproc)/reference_file[4])*100,1)
-                    # reference file is accepted when different in unitcell volume < 5%
-                    # and both files have the same lattice type
-                    if unitcell_difference < self.allowed_unitcell_difference_percent and lattice_autoproc==reference_file[3]:
-                        spg_reference=reference_file[1]
-                        unitcell_reference=reference_file[2]
-                        reference=reference_file[0]
-                        found_suitable_reference=True
-                        break
-            else:
-                continue    # do not add to table if no mtz file is present
+#            found_suitable_reference=False
+#            if os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'.mtz')):
+#                mtz_autoproc=mtztools(os.path.join(self.initial_model_directory,sample,sample+'.mtz')).get_all_values_as_dict()
+#                resolution_high=mtz_autoproc['resolution_high']
+#                spg_autoproc=mtz_autoproc['spacegroup']
+#                unitcell_autoproc=mtz_autoproc['unitcell']
+#                lattice_autoproc=mtz_autoproc['bravais_lattice']
+#                unitcell_volume_autoproc=mtz_autoproc['unitcell_volume']
+#                # check which reference file is most similar
+#                for o,reference_file in enumerate(self.reference_file_list):
+#                    unitcell_difference=round((math.fabs(reference_file[4]-unitcell_volume_autoproc)/reference_file[4])*100,1)
+#                    # reference file is accepted when different in unitcell volume < 5%
+#                    # and both files have the same lattice type
+#                    if unitcell_difference < self.allowed_unitcell_difference_percent and lattice_autoproc==reference_file[3]:
+#                        spg_reference=reference_file[1]
+#                        unitcell_reference=reference_file[2]
+#                        reference=reference_file[0]
+#                        found_suitable_reference=True
+#                        break
+#            else:
+#                continue    # do not add to table if no mtz file is present
+
+#            tempIn=os.path.join(self.initial_model_directory,sample,sample+'.mtz')
+#            print tempIn
+#            ref_init=reference(tempIn,self.reference_file_list)
+#            spg_reference,unitcell_reference,reference_file,found_suitable_reference=ref_init.find_suitable_reference()
+            spg_reference,unitcell_reference,reference_file,found_suitable_reference,\
+                resolution_high,spg_autoproc,unitcell_autoproc,unitcell_difference= \
+                reference(os.path.join(self.initial_model_directory,sample,sample+'.mtz'),
+                          self.reference_file_list).find_suitable_reference(self.allowed_unitcell_difference_percent)
+
             if os.path.isdir(os.path.join(self.initial_model_directory,sample,'Dimple')):
                     if os.path.isfile(os.path.join(self.initial_model_directory,sample,'Dimple','dimple','final.pdb')):
                         pdb=parse().PDBheader(os.path.join(self.initial_model_directory,sample,'Dimple','dimple','final.pdb'))
@@ -178,17 +193,16 @@ class read_intial_refinement_results(QtCore.QThread):
                 mtz_free=os.path.realpath(os.path.join(self.initial_model_directory,sample,sample+'free.mtz'))
 
             # update data source
-            refinement_db_list=[
-                        ['RefinementRcryst',         Rcryst],
-                        ['RefinementRfree',          Rfree],
-                        ['RefinementRmsdBonds',      'n/a'],
-                        ['RefinementRmsdAngles',     'n/a'],
-                        ['RefinementOutcome',        outcome],
-                        ['RefinementMTZfree',        mtz_free],
-                        ['RefinementPDB_latest',     pdb_latest],
-                        ['RefinementMTZ_latest',     mtz_latest]          ]
+            db_dict={   'RefinementRcryst':         Rcryst,
+                        'RefinementRfree':          Rfree,
+                        'RefinementRmsdBonds':      'n/a',
+                        'RefinementRmsdAngles':     'n/a',
+                        'RefinementOutcome':        outcome,
+                        'RefinementMTZfree':        mtz_free,
+                        'RefinementPDB_latest':     pdb_latest,
+                        'RefinementMTZ_latest':     mtz_latest          }
 
-#            db.update_table(sample,refinement_db_list)
+            db.update_insert_not_null_fields_only(sample,db_dict)
 
             initial_model_list.append( [ sample,
                                         run_dimple,
@@ -198,7 +212,7 @@ class read_intial_refinement_results(QtCore.QThread):
                                         spg_autoproc,
                                         spg_reference,
                                         unitcell_difference,
-                                        reference,
+                                        reference_file,
                                         unitcell_autoproc,
                                         unitcell_reference,
                                         alert ] )

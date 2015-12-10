@@ -5,6 +5,12 @@ import glob
 import pickle
 import subprocess
 
+from matplotlib.figure import Figure
+#from numpy import arange, sin, pi
+from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
+
+# last commit: 05/12/2015
+
 # SParkle libraries
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 sys.path.append(os.getenv('CCP4')+'/lib/python2.7/site-packages')
@@ -13,12 +19,6 @@ import XChemDB
 import XChemRefine
 
 import XChemUtils
-#import SPmodel
-#import SPrefine
-#import SPdatabase
-#import SPvalidate
-#import prepare4deposition
-#import SPProcess
 
 # libraries from COOT
 import pygtk, gtk, pango
@@ -37,60 +37,39 @@ class GUI(object):
 
     def __init__(self):
 
+        # checking for external software packages
+        self.external_software=XChemUtils.external_software().check()
+
         # read in settings file from XChemExplorer to set the relevant paths
         self.settings = pickle.load(open("XChemExplorer_settings.pkl","rb"))
-
-        self.external_software=self.settings['external_software']
-        for key in self.external_software:
-            print key,self.external_software[key]
         self.refine_model_directory=self.settings['refine_model_directory']
         self.database_directory=self.settings['database_directory']
-        self.data_source_file=self.settings['data_source']
+        self.data_source=self.settings['data_source']
+        self.db=XChemDB.data_source(self.data_source)
 
-        self.db=XChemDB.data_source(self.data_source_file)
-
-
-        self.selection_criteria =   [   'All Datasets',
-                                        'Analysis Pending',
-                                        'Datasets under refinement',
-                                        'ligand confirmed',
-                                        'finished models'   ]
+        self.selection_criteria =   {   'Show All Datasets':                'RefinementPDB_latest is not null',
+                                        'Show Analysis Pending Only':       "RefinementOutcome='Analysis Pending'",
+                                        'Show Datasets Under Refinement':   "RefinementOutcome='Refinement Ongoing'",
+                                        'Show Confirmed Ligands':           "RefinementOutcome='Ligand Confirmed'",
+                                        'SHow Final Structures':            "RefinementOutcome='Structure finished'"   }
+        print self.selection_criteria
         # this decides which samples will be looked at
         self.selection_mode = ''
-
-
-        # Todo list:
-        # 0: sampleID
-        # 1: compoundID
-
 
         # the Folder is kind of a legacy thing because my inital idea was to have separate folders
         # for Data Processing and Refinement
         self.project_directory = self.settings['initial_model_directory']
-#        self.DataPath = DataPath
         self.Serial=0
         self.Refine=None
-#        self.Action = Action
-#        self.ActionPath = ''    # self.ActionPath is were stuff is actually done; depending on Action it's either the ProjectPath or DataPath
-#        self .Todo=[]
-#        tmp=[]
-#        for folders in glob.glob(self.refine_model_directory+'/*'):
-#            sample=folders[folders.rfind('/')+1:folders.rfind('.')]
-#            if os.path.isfile(os.path.join(self.refine_model_directory,sample,refine.pdb)):
-#                tmp.append(os.path.join(self.refine_model_directory,sample,refine.pdb)
-#            if os.path.isfile(os.path.join(self.refine_model_directory,sample,refine.mtz)):
-#                tmp.append(os.path.join(self.refine_model_directory,sample,refine.mtz)
-
-
-#        self.User = User
-#        self.Password = Password
         self.index = -1
         self.Todo=[]
-#        self.Database = SPdatabase.initDB().whichDatabase()
 
         self.xtalID=''
         self.compoundID=''
 #        self.datasetOutcome=''
+
+        self.pdb_style='refine.pdb'
+        self.mtz_style='refine.mtz'
 
         # some COOT settings
         coot.set_map_radius(15)
@@ -112,10 +91,10 @@ class GUI(object):
                                     'LigandCC':                     'n/a'   }
 
         # default refmac parameters
-        self.RefmacParams={ 'HKLIN': '', 'HKLOUT': '',
-                            'XYZIN': '', 'XYZOUT': '',
-                            'LIBIN': '', 'LIBOUT': '',
-                            'TLSIN': '', 'TLSOUT': '',
+        self.RefmacParams={ 'HKLIN': '',        'HKLOUT': '',
+                            'XYZIN': '',        'XYZOUT': '',
+                            'LIBIN': '',        'LIBOUT': '',
+                            'TLSIN': '',        'TLSOUT': '',
                             'TLSADD': '',
                             'NCYCLES': '10',
                             'MATRIX_WEIGHT': 'AUTO',
@@ -124,6 +103,12 @@ class GUI(object):
                             'NCS':    '',
                             'TWIN':   ''    }
 
+        refinement_cycle=[1,2,3,4,5,6,7,8,9,10]
+        Rfree=  [0.1,0.2,0.14,0.12,0.1,0.1,0.1,0.1,0.1,0.1]
+        Rcryst= [0.3,0.4,0.14,0.12,0.2,0.1,0.3,0.1,0.2,0.1]
+        self.canvas = FigureCanvas(self.update_plot(refinement_cycle,Rfree,Rcryst))  # a gtk.DrawingArea
+        self.canvas.set_size_request(300, 150)
+
 
 
     def StartGUI(self):
@@ -131,10 +116,9 @@ class GUI(object):
         self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         self.window.connect("delete_event", gtk.main_quit)
         self.window.set_border_width(10)
-        self.window.set_default_size(400, 1200)
+        self.window.set_default_size(400, 1000)
         self.window.set_title("XChemExplorer")
         self.vbox = gtk.VBox()
-
 
         # choose here which subset of samples should be looked at
         self.vbox.add(gtk.Label('Select Samples'))
@@ -204,7 +188,7 @@ class GUI(object):
         self.vbox.add(self.table)
 
         # compound picture
-        self.pic = gtk.gdk.pixbuf_new_from_file(os.getenv('XChemExplorer_DIR')+'/image/NO_COMPOUND_IMAGE_AVAILABLE.png')
+        self.pic = gtk.gdk.pixbuf_new_from_file(os.path.join(os.getenv('XChemExplorer_DIR'),'image','NO_COMPOUND_IMAGE_AVAILABLE.png'))
         self.image = gtk.Image()
         self.image.set_from_pixbuf(self.pic)
         self.vbox.pack_start(self.image)
@@ -212,14 +196,9 @@ class GUI(object):
         # define main buttons
         self.PREVbutton = gtk.Button(label="<<<")
         self.NEXTbutton = gtk.Button(label=">>>")
-#        self.PREPAREforREFINEMENTbutton = gtk.Button(label="Prepare for Refinement")
-#        self.NODATACOLLECTIONFAILEDbutton = gtk.Button(label="Data Collection Failed")
-#        self.NODATAPROCESSINGFAILEDbutton = gtk.Button(label="Data Processing Failed")
         self.NOREFINEMENTFAILEDbutton = gtk.Button(label="Refinement Failed")
         self.NOLIGANDFAILEDbutton = gtk.Button(label="No Ligand")
         self.REFINEbutton = gtk.Button(label="Refine")
-#        self.PDBREDObutton = gtk.Button(label="Refine @ PDBREDO")
-#        self.MODELbutton = gtk.Button(label="create/update Model")
         self.VALIDATEbutton = gtk.Button(label="validate structure")
         self.DEPOSITbutton = gtk.Button(label="prepare for deposition")
 #        self.LigandConfidenceButton = gtk.Button(label="ligand confidence")
@@ -228,8 +207,6 @@ class GUI(object):
 
         self.cb = gtk.combo_box_new_text()
         self.cb.connect("changed", self.ChooseXtal)
-#        for item in self.Todo:
-#            self.cb.append_text('%s' %item[0])
         self.vbox.add(self.cb)
 
         # Buttons
@@ -254,49 +231,26 @@ class GUI(object):
         self.NOLIGANDFAILEDbutton.connect("clicked",self.update_data_source,"No Ligand Bound")
         self.vbox.pack_start(self.hbox6)
 
-#        elif self.Action == 'Refine':
-
         # Refinement History
-        self.pic2 = gtk.gdk.pixbuf_new_from_file(os.getenv('XChemExplorer_DIR')+'/image/NO_REFINEMENT_HISTORY_AVAILABLE.png')
-        self.image2 = gtk.Image()
-        self.image2.set_from_pixbuf(self.pic2)
-        self.vbox.pack_start(self.image2)
+#        self.pic2 = gtk.gdk.pixbuf_new_from_file(os.getenv('XChemExplorer_DIR')+'/image/NO_REFINEMENT_HISTORY_AVAILABLE.png')
+#        self.image2 = gtk.Image()
+#        self.image2.set_from_pixbuf(self.pic2)
+#        self.vbox.pack_start(self.image2)
+
+        # not sure why, but adding self.canvas to the window makes it forget all other global variables
+#        self.vbox.add(self.canvas)
+
+
 
         self.hbox2a = gtk.HBox()
         self.hbox2a.pack_start(self.REFINEbutton)
         self.REFINEbutton.connect("clicked",self.REFINE)
         self.vbox.pack_start(self.hbox2a)
 
-#            self.hbox2b = gtk.HBox()
-#            self.hbox2b.pack_start(self.PDBREDObutton)
-#            self.PDBREDObutton.connect("clicked",self.PDBREDO)
-#            self.vbox.pack_start(self.hbox2b)
-
         self.hbox2c = gtk.HBox()
         self.hbox2c.pack_start(self.RefinementParamsButton)
         self.RefinementParamsButton.connect("clicked",self.RefinementParams)
         self.vbox.pack_start(self.hbox2c)
-
-#            self.hbox3a = gtk.HBox()
-#            self.hbox3a.pack_start(self.MODELbutton)
-#            self.MODELbutton.connect("clicked",self.CreateUpdateModel)
-#            self.vbox.pack_start(self.hbox3a)
-
-#        self.hbox4 = gtk.HBox()
-#        self.hbox4.pack_start(self.NOLIGANDFAILEDbutton)
-#        self.NOLIGANDFAILEDbutton.connect("clicked",self.update_data_source,"Failed - no ligand")
-#        self.vbox.pack_start(self.hbox4)
-
-#        self.hbox6 = gtk.HBox()
-#        self.hbox6.pack_start(self.VALIDATEbutton)
-#        self.VALIDATEbutton.connect("clicked",self.Validate)
-#        self.vbox.pack_start(self.hbox6)
-
-#            self.hbox7 = gtk.HBox()
-#            self.hbox7.pack_start(self.DEPOSITbutton)
-#            self.DEPOSITbutton.connect("clicked",self.Prepare4Deposition)
-#            self.vbox.pack_start(self.hbox7)
-
 
         self.CANCELbutton = gtk.Button(label="CANCEL")
         self.CANCELbutton.connect("clicked", self.CANCEL)
@@ -318,25 +272,20 @@ class GUI(object):
         self.cb.set_active(self.index)
 
     def ChooseXtal(self, widget):
-        self.xtalID = widget.get_active_text()
+        self.xtalID = str(widget.get_active_text())
         for n,item in enumerate(self.Todo):
-            if item[0] == self.xtalID:
+            if str(item[0]) == self.xtalID:
                 self.index = n
-#        print '\n==> cootSP: current xtal = %s' %widget.get_active_text()
-        # update current xtal
-        self.xtalID=self.Todo[self.index][0]
-#        if self.Todo[self.index][2]==None:
-#            self.compoundID='None'
-#        else:
-#            self.compoundID=self.Todo[self.index][1]
-#        self.datasetOutcome=self.Todo[self.index][2]
+        self.xtalID=str(self.Todo[self.index][0])
         self.RefreshData()
 
-    def update_data_source(self,widget,data=None):
-        refinement_db_list=[ ['RefinementOutcome',data]  ]
-        self.db.update_table(self.xtalID,refinement_db_list)
-
-#        data_source(self.data_source_file).update_data_source_from_coot()
+    def update_data_source(self,widget,data=None):              # update and move to next xtal
+        outcome_dict={'RefinementOutcome': data}
+        self.db.update_data_source(self.xtalID,outcome_dict)
+        self.index+=1
+        if self.index >= len(self.Todo):
+            self.index = len(self.Todo)
+        self.cb.set_active(self.index)
 
     def RefreshData(self):
         # initialize Refinement library
@@ -344,16 +293,16 @@ class GUI(object):
         self.Serial=self.Refine.GetSerial()
 
         self.QualityIndicators=XChemUtils.ParseFiles(self.project_directory,self.xtalID).UpdateQualityIndicators()
-        PDBin='refine.pdb'
         # if the structure was previously refined, try to read the parameters
         if self.Serial > 1: self.RefmacParams=self.Refine.ParamsFromPreviousCycle(self.Serial-1)
-        self.Refine.GetRefinementHistory()
-        try:
-            self.pic2 = gtk.gdk.pixbuf_new_from_file(os.path.join(self.project_directory,self.xtalID,'RefinementHistory.png'))
-            self.image2.set_from_pixbuf(self.pic2)
-        except gobject.GError:
-            self.pic2 = gtk.gdk.pixbuf_new_from_file(os.getenv('XChemExplorer_DIR')+'/image/NO_REFINEMENT_HISTORY_AVAILABLE.png')
-            self.image2.set_from_pixbuf(self.pic2)
+# disabled for the moment until matplotlib display function is implemented
+        print self.Refine.GetRefinementHistory()
+#        try:
+#            self.pic2 = gtk.gdk.pixbuf_new_from_file(os.path.join(self.project_directory,self.xtalID,'RefinementHistory.png'))
+#            self.image2.set_from_pixbuf(self.pic2)
+#        except gobject.GError:
+#            self.pic2 = gtk.gdk.pixbuf_new_from_file(os.path.join(os.getenv('XChemExplorer_DIR'),'image','NO_REFINEMENT_HISTORY_AVAILABLE.png'))
+#            self.image2.set_from_pixbuf(self.pic2)
 
         # update pdb & maps
         # - get a list of all molecules which are currently opened in COOT
@@ -366,9 +315,9 @@ class GUI(object):
         # read protein molecule after ligand so that this one is the active molecule
         #coot.handle_read_draw_molecule_with_recentre(Pdb[0],0)
         # read ligand pdb+cif
-        coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,'refine.pdb'),0)
+        coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style),0)
         for item in coot_utils_XChem.molecule_number_list():
-            if coot.molecule_name(item).endswith('refine.pdb'):
+            if coot.molecule_name(item).endswith(self.pdb_style):
                 coot.set_show_symmetry_master(1)    # master switch to show symmetry molecules
                 coot.set_show_symmetry_molecule(item,1) # show symm for model
         if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.pdb')):
@@ -385,7 +334,7 @@ class GUI(object):
             coot.set_last_map_colour(0,0,1)
         else:
             # try to open mtz file with same name as pdb file
-            coot.auto_read_make_and_draw_maps(os.path.join(self.project_directory,self.xtalID,'refine.mtz'))
+            coot.auto_read_make_and_draw_maps(os.path.join(self.project_directory,self.xtalID,self.mtz_style))
 
         # update Quality Indicator table
         self.RRfreeValue.set_label(self.QualityIndicators['R']+' / '+self.QualityIndicators['RRfree'])
@@ -405,49 +354,50 @@ class GUI(object):
             pic = gtk.gdk.pixbuf_new_from_file(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.png'))
             self.image.set_from_pixbuf(pic)
         except gobject.GError:
-            pic = gtk.gdk.pixbuf_new_from_file(os.getenv('XChemExplorer_DIR')+'/image/NO_COMPOUND_IMAGE_AVAILABLE.png')
+            pic = gtk.gdk.pixbuf_new_from_file(os.path.join(os.getenv('XChemExplorer_DIR'),'image','NO_COMPOUND_IMAGE_AVAILABLE.png'))
             self.image.set_from_pixbuf(pic)
 
 
     def REFINE(self,widget):
+        outcome_dict={'RefinementOutcome': 'Refinement Ongoing'}
+        self.db.update_data_source(self.xtalID,outcome_dict)
         self.Refine.RunRefmac(self.Serial,self.RefmacParams,self.external_software)
+        self.index+=1
+        if self.index >= len(self.Todo):
+            self.index = len(self.Todo)
+        self.cb.set_active(self.index)
+
     
     def RefinementParams(self,widget):
-        print '\n==> cootSP: changing refinement parameters'
+        print '\n==> XCE: changing refinement parameters'
         self.RefmacParams=self.Refine.RefinementParams(self.RefmacParams)
 
-#    def Prepare4Deposition(self,widget):
-#        print '\n==> cootSP: current model = %s' %SPdatabase.scarab().GetModels(self.Todo[self.index][3])[0][0]
-#        print '\n==> cootSP: starting prepare4deposition GUI...'
-#        print '\n==> cootSP: ... be patient, we\'re asking many questions...\n'
-#        prepare4deposition.Prepare4Deposition(SPdatabase.initDB().GetModels(self.Todo[self.index][3])[0][0])
-
-#    def Validate(self,widget):
-#        SPvalidate.Validate('SParkle',self.ProjectPath+'/'+self.xtalID)
-
     def set_selection_mode(self,widget):
-        self.selection_mode = widget.get_active_text()
+        for criteria in self.selection_criteria:
+            if criteria==widget.get_active_text():
+                self.selection_mode=self.selection_criteria[criteria]
+                break
 
     def get_samples_to_look_at(self,widget):
-        print 'hallo'
+        # first remove old samples if present
+        if len(self.Todo) != 0:
+            for n,item in enumerate(self.Todo):
+                self.cb.remove_text(0)
+        self.Todo=[]
         self.Todo=self.db.get_samples_for_coot(self.selection_mode)
-
-        try:
-            # get todo_list from datasource
-            self.Todo=self.db.get_samples_for_coot(self.selection_mode)
-            print self.Todo
-        except:
-            # if not available, then parse file system
-            for samples in glob.glob(self.refine_model_directory+'/*'):
-                xtalID=samples[samples.rfind('/')+1:]
-                print xtalID
-#
-                if os.path.isfile(os.path.join(self.refine_model_directory,xtalID,'refine.pdb')):
-#                 if os.path.isfile(os.path.join(self.refine_model_directory,xtalID,'*cif')):
-                    compoundID=None
-                    self.Todo.append([xtalID,compoundID,None])
         for item in self.Todo:
             self.cb.append_text('%s' %item[0])
+
+    def update_plot(self,refinement_cycle,Rfree,Rcryst):
+        fig = Figure(figsize=(3, 2), dpi=75)
+        Plot = fig.add_subplot(111)
+        Plot.set_ylim([0,max(Rcryst+Rfree)])
+        Plot.set_xlabel('Refinement Cycle')
+        Plot.plot(refinement_cycle,Rfree,label='Rfree')
+        Plot.plot(refinement_cycle,Rcryst,label='Rcryst')
+        Plot.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+                ncol=2, mode="expand", borderaxespad=0.)
+        return fig
 
 
 if __name__=='__main__':
