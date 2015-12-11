@@ -806,9 +806,12 @@ class XChemExplorer(QtGui.QApplication):
 
             if self.sender().text()=="Select Columns":
                 print 'hallo'
-#                testx = XChemDialogs.select_columns_to_show([os.path.join(self.database_directory,self.data_source_file),
-#                                                            self.data_source_columns_to_display]).show_columns()
-#                print testx
+#                date.date(), date.time(), result = XChemDialogs.select_columns_to_show(os.path.join(self.database_directory,self.data_source_file),
+#                                                            self.data_source_columns_to_display).show_columns()
+                print os.path.join(self.database_directory,self.data_source_file)
+                date, time, result = XChemDialogs.select_columns_to_show([os.path.join(self.database_directory,self.data_source_file),
+                                                                         self.data_source_columns_to_display]).show_columns()
+                print date, time, result
                 # QDialog is the kind of widget that will help here, but for now I park this
 #                self.dialogTextBrowser = XChemDialogs.select_data_source_columns()
 #                self.dialogTextBrowser.exec_()

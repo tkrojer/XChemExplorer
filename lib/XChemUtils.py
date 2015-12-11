@@ -7,6 +7,16 @@ import math
 import subprocess
 import getpass
 import shutil
+import platform
+if os.getenv('PHENIX'):
+    if platform.system()=='Linux':
+        sys.path.append(os.path.join(os.getenv('PHENIX'),'build','intel-linux-2.6-x86_64','base','lib','python2.7','site-packages'))
+    if platform.system()=='Darwin':
+        sys.path.append(os.path.join(os.getenv('PHENIX'),'base','Python.framework','Versions','2.7','lib','python2.7','site-packages'))
+    import PIL
+    from rdkit import Chem
+    from rdkit.Chem import AllChem
+    from rdkit.Chem import Draw
 
 # last commited: 03/12/2015
 
@@ -162,24 +172,31 @@ class helpers:
 #        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif')):
 #            pass
 
-        if 'dls' in os.getcwd():
-            obabel='module load openbabel\n'
-        else:
-            obabel=''
+#        if 'dls' in os.getcwd():
+#            obabel='module load openbabel\n'
+#        else:
+#            obabel=''
+
+#        Cmds = (
+#            '#!'+os.getenv('SHELL')+'\n'
+#            '\n'
+#            +obabel+
+#            '\n'
+#            'obabel -:"%s" -O %s.png\n' %(smiles,compoundID)+
+#            '\n'
+#            'acedrg -i "%s" -o %s\n' %(smiles,compoundID)
+#            )
+
 
         os.chdir(os.path.join(initial_model_directory,sample,'compound'))
 
-        Cmds = (
-            '#!'+os.getenv('SHELL')+'\n'
-            '\n'
-            +obabel+
-            '\n'
-            'obabel -:"%s" -O %s.png\n' %(smiles,compoundID)+
-            '\n'
-            'acedrg -i "%s" -o %s\n' %(smiles,compoundID)
-            )
-        print Cmds
-        os.system(Cmds)
+        mol = Chem.MolFromSmiles(smiles)
+        AllChem.Compute2DCoords(mol)
+        # Draw to a file
+        Draw.MolToFile(mol, "%s.png" %compoundID)
+
+        os.system('acedrg -i "%s" -o %s' %(smiles,compoundID))
+
         os.chdir(os.path.join(initial_model_directory,sample))
         if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.pdb')):
             os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.pdb'))
@@ -187,6 +204,7 @@ class helpers:
             os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif'))
         if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png')):
             os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png'))
+
 
 
 
