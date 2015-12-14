@@ -116,8 +116,6 @@ class XChemExplorer(QtGui.QApplication):
         self.all_columns_in_data_source=XChemDB.data_source(os.path.join(self.database_directory,
                                                                          self.data_source_file)).return_column_list()
 
-        self.target_list=['*']      # always give the option to read in all targets
-
         # command line arguments
         try:
             opts, args = getopt.getopt(sys.argv[1:], "hc:b:d:", ["help", "config=","beamline=","datasource="])
@@ -163,12 +161,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.data_source_set=True
 
 
-        for dir in glob.glob(self.beamline_directory+'/*'):
-            self.visit_list.append(os.path.realpath(dir))
-            for target in glob.glob(os.path.realpath(dir)+'/processed/*'):
-                if target[target.rfind('/')+1:] not in ['results','README-log','edna-latest.html']:
-                    if target[target.rfind('/')+1:] not in self.target_list:
-                        self.target_list.append(target[target.rfind('/')+1:])
+        self.target_list,self.visit_list=self.get_target_and_visit_list()
 
 
         # Settings @ Switches
@@ -192,6 +185,25 @@ class XChemExplorer(QtGui.QApplication):
 
         self.start_GUI()
         self.exec_()
+
+    def get_target_and_visit_list(self):
+        target_list=['*']      # always give the option to read in all targets
+        # the beamline directory could be a the real directory or
+        # a directory where the visits are linked into
+        if len(self.beamline_directory.split('/')) and \
+            self.beamline_directory.split('/')[1]=='dls' and self.beamline_directory.split('/')[3]=='data':
+            visit_list.append(self.beamline_directory)
+        else:
+            for dir in glob.glob(self.beamline_directory+'/*'):
+                visit_list.append(os.path.realpath(dir))
+        for visit in self.visit_list:
+            for target in glob.glob(os.path.join(visit,'processed','*')):
+                if target[target.rfind('/')+1:] not in ['results','README-log','edna-latest.html']:
+                    if target[target.rfind('/')+1:] not in target_list:
+                        target_list.append(target[target.rfind('/')+1:])
+        return target_list,visit_list
+
+
 
 
     def start_GUI(self):
@@ -287,13 +299,12 @@ class XChemExplorer(QtGui.QApplication):
         write_files_button=QtGui.QPushButton("Save Files from Autoprocessing in 'inital_model' Folder")
         write_files_button.clicked.connect(self.button_clicked)
         data_collection_button_hbox.addWidget(write_files_button)
-        target_selection_combobox = QtGui.QComboBox()
-        for target in self.target_list:
-            target_selection_combobox.addItem(target)
-        target_selection_combobox.activated[str].connect(self.target_selection_combobox_activated)
-        data_collection_button_hbox.addWidget(target_selection_combobox)
+        self.target_selection_combobox = QtGui.QComboBox()
+        self.populate_reference_combobox(self.target_selection_combobox)
+        self.target_selection_combobox.activated[str].connect(self.target_selection_combobox_activated)
+        data_collection_button_hbox.addWidget(self.target_selection_combobox)
         self.tab_dict['DLS @ Data Collection'][1].addLayout(data_collection_button_hbox)
-        self.target=str(target_selection_combobox.currentText())
+        self.target=str(self.target_selection_combobox.currentText())
 
         # DLS @ Summary
         data_collection_summary_list=[]
@@ -543,6 +554,11 @@ class XChemExplorer(QtGui.QApplication):
         for reference_file in self.reference_file_list:
             comboxbox.addItem(reference_file[0])
 
+    def populate_target_selection_combobox(self,combobox):
+        comboxbox.clear()
+        for target in self.target_list:
+            combobox.addItem(target)
+
 
     def open_config_file(self):
         file_name = QtGui.QFileDialog.getOpenFileName(self.window,'Open file', self.current_directory)
@@ -551,8 +567,12 @@ class XChemExplorer(QtGui.QApplication):
             pickled_settings = pickle.load(open(file_name,"rb"))
 #            self.project_directory=pickled_settings['project_directory']
 #            self.settings['project_directory']=self.project_directory
-            self.beamline_directory=pickled_settings['beamline_directory']
-            self.settings['beamline_directory']=self.beamline_directory
+            if pickled_settings['beamline_directory'] != self.beamline_directory:
+                self.beamline_directory=pickled_settings['beamline_directory']
+                self.target_list,self.visit_list=self.get_target_and_visit_list()
+                self.settings['beamline_directory']=self.beamline_directory
+                self.populate_reference_combobox(self.target_selection_combobox)
+
             self.initial_model_directory=pickled_settings['initial_model_directory']
             self.settings['initial_model_directory']=self.initial_model_directory
 #            self.refine_model_directory=pickled_settings['refine_model_directory']
@@ -655,7 +675,11 @@ class XChemExplorer(QtGui.QApplication):
             self.data_source_set=True
             XChemDB.data_source(self.settings['data_source']).create_missing_columns()
         if self.sender().text()=='Select Beamline Directory':
-            self.beamline_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
+            dir_name = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
+            if dir_name != self.beamline_directory:
+                self.beamline_directory=dir_name
+                self.target_list,self.visit_list=self.get_target_and_visit_list()
+                self.populate_reference_combobox(self.target_selection_combobox)
             self.beamline_directory_label.setText(self.beamline_directory)
             self.settings['beamline_directory']=self.beamline_directory
         if self.sender().text()=='Select CCP4_SCR Directory':
