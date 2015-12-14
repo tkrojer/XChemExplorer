@@ -198,13 +198,11 @@ class XChemExplorer(QtGui.QApplication):
         else:
             for dir in glob.glob(self.beamline_directory+'/*'):
                 visit_list.append(os.path.realpath(dir))
-        for visit in self.visit_list:
+        for visit in visit_list:
             for target in glob.glob(os.path.join(visit,'processed','*')):
-                print target
                 if target[target.rfind('/')+1:] not in ['results','README-log','edna-latest.html']:
                     if target[target.rfind('/')+1:] not in target_list:
                         target_list.append(target[target.rfind('/')+1:])
-        print visit_list
         return target_list,visit_list
 
 
