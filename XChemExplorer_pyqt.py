@@ -192,7 +192,8 @@ class XChemExplorer(QtGui.QApplication):
         # the beamline directory could be a the real directory or
         # a directory where the visits are linked into
         if len(self.beamline_directory.split('/')) and \
-            self.beamline_directory.split('/')[1]=='dls' and self.beamline_directory.split('/')[3]=='data':
+            self.beamline_directory.split('/')[1]=='dls' and self.beamline_directory.split('/')[3]=='data' \
+            and not 'labxchem' in self.beamline_directory:
             visit_list.append(self.beamline_directory)
         else:
             for dir in glob.glob(self.beamline_directory+'/*'):
