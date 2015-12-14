@@ -551,13 +551,13 @@ class XChemExplorer(QtGui.QApplication):
 #        self.timer = QtCore.QBasicTimer()
         self.window.show()
 
-    def populate_reference_combobox(self,comboxbox):
-        comboxbox.clear()
+    def populate_reference_combobox(self,combobox):
+        combobox.clear()
         for reference_file in self.reference_file_list:
-            comboxbox.addItem(reference_file[0])
+            combobox.addItem(reference_file[0])
 
     def populate_target_selection_combobox(self,combobox):
-        comboxbox.clear()
+        combobox.clear()
         for target in self.target_list:
             combobox.addItem(target)
 
