@@ -34,8 +34,6 @@ import XChemDialogs
 class XChemExplorer(QtGui.QApplication):
     def __init__(self,args):
         QtGui.QApplication.__init__(self,args)
-        # checking for external software packages
-        self.external_software=external_software().check()
 
         # general settings
         self.allowed_unitcell_difference_percent=5
@@ -119,8 +117,7 @@ class XChemExplorer(QtGui.QApplication):
         # command line arguments
         try:
             opts, args = getopt.getopt(sys.argv[1:], "hc:b:d:", ["help", "config=","beamline=","datasource="])
-        except getopt.GetoptError as err:
-            # print help information and exit:
+        except getopt.GetoptError:
             print 'Sorry, command line option does not exist'
             sys.exit()
         for o, a in opts:
@@ -182,6 +179,9 @@ class XChemExplorer(QtGui.QApplication):
                                     "Failed - no X-rays":           "rgb(200,200,200)",
                                     "Failed - unknown":             "rgb(200,200,200)"  }
 
+
+        # checking for external software packages
+        self.external_software=external_software().check()
 
         self.start_GUI()
         self.exec_()
