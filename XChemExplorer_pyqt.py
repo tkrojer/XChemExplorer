@@ -203,6 +203,7 @@ class XChemExplorer(QtGui.QApplication):
                 if target[target.rfind('/')+1:] not in ['results','README-log','edna-latest.html']:
                     if target[target.rfind('/')+1:] not in target_list:
                         target_list.append(target[target.rfind('/')+1:])
+        print target_list,visit_list
         return target_list,visit_list
 
 
