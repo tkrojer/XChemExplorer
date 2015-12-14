@@ -14,9 +14,14 @@ if os.getenv('PHENIX'):
     if platform.system()=='Darwin':
         sys.path.append(os.path.join(os.getenv('PHENIX'),'base','Python.framework','Versions','2.7','lib','python2.7','site-packages'))
     import PIL
-    from rdkit import Chem
-    from rdkit.Chem import AllChem
-    from rdkit.Chem import Draw
+    try:
+        # this sys path append is only meaningful if non-CCP4 python is used to launch XCE
+        sys.path.append(os.path.join(os.getenv('CCP4'),'lib','python2.7','site-packages'))
+        from rdkit import Chem
+        from rdkit.Chem import AllChem
+        from rdkit.Chem import Draw
+    except ImportError:
+        pass
 
 # last commited: 03/12/2015
 
