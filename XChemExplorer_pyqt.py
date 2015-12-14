@@ -139,6 +139,10 @@ class XChemExplorer(QtGui.QApplication):
                 self.settings['database_directory']=self.database_directory
                 self.data_source_file=pickled_settings['data_source']
                 self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
+                if os.path.isfile(self.settings['data_source']):
+                    XChemDB.data_source(self.settings['data_source']).create_missing_columns()
+                else:
+                    XChemDB.data_source(self.settings['data_source']).create_empty_data_source_file()
                 self.ccp4_scratch_directory=pickled_settings['ccp4_scratch']
                 self.settings['ccp4_scratch']=self.ccp4_scratch_directory
                 self.allowed_unitcell_difference_percent=pickled_settings['unitcell_difference']
@@ -148,6 +152,12 @@ class XChemExplorer(QtGui.QApplication):
                 tmp=os.path.abspath(a)
                 self.database_directory=tmp[:tmp.rfind('/')]
                 self.data_source_file=tmp[tmp.rfind('/')+1:]
+                self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
+                if os.path.isfile(self.settings['data_source']):
+                    XChemDB.data_source(self.settings['data_source']).create_missing_columns()
+                else:
+                    XChemDB.data_source(self.settings['data_source']).create_empty_data_source_file()
+
 
         for dir in glob.glob(self.beamline_directory+'/*'):
             self.visit_list.append(os.path.realpath(dir))
@@ -546,6 +556,10 @@ class XChemExplorer(QtGui.QApplication):
             self.settings['database_directory']=self.database_directory
             self.data_source_file=pickled_settings['data_source']
             self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
+            if os.path.isfile(self.settings['data_source']):
+                XChemDB.data_source(self.settings['data_source']).create_missing_columns()
+            else:
+                XChemDB.data_source(self.settings['data_source']).create_empty_data_source_file()
             self.ccp4_scratch_directory=pickled_settings['ccp4_scratch']
             self.settings['ccp4_scratch']=self.ccp4_scratch_directory
             self.allowed_unitcell_difference_percent=pickled_settings['unitcell_difference']
@@ -630,7 +644,8 @@ class XChemExplorer(QtGui.QApplication):
             self.data_source_file_label.setText(self.data_source_file)
             self.database_directory_label.setText(str(self.database_directory))
             self.settings['database_directory']=self.database_directory
-            self.settings['data_source']=self.data_source_file
+            self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
+            XChemDB.data_source(self.settings['data_source']).create_missing_columns()
         if self.sender().text()=='Select Beamline Directory':
             self.beamline_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.beamline_directory_label.setText(self.beamline_directory)

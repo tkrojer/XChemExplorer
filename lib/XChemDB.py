@@ -59,6 +59,7 @@ class data_source:
             # from XChemExplorer
             ['CompoundName',                         'Compound Name',                           'TEXT'],
             ['CrystalTag',                           'Tag',                                     'TEXT'],
+            ['CrystalForm',                          'Crystal\nForm',                           'TEXT'],
             ['DataCollectionBeamline',               'DataCollectionBeamline',                  'TEXT'],
             ['DataCollectionDate',                   'DataCollectionDate',                      'TEXT'],
             ['DataCollectionOutcome',                'DataCollection\nOutcome',                   'TEXT'],

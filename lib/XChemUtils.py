@@ -8,15 +8,15 @@ import subprocess
 import getpass
 import shutil
 import platform
-#if os.getenv('PHENIX'):
-#    if platform.system()=='Linux':
-#        sys.path.append(os.path.join(os.getenv('PHENIX'),'build','intel-linux-2.6-x86_64','base','lib','python2.7','site-packages'))
-#    if platform.system()=='Darwin':
-#        sys.path.append(os.path.join(os.getenv('PHENIX'),'base','Python.framework','Versions','2.7','lib','python2.7','site-packages'))
-#    import PIL
-#    from rdkit import Chem
-#    from rdkit.Chem import AllChem
-#    from rdkit.Chem import Draw
+if os.getenv('PHENIX'):
+    if platform.system()=='Linux':
+        sys.path.append(os.path.join(os.getenv('PHENIX'),'build','intel-linux-2.6-x86_64','base','lib','python2.7','site-packages'))
+    if platform.system()=='Darwin':
+        sys.path.append(os.path.join(os.getenv('PHENIX'),'base','Python.framework','Versions','2.7','lib','python2.7','site-packages'))
+    import PIL
+    from rdkit import Chem
+    from rdkit.Chem import AllChem
+    from rdkit.Chem import Draw
 
 # last commited: 03/12/2015
 
@@ -199,11 +199,11 @@ class helpers:
 
         os.chdir(os.path.join(initial_model_directory,sample))
         if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.pdb')):
-            os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.pdb'))
+            os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.pdb'),compoundID+'.pdb')
         if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif')):
-            os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif'))
+            os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif'),compoundID+'.cif')
         if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png')):
-            os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png'))
+            os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png'),compoundID+'.png')
 
 
 
