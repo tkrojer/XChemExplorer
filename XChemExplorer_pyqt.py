@@ -56,8 +56,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.data_source_file='soakDBDataFile.sqlite'
                 self.database_directory=os.path.join(self.project_directory,'processing','lab36')
                 self.data_source_set=True
-                self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
-                XChemDB.data_source(self.settings['data_source']).create_missing_columns()
+                XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).create_missing_columns()
             self.ccp4_scratch_directory=os.path.join(self.project_directory,'processing','tmp')
 
             if not os.path.isdir(self.beamline_directory):
