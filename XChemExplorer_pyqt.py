@@ -882,6 +882,7 @@ class XChemExplorer(QtGui.QApplication):
                 if not self.albula:
                     self.albula = dectris.albula.openMainFrame()
                 self.show_diffraction_image = self.albula.openSubFrame()
+                self.show_diffraction_image.close()     # open any open image first
                 self.show_diffraction_image.loadFile(os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image))
 
 
