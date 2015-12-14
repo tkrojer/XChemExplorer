@@ -188,6 +188,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def get_target_and_visit_list(self):
         target_list=['*']      # always give the option to read in all targets
+        visit_list=[]
         # the beamline directory could be a the real directory or
         # a directory where the visits are linked into
         if len(self.beamline_directory.split('/')) and \
