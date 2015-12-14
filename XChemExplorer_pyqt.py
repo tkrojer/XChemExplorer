@@ -873,15 +873,15 @@ class XChemExplorer(QtGui.QApplication):
                 visit=str(self.sender().text()).split()[1]
                 diffraction_image=str(self.sender().text()).split()[3]
                 xtal=diffraction_image[:diffraction_image.find('_')]
-                try:
-                    self.show_diffraction_image.loadFile('')
-                except dectris.albula.viewer.DNoObject:
-                    self.albula = dectris.albula.openMainFrame()
-                    self.show_diffraction_image = self.albula.openSubFrame()
-                    self.show_diffraction_image.loadFile(os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image))
-#                self.albula = dectris.albula.openMainFrame()
-#                self.show_diffraction_image = self.albula.openSubFrame()
-#                self.show_diffraction_image.loadFile(os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image))
+#                try:
+#                    self.show_diffraction_image.loadFile('')
+#                except dectris.albula.viewer.DNoObject:
+#                    self.albula = dectris.albula.openMainFrame()
+#                    self.show_diffraction_image = self.albula.openSubFrame()
+#                    self.show_diffraction_image.loadFile(os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image))
+                self.albula = dectris.albula.openMainFrame()
+                self.show_diffraction_image = self.albula.openSubFrame()
+                self.show_diffraction_image.loadFile(os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image))
 
 
 
