@@ -113,6 +113,7 @@ class XChemExplorer(QtGui.QApplication):
         self.reference_file_list=[]
         self.all_columns_in_data_source=XChemDB.data_source(os.path.join(self.database_directory,
                                                                          self.data_source_file)).return_column_list()
+        self.albula_button_dict={}
 
         # command line arguments
         try:
@@ -897,23 +898,21 @@ class XChemExplorer(QtGui.QApplication):
                     self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                     self.work_thread.start()
             if str(self.sender().text()).startswith('Show'):
+                for key in self.albula_button_dict:
+                    if self.albula_button_dict[key]==self.sender():
+                        print 'found'
+                        print key
                 print str(self.sender().text())
-                visit=str(self.sender().text()).split()[1]
-                diffraction_image=str(self.sender().text()).split()[3]
-                xtal=diffraction_image[:diffraction_image.find('_')]
-#                try:
-#                    self.show_diffraction_image.loadFile('')
-#                except dectris.albula.viewer.DNoObject:
+#                visit=str(self.sender().text()).split()[1]
+#                diffraction_image=str(self.sender().text()).split()[3]
+#                xtal=diffraction_image[:diffraction_image.find('_')]
+#                if not self.albula:
 #                    self.albula = dectris.albula.openMainFrame()
-#                    self.show_diffraction_image = self.albula.openSubFrame()
-#                    self.show_diffraction_image.loadFile(os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image))
-                if not self.albula:
-                    self.albula = dectris.albula.openMainFrame()
-                for frame in self.albula_subframes:
-                    frame.close()
-                show_diffraction_image = self.albula.openSubFrame()
-                show_diffraction_image.loadFile(os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image))
-                self.albula_subframes.append(show_diffraction_image)
+#                for frame in self.albula_subframes:
+#                    frame.close()
+#                show_diffraction_image = self.albula.openSubFrame()
+#                show_diffraction_image.loadFile(os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image))
+#                self.albula_subframes.append(show_diffraction_image)
 
 
         elif self.data_source_set==False:
@@ -1280,6 +1279,7 @@ class XChemExplorer(QtGui.QApplication):
         # 1. get length of table
         # 2. delete all entries
         self.data_collection_summary_table.setRowCount(0)
+        self.albula_button_dict={}
 
         self.data_collection_summary_table.setRowCount(len(self.data_collection_statistics_dict))
         for row,key in enumerate(sorted(self.data_collection_statistics_dict)):
@@ -1370,8 +1370,9 @@ class XChemExplorer(QtGui.QApplication):
                         position=self.data_collection_dict[key][4][1]
                     cell_text.setText(position)
                 if header.startswith('Show'):
-                    start_albula_button=QtGui.QPushButton('Show: '+visit+" @ "+latest_run+'0001.cbf')
+                    start_albula_button=QtGui.QPushButton('Show: '+latest_run+'0001.cbf')
                     start_albula_button.clicked.connect(self.button_clicked)
+                    self.albula_button_dict[key]=start_albula_button
                     self.data_collection_summary_table.setCellWidget(row,column,start_albula_button)
                 for item in self.data_collection_statistics_dict[key][selected_processing_result]:
                     if isinstance(item, list):
