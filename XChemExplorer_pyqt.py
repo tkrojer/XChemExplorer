@@ -3,12 +3,11 @@ import getopt
 
 # commited on: 04/12/2015
 
-#sys.path.append('/dls_sw/apps/albula/3.1/dectris/albula/3.1/python')
-#import dectris.albula
-#try:
-#    import dectris.albula
-#except ImportError:
-#    pass
+sys.path.append('/dls_sw/apps/albula/3.1/dectris/albula/3.1/python')
+try:
+    import dectris.albula
+except ImportError:
+    pass
 
 #from datetime import datetime
 from PyQt4 import QtGui, QtCore
@@ -38,6 +37,11 @@ class XChemExplorer(QtGui.QApplication):
         # checking for external software packages
         self.external_software=external_software().check()
 
+        # general settings
+        self.allowed_unitcell_difference_percent=5
+        self.filename_root='${samplename}'
+        self.data_source_set=False
+
         # Settings @ Directories
         self.current_directory=os.getcwd()
         if 'labxchem' in self.current_directory:
@@ -48,8 +52,12 @@ class XChemExplorer(QtGui.QApplication):
             self.reference_directory=os.path.join(self.project_directory,'processing','reference')
             self.database_directory=os.path.join(self.project_directory,'processing','database')
             self.data_source_file=''
-            if os.path.isfile(os.path.join(self.database_directory,'SoakerDB.sqlite')):
-                self.data_source_file='SoakerDB.sqlite'
+            if os.path.isfile(os.path.join(self.project_directory,'processing','lab36','soakDBDataFile.sqlite')):
+                self.data_source_file='soakDBDataFile.sqlite'
+                self.database_directory=os.path.join(self.project_directory,'processing','lab36')
+                self.data_source_set=True
+                self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
+                XChemDB.data_source(self.settings['data_source']).create_missing_columns()
             self.ccp4_scratch_directory=os.path.join(self.project_directory,'processing','tmp')
 
             if not os.path.isdir(self.beamline_directory):
@@ -76,10 +84,6 @@ class XChemExplorer(QtGui.QApplication):
             self.data_source_file=''
             self.ccp4_scratch_directory=os.getenv('CCP4_SCR')
 
-
-        # general settings
-        self.allowed_unitcell_difference_percent=5
-        self.filename_root='${samplename}'
 
         self.settings =     {'current_directory':       self.current_directory,
                              'project_directory':       self.project_directory,
@@ -157,6 +161,7 @@ class XChemExplorer(QtGui.QApplication):
                     XChemDB.data_source(self.settings['data_source']).create_missing_columns()
                 else:
                     XChemDB.data_source(self.settings['data_source']).create_empty_data_source_file()
+                self.data_source_set=True
 
 
         for dir in glob.glob(self.beamline_directory+'/*'):
@@ -555,11 +560,13 @@ class XChemExplorer(QtGui.QApplication):
             self.database_directory=pickled_settings['database_directory']
             self.settings['database_directory']=self.database_directory
             self.data_source_file=pickled_settings['data_source']
-            self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
-            if os.path.isfile(self.settings['data_source']):
-                XChemDB.data_source(self.settings['data_source']).create_missing_columns()
-            else:
-                XChemDB.data_source(self.settings['data_source']).create_empty_data_source_file()
+            if self.data_source_file != '':
+                self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
+                if os.path.isfile(self.settings['data_source']):
+                    XChemDB.data_source(self.settings['data_source']).create_missing_columns()
+                else:
+                    XChemDB.data_source(self.settings['data_source']).create_empty_data_source_file()
+                self.data_source_set=True
             self.ccp4_scratch_directory=pickled_settings['ccp4_scratch']
             self.settings['ccp4_scratch']=self.ccp4_scratch_directory
             self.allowed_unitcell_difference_percent=pickled_settings['unitcell_difference']
@@ -645,6 +652,7 @@ class XChemExplorer(QtGui.QApplication):
             self.database_directory_label.setText(str(self.database_directory))
             self.settings['database_directory']=self.database_directory
             self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
+            self.data_source_set=True
             XChemDB.data_source(self.settings['data_source']).create_missing_columns()
         if self.sender().text()=='Select Beamline Directory':
             self.beamline_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
@@ -666,7 +674,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def button_clicked(self):
-        if self.explorer_active==0:
+        if self.explorer_active==0 and self.data_source_set==True:
             if self.sender().text()=='Get New Results from Autoprocessing':
                 print 'target: ',self.target
                 self.work_thread=XChemThread.read_autoprocessing_results_from_disc(self.visit_list,
@@ -866,18 +874,12 @@ class XChemExplorer(QtGui.QApplication):
                 visit=str(self.sender().text()).split()[1]
                 diffraction_image=str(self.sender().text()).split()[3]
                 xtal=diffraction_image[:diffraction_image.find('_')]
-                print diffraction_image
-                print xtal
-                print visit
-                print os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image)
-
- #               try:
- #                   self.show_diffraction_image.loadFile('')
- #               except dectris.albula.viewer.DNoObject:
- #                   self.albula = dectris.albula.openMainFrame()
- #                   self.show_diffraction_image = self.albula.openSubFrame()
- #                   self.show_diffraction_image.loadFile(os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image))
-
+                try:
+                    self.show_diffraction_image.loadFile('')
+                except dectris.albula.viewer.DNoObject:
+                    self.albula = dectris.albula.openMainFrame()
+                    self.show_diffraction_image = self.albula.openSubFrame()
+                    self.show_diffraction_image.loadFile(os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image))
 #                self.albula = dectris.albula.openMainFrame()
 #                self.show_diffraction_image = self.albula.openSubFrame()
 #                self.show_diffraction_image.loadFile(os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image))
@@ -896,6 +898,17 @@ class XChemExplorer(QtGui.QApplication):
 #                    out+='\n'
 #                   print out
 
+        elif self.data_source_set==False:
+            QtGui.QMessageBox.warning(self.window, "Data Source Problem",
+                                      ('Please set or create a data source file\n')+
+                                      ('Options:\n')+
+                                      ('1. Use an existing file:\n')+
+                                      ('- Settings -> Select Data Source File\n')+
+                                      ('- start XCE with command line argument (-d)\n')+
+                                      ('2. Create a new file\n')+
+                                      ('- Data Source -> Create New Data Source (SQLite)'),
+                        QtGui.QMessageBox.Cancel, QtGui.QMessageBox.NoButton,
+                        QtGui.QMessageBox.NoButton)
 
 
     def update_progress_bar(self,progress):
