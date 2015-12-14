@@ -1306,6 +1306,7 @@ class XChemExplorer(QtGui.QApplication):
             visit=''
             diffraction_image=''
             for n,run in enumerate(self.data_collection_dict[key][0]):
+                print run
                 if run[1]==max(tmp):
                     latest_run=run[0]
                     visit=run[2]
