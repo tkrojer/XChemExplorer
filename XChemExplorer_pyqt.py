@@ -162,7 +162,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
         self.target_list,self.visit_list=self.get_target_and_visit_list()
-
+        print self.target_list
 
         # Settings @ Switches
         self.explorer_active=0
