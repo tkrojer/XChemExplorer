@@ -202,6 +202,7 @@ class XChemExplorer(QtGui.QApplication):
                 if target[target.rfind('/')+1:] not in ['results','README-log','edna-latest.html']:
                     if target[target.rfind('/')+1:] not in target_list:
                         target_list.append(target[target.rfind('/')+1:])
+        print visit_list
         return target_list,visit_list
 
 
@@ -301,7 +302,7 @@ class XChemExplorer(QtGui.QApplication):
         write_files_button.clicked.connect(self.button_clicked)
         data_collection_button_hbox.addWidget(write_files_button)
         self.target_selection_combobox = QtGui.QComboBox()
-        self.populate_reference_combobox(self.target_selection_combobox)
+        self.populate_target_selection_combobox(self.target_selection_combobox)
         self.target_selection_combobox.activated[str].connect(self.target_selection_combobox_activated)
         data_collection_button_hbox.addWidget(self.target_selection_combobox)
         self.tab_dict['DLS @ Data Collection'][1].addLayout(data_collection_button_hbox)
