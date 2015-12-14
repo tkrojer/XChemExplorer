@@ -177,6 +177,7 @@ class XChemExplorer(QtGui.QApplication):
         self.progress_bar_start=0
         self.progress_bar_step=0
         self.albula = None
+        self.albula_subframes=[]
         self.show_diffraction_image = None
 
         self.dataset_outcome = {    "success":                      "rgb(200,200,200)",
@@ -881,24 +882,12 @@ class XChemExplorer(QtGui.QApplication):
 #                    self.show_diffraction_image.loadFile(os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image))
                 if not self.albula:
                     self.albula = dectris.albula.openMainFrame()
-                self.show_diffraction_image = self.albula.openSubFrame()
-                self.show_diffraction_image.close()     # open any open image first
-                self.show_diffraction_image = self.albula.openSubFrame()
-                self.show_diffraction_image.loadFile(os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image))
+                for frame in self.albula_subframes:
+                    frame.close()
+                show_diffraction_image = self.albula.openSubFrame()
+                show_diffraction_image.loadFile(os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image))
+                self.albula_subframes.append(show_diffraction_image)
 
-
-
-
-#                    print self.mounted_crystal_table.item(row,0).text()
-#                    for i in range(5):
-#                        print
-#                        if self.mounted_crystal_table.item(row,i).text()=='':
-#                            print 'hallo'
-#                            break
-#                        else:
-#                            out+=self.mounted_crystal_table.item(row,i).text()+','
-#                    out+='\n'
-#                   print out
 
         elif self.data_source_set==False:
             QtGui.QMessageBox.warning(self.window, "Data Source Problem",
