@@ -574,7 +574,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.beamline_directory=pickled_settings['beamline_directory']
                 self.target_list,self.visit_list=self.get_target_and_visit_list()
                 self.settings['beamline_directory']=self.beamline_directory
-                self.populate_reference_combobox(self.target_selection_combobox)
+                self.populate_target_selection_combobox(self.target_selection_combobox)
 
             self.initial_model_directory=pickled_settings['initial_model_directory']
             self.settings['initial_model_directory']=self.initial_model_directory
@@ -682,7 +682,7 @@ class XChemExplorer(QtGui.QApplication):
             if dir_name != self.beamline_directory:
                 self.beamline_directory=dir_name
                 self.target_list,self.visit_list=self.get_target_and_visit_list()
-                self.populate_reference_combobox(self.target_selection_combobox)
+                self.populate_target_selection_combobox(self.target_selection_combobox)
             self.beamline_directory_label.setText(self.beamline_directory)
             self.settings['beamline_directory']=self.beamline_directory
         if self.sender().text()=='Select CCP4_SCR Directory':
