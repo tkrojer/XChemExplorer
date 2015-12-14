@@ -898,21 +898,17 @@ class XChemExplorer(QtGui.QApplication):
                     self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                     self.work_thread.start()
             if str(self.sender().text()).startswith('Show'):
+                diffraction_image=''
                 for key in self.albula_button_dict:
-                    if self.albula_button_dict[key]==self.sender():
-                        print 'found'
-                        print key
-                print str(self.sender().text())
-#                visit=str(self.sender().text()).split()[1]
-#                diffraction_image=str(self.sender().text()).split()[3]
-#                xtal=diffraction_image[:diffraction_image.find('_')]
-#                if not self.albula:
-#                    self.albula = dectris.albula.openMainFrame()
-#                for frame in self.albula_subframes:
-#                    frame.close()
-#                show_diffraction_image = self.albula.openSubFrame()
-#                show_diffraction_image.loadFile(os.path.join(self.beamline_directory,visit,self.target,xtal,diffraction_image))
-#                self.albula_subframes.append(show_diffraction_image)
+                    if self.albula_button_dict[key][0]==self.sender():
+                        diffraction_image=self.albula_button_dict[key][1]
+                if not self.albula:
+                    self.albula = dectris.albula.openMainFrame()
+                for frame in self.albula_subframes:
+                    frame.close()
+                show_diffraction_image = self.albula.openSubFrame()
+                show_diffraction_image.loadFile(os.path.join(diffraction_image))
+                self.albula_subframes.append(show_diffraction_image)
 
 
         elif self.data_source_set==False:
@@ -1308,10 +1304,12 @@ class XChemExplorer(QtGui.QApplication):
                 tmp.append(runs[1])
             latest_run=''
             visit=''
+            diffraction_image=''
             for n,run in enumerate(self.data_collection_dict[key][0]):
                 if run[1]==max(tmp):
                     latest_run=run[0]
                     visit=run[2]
+                    diffraction_image=os.path.join(str(run[3]),latest_run+'0001.cbf')
             images_to_show=[]
             if latest_run != '':
                 for image in self.data_collection_dict[key][3]:
@@ -1372,7 +1370,7 @@ class XChemExplorer(QtGui.QApplication):
                 if header.startswith('Show'):
                     start_albula_button=QtGui.QPushButton('Show: '+latest_run+'0001.cbf')
                     start_albula_button.clicked.connect(self.button_clicked)
-                    self.albula_button_dict[key]=start_albula_button
+                    self.albula_button_dict[key]=[start_albula_button,diffraction_image]
                     self.data_collection_summary_table.setCellWidget(row,column,start_albula_button)
                 for item in self.data_collection_statistics_dict[key][selected_processing_result]:
                     if isinstance(item, list):

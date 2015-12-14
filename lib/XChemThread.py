@@ -439,7 +439,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                         continue
 
                     timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
-                    run_list.append([(run,timestamp,visit)])
+                    diffraction_image_directory=os.path.join(visit_directory,xtal)
+                    run_list.append([(run,timestamp,visit,diffraction_image_directory)])
                     self.data_collection_dict[xtal][0].append([run,timestamp,visit])
 #                    for (path, dirs, files) in os.walk(runs):
 #                        if 'edna' in dirs:
