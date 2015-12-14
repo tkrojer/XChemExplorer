@@ -200,6 +200,7 @@ class XChemExplorer(QtGui.QApplication):
                 visit_list.append(os.path.realpath(dir))
         for visit in self.visit_list:
             for target in glob.glob(os.path.join(visit,'processed','*')):
+                print target
                 if target[target.rfind('/')+1:] not in ['results','README-log','edna-latest.html']:
                     if target[target.rfind('/')+1:] not in target_list:
                         target_list.append(target[target.rfind('/')+1:])
