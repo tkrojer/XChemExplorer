@@ -227,7 +227,6 @@ class data_source:
                 if not str(value).replace(' ','')=='':  # ignore if nothing in csv field
                     value_string+="'"+value+"'"+','
                     column_string+=key+','
-            print          "INSERT INTO mainTable ("+column_string[:-1]+") VALUES ("+value_string[:-1]+");"
             cursor.execute("INSERT INTO mainTable ("+column_string[:-1]+") VALUES ("+value_string[:-1]+");")
         connect.commit()
 
@@ -245,8 +244,6 @@ class data_source:
         rows = cursor.fetchall()
         csvWriter = csv.writer(open(csv_file, "w"))
         csvWriter.writerows([header]+rows)
-#        print cursor.description
-#        print header
 
 
     def load_samples_from_data_source(self):

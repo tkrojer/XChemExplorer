@@ -9,23 +9,14 @@ try:
 except ImportError:
     pass
 
-#from datetime import datetime
 from PyQt4 import QtGui, QtCore
-#from PyQt4.QtCore import QThread, SIGNAL
 
-#import time
 import pickle
 import base64
-#import math
-import subprocess
 
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
-#from XChemUtils import process
 from XChemUtils import parse
-#from XChemUtils import queue
-#from XChemUtils import mtztools
 from XChemUtils import external_software
-from XChemUtils import reference
 import XChemThread
 import XChemDB
 import XChemDialogs
@@ -140,8 +131,10 @@ class XChemExplorer(QtGui.QApplication):
                 self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
                 if os.path.isfile(self.settings['data_source']):
                     XChemDB.data_source(self.settings['data_source']).create_missing_columns()
-                else:
+                    self.data_source_set=True
+                else:       # in case just an empty file was specified
                     XChemDB.data_source(self.settings['data_source']).create_empty_data_source_file()
+                    self.data_source_set=True
                 self.ccp4_scratch_directory=pickled_settings['ccp4_scratch']
                 self.settings['ccp4_scratch']=self.ccp4_scratch_directory
                 self.allowed_unitcell_difference_percent=pickled_settings['unitcell_difference']
@@ -1310,7 +1303,8 @@ class XChemExplorer(QtGui.QApplication):
                 if run[1]==max(tmp):
                     latest_run=run[0]
                     visit=run[2]
-                    diffraction_image=os.path.join(str(run[3]),latest_run+'0001.cbf')
+                    if len(run)==3:
+                        diffraction_image=os.path.join(str(run[3]),latest_run+'0001.cbf')
             images_to_show=[]
             if latest_run != '':
                 for image in self.data_collection_dict[key][3]:

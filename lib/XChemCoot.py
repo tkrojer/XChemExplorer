@@ -52,7 +52,7 @@ class GUI(object):
                                         'Show Datasets Under Refinement':   "RefinementOutcome='Refinement Ongoing'",
                                         'Show Confirmed Ligands':           "RefinementOutcome='Ligand Confirmed'",
                                         'SHow Final Structures':            "RefinementOutcome='Structure finished'"   }
-        print self.selection_criteria
+
         # this decides which samples will be looked at
         self.selection_mode = ''
 
@@ -140,37 +140,31 @@ class GUI(object):
         self.RRfreeValue = gtk.Label(self.QualityIndicators['RRfree'])
         self.RRfreeBox = gtk.EventBox()
         self.RRfreeBox.add(self.RRfreeValue)
-#        self.RRfreeBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("gray"))
 
         self.ResolutionLabel = gtk.Label('Resolution')
         self.ResolutionValue = gtk.Label(self.QualityIndicators['Resolution'])
         self.ResolutionBox = gtk.EventBox()
         self.ResolutionBox.add(self.ResolutionValue)
-#        self.ResolutionBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("gray"))
 
         self.MolprobityScoreLabel = gtk.Label('MolprobityScore')
         self.MolprobityScoreValue = gtk.Label(self.QualityIndicators['MolprobityScore'])
         self.MolprobityScoreBox = gtk.EventBox()
         self.MolprobityScoreBox.add(self.MolprobityScoreValue)
-#        self.MolprobityScoreBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("gray"))
 
         self.RamachandranOutliersLabel = gtk.Label('Ramachandran Outliers')
         self.RamachandranOutliersValue = gtk.Label(self.QualityIndicators['RamachandranOutliers'])
         self.RamachandranOutliersBox = gtk.EventBox()
         self.RamachandranOutliersBox.add(self.RamachandranOutliersValue)
-#        self.RamachandranOutliersBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("gray"))
 
         self.RamachandranFavoredLabel = gtk.Label('Ramachandran Favored')
         self.RamachandranFavoredValue = gtk.Label(self.QualityIndicators['RamachandranFavored'])
         self.RamachandranFavoredBox = gtk.EventBox()
         self.RamachandranFavoredBox.add(self.RamachandranFavoredValue)
-#        self.RamachandranFavoredBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("gray"))
 
         self.LigandCCLabel = gtk.Label('Ligand CC')
         self.LigandCCValue = gtk.Label(self.QualityIndicators['LigandCC'])
         self.LigandCCBox = gtk.EventBox()
         self.LigandCCBox.add(self.LigandCCValue)
-#        self.LigandCCBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("gray"))
 
         self.table = gtk.Table(4, 2, False)
         self.table.attach(self.RRfreeLabel,                 0, 1, 0, 1)
@@ -204,6 +198,9 @@ class GUI(object):
 #        self.LigandConfidenceButton = gtk.Button(label="ligand confidence")
         self.RefinementParamsButton = gtk.Button(label="refinement parameters")
 #        self.AdjustDataProcessingButton = gtk.Button(label="adjust data processing")
+        self.merge_ligand_button=gtk.Button(label="Merge Ligand")
+        self.place_ligand_here_button=gtk.Button(label="Place Ligand here")
+        self.fit_ligand_to_density_button.gtk.Button(label='Fit Ligand to Density')
 
         self.cb = gtk.combo_box_new_text()
         self.cb.connect("changed", self.ChooseXtal)
@@ -219,17 +216,23 @@ class GUI(object):
         self.PREVbutton.connect("clicked", self.ChangeXtal,-1)
         self.NEXTbutton.connect("clicked", self.ChangeXtal,+1)
 
-        # things concerning the dataset outcome
+        # --- modeling shortcuts ---
+        self.hbox_for_modeling=gtk.HBox()
+        self.hbox_for_modeling.add(self.place_ligand_here_button)
+        self.place_ligand_here_button.connect("clicked",self.place_ligand_here)
+        self.hbox_for_modeling.add(self.merge_ligand_button)
+        self.merge_ligand_button.connect("clicked",self.merge_ligand_into_protein)
+        self.hbox_for_modeling.add(self.fit_ligand_to_density_button)
+        self.fit_ligand_to_density_button.connect(self.fit_ligand)
+        self.vbox.add(self.hbox_for_modeling)
 
-        self.hbox5 = gtk.HBox()
-        self.hbox5.pack_start(self.NOREFINEMENTFAILEDbutton)
+        # --- things concerning the dataset outcome ---
+        self.hbox_refinemnt_outcome=gtk.HBox()
         self.NOREFINEMENTFAILEDbutton.connect("clicked",self.update_data_source,"Refinement Failed")
-        self.vbox.pack_start(self.hbox5)
-
-        self.hbox6 = gtk.HBox()
-        self.hbox6.pack_start(self.NOLIGANDFAILEDbutton)
+        self.hbox_refinemnt_outcome.add(self.NOREFINEMENTFAILEDbutton)
         self.NOLIGANDFAILEDbutton.connect("clicked",self.update_data_source,"No Ligand Bound")
-        self.vbox.pack_start(self.hbox6)
+        self.hbox_refinemnt_outcome.add(self.NOLIGANDFAILEDbutton)
+        self.vbox.pack_start(self.hbox_refinemnt_outcome)
 
         # Refinement History
 #        self.pic2 = gtk.gdk.pixbuf_new_from_file(os.getenv('XChemExplorer_DIR')+'/image/NO_REFINEMENT_HISTORY_AVAILABLE.png')
@@ -241,17 +244,15 @@ class GUI(object):
 #        self.vbox.add(self.canvas)
 
 
-
-        self.hbox2a = gtk.HBox()
-        self.hbox2a.pack_start(self.REFINEbutton)
+        # --- Refine button ---
         self.REFINEbutton.connect("clicked",self.REFINE)
-        self.vbox.pack_start(self.hbox2a)
+        self.vbox.pack_start(self.REFINEbutton)
 
-        self.hbox2c = gtk.HBox()
-        self.hbox2c.pack_start(self.RefinementParamsButton)
+        # --- Refinement parameters ---
         self.RefinementParamsButton.connect("clicked",self.RefinementParams)
-        self.vbox.pack_start(self.hbox2c)
+        self.vbox.pack_start(self.RefinementParamsButton)
 
+        # --- CANCEL button ---
         self.CANCELbutton = gtk.Button(label="CANCEL")
         self.CANCELbutton.connect("clicked", self.CANCEL)
         self.vbox.add(self.CANCELbutton)
@@ -399,6 +400,14 @@ class GUI(object):
                 ncol=2, mode="expand", borderaxespad=0.)
         return fig
 
+    def place_ligand_here(self,widget):
+        print 'hallo'
+
+    def merge_ligand_into_protein(self,widget):
+        print 'ok'
+
+    def fit_ligand(self,widget):
+        print 'fit'
 
 if __name__=='__main__':
     GUI().StartGUI()
