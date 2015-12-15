@@ -1303,7 +1303,7 @@ class XChemExplorer(QtGui.QApplication):
                 if run[1]==max(tmp):
                     latest_run=run[0]
                     visit=run[2]
-                    if len(run)==3:
+                    if len(run)==4:
                         diffraction_image=os.path.join(str(run[3]),latest_run+'0001.cbf')
             images_to_show=[]
             if latest_run != '':
@@ -1354,13 +1354,13 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text.setText('')
                 if header=='Puck':
                     puck='n/a'
-                    if len(self.data_collection_dict[key])==5:
-                        puck=self.data_collection_dict[key][4][0]
+#                    if len(self.data_collection_dict[key])==5:
+#                        puck=self.data_collection_dict[key][4][0]
                     cell_text.setText(puck)
                 if header=='Position':
                     position='n/a'
-                    if len(self.data_collection_dict[key])==5:
-                        position=self.data_collection_dict[key][4][1]
+#                    if len(self.data_collection_dict[key])==5:
+#                        position=self.data_collection_dict[key][4][1]
                     cell_text.setText(position)
                 if header.startswith('Show'):
                     start_albula_button=QtGui.QPushButton('Show: '+latest_run+'0001.cbf')
