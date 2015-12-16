@@ -81,7 +81,7 @@ class Refine(object):
         os.system('/bin/rm refine.pdb refine.mtz validation_summary.txt validate_ligands.txt 2fofc.map fofc.map refine_molprobity.log')
 
         if self.queueing_system_available:
-            pbs_line='#PBS -joe -N dimple'
+            pbs_line='#PBS -joe -N refmac'
         else:
             pbs_line=''
 
@@ -192,7 +192,7 @@ class Refine(object):
 
         os.chdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
         if external_software['qsub']:
-            os.system('qsub refmac.csh"')
+            os.system('qsub refmac.csh')
         else:
             os.system('chmod +x refmac.csh')
             os.system('./refmac.csh &')
