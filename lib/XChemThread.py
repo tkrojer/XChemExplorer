@@ -129,7 +129,6 @@ class start_COOT(QtCore.QThread):
         self.settings=settings
 
     def run(self):
-        print self.settings
         pickle.dump(self.settings,open('XChemExplorer_settings.pkl','wb'))
         os.system('coot --no-guano --no-state-script --script %s' %(os.getenv('XChemExplorer_DIR')+'/lib/XChemCoot.py'))
 
@@ -148,7 +147,6 @@ class read_intial_refinement_results(QtCore.QThread):
         progress_step=100/float(len(glob.glob(self.initial_model_directory+'/*')))
         progress=0
 
-        print self.data_source
         db=XChemDB.data_source(self.data_source)
         db.create_missing_columns()
 
@@ -296,8 +294,7 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
                     logfile=self.data_collection_statistics_dict[sample][index.row()][1]
             if self.data_source_file != '':
                 data_dict=data_source.get_data_dict_to_save_autoprocessing_results_to_data_source(sample,str(outcome),logfile)
-#                data_source.update_data_source(sample,data_dict)
-                data_source.update_insert_not_null_fields_only(sample,data_dict)
+                data_source.update_data_source(sample,data_dict)
 #                data_source.save_autoprocessing_results_to_data_source(sample,str(outcome),logfile)
 
             # create all the directories if necessary
@@ -311,10 +308,8 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
                 # copy files
                 if 'xia2' in path_to_logfile:
                     path_to_procdir=os.path.join('/',*path_to_logfile.split('/')[:len(path_to_logfile.split('/'))-2])
-                    print path_to_procdir
                 if 'fast_dp' in path_to_logfile:
                     path_to_procdir=os.path.join('/',*path_to_logfile.split('/')[:len(path_to_logfile.split('/'))-1])
-                    print path_to_procdir
                 os.system('/bin/cp -R '+path_to_procdir+' '+os.path.join(self.initial_model_directory,sample,'autoprocessing'))
 
                 # link files

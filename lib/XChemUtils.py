@@ -913,6 +913,7 @@ class reference:
         unitcell_difference='n/a'
         resolution_high='n/a'
         spg_autoproc='n/a'
+        unitcell_autoproc='n/a'
         if os.path.isfile(self.sample_mtz):
             mtz_autoproc=mtztools(self.sample_mtz).get_all_values_as_dict()
             resolution_high=mtz_autoproc['resolution_high']
