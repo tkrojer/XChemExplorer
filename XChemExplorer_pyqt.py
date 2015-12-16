@@ -695,8 +695,9 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def button_clicked(self):
-        if self.explorer_active==0 and self.data_source_set==True:
-            if self.sender().text()=='Get New Results from Autoprocessing':
+        if self.explorer_active==0:
+            if self.sender().text()=='Get New Results from Autoprocessing' \
+                     and self.data_source_set==True:
                 print 'target: ',self.target
                 self.work_thread=XChemThread.read_autoprocessing_results_from_disc(self.visit_list,
                                                                                    self.target,
@@ -710,7 +711,8 @@ class XChemExplorer(QtGui.QApplication):
                                                          self.create_widgets_for_autoprocessing_results)
                 self.work_thread.start()
 
-            if self.sender().text()=="Save Files from Autoprocessing in 'inital_model' Folder":
+            if self.sender().text()=="Save Files from Autoprocessing in 'inital_model' Folder" \
+                     and self.data_source_set==True:
                 self.work_thread=XChemThread.save_autoprocessing_results_to_disc(self.dataset_outcome_dict,
                                                                      self.data_collection_table_dict,
                                                                      self.data_collection_statistics_dict,
@@ -729,7 +731,8 @@ class XChemExplorer(QtGui.QApplication):
                 data=content[1]
                 self.populate_summary_table(header,data)
 
-            if self.sender().text()=="Check for inital Refinement":
+            if self.sender().text()=="Check for inital Refinement" \
+                     and self.data_source_set==True:
                 # first check if there is already content in the table and if so
                 # delete checkbox and combobox widgets
                 if self.initial_model_dimple_dict != {}:

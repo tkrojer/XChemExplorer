@@ -166,7 +166,8 @@ class data_source:
                             continue
                         if not str(value).replace(' ','')=='':  # ignore if nothing in csv field
                             update_string+=str(key)+'='+"'"+str(value)+"'"+','
-                    cursor.execute("UPDATE mainTable SET "+update_string[:-1]+" WHERE CrystalName="+"'"+sampleID+"'")
+                            print "UPDATE mainTable SET "+update_string[:-1]+" WHERE CrystalName="+"'"+sampleID+"';"
+                            cursor.execute("UPDATE mainTable SET "+update_string[:-1]+" WHERE CrystalName="+"'"+sampleID+"';")
                 else:
                     column_string=''
                     value_string=''

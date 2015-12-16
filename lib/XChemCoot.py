@@ -5,9 +5,8 @@ import glob
 import pickle
 import subprocess
 
-from matplotlib.figure import Figure
-#from numpy import arange, sin, pi
-from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
+#from matplotlib.figure import Figure
+#from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 
 # last commit: 05/12/2015
 
@@ -106,8 +105,8 @@ class GUI(object):
         refinement_cycle=[1,2,3,4,5,6,7,8,9,10]
         Rfree=  [0.1,0.2,0.14,0.12,0.1,0.1,0.1,0.1,0.1,0.1]
         Rcryst= [0.3,0.4,0.14,0.12,0.2,0.1,0.3,0.1,0.2,0.1]
-        self.canvas = FigureCanvas(self.update_plot(refinement_cycle,Rfree,Rcryst))  # a gtk.DrawingArea
-        self.canvas.set_size_request(300, 150)
+#        self.canvas = FigureCanvas(self.update_plot(refinement_cycle,Rfree,Rcryst))  # a gtk.DrawingArea
+#        self.canvas.set_size_request(300, 150)
 
 
 
@@ -200,7 +199,7 @@ class GUI(object):
 #        self.AdjustDataProcessingButton = gtk.Button(label="adjust data processing")
         self.merge_ligand_button=gtk.Button(label="Merge Ligand")
         self.place_ligand_here_button=gtk.Button(label="Place Ligand here")
-        self.fit_ligand_to_density_button.gtk.Button(label='Fit Ligand to Density')
+        self.fit_ligand_to_density_button=gtk.Button(label='Fit Ligand to Density')
 
         self.cb = gtk.combo_box_new_text()
         self.cb.connect("changed", self.ChooseXtal)
@@ -223,7 +222,7 @@ class GUI(object):
         self.hbox_for_modeling.add(self.merge_ligand_button)
         self.merge_ligand_button.connect("clicked",self.merge_ligand_into_protein)
         self.hbox_for_modeling.add(self.fit_ligand_to_density_button)
-        self.fit_ligand_to_density_button.connect(self.fit_ligand)
+        self.fit_ligand_to_density_button.connect("clicked",self.fit_ligand)
         self.vbox.add(self.hbox_for_modeling)
 
         # --- things concerning the dataset outcome ---
