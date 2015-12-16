@@ -36,8 +36,6 @@ class GUI(object):
 
     def __init__(self):
 
-        # checking for external software packages
-        self.external_software=XChemUtils.external_software().check()
         print '=====>',os.getcwd()
         # read in settings file from XChemExplorer to set the relevant paths
         self.settings = pickle.load(open("XChemExplorer_settings.pkl","rb"))
@@ -45,6 +43,9 @@ class GUI(object):
         self.database_directory=self.settings['database_directory']
         self.data_source=self.settings['data_source']
         self.db=XChemDB.data_source(self.data_source)
+
+        # checking for external software packages
+        self.external_software=XChemUtils.external_software().check()
 
         self.selection_criteria =   {   'Show All Datasets':                'RefinementPDB_latest is not null',
                                         'Show Analysis Pending Only':       "RefinementOutcome='Analysis Pending'",

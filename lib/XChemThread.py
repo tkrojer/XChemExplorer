@@ -130,7 +130,7 @@ class start_COOT(QtCore.QThread):
 
     def run(self):
         pickle.dump(self.settings,open('XChemExplorer_settings.pkl','wb'))
-        os.system('cd '+os.getcwd()+'\ncoot --no-guano --no-state-script --script %s' %(os.getenv('XChemExplorer_DIR')+'/lib/XChemCoot.py'))
+        os.system('coot --no-guano --no-state-script --script %s' %(os.getenv('XChemExplorer_DIR')+'/lib/XChemCoot.py'))
 
 
 class read_intial_refinement_results(QtCore.QThread):
