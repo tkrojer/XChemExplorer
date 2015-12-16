@@ -296,7 +296,8 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
                     logfile=self.data_collection_statistics_dict[sample][index.row()][1]
             if self.data_source_file != '':
                 data_dict=data_source.get_data_dict_to_save_autoprocessing_results_to_data_source(sample,str(outcome),logfile)
-                data_source.update_data_source(sample,data_dict)
+#                data_source.update_data_source(sample,data_dict)
+                data_source.update_insert_not_null_fields_only(sample,data_dict)
 #                data_source.save_autoprocessing_results_to_data_source(sample,str(outcome),logfile)
 
             # create all the directories if necessary
