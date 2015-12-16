@@ -8,21 +8,21 @@ import subprocess
 import getpass
 import shutil
 import platform
-#if os.getenv('PHENIX'):
-#    if platform.system()=='Linux':
-#        sys.path.append(os.path.join(os.getenv('PHENIX'),'build','intel-linux-2.6-x86_64','base','lib','python2.7','site-packages'))
-#        sys.path.append(os.path.join(os.getenv('PHENIX'),'base','lib','python2.7','site-packages'))
-#    if platform.system()=='Darwin':
-#        sys.path.append(os.path.join(os.getenv('PHENIX'),'base','Python.framework','Versions','2.7','lib','python2.7','site-packages'))
-#    try:
-#        import PIL
-#        # this sys path append is only meaningful if non-CCP4 python is used to launch XCE
-#        sys.path.append(os.path.join(os.getenv('CCP4'),'lib','python2.7','site-packages'))
-#        from rdkit import Chem
-#        from rdkit.Chem import AllChem
-#        from rdkit.Chem import Draw
-#    except ImportError:
-#        pass
+if os.getenv('PHENIX'):
+    if platform.system()=='Linux':
+        sys.path.append(os.path.join(os.getenv('PHENIX'),'build','intel-linux-2.6-x86_64','base','lib','python2.7','site-packages'))
+        sys.path.append(os.path.join(os.getenv('PHENIX'),'base','lib','python2.7','site-packages'))
+    if platform.system()=='Darwin':
+        sys.path.append(os.path.join(os.getenv('PHENIX'),'base','Python.framework','Versions','2.7','lib','python2.7','site-packages'))
+    try:
+        import PIL
+        # this sys path append is only meaningful if non-CCP4 python is used to launch XCE
+        sys.path.append(os.path.join(os.getenv('CCP4'),'lib','python2.7','site-packages'))
+        from rdkit import Chem
+        from rdkit.Chem import AllChem
+        from rdkit.Chem import Draw
+    except ImportError:
+        pass
 
 # last commited: 03/12/2015
 
