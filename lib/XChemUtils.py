@@ -11,6 +11,7 @@ import platform
 if os.getenv('PHENIX'):
     if platform.system()=='Linux':
         sys.path.append(os.path.join(os.getenv('PHENIX'),'build','intel-linux-2.6-x86_64','base','lib','python2.7','site-packages'))
+        sys.path.append(os.path.join(os.getenv('PHENIX'),'base','lib','python2.7','site-packages'))
     if platform.system()=='Darwin':
         sys.path.append(os.path.join(os.getenv('PHENIX'),'base','Python.framework','Versions','2.7','lib','python2.7','site-packages'))
     import PIL
