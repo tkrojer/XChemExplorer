@@ -393,7 +393,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                 xtal=collected_xtals[collected_xtals.rfind('/')+1:]
 ##                protein_name=collected_xtals.split('/')[len(collected_xtals.split('/')-2)]
                 print collected_xtals.split('/')
-                print protein_name
+#                print protein_name
                 self.data_collection_dict[xtal]=[[],[],[],[],[]]
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 1 of 3: searching visit '+ \
                                                                        str(search_cycle)+' of '+str(number_of_visits_to_search)+ \
