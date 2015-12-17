@@ -392,9 +392,6 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                     continue
                 xtal=collected_xtals[collected_xtals.rfind('/')+1:]
                 protein_name=collected_xtals.split('/')[len(collected_xtals.split('/'))-2]
-                print collected_xtals.split('/')
-                print len(collected_xtals.split('/'))
-                print protein_name
                 self.data_collection_dict[xtal]=[[],[],[],[],[]]
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 1 of 3: searching visit '+ \
                                                                        str(search_cycle)+' of '+str(number_of_visits_to_search)+ \
@@ -438,7 +435,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                         continue
 
                     timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
-                    diffraction_image_directory=os.path.join(visit_directory,xtal)
+                    diffraction_image_directory=os.path.join(visit_directory,protein_name,xtal)
                     run_list.append([(run,timestamp,visit,diffraction_image_directory)])
                     self.data_collection_dict[xtal][0].append([run,timestamp,visit,diffraction_image_directory])
 
