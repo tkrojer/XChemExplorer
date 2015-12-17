@@ -355,6 +355,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             summary = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
             self.data_collection_dict_collected=summary[0]
             self.data_collection_statistics_dict_collected=summary[1]
+            print len(self.data_collection_dict)
 
     def run(self):
         number_of_visits_to_search=len(self.visit_list)

@@ -805,6 +805,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.database_directory_label.setText(str(self.database_directory))
                 self.settings['database_directory']=self.database_directory
                 self.settings['data_source']=self.data_source_file
+                self.data_source_set=True
 
         elif self.sender().text()=="Import CSV file into Data Source":
             if self.data_source_file=='':
