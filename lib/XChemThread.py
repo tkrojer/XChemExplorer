@@ -355,7 +355,6 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             summary = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
             self.data_collection_dict_collected=summary[0]
             self.data_collection_statistics_dict_collected=summary[1]
-            print len(self.data_collection_dict)
 
     def run(self):
         number_of_visits_to_search=len(self.visit_list)
@@ -390,7 +389,6 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
                 # this step is only relevant when several samples are reviewed in one session
                 if 'tmp' in collected_xtals or 'results' in collected_xtals:
-                    print xtal
                     continue
                 xtal=collected_xtals[collected_xtals.rfind('/')+1:]
                 self.data_collection_dict[xtal]=[[],[],[],[],[]]
@@ -437,22 +435,9 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 
                     timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
                     diffraction_image_directory=os.path.join(visit_directory,xtal)
-                    print run,timestamp,visit,diffraction_image_directory
                     run_list.append([(run,timestamp,visit,diffraction_image_directory)])
-                    self.data_collection_dict[xtal][0].append([run,timestamp,visit])
-#                    for (path, dirs, files) in os.walk(runs):
-#                        if 'edna' in dirs:
-#                            dirs.remove('edna')
-#                        if 'auto_mrbump' in dirs:
-#                            dirs.remove('auto_mrbump')
-#                        if 'fast_ep' in dirs:
-#                            dirs.remove('fast_ep')
-#                        if 'multi-xia2' in dirs:
-#                            dirs.remove('multi-xia2')
-#                        for file_name in files:
-#                            if file_name.endswith('aimless.log') and (self.target in path or self.target=='*'):
-#                                logfile_list.append(path+'/'+file_name)
-#                                continue
+                    self.data_collection_dict[xtal][0].append([run,timestamp,visit,diffraction_image_directory])
+
                     for file_name in glob.glob(os.path.join(runs,'xia2','*','LogFiles','*')):
                         if file_name.endswith('aimless.log') and (self.target in file_name or self.target=='*'):
                             logfile_list.append(file_name)

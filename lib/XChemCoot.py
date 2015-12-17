@@ -278,6 +278,10 @@ class GUI(object):
             if str(item[0]) == self.xtalID:
                 self.index = n
         self.xtalID=str(self.Todo[self.index][0])
+        if str(self.Todo[self.index][0]) != None:
+            self.compoundID=str(self.Todo[self.index][1])
+        else:
+            self.compoundID=''
         self.RefreshData()
 
     def update_data_source(self,widget,data=None):              # update and move to next xtal
@@ -351,6 +355,7 @@ class GUI(object):
         self.LigandCCValue.set_label(self.QualityIndicators['LigandCC'])
         self.LigandCCBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['LigandCCcolor']))
 
+        print 'HHHHHHHHH',self.compoundID
         try:
             pic = gtk.gdk.pixbuf_new_from_file(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.png'))
             self.image.set_from_pixbuf(pic)
@@ -387,6 +392,7 @@ class GUI(object):
         self.Todo=[]
         self.Todo=self.db.get_samples_for_coot(self.selection_mode)
         for item in self.Todo:
+            print item
             self.cb.append_text('%s' %item[0])
 
     def update_plot(self,refinement_cycle,Rfree,Rcryst):

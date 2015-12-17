@@ -298,6 +298,9 @@ class XChemExplorer(QtGui.QApplication):
         self.populate_target_selection_combobox(self.target_selection_combobox)
         self.target_selection_combobox.activated[str].connect(self.target_selection_combobox_activated)
         data_collection_button_hbox.addWidget(self.target_selection_combobox)
+        read_pickle_file_button=QtGui.QPushButton("Read Pickle File")
+        read_pickle_file_button.clicked.connect(self.button_clicked)
+        data_collection_button_hbox.addWidget(read_pickle_file_button)
         self.tab_dict['DLS @ Data Collection'][1].addLayout(data_collection_button_hbox)
         self.target=str(self.target_selection_combobox.currentText())
 
@@ -721,6 +724,11 @@ class XChemExplorer(QtGui.QApplication):
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.work_thread.start()
 
+        elif self.explorer_active==0 and self.data_source_set==True \
+            and self.sender().text()=="Read Pickle File":
+            summary = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
+            self.create_widgets_for_autoprocessing_results(summary)
+
         elif self.explorer_active==0 \
             and self.sender().text()=="Load All Samples" or self.sender().text()=="Refresh All Samples":
             content=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
@@ -731,9 +739,9 @@ class XChemExplorer(QtGui.QApplication):
         elif self.sender().text()=="Check for inital Refinement" and self.data_source_set==True:
             # first check if there is already content in the table and if so
             # delete checkbox and combobox widgets
-            if self.initial_model_dimple_dict != {}:
-                for key in self.initial_model_dimple_dict:
-                    print key, self.initial_model_dimple_dict[key]
+#            if self.initial_model_dimple_dict != {}:
+#                for key in self.initial_model_dimple_dict:
+#                    print key, self.initial_model_dimple_dict[key]
 
             self.explorer_active=1
             self.work_thread=XChemThread.read_intial_refinement_results(self.initial_model_directory,
@@ -812,9 +820,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.update_status_bar('Please load a data soure file first')
             else:
                 file_name = QtGui.QFileDialog.getOpenFileName(self.window,'Open file', self.database_directory)
-                print self.data_source_file
                 XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).import_csv_file(file_name)
-                print file_name
 
         elif self.sender().text()=="Export CSV file from Data Source":
             file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
@@ -822,7 +828,6 @@ class XChemExplorer(QtGui.QApplication):
                 file_name=file_name[:file_name.rfind('.')]+'.csv'
             else:
                 file_name=file_name+'.csv'
-            print file_name
             XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).export_to_csv_file(file_name)
 
         elif self.sender().text()=="Save Samples To Datasource":
@@ -1220,7 +1225,6 @@ class XChemExplorer(QtGui.QApplication):
                     button.setStyleSheet("font-size:9px;background-color: rgb(255,0,0)")
 #                button.setStyleSheet("border-style: inset")
             else:
-                print self.dataset_outcome[str(button.text())]
                 button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[str(button.text())])
 #        self.update_outcome_data_collection_summary_table(dataset,outcome)
 
@@ -1237,7 +1241,6 @@ class XChemExplorer(QtGui.QApplication):
                 dataset=key
 
         for button in self.dataset_outcome_dict[dataset]:
-            print str(button.text())
             if str(button.text())==outcome:
                 if outcome.startswith('success'):
                     button.setStyleSheet("font-size:9px;background-color: rgb(0,255,0)")
@@ -1246,11 +1249,6 @@ class XChemExplorer(QtGui.QApplication):
             else:
 
                 button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[str(button.text())])
-
-#        self.update_outcome_data_collection_summary_table(dataset,outcome)
-
-
-
 
 
     def set_run_dimple_flag(self,state):
@@ -1298,7 +1296,6 @@ class XChemExplorer(QtGui.QApplication):
             visit=''
             diffraction_image=''
             for n,run in enumerate(self.data_collection_dict[key][0]):
-                print run
                 if run[1]==max(tmp):
                     latest_run=run[0]
                     visit=run[2]
@@ -1379,12 +1376,9 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_summary_table.resizeColumnsToContents()
 
     def update_outcome_data_collection_summary_table(self,sample,outcome):
-#        print 'hallo update'
-#	    allRows=self.data_collection_summary_table.rowCount()
         rows_in_table=self.data_collection_summary_table.rowCount()
         for row in range(rows_in_table):
             if self.data_collection_summary_table.item(row,0).text()==sample:
-#                print self.data_collection_summary_table.item(row,0).text()
                 cell_text=QtGui.QTableWidgetItem()
                 cell_text.setText(outcome)
                 self.data_collection_summary_table.setItem(row, 3, cell_text)
@@ -1430,14 +1424,12 @@ class XChemExplorer(QtGui.QApplication):
         # reason being that the unique column ID for DB may not be nice to look at
         columns_to_show=[]
         for column in self.data_source_columns_to_display:
-#            print column
             for n,all_column in enumerate(self.all_columns_in_data_source):
                 if column==all_column[1]:
                     columns_to_show.append(n)
                     break
 
         for x,row in enumerate(data):
-#            print row
             y=0
             for q,item in enumerate(columns_to_show):
                 cell_text=QtGui.QTableWidgetItem()
@@ -1463,7 +1455,6 @@ class XChemExplorer(QtGui.QApplication):
         # reason being that the unique column ID for DB may not be nice to look at
         columns_to_show=[]
         for column in self.summary_column_name:
-#            print column
             for n,all_column in enumerate(self.all_columns_in_data_source):
                 if column==all_column[1]:
                     columns_to_show.append(n)
