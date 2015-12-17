@@ -391,7 +391,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                 if 'tmp' in collected_xtals or 'results' in collected_xtals:
                     continue
                 xtal=collected_xtals[collected_xtals.rfind('/')+1:]
-                rotein_name=collected_xtals.split('/')[len(collected_xtals.split('/'))-2]
+                protein_name=collected_xtals.split('/')[len(collected_xtals.split('/'))-2]
                 print collected_xtals.split('/')
                 print len(collected_xtals.split('/'))
                 print protein_name
