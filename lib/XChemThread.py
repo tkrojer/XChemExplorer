@@ -587,6 +587,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                 for reference_file in self.reference_file_list:
                     for aimless_file in self.data_collection_statistics_dict[sample]:
                         try:
+                            print reference_file
                             unitcell_difference=round((math.fabs(reference_file[4]-aimless_file[25])/reference_file[4])*100,1)
                             if unitcell_difference < 5 and reference_file[3]==aimless_file[21]:
                                 select_stage_one_list.append(aimless_file)
