@@ -1205,7 +1205,8 @@ class XChemExplorer(QtGui.QApplication):
                                                     unitcell_reference,
                                                     lattice_reference,
                                                     unitcell_volume_reference])
-
+        for i in reference_file_list:
+            print i
         return reference_file_list
 
 
