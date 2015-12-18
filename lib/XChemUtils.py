@@ -303,7 +303,7 @@ class parse:
             if line.startswith('Total number unique') and len(line.split())==6:
                 Aimless['UniqueReflectionsOverall']=line.split()[3]
             if line.startswith('Space group:'):
-                Aimless['SpaceGroup']=str(line.replace('Space group: ','')[:-1]).rstrip('\r')
+                Aimless['SpaceGroup']=line.replace('Space group: ','')[:-1]
                 Aimless['Lattice']=self.get_lattice_from_space_group(Aimless['SpaceGroup'])
                 if a != 'n/a' and b != 'n/a' and c != 'n/a' and \
                    alpha != 'n/a' and beta != 'n/a' and gamma != 'n/a' and Aimless['Lattice'] != 'n/a':
@@ -429,7 +429,7 @@ class parse:
 
                     PDBinfo['UnitCell']=line.split()[1]+' '+line.split()[2]+' '+line.split()[3]+' '+ \
                                         line.split()[4]+' '+line.split()[5]+' '+line.split()[6]
-                    PDBinfo['SpaceGroup']=line[55:len(line)-1].replace(' ','')
+                    PDBinfo['SpaceGroup']=line[55:len(line)-1].replace(' ','').rstrip('\r')
                     
                     PDBinfo['Lattice']=self.get_lattice_from_space_group(PDBinfo['SpaceGroup'])
                     if a != 'n/a' and b != 'n/a' and c != 'n/a' and \
