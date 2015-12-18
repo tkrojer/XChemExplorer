@@ -310,17 +310,21 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
                     path_to_procdir=os.path.join('/',*path_to_logfile.split('/')[:len(path_to_logfile.split('/'))-2])
                 if 'fast_dp' in path_to_logfile:
                     path_to_procdir=os.path.join('/',*path_to_logfile.split('/')[:len(path_to_logfile.split('/'))-1])
-                os.system('/bin/cp -R '+path_to_procdir+' '+os.path.join(self.initial_model_directory,sample,'autoprocessing'))
+                os.system('/bin/cp -Rf '+path_to_procdir+' '+os.path.join(self.initial_model_directory,sample,'autoprocessing'))
 
                 # link files
                 if 'xia2' in path_to_logfile:
                     os.chdir(os.path.join(self.initial_model_directory,sample))
                     for datafile in glob.glob('autoprocessing/*/DataFiles/*'):
                         if datafile.endswith('free.mtz'):
+                            if os.path.isfile(sample+'.mtz'):
+                                os.system('/bin/rm '+sample+'.mtz')
                             os.symlink(datafile,sample+'.mtz')
                             break
                     for logfile in glob.glob('autoprocessing/*/LogFiles/*'):
                         if logfile.endswith('aimless.log'):
+                            if os.path.isfile(sample+'.log'):
+                                os.system('/bin/rm '+sample+'.log')
                             os.symlink(logfile,sample+'.log')
                             break
                 if 'fast_dp' in path_to_logfile:
@@ -329,6 +333,10 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
                               "-hklout ctruncate.mtz -colin '/*/*/[IMEAN,SIGIMEAN]' "
                               "> ctruncate.log")
                     os.chdir(os.path.join(self.initial_model_directory,sample))
+                    if os.path.isfile(sample+'.mtz'):
+                        os.system('/bin/rm '+sample+'.mtz')
+                    if os.path.isfile(sample+'.log'):
+                        os.system('/bin/rm '+sample+'.log')
                     os.symlink('autoprocessing/fast_dp/aimless.log',sample+'.log')
                     os.symlink('autoprocessing/fast_dp/ctruncate.mtz',sample+'.mtz')
 
