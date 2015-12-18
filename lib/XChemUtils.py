@@ -336,7 +336,7 @@ class parse:
     def get_lattice_from_space_group(self,logfile_spacegroup):
         lattice_type='n/a'
         self.space_group_dict=   {  'triclinic':    ['P1'],
-                                    'monoclinic':   ['P2','P21','C121'],
+                                    'monoclinic':   ['P2','P21','C121','P1211','P121'],
                                     'orthorhombic': ['P222','P2122','P2212','P2221',
                                                      'P21212','P21221','P22121','P212121',
                                                      'C222','C2221'],
