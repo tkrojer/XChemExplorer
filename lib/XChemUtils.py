@@ -923,15 +923,20 @@ class reference:
             unitcell_volume_autoproc=mtz_autoproc['unitcell_volume']
             # check which reference file is most similar
             for o,reference_file in enumerate(self.reference_file_list):
-                unitcell_difference=round((math.fabs(reference_file[4]-unitcell_volume_autoproc)/reference_file[4])*100,1)
-                # reference file is accepted when different in unitcell volume < 5%
-                # and both files have the same lattice type
-                if unitcell_difference < allowed_unitcell_difference_percent and lattice_autoproc==reference_file[3]:
-                    spg_reference=reference_file[1]
-                    unitcell_reference=reference_file[2]
-                    reference=reference_file[0]
-                    found_suitable_reference=True
-                    break
+                print reference_file
+                try:
+                    if not reference_file[4]==0:
+                        unitcell_difference=round((math.fabs(reference_file[4]-unitcell_volume_autoproc)/reference_file[4])*100,1)
+                        # reference file is accepted when different in unitcell volume < 5%
+                        # and both files have the same lattice type
+                        if unitcell_difference < allowed_unitcell_difference_percent and lattice_autoproc==reference_file[3]:
+                            spg_reference=reference_file[1]
+                            unitcell_reference=reference_file[2]
+                            reference=reference_file[0]
+                            found_suitable_reference=True
+                            break
+                except IndexError:
+                    pass
         return (spg_reference,unitcell_reference,reference,found_suitable_reference,
                 resolution_high,spg_autoproc,unitcell_autoproc,unitcell_difference)
 
