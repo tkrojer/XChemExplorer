@@ -408,6 +408,7 @@ class GUI(object):
 
     def place_ligand_here(self,widget):
         print 'hallo'
+        coot.move_molecule_here(<molecule_number>)
 
     def merge_ligand_into_protein(self,widget):
         print 'ok'
