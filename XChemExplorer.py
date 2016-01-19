@@ -325,7 +325,7 @@ class XChemExplorer(QtGui.QApplication):
         vals=[1,1,3,4,5,6,7,1,2,4,9,6,5,3,2,4,6,7]
         y,x = np.histogram(vals, bins=np.linspace(0, 8, 40))
         print x,y
-        curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
+        curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(255, 0, 0, 255))
         plt1.setLabel('left', "frequency")
         plt1.setLabel('bottom', "Resolution")
         plt1.addItem(curve)
