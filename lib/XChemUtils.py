@@ -8,21 +8,6 @@ import subprocess
 import getpass
 import shutil
 import platform
-if os.getenv('PHENIX'):
-    if platform.system()=='Linux':
-        sys.path.append(os.path.join(os.getenv('PHENIX'),'build','intel-linux-2.6-x86_64','base','lib','python2.7','site-packages'))
-        sys.path.append(os.path.join(os.getenv('PHENIX'),'base','lib','python2.7','site-packages'))
-    if platform.system()=='Darwin':
-        sys.path.append(os.path.join(os.getenv('PHENIX'),'base','Python.framework','Versions','2.7','lib','python2.7','site-packages'))
-    try:
-        import PIL
-        # this sys path append is only meaningful if non-CCP4 python is used to launch XCE
-        sys.path.append(os.path.join(os.getenv('CCP4'),'lib','python2.7','site-packages'))
-        from rdkit import Chem
-        from rdkit.Chem import AllChem
-        from rdkit.Chem import Draw
-    except ImportError:
-        pass
 
 # last commited: 03/12/2015
 
@@ -167,31 +152,38 @@ class process:
 
 class helpers:
 
+
+    def __init__(self):
+        if os.getenv('PHENIX'):
+            # need to import PIL library from PHENIX installation
+            if platform.system()=='Linux':
+                sys.path.append(os.path.join(os.getenv('PHENIX'),'build','intel-linux-2.6-x86_64','base','lib','python2.7','site-packages'))
+                sys.path.append(os.path.join(os.getenv('PHENIX'),'base','lib','python2.7','site-packages'))
+            if platform.system()=='Darwin':
+                sys.path.append(os.path.join(os.getenv('PHENIX'),'base','Python.framework','Versions','2.7','lib','python2.7','site-packages'))
+        try:
+            import PIL
+            # this sys path append is only meaningful if non-CCP4 python is used to launch XCE
+            sys.path.append(os.path.join(os.getenv('CCP4'),'lib','python2.7','site-packages'))
+            from rdkit import Chem
+            from rdkit.Chem import AllChem
+            from rdkit.Chem import Draw
+            print 'XCE: found rdkit & PIL libraries'
+            self.pil_rdkit_present=True
+        except ImportError:
+            self.pil_rdkit_present=False
+            print 'XCE: cannot find rdkit & PIL libraries'
+            pass
+
+    def pil_rdkit_exist(self):
+        return self.pil_rdkit_present
+
     def make_png(self,initial_model_directory,sample,compoundID,smiles):
 
         if not os.path.isdir(os.path.join(initial_model_directory,sample)):
             os.mkdir(os.path.join(initial_model_directory,sample))
         if not os.path.isdir(os.path.join(initial_model_directory,sample,'compound')):
             os.mkdir(os.path.join(initial_model_directory,sample,'compound'))
-
-#        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif')):
-#            pass
-
-#        if 'dls' in os.getcwd():
-#            obabel='module load openbabel\n'
-#        else:
-#            obabel=''
-
-#        Cmds = (
-#            '#!'+os.getenv('SHELL')+'\n'
-#            '\n'
-#            +obabel+
-#            '\n'
-#            'obabel -:"%s" -O %s.png\n' %(smiles,compoundID)+
-#            '\n'
-#            'acedrg -i "%s" -o %s\n' %(smiles,compoundID)
-#            )
-
 
         os.chdir(os.path.join(initial_model_directory,sample,'compound'))
 
@@ -209,8 +201,6 @@ class helpers:
             os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif'),compoundID+'.cif')
         if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png')):
             os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png'),compoundID+'.png')
-
-
 
 
 class parse:

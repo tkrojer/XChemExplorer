@@ -36,7 +36,6 @@ class GUI(object):
 
     def __init__(self):
 
-        print '=====>',os.getcwd()
         # read in settings file from XChemExplorer to set the relevant paths
         self.settings = pickle.load(open("XChemExplorer_settings.pkl","rb"))
         self.refine_model_directory=self.settings['refine_model_directory']

@@ -170,32 +170,6 @@ class read_intial_refinement_results(QtCore.QThread):
             alert='#E0E0E0'
             outcome='Analysis Pending'
 
-#            found_suitable_reference=False
-#            if os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'.mtz')):
-#                mtz_autoproc=mtztools(os.path.join(self.initial_model_directory,sample,sample+'.mtz')).get_all_values_as_dict()
-#                resolution_high=mtz_autoproc['resolution_high']
-#                spg_autoproc=mtz_autoproc['spacegroup']
-#                unitcell_autoproc=mtz_autoproc['unitcell']
-#                lattice_autoproc=mtz_autoproc['bravais_lattice']
-#                unitcell_volume_autoproc=mtz_autoproc['unitcell_volume']
-#                # check which reference file is most similar
-#                for o,reference_file in enumerate(self.reference_file_list):
-#                    unitcell_difference=round((math.fabs(reference_file[4]-unitcell_volume_autoproc)/reference_file[4])*100,1)
-#                    # reference file is accepted when different in unitcell volume < 5%
-#                    # and both files have the same lattice type
-#                    if unitcell_difference < self.allowed_unitcell_difference_percent and lattice_autoproc==reference_file[3]:
-#                        spg_reference=reference_file[1]
-#                        unitcell_reference=reference_file[2]
-#                        reference=reference_file[0]
-#                        found_suitable_reference=True
-#                        break
-#            else:
-#                continue    # do not add to table if no mtz file is present
-
-#            tempIn=os.path.join(self.initial_model_directory,sample,sample+'.mtz')
-#            print tempIn
-#            ref_init=reference(tempIn,self.reference_file_list)
-#            spg_reference,unitcell_reference,reference_file,found_suitable_reference=ref_init.find_suitable_reference()
             spg_reference,unitcell_reference,reference_file,found_suitable_reference,\
                 resolution_high,spg_autoproc,unitcell_autoproc,unitcell_difference= \
                 reference(os.path.join(self.initial_model_directory,sample,sample+'.mtz'),
@@ -358,6 +332,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
         self.database_directory=database_directory
         self.data_collection_dict_collected={}
         self.data_collection_statistics_dict_collected={}
+
         if os.path.isfile(os.path.join(self.database_directory,'data_collection_summary.pkl')):
             #data_collection_dict = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
             summary = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
@@ -420,23 +395,15 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                     if run_is_in_pickle_file:
                         for stuff in self.data_collection_dict_collected[xtal][0]:
                             if stuff[0]==run:
-                                #self.data_collection_dict[xtal][0]+=stuff
                                 self.data_collection_dict[xtal][0].append(stuff)
-                                #run_list.append(stuff)
-                                #run_list+=stuff
                         for stuff in self.data_collection_dict_collected[xtal][1]:
                             if run in stuff:
-                                #self.data_collection_dict[xtal][1]+=stuff
                                 image_list.append(stuff)
                         for stuff in self.data_collection_dict_collected[xtal][2]:
                             if run in stuff:
-                                #self.data_collection_dict[xtal][2]+=stuff
-                                #self.data_collection_dict[xtal][2].append(stuff)
                                 logfile_list.append(stuff)
-#                        print self.data_collection_dict[xtal][2]
                         for stuff in self.data_collection_dict_collected[xtal][3]:
                             if run in stuff[0]:
-                                #self.data_collection_dict[xtal][3]+=stuff
                                 image_string_list.append(stuff)
                         if len(self.data_collection_dict_collected[xtal])==5:
                             puck_position=self.data_collection_dict_collected[xtal][4]
@@ -584,10 +551,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
         # a unit cell volume difference of less than 5%
         for sample in sorted(self.data_collection_statistics_dict):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 3 of 3: selecting "best" aimless logfile ->'+sample)
-#            print sample
-#            print self.data_collection_statistics_dict[sample]
             if self.data_collection_statistics_dict[sample][0]=='#':
-#                print sample
                 continue
             select_stage_one_list = []
             found=0

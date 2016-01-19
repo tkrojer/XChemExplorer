@@ -1,8 +1,9 @@
 import os, sys, glob
 import getopt
 
-# commited on: 04/12/2015
+# commited on: 18/01/2016
 
+# diffraction image viewing only possible at DLS
 sys.path.append('/dls_sw/apps/albula/3.1/dectris/albula/3.1/python')
 try:
     import dectris.albula
@@ -17,10 +18,15 @@ import base64
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 from XChemUtils import parse
 from XChemUtils import external_software
+from XChemUtils import helpers
 import XChemThread
 import XChemDB
 import XChemDialogs
 
+
+sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'site-packages','pyqtgraph-0.9.10'))
+import pyqtgraph as pg
+import numpy as np      # just for testing
 
 class XChemExplorer(QtGui.QApplication):
     def __init__(self,args):
@@ -84,11 +90,6 @@ class XChemExplorer(QtGui.QApplication):
                              'ccp4_scratch':            self.ccp4_scratch_directory,
                              'unitcell_difference':     self.allowed_unitcell_difference_percent,
                              'filename_root':           self.filename_root  }
-
-#        self.FindHitsDir=self.project_directory+'/processing/analysis/find_hits'
-#        self.DatabaseDir=self.project_directory+'/processing/database'
-#        self.reference_directory=self.project_directory+'/processing/reference'
-#        self.reference_file_root='reference'
 
 
         # Settings @ Lists
@@ -172,7 +173,6 @@ class XChemExplorer(QtGui.QApplication):
                                     "Failed - no X-rays":           "rgb(200,200,200)",
                                     "Failed - unknown":             "rgb(200,200,200)"  }
 
-
         # checking for external software packages
         self.external_software=external_software().check()
 
@@ -233,6 +233,7 @@ class XChemExplorer(QtGui.QApplication):
         # Tab widget
         tab_widget = QtGui.QTabWidget()
         tab_list = [    'Data Source',
+                        'Overview',
                         'DLS @ Data Collection',
                         'DLS @ Summary',
                         'Initial Model',
@@ -303,6 +304,36 @@ class XChemExplorer(QtGui.QApplication):
         data_collection_button_hbox.addWidget(read_pickle_file_button)
         self.tab_dict['DLS @ Data Collection'][1].addLayout(data_collection_button_hbox)
         self.target=str(self.target_selection_combobox.currentText())
+
+        # Overview
+        self.data_collection_vbox_for_overview=QtGui.QVBoxLayout()
+#        plot = pg.PlotWidget()
+#        x=[1,2,3]
+#        y=[4,6,3]
+#        plot.plot(x,y)
+
+
+#        XChemDB.data_source(self.settings['data_source']).get_all_samples_in_data_source_as_list()
+
+        win = pg.GraphicsWindow()
+#        win.setBackground([255,255,255,0])
+#        pg.setConfigOption('background', 'w')
+ #       pg.setConfigOption('foreground', 'k')
+        #win.resize(800,350)
+        win.setWindowTitle('pyqtgraph example: Histogram')
+        plt1 = win.addPlot(title="R-factor distribution")
+        vals=[1,1,3,4,5,6,7,1,2,4,9,6,5,3,2,4,6,7]
+        y,x = np.histogram(vals, bins=np.linspace(0, 8, 40))
+        print x,y
+        curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
+        plt1.setLabel('left', "frequency")
+        plt1.setLabel('bottom', "Resolution")
+        plt1.addItem(curve)
+#        plt1.plot(vals, y, pen=None, symbol='o', symbolSize=5, symbolPen=(255,255,255,200), symbolBrush=(0,0,255,150))
+        self.data_collection_vbox_for_overview.addWidget(win)
+
+#        self.data_collection_vbox_for_overview.addWidget(plot)
+        self.tab_dict['Overview'][1].addLayout(self.data_collection_vbox_for_overview)
 
         # DLS @ Summary
         data_collection_summary_list=[]
@@ -865,35 +896,41 @@ class XChemExplorer(QtGui.QApplication):
 #                self.dialogTextBrowser.exec_()
 
         elif self.sender().text()=="Create PDB/CIF/PNG files of Compound":
-            columns_to_read=['Sample ID',
-                             'Compound ID',
-                             'Smiles']
-            # it's a bit pointless now to search for the position of the columns,
-            # but later I may want to give the user the option to change the column order
-            headercount = self.mounted_crystal_table.columnCount()
-            column_positions=[]
-            for item in columns_to_read:
-                for x in range(headercount):
-                    headertext = self.mounted_crystal_table.horizontalHeaderItem(x).text()
-                    if headertext==item:
-                        column_positions.append(x)
-                        break
-            allRows = self.mounted_crystal_table.rowCount()
-            compound_list=[]
-            for row in range(allRows):
-                if self.mounted_crystal_table.item(row,column_positions[2]).text() != '':
-                    compound_list.append([str(self.mounted_crystal_table.item(row,column_positions[0]).text()),
-                                          str(self.mounted_crystal_table.item(row,column_positions[1]).text()),
-                                          str(self.mounted_crystal_table.item(row,column_positions[2]).text())] )
-            if compound_list != []:
-                self.explorer_active=1
-                self.work_thread=XChemThread.create_png_and_cif_of_compound(self.external_software,
-                                                                            self.initial_model_directory,
-                                                                            compound_list)
-                self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-                self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-                self.work_thread.start()
+            if helpers().pil_rdkit_exist()==False:
+                QtGui.QMessageBox.warning(self.window, "Library Problem",
+                                                       ('Cannot find PIL and RDKIT'),
+                        QtGui.QMessageBox.Cancel, QtGui.QMessageBox.NoButton,
+                        QtGui.QMessageBox.NoButton)
+            else:
+                columns_to_read=['Sample ID',
+                                 'Compound ID',
+                                 'Smiles']
+                # it's a bit pointless now to search for the position of the columns,
+                # but later I may want to give the user the option to change the column order
+                headercount = self.mounted_crystal_table.columnCount()
+                column_positions=[]
+                for item in columns_to_read:
+                    for x in range(headercount):
+                        headertext = self.mounted_crystal_table.horizontalHeaderItem(x).text()
+                        if headertext==item:
+                            column_positions.append(x)
+                            break
+                allRows = self.mounted_crystal_table.rowCount()
+                compound_list=[]
+                for row in range(allRows):
+                    if self.mounted_crystal_table.item(row,column_positions[2]).text() != '':
+                        compound_list.append([str(self.mounted_crystal_table.item(row,column_positions[0]).text()),
+                                              str(self.mounted_crystal_table.item(row,column_positions[1]).text()),
+                                              str(self.mounted_crystal_table.item(row,column_positions[2]).text())] )
+                if compound_list != []:
+                    self.explorer_active=1
+                    self.work_thread=XChemThread.create_png_and_cif_of_compound(self.external_software,
+                                                                                self.initial_model_directory,
+                                                                                compound_list)
+                    self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+                    self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+                    self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+                    self.work_thread.start()
         elif str(self.sender().text()).startswith('Show'):
             diffraction_image=''
             for key in self.albula_button_dict:
@@ -961,10 +998,6 @@ class XChemExplorer(QtGui.QApplication):
                                         'Multiplicity\nOverall',
                                         'Multiplicity\nInner Shell',
                                         'Multiplicity\nOuter Shell',    ]
-
-
-
-
 
         table=QtGui.QTableWidget()
         table.setSortingEnabled(True)
