@@ -5,14 +5,14 @@ import glob
 import pickle
 import subprocess
 
-#from matplotlib.figure import Figure
-#from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 
 # last commit: 05/12/2015
 
-# SParkle libraries
+# XCE libraries
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
-sys.path.append(os.getenv('CCP4')+'/lib/python2.7/site-packages')
+#sys.path.append(os.getenv('CCP4')+'/lib/python2.7/site-packages')
 
 import XChemDB
 import XChemRefine
@@ -36,6 +36,7 @@ class GUI(object):
 
     def __init__(self):
 
+        ###########################################################################################
         # read in settings file from XChemExplorer to set the relevant paths
         self.settings = pickle.load(open("XChemExplorer_settings.pkl","rb"))
         self.refine_model_directory=self.settings['refine_model_directory']
@@ -70,6 +71,7 @@ class GUI(object):
         self.pdb_style='refine.pdb'
         self.mtz_style='refine.mtz'
 
+        ###########################################################################################
         # some COOT settings
         coot.set_map_radius(15)
         coot.set_colour_map_rotation_for_map(0)
@@ -87,7 +89,12 @@ class GUI(object):
                                     'RamachandranFavored':          'n/a',
                                     'RamachandranFavoredColor':     'gray',
                                     'LigandCCcolor':                'gray',
-                                    'LigandCC':                     'n/a'   }
+                                    'LigandCC':                     'n/a',
+                                    'rmsdBonds':                    'n/a',
+                                    'rmsdBondsColor':               'gray',
+                                    'rmsdAngles':                   'n/a',
+                                    'rmsdAnglesColor':              'gray',
+                                    'MatrixWeight':                 'n/a'   }
 
         # default refmac parameters
         self.RefmacParams={ 'HKLIN': '',        'HKLOUT': '',
@@ -102,11 +109,14 @@ class GUI(object):
                             'NCS':    '',
                             'TWIN':   ''    }
 
-        refinement_cycle=[1,2,3,4,5,6,7,8,9,10]
-        Rfree=  [0.1,0.2,0.14,0.12,0.1,0.1,0.1,0.1,0.1,0.1]
-        Rcryst= [0.3,0.4,0.14,0.12,0.2,0.1,0.3,0.1,0.2,0.1]
-#        self.canvas = FigureCanvas(self.update_plot(refinement_cycle,Rfree,Rcryst))  # a gtk.DrawingArea
-#        self.canvas.set_size_request(300, 150)
+#        refinement_cycle=[1,2,3,4,5,6,7,8,9,10]
+#        Rfree=  [0.1,0.2,0.14,0.12,0.1,0.1,0.1,0.1,0.1,0.1]
+#        Rcryst= [0.3,0.4,0.14,0.12,0.2,0.1,0.3,0.1,0.2,0.1]
+        refinement_cycle=[0]
+        Rfree=  [0]
+        Rcryst= [0]
+        self.canvas = FigureCanvas(self.update_plot(refinement_cycle,Rfree,Rcryst))  # a gtk.DrawingArea
+        self.canvas.set_size_request(300, 150)
 
 
 
@@ -117,7 +127,7 @@ class GUI(object):
         self.window.set_border_width(10)
         self.window.set_default_size(400, 1000)
         self.window.set_title("XChemExplorer")
-        self.vbox = gtk.VBox()
+        self.vbox = gtk.VBox()                      # this is the main container
 
         # choose here which subset of samples should be looked at
         self.vbox.add(gtk.Label('Select Samples'))
@@ -165,6 +175,21 @@ class GUI(object):
         self.LigandCCBox = gtk.EventBox()
         self.LigandCCBox.add(self.LigandCCValue)
 
+        self.rmsdBondsLabel = gtk.Label('rmsd(Bonds)')
+        self.rmsdBondsValue = gtk.Label(self.QualityIndicators['rmsdBonds'])
+        self.rmsdBondsBox = gtk.EventBox()
+        self.rmsdBondsBox.add(self.rmsdBondsValue)
+
+        self.rmsdAnglesLabel = gtk.Label('rmsd(Angles)')
+        self.rmsdAnglesValue = gtk.Label(self.QualityIndicators['rmsdAngles'])
+        self.rmsdAnglesBox = gtk.EventBox()
+        self.rmsdAnglesBox.add(self.rmsdAnglesValue)
+
+        self.MatrixWeightLabel = gtk.Label('Matrix Weight')
+        self.MatrixWeightValue = gtk.Label(self.QualityIndicators['MatrixWeight'])
+        self.MatrixWeightBox = gtk.EventBox()
+        self.MatrixWeightBox.add(self.MatrixWeightValue)
+
         self.table = gtk.Table(4, 2, False)
         self.table.attach(self.RRfreeLabel,                 0, 1, 0, 1)
         self.table.attach(self.RRfreeBox,                   1, 2, 0, 1)
@@ -178,6 +203,13 @@ class GUI(object):
         self.table.attach(self.RamachandranFavoredBox,      1, 2, 4, 5)
         self.table.attach(self.LigandCCLabel,               0, 1, 5, 6)
         self.table.attach(self.LigandCCBox,                 1, 2, 5, 6)
+        self.table.attach(self.rmsdBondsLabel,              0, 1, 7, 8)
+        self.table.attach(self.rmsdBondsBox,                1, 2, 7, 8)
+        self.table.attach(self.rmsdAnglesLabel,             0, 1, 9,10)
+        self.table.attach(self.rmsdAnglesBox,               1, 2, 9,10)
+        self.table.attach(self.MatrixWeightLabel,           0, 1,11,12)
+        self.table.attach(self.MatrixWeightBox,             1, 2,11,12)
+
         self.vbox.add(self.table)
 
         # compound picture
@@ -234,14 +266,9 @@ class GUI(object):
         self.vbox.pack_start(self.hbox_refinemnt_outcome)
 
         # Refinement History
-#        self.pic2 = gtk.gdk.pixbuf_new_from_file(os.getenv('XChemExplorer_DIR')+'/image/NO_REFINEMENT_HISTORY_AVAILABLE.png')
-#        self.image2 = gtk.Image()
-#        self.image2.set_from_pixbuf(self.pic2)
-#        self.vbox.pack_start(self.image2)
-
-        # not sure why, but adding self.canvas to the window makes it forget all other global variables
-#        self.vbox.add(self.canvas)
-
+        self.vbox_for_refinement_history=gtk.VBox()
+        self.vbox_for_refinement_history.add(self.canvas)
+        self.vbox.add(self.vbox_for_refinement_history)
 
         # --- Refine button ---
         self.REFINEbutton.connect("clicked",self.REFINE)
@@ -298,38 +325,56 @@ class GUI(object):
 
         self.QualityIndicators=XChemUtils.ParseFiles(self.project_directory,self.xtalID).UpdateQualityIndicators()
         # if the structure was previously refined, try to read the parameters
-        if self.Serial > 1: self.RefmacParams=self.Refine.ParamsFromPreviousCycle(self.Serial-1)
-# disabled for the moment until matplotlib display function is implemented
-        print self.Refine.GetRefinementHistory()
-#        try:
-#            self.pic2 = gtk.gdk.pixbuf_new_from_file(os.path.join(self.project_directory,self.xtalID,'RefinementHistory.png'))
-#            self.image2.set_from_pixbuf(self.pic2)
-#        except gobject.GError:
-#            self.pic2 = gtk.gdk.pixbuf_new_from_file(os.path.join(os.getenv('XChemExplorer_DIR'),'image','NO_REFINEMENT_HISTORY_AVAILABLE.png'))
-#            self.image2.set_from_pixbuf(self.pic2)
+        if self.Serial > 1:
+            self.RefmacParams=self.Refine.ParamsFromPreviousCycle(self.Serial-1)
+            refinement_cycle,Rfree,Rcryst=self.Refine.GetRefinementHistory()
+            self.vbox_for_refinement_history.remove(self.canvas)
+            self.canvas = FigureCanvas(self.update_plot(refinement_cycle,Rfree,Rcryst))
+            self.canvas.set_size_request(300, 150)
+            self.vbox_for_refinement_history.add(self.canvas)
+            self.canvas.show()
+        else:
+            self.canvas = FigureCanvas(self.update_plot([0],[0],[0]))  # a gtk.DrawingArea
 
+        #########################################################################################
         # update pdb & maps
+
+        #########################################################################################
+        # delete old PDB and MAP files
         # - get a list of all molecules which are currently opened in COOT
         # - remove all molecules/ maps before loading a new set
         if len(coot_utils_XChem.molecule_number_list()) > 0:
             for item in coot_utils_XChem.molecule_number_list():
-#                if not coot.molecule_name(item).endswith('reference.pdb'): coot.close_molecule(item)
                 coot.close_molecule(item)
-        coot.set_nomenclature_errors_on_read("ignore")
+
+        #########################################################################################
+        # read new PDB files
         # read protein molecule after ligand so that this one is the active molecule
-        #coot.handle_read_draw_molecule_with_recentre(Pdb[0],0)
-        # read ligand pdb+cif
+        coot.set_nomenclature_errors_on_read("ignore")
+        if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.pdb')):
+            coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.pdb'),0)
+            coot.read_cif_dictionary(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.cif'))
         coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style),0)
         for item in coot_utils_XChem.molecule_number_list():
             if coot.molecule_name(item).endswith(self.pdb_style):
                 coot.set_show_symmetry_master(1)    # master switch to show symmetry molecules
                 coot.set_show_symmetry_molecule(item,1) # show symm for model
-        if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.pdb')):
-            coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.pdb'),0)
-            coot.read_cif_dictionary(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.cif'))
 
+        #########################################################################################
+        # check for PANDDAs EVENT maps
+        for map in glob.glob(os.path.join(self.project_directory,self.xtalID,'*')):
+            if 'event' in str(map) and '.ccp4' in str(map):
+                occupancy=map[map.find('occupancy')+10:map.rfind('_')]
+                coot.handle_read_ccp4_map((map),0)
+                for imol in coot_utils_XChem.molecule_number_list():
+                    if map in coot.molecule_name(imol):
+                        coot.set_contour_level_absolute(imol,float(occupancy))
+                        coot.set_last_map_colour(0.4,0,0.4)
+
+        #########################################################################################
         # read fofo maps
         # - read ccp4 map: 0 - 2fofc map, 1 - fofc.map
+        # read 2fofc map last so that one can change its contour level
         if os.path.isfile(os.path.join(self.project_directory,self.xtalID,'2fofc.map')):
             coot.set_default_initial_contour_level_for_difference_map(3)
             coot.handle_read_ccp4_map(os.path.join(self.project_directory,self.xtalID,'fofc.map'),1)
@@ -338,8 +383,10 @@ class GUI(object):
             coot.set_last_map_colour(0,0,1)
         else:
             # try to open mtz file with same name as pdb file
+            coot.set_default_initial_contour_level_for_map(1)
             coot.auto_read_make_and_draw_maps(os.path.join(self.project_directory,self.xtalID,self.mtz_style))
 
+        #########################################################################################
         # update Quality Indicator table
         self.RRfreeValue.set_label(self.QualityIndicators['R']+' / '+self.QualityIndicators['RRfree'])
         self.RRfreeBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RRfreeColor']))
@@ -353,8 +400,12 @@ class GUI(object):
         self.RamachandranFavoredBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RamachandranFavoredColor']))
         self.LigandCCValue.set_label(self.QualityIndicators['LigandCC'])
         self.LigandCCBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['LigandCCcolor']))
+        self.rmsdBondsValue.set_label(self.QualityIndicators['rmsdBonds'])
+        self.rmsdBondsBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['rmsdBondsColor']))
+        self.rmsdAnglesValue.set_label(self.QualityIndicators['rmsdAngles'])
+        self.rmsdAnglesBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['rmsdAnglesColor']))
+        self.MatrixWeightValue.set_label(self.QualityIndicators['MatrixWeight'])
 
-        print 'HHHHHHHHH',self.compoundID
         try:
             pic = gtk.gdk.pixbuf_new_from_file(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.png'))
             self.image.set_from_pixbuf(pic)
@@ -407,7 +458,7 @@ class GUI(object):
 
     def place_ligand_here(self,widget):
         print 'hallo'
-        coot.move_molecule_here(<molecule_number>)
+#        coot.move_molecule_here(<molecule_number>)
 
     def merge_ligand_into_protein(self,widget):
         print 'ok'

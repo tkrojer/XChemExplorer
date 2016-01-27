@@ -38,66 +38,102 @@ class Refine(object):
 
 
     def RunRefmac(self,Serial,RefmacParams,external_software):
-        print self.ProjectPath,self.xtalID,self.compoundID
         Serial=str(Serial)
-        findTLS=''
-        TLSphenix=''
-
-        self.queueing_system_available=external_software['qsub']
 
         # first check if refinement is ongoing and exit if yes
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'REFINEMENT_IN_PROGRESS')):
             coot.info_dialog('*** REFINEMENT IN PROGRESS ***')
             return None
 
-        RefmacParams['HKLIN']='HKLIN '+os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'.free.mtz \\\n')
+        #######################################################
+        # HKLIN & HKLOUT
+        if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'.free.mtz')):
+            RefmacParams['HKLIN']='HKLIN '+os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'.free.mtz \\\n')
+        elif os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz')):
+            RefmacParams['HKLIN']='HKLIN '+os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz \\\n')
+        else:
+            print '\n==> XCE: cannot find HKLIN for refinement; aborting...'
+            return None
         RefmacParams['HKLOUT']='HKLOUT '+os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refine_'+Serial+'.mtz \\\n')
+
+        #######################################################
+        # XYZIN & XYZOUT
         RefmacParams['XYZIN']='XYZIN '+os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'in.pdb \\\n')
         RefmacParams['XYZOUT']='XYZOUT '+os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refine_'+Serial+'.pdb \\\n')
 
-
+        #######################################################
+        # LIBIN & LIBOUT
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.compoundID+'.cif')):
             RefmacParams['LIBIN']='LIBIN '+self.ProjectPath+'/'+self.xtalID+'/'+self.compoundID+'.cif \\\n'
             RefmacParams['LIBOUT']='LIBOUT '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'/refine_'+Serial+'.cif \\\n'
-        if RefmacParams['TLS'].startswith('refi'):
-            findTLS='/usr/local/scripts/tobias/SParkle/helpers/FindTLSgroups.py in.pdb\n'
-            RefmacParams['TLSIN']='TLSIN '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'/refmac.tls \\\n'
-            RefmacParams['TLSOUT']='TLSOUT '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'/refine.tls \\\n'
-            TLSphenix=' phenix.tls '
 
-        # make new refinement folder
-        print    os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial)
+        #######################################################
+        # TLSIN & TLSOUT
+        findTLS='\n'
+        TLSphenix=''
+        if RefmacParams['TLS'].startswith('refi'):
+            if external_software['phenix.find_tls_groups']:
+                findTLS=os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','phenix_find_TLS_groups.py')+' in.pdb\n'
+                RefmacParams['TLSIN']='TLSIN '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'/refmac.tls \\\n'
+                RefmacParams['TLSOUT']='TLSOUT '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'/refine.tls \\\n'
+                TLSphenix=' phenix.tls '
+            else:
+                RefmacParams['TLS']='\n'
+
+
+        #######################################################
+        # create folder for new refinement cycle
         os.mkdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
 
+        #######################################################
+        # write PDB file
         # now take protein pdb file and write it to newly create Refine_<serial> folder
         # note: the user has to make sure that the ligand file was merged into main file
         for item in coot_utils_XChem.molecule_number_list():
             if coot.molecule_name(item).endswith(self.prefix+'.pdb'):
-                coot.write_pdb_file(item,self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'/in.pdb')
+                coot.write_pdb_file(item,os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'in.pdb'))
 
+        #######################################################
+        # PANDDAs stuff
+        # only use occupancy refinement if EVENT map is present
+        occupancy_refinement='\n'
+        for map in glob.glob(os.path.join(self.ProjectPath,self.xtalID,'*')):
+            if 'event' in map and map.endswith('.ccp4'):
+                if external_software['giant.create_occupancy_params']:
+                    os.chdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
+                    os.system('giant.create_occupancy_params in.pdb')
+                    break       # doesn't matter if 2nd event map is there
+        if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refmac_refine.params')):
+            occupancy_refinement='@refmac_refine.params\n'
+
+
+        #######################################################
         # we write 'REFINEMENT_IN_PROGRESS' immediately to avoid unncessary refiment
         os.chdir(os.path.join(self.ProjectPath,self.xtalID))
+        os.system('touch REFINEMENT_IN_PROGRESS')
 
+        #######################################################
+        # clean up!
+        # and remove all files which will be re-created by current refinement cycle
         os.system('/bin/rm refine.pdb refine.mtz validation_summary.txt validate_ligands.txt 2fofc.map fofc.map refine_molprobity.log')
 
-        if self.queueing_system_available:
-            pbs_line='#PBS -joe -N refmac'
+        if external_software['qsub']:
+            pbs_line='#PBS -joe -N XCE_refmac\n'
         else:
-            pbs_line=''
+            pbs_line='\n'
 
-#        if 'csh' in os.getenv('SHELL'):
-#            ccp4_scratch='setenv CCP4_SCR '+self.ccp4_scratch_directory+'\n'
-#        elif 'bash' in os.getenv('SHELL'):
-#            ccp4_scratch='export CCP4_SCR='+self.ccp4_scratch_directory+'\n'
-#        else:
-#            ccp4_scratch=''
+        #######################################################
+        # weight
+        if str(RefmacParams['MATRIX_WEIGHT']).lower() == 'auto':
+            weight='weight AUTO\n'
+        else:
+            weight='weight matrix '+str(RefmacParams['MATRIX_WEIGHT'])+'\n'
 
-
-        os.system('touch REFINEMENT_IN_PROGRESS')
 
         refmacCmds = (
             '#!'+os.getenv('SHELL')+'\n'
-            '%s\n' %pbs_line+
+            +pbs_line+
+            'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','xce.setup-csh')+'\n'
             'cd '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'\n'
             +findTLS+
             'refmac5 '
@@ -134,8 +170,9 @@ class Refine(object):
             '    LSSC -\n'
             '    ANISO -\n'
             '    EXPE\n'
+            +weight+
             'solvent YES\n'
-            'weight '+RefmacParams['MATRIX_WEIGHT']+'\n'
+            +occupancy_refinement+
             'monitor MEDIUM -\n'
             '    torsion 10.0 -\n'
             '    distance 10.0 -\n'
@@ -153,15 +190,15 @@ class Refine(object):
             'END\n'
             'EOF\n'
             '\n'
-            '#phenix.molprobity refine_%s.pdb refine_%s.mtz\n' %(Serial,Serial)+
-            '#/bin/mv molprobity.out refine_molprobity.log\n'
-            '#mmtbx.validate_ligands refine_%s.pdb refine_%s.mtz LIG > validate_ligands.txt\n' %(Serial,Serial)+
+            'phenix.molprobity refine_%s.pdb refine_%s.mtz\n' %(Serial,Serial)+
+            '/bin/mv molprobity.out refine_molprobity.log\n'
+            'mmtbx.validate_ligands refine_%s.pdb refine_%s.mtz LIG > validate_ligands.txt\n' %(Serial,Serial)+
             'cd '+self.ProjectPath+'/'+self.xtalID+'\n'
             'ln -s %s/%s/Refine_%s/refine_%s.pdb refine.pdb\n' %(self.ProjectPath,self.xtalID,Serial,Serial)+
             'ln -s %s/%s/Refine_%s/refine_%s.mtz refine.mtz\n' %(self.ProjectPath,self.xtalID,Serial,Serial)+
-            '#ln -s Refine_%s/validate_ligands.txt .\n' %Serial+
-            '#ln -s Refine_%s/refine_molprobity.log .\n' %Serial+
-            '#mmtbx.validation_summary refine.pdb > validation_summary.txt\n'
+            'ln -s Refine_%s/validate_ligands.txt .\n' %Serial+
+            'ln -s Refine_%s/refine_molprobity.log .\n' %Serial+
+            'mmtbx.validation_summary refine.pdb > validation_summary.txt\n'
             '\n'
             'fft hklin refine.mtz mapout 2fofc.map << EOF\n'
             'labin F1=FWT PHI=PHWT\n'
@@ -173,17 +210,17 @@ class Refine(object):
              '\n'
             '/bin/rm %s/%s/REFINEMENT_IN_PROGRESS\n' %(self.ProjectPath,self.xtalID)+
             '\n'
-            '#cd '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'\n'
-            '#\n'
-            '#phenix.refine in.pdb ../'+self.xtalID+'.free.mtz ../'+self.compoundID+'.cif '+TLSphenix+' '
-            '# refinement.input.xray_data.labels=../'+self.xtalID+'.free.mtz:F,SIGF '
-            '# optimize_xyz_weight=true '
-            '# optimize_adp_weight=true ordered_solvent=False output.prefix=refine_phenix_'+Serial+'\n'
-            '#\n' 
-            '#phenix.molprobity refine_phenix_%s.pdb refine_phenix_%s.mtz\n' %(Serial,Serial)+
-            '#/bin/mv molprobity.out refine_phenix_molprobity.log\n'
-            '#mmtbx.validate_ligands refine_phenix_%s.pdb refine_phenix_%s.mtz LIG > validate_ligands_phenix.txt\n' %(Serial,Serial)+
-            '#\n'
+#            '#cd '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'\n'
+#            '#\n'
+#            '#phenix.refine in.pdb ../'+self.xtalID+'.free.mtz ../'+self.compoundID+'.cif '+TLSphenix+' '
+#            '# refinement.input.xray_data.labels=../'+self.xtalID+'.free.mtz:F,SIGF '
+#            '# optimize_xyz_weight=true '
+#            '# optimize_adp_weight=true ordered_solvent=False output.prefix=refine_phenix_'+Serial+'\n'
+#            '#\n'
+#            '#phenix.molprobity refine_phenix_%s.pdb refine_phenix_%s.mtz\n' %(Serial,Serial)+
+#            '#/bin/mv molprobity.out refine_phenix_molprobity.log\n'
+#            '#mmtbx.validate_ligands refine_phenix_%s.pdb refine_phenix_%s.mtz LIG > validate_ligands_phenix.txt\n' %(Serial,Serial)+
+#            '#\n'
            )
 
         cmd = open(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refmac.csh'),'w')
@@ -195,7 +232,11 @@ class Refine(object):
             os.system('qsub refmac.csh')
         else:
             os.system('chmod +x refmac.csh')
-            os.system('./refmac.csh &')
+            if '/work/' in os.getcwd():
+                os.system('ssh %s@artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(getpass.getuser(),self.ProjectPath,self.xtalID,Serial))
+            else:
+                os.system('./refmac.csh &')
+
 
 
 
@@ -337,7 +378,7 @@ class Refine(object):
                 if line.startswith('ncyc'):
                     RefmacParams['Ncycles'] = line.split()[1]
                 if line.startswith('weight'):
-                    RefmacParams['MATRIX_WEIGHT'] = line[7:-1]
+                    RefmacParams['MATRIX_WEIGHT'] = line.split()[len(line.split())-1]
                 if line.startswith('TWIN'):
                     RefmacParams['TWIN']=line
 
@@ -356,7 +397,8 @@ class Refine(object):
                     RefinementCycle.append(int(item[item.rfind('_')+1:]))
                     found = True
         if found:
-            for cycle in sorted(RefinementCycle):
+#            for cycle in sorted(RefinementCycle):
+            for cycle in RefinementCycle:
 #                Rcryst=0
 #                Rfree=0
 #                LigandCC=0
@@ -365,10 +407,10 @@ class Refine(object):
                     for line in open(newestPDB):
                         if line.startswith('REMARK   3   R VALUE     (WORKING + TEST SET) :'):
                             Rcryst = line.split()[9]
-                            RcrystList.append(Rcryst)
+                            RcrystList.append(float(Rcryst))
                         if line.startswith('REMARK   3   FREE R VALUE                     :'):
                             Rfree = line.split()[6]
-                            RfreeList.append(Rfree)
+                            RfreeList.append(float(Rfree))
 #                    if os.path.isfile(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(cycle)+'/validate_ligands.txt'):
 #                        for line in open(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(cycle)+'/validate_ligands.txt'):
 #                                if line.startswith('|  LIG'): LigandCC = line.split()[6]
@@ -381,7 +423,7 @@ class Refine(object):
             RefinementCycle = [0]
             RcrystList=[0]
             RfreeList=[0]
-
+        print RefinementCycle,RcrystList,RfreeList
         return(RefinementCycle,RcrystList,RfreeList)
 
 

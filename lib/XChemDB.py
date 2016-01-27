@@ -12,9 +12,8 @@ class data_source:
     def __init__(self,data_source_file):
 
         self.data_source_file=data_source_file
-        print self.data_source_file
-        #   [column_name in DB, column_name shown in XCE, SQLite column type (Integer,Text,PKEY...)]
 
+        #   [column_name in DB, column_name shown in XCE, SQLite column type (Integer,Text,PKEY...)]
         self.column_list=[
             # SQLite column name                    XCE column name                             SQLite type
             # from Lab36
@@ -56,15 +55,28 @@ class data_source:
             ['MountingTime',                         'MountingTime',                            'TEXT'],
             ['ispybStatus',                          'ispybStatus',                             'TEXT'],
             ['DataCollectionVisit',                  'DataCollectionVisit',                     'TEXT'],
+
             # from XChemExplorer
+
             ['CompoundName',                         'Compound Name',                           'TEXT'],
             ['CrystalTag',                           'Tag',                                     'TEXT'],
-            ['CrystalForm',                          'Crystal\nForm',                           'TEXT'],
+#            ['CrystalForm',                          'Crystal\nForm',                           'TEXT'],
+            ['CrystalFormName',                      'CrystalFormName',                         'TEXT'],
+            ['CrystalFormSpaceGroup',                'CrystalFormSpaceGroup',                   'TEXT'],
+            ['CrystalFormPointGroup',                'CrystalFormPointGroup',                   'TEXT'],
+            ['CrystalFormA',                         'CrystalFormA',                            'TEXT'],
+            ['CrystalFormB',                         'CrystalFormB',                            'TEXT'],
+            ['CrystalFormC',                         'CrystalFormC',                            'TEXT'],
+            ['CrystalFormAlpha',                     'CrystalFormAlpha',                        'TEXT'],
+            ['CrystalFormBeta',                      'CrystalFormBeta',                         'TEXT'],
+            ['CrystalFormGamma',                     'CrystalFormGamma',                        'TEXT'],
+
             ['DataCollectionBeamline',               'DataCollectionBeamline',                  'TEXT'],
             ['DataCollectionDate',                   'DataCollectionDate',                      'TEXT'],
             ['DataCollectionOutcome',                'DataCollection\nOutcome',                   'TEXT'],
             ['DataCollectionRun',                    'DataCollectionRun',                       'TEXT'],
             ['DataCollectionComment',                'DataCollectionComment',                   'TEXT'],
+
             ['DataProcessingProgram',                'DataProcessingProgram',                   'TEXT'],
             ['DataProcessingSpaceGroup',             'DataProcessing\nSpaceGroup',                'TEXT'],
             ['DataProcessingUnitCell',               'DataProcessingUnitCell',                  'TEXT'],
@@ -84,7 +96,10 @@ class data_source:
             ['DataProcessingMultiplicityLow',        'DataProcessingMultiplicityLow',           'TEXT'],
             ['DataProcessingMultiplicityHigh',       'DataProcessingMultiplicityHigh',          'TEXT'],
             ['DataProcessingPathToLogfile',          'DataProcessingPathToLogfile',             'TEXT'],
-            ['PANDDAstuff',                          'PANDDAstuff',                             'TEXT'],
+
+#            ['PANDDAstuff',                          'PANDDAstuff',                             'TEXT'],
+            ['PANDDApath',                           'PANDDApath',                             'TEXT'],
+
             ['RefinementRcryst',                     'Refinement\nRcryst',                        'TEXT'],
             ['RefinementRfree',                      'Refinement\nRfree',                         'TEXT'],
             ['RefinementLigandCC',                   'RefinementLigandCC',                      'TEXT'],
@@ -96,6 +111,8 @@ class data_source:
             ['RefinementPDB_latest',                 'RefinementPDB_latest',                    'TEXT'],
             ['RefinementMTZ_latest',                 'RefinementMTZ_latest',                    'TEXT'],
             ['RefinementComment',                    'RefinementComment',                       'TEXT'],
+            ['RefinementPathToRefinementFolder',     'RefinementPathToRefinementFolder',        'TEXT'],
+
             ['AssayIC50',                            'AssayIC50',                               'TEXT']
         ]
 
@@ -135,6 +152,13 @@ class data_source:
         for sample in samples:
             existing_samples_in_db.append(str(sample[0]))
         return existing_samples_in_db
+
+    def execute_statement(self,cmd):
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+        cursor.execute(cmd)
+        output=cursor.fetchall()
+        return output
 
     def check_if_sample_exists_in_data_source(self,sampleID):
         sample_exists=False
@@ -232,6 +256,8 @@ class data_source:
         connect.commit()
 
     def get_value_from_field(self,sampleID,column):
+        connect=sqlite3.connect(self.data_source_file)
+        cursor = connect.cursor()
         cursor.execute("SELECT "+column+" FROM  mainTable WHERE CrystalName='"+sampleID+"';")
         return cursor.fetchone()
 

@@ -169,26 +169,42 @@ class read_intial_refinement_results(QtCore.QThread):
             reference_file=''
             alert='#E0E0E0'
             outcome='Analysis Pending'
+            rmsdBonds='n/a'
+            rmsdAngles='n/a'
+
+            # if XCE is used throughout the process then there will be an inital <sample>.mtz file
+            # but if not then there could be a few files which serve the same purpose
+            sample_mtz=sample+'.mtz'
+            if os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'.free.pdb')):
+                tmp=os.path.join(self.initial_model_directory,sample,sample+'.free.pdb')
+                sample_mtz=tmp[tmp.rfind('/')+1:]
+            elif os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'-pandda-input.mtz')):
+                tmp=os.path.join(self.initial_model_directory,sample,sample+'-pandda-input.mtz')
+                sample_mtz=tmp[tmp.rfind('/')+1:]
+            elif os.path.isfile(os.path.join(self.initial_model_directory,sample,'refine.mtz')):
+                tmp=os.path.join(self.initial_model_directory,sample,'refine.mtz')
+                sample_mtz=tmp[tmp.rfind('/')+1:]
 
             spg_reference,unitcell_reference,reference_file,found_suitable_reference,\
                 resolution_high,spg_autoproc,unitcell_autoproc,unitcell_difference= \
-                reference(os.path.join(self.initial_model_directory,sample,sample+'.mtz'),
+                reference(os.path.join(self.initial_model_directory,sample,sample_mtz),
                           self.reference_file_list).find_suitable_reference(self.allowed_unitcell_difference_percent)
 
-            if os.path.isdir(os.path.join(self.initial_model_directory,sample,'Dimple')):
-                    if os.path.isfile(os.path.join(self.initial_model_directory,sample,'Dimple','dimple','final.pdb')):
-                        pdb=parse().PDBheader(os.path.join(self.initial_model_directory,sample,'Dimple','dimple','final.pdb'))
-                        Rcryst=pdb['Rcryst']
-                        Rfree=pdb['Rfree']
-                        alert=pdb['Alert']
-                    elif os.path.isfile(os.path.join(self.initial_model_directory,sample,'/dimple_run_in_progress')):
-                        Rcryst='in progress'
-                        Rfree='in progress'
-                        alert=(51,153,255)
+            if os.path.isfile(os.path.join(self.initial_model_directory,sample,'refine.pdb')):
+                pdb=parse().PDBheader(os.path.join(self.initial_model_directory,sample,'refine.pdb'))
+                Rcryst=pdb['Rcryst']
+                Rfree=pdb['Rfree']
+                alert=pdb['Alert']
+                rmsdBonds=pdb['rmsdBonds']
+                rmsdAngles=pdb['rmsdAngles']
+
+            elif os.path.isfile(os.path.join(self.initial_model_directory,sample,'/dimple_run_in_progress')):
+                Rcryst='in progress'
+                Rfree='in progress'
+                alert=(51,153,255)
 
             if Rcryst=='pending':
                 run_dimple=True
-                outcome='n/a'
 
             if found_suitable_reference==True:
                 run_dimple=True
@@ -207,17 +223,20 @@ class read_intial_refinement_results(QtCore.QThread):
             if os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'free.mtz')):
                 mtz_free=os.path.realpath(os.path.join(self.initial_model_directory,sample,sample+'free.mtz'))
 
-            # update data source
+
+            # update data source only if field is null
+            db_dict={   'RefinementOutcome':        outcome,
+                        'RefinementMTZfree':        mtz_free    }
+            db.update_insert_not_null_fields_only(sample,db_dict)
+
+            # update to reflect current state
             db_dict={   'RefinementRcryst':         Rcryst,
                         'RefinementRfree':          Rfree,
-                        'RefinementRmsdBonds':      'n/a',
-                        'RefinementRmsdAngles':     'n/a',
-                        'RefinementOutcome':        outcome,
-                        'RefinementMTZfree':        mtz_free,
+                        'RefinementRmsdBonds':      rmsdBonds,
+                        'RefinementRmsdAngles':     rmsdAngles,
                         'RefinementPDB_latest':     pdb_latest,
                         'RefinementMTZ_latest':     mtz_latest          }
-
-            db.update_insert_not_null_fields_only(sample,db_dict)
+            db.update_data_source(sample,db_dict)
 
             initial_model_list.append( [ sample,
                                         run_dimple,

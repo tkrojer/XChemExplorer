@@ -9,7 +9,10 @@ import getpass
 import shutil
 import platform
 
-# last commited: 03/12/2015
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem import Draw
+
 
 class process:
 
@@ -154,25 +157,15 @@ class helpers:
 
 
     def __init__(self):
-        if os.getenv('PHENIX'):
-            # need to import PIL library from PHENIX installation
-            if platform.system()=='Linux':
-                sys.path.append(os.path.join(os.getenv('PHENIX'),'build','intel-linux-2.6-x86_64','base','lib','python2.7','site-packages'))
-                sys.path.append(os.path.join(os.getenv('PHENIX'),'base','lib','python2.7','site-packages'))
-            if platform.system()=='Darwin':
-                sys.path.append(os.path.join(os.getenv('PHENIX'),'base','Python.framework','Versions','2.7','lib','python2.7','site-packages'))
         try:
-            import PIL
             # this sys path append is only meaningful if non-CCP4 python is used to launch XCE
-            sys.path.append(os.path.join(os.getenv('CCP4'),'lib','python2.7','site-packages'))
+#            sys.path.append(os.path.join(os.getenv('CCP4'),'lib','python2.7','site-packages'))
             from rdkit import Chem
             from rdkit.Chem import AllChem
             from rdkit.Chem import Draw
-            print 'XCE: found rdkit & PIL libraries'
             self.pil_rdkit_present=True
         except ImportError:
             self.pil_rdkit_present=False
-            print 'XCE: cannot find rdkit & PIL libraries'
             pass
 
     def pil_rdkit_exist(self):
@@ -380,7 +373,9 @@ class parse:
                     'ResolutionHigh':   'n/a',
                     'Lattice':          'n/a',
                     'UnitCellVolume':       0,
-                    'Alert':          '#E0E0E0' }
+                    'Alert':            '#E0E0E0',
+                    'rmsdBonds':        'n/a',
+                    'rmsdAngles':       'n/a'   }
 
         a='n/a'
         b='n/a'
@@ -409,6 +404,13 @@ class parse:
                         PDBinfo['Alert']='#00FF00'
                 if line.startswith('REMARK   3   RESOLUTION RANGE HIGH (ANGSTROMS) :'):
                     PDBinfo['ResolutionHigh']=line.split()[7]
+
+                if line.startswith('REMARK   3   BOND LENGTHS REFINED ATOMS        (A):'):
+                    PDBinfo['rmsdBonds'] = line.split()[9]
+                if line.startswith('REMARK   3   BOND ANGLES REFINED ATOMS   (DEGREES):'):
+                    PDBinfo['rmsdAngles'] = line.split()[9]
+
+
                 if line.startswith('CRYST1'):
                     a=int(float(line.split()[1]))
                     b=int(float(line.split()[2]))
@@ -652,6 +654,15 @@ class external_software:
         print '{0:40} {1:10}'.format('-checking for phenix.molprobity:', status)
 
         try:
+            subprocess.call(['phenix.find_tls_groups'], stdout=FNULL, stderr=subprocess.STDOUT)
+            self.available_programs['phenix.find_tls_groups']=True
+            status='found'
+        except OSError:
+            self.available_programs['phenix.find_tls_groups']=False
+            status='not found'
+        print '{0:40} {1:10}'.format('-checking for phenix.find_tls_groups:', status)
+
+        try:
             subprocess.call(['mmtbx.validate_ligands'], stdout=FNULL, stderr=subprocess.STDOUT)
             self.available_programs['mmtbx.validate_ligands']=True
             status='found'
@@ -679,6 +690,17 @@ class external_software:
             status='not found'
         print '{0:40} {1:10}'.format('-checking for acedrg:', status)
 
+        try:
+            subprocess.call(['giant.create_occupancy_params'], stdout=FNULL, stderr=subprocess.STDOUT)
+            self.available_programs['giant.create_occupancy_params']=True
+            status='found'
+        except OSError:
+            self.available_programs['giant.create_occupancy_params']=False
+            status='not found'
+        print '{0:40} {1:10}'.format('-checking for giant.create_occupancy_params:', status)
+
+
+
         return self.available_programs
 
 
@@ -697,19 +719,24 @@ class ParseFiles:
 
     def UpdateQualityIndicators(self):
 
-        QualityIndicators = {  'R':                            '-',
-                                    'RRfree':                       '-',
-                                    'RRfreeColor':                  'gray',
-                                    'Resolution':                   'n/a',
-                                    'ResolutionColor':              'gray',
-                                    'MolprobityScore':              'n/a',
-                                    'MolprobityScoreColor':         'gray',
-                                    'RamachandranOutliers':         'n/a',
-                                    'RamachandranOutliersColor':    'gray',
-                                    'RamachandranFavored':          'n/a',
-                                    'RamachandranFavoredColor':     'gray',
-                                    'LigandCCcolor':                'gray',
-                                    'LigandCC':                     'n/a'   }
+        QualityIndicators = {   'R':                            '-',
+                                'RRfree':                       '-',
+                                'RRfreeColor':                  'gray',
+                                'Resolution':                   'n/a',
+                                'ResolutionColor':              'gray',
+                                'MolprobityScore':              'n/a',
+                                'MolprobityScoreColor':         'gray',
+                                'RamachandranOutliers':         'n/a',
+                                'RamachandranOutliersColor':    'gray',
+                                'RamachandranFavored':          'n/a',
+                                'RamachandranFavoredColor':     'gray',
+                                'LigandCCcolor':                'gray',
+                                'LigandCC':                     'n/a',
+                                'rmsdBonds':                    'n/a',
+                                'rmsdBondsColor':               'gray',
+                                'rmsdAngles':                   'n/a',
+                                'rmsdAnglesColor':              'gray',
+                                'MatrixWeight':                 'n/a'   }
 
         # R, Rfree, Resolution
         found = 0
@@ -727,6 +754,17 @@ class ParseFiles:
                     if float(line.split()[7]) < 2.4:                                   QualityIndicators['ResolutionColor'] = 'green'
                     if float(line.split()[7]) >= 2.4 and float(line.split()[7]) < 2.8: QualityIndicators['ResolutionColor'] = 'orange'
                     if float(line.split()[7]) >= 2.8:                                  QualityIndicators['ResolutionColor'] = 'red'
+                if line.startswith('REMARK   3   BOND LENGTHS REFINED ATOMS        (A):'):
+                    QualityIndicators['rmsdBonds'] = line.split()[9]
+                    if float(line.split()[9]) < 0.02:                                   QualityIndicators['rmsdBondsColor'] = 'green'
+                    if float(line.split()[9]) >= 0.02 and float(line.split()[9]) < 0.03: QualityIndicators['rmsdBondsColor'] = 'orange'
+                    if float(line.split()[9]) >= 0.03:                                  QualityIndicators['rmsdBondsColor'] = 'red'
+                if line.startswith('REMARK   3   BOND ANGLES REFINED ATOMS   (DEGREES):'):
+                    QualityIndicators['rmsdAngles'] = line.split()[9]
+                    if float(line.split()[9]) < 2.0:                                   QualityIndicators['rmsdAnglesColor'] = 'green'
+                    if float(line.split()[9]) >= 2.0 and float(line.split()[9]) < 3.0: QualityIndicators['rmsdAnglesColor'] = 'orange'
+                    if float(line.split()[9]) >= 3.0:                                  QualityIndicators['rmsdAnglesColor'] = 'red'
+
 
         # Molprobity
         if os.path.isfile(self.DataPath+'/'+self.xtalID+'/validation_summary.txt'):
@@ -750,11 +788,27 @@ class ParseFiles:
         # LigandCC
         if os.path.isfile(self.DataPath+'/'+self.xtalID+'/validate_ligands.txt'):
             for line in open(self.DataPath+'/'+self.xtalID+'/validate_ligands.txt'):
-                if line.startswith('|  LIG'):
+#                if line.startswith('|  LIG'):
+                if 'LIG' in line:
                     QualityIndicators['LigandCC'] = line.split()[6]
                     if float(line.split()[6]) < 0.8:                                   QualityIndicators['LigandCCcolor'] = 'red'
                     if float(line.split()[6]) >= 0.8 and float(line.split()[6]) < 0.9: QualityIndicators['LigandCCcolor'] = 'orange'
                     if float(line.split()[6]) >= 0.9:                                  QualityIndicators['LigandCCcolor'] = 'green'
+
+        # Matrix Weight
+        temp = []
+        found = 0
+        if os.path.isdir(os.path.join(self.DataPath,self.xtalID)):
+            for item in glob.glob(os.path.join(self.DataPath,self.xtalID,'*')):
+                if item.startswith(os.path.join(self.DataPath,self.xtalID,'Refine_')):
+                        temp.append(int(item[item.rfind('_')+1:]))
+                        found = 1
+        if found:
+            Serial = max(temp)
+            if os.path.isfile(os.path.join(self.DataPath,self.xtalID,'Refine_'+str(Serial),'refmac.log') ):
+                for line in open(os.path.join(self.DataPath,self.xtalID,'Refine_'+str(Serial),'refmac.log')):
+                    if line.startswith(' Weight matrix') and len(line.split())==3:
+                        QualityIndicators['MatrixWeight']=line.split()[2]
 
         return QualityIndicators
 
@@ -894,6 +948,7 @@ class reference:
     def __init__(self,sample_mtz,reference_file_list):
         self.sample_mtz=sample_mtz
         self.reference_file_list=reference_file_list
+        print reference_file_list
 
     def find_suitable_reference(self,allowed_unitcell_difference_percent):
         found_suitable_reference=False
