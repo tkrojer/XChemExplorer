@@ -4,11 +4,11 @@ import getopt
 # commited on: 18/01/2016
 
 # diffraction image viewing only possible at DLS
-sys.path.append('/dls_sw/apps/albula/3.1/dectris/albula/3.1/python')
-try:
-    import dectris.albula
-except ImportError:
-    pass
+#sys.path.append('/dls_sw/apps/albula/3.1/dectris/albula/3.1/python')
+#try:
+#    import dectris.albula
+#except ImportError:
+#    pass
 
 from PyQt4 import QtGui, QtCore, QtWebKit
 
