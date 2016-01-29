@@ -970,7 +970,8 @@ class XChemExplorer(QtGui.QApplication):
                                                                         self.reference_file_list,
                                                                         os.path.join(self.database_directory,
                                                                                      self.data_source_file),
-                                                                        self.allowed_unitcell_difference_percent)
+                                                                        self.allowed_unitcell_difference_percent,
+                                                                        self.filename_root)
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)

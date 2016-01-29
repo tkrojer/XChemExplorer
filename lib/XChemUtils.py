@@ -109,6 +109,16 @@ class process:
         else:
             ccp4_scratch=''
 
+        ################################################################################
+        # in case additional ligands are present in the reference.pdb file,
+        # the user needs to provide the following files:
+        # - <my_file_1>.pdb
+        # - <my_file_1>.cif     # this file contains restraints for all the ligands in the respective pdb file
+
+        if os.path.isfile(self.reference+'.cif'):
+            ref_lib=' --libin '+self.reference+'.cif'
+        else:
+            ref_lib=''
 
         Cmds = (
                 '#!'+os.getenv('SHELL')+'\n'
@@ -118,10 +128,12 @@ class process:
                 '\n'
                 +ccp4_scratch+
                 '\n'
-                'dimple ../%s %s.pdb dimple' %(self.mtz_free,self.reference) +
+                'dimple %s ../%s %s.pdb dimple' %(ref_lib,self.mtz_free,self.reference) +
                 '\n'
                 'cd %s/%s\n' %(self.project_directory,self.xtalID) +
                 '\n'
+                '/bin/rm refine.pdb\n'
+                '/bin/rm refine.mtz\n'
                 'ln -s Dimple/dimple/final.pdb refine.pdb\n'
                 'ln -s Dimple/dimple/final.mtz refine.mtz\n'
                 '\n'

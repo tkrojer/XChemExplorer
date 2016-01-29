@@ -55,6 +55,7 @@ class run_dimple_on_selected_samples(QtCore.QThread):
         self.ccp4_scratch_directory=ccp4_scratch
         self.filename_root=filename_root
 
+
     def run(self):
         if len(self.initial_model_dimple_dict) != 0:
             progress_step=100/float(len(self.initial_model_dimple_dict))
@@ -135,12 +136,13 @@ class start_COOT(QtCore.QThread):
 
 class read_intial_refinement_results(QtCore.QThread):
 
-    def __init__(self,initial_model_directory,reference_file_list,data_source,allowed_unitcell_difference_percent):
+    def __init__(self,initial_model_directory,reference_file_list,data_source,allowed_unitcell_difference_percent,filename_root):
         QtCore.QThread.__init__(self)
         self.initial_model_directory=initial_model_directory
         self.reference_file_list=reference_file_list
         self.data_source=data_source
         self.allowed_unitcell_difference_percent=allowed_unitcell_difference_percent
+        self.filename_root=filename_root
 
     def run(self):
 
@@ -174,16 +176,17 @@ class read_intial_refinement_results(QtCore.QThread):
 
             # if XCE is used throughout the process then there will be an inital <sample>.mtz file
             # but if not then there could be a few files which serve the same purpose
-            sample_mtz=sample+'.mtz'
-            if os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'.free.pdb')):
-                tmp=os.path.join(self.initial_model_directory,sample,sample+'.free.pdb')
-                sample_mtz=tmp[tmp.rfind('/')+1:]
-            elif os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'-pandda-input.mtz')):
-                tmp=os.path.join(self.initial_model_directory,sample,sample+'-pandda-input.mtz')
-                sample_mtz=tmp[tmp.rfind('/')+1:]
-            elif os.path.isfile(os.path.join(self.initial_model_directory,sample,'refine.mtz')):
-                tmp=os.path.join(self.initial_model_directory,sample,'refine.mtz')
-                sample_mtz=tmp[tmp.rfind('/')+1:]
+            sample_mtz=self.filename_root.replace('${samplename}',sample)+'.mtz'
+#            sample_mtz=self.filename_root+'.mtz'
+#            if os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'.free.pdb')):
+#                tmp=os.path.join(self.initial_model_directory,sample,sample+'.free.pdb')
+#                sample_mtz=tmp[tmp.rfind('/')+1:]
+#            elif os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'-pandda-input.mtz')):
+#                tmp=os.path.join(self.initial_model_directory,sample,sample+'-pandda-input.mtz')
+#                sample_mtz=tmp[tmp.rfind('/')+1:]
+#            elif os.path.isfile(os.path.join(self.initial_model_directory,sample,'refine.mtz')):
+#                tmp=os.path.join(self.initial_model_directory,sample,'refine.mtz')
+#                sample_mtz=tmp[tmp.rfind('/')+1:]
 
             spg_reference,unitcell_reference,reference_file,found_suitable_reference,\
                 resolution_high,spg_autoproc,unitcell_autoproc,unitcell_difference= \
