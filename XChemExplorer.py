@@ -14,6 +14,7 @@ from PyQt4 import QtGui, QtCore, QtWebKit
 
 import pickle
 import base64
+import math
 
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 from XChemUtils import parse
@@ -108,6 +109,7 @@ class XChemExplorer(QtGui.QApplication):
         self.all_columns_in_data_source=XChemDB.data_source(os.path.join(self.database_directory,
                                                                          self.data_source_file)).return_column_list()
         self.albula_button_dict={}
+        self.xtalform_dict={}
 
         # command line arguments
         try:
@@ -514,9 +516,10 @@ class XChemExplorer(QtGui.QApplication):
         ######################################################################################
         # Crystal Form Tab
         self.vbox_for_crystal_form_table=QtGui.QVBoxLayout()
-        self.vbox_for_crystal_form_table.addStretch(1)
+#        self.vbox_for_crystal_form_table.addStretch(1)
         self.crystal_form_column_name=[ 'Name',
-                                        'Space Grooup',
+                                        'Space\nGroup',
+                                        'Point\nGroup',
                                         'a',
                                         'b',
                                         'c',
@@ -530,7 +533,7 @@ class XChemExplorer(QtGui.QApplication):
         self.vbox_for_crystal_form_table.addWidget(self.crystal_form_table)
         self.tab_dict['Crystal Form'][1].addLayout(self.vbox_for_crystal_form_table)
 
-        self.vbox_for_crystal_form_table.addStretch(1)
+#        self.vbox_for_crystal_form_table.addStretch(1)
 
         crystal_form_button_hbox=QtGui.QHBoxLayout()
         load_all_crystal_form_button=QtGui.QPushButton("Load Crystal Forms From Datasource")
@@ -674,6 +677,7 @@ class XChemExplorer(QtGui.QApplication):
             Resolution_missing=[]
             data_collection_outcome={}
             refinement_outcome={}
+
 
             for item in query:
 
@@ -958,7 +962,12 @@ class XChemExplorer(QtGui.QApplication):
             data=content[1]
             self.populate_summary_table(header,data)
 
-        elif self.sender().text()=="Check for inital Refinement" and self.data_source_set==True:
+        elif (self.sender().text()=="Check for inital Refinement" and self.data_source_set==True) or \
+             (self.sender().text()=="Update Datasource" and self.data_source_set==True):
+            if self.sender().text()=="Update Datasource":
+                update_datasource_only=True
+            else:
+                update_datasource_only=False
             # first check if there is already content in the table and if so
             # delete checkbox and combobox widgets
 #            if self.initial_model_dimple_dict != {}:
@@ -971,16 +980,75 @@ class XChemExplorer(QtGui.QApplication):
                                                                         os.path.join(self.database_directory,
                                                                                      self.data_source_file),
                                                                         self.allowed_unitcell_difference_percent,
-                                                                        self.filename_root)
+                                                                        self.filename_root,
+                                                                        update_datasource_only)
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.connect(self.work_thread, QtCore.SIGNAL("create_initial_model_table"),self.create_initial_model_table)
             self.work_thread.start()
 
+
         elif self.sender().text()=="Refresh":
             for key in self.initial_model_dimple_dict:
                 print key, self.initial_model_dimple_dict[key]
+
+        elif self.sender().text()=="Load Crystal Forms From Datasource":
+            columns = ( 'CrystalFormName,'
+                        'CrystalFormPointGroup,'
+                        'CrystalFormVolume,'
+                        'CrystalFormA,'
+                        'CrystalFormB,'
+                        'CrystalFormC,'
+                        'CrystalFormAlpha,'
+                        'CrystalFormBeta,'
+                        'CrystalFormGamma,'
+                        'CrystalFormSpaceGroup' )
+            self.xtalform_dict={}
+            all_xtalforms=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).execute_statement("SELECT "+columns+" FROM mainTable;")
+            for item in all_xtalforms:
+                name=item[0]
+                pg=item[1]
+                vol=item[2]
+                a=item[3]
+                b=item[4]
+                c=item[5]
+                alpha=item[6]
+                beta=item[7]
+                gamma=item[8]
+                spg=item[9]
+                add_crystalform=True
+                for xf in self.xtalform_dict:
+                    if self.xtalform_dict[xf][0]==pg:      # same pointgroup as reference
+                        unitcell_difference=round((math.fabs(float(vol)-float(self.xtalform_dict[xf][1]))/float(vol))*100,1)
+                        if unitcell_difference < self.allowed_unitcell_difference_percent:      # suggest new crystal form
+                            add_crystalform=False
+                            break
+                if add_crystalform:
+                    self.xtalform_dict[name]=[pg,vol,[a,b,c,alpha,beta,gamma],spg]
+            self.update_xtalfrom_table(self.xtalform_dict)
+
+        elif self.sender().text()=="Suggest Additional Crystal Forms" or \
+             self.sender().text()=="Assign Crystal Forms To Samples":
+            self.explorer_active=1
+            if self.sender().text()=="Suggest Additional Crystal Forms":
+                mode='suggest'
+            if self.sender().text()=="Assign Crystal Forms To Samples":
+                mode='assign'
+            self.work_thread=XChemThread.crystal_from(self.initial_model_directory,
+                                                                        self.reference_file_list,
+                                                                        os.path.join(self.database_directory,
+                                                                                     self.data_source_file),
+                                                                        self.filename_root,
+                                                                        self.xtalform_dict,
+                                                                        mode)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_xtalfrom_table"),self.update_xtalfrom_table)
+            self.work_thread.start()
+
+
 
         elif self.sender().text()=="Open COOT":
             if not self.coot_running:
@@ -1071,7 +1139,7 @@ class XChemExplorer(QtGui.QApplication):
                         headertext = str(self.mounted_crystal_table.horizontalHeaderItem(i).text())
                         column_to_update=column_dict[headertext]
                         data_dict[column_to_update]=str(self.mounted_crystal_table.item(row,i).text())
-                print sampleID,data_dict
+#                print sampleID,data_dict
                 XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).update_data_source(sampleID,data_dict)
 
 
@@ -1123,6 +1191,7 @@ class XChemExplorer(QtGui.QApplication):
                     self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
                     self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                     self.work_thread.start()
+
 
         elif str(self.sender().text()).startswith("Show Overview"):
             self.update_overview()
@@ -1368,6 +1437,52 @@ class XChemExplorer(QtGui.QApplication):
 
         #-----------------------------------------------------------------------------------------------
 
+    def update_xtalfrom_table(self,xtalform_dict):
+        self.xtalform_dict=xtalform_dict
+        for key in self.xtalform_dict:
+            db_dict = {
+                'CrystalFormName':          key,
+                'CrystalFormSpaceGroup':    xtalform_dict[key][3],
+                'CrystalFormPointGroup':    xtalform_dict[key][0],
+                'CrystalFormA':             xtalform_dict[key][2][0],
+                'CrystalFormB':             xtalform_dict[key][2][1],
+                'CrystalFormC':             xtalform_dict[key][2][2],
+                'CrystalFormAlpha':         xtalform_dict[key][2][3],
+                'CrystalFormBeta':          xtalform_dict[key][2][4],
+                'CrystalFormGamma':         xtalform_dict[key][2][5],
+                'CrystalFormVolume':        xtalform_dict[key][1]       }
+            print db_dict
+
+        self.crystal_form_table.setRowCount(0)
+        self.crystal_form_table.setRowCount(len(self.xtalform_dict))
+        self.crystal_form_table.setColumnCount(len(self.crystal_form_column_name)-1)
+        all_columns_in_datasource=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).return_column_list()
+        for y,key in enumerate(sorted(self.xtalform_dict)):
+            db_dict = {
+                'CrystalFormName':          key,
+                'CrystalFormSpaceGroup':    xtalform_dict[key][3],
+                'CrystalFormPointGroup':    xtalform_dict[key][0],
+                'CrystalFormA':             xtalform_dict[key][2][0],
+                'CrystalFormB':             xtalform_dict[key][2][1],
+                'CrystalFormC':             xtalform_dict[key][2][2],
+                'CrystalFormAlpha':         xtalform_dict[key][2][3],
+                'CrystalFormBeta':          xtalform_dict[key][2][4],
+                'CrystalFormGamma':         xtalform_dict[key][2][5],
+                'CrystalFormVolume':        xtalform_dict[key][1]       }
+            for x,column_name in enumerate(self.crystal_form_column_name):
+                cell_text=QtGui.QTableWidgetItem()
+                for column in all_columns_in_datasource:
+                    if column[1]==column_name:
+                        cell_text.setText(str(db_dict[column[0]]))
+                        break
+                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                self.crystal_form_table.setItem(y, x, cell_text)
+        self.crystal_form_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.crystal_form_table.resizeColumnsToContents()
+        self.crystal_form_table.setHorizontalHeaderLabels(self.crystal_form_column_name)
+
+
+
     def create_initial_model_table(self,initial_model_list):
 
         self.initial_model_dimple_dict={}
@@ -1416,28 +1531,30 @@ class XChemExplorer(QtGui.QApplication):
             unitcell_reference=pdb_reference['UnitCell']
             lattice_reference=pdb_reference['Lattice']
             unitcell_volume_reference=pdb_reference['UnitCellVolume']
+            pointgroup_reference=pdb_reference['PointGroup']
             reference_file_list.append([reference_root,
                                         spg_reference,
                                         unitcell_reference,
                                         lattice_reference,
-                                        unitcell_volume_reference])
+                                        unitcell_volume_reference,
+                                        pointgroup_reference])
         else:
-            print 'hallo'
             for files in glob.glob(self.reference_directory+'/*'):
                 if files.endswith('.pdb'):
                     reference_root=files[files.rfind('/')+1:files.rfind('.')]
-                    print files
                     if os.path.isfile(os.path.join(self.reference_directory,reference_root+'.pdb')):
                         pdb_reference=parse().PDBheader(os.path.join(self.reference_directory,reference_root+'.pdb'))
                         spg_reference=pdb_reference['SpaceGroup']
                         unitcell_reference=pdb_reference['UnitCell']
                         lattice_reference=pdb_reference['Lattice']
                         unitcell_volume_reference=pdb_reference['UnitCellVolume']
+                        pointgroup_reference=pdb_reference['PointGroup']
                         reference_file_list.append([reference_root,
                                                     spg_reference,
                                                     unitcell_reference,
                                                     lattice_reference,
-                                                    unitcell_volume_reference])
+                                                    unitcell_volume_reference,
+                                                    pointgroup_reference])
         for i in reference_file_list:
             print i
         return reference_file_list

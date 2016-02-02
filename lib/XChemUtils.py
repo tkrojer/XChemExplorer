@@ -210,6 +210,41 @@ class helpers:
 
 class parse:
 
+    def __init__(self):
+        self.space_group_dict=   {  'triclinic':    ['P1'],
+                                    'monoclinic':   ['P2','P21','C121','P1211','P121'],
+                                    'orthorhombic': ['P222','P2122','P2212','P2221',
+                                                     'P21212','P21221','P22121','P212121',
+                                                     'C222','C2221',
+                                                     'F222', 'I222', 'I212121'],
+                                    'tetragonal':   ['P4','P41','P42','P43','I4','I41',
+                                                     'P422','P4212','P4122','P41212','P4222',
+                                                     'P42212','P4322','P43212','I422','I4122' ],
+                                    'hexagonal':    ['P3','P31','P32',
+                                                     'P312','P321','P3112','P3121','P3212','P3221',
+                                                     'P6','P61','P65','P62','P64','P63',
+                                                     'P622','P6122','P6522','P6222','P6422','P6322'    ],
+                                    'rhombohedral': ['H3','H32'],
+                                    'cubic':        ['P23','F23','I23','P213','I213',
+                                                     'P432','P4232','F432','F4132','I432','P4332','P4132','I4132' ] }
+
+        self.point_group_dict=   {  '1':    ['P1'],
+                                    '2':    ['P2','P21','C121','P1211','P121'],
+                                    '222':  ['P222','P2122','P2212','P2221',
+                                             'P21212','P21221','P22121','P212121',
+                                             'C222','C2221',
+                                             'F222', 'I222', 'I212121'],
+                                    '4':    ['P4','P41','P42','P43','I4','I41'],
+                                    '422':  ['P422','P4212','P4122','P41212','P4222',
+                                             'P42212','P4322','P43212','I422','I4122' ],
+                                    '3':    ['P3','P31','P32','H3'],
+                                    '32':   ['P312','P321','P3112','P3121','P3212','P3221','H32'],
+                                    '6':    ['P6','P61','P65','P62','P64','P63'],
+                                    '622':  ['P622','P6122','P6522','P6222','P6422','P6322'    ],
+                                    '23':   ['P23','F23','I23','P213','I213'],
+                                    '432':  ['P432','P4232','F432','F4132','I432','P4332','P4132','I4132' ] }
+
+
     def GetAimlessLog(self,Logfile):
         self.Logfile=Logfile
         Aimless = { 'AutoProc': 'n/a',
@@ -328,29 +363,160 @@ class parse:
 
         return Aimless
 
+    def read_aimless_logfile(self,logfile):
+        # essentially same as above, but compatible with datasource
+        # will hopefully supersede function above
+        aimless = { 'DataProcessingProgram':                        'n/a',
+                    'DataCollectionRun':                            'n/a',
+                    'DataProcessingSpaceGroup':                     'n/a',
+                    'DataProcessingUnitCell':                       'n/a',
+                    'DataProcessingA':                              'n/a',
+                    'DataProcessingB':                              'n/a',
+                    'DataProcessingC':                              'n/a',
+                    'DataProcessingAlpha':                          'n/a',
+                    'DataProcessingBeta':                           'n/a',
+                    'DataProcessingGamma':                          'n/a',
+                    'DataProcessingResolutionLow':                  'n/a',
+                    'DataProcessingResolutionLowInnerShell':        'n/a',
+                    'DataProcessingResolutionHigh':                 'n/a',
+                    'DataProcessingResolutionHighOuterShell':       'n/a',
+                    'DataProcessingRmergeOverall':                  'n/a',
+                    'DataProcessingRmergeLow':                      'n/a',
+                    'DataProcessingRmergeHigh':                     'n/a',
+                    'DataProcessingIsigOverall':                    'n/a',
+                    'DataProcessingIsigLow':                        'n/a',
+                    'DataProcessingIsigHigh':                       'n/a',
+                    'DataProcessingCompletenessOverall':            'n/a',
+                    'DataProcessingCompletenessLow':                'n/a',
+                    'DataProcessingCompletenessHigh':               'n/a',
+                    'DataProcessingMultiplicityOverall':            'n/a',
+                    'DataProcessingMultiplicityLow':                'n/a',
+                    'DataProcessingMultiplicityHigh':               'n/a',
+                    'DataProcessingUniqueReflectionsOverall':       'n/a',
+                    'DataProcessingLattice':                        'n/a',
+                    'DataProcessingPointGroup':                     'n/a',
+                    'DataProcessingUnitCellVolume':                 0,
+                    'DataProcessingAlert':                          '#FF0000' }
+
+        spg='n/a'
+        a='n/a'
+        b='n/a'
+        c='n/a'
+        alpha='n/a'
+        beta='n/a'
+        gamma='n/a'
+
+        if 'fast_dp' in logfile:
+            aimless['DataProcessingProgram']='fast_dp'
+        elif '3d-run' in logfile:
+            aimless['DataProcessingProgram']='xia2 3d'
+        elif '3dii-run' in logfile:
+            aimless['DataProcessingProgram']='xia2 3dii'
+        elif 'dials-run' in logfile:
+            aimless['DataProcessingProgram']='dials'
+
+        # get run number from logfile
+        # Note: only works if file is in original directory, but not once it moved to 'inital_model' folder
+#        print self.Logfile.split('/')[9].split('_')[1]
+#        if len(self.Logfile.split('/'))>8 and len(self.Logfile.split('/')[9].split('_'))==1:
+        try:
+            aimless['DataCollectionRun']=logfile.split('/')[9].split('_')[1]
+        except IndexError:
+            pass
+
+        for line in open(logfile):
+            if line.startswith('Low resolution limit') and len(line.split())==6:
+                aimless['DataProcessingResolutionLow'] = line.split()[3]
+                aimless['DataProcessingResolutionHighOuterShell'] = line.split()[5]
+            if line.startswith('High resolution limit') and len(line.split())==6:
+                aimless['DataProcessingResolutionHigh'] = line.split()[3]
+                aimless['DataProcessingResolutionLowInnerShell'] = line.split()[4]
+            if line.startswith('Rmerge  (all I+ and I-)') and len(line.split())==8:
+                aimless['DataProcessingRmergeOverall'] = line.split()[5]
+                aimless['DataProcessingRmergeLow'] = line.split()[6]
+                aimless['DataProcessingRmergeHigh']  = line.split()[7]
+            if line.startswith('Mean((I)/sd(I))') and len(line.split())==4:
+                aimless['DataProcessingIsigOverall'] = line.split()[1]
+                aimless['DataProcessingIsigHigh'] = line.split()[3]
+                aimless['DataProcessingIsigLow'] = line.split()[2]
+            if line.startswith('Completeness') and len(line.split())==4:
+                aimless['DataProcessingCompletenessOverall'] = line.split()[1]
+                aimless['DataProcessingCompletenessHigh'] = line.split()[3]
+                aimless['DataProcessingCompletenessLow'] = line.split()[2]
+            if line.startswith('Multiplicity') and len(line.split())==4:
+                aimless['DataProcessingMultiplicityOverall'] = line.split()[1]
+                aimless['DataProcessingMultiplicityHigh'] = line.split()[3]
+                aimless['DataProcessingMultiplicityLow'] = line.split()[3]
+            if line.startswith('Average unit cell:') and len(line.split())==9:
+                tmp = []
+                tmp.append(line.split())
+                a = int(float(tmp[0][3]))
+                b = int(float(tmp[0][4]))
+                c = int(float(tmp[0][5]))
+                alpha = int(float(tmp[0][6]))
+                beta = int(float(tmp[0][7]))
+                gamma = int(float(tmp[0][8]))
+                aimless['DataProcessingA']=str(a)
+                aimless['DataProcessingB']=str(b)
+                aimless['DataProcessingC']=str(c)
+                aimless['DataProcessingAlpha']=str(alpha)
+                aimless['DataProcessingBeta']=str(beta)
+                aimless['DataProcessingGamma']=str(gamma)
+            if line.startswith('Total number unique') and len(line.split())==6:
+                aimless['DataProcessingUniqueReflectionsOverall']=line.split()[3]
+            if line.startswith('Space group:'):
+                aimless['DataProcessingSpaceGroup']=line.replace('Space group: ','')[:-1]
+                aimless['DataProcessingLattice']=self.get_lattice_from_space_group(aimless['DataProcessingSpaceGroup'])
+                aimless['DataProcessingPointGroup']=self.get_pointgroup_from_space_group(aimless['DataProcessingSpaceGroup'])
+                if a != 'n/a' and b != 'n/a' and c != 'n/a' and \
+                   alpha != 'n/a' and beta != 'n/a' and gamma != 'n/a' and aimless['DataProcessingLattice'] != 'n/a':
+                    aimless['DataProcessingUnitCellVolume']=str(self.calc_unitcell_volume_from_logfile(float(a),float(b),float(c),
+                                                                                 math.radians(float(alpha)),
+                                                                                 math.radians(float(beta)),
+                                                                                 math.radians(float(gamma)),
+                                                                                 aimless['DataProcessingLattice']))
+        aimless['DataProcessingUnitCell']=str(a)+' '+str(b)+' '+str(c)+' '+str(alpha)+' '+str(beta)+' '+str(gamma)
+
+        # Hex Color code:
+        # red:      #FF0000
+        # orange:   #FF9900
+        # green:    #00FF00
+        # gray:     #E0E0E0
+
+        if aimless['DataProcessingResolutionHigh']=='n/a' or aimless['DataProcessingRmergeLow'] =='n/a':
+            aimless['Alert'] = '#FF0000'
+        else:
+            if float(aimless['DataProcessingResolutionHigh']) > 3.5 or float(aimless['DataProcessingRmergeLow']) > 0.1:
+                aimless['DataProcessingAlert'] = '#FF0000'
+            if (float(aimless['DataProcessingResolutionHigh']) <= 3.5 and float(aimless['DataProcessingResolutionHigh']) > 2.5) or \
+               (float(aimless['DataProcessingRmergeLow']) <= 0.1 and float(aimless['DataProcessingRmergeLow']) > 0.05):
+                aimless['DataProcessingAlert'] = '#FF9900'
+            if float(aimless['DataProcessingResolutionHigh']) <= 2.5 and float(aimless['DataProcessingRmergeLow']) <= 0.05:
+                aimless['DataProcessingAlert'] = '#00FF00'
+
+        return aimless
+
+
+
+
     def get_lattice_from_space_group(self,logfile_spacegroup):
         lattice_type='n/a'
-        self.space_group_dict=   {  'triclinic':    ['P1'],
-                                    'monoclinic':   ['P2','P21','C121','P1211','P121'],
-                                    'orthorhombic': ['P222','P2122','P2212','P2221',
-                                                     'P21212','P21221','P22121','P212121',
-                                                     'C222','C2221'],
-                                    'tetragonal':   ['P4','P41','P42','P43','I4','I41',
-                                                     'P422','P4212','P4122','P41212','P4222',
-                                                     'P42212','P4322','P43212','I422','I4122' ],
-                                    'hexagonal':    ['P3','P31','P32',
-                                                     'P312','P321','P3112','P3121','P3212','P3221',
-                                                     'P6','P61','P65','P62','P64','P63',
-                                                     'P622','P6122','P6522','P6222','P6422','P6322'    ],
-                                    'rhombohedral': ['H3','H32'],
-                                    'cubic':        ['P23','F23','I23','P213','I213',
-                                                     'P432','P4232','F432','F4132','I432','P4332','P4132','I4132' ] }
         for lattice in self.space_group_dict:
             for spacegroup in self.space_group_dict[lattice]:
                 if logfile_spacegroup.replace(' ','')==spacegroup:
                     lattice_type=lattice
                     break
         return lattice_type
+
+    def get_pointgroup_from_space_group(self,logfile_spacegroup):
+        pointgroup='n/a'
+        for pg in self.point_group_dict:
+            for spacegroup in self.point_group_dict[pg]:
+                if logfile_spacegroup.replace(' ','')==spacegroup:
+                    pointgroup=pg
+                    break
+        return pointgroup
+
 
 
     def calc_unitcell_volume_from_logfile(self,a,b,c,alpha,beta,gamma,lattice):
@@ -381,6 +547,7 @@ class parse:
         PDBinfo = { 'Rcryst':           'n/a',
                     'Rfree':            'n/a',
                     'SpaceGroup':       'n/a',
+                    'PointGroup':       'n/a',
                     'UnitCell':         'n/a',
                     'ResolutionHigh':   'n/a',
                     'Lattice':          'n/a',
@@ -436,6 +603,7 @@ class parse:
                     PDBinfo['SpaceGroup']=line[55:len(line)-1].replace(' ','').rstrip('\r')
                     
                     PDBinfo['Lattice']=self.get_lattice_from_space_group(PDBinfo['SpaceGroup'])
+                    PDBinfo['PointGroup']=self.get_pointgroup_from_space_group(PDBinfo['SpaceGroup'])
                     if a != 'n/a' and b != 'n/a' and c != 'n/a' and \
                      alpha != 'n/a' and beta != 'n/a' and gamma != 'n/a' and PDBinfo['Lattice'] != 'n/a':
                         PDBinfo['UnitCellVolume']=self.calc_unitcell_volume_from_logfile(float(a),float(b),float(c),
@@ -462,6 +630,21 @@ class mtztools:
                                     'cubic':        [195,196,197,198,199,
                                                      207,208,209,210,211,212,213,214]  }
 
+
+        self.point_group_dict=   {  '1':            [1],
+                                    '2':            [3,4,5],
+                                    '222':          [16,17,18,19,20,21,22,23,24],
+                                    '4':            [75,76,77,78,79,80],
+                                    '422':          [89,90,91,92,93,94,95,96,97,98],
+                                    '3':            [143,144,145,146],
+                                    'hexagonal':    [149,150,151,152,153,154,155],
+                                    '6':            [168,169,170,171,172,173],
+                                    '622':          [177,178,179,180,181,182],
+                                    '23':           [195,196,197,198,199],
+                                    '432':          [207,208,209,210,211,212,213,214]  }
+
+
+
     def get_bravais_lattice_from_spg_number(self,number):
         lattice=''
         for bravaislattice in self.space_group_dict:
@@ -470,9 +653,24 @@ class mtztools:
                     lattice=bravaislattice
         return lattice
 
+    def get_point_group_from_spg_number(self,number):
+        pointgroup=''
+        for pg in self.point_group_dict:
+            for spg_number in self.point_group_dict[pg]:
+                if spg_number==number:
+                    pointgroup=pg
+        return pointgroup
+
+
     def get_unit_cell_from_mtz(self):
         unitcell=[]
         cell_line=100000
+        a=0
+        b=0
+        c=0
+        alpha=0
+        beta=0
+        gamma=0
         mtzdmp=subprocess.Popen(['mtzdmp',self.mtzfile],stdout=subprocess.PIPE)
         for n,line in enumerate(iter(mtzdmp.stdout.readline,'')):
             if line.startswith(' * Cell Dimensions :'):
@@ -507,6 +705,12 @@ class mtztools:
         spg_number=self.get_spg_number_from_mtz()
         bravais_lattice=self.get_bravais_lattice_from_spg_number(spg_number)
         return bravais_lattice
+
+    def get_pointgroup_from_mtz(self):
+        pointgroup=''
+        spg_number=self.get_spg_number_from_mtz()
+        pointgroup=self.get_point_group_from_spg_number(spg_number)
+        return pointgroup
 
     def calc_unitcell_volume_from_mtz(self):
         spg_number=self.get_spg_number_from_mtz()
@@ -960,7 +1164,7 @@ class reference:
     def __init__(self,sample_mtz,reference_file_list):
         self.sample_mtz=sample_mtz
         self.reference_file_list=reference_file_list
-        print reference_file_list
+#        print reference_file_list
 
     def find_suitable_reference(self,allowed_unitcell_difference_percent):
         found_suitable_reference=False
@@ -980,7 +1184,7 @@ class reference:
             unitcell_volume_autoproc=mtz_autoproc['unitcell_volume']
             # check which reference file is most similar
             for o,reference_file in enumerate(self.reference_file_list):
-                print reference_file
+#                print reference_file
                 try:
                     if not reference_file[4]==0:
                         unitcell_difference=round((math.fabs(reference_file[4]-unitcell_volume_autoproc)/reference_file[4])*100,1)

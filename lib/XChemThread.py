@@ -21,6 +21,153 @@ from XChemUtils import reference
 import XChemDB
 
 
+class crystal_from(QtCore.QThread):
+    def __init__(self,initial_model_directory,
+                      reference_file_list,
+                      data_source,
+                      filename_root,
+                 xtalform_dict,
+                 mode):
+        QtCore.QThread.__init__(self)
+
+        self.initial_model_directory=initial_model_directory
+        self.reference_file_list=reference_file_list
+        self.data_source=data_source
+        self.allowed_unitcell_difference_percent=10
+        self.filename_root=filename_root
+        self.xtalform_dict=xtalform_dict
+        self.mode=mode
+
+    def suggest_new_crystalfrom_name(self,xtalform_dict,pointgroup):
+        temp = []
+        found = 0
+        for item in xtalform_dict:
+            if str(item)[:str(item).rfind('_')]==pointgroup:
+                temp.append(int(item[item.rfind('_')+1:]))
+                found = 1
+                Serial=item
+        if found:
+            Serial = max(temp) + 1
+        else:
+            Serial=1
+        return pointgroup+'_'+str(Serial)
+
+
+    def run(self):
+
+        progress_step=100/float(len(glob.glob(self.initial_model_directory+'/*')))
+        progress=0
+
+        # xtalform_dict['name']: [pointgroup,unitcell_volume,[unitcell],spacegroup]
+        # xf naming convetion: <pointgroup>_<serial>; e.g. 222_1
+
+        db=XChemDB.data_source(self.data_source)
+        db.create_missing_columns()             # always do this because additional columns might be added
+
+        if self.mode=='suggest':
+            # 1. check for XF in reference files
+            for reference in self.reference_file_list:
+                add_crystalform=True
+                for xf in self.xtalform_dict:
+                    if self.xtalform_dict[xf][0]==reference[5]:      # same pointgroup as reference
+                        unitcell_difference=round((math.fabs(reference[4]-float(self.xtalform_dict[xf][1]))/reference[4])*100,1)
+                        if unitcell_difference < self.allowed_unitcell_difference_percent:      # suggest new crystal form
+                            add_crystalform=False
+                            break
+                if add_crystalform:
+                    name=self.suggest_new_crystalfrom_name(self.xtalform_dict,reference[5])
+                    self.xtalform_dict[name]=[reference[5],reference[4],str(reference[2]).split(),reference[1]]
+
+            # 2. check for existing XF in datasource
+            columns = ( 'CrystalFormName,'
+                        'CrystalFormPointGroup,'
+                        'CrystalFormVolume,'
+                        'CrystalFormA,'
+                        'CrystalFormB,'
+                        'CrystalFormC,'
+                        'CrystalFormAlpha,'
+                        'CrystalFormBeta,'
+                        'CrystalFormGamma,'
+                        'CrystalFormSpaceGroup' )
+            all_xtalforms=db.execute_statement("SELECT "+columns+" FROM mainTable;")
+            for item in all_xtalforms:
+                name=item[0]
+                pg=item[1]
+                vol=item[2]
+                a=item[3]
+                b=item[4]
+                c=item[5]
+                alpha=item[6]
+                beta=item[7]
+                gamma=item[8]
+                spg=item[9]
+                add_crystalform=True
+                for xf in self.xtalform_dict:
+                    if self.xtalform_dict[xf][0]==pg:      # same pointgroup as reference
+                        unitcell_difference=round((math.fabs(float(vol)-float(self.xtalform_dict[xf][1]))/float(vol))*100,1)
+                        if unitcell_difference < self.allowed_unitcell_difference_percent:      # suggest new crystal form
+                            add_crystalform=False
+                            break
+                if add_crystalform:
+                    self.xtalform_dict[name]=[pg,vol,[a,b,c,alpha,beta,gamma],spg]
+
+
+        # 3. parse inital_model directory
+        # now assiignment will be random, because first sample read will be first xtalfrom
+        # in case nothing else was provided
+        for sample_dir in sorted(glob.glob(self.initial_model_directory+'/*')):
+
+            sample=sample_dir[sample_dir.rfind('/')+1:]
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'parsing initial_models folder -> '+sample)
+
+            mtzin=''
+            sample_mtz=self.filename_root.replace('${samplename}',sample)+'.mtz'
+            if os.path.isfile(os.path.join(self.initial_model_directory,sample,sample_mtz)):
+                mtzin=os.path.realpath(os.path.join(self.initial_model_directory,sample,sample_mtz))
+            elif os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'.mtz')):
+                mtzin=os.path.realpath(os.path.join(self.initial_model_directory,sample,sample+'.mtz'))
+            elif os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'.free.mtz')):
+                mtzin=os.path.realpath(os.path.join(self.initial_model_directory,sample,sample+'.free.mtz'))
+            elif os.path.isfile(os.path.join(self.initial_model_directory,sample,'refine.mtz')):
+                mtzin=os.path.realpath(os.path.join(self.initial_model_directory,sample,'refine.mtz'))
+            if mtzin!='':
+                mtz_pg=mtztools(mtzin).get_pointgroup_from_mtz()
+                mtz_vol=mtztools(mtzin).calc_unitcell_volume_from_mtz()
+                add_crystalform=True
+                for xf in self.xtalform_dict:
+                    if self.xtalform_dict[xf][0]==mtz_pg:      # same pointgroup as reference
+                        unitcell_difference=round((math.fabs(mtz_vol-float(self.xtalform_dict[xf][1]))/mtz_vol)*100,1)
+                        if unitcell_difference < self.allowed_unitcell_difference_percent:      # suggest new crystal form
+                            add_crystalform=False
+                            if self.mode=='assign':
+                                db_dict = {
+                                    'CrystalFormName':          xf,
+                                    'CrystalFormSpaceGroup':    self.xtalform_dict[xf][3],
+                                    'CrystalFormPointGroup':    self.xtalform_dict[xf][0],
+                                    'CrystalFormA':             self.xtalform_dict[xf][2][0],
+                                    'CrystalFormB':             self.xtalform_dict[xf][2][1],
+                                    'CrystalFormC':             self.xtalform_dict[xf][2][2],
+                                    'CrystalFormAlpha':         self.xtalform_dict[xf][2][3],
+                                    'CrystalFormBeta':          self.xtalform_dict[xf][2][4],
+                                    'CrystalFormGamma':         self.xtalform_dict[xf][2][5],
+                                    'CrystalFormVolume':        self.xtalform_dict[xf][1]       }
+                                db.update_data_source(sample,db_dict)
+                            break
+                if self.mode=='suggest':
+                    if add_crystalform:
+                        name=self.suggest_new_crystalfrom_name(self.xtalform_dict,mtz_pg)
+                        unitcell=mtztools(mtzin).get_unit_cell_from_mtz()
+                        spacegroup=mtztools(mtzin).get_spg_from_mtz()
+                        self.xtalform_dict[name]=[mtz_pg,mtz_vol,unitcell,spacegroup]
+
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+        if self.mode=='suggest':
+            self.emit(QtCore.SIGNAL('update_xtalfrom_table'), self.xtalform_dict)
+
+
+
 class create_png_and_cif_of_compound(QtCore.QThread):
     def __init__(self,external_software,initial_model_directory,compound_list):
         QtCore.QThread.__init__(self)
@@ -80,49 +227,6 @@ class run_dimple_on_selected_samples(QtCore.QThread):
         self.emit(QtCore.SIGNAL("finished()"))
 
 
-#class cluster_datasets(QtCore.QThread):
-#    def __init__(self,settings,initial_model_dimple_dict,external_software,ccp4_scratch,filename_root):
-#        QtCore.QThread.__init__(self)
-#        self.initial_model_directory=settings['initial_model_directory']
-#        self.reference_directory=settings['reference_directory']
-#        self.initial_model_dimple_dict=initial_model_dimple_dict
-#        self.queueing_system_available=external_software['qsub']
-#        self.ccp4_scratch_directory=ccp4_scratch
-#        self.filename_root=filename_root
-#
-#    def run(self):
-##       list=[[sampleID,point_group,unitcell_volume],
-##             [....................................]]
-##         item[0] is member of the first arbitrary cluster
-##       name of cluster: 1-<point_group>
-##        for item in list:
-#
-##
-##        if len(self.initial_model_dimple_dict) != 0:
-##            progress_step=100/float(len(self.initial_model_dimple_dict))
-##        progress=0
-##
-#        for sample in sorted(self.initial_model_dimple_dict):
-#            if self.initial_model_dimple_dict[sample][0].isChecked():
-##                self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running dimple -> '+sample)
-##                dimple_commands={   'project_directory': self.initial_model_directory,
-##                                    'delete_old': self.initial_model_dimple_dict[sample][0].isChecked(),
-##                                    'xtalID': sample,
-##                                    'compoundID': '',
-##                                    'smiles': '',
-##                                    'reference': self.reference_directory+'/'+
-##                                                 str(self.initial_model_dimple_dict[sample][1].currentText()),
-##                                    'queueing_system_available': self.queueing_system_available,
-##                                    'ccp4_scratch': self.ccp4_scratch_directory,
-##                                    'fileroot_in':  self.filename_root.replace('${samplename}',sample)  }
-##                process(dimple_commands).dimple()
-##            progress += progress_step
-##            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-##        self.emit(QtCore.SIGNAL("finished()"))
-##---------------------------------------------------------------------------------------------------------------
-
-
-
 class start_COOT(QtCore.QThread):
 
     def __init__(self,settings):
@@ -134,15 +238,23 @@ class start_COOT(QtCore.QThread):
         os.system('coot --no-guano --no-state-script --script %s' %(os.getenv('XChemExplorer_DIR')+'/lib/XChemCoot.py'))
 
 
+
 class read_intial_refinement_results(QtCore.QThread):
 
-    def __init__(self,initial_model_directory,reference_file_list,data_source,allowed_unitcell_difference_percent,filename_root):
+    def __init__(self,initial_model_directory,
+                      reference_file_list,
+                      data_source,
+                      allowed_unitcell_difference_percent,
+                      filename_root,
+                      update_datasource_only):
         QtCore.QThread.__init__(self)
         self.initial_model_directory=initial_model_directory
         self.reference_file_list=reference_file_list
         self.data_source=data_source
         self.allowed_unitcell_difference_percent=allowed_unitcell_difference_percent
         self.filename_root=filename_root
+        self.update_datasource_only=update_datasource_only
+
 
     def run(self):
 
@@ -177,16 +289,6 @@ class read_intial_refinement_results(QtCore.QThread):
             # if XCE is used throughout the process then there will be an inital <sample>.mtz file
             # but if not then there could be a few files which serve the same purpose
             sample_mtz=self.filename_root.replace('${samplename}',sample)+'.mtz'
-#            sample_mtz=self.filename_root+'.mtz'
-#            if os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'.free.pdb')):
-#                tmp=os.path.join(self.initial_model_directory,sample,sample+'.free.pdb')
-#                sample_mtz=tmp[tmp.rfind('/')+1:]
-#            elif os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'-pandda-input.mtz')):
-#                tmp=os.path.join(self.initial_model_directory,sample,sample+'-pandda-input.mtz')
-#                sample_mtz=tmp[tmp.rfind('/')+1:]
-#            elif os.path.isfile(os.path.join(self.initial_model_directory,sample,'refine.mtz')):
-#                tmp=os.path.join(self.initial_model_directory,sample,'refine.mtz')
-#                sample_mtz=tmp[tmp.rfind('/')+1:]
 
             spg_reference,unitcell_reference,reference_file,found_suitable_reference,\
                 resolution_high,spg_autoproc,unitcell_autoproc,unitcell_difference= \
@@ -215,30 +317,49 @@ class read_intial_refinement_results(QtCore.QThread):
                 run_dimple=False
 
             pdb_latest=''
+            path_to_refinement_folder=''
             if os.path.isfile(os.path.join(self.initial_model_directory,sample,'refine.pdb')):
                 pdb_latest=os.path.realpath(os.path.join(self.initial_model_directory,sample,'refine.pdb'))
+                path_to_refinement_folder=os.path.realpath(os.path.join(self.initial_model_directory,sample))
 
             mtz_latest=''
             if os.path.isfile(os.path.join(self.initial_model_directory,sample,'refine.mtz')):
                 mtz_latest=os.path.realpath(os.path.join(self.initial_model_directory,sample,'refine.mtz'))
 
             mtz_free=''
-            if os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'free.mtz')):
-                mtz_free=os.path.realpath(os.path.join(self.initial_model_directory,sample,sample+'free.mtz'))
+            if os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'.free.mtz')):
+                mtz_free=os.path.realpath(os.path.join(self.initial_model_directory,sample,sample+'.free.mtz'))
+
+            cif_file=''
+            compoundID=db.execute_statement("SELECT CompoundCode FROM mainTable WHERE CrystalName='"+sample+"';")
+            if len(compoundID) >= 1:
+                if os.path.isfile(os.path.join(self.initial_model_directory,sample,str(compoundID[0][0])+'.cif')):
+                    cif_file=os.path.realpath(os.path.join(self.initial_model_directory,sample,str(compoundID[0][0])+'.cif'))
+
+            if os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'.log')):
+                scaling_logfile=os.path.realpath(os.path.join(self.initial_model_directory,sample,sample+'.log'))
+                db_dict={'DataProcessingPathToLogfile': scaling_logfile }
+                # update path to logfile: might have changed if data were copied to different location
+                db.update_data_source(sample,db_dict)
+                db_dict=parse().read_aimless_logfile(scaling_logfile)
+                # actual values will only be updated if not present;
+                db.update_insert_not_null_fields_only(sample,db_dict)
 
 
             # update data source only if field is null
-            db_dict={   'RefinementOutcome':        outcome,
-                        'RefinementMTZfree':        mtz_free    }
+            db_dict={   'RefinementOutcome':            outcome,
+                        'RefinementMTZfree':            mtz_free    }
             db.update_insert_not_null_fields_only(sample,db_dict)
 
             # update to reflect current state
-            db_dict={   'RefinementRcryst':         Rcryst,
-                        'RefinementRfree':          Rfree,
-                        'RefinementRmsdBonds':      rmsdBonds,
-                        'RefinementRmsdAngles':     rmsdAngles,
-                        'RefinementPDB_latest':     pdb_latest,
-                        'RefinementMTZ_latest':     mtz_latest          }
+            db_dict={   'RefinementRcryst':                 Rcryst,
+                        'RefinementRfree':                  Rfree,
+                        'RefinementRmsdBonds':              rmsdBonds,
+                        'RefinementRmsdAngles':             rmsdAngles,
+                        'RefinementPDB_latest':             pdb_latest,
+                        'RefinementMTZ_latest':             mtz_latest,
+                        'RefinementPathToRefinementFolder': path_to_refinement_folder,
+                        'RefinementCIF':                    cif_file}
             db.update_data_source(sample,db_dict)
 
             initial_model_list.append( [ sample,
@@ -256,7 +377,8 @@ class read_intial_refinement_results(QtCore.QThread):
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-        self.emit(QtCore.SIGNAL('create_initial_model_table'), initial_model_list)
+        if not self.update_datasource_only:
+            self.emit(QtCore.SIGNAL('create_initial_model_table'), initial_model_list)
 
 
 
@@ -356,7 +478,6 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
         self.data_collection_statistics_dict_collected={}
 
         if os.path.isfile(os.path.join(self.database_directory,'data_collection_summary.pkl')):
-            #data_collection_dict = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
             summary = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
             self.data_collection_dict_collected=summary[0]
             self.data_collection_statistics_dict_collected=summary[1]
@@ -365,7 +486,6 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
         number_of_visits_to_search=len(self.visit_list)
         search_cycle=1
         for visit_directory in sorted(self.visit_list):
-
             if len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*')))==0:
                 continue
             progress_step=100/float(len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))))
@@ -376,6 +496,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             else:
                 visit=visit_directory.split('/')[5]
 
+            ####################################################################################################
             # dewar configuration:
             dewar_configuration=[]
             for xml in glob.glob(os.path.join(visit_directory,'xml','exptTableParams-*.xml')):
@@ -484,10 +605,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                                 self.data_collection_statistics_dict[sample].append(entry)
                                 already_parsed=True
                     if already_parsed:
-#                        print 'hallo'
                         continue
                     else:
-#                        print 'hallo ',logfile,self.data_collection_dict[sample][2]
                         aimless_results=parse().GetAimlessLog(logfile)
                         try:
                             self.data_collection_statistics_dict[sample].append([

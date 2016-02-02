@@ -61,15 +61,17 @@ class data_source:
             ['CompoundName',                         'Compound Name',                           'TEXT'],
             ['CrystalTag',                           'Tag',                                     'TEXT'],
 #            ['CrystalForm',                          'Crystal\nForm',                           'TEXT'],
-            ['CrystalFormName',                      'CrystalFormName',                         'TEXT'],
-            ['CrystalFormSpaceGroup',                'CrystalFormSpaceGroup',                   'TEXT'],
-            ['CrystalFormPointGroup',                'CrystalFormPointGroup',                   'TEXT'],
-            ['CrystalFormA',                         'CrystalFormA',                            'TEXT'],
-            ['CrystalFormB',                         'CrystalFormB',                            'TEXT'],
-            ['CrystalFormC',                         'CrystalFormC',                            'TEXT'],
-            ['CrystalFormAlpha',                     'CrystalFormAlpha',                        'TEXT'],
-            ['CrystalFormBeta',                      'CrystalFormBeta',                         'TEXT'],
-            ['CrystalFormGamma',                     'CrystalFormGamma',                        'TEXT'],
+            ['CrystalFormName',                      'Name',                         'TEXT'],
+            ['CrystalFormSpaceGroup',                'Space\nGroup',                   'TEXT'],
+            ['CrystalFormPointGroup',                'Point\nGroup',                   'TEXT'],
+            ['CrystalFormA',                         'a',                            'TEXT'],
+            ['CrystalFormB',                         'b',                            'TEXT'],
+            ['CrystalFormC',                         'c',                            'TEXT'],
+            ['CrystalFormAlpha',                     'alpha',                        'TEXT'],
+            ['CrystalFormBeta',                      'beta',                         'TEXT'],
+            ['CrystalFormGamma',                     'gamma',                        'TEXT'],
+            ['CrystalFormVolume',                     'CrystalFormVolume',                        'TEXT'],
+
 
             ['DataCollectionBeamline',               'DataCollectionBeamline',                  'TEXT'],
             ['DataCollectionDate',                   'DataCollectionDate',                      'TEXT'],
@@ -80,9 +82,21 @@ class data_source:
             ['DataProcessingProgram',                'DataProcessingProgram',                   'TEXT'],
             ['DataProcessingSpaceGroup',             'DataProcessing\nSpaceGroup',                'TEXT'],
             ['DataProcessingUnitCell',               'DataProcessingUnitCell',                  'TEXT'],
+
+            ['DataProcessingA',               'DataProcessingA',                  'TEXT'],
+            ['DataProcessingB',               'DataProcessingB',                  'TEXT'],
+            ['DataProcessingC',               'DataProcessingC',                  'TEXT'],
+            ['DataProcessingAlpha',               'DataProcessingAlpha',                  'TEXT'],
+            ['DataProcessingBeta',               'DataProcessingBeta',                  'TEXT'],
+            ['DataProcessingGamma',               'DataProcessingGamma',                  'TEXT'],
+
+
+
             ['DataProcessingResolutionOverall',      'DataProcessingResolutionOverall',         'TEXT'],
             ['DataProcessingResolutionLow',          'DataProcessingResolutionLow',             'TEXT'],
+            ['DataProcessingResolutionLowInnerShell','DataProcessingResolutionLowInnerShell',   'TEXT'],
             ['DataProcessingResolutionHigh',         'DataProcessing\nResolutionHigh',            'TEXT'],
+            ['DataProcessingResolutionHighOuterShell','DataProcessingResolutionHighOuterShell', 'TEXT'],
             ['DataProcessingRmergeOverall',          'DataProcessingRmergeOverall',             'TEXT'],
             ['DataProcessingRmergeLow',              'DataProcessingRmergeLow',                 'TEXT'],
             ['DataProcessingRmergeHigh',             'DataProcessingRmergeHigh',                'TEXT'],
@@ -96,6 +110,11 @@ class data_source:
             ['DataProcessingMultiplicityLow',        'DataProcessingMultiplicityLow',           'TEXT'],
             ['DataProcessingMultiplicityHigh',       'DataProcessingMultiplicityHigh',          'TEXT'],
             ['DataProcessingPathToLogfile',          'DataProcessingPathToLogfile',             'TEXT'],
+            ['DataProcessingUniqueReflectionsOverall','DataProcessingUniqueReflectionsOverall', 'TEXT'],
+            ['DataProcessingLattice',                'DataProcessingLattice',                   'TEXT'],
+            ['DataProcessingPointGroup',             'DataProcessingPointGroup',                'TEXT'],
+            ['DataProcessingUnitCellVolume',         'DataProcessingUnitCellVolume',            'TEXT'],
+            ['DataProcessingAlert',                  'DataProcessingAlert',                     'TEXT'],
 
 #            ['PANDDAstuff',                          'PANDDAstuff',                             'TEXT'],
             ['PANDDApath',                           'PANDDApath',                             'TEXT'],
@@ -188,10 +207,17 @@ class data_source:
                             continue
                         if key not in available_columns:
                             continue
-                        if not str(value).replace(' ','')=='':  # ignore if nothing in csv field
-                            update_string+=str(key)+'='+"'"+str(value)+"'"+','
-                            print "UPDATE mainTable SET "+update_string[:-1]+" WHERE CrystalName="+"'"+sampleID+"';"
-                            cursor.execute("UPDATE mainTable SET "+update_string[:-1]+" WHERE CrystalName="+"'"+sampleID+"';")
+                        # this is how I had it originally, so it would ignore empty fields
+                        # the problem is that if the user wants to set all values to Null,
+                        # if will ignore it and leave the inital value in the datasource
+#                        if not str(value).replace(' ','')=='':  # ignore if nothing in csv field
+#                            update_string+=str(key)+'='+"'"+str(value)+"'"+','
+#                            print "UPDATE mainTable SET "+update_string[:-1]+" WHERE CrystalName="+"'"+sampleID+"';"
+#                            cursor.execute("UPDATE mainTable SET "+update_string[:-1]+" WHERE CrystalName="+"'"+sampleID+"';")
+                        # now try this instead; not sure what will break now...
+                        update_string+=str(key)+'='+"'"+str(value)+"'"+','
+                        print "UPDATE mainTable SET "+update_string[:-1]+" WHERE CrystalName="+"'"+sampleID+"';"
+                        cursor.execute("UPDATE mainTable SET "+update_string[:-1]+" WHERE CrystalName="+"'"+sampleID+"';")
                 else:
                     column_string=''
                     value_string=''
@@ -203,8 +229,8 @@ class data_source:
                         if not str(value).replace(' ','')=='':  # ignore if nothing in csv field
                             value_string+="'"+value+"'"+','
                             column_string+=key+','
-                    print sampleID
-                    print          "INSERT INTO mainTable ("+column_string[:-1]+") VALUES ("+value_string[:-1]+");"
+#                    print sampleID
+#                    print          "INSERT INTO mainTable ("+column_string[:-1]+") VALUES ("+value_string[:-1]+");"
                     cursor.execute("INSERT INTO mainTable ("+column_string[:-1]+") VALUES ("+value_string[:-1]+");")
 
         connect.commit()
@@ -234,12 +260,13 @@ class data_source:
         if self.check_if_sample_exists_in_data_source(sampleID):
             for key in data_dict:
                 value=data_dict[key]
-                print value
+#                print value
                 if key=='ID' or key=='CrystalName':
                     continue
                 if not str(value).replace(' ','')=='':  # ignore empty fields
                     update_string=str(key)+'='+"'"+str(value)+"'"
-                    cursor.execute("UPDATE mainTable SET "+update_string+" WHERE CrystalName="+"'"+sampleID+"' and "+str(key)+" is null;")
+#                    cursor.execute("UPDATE mainTable SET "+update_string+" WHERE CrystalName="+"'"+sampleID+"' and "+str(key)+" is null;")
+                    cursor.execute("UPDATE mainTable SET "+update_string+" WHERE CrystalName="+"'"+sampleID+"' and ("+str(key)+" is null or "+str(key)+"='');")
         else:
             column_string='CrystalName'+','
             value_string="'"+sampleID+"'"+','
