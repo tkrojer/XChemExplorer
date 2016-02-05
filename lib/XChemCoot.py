@@ -51,7 +51,7 @@ class GUI(object):
                                         'Show Analysis Pending Only':       "RefinementOutcome='Analysis Pending'",
                                         'Show Datasets Under Refinement':   "RefinementOutcome='Refinement Ongoing'",
                                         'Show Confirmed Ligands':           "RefinementOutcome='Ligand Confirmed'",
-                                        'SHow Final Structures':            "RefinementOutcome='Structure finished'"   }
+                                        'SHow Final Structures':            "RefinementOutcome='Structure Finished'"   }
 
         # this decides which samples will be looked at
         self.selection_mode = ''
@@ -115,8 +115,8 @@ class GUI(object):
         refinement_cycle=[0]
         Rfree=  [0]
         Rcryst= [0]
-        self.canvas = FigureCanvas(self.update_plot(refinement_cycle,Rfree,Rcryst))  # a gtk.DrawingArea
-        self.canvas.set_size_request(300, 150)
+#        self.canvas = FigureCanvas(self.update_plot(refinement_cycle,Rfree,Rcryst))  # a gtk.DrawingArea
+#        self.canvas.set_size_request(300, 150)
 
 
 
@@ -223,6 +223,7 @@ class GUI(object):
         self.NEXTbutton = gtk.Button(label=">>>")
         self.NOREFINEMENTFAILEDbutton = gtk.Button(label="Refinement Failed")
         self.NOLIGANDFAILEDbutton = gtk.Button(label="No Ligand")
+        self.structure_finished_button = gtk.Button(label="Structure\nFinished")
         self.REFINEbutton = gtk.Button(label="Refine")
         self.VALIDATEbutton = gtk.Button(label="validate structure")
         self.DEPOSITbutton = gtk.Button(label="prepare for deposition")
@@ -263,12 +264,14 @@ class GUI(object):
         self.hbox_refinemnt_outcome.add(self.NOREFINEMENTFAILEDbutton)
         self.NOLIGANDFAILEDbutton.connect("clicked",self.update_data_source,"No Ligand Bound")
         self.hbox_refinemnt_outcome.add(self.NOLIGANDFAILEDbutton)
+        self.structure_finished_button.connect("clicked",self.update_data_source,"Structure Finished")
+        self.hbox_refinemnt_outcome.add(self.structure_finished_button)
         self.vbox.pack_start(self.hbox_refinemnt_outcome)
 
         # Refinement History
-        self.vbox_for_refinement_history=gtk.VBox()
-        self.vbox_for_refinement_history.add(self.canvas)
-        self.vbox.add(self.vbox_for_refinement_history)
+#        self.vbox_for_refinement_history=gtk.VBox()
+#        self.vbox_for_refinement_history.add(self.canvas)
+#        self.vbox.add(self.vbox_for_refinement_history)
 
         # --- Refine button ---
         self.REFINEbutton.connect("clicked",self.REFINE)
@@ -328,13 +331,13 @@ class GUI(object):
         if self.Serial > 1:
             self.RefmacParams=self.Refine.ParamsFromPreviousCycle(self.Serial-1)
             refinement_cycle,Rfree,Rcryst=self.Refine.GetRefinementHistory()
-            self.vbox_for_refinement_history.remove(self.canvas)
-            self.canvas = FigureCanvas(self.update_plot(refinement_cycle,Rfree,Rcryst))
-            self.canvas.set_size_request(300, 150)
-            self.vbox_for_refinement_history.add(self.canvas)
-            self.canvas.show()
-        else:
-            self.canvas = FigureCanvas(self.update_plot([0],[0],[0]))  # a gtk.DrawingArea
+#            self.vbox_for_refinement_history.remove(self.canvas)
+#            self.canvas = FigureCanvas(self.update_plot(refinement_cycle,Rfree,Rcryst))
+#            self.canvas.set_size_request(300, 150)
+#            self.vbox_for_refinement_history.add(self.canvas)
+#            self.canvas.show()
+#        else:
+#            self.canvas = FigureCanvas(self.update_plot([0],[0],[0]))  # a gtk.DrawingArea
 
         #########################################################################################
         # update pdb & maps

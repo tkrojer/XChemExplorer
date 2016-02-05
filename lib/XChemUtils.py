@@ -177,7 +177,7 @@ class helpers:
             from rdkit.Chem import Draw
             self.pil_rdkit_present=True
         except ImportError:
-            self.pil_rdkit_present=False
+            self.pil_rdkit_present=FalseU
             pass
 
     def pil_rdkit_exist(self):
@@ -197,7 +197,8 @@ class helpers:
         # Draw to a file
         Draw.MolToFile(mol, "%s.png" %compoundID)
 
-        os.system('acedrg -i "%s" -o %s' %(smiles,compoundID))
+#        os.system('acedrg -i "%s" -o %s' %(smiles,compoundID))
+        os.system("grade '%s' -resname LIG -ocif %s.cif -opdb %s.pdb" %(smiles,compoundID,compoundID))
 
         os.chdir(os.path.join(initial_model_directory,sample))
         if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.pdb')):

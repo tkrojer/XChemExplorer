@@ -64,7 +64,34 @@ class Refine(object):
         #######################################################
         # LIBIN & LIBOUT
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.compoundID+'.cif')):
-            RefmacParams['LIBIN']='LIBIN '+self.ProjectPath+'/'+self.xtalID+'/'+self.compoundID+'.cif \\\n'
+            # in cases where multiple liagnds are present (e.g. NOG, ATP) the user for now needs to put
+            # the respective dictionary into the xtalID folder
+            # need to think of a better mechanism in the future
+            additional_cif=False
+            additional_cif_file=''
+            for file in glob.glob(os.path.join(self.ProjectPath,self.xtalID,'*')):
+                if file.endswith('.cif'):
+                    if self.compoundID not in file:
+                        additional_cif_file=file
+                        additional_cif=True
+            if additional_cif:
+                Cmds = (
+                    '#!'+os.getenv('SHELL')+'\n'
+                    '\n'
+                    '$CCP4/bin/libcheck << eof \n'
+                    '_Y\n'
+                    '_FILE_L '+os.path.join(self.ProjectPath,self.xtalID,self.compoundID+'.cif')+'\n'
+                    '_FILE_L2 '+additional_cif_file+'\n'
+                    '_FILE_O '+os.path.join(self.ProjectPath,self.xtalID,'combined_cif')+'\n'
+                    '_END\n'
+                    'eof\n'
+                    )
+                os.chdir(os.path.join(self.ProjectPath,self.xtalID))
+                print Cmds
+                os.system(Cmds)
+                RefmacParams['LIBIN']='LIBIN '+self.ProjectPath+'/'+self.xtalID+'/combined_cif.lib \\\n'
+            else:
+                RefmacParams['LIBIN']='LIBIN '+self.ProjectPath+'/'+self.xtalID+'/'+self.compoundID+'.cif \\\n'
             RefmacParams['LIBOUT']='LIBOUT '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'/refine_'+Serial+'.cif \\\n'
 
         #######################################################
@@ -228,14 +255,17 @@ class Refine(object):
         cmd.close()
 
         os.chdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
-        if external_software['qsub']:
-            os.system('qsub refmac.csh')
-        else:
-            os.system('chmod +x refmac.csh')
-            if '/work/' in os.getcwd():
-                os.system('ssh %s@artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(getpass.getuser(),self.ProjectPath,self.xtalID,Serial))
-            else:
-                os.system('./refmac.csh &')
+        os.system('ssh artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(self.ProjectPath,self.xtalID,Serial))
+#        if external_software['qsub']:
+#            os.system('qsub refmac.csh')
+#        else:
+#            os.system('chmod +x refmac.csh')
+#            if '/work/' in os.getcwd():
+#                print 'HALLLLLLLLLLLLLLLLLLLLLLLLLLLo'
+#                print 'ssh artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(self.ProjectPath,self.xtalID,Serial)
+#                os.system('ssh artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(self.ProjectPath,self.xtalID,Serial))
+#            else:
+#                os.system('./refmac.csh &')
 
 
 
@@ -403,14 +433,22 @@ class Refine(object):
 #                Rfree=0
 #                LigandCC=0
                 try:
+                    found_Rcryst=False
+                    found_Rfree=False
                     newestPDB = max(glob.iglob(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(cycle)+'/refine_'+str(cycle)+'.pdb'), key=os.path.getctime)
                     for line in open(newestPDB):
                         if line.startswith('REMARK   3   R VALUE     (WORKING + TEST SET) :'):
                             Rcryst = line.split()[9]
                             RcrystList.append(float(Rcryst))
+                            found_Rcryst=True
                         if line.startswith('REMARK   3   FREE R VALUE                     :'):
                             Rfree = line.split()[6]
                             RfreeList.append(float(Rfree))
+                            found_Rfree=True
+                    if not found_Rcryst:
+                        RcrystList.append(0)
+                    if not found_Rfree:
+                        RfreeList.append(0)
 #                    if os.path.isfile(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(cycle)+'/validate_ligands.txt'):
 #                        for line in open(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(cycle)+'/validate_ligands.txt'):
 #                                if line.startswith('|  LIG'): LigandCC = line.split()[6]

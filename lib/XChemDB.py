@@ -277,7 +277,7 @@ class data_source:
                 if key not in available_columns:
                     continue
                 if not str(value).replace(' ','')=='':  # ignore if nothing in csv field
-                    value_string+="'"+value+"'"+','
+                    value_string+="'"+str(value)+"'"+','
                     column_string+=key+','
             cursor.execute("INSERT INTO mainTable ("+column_string[:-1]+") VALUES ("+value_string[:-1]+");")
         connect.commit()
