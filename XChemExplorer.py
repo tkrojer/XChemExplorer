@@ -210,9 +210,9 @@ class XChemExplorer(QtGui.QApplication):
 
         # GUI setup
         self.window=QtGui.QWidget()
-        self.window.setGeometry(0,0, 1800,1100)
+#        self.window.setGeometry(0,0, 1800,1100)
         self.window.setWindowTitle("XChemExplorer")
-        self.center_main_window()
+#        self.center_main_window()
         
         # Menu Widget
         load=QtGui.QAction("Open Config File", self.window)
@@ -663,7 +663,8 @@ class XChemExplorer(QtGui.QApplication):
 
         self.status_bar.showMessage('Ready')
 #        self.timer = QtCore.QBasicTimer()
-        self.window.show()
+        self.window.showMaximized()
+#        self.window.show()
 
     def update_overview(self):
         if os.path.isfile(self.settings['data_source']):

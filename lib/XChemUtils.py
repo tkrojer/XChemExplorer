@@ -828,14 +828,17 @@ class queue:
 class external_software:
 
     def __init__(self):
-        self.available_programs={
-            'qsub':                     False,
-            'refmac5':                  False,
-            'phenix.molprobity':        False,
-            'mmtbx.validate_ligands':   False,
-            'obabel':                   False,
-            'acedrg':                   False
-        }
+#        self.available_programs={
+#            'qsub':                     False,
+#            'refmac5':                  False,
+#            'phenix.molprobity':        False,
+#            'mmtbx.validate_ligands':   False,
+#            'obabel':                   False,
+#            'acedrg':                   False
+#        }
+
+        self.available_programs = {}
+
 
     def check(self):
 
@@ -850,7 +853,7 @@ class external_software:
         except OSError:
             self.available_programs['qsub']=False
             status='not found'
-        print '{0:40} {1:10}'.format('-checking for qsub:', status)
+        print '{0:50} {1:10}'.format('-checking for qsub:', status)
 
         try:
             subprocess.call(['refmac5','end'], stdout=FNULL, stderr=subprocess.STDOUT)
@@ -859,7 +862,7 @@ class external_software:
         except OSError:
             self.available_programs['refmac5']=False
             status='not found'
-        print '{0:40} {1:10}'.format('-checking for refmac5:', status)
+        print '{0:50} {1:10}'.format('-checking for refmac5:', status)
 
         try:
             subprocess.call(['phenix.molprobity'], stdout=FNULL, stderr=subprocess.STDOUT)
@@ -868,7 +871,7 @@ class external_software:
         except OSError:
             self.available_programs['phenix.molprobity']=False
             status='not found'
-        print '{0:40} {1:10}'.format('-checking for phenix.molprobity:', status)
+        print '{0:50} {1:10}'.format('-checking for phenix.molprobity:', status)
 
         try:
             subprocess.call(['phenix.find_tls_groups'], stdout=FNULL, stderr=subprocess.STDOUT)
@@ -877,7 +880,7 @@ class external_software:
         except OSError:
             self.available_programs['phenix.find_tls_groups']=False
             status='not found'
-        print '{0:40} {1:10}'.format('-checking for phenix.find_tls_groups:', status)
+        print '{0:50} {1:10}'.format('-checking for phenix.find_tls_groups:', status)
 
         try:
             subprocess.call(['mmtbx.validate_ligands'], stdout=FNULL, stderr=subprocess.STDOUT)
@@ -886,16 +889,7 @@ class external_software:
         except OSError:
             self.available_programs['mmtbx.validate_ligands']=False
             status='not found'
-        print '{0:40} {1:10}'.format('-checking for mmtbx.validate_ligands:', status)
-
-        try:
-            subprocess.call(['obabel'], stdout=FNULL, stderr=subprocess.STDOUT)
-            self.available_programs['obabel']=True
-            status='found'
-        except OSError:
-            self.available_programs['obabel']=False
-            status='not found'
-        print '{0:40} {1:10}'.format('-checking for obabel:', status)
+        print '{0:50} {1:10}'.format('-checking for mmtbx.validate_ligands:', status)
 
         try:
             subprocess.call(['acedrg'], stdout=FNULL, stderr=subprocess.STDOUT)
@@ -905,7 +899,7 @@ class external_software:
         except OSError:
             self.available_programs['acedrg']=False
             status='not found'
-        print '{0:40} {1:10}'.format('-checking for acedrg:', status)
+        print '{0:50} {1:10}'.format('-checking for acedrg:', status)
 
         try:
             subprocess.call(['giant.create_occupancy_params'], stdout=FNULL, stderr=subprocess.STDOUT)
@@ -914,7 +908,7 @@ class external_software:
         except OSError:
             self.available_programs['giant.create_occupancy_params']=False
             status='not found'
-        print '{0:40} {1:10}'.format('-checking for giant.create_occupancy_params:', status)
+        print '{0:50} {1:10}'.format('-checking for giant.create_occupancy_params:', status)
 
 
 
@@ -986,21 +980,28 @@ class ParseFiles:
         # Molprobity
         if os.path.isfile(self.DataPath+'/'+self.xtalID+'/validation_summary.txt'):
             for line in open(self.DataPath+'/'+self.xtalID+'/validation_summary.txt'):
-                if line.startswith('  Molprobity score      ='):
-                    QualityIndicators['MolprobityScore'] = line.split()[3]
-                    if float(line.split()[3]) < 2:                                 QualityIndicators['MolprobityScoreColor'] = 'green'
-                    if float(line.split()[3]) >= 2 and float(line.split()[3]) < 3: QualityIndicators['MolprobityScoreColor'] = 'orange'
-                    if float(line.split()[3]) >= 3:                                QualityIndicators['MolprobityScoreColor'] = 'red'
-                if line.startswith('  Ramachandran outliers ='):
-                    QualityIndicators['RamachandranOutliers'] = line.split()[3]
-                    if float(line.split()[3]) < 0.3:                                 QualityIndicators['RamachandranOutliersColor'] = 'green'
-                    if float(line.split()[3]) >= 0.3 and float(line.split()[3]) < 1: QualityIndicators['RamachandranOutliersColor'] = 'orange'
-                    if float(line.split()[3]) >= 1:                                  QualityIndicators['RamachandranOutliersColor'] = 'red'
-                if line.startswith('               favored  ='):
-                    QualityIndicators['RamachandranFavored'] = line.split()[2]
-                    if float(line.split()[2]) < 90:                                  QualityIndicators['RamachandranFavoredColor'] = 'red'
-                    if float(line.split()[2]) >= 90 and float(line.split()[2]) < 98: QualityIndicators['RamachandranFavoredColor'] = 'orange'
-                    if float(line.split()[2]) >= 98:                                 QualityIndicators['RamachandranFavoredColor'] = 'green'
+#                if line.startswith('  Molprobity score      ='):
+#                if line.lower().startswith('  molprobity score'):
+                if 'molprobity score' in line.lower():
+                    if len(line.split()) >= 4:
+                        QualityIndicators['MolprobityScore'] = line.split()[3]
+                        if float(line.split()[3]) < 2:                                 QualityIndicators['MolprobityScoreColor'] = 'green'
+                        if float(line.split()[3]) >= 2 and float(line.split()[3]) < 3: QualityIndicators['MolprobityScoreColor'] = 'orange'
+                        if float(line.split()[3]) >= 3:                                QualityIndicators['MolprobityScoreColor'] = 'red'
+#                if line.lower().startswith('  ramachandran outliers ='):
+                if 'ramachandran outliers' in line.lower():
+                    if len(line.split()) >= 4:
+                        QualityIndicators['RamachandranOutliers'] = line.split()[3]
+                        if float(line.split()[3]) < 0.3:                                 QualityIndicators['RamachandranOutliersColor'] = 'green'
+                        if float(line.split()[3]) >= 0.3 and float(line.split()[3]) < 1: QualityIndicators['RamachandranOutliersColor'] = 'orange'
+                        if float(line.split()[3]) >= 1:                                  QualityIndicators['RamachandranOutliersColor'] = 'red'
+#                if line.startswith('               favored  ='):
+                if 'favored' in line.lower():
+                    if len(line.split()) >= 3:
+                        QualityIndicators['RamachandranFavored'] = line.split()[2]
+                        if float(line.split()[2]) < 90:                                  QualityIndicators['RamachandranFavoredColor'] = 'red'
+                        if float(line.split()[2]) >= 90 and float(line.split()[2]) < 98: QualityIndicators['RamachandranFavoredColor'] = 'orange'
+                        if float(line.split()[2]) >= 98:                                 QualityIndicators['RamachandranFavoredColor'] = 'green'
 
         # LigandCC
         if os.path.isfile(self.DataPath+'/'+self.xtalID+'/validate_ligands.txt'):

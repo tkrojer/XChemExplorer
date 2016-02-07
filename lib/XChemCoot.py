@@ -53,6 +53,12 @@ class GUI(object):
                                         'Show Confirmed Ligands':           "RefinementOutcome='Ligand Confirmed'",
                                         'SHow Final Structures':            "RefinementOutcome='Structure Finished'"   }
 
+        self.ligand_confidence = [  'Ligand Confidence: Analysis Pending',
+                                    'Ligand Confidence: 0 - no ligand present',
+                                    'Ligand Confidence: 1 - low confidence',
+                                    'Ligand Confidence: 2 - pose/identity uncertain',
+                                    'Ligand Confidence: 3 - high confidence'   ]
+
         # this decides which samples will be looked at
         self.selection_mode = ''
 
@@ -66,10 +72,19 @@ class GUI(object):
 
         self.xtalID=''
         self.compoundID=''
+        self.ligand_confidence_of_sample=''
+        self.refinement_folder=''
 #        self.datasetOutcome=''
 
         self.pdb_style='refine.pdb'
         self.mtz_style='refine.mtz'
+
+        # stores imol of currently loaded molecules and maps
+        self.mol_dict = {   'protein':  -1,
+                            'ligand':   -1,
+                            '2fofc':    -1,
+                            'fofc':     -1,
+                            'event':    -1  }
 
         ###########################################################################################
         # some COOT settings
@@ -97,26 +112,17 @@ class GUI(object):
                                     'MatrixWeight':                 'n/a'   }
 
         # default refmac parameters
-        self.RefmacParams={ 'HKLIN': '',        'HKLOUT': '',
-                            'XYZIN': '',        'XYZOUT': '',
-                            'LIBIN': '',        'LIBOUT': '',
-                            'TLSIN': '',        'TLSOUT': '',
-                            'TLSADD': '',
-                            'NCYCLES': '10',
-                            'MATRIX_WEIGHT': 'AUTO',
-                            'BREF':   '    bref ISOT\n',
-                            'TLS':    '',
-                            'NCS':    '',
-                            'TWIN':   ''    }
-
-#        refinement_cycle=[1,2,3,4,5,6,7,8,9,10]
-#        Rfree=  [0.1,0.2,0.14,0.12,0.1,0.1,0.1,0.1,0.1,0.1]
-#        Rcryst= [0.3,0.4,0.14,0.12,0.2,0.1,0.3,0.1,0.2,0.1]
-        refinement_cycle=[0]
-        Rfree=  [0]
-        Rcryst= [0]
-#        self.canvas = FigureCanvas(self.update_plot(refinement_cycle,Rfree,Rcryst))  # a gtk.DrawingArea
-#        self.canvas.set_size_request(300, 150)
+        self.RefmacParams={ 'HKLIN':            '',                 'HKLOUT': '',
+                            'XYZIN':            '',                 'XYZOUT': '',
+                            'LIBIN':            '',                 'LIBOUT': '',
+                            'TLSIN':            '',                 'TLSOUT': '',
+                            'TLSADD':           '',
+                            'NCYCLES':          '10',
+                            'MATRIX_WEIGHT':    'AUTO',
+                            'BREF':             '    bref ISOT\n',
+                            'TLS':              '',
+                            'NCS':              '',
+                            'TWIN':             ''    }
 
 
 
@@ -129,8 +135,11 @@ class GUI(object):
         self.window.set_title("XChemExplorer")
         self.vbox = gtk.VBox()                      # this is the main container
 
-        # choose here which subset of samples should be looked at
-        self.vbox.add(gtk.Label('Select Samples'))
+        #################################################################################
+        # --- Sample Selection ---
+#        self.vbox.add(gtk.Label('Select Samples'))
+
+        frame = gtk.Frame(label='Select Samples')
         self.hbox_select_samples=gtk.HBox()
         self.cb_select_samples = gtk.combo_box_new_text()
         self.cb_select_samples.connect("changed", self.set_selection_mode)
@@ -140,8 +149,15 @@ class GUI(object):
         self.select_samples_button = gtk.Button(label="GO")
         self.select_samples_button.connect("clicked",self.get_samples_to_look_at)
         self.hbox_select_samples.add(self.select_samples_button)
-        self.vbox.pack_start(self.hbox_select_samples)
+#        self.vbox.pack_start(self.hbox_select_samples)
+        frame.add(self.hbox_select_samples)
+        self.vbox.pack_start(frame)
 
+        # SPACER
+        self.vbox.add(gtk.Label(' '))
+
+        #################################################################################
+        # --- Refinement Statistics ---
         # next comes a section which displays some global quality indicators
         # a combination of labels and textview widgets, arranged in a table
 
@@ -190,6 +206,7 @@ class GUI(object):
         self.MatrixWeightBox = gtk.EventBox()
         self.MatrixWeightBox.add(self.MatrixWeightValue)
 
+        frame = gtk.Frame()
         self.table = gtk.Table(4, 2, False)
         self.table.attach(self.RRfreeLabel,                 0, 1, 0, 1)
         self.table.attach(self.RRfreeBox,                   1, 2, 0, 1)
@@ -209,77 +226,122 @@ class GUI(object):
         self.table.attach(self.rmsdAnglesBox,               1, 2, 9,10)
         self.table.attach(self.MatrixWeightLabel,           0, 1,11,12)
         self.table.attach(self.MatrixWeightBox,             1, 2,11,12)
+        frame.add(self.table)
+        self.vbox.add(frame)
 
-        self.vbox.add(self.table)
+        # SPACER
+        self.vbox.add(gtk.Label(' '))
 
-        # compound picture
-        self.pic = gtk.gdk.pixbuf_new_from_file(os.path.join(os.getenv('XChemExplorer_DIR'),'image','NO_COMPOUND_IMAGE_AVAILABLE.png'))
+        #################################################################################
+        # --- hbox for compound picture & refinement history ---
+        frame=gtk.Frame()
+        self.hbox_for_info_graphics=gtk.HBox()
+
+        # --- compound picture ---
+        compound_frame=gtk.Frame()
+        pic = gtk.gdk.pixbuf_new_from_file(os.path.join(os.getenv('XChemExplorer_DIR'),'image','NO_COMPOUND_IMAGE_AVAILABLE.png'))
+        self.pic = pic.scale_simple(190, 190, gtk.gdk.INTERP_BILINEAR)
         self.image = gtk.Image()
         self.image.set_from_pixbuf(self.pic)
-        self.vbox.pack_start(self.image)
+        compound_frame.add(self.image)
+        self.hbox_for_info_graphics.add(compound_frame)
 
-        # define main buttons
-        self.PREVbutton = gtk.Button(label="<<<")
-        self.NEXTbutton = gtk.Button(label=">>>")
-        self.NOREFINEMENTFAILEDbutton = gtk.Button(label="Refinement Failed")
-        self.NOLIGANDFAILEDbutton = gtk.Button(label="No Ligand")
-        self.structure_finished_button = gtk.Button(label="Structure\nFinished")
-        self.REFINEbutton = gtk.Button(label="Refine")
-        self.VALIDATEbutton = gtk.Button(label="validate structure")
-        self.DEPOSITbutton = gtk.Button(label="prepare for deposition")
-#        self.LigandConfidenceButton = gtk.Button(label="ligand confidence")
-        self.RefinementParamsButton = gtk.Button(label="refinement parameters")
-#        self.AdjustDataProcessingButton = gtk.Button(label="adjust data processing")
-        self.merge_ligand_button=gtk.Button(label="Merge Ligand")
-        self.place_ligand_here_button=gtk.Button(label="Place Ligand here")
-        self.fit_ligand_to_density_button=gtk.Button(label='Fit Ligand to Density')
+        # --- Refinement History ---
+        self.canvas = FigureCanvas(self.update_plot([0],[0],[0]))
+        self.canvas.set_size_request(190, 190)
+#        self.vbox_for_refinement_history=gtk.VBox()
+#        self.vbox_for_refinement_history.add(self.canvas)
+#        self.vbox.add(self.vbox_for_refinement_history)
+        self.hbox_for_info_graphics.add(self.canvas)
+#        self.vbox.pack_start(self.hbox_for_info_graphics)
+        frame.add(self.hbox_for_info_graphics)
+        self.vbox.add(frame)
 
+        # SPACER
+        self.vbox.add(gtk.Label(' '))
+
+        #################################################################################
+        # --- crystal navigator combobox ---
+        frame = gtk.Frame(label='Sample Navigator')
+        self.vbox_sample_navigator=gtk.VBox()
         self.cb = gtk.combo_box_new_text()
         self.cb.connect("changed", self.ChooseXtal)
-        self.vbox.add(self.cb)
-
-        # Buttons
-        self.hbox1 = gtk.HBox()
-        self.hbox1.pack_start(self.PREVbutton)
-        self.hbox1.pack_start(self.NEXTbutton)
-        self.vbox.pack_start(self.hbox1)
-
-        # --- functions that are called when buttons are clicked ---
+        self.vbox_sample_navigator.add(self.cb)
+        # --- crystal navigator backward/forward button ---
+        self.PREVbutton = gtk.Button(label="<<<")
+        self.NEXTbutton = gtk.Button(label=">>>")
         self.PREVbutton.connect("clicked", self.ChangeXtal,-1)
         self.NEXTbutton.connect("clicked", self.ChangeXtal,+1)
+        hbox = gtk.HBox()
+        hbox.pack_start(self.PREVbutton)
+        hbox.pack_start(self.NEXTbutton)
+        self.vbox_sample_navigator.add(hbox)
+        frame.add(self.vbox_sample_navigator)
+        self.vbox.add(frame)
 
-        # --- modeling shortcuts ---
-        self.hbox_for_modeling=gtk.HBox()
-        self.hbox_for_modeling.add(self.place_ligand_here_button)
-        self.place_ligand_here_button.connect("clicked",self.place_ligand_here)
-        self.hbox_for_modeling.add(self.merge_ligand_button)
-        self.merge_ligand_button.connect("clicked",self.merge_ligand_into_protein)
-        self.hbox_for_modeling.add(self.fit_ligand_to_density_button)
-        self.fit_ligand_to_density_button.connect("clicked",self.fit_ligand)
-        self.vbox.add(self.hbox_for_modeling)
+        # SPACER
+        self.vbox.add(gtk.Label(' '))
 
-        # --- things concerning the dataset outcome ---
+        #################################################################################
+        # --- current refinement stage ---
+        frame = gtk.Frame(label='Experiment State')
         self.hbox_refinemnt_outcome=gtk.HBox()
+        self.NOREFINEMENTFAILEDbutton = gtk.Button(label="Refinement Failed")
+        self.NOREFINEMENTFAILEDbutton.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(65535,0,0))
+        self.NOREFINEMENTFAILEDbutton.modify_bg(gtk.STATE_ACTIVE, gtk.gdk.Color(0,65535,0))
+        self.NOREFINEMENTFAILEDbutton.modify_bg(gtk.STATE_PRELIGHT, gtk.gdk.Color(0,0,65535))
+#        self.NOREFINEMENTFAILEDbutton.modify_bg(gtk.STATE_SELECTED, gtk.gdk.Color(65535,0,0))
+#        self.NOREFINEMENTFAILEDbutton.modify_bg(gtk.STATE_INSENSITIVE, gtk.gdk.Color(65535,0,0))
+
+        self.NOLIGANDFAILEDbutton = gtk.Button(label="No Ligand")
+        self.structure_finished_button = gtk.Button(label="Structure\nFinished")
         self.NOREFINEMENTFAILEDbutton.connect("clicked",self.update_data_source,"Refinement Failed")
         self.hbox_refinemnt_outcome.add(self.NOREFINEMENTFAILEDbutton)
         self.NOLIGANDFAILEDbutton.connect("clicked",self.update_data_source,"No Ligand Bound")
         self.hbox_refinemnt_outcome.add(self.NOLIGANDFAILEDbutton)
         self.structure_finished_button.connect("clicked",self.update_data_source,"Structure Finished")
         self.hbox_refinemnt_outcome.add(self.structure_finished_button)
-        self.vbox.pack_start(self.hbox_refinemnt_outcome)
+        frame.add(self.hbox_refinemnt_outcome)
+        self.vbox.pack_start(frame)
 
-        # Refinement History
-#        self.vbox_for_refinement_history=gtk.VBox()
-#        self.vbox_for_refinement_history.add(self.canvas)
-#        self.vbox.add(self.vbox_for_refinement_history)
+        # --- ligand modeling ---
+        self.merge_ligand_button=gtk.Button(label="Merge Ligand")
+        self.place_ligand_here_button=gtk.Button(label="Place Ligand here")
+#        self.fit_ligand_to_density_button=gtk.Button(label='Fit Ligand to Density')
+        self.hbox_for_modeling=gtk.HBox()
+        self.hbox_for_modeling.add(self.place_ligand_here_button)
+        self.place_ligand_here_button.connect("clicked",self.place_ligand_here)
+        self.hbox_for_modeling.add(self.merge_ligand_button)
+        self.merge_ligand_button.connect("clicked",self.merge_ligand_into_protein)
+#        self.hbox_for_modeling.add(self.fit_ligand_to_density_button)
+#        self.fit_ligand_to_density_button.connect("clicked",self.fit_ligand)
+        self.vbox.add(self.hbox_for_modeling)
 
-        # --- Refine button ---
+        # --- ligand confidence ---
+        self.cb_ligand_confidence = gtk.combo_box_new_text()
+        self.cb_ligand_confidence.connect("changed", self.set_ligand_confidence)
+        for citeria in self.ligand_confidence:
+            self.cb_ligand_confidence.append_text(citeria)
+        self.vbox.add(self.cb_ligand_confidence)
+
+
+        # --- refinement & options ---
+        self.hbox_for_refinement=gtk.HBox()
+        self.REFINEbutton = gtk.Button(label="Refine")
+        self.RefinementParamsButton = gtk.Button(label="refinement parameters")
         self.REFINEbutton.connect("clicked",self.REFINE)
-        self.vbox.pack_start(self.REFINEbutton)
-
-        # --- Refinement parameters ---
+        self.hbox_for_refinement.add(self.REFINEbutton)
         self.RefinementParamsButton.connect("clicked",self.RefinementParams)
-        self.vbox.pack_start(self.RefinementParamsButton)
+        self.hbox_for_refinement.add(self.RefinementParamsButton)
+        self.vbox.add(self.hbox_for_refinement)
+
+        self.VALIDATEbutton = gtk.Button(label="validate structure")
+        self.DEPOSITbutton = gtk.Button(label="prepare for deposition")
+#        self.LigandConfidenceButton = gtk.Button(label="ligand confidence")
+#        self.AdjustDataProcessingButton = gtk.Button(label="adjust data processing")
+
+
+
 
         # --- CANCEL button ---
         self.CANCELbutton = gtk.Button(label="CANCEL")
@@ -309,8 +371,12 @@ class GUI(object):
         self.xtalID=str(self.Todo[self.index][0])
         if str(self.Todo[self.index][0]) != None:
             self.compoundID=str(self.Todo[self.index][1])
+            self.ligand_confidence_of_sample=str(self.Todo[self.index][2])
+            self.refinement_folder=str(self.Todo[self.index][3])
         else:
             self.compoundID=''
+            self.ligand_confidence_of_sample=''
+            self.refinement_folder=''
         self.RefreshData()
 
     def update_data_source(self,widget,data=None):              # update and move to next xtal
@@ -328,16 +394,18 @@ class GUI(object):
 
         self.QualityIndicators=XChemUtils.ParseFiles(self.project_directory,self.xtalID).UpdateQualityIndicators()
         # if the structure was previously refined, try to read the parameters
+#        self.vbox_for_refinement_history.remove(self.canvas)
+        self.hbox_for_info_graphics.remove(self.canvas)
         if self.Serial > 1:
             self.RefmacParams=self.Refine.ParamsFromPreviousCycle(self.Serial-1)
             refinement_cycle,Rfree,Rcryst=self.Refine.GetRefinementHistory()
-#            self.vbox_for_refinement_history.remove(self.canvas)
-#            self.canvas = FigureCanvas(self.update_plot(refinement_cycle,Rfree,Rcryst))
-#            self.canvas.set_size_request(300, 150)
-#            self.vbox_for_refinement_history.add(self.canvas)
-#            self.canvas.show()
-#        else:
-#            self.canvas = FigureCanvas(self.update_plot([0],[0],[0]))  # a gtk.DrawingArea
+            self.canvas = FigureCanvas(self.update_plot(refinement_cycle,Rfree,Rcryst))
+        else:
+            self.canvas = FigureCanvas(self.update_plot([0],[0],[0]))  # a gtk.DrawingArea
+        self.canvas.set_size_request(190, 190)
+#        self.vbox_for_refinement_history.add(self.canvas)
+        self.hbox_for_info_graphics.add(self.canvas)
+        self.canvas.show()
 
         #########################################################################################
         # update pdb & maps
@@ -355,9 +423,11 @@ class GUI(object):
         # read protein molecule after ligand so that this one is the active molecule
         coot.set_nomenclature_errors_on_read("ignore")
         if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.pdb')):
-            coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.pdb'),0)
+            imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.pdb'),0)
+            self.mol_dict['ligand']=imol
             coot.read_cif_dictionary(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.cif'))
-        coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style),0)
+        imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style),0)
+        self.mol_dict['protein']=imol
         for item in coot_utils_XChem.molecule_number_list():
             if coot.molecule_name(item).endswith(self.pdb_style):
                 coot.set_show_symmetry_master(1)    # master switch to show symmetry molecules
@@ -390,6 +460,16 @@ class GUI(object):
             coot.auto_read_make_and_draw_maps(os.path.join(self.project_directory,self.xtalID,self.mtz_style))
 
         #########################################################################################
+        # update Ligand Confidence combobox
+        if str(self.ligand_confidence_of_sample)=='None':
+            self.ligand_confidence_of_sample='Analysis Pending'
+            db_dict={'RefinementLigandConfidence': self.ligand_confidence_of_sample}
+            self.db.update_data_source(self.xtalID,db_dict)
+        for n,criteria in enumerate(self.ligand_confidence):
+            if criteria.replace('Ligand Confidence: ','')==self.ligand_confidence_of_sample:
+                self.cb_ligand_confidence.set_active(n)
+
+        #########################################################################################
         # update Quality Indicator table
         self.RRfreeValue.set_label(self.QualityIndicators['R']+' / '+self.QualityIndicators['RRfree'])
         self.RRfreeBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RRfreeColor']))
@@ -411,10 +491,10 @@ class GUI(object):
 
         try:
             pic = gtk.gdk.pixbuf_new_from_file(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.png'))
-            self.image.set_from_pixbuf(pic)
         except gobject.GError:
             pic = gtk.gdk.pixbuf_new_from_file(os.path.join(os.getenv('XChemExplorer_DIR'),'image','NO_COMPOUND_IMAGE_AVAILABLE.png'))
-            self.image.set_from_pixbuf(pic)
+        self.pic = pic.scale_simple(200, 200, gtk.gdk.INTERP_BILINEAR)
+        self.image.set_from_pixbuf(self.pic)
 
 
     def REFINE(self,widget):
@@ -437,37 +517,55 @@ class GUI(object):
                 self.selection_mode=self.selection_criteria[criteria]
                 break
 
+    def set_ligand_confidence(self,widget):
+        self.ligand_confidence_of_sample=widget.get_active_text().replace('Ligand Confidence: ','')
+        print '===> XCE: updating data source with new ligand confidence ',self.ligand_confidence_of_sample
+        db_dict={'RefinementLigandConfidence': self.ligand_confidence_of_sample}
+        self.db.update_data_source(self.xtalID,db_dict)
+        self.Todo[self.index][2]=self.ligand_confidence_of_sample
+
+
     def get_samples_to_look_at(self,widget):
         # first remove old samples if present
         if len(self.Todo) != 0:
             for n,item in enumerate(self.Todo):
                 self.cb.remove_text(0)
         self.Todo=[]
-        self.Todo=self.db.get_samples_for_coot(self.selection_mode)
+#        self.Todo=self.db.get_samples_for_coot(self.selection_mode)
+        tmp=self.db.get_samples_for_coot(self.selection_mode)
+        for item in tmp:
+            self.Todo.append(list(item))
         for item in self.Todo:
             print item
             self.cb.append_text('%s' %item[0])
 
+
+
     def update_plot(self,refinement_cycle,Rfree,Rcryst):
-        fig = Figure(figsize=(3, 2), dpi=75)
+        fig = Figure(figsize=(2, 2), dpi=50)
         Plot = fig.add_subplot(111)
         Plot.set_ylim([0,max(Rcryst+Rfree)])
-        Plot.set_xlabel('Refinement Cycle')
+        Plot.set_xlabel('Refinement Cycle',fontsize=6)
         Plot.plot(refinement_cycle,Rfree,label='Rfree')
         Plot.plot(refinement_cycle,Rcryst,label='Rcryst')
         Plot.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
-                ncol=2, mode="expand", borderaxespad=0.)
+                ncol=2, mode="expand", borderaxespad=0.,fontsize=12)
         return fig
 
     def place_ligand_here(self,widget):
-        print 'hallo'
+        print '===> XCE: moving ligand to pointer'
 #        coot.move_molecule_here(<molecule_number>)
+        coot.move_molecule_here(self.mol_dict['ligand'])
 
     def merge_ligand_into_protein(self,widget):
-        print 'ok'
+        print '===> XCE: merge ligand into protein structure'
+        # merge_molecules(list(imols), imol) e.g. merge_molecules([1],0)
+        coot.merge_molecules([self.mol_dict['ligand']],self.mol_dict['protein'])
+        print '===> XCE: deleting ligand molecule'
+        coot.close_molecule(self.mol_dict['ligand'])
 
-    def fit_ligand(self,widget):
-        print 'fit'
+#    def fit_ligand(self,widget):
+#        print 'fit'
 
 if __name__=='__main__':
     GUI().StartGUI()

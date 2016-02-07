@@ -131,6 +131,7 @@ class data_source:
             ['RefinementMTZ_latest',                 'RefinementMTZ_latest',                    'TEXT'],
             ['RefinementComment',                    'RefinementComment',                       'TEXT'],
             ['RefinementPathToRefinementFolder',     'RefinementPathToRefinementFolder',        'TEXT'],
+            ['RefinementLigandConfidence',           'Ligand\nConfidence',                      'TEXT'],
 
             ['AssayIC50',                            'AssayIC50',                               'TEXT']
         ]
@@ -376,14 +377,18 @@ class data_source:
         # 0: sampleID
         # 1: compoundID
         # 2: dataset outcome
+        # 3: ligand confidence
+        # 4: path to refinement
         sample_list_for_coot=[]
-        colums_for_coot=[['RefinementOutcome',  None],
-                         ['CrystalName',        None],
-                         ['CompoundCode',       None]]
+        colums_for_coot=[['RefinementOutcome',                  None],
+                         ['CrystalName',                        None],
+                         ['CompoundCode',                       None],
+                         ['RefinementLigandConfidence',         None],
+                         ['RefinementPathToRefinementFolder',   None]]
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
 
-        cursor.execute("SELECT CrystalName,CompoundCode FROM mainTable WHERE %s;" % RefinementOutcome )
+        cursor.execute("SELECT CrystalName,CompoundCode,RefinementLigandConfidence,RefinementPathToRefinementFolder FROM mainTable WHERE %s;" % RefinementOutcome )
 
         sample_list_for_coot= cursor.fetchall()
         return sample_list_for_coot

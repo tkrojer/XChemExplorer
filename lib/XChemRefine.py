@@ -255,14 +255,13 @@ class Refine(object):
         cmd.close()
 
         os.chdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
-        os.system('ssh artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(self.ProjectPath,self.xtalID,Serial))
-#        if external_software['qsub']:
-#            os.system('qsub refmac.csh')
-#        else:
-#            os.system('chmod +x refmac.csh')
+#        os.system('ssh artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(self.ProjectPath,self.xtalID,Serial))
+        if external_software['qsub']:
+            os.system('qsub refmac.csh')
+        else:
+            os.system('chmod +x refmac.csh')
+            os.system('./refmac.csh &')
 #            if '/work/' in os.getcwd():
-#                print 'HALLLLLLLLLLLLLLLLLLLLLLLLLLLo'
-#                print 'ssh artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(self.ProjectPath,self.xtalID,Serial)
 #                os.system('ssh artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(self.ProjectPath,self.xtalID,Serial))
 #            else:
 #                os.system('./refmac.csh &')
