@@ -525,9 +525,9 @@ def string_append_with_spaces(ls):
 # is python list [...] !!!
 #
 def rotation_centre():
-   return [rotation_centre_position(0),
-           rotation_centre_position(1),
-           rotation_centre_position(2)]
+   return [coot.rotation_centre_position(0),
+           coot.rotation_centre_position(1),
+           coot.rotation_centre_position(2)]
 
 # this is actually not essentail since python has these funtion(s)
 def number_list(a,b):
@@ -1012,18 +1012,18 @@ def miguels_axes():
 #  Note: mol_cen could contain values less than -9999.
 #
 def molecule_centre(imol):
-   return [molecule_centre_internal(imol,0),
-           molecule_centre_internal(imol,1),
-           molecule_centre_internal(imol,2)]
+   return [coot.molecule_centre_internal(imol,0),
+           coot.molecule_centre_internal(imol,1),
+           coot.molecule_centre_internal(imol,2)]
 
 # Move the centre of molecule number imol to the current screen centre
 #
 def move_molecule_to_screen_centre(imol):
   if valid_model_molecule_qm(imol):
     rotate_centre = rotation_centre()
-    translate_molecule_by(imol,(rotate_centre[0]-molecule_centre(imol)[0]),
-                               (rotate_centre[1]-molecule_centre(imol)[1]),
-                               (rotate_centre[2]-molecule_centre(imol)[2]))
+    coot.translate_molecule_by(imol,(rotate_centre[0]-molecule_centre(imol)[0]),
+                                    (rotate_centre[1]-molecule_centre(imol)[1]),
+                                    (rotate_centre[2]-molecule_centre(imol)[2]))
 # This is a short name for the above.
 # deftexi move_molecule_here
 move_molecule_here = move_molecule_to_screen_centre

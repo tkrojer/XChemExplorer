@@ -426,8 +426,8 @@ class Refine(object):
                     RefinementCycle.append(int(item[item.rfind('_')+1:]))
                     found = True
         if found:
-#            for cycle in sorted(RefinementCycle):
-            for cycle in RefinementCycle:
+            for cycle in sorted(RefinementCycle):
+#            for cycle in RefinementCycle:
 #                Rcryst=0
 #                Rfree=0
 #                LigandCC=0
@@ -461,6 +461,6 @@ class Refine(object):
             RcrystList=[0]
             RfreeList=[0]
         print RefinementCycle,RcrystList,RfreeList
-        return(RefinementCycle,RcrystList,RfreeList)
+        return(sorted(RefinementCycle),RcrystList,RfreeList)
 
 

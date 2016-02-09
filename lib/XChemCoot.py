@@ -284,21 +284,22 @@ class GUI(object):
 
         #################################################################################
         # --- current refinement stage ---
-        frame = gtk.Frame(label='Experiment State')
+        frame = gtk.Frame(label='Experiment Outcome')
         self.hbox_refinemnt_outcome=gtk.HBox()
-        self.NOREFINEMENTFAILEDbutton = gtk.Button(label="Refinement Failed")
-        self.NOREFINEMENTFAILEDbutton.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(65535,0,0))
-        self.NOREFINEMENTFAILEDbutton.modify_bg(gtk.STATE_ACTIVE, gtk.gdk.Color(0,65535,0))
-        self.NOREFINEMENTFAILEDbutton.modify_bg(gtk.STATE_PRELIGHT, gtk.gdk.Color(0,0,65535))
-#        self.NOREFINEMENTFAILEDbutton.modify_bg(gtk.STATE_SELECTED, gtk.gdk.Color(65535,0,0))
-#        self.NOREFINEMENTFAILEDbutton.modify_bg(gtk.STATE_INSENSITIVE, gtk.gdk.Color(65535,0,0))
+        self.refinement_failed_buttoon = gtk.Button(label="Refinement\nFailed")
+        self.refinement_failed_buttoon.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(65535,0,0))
+        self.refinement_failed_buttoon.modify_bg(gtk.STATE_ACTIVE, gtk.gdk.Color(0,65535,0))
+        self.refinement_failed_buttoon.modify_bg(gtk.STATE_PRELIGHT, gtk.gdk.Color(0,0,65535))
+#        self.refinement_failed_buttoon.modify_bg(gtk.STATE_SELECTED, gtk.gdk.Color(65535,0,0))
+#        self.refinement_failed_buttoon.modify_bg(gtk.STATE_INSENSITIVE, gtk.gdk.Color(65535,0,0))
+        self.refinement_failed_buttoon.connect("clicked",self.update_data_source,"Refinement Failed")
+        self.hbox_refinemnt_outcome.add(self.refinement_failed_buttoon)
 
-        self.NOLIGANDFAILEDbutton = gtk.Button(label="No Ligand")
+        self.no_ligand_present_button = gtk.Button(label="No Ligand")
+        self.no_ligand_present_button.connect("clicked",self.update_data_source,"No Ligand Bound")
+        self.hbox_refinemnt_outcome.add(self.no_ligand_present_button)
         self.structure_finished_button = gtk.Button(label="Structure\nFinished")
-        self.NOREFINEMENTFAILEDbutton.connect("clicked",self.update_data_source,"Refinement Failed")
-        self.hbox_refinemnt_outcome.add(self.NOREFINEMENTFAILEDbutton)
-        self.NOLIGANDFAILEDbutton.connect("clicked",self.update_data_source,"No Ligand Bound")
-        self.hbox_refinemnt_outcome.add(self.NOLIGANDFAILEDbutton)
+
         self.structure_finished_button.connect("clicked",self.update_data_source,"Structure Finished")
         self.hbox_refinemnt_outcome.add(self.structure_finished_button)
         frame.add(self.hbox_refinemnt_outcome)
@@ -339,8 +340,6 @@ class GUI(object):
         self.DEPOSITbutton = gtk.Button(label="prepare for deposition")
 #        self.LigandConfidenceButton = gtk.Button(label="ligand confidence")
 #        self.AdjustDataProcessingButton = gtk.Button(label="adjust data processing")
-
-
 
 
         # --- CANCEL button ---
@@ -506,7 +505,7 @@ class GUI(object):
             self.index = len(self.Todo)
         self.cb.set_active(self.index)
 
-    
+
     def RefinementParams(self,widget):
         print '\n==> XCE: changing refinement parameters'
         self.RefmacParams=self.Refine.RefinementParams(self.RefmacParams)
@@ -545,9 +544,9 @@ class GUI(object):
         fig = Figure(figsize=(2, 2), dpi=50)
         Plot = fig.add_subplot(111)
         Plot.set_ylim([0,max(Rcryst+Rfree)])
-        Plot.set_xlabel('Refinement Cycle',fontsize=6)
-        Plot.plot(refinement_cycle,Rfree,label='Rfree')
-        Plot.plot(refinement_cycle,Rcryst,label='Rcryst')
+        Plot.set_xlabel('Refinement Cycle',fontsize=12)
+        Plot.plot(refinement_cycle,Rfree,label='Rfree',linewidth=2)
+        Plot.plot(refinement_cycle,Rcryst,label='Rcryst',linewidth=2)
         Plot.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
                 ncol=2, mode="expand", borderaxespad=0.,fontsize=12)
         return fig
@@ -555,12 +554,13 @@ class GUI(object):
     def place_ligand_here(self,widget):
         print '===> XCE: moving ligand to pointer'
 #        coot.move_molecule_here(<molecule_number>)
-        coot.move_molecule_here(self.mol_dict['ligand'])
+        print 'LIGAND: ',self.mol_dict['ligand']
+        coot_utils_XChem.move_molecule_here(self.mol_dict['ligand'])
 
     def merge_ligand_into_protein(self,widget):
         print '===> XCE: merge ligand into protein structure'
         # merge_molecules(list(imols), imol) e.g. merge_molecules([1],0)
-        coot.merge_molecules([self.mol_dict['ligand']],self.mol_dict['protein'])
+        coot.merge_molecules_py([self.mol_dict['ligand']],self.mol_dict['protein'])
         print '===> XCE: deleting ligand molecule'
         coot.close_molecule(self.mol_dict['ligand'])
 

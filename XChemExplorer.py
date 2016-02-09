@@ -92,7 +92,7 @@ class XChemExplorer(QtGui.QApplication):
                              'data_source':             os.path.join(self.database_directory,self.data_source_file),
                              'ccp4_scratch':            self.ccp4_scratch_directory,
                              'unitcell_difference':     self.allowed_unitcell_difference_percent,
-                             'filename_root':           self.filename_root  }
+                             'filename_root':           self.filename_root   }
 
 
         # Settings @ Lists
@@ -410,6 +410,9 @@ class XChemExplorer(QtGui.QApplication):
         set_new_reference_button=QtGui.QPushButton("Set New Reference (if applicable)")
         set_new_reference_button.clicked.connect(self.button_clicked)
         initial_model_button_hbox.addWidget(set_new_reference_button)
+        run_panddas_button=QtGui.QPushButton("Run PANDDAs")
+        run_panddas_button.clicked.connect(self.button_clicked)
+        initial_model_button_hbox.addWidget(run_panddas_button)
         self.tab_dict['Initial Model'][1].addLayout(initial_model_button_hbox)
 
         ######################################################################################
@@ -644,6 +647,21 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_ccp4_scratch_directory.addWidget(settings_buttoon_ccp4_scratch_directory)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_ccp4_scratch_directory)
 
+        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nPANDDAs directory:'))
+        settings_hbox_panddas_directory=QtGui.QHBoxLayout()
+        self.panddas_directory_label=QtGui.QLabel(self.panddas_directory)
+        settings_hbox_panddas_directory.addWidget(self.panddas_directory_label)
+        settings_button_panddas_directory=QtGui.QPushButton('Select PANNDAs Directory')
+        settings_button_panddas_directory.clicked.connect(self.settings_button_clicked)
+        settings_hbox_panddas_directory.addWidget(settings_button_panddas_directory)
+        self.data_collection_vbox_for_settings.addLayout(settings_hbox_panddas_directory)
+
+        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nSites of Interest:'))
+        self.sites_of_interest_input = QtGui.QTextEdit()
+        self.sites_of_interest_input.setFixedWidth(400)
+        self.data_collection_vbox_for_settings.addWidget(self.sites_of_interest_input)
+
+
         self.data_collection_vbox_for_settings.addStretch(1)
         ######################################################################################
 
@@ -800,17 +818,22 @@ class XChemExplorer(QtGui.QApplication):
             self.initial_model_directory=pickled_settings['initial_model_directory']
             self.settings['initial_model_directory']=self.initial_model_directory
 
+            self.panddas_directory=pickled_settings['panddas_directory']
+            self.settings['panddas_directory']=self.panddas_directory
+
             self.database_directory=pickled_settings['database_directory']
             self.settings['database_directory']=self.database_directory
 
             self.data_source_file=pickled_settings['data_source']
             if self.data_source_file != '':
                 self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
+                # this is probably not necessary
                 if os.path.isfile(self.settings['data_source']):
-                    XChemDB.data_source(self.settings['data_source']).create_missing_columns()
-                else:
-                    XChemDB.data_source(self.settings['data_source']).create_empty_data_source_file()
-                self.data_source_set=True
+                    self.data_source_set=True
+#                    XChemDB.data_source(self.settings['data_source']).create_missing_columns()
+#                else:
+#                    XChemDB.data_source(self.settings['data_source']).create_empty_data_source_file()
+#                self.data_source_set=True
 
             self.ccp4_scratch_directory=pickled_settings['ccp4_scratch']
             self.settings['ccp4_scratch']=self.ccp4_scratch_directory
@@ -824,6 +847,7 @@ class XChemExplorer(QtGui.QApplication):
 
 #            self.project_directory_label.setText(self.project_directory)
             self.initial_model_directory_label.setText(self.initial_model_directory)
+            self.panddas_directory_label.setText(self.panddas_directory)
 #            self.refine_model_directory_label.setText(self.refine_model_directory)
             self.reference_directory_label.setText(self.reference_directory)
             self.database_directory_label.setText(self.database_directory)
@@ -911,6 +935,11 @@ class XChemExplorer(QtGui.QApplication):
             self.ccp4_scratch_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.ccp4_scratch_directory_label.setText(self.ccp4_scratch_directory)
             self.settings['ccp4_scratch']=self.ccp4_scratch_directory
+        if self.sender().text()=='Select PANNDAs Directory':
+            self.panddas_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
+            self.panddas_directory_label.setText(self.panddas_directory)
+            self.settings['panddas_directory']=self.panddas_directory
+
 
     def change_allowed_unitcell_difference_percent(self,text):
         self.allowed_unitcell_difference_percent=int(text)
@@ -923,6 +952,30 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def button_clicked(self):
+
+        if self.data_source_set==False:
+            if self.sender().text()=="Create New Data Source (SQLite)":
+                file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
+                #make sure that the file always has .csv extension
+                if file_name.rfind('.') != -1:
+                    file_name=file_name[:file_name.rfind('.')]+'.sqlite'
+                else:
+                    file_name=file_name+'.sqlite'
+                XChemDB.data_source(os.path.join(file_name)).create_empty_data_source_file()
+                if self.data_source_file=='':
+                    self.database_directory=file_name[:file_name.rfind('/')]
+                    self.data_source_file=file_name[file_name.rfind('/')+1:]
+                    self.data_source_file_label.setText(self.data_source_file)
+                    self.database_directory_label.setText(str(self.database_directory))
+                    self.settings['database_directory']=self.database_directory
+                    self.settings['data_source']=self.data_source_file
+                    self.data_source_set=True
+            else:
+                self.no_data_source_selected()
+                pass
+
+
+
         if self.explorer_active==0 and self.data_source_set==True \
             and self.sender().text()=='Get New Results from Autoprocessing':
             self.work_thread=XChemThread.read_autoprocessing_results_from_disc(self.visit_list,
@@ -1090,26 +1143,9 @@ class XChemExplorer(QtGui.QApplication):
             self.populate_data_source_table(header,data)
 
 
-        elif self.sender().text()=="Create New Data Source (SQLite)":
-            file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
-            #make sure that the file always has .csv extension
-            if file_name.rfind('.') != -1:
-                file_name=file_name[:file_name.rfind('.')]+'.sqlite'
-            else:
-                file_name=file_name+'.sqlite'
-            XChemDB.data_source(os.path.join(file_name)).create_empty_data_source_file()
-            if self.data_source_file=='':
-                self.database_directory=file_name[:file_name.rfind('/')]
-                self.data_source_file=file_name[file_name.rfind('/')+1:]
-                self.data_source_file_label.setText(self.data_source_file)
-                self.database_directory_label.setText(str(self.database_directory))
-                self.settings['database_directory']=self.database_directory
-                self.settings['data_source']=self.data_source_file
-                self.data_source_set=True
-
         elif self.sender().text()=="Import CSV file into Data Source":
             if self.data_source_file=='':
-                self.update_status_bar('Please load a data soure file first')
+                self.update_status_bar('Please load a data source file first')
             else:
                 file_name = QtGui.QFileDialog.getOpenFileName(self.window,'Open file', self.database_directory)
                 XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).import_csv_file(file_name)
@@ -1210,19 +1246,21 @@ class XChemExplorer(QtGui.QApplication):
             show_diffraction_image.loadFile(os.path.join(diffraction_image))
             self.albula_subframes.append(show_diffraction_image)
 
+        elif str(self.sender().text()).startswith("Run PANDDAs"):
+            XChemPANDDA.PANDDAs(self.initial_model_directory,self.panddas_directory).run_pandda_analyse()
 
-        elif self.data_source_set==False:
-            QtGui.QMessageBox.warning(self.window, "Data Source Problem",
+
+    def no_data_source_selected(self):
+        QtGui.QMessageBox.warning(self.window, "Data Source Problem",
                                       ('Please set or create a data source file\n')+
                                       ('Options:\n')+
                                       ('1. Use an existing file:\n')+
                                       ('- Settings -> Select Data Source File\n')+
-                                      ('- start XCE with command line argument (-d)\n')+
+#                                      ('- start XCE with command line argument (-d)\n')+
                                       ('2. Create a new file\n')+
                                       ('- Data Source -> Create New Data Source (SQLite)'),
                         QtGui.QMessageBox.Cancel, QtGui.QMessageBox.NoButton,
                         QtGui.QMessageBox.NoButton)
-
 
 
 
