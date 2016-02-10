@@ -1,0 +1,62 @@
+DONE - Data Source: capture ligand confidence and other Model table things
+- datasource2scarab script
+- settings: 2fofc & fofc sigma level; show EVENT maps (yes/no)
+- SQLite operational error: database is locked
+
+- DLS: submission of array jobs to cluster
+- reference mtz files with other column names: e.g. F-obs...
+
+- ligand pdb/png/cif files: ignore if already present
+
+- PANDDA models
+  -> Nick: script which extracts bound and unbound state
+  -> pdb file of bound is read in 
+  
+
+- mmtbx commandline tools for validation
+
+- PANDDA validation:
+   * fofc maps: before/ after ligand was modelled
+   * event maps
+   * B-factor distribution
+   * bound conformation
+   * 2fofc maps
+   * ligand model (before/ after refinement); did it move?
+   ==> bundle everything in a kind of pandda.validate script
+
+- reorganize XCE to better reflect actual workflow
+- put DLS @ data collection in one tab, then add subtabs for details and summary
+- read data processing module: make more generic:
+  (so that programmer can preconfigure)
+  * path to logfile
+  * path to merged mtzfile
+  * path to unmerged mtzfile
+  * path to cystal snapshots
+
+- 'create data source' button in settings tab
+- block everything as long as data source is not assigned (maybe some color coding)
+
+- deposition tab: one subtab to provide stuff like authors etc; can be saved in file
+
+- further columns in data source: 
+	Pandda was run: true/false
+	Pandda hit
+	Pandda hit near site of interest: true/ false
+
+- Run pandda when maps already exist, what's the best mechanism?
+
+- add at some point XChemScripts and XChemHelp libraries
+
+- DLS visit (09/02/2016)
+	- show texrank crystal images alongside diffraction images; maybe add additional tab
+	- single dls main tab (then 3 subtabs [see above])
+	- create datasource: doesn't work if pressed after other folders were selected; 
+	   probably because data source was set to true somewhere
+	- Alice: get sqlite file: crystals which are soaked but not mounted are displayed
+	         (that's OK, but how does XCE deal with it)
+	- Update reference folder is buggy, if it has already set something, it doesn't update the list; 
+	         check line877; essentially re-assigning other reference file does not work
+	- Select might be nice to have; with the possibility to update the datasource
+	- Sorting odd when xtal numbers are like x3 x45 etc
+	- create cif/pdb/png: Empty samples create compound folder in initial model folder when sample is empty
+	- Dataset summary not properly shown at dls; maybe datasource is not updated properly
