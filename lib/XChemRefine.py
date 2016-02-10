@@ -262,7 +262,7 @@ class Refine(object):
             os.system('chmod +x refmac.csh')
             os.system('./refmac.csh &')
 #            if '/work/' in os.getcwd():
-#                os.system('ssh artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(self.ProjectPath,self.xtalID,Serial))
+#            os.system('ssh artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(self.ProjectPath,self.xtalID,Serial))
 #            else:
 #                os.system('./refmac.csh &')
 
