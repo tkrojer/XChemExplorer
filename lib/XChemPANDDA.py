@@ -26,7 +26,7 @@ class PANDDAs(object):
             f = open('pandda.sh','w')
             f.write(Cmds)
             f.close()
-            os.system('chmod +x pandda.sh')
-            os.system('./pandda.sh &')
+#            os.system('chmod +x pandda.sh')
+#            os.system('./pandda.sh &')
 
 

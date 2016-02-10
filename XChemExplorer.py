@@ -23,6 +23,7 @@ from XChemUtils import helpers
 import XChemThread
 import XChemDB
 import XChemDialogs
+import XChemPANDDA
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
