@@ -34,10 +34,11 @@ class process:
 
 
     def get_Rfree(self):
+        Cmds=''
         if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.mtz_free)):
             if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.reference+'.mtz')):
                 Cmds = (
-                    '#!'+os.getenv('SHELL')+'\n'
+#                    '#!'+os.getenv('SHELL')+'\n'
                     '\n'
                     'cd %s/%s/Dimple\n' %(self.project_directory,self.xtalID) +
                     '\n'
@@ -61,7 +62,7 @@ class process:
                     )
             else:
                 Cmds = (
-                    '#!'+os.getenv('SHELL')+'\n'
+#                    '#!'+os.getenv('SHELL')+'\n'
                     '\n'
                     'cd %s/%s/Dimple\n' %(self.project_directory,self.xtalID) +
                     '\n'
@@ -77,16 +78,18 @@ class process:
                     '\n'
                     'uniqueify cad.mtz ../%s\n' %self.mtz_free
                     )
-            os.chdir(os.path.join(self.project_directory,self.xtalID))
-            os.system(Cmds)
-#            os.symlink(os.path.join('Dimple',self.xtalID+'.free.mtz'),self.xtalID+'.free.mtz')
+#            os.chdir(os.path.join(self.project_directory,self.xtalID))
+#            os.system(Cmds)
+##            os.symlink(os.path.join('Dimple',self.xtalID+'.free.mtz'),self.xtalID+'.free.mtz')
+            return Cmds
 
     def dimple(self):
         os.chdir('%s/%s' %(self.project_directory,self.xtalID))
+        generate_Rfree_Cmds=''
         if os.path.isdir('%s/%s/Dimple' %(self.project_directory,self.xtalID)):
             # this 'if not' step is usually not necessary; only if process was stopped in an odd way
             if not os.path.isfile(self.project_directory+'/'+self.xtalID+'/'+self.mtz_free):
-                self.get_Rfree()
+                generate_Rfree_Cmds=self.get_Rfree()
             if self.delete_old==True:
                 os.system('rm -fr Dimple')
                 os.mkdir('%s/%s/Dimple' %(self.project_directory,self.xtalID))
@@ -94,13 +97,13 @@ class process:
                 return None
         else:
             os.mkdir('%s/%s/Dimple' %(self.project_directory,self.xtalID))
-            self.get_Rfree()
+            generate_Rfree_Cmds=self.get_Rfree()
             os.chdir('%s/%s/Dimple' %(self.project_directory,self.xtalID))
 
         if self.queueing_system_available:
-            pbs_line='#PBS -joe -N dimple'
+            top_line='#PBS -joe -N XCE_dimple'
         else:
-            pbs_line=''
+            top_line='#!'+os.getenv('SHELL')
 
         if 'csh' in os.getenv('SHELL'):
             ccp4_scratch='setenv CCP4_SCR '+self.ccp4_scratch_directory+'\n'
@@ -121,8 +124,8 @@ class process:
             ref_lib=''
 
         Cmds = (
-                '#!'+os.getenv('SHELL')+'\n'
-                '%s\n' %pbs_line+
+                '%s\n' %top_line+
+                generate_Rfree_Cmds+
                 '\n'
                 'cd %s/%s/Dimple\n' %(self.project_directory,self.xtalID) +
                 '\n'
@@ -142,7 +145,15 @@ class process:
                 'EOF\n'
                 '\n'
                 'fft hklin refine.mtz mapout fofc.map << EOF\n'
-                ' labin F1=FOFCWT PHI=PH2FOFCWT\n'
+                ' labin F1=FOFCWT PHI=PHFOFCWT\n'
+                'EOF\n'
+                '\n'
+                'fft hklin refine.mtz mapout 2fofc.map << EOF\n'
+                ' labin F1=FWT PHI=PHWT\n'
+                'EOF\n'
+                '\n'
+                'fft hklin refine.mtz mapout fofc.map << EOF\n'
+                ' labin F1=DELFWT PHI=PHDELWT\n'
                 'EOF\n'
                 '\n'
                 '/bin/rm dimple_run_in_progress\n'
@@ -192,20 +203,25 @@ class helpers:
 
         os.chdir(os.path.join(initial_model_directory,sample,'compound'))
 
-        mol = Chem.MolFromSmiles(smiles)
-        AllChem.Compute2DCoords(mol)
-        # Draw to a file
-        Draw.MolToFile(mol, "%s.png" %compoundID)
+        if not os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png')):
+            mol = Chem.MolFromSmiles(smiles)
+            AllChem.Compute2DCoords(mol)
+            # Draw to a file
+            Draw.MolToFile(mol, "%s.png" %compoundID)
 
-        os.system('acedrg -i "%s" -o %s' %(smiles,compoundID))
-#        os.system("grade '%s' -resname LIG -ocif %s.cif -opdb %s.pdb" %(smiles,compoundID,compoundID))
+        if not os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png')):
+            os.system('acedrg -i "%s" -o %s' %(smiles,compoundID))
+#            os.system("grade '%s' -resname LIG -ocif %s.cif -opdb %s.pdb" %(smiles,compoundID,compoundID))
 
         os.chdir(os.path.join(initial_model_directory,sample))
-        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.pdb')):
+        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.pdb'))\
+                and not os.path.isfile(os.path.join(initial_model_directory,sample,compoundID+'.pdb')):
             os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.pdb'),compoundID+'.pdb')
-        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif')):
+        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif'))\
+                and not os.path.isfile(os.path.join(initial_model_directory,sample,compoundID+'.cif')):
             os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif'),compoundID+'.cif')
-        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png')):
+        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png'))\
+                and not os.path.isfile(os.path.join(initial_model_directory,sample,compoundID+'.png')):
             os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png'),compoundID+'.png')
 
 

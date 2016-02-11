@@ -4,11 +4,11 @@ import getopt
 # commited on: 18/01/2016
 
 # diffraction image viewing only possible at DLS
-#sys.path.append('/dls_sw/apps/albula/3.1/dectris/albula/3.1/python')
-#try:
-#    import dectris.albula
-#except ImportError:
-#    pass
+sys.path.append('/dls_sw/apps/albula/3.1/dectris/albula/3.1/python')
+try:
+    import dectris.albula
+except ImportError:
+    pass
 
 from PyQt4 import QtGui, QtCore, QtWebKit
 
@@ -258,9 +258,7 @@ class XChemExplorer(QtGui.QApplication):
         # Data Source Tab
         self.data_source_columns_to_display=[   'Sample ID',
                                                 'Compound ID',
-                                                'Smiles',
-                                                'Compound Name',
-                                                'Tag'           ]
+                                                'Smiles'           ]
         self.mounted_crystal_table=QtGui.QTableWidget()
         self.mounted_crystal_table.setSortingEnabled(True)
 #        self.mounted_crystal_table.setColumnWidth(0,250)
@@ -844,6 +842,7 @@ class XChemExplorer(QtGui.QApplication):
             reference_directory_temp=pickled_settings['reference_directory']
             if reference_directory_temp != self.reference_directory:
                 self.reference_directory=reference_directory_temp
+                self.settings['reference_directory']=self.reference_directory
                 self.update_reference_files(' ')
 
 #            self.project_directory_label.setText(self.project_directory)
@@ -871,11 +870,14 @@ class XChemExplorer(QtGui.QApplication):
         self.populate_reference_combobox(self.reference_file_selection_combobox)
         if self.initial_model_dimple_dict != {}:
             self.explorer_active=1
+            update_datasource_only=False
             self.work_thread=XChemThread.read_intial_refinement_results(self.initial_model_directory,
                                                                         self.reference_file_list,
                                                                         os.path.join(self.database_directory,
                                                                                      self.data_source_file),
-                                                                        self.allowed_unitcell_difference_percent)
+                                                                        self.allowed_unitcell_difference_percent,
+                                                                        self.filename_root,
+                                                                        update_datasource_only  )
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
@@ -1183,15 +1185,17 @@ class XChemExplorer(QtGui.QApplication):
 
         elif self.sender().text()=="Select Columns":
             print 'hallo'
-#                date.date(), date.time(), result = XChemDialogs.select_columns_to_show(os.path.join(self.database_directory,self.data_source_file),
-#                                                            self.data_source_columns_to_display).show_columns()
-            print os.path.join(self.database_directory,self.data_source_file)
-            date, time, result = XChemDialogs.select_columns_to_show([os.path.join(self.database_directory,self.data_source_file),
-                                                                     self.data_source_columns_to_display]).show_columns()
-            print date, time, result
-                # QDialog is the kind of widget that will help here, but for now I park this
-#                self.dialogTextBrowser = XChemDialogs.select_data_source_columns()
-#                self.dialogTextBrowser.exec_()
+#            input_params = [os.path.join(self.database_directory,self.data_source_file),self.data_source_columns_to_display]
+#            self.data_source_columns_to_display, ok = XChemDialogs.select_columns_to_show(input_params).return_selected_columns()
+            self.data_source_columns_to_display, ok = XChemDialogs.select_columns_to_show(
+                os.path.join(self.database_directory,self.data_source_file)).return_selected_columns()
+            content=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
+            header=content[0]
+            data=content[1]
+            self.populate_data_source_table(header,data)
+
+#            date, time, ok = XChemDialogs.DateDialog.getDateTime()
+#            print 'WERE HERE',str(date),str(time),str(ok)
 
         elif self.sender().text()=="Create PDB/CIF/PNG files of Compound":
             if helpers().pil_rdkit_exist()==False:
@@ -1806,6 +1810,7 @@ class XChemExplorer(QtGui.QApplication):
                     self.data_collection_summary_table.setItem(row, column, cell_text)
 
     def populate_data_source_table(self,header,data):
+        self.mounted_crystal_table.setColumnCount(0)
         self.mounted_crystal_table.setColumnCount(len(self.data_source_columns_to_display))
         self.mounted_crystal_table.setRowCount(0)
         self.mounted_crystal_table.setRowCount(len(data))

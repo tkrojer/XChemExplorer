@@ -202,10 +202,15 @@ class run_dimple_on_selected_samples(QtCore.QThread):
         self.ccp4_scratch_directory=ccp4_scratch
         self.filename_root=filename_root
 
-
     def run(self):
+        todo=0
         if len(self.initial_model_dimple_dict) != 0:
-            progress_step=100/float(len(self.initial_model_dimple_dict))
+#            progress_step=100/float(len(self.initial_model_dimple_dict))
+            for sample in sorted(self.initial_model_dimple_dict):
+                if self.initial_model_dimple_dict[sample][0].isChecked(): todo+=1
+            if todo==0:
+                todo=1
+            progress_step=100/float(todo)
         progress=0
 
         for sample in sorted(self.initial_model_dimple_dict):

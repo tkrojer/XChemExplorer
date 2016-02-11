@@ -11,7 +11,8 @@ DONE - Data Source: capture ligand confidence and other Model table things
 - PANDDA models
   -> Nick: script which extracts bound and unbound state
   -> pdb file of bound is read in 
-  
+
+- Dimple Phase column names changed from 2ffc to FWT…
 
 - mmtbx commandline tools for validation
 
@@ -54,9 +55,9 @@ DONE - Data Source: capture ligand confidence and other Model table things
 	   probably because data source was set to true somewhere
 	- Alice: get sqlite file: crystals which are soaked but not mounted are displayed
 	         (that's OK, but how does XCE deal with it)
-	- Update reference folder is buggy, if it has already set something, it doesn't update the list; 
+	DONE - Update reference folder is buggy, if it has already set something, it doesn't update the list; 
 	         check line877; essentially re-assigning other reference file does not work
-	- Select might be nice to have; with the possibility to update the datasource
+	DONEish- Select Columns might be nice to have; with the possibility to update the datasource
 	- Sorting odd when xtal numbers are like x3 x45 etc
 	- create cif/pdb/png: Empty samples create compound folder in initial model folder when sample is empty
 	- Dataset summary not properly shown at dls; maybe datasource is not updated properly

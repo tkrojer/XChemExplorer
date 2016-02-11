@@ -3,36 +3,40 @@ from PyQt4 import QtGui, QtCore
 
 import XChemDB
 
-
 class select_columns_to_show(QtGui.QDialog):
-    def __init__(self,tmp, parent = None):
+    def __init__(self, data_source_file,parent = None):
         super(select_columns_to_show, self).__init__(parent)
+        self.columns_in_data_source=XChemDB.data_source(data_source_file).return_column_list()
+
+#    def __init__(self, input_params,parent = None):
+#        super(select_columns_to_show, self).__init__(parent)
+#        self.columns_in_data_source=XChemDB.data_source(input_params[0]).return_column_list()
+#        self.active_columns=input_params[1]
+#        print self.active_columns
+
+
+
+
+        self.column_dict={}
 
         layout = QtGui.QVBoxLayout(self)
-
-        # nice widget for editing the date
-        self.datetime = QtGui.QDateTimeEdit(self)
-        self.datetime.setCalendarPopup(True)
-        self.datetime.setDateTime(QtCore.QDateTime.currentDateTime())
-        layout.addWidget(self.datetime)
-
-        print tmp
-        print len(tmp)
-
-
-        #self.data_source=tmp[0]
-        #self.active_columns=tmp[1]
-        #print self.data_source
-        #print self.active_columns
-#        db_columns=XChemDB.data_source(self.data_source).return_column_list()
-#        self.hallo='hallo'
-#        layout = QtGui.QVBoxLayout(self)
-#        for item in db_columns:
-#            if item[1] in self.active_columns:
-#                print 'present',item[1]
-#            else:
-#                print 'NOT present',item[1]
-#            cb = QtGui.QCheckBox(item[1], self)
+        number_of_entries=len(self.columns_in_data_source)
+        columns_shown_in_dialog_column=25
+        grid = QtGui.QGridLayout()
+        x=0
+        y=0
+        columns_to_ignore=['Sample ID','ID']
+        for entries_added in range(number_of_entries):
+            if not self.columns_in_data_source[entries_added][1] in columns_to_ignore:
+                data_source_column = QtGui.QCheckBox(self.columns_in_data_source[entries_added][1])
+                self.column_dict[entries_added]=data_source_column
+#            data_source_column.toggle()
+                grid.addWidget(data_source_column, y,x)
+                y+=1
+            if y==columns_shown_in_dialog_column:
+                y=0
+                x+=1
+        layout.addLayout(grid)
 
 
         # OK and Cancel buttons
@@ -43,53 +47,17 @@ class select_columns_to_show(QtGui.QDialog):
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
 
-    # get current date and time from the dialog
-    def dateTime(self):
-        return self.datetime.dateTime()
+    def data_source_column_active(self):
+        columns_to_show=['Sample ID']
+        for key in self.column_dict:
+            if self.column_dict[key].isChecked():
+                columns_to_show.append(self.columns_in_data_source[key][1])
+        return columns_to_show
 
     # static method to create the dialog and return (date, time, accepted)
     @staticmethod
-    def show_columns(parent = None):
+    def return_selected_columns(parent = None):
         dialog = select_columns_to_show(parent)
         result = dialog.exec_()
-        date = dialog.dateTime()
-        return (date.date(), date.time(), result == QtGui.QDialog.Accepted)
-
-
-
-
-
-# stuff below works in principle
-#class select_columns_to_show(QtGui.QDialog):
-#    def __init__(self, parent = None):
-#        super(select_columns_to_show, self).__init__(parent)
-#
-#        layout = QtGui.QVBoxLayout(self)
-#
-#        # nice widget for editing the date
-#        self.datetime = QtGui.QDateTimeEdit(self)
-#        self.datetime.setCalendarPopup(True)
-#        self.datetime.setDateTime(QtCore.QDateTime.currentDateTime())
-#        layout.addWidget(self.datetime)
-#
-#        # OK and Cancel buttons
-#        buttons = QtGui.QDialogButtonBox(
-#            QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel,
-#            QtCore.Qt.Horizontal, self)
-#        buttons.accepted.connect(self.accept)
-#        buttons.rejected.connect(self.reject)
-#        layout.addWidget(buttons)
-#
-#    # get current date and time from the dialog
-#    def dateTime(self):
-#        return self.datetime.dateTime()
-#
-#    # static method to create the dialog and return (date, time, accepted)
-#    @staticmethod
-#    def getDateTime(parent = None):
-#        dialog = select_columns_to_show(parent)
-#        result = dialog.exec_()
-#        date = dialog.dateTime()
-#        return (date.date(), date.time(), result == QtGui.QDialog.Accepted)
-
-
+        columns = dialog.data_source_column_active()
+        return (columns,result == QtGui.QDialog.Accepted)
