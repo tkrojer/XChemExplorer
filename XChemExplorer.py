@@ -7,7 +7,7 @@ import getopt
 sys.path.append('/dls_sw/apps/albula/3.1/dectris/albula/3.1/python')
 try:
     import dectris.albula
-except ImportError:
+except (ImportError,RuntimeError):
     pass
 
 from PyQt4 import QtGui, QtCore, QtWebKit
