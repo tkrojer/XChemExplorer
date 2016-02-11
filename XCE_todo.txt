@@ -12,6 +12,8 @@ DONE - Data Source: capture ligand confidence and other Model table things
   -> Nick: script which extracts bound and unbound state
   -> pdb file of bound is read in 
 
+- ALBULA problem at Dmd; Nick?
+
 - Dimple Phase column names changed from 2ffc to FWT…
 
 - mmtbx commandline tools for validation
