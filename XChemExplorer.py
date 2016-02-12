@@ -238,15 +238,15 @@ class XChemExplorer(QtGui.QApplication):
         ######################################################################################
         # Tab widget
         tab_widget = QtGui.QTabWidget()
-        tab_list = [    'Data Source',
+        tab_list = [    'Settings',
+                        'Data Source',
                         'Overview',
                         'DLS @ Data Collection',
                         'DLS @ Summary',
                         'Initial Model',
                         'PANDDAs',
                         'Summary & Refine',
-                        'Crystal Form',
-                        'Settings'  ]
+                        'Crystal Form'  ]
         self.tab_dict={}
         for page in tab_list:
             tab=QtGui.QWidget()
@@ -409,9 +409,9 @@ class XChemExplorer(QtGui.QApplication):
         set_new_reference_button=QtGui.QPushButton("Set New Reference (if applicable)")
         set_new_reference_button.clicked.connect(self.button_clicked)
         initial_model_button_hbox.addWidget(set_new_reference_button)
-        run_panddas_button=QtGui.QPushButton("Run PANDDAs")
-        run_panddas_button.clicked.connect(self.button_clicked)
-        initial_model_button_hbox.addWidget(run_panddas_button)
+#        run_panddas_button=QtGui.QPushButton("Run PANDDAs")
+#        run_panddas_button.clicked.connect(self.button_clicked)
+#        initial_model_button_hbox.addWidget(run_panddas_button)
         self.tab_dict['Initial Model'][1].addLayout(initial_model_button_hbox)
 
         ######################################################################################
@@ -470,7 +470,8 @@ class XChemExplorer(QtGui.QApplication):
 
 
         pandda_tab_widget = QtGui.QTabWidget()
-        pandda_tab_list = [ 'Dataset Summary',
+        pandda_tab_list = [ 'pandda.analyse',
+                            'Dataset Summary',
                             'Results Summary',
                             'Inspect Summary'  ]
         self.pandda_tab_dict={}
@@ -480,6 +481,50 @@ class XChemExplorer(QtGui.QApplication):
             pandda_tab_widget.addTab(tab,page)
             self.pandda_tab_dict[page]=[tab,vbox]
 
+        self.pandda_analyse_hbox=QtGui.QHBoxLayout()
+        self.pandda_tab_dict['pandda.analyse'][1].addLayout(self.pandda_analyse_hbox)
+        # left hand side: table with information about available datasets
+        self.pandda_analyse_data_table=QtGui.QTableWidget()
+        self.pandda_analyse_data_table.setSortingEnabled(True)
+        self.pandda_analyse_data_table.resizeColumnsToContents()
+        self.pandda_analyse_hbox.addWidget(self.pandda_analyse_data_table)
+        # right hand side: input parameters for PANDDAs run
+        self.pandda_analyse_input_params_vbox=QtGui.QVBoxLayout()
+
+        self.pandda_input_data_dir_label=QtGui.QLabel('data directory')
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_input_data_dir_label)
+        self.pandda_input_data_dir_entry = QtGui.QLineEdit()
+        self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory,'*','Dimple','dimple'))
+        self.pandda_input_data_dir_entry.setFixedWidth(400)
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_input_data_dir_entry)
+
+        self.pandda_output_dir_label=QtGui.QLabel('output directory')
+        self.pandda_output_data_dir_entry = QtGui.QLineEdit()
+        self.pandda_output_data_dir_entry.setText(self.panddas_directory)
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_output_dir_label)
+
+        self.pandda_submission_mode_label=QtGui.QLabel('submit')
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_submission_mode_label)
+        # qstat or local machine
+
+        self.pandda_nproc_label=QtGui.QLabel('number of processors')
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_nproc_label)
+
+        self.pandda_analyse_input_params_vbox.addStretch(10)
+
+
+        # green 'Run Pandda' button (which is red when pandda run in progress
+        self.run_panddas_button=QtGui.QPushButton("Run PANDDAs")
+        self.run_panddas_button.clicked.connect(self.button_clicked)
+        self.run_panddas_button.setFixedWidth(200)
+        self.run_panddas_button.setFixedHeight(100)
+        self.color_run_panddas_button()
+        self.pandda_analyse_input_params_vbox.addWidget(self.run_panddas_button)
+
+        self.pandda_analyse_hbox.addLayout(self.pandda_analyse_input_params_vbox)
+
+        #######################################################
+        # next three blocks display html documents created by pandda.analyse
         self.pandda_initial_html = QtWebKit.QWebView()
         self.pandda_tab_dict['Dataset Summary'][1].addWidget(self.pandda_initial_html)
         self.pandda_initial_html.load(QtCore.QUrl(self.pandda_initial_html_file))
@@ -682,6 +727,12 @@ class XChemExplorer(QtGui.QApplication):
 #        self.timer = QtCore.QBasicTimer()
         self.window.showMaximized()
 #        self.window.show()
+
+    def color_run_panddas_button(self):
+        if os.path.isfile(os.path.join(self.panddas_directory,'PANDDA_RUN_IN_PROGRESS')):
+            self.run_panddas_button.setStyleSheet("background-color: red")
+        else:
+            self.run_panddas_button.setStyleSheet("background-color: green")
 
     def update_overview(self):
         if os.path.isfile(self.settings['data_source']):

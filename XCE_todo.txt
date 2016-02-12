@@ -1,4 +1,4 @@
-DONE - Data Source: capture ligand confidence and other Model table things
+﻿DONE - Data Source: capture ligand confidence and other Model table things
 - datasource2scarab script
 - settings: 2fofc & fofc sigma level; show EVENT maps (yes/no)
 - SQLite operational error: database is locked
