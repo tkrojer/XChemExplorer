@@ -795,8 +795,6 @@ class temp_read_autoprocessing_results_from_disc(QtCore.QThread):
         # - convert to string and use in data dict
         # - but images can only be found of XCE is started in the respective labchem directory
 
-        self.data_collection_dict=[]
-
     def run(self):
 
         number_of_visits_to_search=len(self.visit_list)
