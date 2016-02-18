@@ -61,7 +61,7 @@ class data_source:
             ['CompoundName',                         'Compound Name',                           'TEXT'],
             ['CrystalTag',                           'Tag',                                     'TEXT'],
 #            ['CrystalForm',                          'Crystal\nForm',                           'TEXT'],
-            ['CrystalFormName',                      'Name',                         'TEXT'],
+            ['CrystalFormName',                      'Crystal Form\nName',                         'TEXT'],
             ['CrystalFormSpaceGroup',                'Space\nGroup',                   'TEXT'],
             ['CrystalFormPointGroup',                'Point\nGroup',                   'TEXT'],
             ['CrystalFormA',                         'a',                            'TEXT'],
@@ -117,6 +117,12 @@ class data_source:
             ['DataProcessingAlert',                  'DataProcessingAlert',                     'TEXT'],
 
 #            ['PANDDAstuff',                          'PANDDAstuff',                             'TEXT'],
+            ['DimpleResolutionHigh',                 'Dimple\nResolution High',                 'TEXT'],
+            ['DimpleRcryst',                        'Dimple\nRcryst',                 'TEXT'],
+            ['DimpleRfree',                         'Dimple\nRfree',                 'TEXT'],
+            ['DimplePathToPDB',                         'Dimple\nPath to PDB file',                 'TEXT'],
+            ['DimplePathToMTZ',                         'Dimple\nPath to MTZ file',                 'TEXT'],
+
             ['PANDDApath',                           'PANDDApath',                             'TEXT'],
 
             ['RefinementRcryst',                     'Refinement\nRcryst',                        'TEXT'],

@@ -198,6 +198,19 @@ class helpers:
 
         if not os.path.isdir(os.path.join(initial_model_directory,sample)):
             os.mkdir(os.path.join(initial_model_directory,sample))
+
+        # remove symbolic links if present
+        if os.path.isfile(os.path.join(initial_model_directory,sample,compoundID+'.pdb')):
+            os.system('/bin/rm '+os.path.join(initial_model_directory,sample,compoundID+'.pdb'))
+        if os.path.isfile(os.path.join(initial_model_directory,sample,compoundID+'.cif')):
+            os.system('/bin/rm '+os.path.join(initial_model_directory,sample,compoundID+'.cif'))
+        if os.path.isfile(os.path.join(initial_model_directory,sample,compoundID+'.png')):
+            os.system('/bin/rm '+os.path.join(initial_model_directory,sample,compoundID+'.png'))
+
+        # remove compound directory if present
+        if os.path.isdir(os.path.join(initial_model_directory,sample,'compound')):
+            os.system('/bin/rm -fr '+os.path.join(initial_model_directory,sample,'compound'))
+
         if not os.path.isdir(os.path.join(initial_model_directory,sample,'compound')):
             os.mkdir(os.path.join(initial_model_directory,sample,'compound'))
 
@@ -209,9 +222,9 @@ class helpers:
             # Draw to a file
             Draw.MolToFile(mol, "%s.png" %compoundID)
 
-        if not os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png')):
-            os.system('acedrg -i "%s" -o %s' %(smiles,compoundID))
-#            os.system("grade '%s' -resname LIG -ocif %s.cif -opdb %s.pdb" %(smiles,compoundID,compoundID))
+        if not os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif')):
+#            os.system('acedrg -i "%s" -o %s' %(smiles,compoundID))
+            os.system("grade '%s' -resname LIG -ocif %s.cif -opdb %s.pdb" %(smiles,compoundID,compoundID))
 
         os.chdir(os.path.join(initial_model_directory,sample))
         if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.pdb'))\

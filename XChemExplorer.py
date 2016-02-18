@@ -15,6 +15,7 @@ from PyQt4 import QtGui, QtCore, QtWebKit
 import pickle
 import base64
 import math
+import multiprocessing
 
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 from XChemUtils import parse
@@ -214,7 +215,7 @@ class XChemExplorer(QtGui.QApplication):
 #        self.window.setGeometry(0,0, 1800,1100)
         self.window.setWindowTitle("XChemExplorer")
 #        self.center_main_window()
-        
+
         # Menu Widget
         load=QtGui.QAction("Open Config File", self.window)
         load.setShortcut('Ctrl+O')
@@ -230,11 +231,11 @@ class XChemExplorer(QtGui.QApplication):
         file = menu_bar.addMenu("&File")
 #        settings = menu_bar.addMenu("&Settings")
         help = menu_bar.addMenu("&Help")
-        
+
         file.addAction(load)
         file.addAction(save)
         file.addAction(quit)
-        
+
         ######################################################################################
         # Tab widget
         tab_widget = QtGui.QTabWidget()
@@ -484,9 +485,15 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_hbox=QtGui.QHBoxLayout()
         self.pandda_tab_dict['pandda.analyse'][1].addLayout(self.pandda_analyse_hbox)
         # left hand side: table with information about available datasets
+        self.pandda_column_name = [ 'Sample ID',
+                                    'Crystal Form\nName',
+                                    'Dimple\nResolution High',
+                                    'Dimple\nRcryst',
+                                    'Dimple\nRfree' ]
         self.pandda_analyse_data_table=QtGui.QTableWidget()
         self.pandda_analyse_data_table.setSortingEnabled(True)
         self.pandda_analyse_data_table.resizeColumnsToContents()
+        self.populate_pandda_analyse_input_table('use all datasets')
         self.pandda_analyse_hbox.addWidget(self.pandda_analyse_data_table)
         # right hand side: input parameters for PANDDAs run
         self.pandda_analyse_input_params_vbox=QtGui.QVBoxLayout()
@@ -499,16 +506,41 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_input_data_dir_entry)
 
         self.pandda_output_dir_label=QtGui.QLabel('output directory')
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_output_dir_label)
         self.pandda_output_data_dir_entry = QtGui.QLineEdit()
         self.pandda_output_data_dir_entry.setText(self.panddas_directory)
-        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_output_dir_label)
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_output_data_dir_entry)
 
+        # qstat or local machine
         self.pandda_submission_mode_label=QtGui.QLabel('submit')
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_submission_mode_label)
-        # qstat or local machine
+        self.pandda_submission_mode_selection_combobox = QtGui.QComboBox()
+        self.pandda_submission_mode_selection_combobox.addItem('local machine')
+        if self.external_software['qsub']:
+            self.pandda_submission_mode_selection_combobox.addItem('qsub')
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_submission_mode_selection_combobox)
 
         self.pandda_nproc_label=QtGui.QLabel('number of processors')
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_nproc_label)
+        self.pandda_nproc=multiprocessing.cpu_count()
+        self.pandda_nproc_entry = QtGui.QLineEdit()
+        self.pandda_nproc_entry.setText(str(self.pandda_nproc).replace(' ',''))
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_nproc_entry)
+
+        # run pandda on specific crystalform only
+        self.pandda_analyse_crystal_from_label=QtGui.QLabel('Use Specific Crystal Form Only')
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_analyse_crystal_from_label)
+        self.pandda_analyse_crystal_from_selection_combobox = QtGui.QComboBox()
+        self.pandda_analyse_crystal_from_selection_combobox.currentIndexChanged.connect(self.pandda_analyse_crystal_from_selection_combobox_changed)
+        self.update_pandda_crystal_from_combobox()
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_analyse_crystal_from_selection_combobox)
+#        self.pandda_analyse_crystal_from_selection_combobox.addItem('use all datasets')
+#        if os.path.isfile(os.path.join(self.database_directory,self.data_source_file)):
+#            self.load_crystal_form_from_datasource()
+#            if self.xtalform_dict != {}:
+#                for key in self.xtalform_dict:
+#                    self.pandda_analyse_crystal_from_selection_combobox.addItem(key)
+#        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_analyse_crystal_from_selection_combobox)
 
         self.pandda_analyse_input_params_vbox.addStretch(10)
 
@@ -564,7 +596,7 @@ class XChemExplorer(QtGui.QApplication):
         # Crystal Form Tab
         self.vbox_for_crystal_form_table=QtGui.QVBoxLayout()
 #        self.vbox_for_crystal_form_table.addStretch(1)
-        self.crystal_form_column_name=[ 'Name',
+        self.crystal_form_column_name=[ 'Crystal Form\nName',
                                         'Space\nGroup',
                                         'Point\nGroup',
                                         'a',
@@ -672,7 +704,7 @@ class XChemExplorer(QtGui.QApplication):
         settings_buttoon_data_source_file.clicked.connect(self.settings_button_clicked)
         settings_hbox_data_source_file.addWidget(settings_buttoon_data_source_file)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_data_source_file)
-        
+
         self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nBeamline Directory:'))
         settings_hbox_beamline_directory=QtGui.QHBoxLayout()
         self.beamline_directory_label=QtGui.QLabel(self.beamline_directory)
@@ -841,6 +873,14 @@ class XChemExplorer(QtGui.QApplication):
 #            ax.set_ylabel("Frequency")
         self.overview_canvas.draw()
 
+    def update_pandda_crystal_from_combobox(self):
+        self.pandda_analyse_crystal_from_selection_combobox.clear()
+        self.pandda_analyse_crystal_from_selection_combobox.addItem('use all datasets')
+        if os.path.isfile(os.path.join(self.database_directory,self.data_source_file)):
+            self.load_crystal_form_from_datasource()
+            if self.xtalform_dict != {}:
+                for key in self.xtalform_dict:
+                    self.pandda_analyse_crystal_from_selection_combobox.addItem(key)
 
 
     def populate_reference_combobox(self,combobox):
@@ -1102,39 +1142,14 @@ class XChemExplorer(QtGui.QApplication):
                 print key, self.initial_model_dimple_dict[key]
 
         elif self.sender().text()=="Load Crystal Forms From Datasource":
-            columns = ( 'CrystalFormName,'
-                        'CrystalFormPointGroup,'
-                        'CrystalFormVolume,'
-                        'CrystalFormA,'
-                        'CrystalFormB,'
-                        'CrystalFormC,'
-                        'CrystalFormAlpha,'
-                        'CrystalFormBeta,'
-                        'CrystalFormGamma,'
-                        'CrystalFormSpaceGroup' )
-            self.xtalform_dict={}
-            all_xtalforms=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).execute_statement("SELECT "+columns+" FROM mainTable;")
-            for item in all_xtalforms:
-                name=item[0]
-                pg=item[1]
-                vol=item[2]
-                a=item[3]
-                b=item[4]
-                c=item[5]
-                alpha=item[6]
-                beta=item[7]
-                gamma=item[8]
-                spg=item[9]
-                add_crystalform=True
-                for xf in self.xtalform_dict:
-                    if self.xtalform_dict[xf][0]==pg:      # same pointgroup as reference
-                        unitcell_difference=round((math.fabs(float(vol)-float(self.xtalform_dict[xf][1]))/float(vol))*100,1)
-                        if unitcell_difference < self.allowed_unitcell_difference_percent:      # suggest new crystal form
-                            add_crystalform=False
-                            break
-                if add_crystalform:
-                    self.xtalform_dict[name]=[pg,vol,[a,b,c,alpha,beta,gamma],spg]
+            self.load_crystal_form_from_datasource()
+            self.pandda_analyse_crystal_from_selection_combobox.clear()
+            self.pandda_analyse_crystal_from_selection_combobox.addItem('all datasets')
+            if self.xtalform_dict != {}:
+                for key in self.xtalform_dict:
+                    self.pandda_analyse_crystal_from_selection_combobox.addItem(key)
             self.update_xtalfrom_table(self.xtalform_dict)
+            self.update_pandda_crystal_from_combobox()
 
         elif self.sender().text()=="Suggest Additional Crystal Forms" or \
              self.sender().text()=="Assign Crystal Forms To Samples":
@@ -1143,6 +1158,7 @@ class XChemExplorer(QtGui.QApplication):
                 mode='suggest'
             if self.sender().text()=="Assign Crystal Forms To Samples":
                 mode='assign'
+                print self.xtalform_dict
             self.work_thread=XChemThread.crystal_from(self.initial_model_directory,
                                                                         self.reference_file_list,
                                                                         os.path.join(self.database_directory,
@@ -1303,7 +1319,52 @@ class XChemExplorer(QtGui.QApplication):
             self.albula_subframes.append(show_diffraction_image)
 
         elif str(self.sender().text()).startswith("Run PANDDAs"):
-            XChemPANDDA.PANDDAs(self.initial_model_directory,self.panddas_directory).run_pandda_analyse()
+
+            self.populate_pandda_analyse_input_table('222_1')
+            #XChemPANDDA.PANDDAs(self.initial_model_directory,self.panddas_directory).run_pandda_analyse()
+
+    def load_crystal_form_from_datasource(self):
+        columns = ( 'CrystalFormName,'
+                    'CrystalFormPointGroup,'
+                    'CrystalFormVolume,'
+                    'CrystalFormA,'
+                    'CrystalFormB,'
+                    'CrystalFormC,'
+                    'CrystalFormAlpha,'
+                    'CrystalFormBeta,'
+                    'CrystalFormGamma,'
+                    'CrystalFormSpaceGroup' )
+        self.xtalform_dict={}
+        all_xtalforms=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).execute_statement("SELECT "+columns+" FROM mainTable;")
+        for item in all_xtalforms:
+            name=item[0]
+            pg=item[1]
+            vol=item[2]
+            a=item[3]
+            b=item[4]
+            c=item[5]
+            alpha=item[6]
+            beta=item[7]
+            gamma=item[8]
+            spg=item[9]
+            add_crystalform=True
+            for xf in self.xtalform_dict:
+                if self.xtalform_dict[xf][0]==pg:      # same pointgroup as reference
+                    try:
+                        unitcell_difference=round((math.fabs(float(vol)-float(self.xtalform_dict[xf][1]))/float(vol))*100,1)
+                    except (ValueError,TypeError):
+                        unitcell_difference=100
+                    if unitcell_difference < self.allowed_unitcell_difference_percent:      # suggest new crystal form
+                        add_crystalform=False
+                        break
+            if add_crystalform:
+                if str(name)=='None':
+                    pass
+                elif str(name)=='':
+                    pass
+                else:
+                    self.xtalform_dict[name]=[pg,vol,[a,b,c,alpha,beta,gamma],spg]
+
 
 
     def no_data_source_selected(self):
@@ -1616,6 +1677,10 @@ class XChemExplorer(QtGui.QApplication):
         self.initial_model_table.resizeColumnsToContents()
         self.initial_model_table.setHorizontalHeaderLabels(self.initial_model_column_name)
 
+    def pandda_analyse_crystal_from_selection_combobox_changed(self,i):
+        crystal_form = self.pandda_analyse_crystal_from_selection_combobox.currentText()
+        self.populate_pandda_analyse_input_table(crystal_form)
+
 
     def get_reference_file_list(self,reference_root):
         # check available reference files
@@ -1923,6 +1988,66 @@ class XChemExplorer(QtGui.QApplication):
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.summary_table.setItem(x, y, cell_text)
         self.summary_table.setHorizontalHeaderLabels(self.summary_column_name)
+
+
+    def populate_pandda_analyse_input_table(self,crystal_form):
+        # load samples from datasource
+        # show:
+        # - sample ID
+        # - crystal form name
+        # - Dimple: resolution
+        # - Dimple: Rcryst
+        # - Dimple: Rfree
+        #self.pandda_analyse_data_table
+        self.pandda_analyse_data_table.setColumnCount(len(self.pandda_column_name))
+        self.pandda_analyse_data_table.setRowCount(0)
+        if os.path.isfile(os.path.join(self.database_directory,self.data_source_file)):
+            content=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
+            header=content[0]
+            data=content[1]
+            columns_to_show=[]
+            for column in self.pandda_column_name:
+                for n,all_column in enumerate(self.all_columns_in_data_source):
+                    if column==all_column[1]:
+                        columns_to_show.append(n)
+                        break
+
+            # determine number of rows
+            n_rows=0
+            for x,row in enumerate(data):
+                for y,item in enumerate(columns_to_show):
+                    if y==1:
+                        if crystal_form=='use all datasets':
+                            n_rows+=1
+                        elif str(row[item]) == crystal_form:
+                            n_rows+=1
+            self.pandda_analyse_data_table.setRowCount(n_rows)
+
+            x=0
+            for row in data:
+                sample_id_exists=False
+                crystal_from_of_interest=False
+                # first run through every line and check if conditions above are fulfilled
+                for y,item in enumerate(columns_to_show):
+                    # y=0 is sample ID
+                    if y==0:
+                        print str(row[item])
+                        if str(row[item]) != 'None' or str(row[item]).replace(' ','') != '':
+                            sample_id_exists=True
+                    if y==1:
+                        if crystal_form=='use all datasets':
+                            crystal_from_of_interest=True
+                        elif str(row[item]) == crystal_form:
+                            crystal_from_of_interest=True
+                if sample_id_exists and crystal_from_of_interest:
+                    for y,item in enumerate(columns_to_show):
+                            print item
+                            cell_text=QtGui.QTableWidgetItem()
+                            cell_text.setText(str(row[item]))
+                            cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                            self.pandda_analyse_data_table.setItem(x, y, cell_text)
+                    x+=1
+        self.pandda_analyse_data_table.setHorizontalHeaderLabels(self.pandda_column_name)
 
 
 

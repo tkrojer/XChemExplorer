@@ -104,12 +104,22 @@ class crystal_from(QtCore.QThread):
                 add_crystalform=True
                 for xf in self.xtalform_dict:
                     if self.xtalform_dict[xf][0]==pg:      # same pointgroup as reference
-                        unitcell_difference=round((math.fabs(float(vol)-float(self.xtalform_dict[xf][1]))/float(vol))*100,1)
+                        try:
+                            unitcell_difference=round((math.fabs(float(vol)-float(self.xtalform_dict[xf][1]))/float(vol))*100,1)
+                        except (ValueError,TypeError):
+                            unitcell_difference=100
                         if unitcell_difference < self.allowed_unitcell_difference_percent:      # suggest new crystal form
                             add_crystalform=False
                             break
                 if add_crystalform:
-                    self.xtalform_dict[name]=[pg,vol,[a,b,c,alpha,beta,gamma],spg]
+                    if str(name)=='None':
+                        pass
+                    elif str(name)=='':
+                        pass
+                    else:
+                        self.xtalform_dict[name]=[pg,vol,[a,b,c,alpha,beta,gamma],spg]
+#                    if not str(name)=='None' or not name=='':
+#                        self.xtalform_dict[name]=[pg,vol,[a,b,c,alpha,beta,gamma],spg]
 
 
         # 3. parse inital_model directory
@@ -350,6 +360,19 @@ class read_intial_refinement_results(QtCore.QThread):
                 # actual values will only be updated if not present;
                 db.update_insert_not_null_fields_only(sample,db_dict)
 
+            # update Dimple stuff (useful for PANDDAs)
+            db_dict={}
+            if os.path.isfile(os.path.join(self.initial_model_directory,sample,'Dimple','dimple','final.pdb')):
+                db_dict['DimplePathToPDB']=os.path.join(self.initial_model_directory,sample,'Dimple','dimple','final.pdb')
+                pdb=parse().PDBheader(os.path.join(self.initial_model_directory,sample,'refine.pdb'))
+                db_dict['DimpleRcryst']=pdb['Rcryst']
+                db_dict['DimpleRfree']=pdb['Rfree']
+                db_dict['DimpleResolutionHigh']=pdb['ResolutionHigh']
+            if os.path.isfile(os.path.join(self.initial_model_directory,sample,'Dimple','dimple','final.mtz')):
+                db_dict['DimplePathToMTZ']=os.path.join(self.initial_model_directory,sample,'Dimple','dimple','final.mtz')
+            if db_dict != {}:
+                print db_dict
+                db.update_insert_not_null_fields_only(sample,db_dict)
 
             # update data source only if field is null
             db_dict={   'RefinementOutcome':            outcome,

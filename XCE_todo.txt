@@ -50,6 +50,8 @@
 
 - add at some point XChemScripts and XChemHelp libraries
 
+DONE - 'Update Datasource': overwrites fields with empty entry: e.g. in case logfiles are in one directory, but only subset of all samples was refined in another directory
+
 - DLS visit (09/02/2016)
 	- show texrank crystal images alongside diffraction images; maybe add additional tab
 	- single dls main tab (then 3 subtabs [see above])
@@ -63,3 +65,5 @@
 	- Sorting odd when xtal numbers are like x3 x45 etc
 	- create cif/pdb/png: Empty samples create compound folder in initial model folder when sample is empty
 	- Dataset summary not properly shown at dls; maybe datasource is not updated properly
+
+- detect misaligned crystals: add analyse menu to XCE; try detecting my calculating standard deviation of Rmerge per frame from mean Rmerge?!
