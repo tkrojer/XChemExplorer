@@ -268,28 +268,28 @@ class XChemExplorer(QtGui.QApplication):
         self.tab_dict['Data Source'][1].addLayout(self.mounted_crystals_vbox_for_table)
         self.mounted_crystals_vbox_for_table.addWidget(self.mounted_crystal_table)
         mounted_crystals_button_hbox=QtGui.QHBoxLayout()
-        get_mounted_crystals_button=QtGui.QPushButton("Load Samples From Datasource")
+        get_mounted_crystals_button=QtGui.QPushButton("Load Samples\nFrom Datasource")
         get_mounted_crystals_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(get_mounted_crystals_button)
-        save_mounted_crystals_button=QtGui.QPushButton("Save Samples To Datasource")
+        save_mounted_crystals_button=QtGui.QPushButton("Save Samples\nTo Datasource")
         save_mounted_crystals_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(save_mounted_crystals_button)
-        create_png_of_soaked_compound_button=QtGui.QPushButton("Create PDB/CIF/PNG files of Compound")
+        create_png_of_soaked_compound_button=QtGui.QPushButton("Create PDB/CIF/PNG\nfiles of Compound")
         create_png_of_soaked_compound_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(create_png_of_soaked_compound_button)
-        create_new_data_source_button=QtGui.QPushButton("Create New Data Source (SQLite)")
+        create_new_data_source_button=QtGui.QPushButton("Create New Data\nSource (SQLite)")
         create_new_data_source_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(create_new_data_source_button)
-        import_csv_into_data_source_button=QtGui.QPushButton("Import CSV file into Data Source")
+        import_csv_into_data_source_button=QtGui.QPushButton("Import CSV file\ninto Data Source")
         import_csv_into_data_source_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(import_csv_into_data_source_button)
-        export_csv_from_data_source_button=QtGui.QPushButton("Export CSV file from Data Source")
+        export_csv_from_data_source_button=QtGui.QPushButton("Export CSV file\nfrom Data Source")
         export_csv_from_data_source_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(export_csv_from_data_source_button)
         select_data_source_columns_to_display_button=QtGui.QPushButton("Select Columns")
         select_data_source_columns_to_display_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(select_data_source_columns_to_display_button)
-        update_data_source_button=QtGui.QPushButton("Update Datasource")
+        update_data_source_button=QtGui.QPushButton("Update\nDatasource")
         update_data_source_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(update_data_source_button)
         self.tab_dict['Data Source'][1].addLayout(mounted_crystals_button_hbox)
@@ -459,12 +459,6 @@ class XChemExplorer(QtGui.QApplication):
 
         ######################################################################################
         # PANDDAs Tab
-#        self.pandda_initial_html_file='/work/JARID1BA/12-JARID1BA-3d-fragment-soaking/pandda/results_summaries/pandda_initial.html'
-#        self.pandda_analyse_html_file='/work/JARID1BA/12-JARID1BA-3d-fragment-soaking/pandda/results_summaries/pandda_analyse.html'
-#        self.pandda_inspect_html_file='/work/JARID1BA/12-JARID1BA-3d-fragment-soaking/pandda/results_summaries/pandda_inspect.html'
-        self.pandda_initial_html_file=''
-        self.pandda_analyse_html_file=''
-        self.pandda_inspect_html_file=''
 
         self.panddas_results_vbox=QtGui.QVBoxLayout()
         self.tab_dict['PANDDAs'][1].addLayout(self.panddas_results_vbox)
@@ -557,6 +551,10 @@ class XChemExplorer(QtGui.QApplication):
 
         #######################################################
         # next three blocks display html documents created by pandda.analyse
+        self.pandda_initial_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_initial.html')
+        self.pandda_analyse_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_analyse.html')
+        self.pandda_inspect_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_inspect.html')
+
         self.pandda_initial_html = QtWebKit.QWebView()
         self.pandda_tab_dict['Dataset Summary'][1].addWidget(self.pandda_initial_html)
         self.pandda_initial_html.load(QtCore.QUrl(self.pandda_initial_html_file))
@@ -604,7 +602,8 @@ class XChemExplorer(QtGui.QApplication):
                                         'c',
                                         'alpha',
                                         'beta',
-                                        'gamma' ]
+                                        'gamma',
+                                        'Crystal Form\nVolume'  ]
         self.crystal_form_table=QtGui.QTableWidget()
         self.crystal_form_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.crystal_form_table.setSortingEnabled(True)
@@ -1048,7 +1047,7 @@ class XChemExplorer(QtGui.QApplication):
     def button_clicked(self):
 
         if self.data_source_set==False:
-            if self.sender().text()=="Create New Data Source (SQLite)":
+            if self.sender().text()=="Create New Data\nSource (SQLite)":
                 file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
                 #make sure that the file always has .csv extension
                 if file_name.rfind('.') != -1:
@@ -1111,8 +1110,8 @@ class XChemExplorer(QtGui.QApplication):
             self.populate_summary_table(header,data)
 
         elif (self.sender().text()=="Check for inital Refinement" and self.data_source_set==True) or \
-             (self.sender().text()=="Update Datasource" and self.data_source_set==True):
-            if self.sender().text()=="Update Datasource":
+             (self.sender().text()=="Update\nDatasource" and self.data_source_set==True):
+            if self.sender().text()=="Update\nDatasource":
                 update_datasource_only=True
             else:
                 update_datasource_only=False
@@ -1158,7 +1157,23 @@ class XChemExplorer(QtGui.QApplication):
                 mode='suggest'
             if self.sender().text()=="Assign Crystal Forms To Samples":
                 mode='assign'
-                print self.xtalform_dict
+                # allows user to change crystal from names
+                allRows = self.crystal_form_table.rowCount()
+                self.xtalform_dict={}
+                for row in range(allRows):
+                    crystal_form_name=str(self.crystal_form_table.item(row,0).text())      # this must be the case
+                    self.xtalform_dict[crystal_form_name] = [
+                            str(self.crystal_form_table.item(row,2).text()),
+                            str(self.crystal_form_table.item(row,9).text()),
+                            [   str(self.crystal_form_table.item(row,3).text()),
+                                str(self.crystal_form_table.item(row,4).text()),
+                                str(self.crystal_form_table.item(row,5).text()),
+                                str(self.crystal_form_table.item(row,6).text()),
+                                str(self.crystal_form_table.item(row,7).text()),
+                                str(self.crystal_form_table.item(row,8).text()) ],
+                            str(self.crystal_form_table.item(row,1).text())         ]
+
+
             self.work_thread=XChemThread.crystal_from(self.initial_model_directory,
                                                                         self.reference_file_list,
                                                                         os.path.join(self.database_directory,
@@ -1206,21 +1221,21 @@ class XChemExplorer(QtGui.QApplication):
 ### if difference between old and new recalculate already if references appeared in initial_model table
 
 
-        elif self.sender().text()=="Load Samples From Datasource":
+        elif self.sender().text()=="Load Samples\nFrom Datasource":
             content=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
             header=content[0]
             data=content[1]
             self.populate_data_source_table(header,data)
 
 
-        elif self.sender().text()=="Import CSV file into Data Source":
+        elif self.sender().text()=="Import CSV file\ninto Data Source":
             if self.data_source_file=='':
                 self.update_status_bar('Please load a data source file first')
             else:
                 file_name = QtGui.QFileDialog.getOpenFileName(self.window,'Open file', self.database_directory)
                 XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).import_csv_file(file_name)
 
-        elif self.sender().text()=="Export CSV file from Data Source":
+        elif self.sender().text()=="Export CSV file\nfrom Data Source":
             file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
             if file_name.rfind('.') != -1:
                 file_name=file_name[:file_name.rfind('.')]+'.csv'
@@ -1228,7 +1243,7 @@ class XChemExplorer(QtGui.QApplication):
                 file_name=file_name+'.csv'
             XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).export_to_csv_file(file_name)
 
-        elif self.sender().text()=="Save Samples To Datasource":
+        elif self.sender().text()=="Save Samples\nTo Datasource":
             # first translate all columns in table in SQLite tablenames
             columns_in_data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).return_column_list()
             column_dict={}
@@ -1264,7 +1279,7 @@ class XChemExplorer(QtGui.QApplication):
 #            date, time, ok = XChemDialogs.DateDialog.getDateTime()
 #            print 'WERE HERE',str(date),str(time),str(ok)
 
-        elif self.sender().text()=="Create PDB/CIF/PNG files of Compound":
+        elif self.sender().text()=="Create PDB/CIF/PNG\nfiles of Compound":
             if helpers().pil_rdkit_exist()==False:
                 QtGui.QMessageBox.warning(self.window, "Library Problem",
                                                        ('Cannot find PIL and RDKIT'),
@@ -1319,9 +1334,15 @@ class XChemExplorer(QtGui.QApplication):
             self.albula_subframes.append(show_diffraction_image)
 
         elif str(self.sender().text()).startswith("Run PANDDAs"):
-
-            self.populate_pandda_analyse_input_table('222_1')
-            #XChemPANDDA.PANDDAs(self.initial_model_directory,self.panddas_directory).run_pandda_analyse()
+            pandda_params = {
+                    'data_dir':         str(self.pandda_input_data_dir_entry.text()),
+                    'out_dir':          str(self.pandda_output_data_dir_entry.text()),
+                    'submit_mode':      str(self.pandda_submission_mode_selection_combobox.currentText()),
+                    'nproc':            str(self.pandda_nproc_entry.text()),
+                    'xtalform':         str(self.pandda_analyse_crystal_from_selection_combobox.currentText())
+                        }
+            print pandda_params
+            XChemPANDDA.PANDDAs(pandda_params).run_pandda_analyse()
 
     def load_crystal_form_from_datasource(self):
         columns = ( 'CrystalFormName,'
@@ -1375,7 +1396,7 @@ class XChemExplorer(QtGui.QApplication):
                                       ('- Settings -> Select Data Source File\n')+
 #                                      ('- start XCE with command line argument (-d)\n')+
                                       ('2. Create a new file\n')+
-                                      ('- Data Source -> Create New Data Source (SQLite)'),
+                                      ('- Data Source -> Create New Data\nSource (SQLite)'),
                         QtGui.QMessageBox.Cancel, QtGui.QMessageBox.NoButton,
                         QtGui.QMessageBox.NoButton)
 
@@ -1611,7 +1632,8 @@ class XChemExplorer(QtGui.QApplication):
 
         self.crystal_form_table.setRowCount(0)
         self.crystal_form_table.setRowCount(len(self.xtalform_dict))
-        self.crystal_form_table.setColumnCount(len(self.crystal_form_column_name)-1)
+#        self.crystal_form_table.setColumnCount(len(self.crystal_form_column_name)-1)
+        self.crystal_form_table.setColumnCount(len(self.crystal_form_column_name))
         all_columns_in_datasource=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).return_column_list()
         for y,key in enumerate(sorted(self.xtalform_dict)):
             db_dict = {
@@ -1936,24 +1958,30 @@ class XChemExplorer(QtGui.QApplication):
         # reason being that the unique column ID for DB may not be nice to look at
         columns_to_show=[]
         for column in self.data_source_columns_to_display:
-            for n,all_column in enumerate(self.all_columns_in_data_source):
-                if column==all_column[1]:
+            # first find out what the column name in the header is:
+            column_name=''
+            for name in self.all_columns_in_data_source:
+                if column==name[1]:
+                    column_name=name[0]
+            for n,all_column in enumerate(header):
+                if column_name==all_column:
                     columns_to_show.append(n)
                     break
-
         for x,row in enumerate(data):
-            y=0
-            for q,item in enumerate(columns_to_show):
+            if x==0:
+                print row
+#            y=0
+            for y,item in enumerate(columns_to_show):
                 cell_text=QtGui.QTableWidgetItem()
                 if row[item]==None:
                     cell_text.setText('')
                 else:
                     cell_text.setText(str(row[item]))
-                if self.data_source_columns_to_display[q]=='Sample ID':     # assumption is that column 0 is always sampleID
+                if self.data_source_columns_to_display[y]=='Sample ID':     # assumption is that column 0 is always sampleID
                     cell_text.setFlags(QtCore.Qt.ItemIsEnabled)             # and this field cannot be changed
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.mounted_crystal_table.setItem(x, y, cell_text)
-                y+=1
+#                y+=1
         self.mounted_crystal_table.setHorizontalHeaderLabels(self.data_source_columns_to_display)
 
 
@@ -2007,11 +2035,14 @@ class XChemExplorer(QtGui.QApplication):
             data=content[1]
             columns_to_show=[]
             for column in self.pandda_column_name:
-                for n,all_column in enumerate(self.all_columns_in_data_source):
-                    if column==all_column[1]:
+                column_name=''
+                for name in self.all_columns_in_data_source:
+                    if column==name[1]:
+                        column_name=name[0]
+                for n,all_column in enumerate(header):
+                    if column_name==all_column:
                         columns_to_show.append(n)
                         break
-
             # determine number of rows
             n_rows=0
             for x,row in enumerate(data):
@@ -2031,7 +2062,6 @@ class XChemExplorer(QtGui.QApplication):
                 for y,item in enumerate(columns_to_show):
                     # y=0 is sample ID
                     if y==0:
-                        print str(row[item])
                         if str(row[item]) != 'None' or str(row[item]).replace(' ','') != '':
                             sample_id_exists=True
                     if y==1:
@@ -2041,7 +2071,6 @@ class XChemExplorer(QtGui.QApplication):
                             crystal_from_of_interest=True
                 if sample_id_exists and crystal_from_of_interest:
                     for y,item in enumerate(columns_to_show):
-                            print item
                             cell_text=QtGui.QTableWidgetItem()
                             cell_text.setText(str(row[item]))
                             cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)

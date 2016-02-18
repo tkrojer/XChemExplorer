@@ -1,9 +1,12 @@
 import os
 
 class PANDDAs(object):
-    def __init__(self,initial_model_directory,panddas_directory):
-        self.initial_model_directory=initial_model_directory
-        self.panddas_directory=panddas_directory
+    def __init__(self,pandda_params):
+        self.data_directory=pandda_params['data_dir']
+        self.panddas_directory=pandda_params['out_dir']
+        self.nproc=pandda_params['nproc']
+        self.submit_mode=pandda_params['submit_mode']
+        self.xtalform=pandda_params['xtalform']
 
     def run_pandda_analyse(self):
         if os.path.isfile(os.path.join(self.panddas_directory,'PANDDA_RUN_IN_PROGRESS')):
@@ -17,16 +20,17 @@ class PANDDAs(object):
                 '\n'
                 'cd '+self.panddas_directory+'\n'
                 '\n'
-                'pandda.analyse data_dirs="'+os.path.join(self.initial_model_directory,'*','Dimple','dimple')+'"'
+                'pandda.analyse data_dirs="'+self.data_directory+'"'
                 ' pdb_style=final.pdb out_dir='+self.panddas_directory+'\n'
                 '\n'
                 '/bin/rm PANDDA_RUN_IN_PROGRESS\n'
             )
-            print
+            print Cmds
 #            f = open('pandda.sh','w')
 #            f.write(Cmds)
 #            f.close()
 #            os.system('chmod +x pandda.sh')
 #            os.system('./pandda.sh &')
 
-
+    def launch_pandda_inspect(self):
+        print 'hallo'

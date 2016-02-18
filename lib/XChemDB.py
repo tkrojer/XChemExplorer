@@ -70,7 +70,7 @@ class data_source:
             ['CrystalFormAlpha',                     'alpha',                        'TEXT'],
             ['CrystalFormBeta',                      'beta',                         'TEXT'],
             ['CrystalFormGamma',                     'gamma',                        'TEXT'],
-            ['CrystalFormVolume',                     'CrystalFormVolume',                        'TEXT'],
+            ['CrystalFormVolume',                     'Crystal Form\nVolume',                        'TEXT'],
 
 
             ['DataCollectionBeamline',               'DataCollectionBeamline',                  'TEXT'],
