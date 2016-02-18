@@ -212,7 +212,7 @@ class XChemExplorer(QtGui.QApplication):
 
         # GUI setup
         self.window=QtGui.QWidget()
-#        self.window.setGeometry(0,0, 1800,1100)
+        self.window.setGeometry(0,0, 800,600)
         self.window.setWindowTitle("XChemExplorer")
 #        self.center_main_window()
 
