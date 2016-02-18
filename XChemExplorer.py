@@ -757,7 +757,7 @@ class XChemExplorer(QtGui.QApplication):
         self.status_bar.showMessage('Ready')
 #        self.timer = QtCore.QBasicTimer()
 #        self.window.showMaximized()
-#        self.window.show()
+        self.window.show()
 
     def color_run_panddas_button(self):
         if os.path.isfile(os.path.join(self.panddas_directory,'PANDDA_RUN_IN_PROGRESS')):
