@@ -536,7 +536,7 @@ class XChemExplorer(QtGui.QApplication):
 #                    self.pandda_analyse_crystal_from_selection_combobox.addItem(key)
 #        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_analyse_crystal_from_selection_combobox)
 
-        self.pandda_analyse_input_params_vbox.addStretch(10)
+#        self.pandda_analyse_input_params_vbox.addStretch(10)
 
 
         # green 'Run Pandda' button (which is red when pandda run in progress
@@ -737,7 +737,7 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_vbox_for_settings.addWidget(self.sites_of_interest_input)
 
 
-        self.data_collection_vbox_for_settings.addStretch(1)
+#        self.data_collection_vbox_for_settings.addStretch(1)
         ######################################################################################
 
         self.status_bar=QtGui.QStatusBar()
