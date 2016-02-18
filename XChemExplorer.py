@@ -731,10 +731,10 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_panddas_directory.addWidget(settings_button_panddas_directory)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_panddas_directory)
 
-        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nSites of Interest:'))
-        self.sites_of_interest_input = QtGui.QTextEdit()
-        self.sites_of_interest_input.setFixedWidth(400)
-        self.data_collection_vbox_for_settings.addWidget(self.sites_of_interest_input)
+#        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nSites of Interest:'))
+#        self.sites_of_interest_input = QtGui.QTextEdit()
+#        self.sites_of_interest_input.setFixedWidth(400)
+#        self.data_collection_vbox_for_settings.addWidget(self.sites_of_interest_input)
 
 
 #        self.data_collection_vbox_for_settings.addStretch(1)
