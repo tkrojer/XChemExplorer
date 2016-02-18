@@ -756,7 +756,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.status_bar.showMessage('Ready')
 #        self.timer = QtCore.QBasicTimer()
-        self.window.showMaximized()
+#        self.window.showMaximized()
 #        self.window.show()
 
     def color_run_panddas_button(self):
