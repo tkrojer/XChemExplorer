@@ -1071,7 +1071,7 @@ class XChemExplorer(QtGui.QApplication):
 
         if self.explorer_active==0 and self.data_source_set==True \
             and self.sender().text()=='Get New Results from Autoprocessing':
-            self.work_thread=XChemThread.temp_read_autoprocessing_results_from_disc(self.visit_list,
+            self.work_thread=XChemThread.read_autoprocessing_results_from_disc(self.visit_list,
                                                                                self.target,
                                                                                self.reference_file_list,
                                                                                self.database_directory)
