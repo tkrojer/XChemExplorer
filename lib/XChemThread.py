@@ -784,15 +784,10 @@ class temp_read_autoprocessing_results_from_disc(QtCore.QThread):
         self.target=target
         self.reference_file_list=reference_file_list
         self.data_collection_dict={}
-        self.data_collection_statistics_dict={}
         self.database_directory=database_directory
-        self.data_collection_dict_collected={}
-        self.data_collection_statistics_dict_collected={}
 
         if os.path.isfile(os.path.join(self.database_directory,'data_collection_summary.pkl')):
-            summary = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
-            self.data_collection_dict_collected=summary[0]
-            self.data_collection_statistics_dict_collected=summary[1]
+            self.data_collection_dict = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
 
         # - open data source if possible
         # - get sampleID, xtbm
@@ -800,9 +795,13 @@ class temp_read_autoprocessing_results_from_disc(QtCore.QThread):
         # - convert to string and use in data dict
         # - but images can only be found of XCE is started in the respective labchem directory
 
+        self.data_collection_dict=[]
+
     def run(self):
+
         number_of_visits_to_search=len(self.visit_list)
         search_cycle=1
+
         for visit_directory in sorted(self.visit_list):
             if len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*')))==0:
                 continue
@@ -814,98 +813,157 @@ class temp_read_autoprocessing_results_from_disc(QtCore.QThread):
             else:
                 visit=visit_directory.split('/')[5]
 
-            ####################################################################################################
-            # dewar configuration:
-            dewar_configuration=[]
-            for xml in glob.glob(os.path.join(visit_directory,'xml','exptTableParams-*.xml')):
-                prefix=''
-                container_reference=''
-                sample_location=''
-                for line in open(xml):
-                    if 'prefix' in line:
-                        prefix=line[line.find('>')+1:line.rfind('<')]
-                    if 'container_reference' in line:
-                        container_reference=line[line.find('>')+1:line.rfind('<')]
-                    if 'sample_location' in line:
-                        sample_location=line[line.find('>')+1:line.rfind('<')]
-                dewar_configuration.append([prefix,container_reference,sample_location])
-
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
                 # this step is only relevant when several samples are reviewed in one session
                 if 'tmp' in collected_xtals or 'results' in collected_xtals:
                     continue
+
                 xtal=collected_xtals[collected_xtals.rfind('/')+1:]
                 protein_name=collected_xtals.split('/')[len(collected_xtals.split('/'))-2]
-                self.data_collection_dict[xtal]=[[],[],[],[],[]]
-                self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 1 of 3: searching visit '+ \
+
+                # if crystal is not in the data_collection_dict then add a new one
+                if xtal not in self.data_collection_dict:
+                    self.data_collection_dict[xtal]=[[],[]]
+
+                self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 1 of 2: searching visit '+ \
                                                                        str(search_cycle)+' of '+str(number_of_visits_to_search)+ \
                                                                        ' ('+visit+'/'+xtal+')')
-                run_list=[]
-                logfile_list=[]
-                image_list=[]
-                image_string_list=[]
-                puck_position=[]
+
+                # first check if visit dictionary does already exist
+                if self.data_collection_dict[xtal][1] != []:
+                    visit_dict={}
+                else:
+                    visit_dict=self.data_collection_dict[xtal][1]
+
+                # now check if a key for the current visit exists
+                if visit not in visit_dict:
+                    visit_dict[visit]=[]
+
+                # check if there is already an entry for the current run
+                # obviously create if not and fill in basic information
+                timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
+                diffraction_image_directory=os.path.join(visit_directory,protein_name,xtal)
+                run_list.append([(run,timestamp,visit,diffraction_image_directory)])
                 for runs in glob.glob(collected_xtals+'/*'):
-                    run_is_in_pickle_file=False
                     run=runs[runs.rfind('/')+1:]
-                    for xtals_in_collected_dict in self.data_collection_dict_collected:
-                        if xtals_in_collected_dict==xtal:
-                            for runs_in_collected_dict in self.data_collection_dict_collected[xtals_in_collected_dict][0]:
-                                if runs_in_collected_dict[0]==run:
-                                    run_is_in_pickle_file=True
-                    if run_is_in_pickle_file:
-                        for stuff in self.data_collection_dict_collected[xtal][0]:
-                            if stuff[0]==run:
-                                self.data_collection_dict[xtal][0].append(stuff)
-                        for stuff in self.data_collection_dict_collected[xtal][1]:
-                            if run in stuff:
-                                image_list.append(stuff)
-                        for stuff in self.data_collection_dict_collected[xtal][2]:
-                            if run in stuff:
-                                logfile_list.append(stuff)
-                        for stuff in self.data_collection_dict_collected[xtal][3]:
-                            if run in stuff[0]:
-                                image_string_list.append(stuff)
-                        if len(self.data_collection_dict_collected[xtal])==5:
-                            puck_position=self.data_collection_dict_collected[xtal][4]
-                        continue
+                    found_run=False
+                    for entry in visit_dict[visit]:
+                        if entry != []:
+                            if entry[0][0]==run:
+                                found_run=True
+                    if not found_run:
+                        visit_dict[visit].append( [ [run,timestamp,diffraction_image_directory],[],[] ] )
 
-                    timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
-                    diffraction_image_directory=os.path.join(visit_directory,protein_name,xtal)
-                    run_list.append([(run,timestamp,visit,diffraction_image_directory)])
-                    self.data_collection_dict[xtal][0].append([run,timestamp,visit,diffraction_image_directory])
+                # iterate again through all the runs visit_dict[visit] dictionary!!!
+                # fill in centred images and aimless logfile information in case missing
+                for runs in visit_dict[visit]:
+                    run=runs[0][0]      # at least one entry must exist by now
 
-                    for file_name in glob.glob(os.path.join(runs,'xia2','*','LogFiles','*')):
-                        if file_name.endswith('aimless.log') and (self.target in file_name or self.target=='*'):
-                            logfile_list.append(file_name)
-                    for file_name in glob.glob(os.path.join(runs,'fast_dp','*')):
-                        if file_name.endswith('aimless.log') and (self.target in file_name or self.target=='*'):
-                            logfile_list.append(file_name)
+                    # image files
+                    # we only need to check once because centring images are either present
+                    # at the beginning of the run or never
+                    if visit_dict[visit][1] == []:
+                        for image in glob.glob(os.path.join(visit_directory,'jpegs',self.target,xtal,'*')):
+                            if run in image:
+                                if image.endswith('t.png') or image.endswith('_.png'):
+                                    image_name=image[image.rfind('/')+1:]
+                                    image_file=open(image,"rb")
+                                    image_string=base64.b64encode(image_file.read())
+                                    visit_dict[visit][1].append([image_name,image_string])
 
+                    # aimless information
+                    # first for xia2 runs
+                    for file_name in glob.glob(os.path.join(runs,'xia2','*','LogFiles','*aimless.log')):
+                        autoproc=file_name.split('/')[len(file_name.split('/'))-3]
+                        found_autoproc=False
+                        if visit_dict[visit][2] != []:
+                            for aimless_file in visit_dict[visit][2]:
+                                if aimless_file[0]==autoproc:
+                                    found_autoproc=True
+                        if not found_autoproc:
+                            aimless_results=parse().GetAimlessLog(file_name)
+                            visit_dict[visit][2].append(autoproc,file_name,aimless_results,False)
+                    # then exactly the same for fast_dp
+                    if os.path.isfile(os.path.join(runs,'fast_dp','*aimless.log')):
+                        file_name=os.path.join(runs,'fast_dp','*aimless.log')
+                        autoproc=file_name.split('/')[len(file_name.split('/'))-2]
+                        found_autoproc=False
+                        if visit_dict[visit][2] != []:
+                            for aimless_file in visit_dict[visit][2]:
+                                if aimless_file[0]==autoproc:
+                                    found_autoproc=True
+                        if not found_autoproc:
+                            aimless_results=parse().GetAimlessLog(file_name)
+                            visit_dict[visit][2].append(autoproc,file_name,aimless_results,False)       # false for best reso file
+                                                                                                        # because we don't know at this point
 
-
-                    for image in glob.glob(os.path.join(visit_directory,'jpegs',self.target,xtal,'*')):
-                        if run in image:
-                            if image.endswith('t.png') or image.endswith('_.png'):
-                                image_list.append(image)
-                                image_file=open(image,"rb")
-                                image_string=base64.b64encode(image_file.read())
-                                image_string_list.append((image[image.rfind('/')+1:],image_string))
-
-                    for item in dewar_configuration:
-                        if item[0]==xtal:
-                            puck_position=[item[1],item[2]]
-                            break
-
-                self.data_collection_dict[xtal][1]+=image_list
-                self.data_collection_dict[xtal][2]+=logfile_list
-                self.data_collection_dict[xtal][3]+=image_string_list
-                self.data_collection_dict[xtal][4]=puck_position
                 progress += progress_step
                 self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
             search_cycle+=1
 
+        print self.data_collection_dict
+        quit()
+
+
+        # now we try, somewhat haphazardly, to determine which autoprocessing run is currently the best
+
+        # before creating the table with the results, try to guess which one to select
+        # 1. check if there are reference mtz files
+        # 1a. if so: take all logfiles forward that fit to the first one found
+        #     'fit means': same lattice and delta Vunitcell < 5%
+        # 2. if possible: select all datasets with Rmerge low < 5%
+        # 3. finally select the dataset with
+        #    max(unique_reflections*completeness*Mn(I/sig<I>)
+
+        if not len(self.data_collection_statistics)==0:
+            progress_step=100/float(len(self.data_collection_statistics))
+        progress=0
+
+
+        for xtal in self.data_collection_dict:
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 2 of 2: selecting "best" aimless logfile ->'+xtal)
+            # selection stage 1:
+            # similarity to reference files
+            selection_stage_ONE_list=[]
+            if self.reference_file_list != []:
+
+
+
+
+
+
+
+
+
+
+
+
+
+                for reference_file in self.reference_file_list:
+                    for aimless_file in self.data_collection_statistics_dict[sample]:
+                        try:
+                            if not reference_file[4]==0:
+                                unitcell_difference=round((math.fabs(reference_file[4]-aimless_file[25])/reference_file[4])*100,1)
+                                if unitcell_difference < 5 and reference_file[3]==aimless_file[21]:
+                                    select_stage_one_list.append(aimless_file)
+                                    found=1
+                        except IndexError:
+                            pass
+                if not found:                                                   # in case no file fullfils the criteria
+                    for aimless_file in self.data_collection_statistics_dict[sample]:
+                        if aimless_file != []:
+                            select_stage_one_list.append(aimless_file)
+            else:                                                               # in case no reference files are available
+                for aimless_file in self.data_collection_statistics_dict[sample]:
+                    if aimless_file != []:
+                        select_stage_one_list.append(aimless_file)
+
+
+
+
+
+########################################################################################################################
 
         if not len(self.data_collection_dict)==0:
             progress_step=100/float(len(self.data_collection_dict))
