@@ -786,8 +786,8 @@ class temp_read_autoprocessing_results_from_disc(QtCore.QThread):
         self.data_collection_dict={}
         self.database_directory=database_directory
 
-        if os.path.isfile(os.path.join(self.database_directory,'data_collection_summary.pkl')):
-            self.data_collection_dict = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
+#        if os.path.isfile(os.path.join(self.database_directory,'data_collection_summary.pkl')):
+#            self.data_collection_dict = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
 
         # - open data source if possible
         # - get sampleID, xtbm
