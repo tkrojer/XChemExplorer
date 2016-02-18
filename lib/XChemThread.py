@@ -832,7 +832,7 @@ class temp_read_autoprocessing_results_from_disc(QtCore.QThread):
                     visit_dict={}
                 else:
                     visit_dict=self.data_collection_dict[xtal][1]
-
+                print visit_dict
                 # now check if a key for the current visit exists
                 if visit not in visit_dict:
                     visit_dict[visit]=[]
