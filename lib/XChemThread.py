@@ -1224,13 +1224,13 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                             self.data_collection_dict[xtal].append(['image',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
 
 
+
                 progress += progress_step
                 self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
             search_cycle+=1
 
         print len(self.data_collection_dict)
-        quit()
 
 
         # now we try, somewhat haphazardly, to determine which autoprocessing run is currently the best
@@ -1243,8 +1243,8 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
         # 3. finally select the dataset with
         #    max(unique_reflections*completeness*Mn(I/sig<I>)
 
-        if not len(self.data_collection_statistics)==0:
-            progress_step=100/float(len(self.data_collection_statistics))
+        if not len(self.data_collection_dict)==0:
+            progress_step=100/float(len(self.data_collection_dict))
         progress=0
 
 
@@ -1255,197 +1255,18 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
             selection_stage_ONE_list=[]
             if self.reference_file_list != []:
 
+            index=0
+            for entry in self.data_collection_dict[xtal]:
+                if len(entry)==9 and entry[0]=='logfile':
+                    print entry[6]
+                    for reference_file in self.reference_file_list:
 
 
 
 
+                   index+=1
 
 
-
-
-
-
-
-
-                for reference_file in self.reference_file_list:
-                    for aimless_file in self.data_collection_statistics_dict[sample]:
-                        try:
-                            if not reference_file[4]==0:
-                                unitcell_difference=round((math.fabs(reference_file[4]-aimless_file[25])/reference_file[4])*100,1)
-                                if unitcell_difference < 5 and reference_file[3]==aimless_file[21]:
-                                    select_stage_one_list.append(aimless_file)
-                                    found=1
-                        except IndexError:
-                            pass
-                if not found:                                                   # in case no file fullfils the criteria
-                    for aimless_file in self.data_collection_statistics_dict[sample]:
-                        if aimless_file != []:
-                            select_stage_one_list.append(aimless_file)
-            else:                                                               # in case no reference files are available
-                for aimless_file in self.data_collection_statistics_dict[sample]:
-                    if aimless_file != []:
-                        select_stage_one_list.append(aimless_file)
-
-
-
-
-
-########################################################################################################################
-
-        if not len(self.data_collection_dict)==0:
-            progress_step=100/float(len(self.data_collection_dict))
-        progress=0
-        for sample in sorted(self.data_collection_dict):
-            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 2 of 3: parsing aimless logfiles -> '+sample)
-            self.data_collection_statistics_dict[sample]=[]
-#            print sample,self.data_collection_dict[sample][2]
-            if not self.data_collection_dict[sample][2]==[]:
-                for index,logfile in enumerate(self.data_collection_dict[sample][2]):
-                    already_parsed=False
-                    if sample in self.data_collection_statistics_dict_collected:
-                        for entry in self.data_collection_statistics_dict_collected[sample]:
-                            if logfile==entry[1]:
-                                self.data_collection_statistics_dict[sample].append(entry)
-                                already_parsed=True
-                    if already_parsed:
-                        continue
-                    else:
-                        aimless_results=parse().GetAimlessLog(logfile)
-                        try:
-                            self.data_collection_statistics_dict[sample].append([
-                        index,                                                                                      # 0
-                        logfile,                                                                                    # 1
-                        ['Program',                     aimless_results['AutoProc'],                                                        (200,200,200)],
-                        ['Run',                         aimless_results['Run'],                                                             (200,200,200)],
-                        ['Space\nGroup',                aimless_results['SpaceGroup'],                                                      (200,200,200)],
-                        ['Unit Cell',                   aimless_results['UnitCell'],                                                        (200,200,200)],
-                        ['Resolution\nOverall',         aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionHigh'],             (200,200,200)],
-                        ['Resolution\nInner Shell',     aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionLowInnerShell'],    (200,200,200)],
-                        ['Resolution\nOuter Shell',     aimless_results['ResolutionHighOuterShell']+'-'+aimless_results['ResolutionHigh'],  (200,200,200)],
-                        ['Rmerge\nOverall',             aimless_results['RmergeOverall'],                                                   (200,200,200)],
-                        ['Rmerge\nInner Shell',         aimless_results['RmergeLow'],                                                       (200,200,200)],
-                        ['Rmerge\nOuter Shell',         aimless_results['RmergeHigh'],                                                      (200,200,200)],
-                        ['Mn(I/sig(I))\nOverall',       aimless_results['IsigOverall'],                                                     (200,200,200)],
-                        ['Mn(I/sig(I))\nInner Shell',   aimless_results['IsigLow'],                                                         (200,200,200)],
-                        ['Mn(I/sig(I))\nOuter Shell',   aimless_results['IsigHigh'],                                                        (200,200,200)],
-                        ['Completeness\nOverall',       aimless_results['CompletenessOverall'],                                             (200,200,200)],
-                        ['Completeness\nInner Shell',   aimless_results['CompletenessLow'],                                                 (200,200,200)],
-                        ['Completeness\nOuter Shell',   aimless_results['CompletenessHigh'],                                                (200,200,200)],
-                        ['Multiplicity\nOverall',       aimless_results['MultiplicityOverall'],                                             (200,200,200)],
-                        ['Multiplicity\nInner Shell',   aimless_results['MultiplicityLow'],                                                 (200,200,200)],
-                        ['Multiplicity\nOuter Shell',   aimless_results['MultiplicityHigh'],                                                (200,200,200)],
-                        aimless_results['Lattice'],                                                                 # 21
-                        float(aimless_results['UniqueReflectionsOverall']),                                         # 22
-                        float(aimless_results['CompletenessOverall']),                                              # 23
-                        float(aimless_results['IsigOverall']),                                                      # 24
-                        float(aimless_results['UnitCellVolume']),                                                   # 25
-                        float(aimless_results['RmergeLow']),                                                        # 26
-                        ['best file',False]                                                                                       # 27
-                                        ])
-                        except ValueError:
-                            self.data_collection_statistics_dict[sample].append([
-                        index,                                                                                      # 0
-                        logfile,                                                                                    # 1
-                        ['Program',                     aimless_results['AutoProc'],                                                        (200,200,200)],
-                        ['Run',                         aimless_results['Run'],                                                             (200,200,200)],
-                        ['Space\nGroup',                aimless_results['SpaceGroup'],                                                      (200,200,200)],
-                        ['Unit Cell',                   aimless_results['UnitCell'],                                                        (200,200,200)],
-                        ['Resolution\nOverall',         aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionHigh'],             (200,200,200)],
-                        ['Resolution\nInner Shell',     aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionLowInnerShell'],    (200,200,200)],
-                        ['Resolution\nOuter Shell',     aimless_results['ResolutionHighOuterShell']+'-'+aimless_results['ResolutionHigh'],  (200,200,200)],
-                        ['Rmerge\nOverall',             aimless_results['RmergeOverall'],                                                   (200,200,200)],
-                        ['Rmerge\nInner Shell',         aimless_results['RmergeLow'],                                                       (200,200,200)],
-                        ['Rmerge\nOuter Shell',         aimless_results['RmergeHigh'],                                                      (200,200,200)],
-                        ['Mn(I/sig(I))\nOverall',       aimless_results['IsigOverall'],                                                     (200,200,200)],
-                        ['Mn(I/sig(I))\nInner Shell',   aimless_results['IsigLow'],                                                         (200,200,200)],
-                        ['Mn(I/sig(I))\nOuter Shell',   aimless_results['IsigHigh'],                                                        (200,200,200)],
-                        ['Completeness\nOverall',       aimless_results['CompletenessOverall'],                                             (200,200,200)],
-                        ['Completeness\nInner Shell',   aimless_results['CompletenessLow'],                                                 (200,200,200)],
-                        ['Completeness\nOuter Shell',   aimless_results['CompletenessHigh'],                                                (200,200,200)],
-                        ['Multiplicity\nOverall',       aimless_results['MultiplicityOverall'],                                             (200,200,200)],
-                        ['Multiplicity\nInner Shell',   aimless_results['MultiplicityLow'],                                                 (200,200,200)],
-                        ['Multiplicity\nOuter Shell',   aimless_results['MultiplicityHigh'],                                                (200,200,200)],
-                        aimless_results['Lattice'],                                                                 # 21
-                        0.0,                                         # 22
-                        0.0,                                              # 23
-                        0.0,                                                      # 24
-                        0.0,                                                   # 25
-                        100.0,                                                        # 26
-                        ['best file',False]                                                                                       # 27
-                                        ])
-
-            else:
-                self.data_collection_statistics_dict[sample]+='###'*27
-            progress += progress_step
-            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-
-        # before creating the table with the results, try to guess which one to select
-        # 1. check if there are reference mtz files
-        # 1a. if so: take all logfiles forward that fit to the first one found
-        #     'fit means': same lattice and delta Vunitcell < 5%
-        # 2. if possible: select all datasets with Rmerge low < 5%
-        # 3. finally select the dataset with
-        #    max(unique_reflections*completeness*Mn(I/sig<I>)
-
-        if not len(self.data_collection_statistics_dict)==0:
-            progress_step=100/float(len(self.data_collection_statistics_dict))
-        progress=0
-
-        # if possible, select only the ones which have the same lattice and
-        # a unit cell volume difference of less than 5%
-        for sample in sorted(self.data_collection_statistics_dict):
-            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 3 of 3: selecting "best" aimless logfile ->'+sample)
-            if self.data_collection_statistics_dict[sample][0]=='#':
-                continue
-            select_stage_one_list = []
-            found=0
-            if self.reference_file_list != []:
-                for reference_file in self.reference_file_list:
-                    for aimless_file in self.data_collection_statistics_dict[sample]:
-                        try:
-                            if not reference_file[4]==0:
-                                unitcell_difference=round((math.fabs(reference_file[4]-aimless_file[25])/reference_file[4])*100,1)
-                                if unitcell_difference < 5 and reference_file[3]==aimless_file[21]:
-                                    select_stage_one_list.append(aimless_file)
-                                    found=1
-                        except IndexError:
-                            pass
-                if not found:                                                   # in case no file fullfils the criteria
-                    for aimless_file in self.data_collection_statistics_dict[sample]:
-                        if aimless_file != []:
-                            select_stage_one_list.append(aimless_file)
-            else:                                                               # in case no reference files are available
-                for aimless_file in self.data_collection_statistics_dict[sample]:
-                    if aimless_file != []:
-                        select_stage_one_list.append(aimless_file)
-
-            # if possible, select only the ones with Rmerge < 5%
-            select_stage_two_list=[]
-            for aimless_file in select_stage_one_list:
-                if aimless_file[26] < 0.05:
-                    select_stage_two_list.append(aimless_file)
-            if select_stage_two_list==[]:
-                select_stage_two_list=select_stage_one_list
-
-            # finally, select the file with the highest
-            # max(unique_reflections*completeness*Mn(I/sig<I>)
-            select_stage_three_list=[]
-            for aimless_file in select_stage_two_list:
-                select_stage_three_list.append([aimless_file[0],
-                                                aimless_file[22] \
-                                                * aimless_file[23] \
-                                                * aimless_file[24]])
-            if select_stage_three_list != []:
-                best_file_index=max(select_stage_three_list,key=lambda x: x[1])[0]
-                for index,results in enumerate(self.data_collection_statistics_dict[sample]):
-                    if index==best_file_index:
-                        self.data_collection_statistics_dict[sample][index][27]=['best file',True]
-            progress += progress_step
-            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-
-        # save everything so that it's quicker to reload and is available outside DLS
-        pickle.dump([self.data_collection_dict,self.data_collection_statistics_dict],
-                    open(  os.path.join(self.database_directory,'data_collection_summary.pkl'),'wb'))
 
         self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results'), [self.data_collection_dict,
                                                                             self.data_collection_statistics_dict])
