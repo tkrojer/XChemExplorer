@@ -828,14 +828,14 @@ class temp_read_autoprocessing_results_from_disc(QtCore.QThread):
                                                                        ' ('+visit+'/'+xtal+')')
 
                 # first check if visit dictionary does already exist
-                if self.data_collection_dict[xtal][1] != []:
+                if self.data_collection_dict[xtal][1] == []:
                     visit_dict={}
-                else:
-                    visit_dict=self.data_collection_dict[xtal][1]
-                print visit_dict
-                # now check if a key for the current visit exists
-                if visit not in visit_dict:
                     visit_dict[visit]=[]
+                else:
+                    # not sure how to do this yet
+                    print 'hallo'
+#                    visit_dict=self.data_collection_dict[xtal][1]
+                print visit_dict
 
                 # check if there is already an entry for the current run
                 # obviously create if not and fill in basic information
