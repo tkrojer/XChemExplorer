@@ -1296,12 +1296,13 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                             print 'bb'
                             print entry[6]['RmergeLow'],entry[7],index
                             print isinstance(entry[6]['RmergeLow'],float)
-                            if isinstance(entry[6]['RmergeLow'],float) and entry[7]==index:
-                                print 'ccc'
-                                if entry[6]['RmergeLow'] < 0.05:
+                            try:
+                                if float(entry[6]['RmergeLow']) < 0.05 and entry[7]==index:
                                     print 'dddd'
                                     select_stage_two_list.append(index)
                                     found=True
+                            except ValueError:
+                                pass
                 if not found:
                     tmp.append(index)
 
