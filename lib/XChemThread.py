@@ -1199,6 +1199,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
 
                     # aimless information
                     # first for xia2 runs
+                    print os.path.join(visit_directory,'processed',run,'xia2','*','LogFiles','*aimless.log')
                     for file_name in glob.glob(os.path.join(visit_directory,'processed',run,'xia2','*','LogFiles','*aimless.log')):
                         print file_name
                         autoproc=file_name.split('/')[len(file_name.split('/'))-3]
