@@ -1253,13 +1253,13 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
             # selection stage 1:
             # similarity to reference files
             selection_stage_ONE_list=[]
-            if self.reference_file_list != []:
+#            if self.reference_file_list != []:
 
             index=0
             for entry in self.data_collection_dict[xtal]:
                 if len(entry)==9 and entry[0]=='logfile':
                     print entry[6]
-                    for reference_file in self.reference_file_list:
+#                    for reference_file in self.reference_file_list:
 
 
 
