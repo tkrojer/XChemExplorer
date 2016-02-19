@@ -830,7 +830,7 @@ class temp_read_autoprocessing_results_from_disc(QtCore.QThread):
                 # first check if visit dictionary does already exist
                 if self.data_collection_dict[xtal][1] == []:
                     visit_dict={}
-                    visit_dict[visit]=[]
+                    visit_dict[visit]=[[],[],[]]
                 else:
                     # not sure how to do this yet
                     print 'hallo'
@@ -849,11 +849,12 @@ class temp_read_autoprocessing_results_from_disc(QtCore.QThread):
                     if not found_run:
                         timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
                         diffraction_image_directory=os.path.join(visit_directory,protein_name,xtal)
-                        visit_dict[visit].append( [ [run,timestamp,diffraction_image_directory],[],[] ] )
+                        visit_dict[visit][0].append( [ [run,timestamp,diffraction_image_directory],[],[] ] )
 
                 # iterate again through all the runs visit_dict[visit] dictionary!!!
                 # fill in centred images and aimless logfile information in case missing
                 for runs in visit_dict[visit]:
+                    print runs
                     run=runs[0][0]      # at least one entry must exist by now
 
                     # image files
