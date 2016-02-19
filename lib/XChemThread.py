@@ -871,7 +871,7 @@ class temp_read_autoprocessing_results_from_disc(QtCore.QThread):
 
                     # aimless information
                     # first for xia2 runs
-                    for file_name in glob.glob(os.path.join(runs,'xia2','*','LogFiles','*aimless.log')):
+                    for file_name in glob.glob(os.path.join(visit_directory,'processed',run,'xia2','*','LogFiles','*aimless.log')):
                         autoproc=file_name.split('/')[len(file_name.split('/'))-3]
                         found_autoproc=False
                         if visit_dict[visit][2] != []:
@@ -882,7 +882,7 @@ class temp_read_autoprocessing_results_from_disc(QtCore.QThread):
                             aimless_results=parse().GetAimlessLog(file_name)
                             visit_dict[visit][2].append(autoproc,file_name,aimless_results,False)
                     # then exactly the same for fast_dp
-                    if os.path.isfile(os.path.join(runs,'fast_dp','*aimless.log')):
+                    if os.path.isfile(os.path.join(visit_directory,'processed',run,'fast_dp','*aimless.log')):
                         file_name=os.path.join(runs,'fast_dp','*aimless.log')
                         autoproc=file_name.split('/')[len(file_name.split('/'))-2]
                         found_autoproc=False
