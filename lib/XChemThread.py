@@ -1264,7 +1264,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
 
 
 
-                   index+=1
+                index+=1
 
 
 
