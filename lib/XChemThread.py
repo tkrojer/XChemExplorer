@@ -1200,6 +1200,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                     # aimless information
                     # first for xia2 runs
                     for file_name in glob.glob(os.path.join(visit_directory,'processed',run,'xia2','*','LogFiles','*aimless.log')):
+                        print file_name
                         autoproc=file_name.split('/')[len(file_name.split('/'))-3]
                         found_autoproc=False
                         for entry in self.data_collection_dict[xtal]:
@@ -1208,6 +1209,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     found_autoproc=True
                         if not found_autoproc:
                             aimless_results=parse().GetAimlessLog(file_name)
+                            print ['image',visit,run,timestamp,autoproc,file_name,aimless_results,0,False]
                             self.data_collection_dict[xtal].append(['image',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
 
                     # then exactly the same for fast_dp
@@ -1248,7 +1250,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
         progress=0
 
 
-        for xtal in self.data_collection_dict:
+        for xtal in sorted(self.data_collection_dict):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 2 of 2: selecting "best" aimless logfile ->'+xtal)
             # selection stage 1:
             # similarity to reference files
