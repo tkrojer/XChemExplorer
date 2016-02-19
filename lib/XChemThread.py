@@ -1209,7 +1209,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     found_autoproc=True
                         if not found_autoproc:
                             aimless_results=parse().GetAimlessLog(file_name)
-                            self.data_collection_dict[xtal].append(['image',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
+                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
 
                     # then exactly the same for fast_dp
                     if os.path.isfile(os.path.join(visit_directory,'processed',protein_name,xtal,run,'fast_dp','*aimless.log')):
@@ -1222,7 +1222,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     found_autoproc=True
                         if not found_autoproc:
                             aimless_results=parse().GetAimlessLog(file_name)
-                            self.data_collection_dict[xtal].append(['image',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
+                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
 
 
 
