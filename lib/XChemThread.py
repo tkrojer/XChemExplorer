@@ -1251,29 +1251,80 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
 
         for xtal in sorted(self.data_collection_dict):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 2 of 2: selecting "best" aimless logfile ->'+xtal)
-            # selection stage 1:
-            # similarity to reference files
-            selection_stage_ONE_list=[]
-#            if self.reference_file_list != []:
 
-            print xtal
+            ############################################################################################
+            # STAGE 1:
+            # similarity to reference files
+            select_stage_one_list = []
+            tmp=[]
             index=0
             for n,entry in enumerate(self.data_collection_dict[xtal]):
                 print entry[0]
+                found=False
                 if len(entry)==9 and entry[0]=='logfile':
                     if isinstance(entry[6],dict):
                         if isinstance(entry[6]['UnitCellVolume'],float):
-                            print
-
-
-#                    print entry[6]
-#                    for reference_file in self.reference_file_list:
-
-
-
+                            for reference_file in self.reference_file_list:
+                                if not reference_file[4]==0:
+                                    unitcell_difference=round((math.fabs(reference_file[4]-entry[6]['UnitCellVolume'])/reference_file[4])*100,1)
+                                    if unitcell_difference < 5 and reference_file[3]==entry[6]['Lattice']:
+                                        select_stage_one_list.append(index)
+                                        found=True
+                    if not found:
+                        tmp.append(index)               # so that if no file passes criterion above
+                                                        # or if no reference is given, we still carry over all existing files
                     self.data_collection_dict[xtal][n][7]=index
                     index+=1
-            print self.data_collection_dict[xtal]
+
+            # if none passed Stage 1, carry them over to Stage 2
+            if select_stage_one_list = [] and tmp != []:
+                select_stage_one_list=tmp
+
+            ############################################################################################
+            # STAGE 2:
+            # if possible, select only the ones with Rmerge < 5%
+            select_stage_two_list=[]
+            tmp=[]
+            for index in select_stage_one_list:
+                # this may be completely over the top!
+                found=False
+                for entry in self.data_collection_dict[xtal]:
+                    if len(entry)==9 and entry[0]=='logfile':
+                        if isinstance(entry[6],dict):
+                            if isinstance(entry[6]['RmergeLow'],float) and entry[7]==index:
+                                if entry[6]['RmergeLow'] < 0.05:
+                                    select_stage_two_list.append(index)
+                                    found=True
+                if not found:
+                    tmp.append(index)
+
+            # if none passed Stage 2, carry them over to Stage 3
+            if select_stage_two_list = [] and tmp != []:
+                select_stage_two_list=tmp
+
+            ############################################################################################
+            # STAGE 3:
+            # finally, select the file with the highest
+            # max(unique_reflections*completeness*Mn(I/sig<I>)
+            select_stage_three_list=[]
+            for index in select_stage_two_list:
+                for entry in self.data_collection_dict[xtal]:
+                    if len(entry)==9 and entry[0]=='logfile':
+                        if isinstance(entry[6],dict) and entry[7]==index:
+                            if isinstance(entry[6]['UniqueReflectionsOverall'],float) and \
+                               isinstance(entry[6]['CompletenessOverall'],float) and \
+                               isinstance(entry[6]['IsigOverall'],float):
+                                quality_index=entry[6]['UniqueReflectionsOverall']*entry[6]['CompletenessOverall']*entry[6]['IsigOverall']
+                                select_stage_three_list.append([index,quality_index])
+
+            for index in select_stage_three_list:
+                best_file_index=max(select_stage_three_list,key=lambda x: x[1])[0]
+                for n,entry in enumerate(self.data_collection_dict[xtal]):
+                    if len(entry)==9 and entry[0]=='logfile':
+                        if entry[7]==best_file_index:
+                            self.data_collection_dict[xtal][n][8]=True
+                            print self.data_collection_dict[xtal][n]
+
 
 
         self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results'), [self.data_collection_dict,
