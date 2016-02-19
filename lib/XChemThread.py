@@ -1291,14 +1291,9 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                 found=False
                 for entry in self.data_collection_dict[xtal]:
                     if len(entry)==9 and entry[0]=='logfile':
-                        print 'a'
                         if isinstance(entry[6],dict):
-                            print 'bb'
-                            print entry[6]['RmergeLow'],entry[7],index
-                            print isinstance(entry[6]['RmergeLow'],float)
                             try:
                                 if float(entry[6]['RmergeLow']) < 0.05 and entry[7]==index:
-                                    print 'dddd'
                                     select_stage_two_list.append(index)
                                     found=True
                             except ValueError:
@@ -1306,10 +1301,10 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                 if not found:
                     tmp.append(index)
 
-            print select_stage_two_list
             # if none passed Stage 2, carry them over to Stage 3
             if select_stage_two_list == [] and tmp != []:
                 select_stage_two_list=tmp
+            print select_stage_two_list
 
             ############################################################################################
             # STAGE 3:
@@ -1334,6 +1329,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                             self.data_collection_dict[xtal][n][8]=True
                             print self.data_collection_dict[xtal][n]
 
+            print select_stage_three_list
 
 
         self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results'), [self.data_collection_dict,
