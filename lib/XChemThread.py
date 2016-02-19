@@ -1277,7 +1277,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                     index+=1
 
             # if none passed Stage 1, carry them over to Stage 2
-            if select_stage_one_list = [] and tmp != []:
+            if select_stage_one_list == [] and tmp != []:
                 select_stage_one_list=tmp
 
             ############################################################################################
@@ -1299,7 +1299,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                     tmp.append(index)
 
             # if none passed Stage 2, carry them over to Stage 3
-            if select_stage_two_list = [] and tmp != []:
+            if select_stage_two_list == [] and tmp != []:
                 select_stage_two_list=tmp
 
             ############################################################################################
