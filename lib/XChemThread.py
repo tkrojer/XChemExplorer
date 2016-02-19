@@ -856,7 +856,7 @@ class temp_read_autoprocessing_results_from_disc(QtCore.QThread):
                 for runs in visit_dict[visit]:
                     print runs
                     run=runs[0][0]      # at least one entry must exist by now
-
+                    print run
                     # image files
                     # we only need to check once because centring images are either present
                     # at the beginning of the run or never
