@@ -812,7 +812,7 @@ class temp_read_autoprocessing_results_from_disc(QtCore.QThread):
                 visit=visit_directory.split('/')[5]
 
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
-                print collected_xtals
+                print collected_xtals,collected_xtals
                 # this step is only relevant when several samples are reviewed in one session
                 if 'tmp' in collected_xtals or 'results' in collected_xtals:
                     continue
@@ -901,8 +901,8 @@ class temp_read_autoprocessing_results_from_disc(QtCore.QThread):
 
             search_cycle+=1
 
-        print self.data_collection_dict
-        quit()
+#        print self.data_collection_dict
+#        quit()
 
 
         # now we try, somewhat haphazardly, to determine which autoprocessing run is currently the best
