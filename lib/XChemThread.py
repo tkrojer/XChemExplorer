@@ -1255,8 +1255,10 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
             selection_stage_ONE_list=[]
 #            if self.reference_file_list != []:
 
+            print xtal
             index=0
             for entry in self.data_collection_dict[xtal]:
+                print entry
                 if len(entry)==9 and entry[0]=='logfile':
                     print entry[6]
 #                    for reference_file in self.reference_file_list:
