@@ -1293,11 +1293,12 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                     if len(entry)==9 and entry[0]=='logfile':
                         print 'a'
                         if isinstance(entry[6],dict):
-                            print 'b'
+                            print 'bb'
+                            print entry[6]['RmergeLow'],entry[7]
                             if isinstance(entry[6]['RmergeLow'],float) and entry[7]==index:
-                                print 'c'
+                                print 'ccc'
                                 if entry[6]['RmergeLow'] < 0.05:
-                                    print 'd'
+                                    print 'dddd'
                                     select_stage_two_list.append(index)
                                     found=True
                 if not found:
