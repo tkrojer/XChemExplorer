@@ -1207,6 +1207,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                             if len(entry)==9:
                                 if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[3]==autoproc:
                                     found_autoproc=True
+                        print found_autoproc
                         if not found_autoproc:
                             aimless_results=parse().GetAimlessLog(file_name)
                             print ['image',visit,run,timestamp,autoproc,file_name,aimless_results,0,False]
@@ -1260,7 +1261,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
             print xtal
             index=0
             for entry in self.data_collection_dict[xtal]:
-                print entry
+#                print entry
                 if len(entry)==9 and entry[0]=='logfile':
                     print entry[6]
 #                    for reference_file in self.reference_file_list:
