@@ -839,9 +839,6 @@ class temp_read_autoprocessing_results_from_disc(QtCore.QThread):
 
                 # check if there is already an entry for the current run
                 # obviously create if not and fill in basic information
-                timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
-                diffraction_image_directory=os.path.join(visit_directory,protein_name,xtal)
-                run_list.append([(run,timestamp,visit,diffraction_image_directory)])
                 for runs in glob.glob(collected_xtals+'/*'):
                     run=runs[runs.rfind('/')+1:]
                     found_run=False
@@ -850,6 +847,8 @@ class temp_read_autoprocessing_results_from_disc(QtCore.QThread):
                             if entry[0][0]==run:
                                 found_run=True
                     if not found_run:
+                        timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
+                        diffraction_image_directory=os.path.join(visit_directory,protein_name,xtal)
                         visit_dict[visit].append( [ [run,timestamp,diffraction_image_directory],[],[] ] )
 
                 # iterate again through all the runs visit_dict[visit] dictionary!!!
