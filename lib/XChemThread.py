@@ -1258,19 +1258,22 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
 
             print xtal
             index=0
-            for entry in self.data_collection_dict[xtal]:
+            for n,entry in enumerate(self.data_collection_dict[xtal]):
                 print entry[0]
                 if len(entry)==9 and entry[0]=='logfile':
                     if isinstance(entry[6],dict):
-                        print entry[6]['UnitCellVolume']
+                        if isinstance(entry[6]['UnitCellVolume'],float):
+                            print
+
+
 #                    print entry[6]
 #                    for reference_file in self.reference_file_list:
 
 
 
-
-                index+=1
-
+                    self.data_collection_dict[xtal][n][7]=index
+                    index+=1
+            print self.data_collection_dict[xtal]
 
 
         self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results'), [self.data_collection_dict,
