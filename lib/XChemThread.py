@@ -1295,6 +1295,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                         if isinstance(entry[6],dict):
                             print 'bb'
                             print entry[6]['RmergeLow'],entry[7],index
+                            print isinstance(entry[6]['RmergeLow'],float)
                             if isinstance(entry[6]['RmergeLow'],float) and entry[7]==index:
                                 print 'ccc'
                                 if entry[6]['RmergeLow'] < 0.05:
