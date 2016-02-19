@@ -1201,7 +1201,6 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                     # first for xia2 runs
 #                    print os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2','*','LogFiles','*aimless.log')
                     for file_name in glob.glob(os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2','*','LogFiles','*aimless.log')):
-                        print file_name
                         autoproc=file_name.split('/')[len(file_name.split('/'))-3]
                         found_autoproc=False
                         for entry in self.data_collection_dict[xtal]:
@@ -1211,13 +1210,11 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                         print found_autoproc
                         if not found_autoproc:
                             aimless_results=parse().GetAimlessLog(file_name)
-                            print ['image',visit,run,timestamp,autoproc,file_name,aimless_results,0,False]
                             self.data_collection_dict[xtal].append(['image',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
 
                     # then exactly the same for fast_dp
                     if os.path.isfile(os.path.join(visit_directory,'processed',protein_name,xtal,run,'fast_dp','*aimless.log')):
                         file_name=os.path.join(runs,'fast_dp','*aimless.log')
-                        print file_name
                         autoproc=file_name.split('/')[len(file_name.split('/'))-2]
                         found_autoproc=False
                         for entry in self.data_collection_dict[xtal]:
