@@ -1313,24 +1313,27 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
             select_stage_three_list=[]
             for index in select_stage_two_list:
                 for entry in self.data_collection_dict[xtal]:
-                    if len(entry)==9 and entry[0]=='logfile':
+                    if len(entry)>=9 and entry[0]=='logfile':
                         if isinstance(entry[6],dict) and entry[7]==index:
                             if isinstance(entry[6]['UniqueReflectionsOverall'],float) and \
                                isinstance(entry[6]['CompletenessOverall'],float) and \
                                isinstance(entry[6]['IsigOverall'],float):
-                                quality_index=entry[6]['UniqueReflectionsOverall']*entry[6]['CompletenessOverall']*entry[6]['IsigOverall']
-                                select_stage_three_list.append([index,quality_index])
+                                ranking=entry[6]['UniqueReflectionsOverall']*entry[6]['CompletenessOverall']*entry[6]['IsigOverall']
+                                print 'quality index',ranking
+                                select_stage_three_list.append([index,ranking])
 
-            for index in select_stage_three_list:
-                best_file_index=max(select_stage_three_list,key=lambda x: x[1])[0]
-                for n,entry in enumerate(self.data_collection_dict[xtal]):
-                    if len(entry)==9 and entry[0]=='logfile':
-                        if entry[7]==best_file_index:
-                            self.data_collection_dict[xtal][n][8]=True
-                            print self.data_collection_dict[xtal][n]
+#            for index in select_stage_three_list:
+            best_file_index=max(select_stage_three_list,key=lambda x: x[1])[0]
+            for n,entry in enumerate(self.data_collection_dict[xtal]):
+                if len(entry)==9 and entry[0]=='logfile':
+                    if entry[7]==best_file_index:
+                        self.data_collection_dict[xtal][n][8]=True
+                        print self.data_collection_dict[xtal][n]
 
             print select_stage_three_list
 
+        # save everything so that it's quicker to reload and is available outside DLS
+        pickle.dump([self.data_collection_dict],
+                    open(  os.path.join(self.database_directory,'data_collection_dict.pkl'),'wb'))
 
-        self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results'), [self.data_collection_dict,
-                                                                            self.data_collection_statistics_dict])
+        self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results'), self.data_collection_dict)
