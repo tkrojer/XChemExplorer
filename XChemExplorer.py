@@ -579,9 +579,9 @@ class XChemExplorer(QtGui.QApplication):
         show_panddas_results=QtGui.QPushButton("Show PANDDAs Results")
         show_panddas_results.clicked.connect(self.button_clicked)
         panddas_button_hbox.addWidget(show_panddas_results)
-        reload_panddas_results=QtGui.QPushButton("Reload PANDDAs Results")
-        reload_panddas_results.clicked.connect(self.button_clicked)
-        panddas_button_hbox.addWidget(reload_panddas_results)
+#        reload_panddas_results=QtGui.QPushButton("Reload PANDDAs Results")
+#        reload_panddas_results.clicked.connect(self.button_clicked)
+#        panddas_button_hbox.addWidget(reload_panddas_results)
         launch_panddas_inspect=QtGui.QPushButton("Launch pandda.inspect")
         launch_panddas_inspect.clicked.connect(self.button_clicked)
         panddas_button_hbox.addWidget(launch_panddas_inspect)
@@ -907,6 +907,10 @@ class XChemExplorer(QtGui.QApplication):
 
             self.panddas_directory=pickled_settings['panddas_directory']
             self.settings['panddas_directory']=self.panddas_directory
+            self.pandda_initial_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_initial.html')
+            self.pandda_analyse_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_analyse.html')
+            self.pandda_inspect_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_inspect.html')
+
 
             self.database_directory=pickled_settings['database_directory']
             self.settings['database_directory']=self.database_directory
@@ -1030,7 +1034,11 @@ class XChemExplorer(QtGui.QApplication):
             self.panddas_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.panddas_directory_label.setText(self.panddas_directory)
             self.pandda_output_data_dir_entry.setText(self.panddas_directory)
+            print 'PANDDA',self.panddas_directory
             self.settings['panddas_directory']=self.panddas_directory
+            self.pandda_initial_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_initial.html')
+            self.pandda_analyse_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_analyse.html')
+            self.pandda_inspect_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_inspect.html')
 
 
 
@@ -1320,7 +1328,7 @@ class XChemExplorer(QtGui.QApplication):
         elif str(self.sender().text()).startswith("Show Overview"):
             self.update_overview()
 
-        elif str(self.sender().text()).startswith('Show'):
+        elif str(self.sender().text()).startswith('Show: '):
             diffraction_image=''
             for key in self.albula_button_dict:
                 if self.albula_button_dict[key][0]==self.sender():
@@ -1353,6 +1361,16 @@ class XChemExplorer(QtGui.QApplication):
                     'xtalform':         str(self.pandda_analyse_crystal_from_selection_combobox.currentText())
                         }
             XChemPANDDA.PANDDAs(pandda_params).launch_pandda_inspect()
+
+        elif str(self.sender().text()).startswith("Show PANDDAs Results"):
+            print 'hallo', self.pandda_initial_html_file
+            self.pandda_initial_html.load(QtCore.QUrl(self.pandda_initial_html_file))
+            self.pandda_initial_html.show()
+            self.pandda_analyse_html.load(QtCore.QUrl(self.pandda_analyse_html_file))
+            self.pandda_analyse_html.show()
+            self.pandda_inspect_html.load(QtCore.QUrl(self.pandda_inspect_html_file))
+            self.pandda_inspect_html.show()
+
 
 
 
