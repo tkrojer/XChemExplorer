@@ -1454,6 +1454,15 @@ class XChemExplorer(QtGui.QApplication):
         table.setColumnCount(3)
 
         for row,key in enumerate(sorted(self.data_collection_statistics_dict)):
+
+            # here should be a sorting step:
+            # - crystal drop image
+            # - crystal alignment images
+            # - data collection information
+
+
+
+
             self.dataset_outcome_dict[key]=[]
             # this is the main table
 
