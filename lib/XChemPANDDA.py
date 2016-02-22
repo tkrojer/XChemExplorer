@@ -51,3 +51,4 @@ class PANDDAs(object):
                 'pandda.inspect\n'
             )
         print Cmds
+        os.system(Cmds)

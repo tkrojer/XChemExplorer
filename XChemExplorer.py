@@ -1344,6 +1344,19 @@ class XChemExplorer(QtGui.QApplication):
             print pandda_params
             XChemPANDDA.PANDDAs(pandda_params).run_pandda_analyse()
 
+        elif str(self.sender().text()).startswith("Launch pandda.inspect"):
+            pandda_params = {
+                    'data_dir':         str(self.pandda_input_data_dir_entry.text()),
+                    'out_dir':          str(self.pandda_output_data_dir_entry.text()),
+                    'submit_mode':      str(self.pandda_submission_mode_selection_combobox.currentText()),
+                    'nproc':            str(self.pandda_nproc_entry.text()),
+                    'xtalform':         str(self.pandda_analyse_crystal_from_selection_combobox.currentText())
+                        }
+            XChemPANDDA.PANDDAs(pandda_params).launch_pandda_inspect()
+
+
+
+
     def load_crystal_form_from_datasource(self):
         columns = ( 'CrystalFormName,'
                     'CrystalFormPointGroup,'
