@@ -1,8 +1,6 @@
 import os, sys, glob
 import getopt
 
-# commited on: 18/01/2016
-
 # diffraction image viewing only possible at DLS
 sys.path.append('/dls_sw/apps/albula/3.1/dectris/albula/3.1/python')
 try:
@@ -536,7 +534,7 @@ class XChemExplorer(QtGui.QApplication):
 #                    self.pandda_analyse_crystal_from_selection_combobox.addItem(key)
 #        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_analyse_crystal_from_selection_combobox)
 
-#        self.pandda_analyse_input_params_vbox.addStretch(10)
+        self.pandda_analyse_input_params_vbox.addStretch(10)
 
 
         # green 'Run Pandda' button (which is red when pandda run in progress
@@ -1031,7 +1029,9 @@ class XChemExplorer(QtGui.QApplication):
         if self.sender().text()=='Select PANNDAs Directory':
             self.panddas_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.panddas_directory_label.setText(self.panddas_directory)
+            self.pandda_output_data_dir_entry.setText(self.panddas_directory)
             self.settings['panddas_directory']=self.panddas_directory
+
 
 
     def change_allowed_unitcell_difference_percent(self,text):

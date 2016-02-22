@@ -33,4 +33,21 @@ class PANDDAs(object):
 #            os.system('./pandda.sh &')
 
     def launch_pandda_inspect(self):
-        print 'hallo'
+
+        if os.getenv('SHELL') == '/bin/tcsh' or os.getenv('SHELL') == '/bin/csh':
+            source_file=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-csh')
+        elif os.getenv('SHELL') == '/bin/bash':
+            source_file=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')
+        else:
+            source_file=''
+
+        Cmds = (
+                '#!'+os.getenv('SHELL')+'\n'
+                '\n'
+                'source '+source_file+'\n'
+                '\n'
+                'cd '+self.panddas_directory+'\n'
+                '\n'
+                'pandda.inspect\n'
+            )
+        print Cmds
