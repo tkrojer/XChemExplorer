@@ -1318,8 +1318,7 @@ class XChemExplorer(QtGui.QApplication):
                     self.explorer_active=1
                     self.work_thread=XChemThread.create_png_and_cif_of_compound(self.external_software,
                                                                                 self.initial_model_directory,
-                                                                                compound_list,
-                                                                                self.external_software['qsub'])
+                                                                                compound_list)
                     self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
                     self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
                     self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)

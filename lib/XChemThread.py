@@ -195,7 +195,7 @@ class create_png_and_cif_of_compound(QtCore.QThread):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'creating cif/png -> '+sampleID)
             if compoundID=='' or compoundID==None:
                 compoundID='compound'
-            helpers().make_png(self.initial_model_directory,sampleID,compoundID,smiles)
+            helpers().make_png(self.initial_model_directory,sampleID,compoundID,smiles,self.external_software['qsub'])
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
         self.emit(QtCore.SIGNAL("finished()"))
