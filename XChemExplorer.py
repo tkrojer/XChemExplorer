@@ -429,7 +429,7 @@ class XChemExplorer(QtGui.QApplication):
         self.summary_vbox_for_table=QtGui.QVBoxLayout()
         self.summary_column_name=[ 'Sample ID',
                                     'Compound ID',
-                                    'Compound\nImage',
+#                                    'Compound\nImage',
                                     'DataCollection\nOutcome',
                                     'DataProcessing\nSpaceGroup',
                                     'DataProcessing\nResolutionHigh',
@@ -1991,26 +1991,16 @@ class XChemExplorer(QtGui.QApplication):
         self.mounted_crystal_table.setColumnCount(0)
         self.mounted_crystal_table.setColumnCount(len(self.data_source_columns_to_display))
         self.mounted_crystal_table.setRowCount(0)
-        self.mounted_crystal_table.setRowCount(len(data))
 
-        # maybe I coded some garbage before, but I need to find out which column name in the
-        # data source corresponds to the actually displayed column name in the table
-        # reason being that the unique column ID for DB may not be nice to look at
-        columns_to_show=[]
-        for column in self.data_source_columns_to_display:
-            # first find out what the column name in the header is:
-            column_name=''
-            for name in self.all_columns_in_data_source:
-                if column==name[1]:
-                    column_name=name[0]
-            for n,all_column in enumerate(header):
-                if column_name==all_column:
-                    columns_to_show.append(n)
-                    break
-        for x,row in enumerate(data):
-            if x==0:
-                print row
-#            y=0
+        columns_to_show=self.get_columns_to_show(self.data_source_columns_to_display,header)
+        n_rows=self.get_rows_with_sample_id_not_null(header,data)
+        self.mounted_crystal_table.setRowCount(n_rows)
+        sample_id_column=self.get_columns_to_show(['Sample ID'],header)
+
+        x=0
+        for row in data:
+            if str(row[sample_id_column[0]]).lower() == 'none' or str(row[sample_id_column[0]]).replace(' ','') == '':
+                continue        # do not show rows where sampleID is null
             for y,item in enumerate(columns_to_show):
                 cell_text=QtGui.QTableWidgetItem()
                 if row[item]==None:
@@ -2021,7 +2011,7 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text.setFlags(QtCore.Qt.ItemIsEnabled)             # and this field cannot be changed
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.mounted_crystal_table.setItem(x, y, cell_text)
-#                y+=1
+            x+=1
         self.mounted_crystal_table.setHorizontalHeaderLabels(self.data_source_columns_to_display)
 
 
@@ -2030,24 +2020,13 @@ class XChemExplorer(QtGui.QApplication):
         self.summary_table.setRowCount(0)
         self.summary_table.setRowCount(len(data))
 
-        # maybe I coded some garbage before, but I need to find out which column name in the
-        # data source corresponds to the actually displayed column name in the table
-        # reason being that the unique column ID for DB may not be nice to look at
-        columns_to_show=[]
-        for column in self.summary_column_name:
-            for n,all_column in enumerate(self.all_columns_in_data_source):
-                if column==all_column[1]:
-                    columns_to_show.append(n)
-                    break
-            if column=='Compound\nImage':
-                columns_to_show.append('Image')
-
+        columns_to_show=self.get_columns_to_show(self.summary_column_name,header)
         for x,row in enumerate(data):
             for y,item in enumerate(columns_to_show):
                 cell_text=QtGui.QTableWidgetItem()
-                if item=='Image':
-                    cell_text.setText('')
-                elif row[item]==None:
+#                if item=='Image':
+#                    cell_text.setText('')
+                if row[item]==None:
                     cell_text.setText('')
                 else:
                     cell_text.setText(str(row[item]))
@@ -2073,16 +2052,17 @@ class XChemExplorer(QtGui.QApplication):
             content=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
             header=content[0]
             data=content[1]
-            columns_to_show=[]
-            for column in self.pandda_column_name:
-                column_name=''
-                for name in self.all_columns_in_data_source:
-                    if column==name[1]:
-                        column_name=name[0]
-                for n,all_column in enumerate(header):
-                    if column_name==all_column:
-                        columns_to_show.append(n)
-                        break
+#            columns_to_show=[]
+#            for column in self.pandda_column_name:
+#                column_name=''
+#                for name in self.all_columns_in_data_source:
+#                    if column==name[1]:
+#                        column_name=name[0]
+#                for n,all_column in enumerate(header):
+#                    if column_name==all_column:
+#                        columns_to_show.append(n)
+#                        break
+            columns_to_show=self.get_columns_to_show(self.pandda_column_name,header)
             # determine number of rows
             n_rows=0
             for x,row in enumerate(data):
@@ -2118,7 +2098,34 @@ class XChemExplorer(QtGui.QApplication):
                     x+=1
         self.pandda_analyse_data_table.setHorizontalHeaderLabels(self.pandda_column_name)
 
+    def get_columns_to_show(self,column_list,header_of_current_datasource):
+        # maybe I coded some garbage before, but I need to find out which column name in the
+        # data source corresponds to the actually displayed column name in the table
+        # reason being that the unique column ID for DB may not be nice to look at
+        columns_to_show=[]
+        for column in column_list:
+            # first find out what the column name in the header is:
+            column_name=''
+            for name in self.all_columns_in_data_source:
+                if column==name[1]:
+                    column_name=name[0]
+            for n,all_column in enumerate(header_of_current_datasource):
+                if column_name==all_column:
+                    columns_to_show.append(n)
+                    break
+        return columns_to_show
 
+    def get_rows_with_sample_id_not_null(self,header,data):
+        sample_id_column=self.get_columns_to_show(['Sample ID'],header)
+        print 'sample id',sample_id_column
+        n_rows=0
+        for row in data:
+            print 'id column',str(row[sample_id_column[0]])
+#            if str(row[sample_id_column[0]]).lower() != 'none' or \
+#            if not str(row[sample_id_column[0]]).replace(' ','') == '':
+            if not str(row[sample_id_column[0]]).lower() != 'none' or not str(row[sample_id_column[0]]).replace(' ','') == '':
+                n_rows+=1
+        return n_rows
 
 if __name__ == "__main__":
     app=XChemExplorer(sys.argv[1:])
