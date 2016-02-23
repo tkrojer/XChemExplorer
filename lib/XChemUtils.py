@@ -223,7 +223,7 @@ class helpers:
             Draw.MolToFile(mol, "%s.png" %compoundID)
 
         if not os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif')):
-            os.system('acedrg -i "%s" -o %s' %(smiles,compoundID))
+            os.system('acedrg --res LIG -i "%s" -o %s' %(smiles,compoundID))
 #            os.system("grade '%s' -resname LIG -ocif %s.cif -opdb %s.pdb" %(smiles,compoundID,compoundID))
 
         os.chdir(os.path.join(initial_model_directory,sample))
