@@ -2113,7 +2113,6 @@ class XChemExplorer(QtGui.QApplication):
         sample_id_column=self.get_columns_to_show(['Sample ID'],header)
         n_rows=0
         for row in data:
-            print 'id column',str(row[sample_id_column[0]])
 #            if str(row[sample_id_column[0]]).lower() != 'none' or \
 #            if not str(row[sample_id_column[0]]).replace(' ','') == '':
             if not str(row[sample_id_column[0]]).lower() != 'none' or not str(row[sample_id_column[0]]).replace(' ','') == '':
