@@ -1656,19 +1656,19 @@ class XChemExplorer(QtGui.QApplication):
 
     def update_xtalfrom_table(self,xtalform_dict):
         self.xtalform_dict=xtalform_dict
-        for key in self.xtalform_dict:
-            db_dict = {
-                'CrystalFormName':          key,
-                'CrystalFormSpaceGroup':    xtalform_dict[key][3],
-                'CrystalFormPointGroup':    xtalform_dict[key][0],
-                'CrystalFormA':             xtalform_dict[key][2][0],
-                'CrystalFormB':             xtalform_dict[key][2][1],
-                'CrystalFormC':             xtalform_dict[key][2][2],
-                'CrystalFormAlpha':         xtalform_dict[key][2][3],
-                'CrystalFormBeta':          xtalform_dict[key][2][4],
-                'CrystalFormGamma':         xtalform_dict[key][2][5],
-                'CrystalFormVolume':        xtalform_dict[key][1]       }
-            print db_dict
+#        for key in self.xtalform_dict:
+#            db_dict = {
+#                'CrystalFormName':          key,
+#                'CrystalFormSpaceGroup':    xtalform_dict[key][3],
+#                'CrystalFormPointGroup':    xtalform_dict[key][0],
+#                'CrystalFormA':             xtalform_dict[key][2][0],
+#                'CrystalFormB':             xtalform_dict[key][2][1],
+#                'CrystalFormC':             xtalform_dict[key][2][2],
+#                'CrystalFormAlpha':         xtalform_dict[key][2][3],
+#                'CrystalFormBeta':          xtalform_dict[key][2][4],
+#                'CrystalFormGamma':         xtalform_dict[key][2][5],
+#                'CrystalFormVolume':        xtalform_dict[key][1]       }
+#            print db_dict
 
         self.crystal_form_table.setRowCount(0)
         self.crystal_form_table.setRowCount(len(self.xtalform_dict))
@@ -2052,18 +2052,7 @@ class XChemExplorer(QtGui.QApplication):
             content=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
             header=content[0]
             data=content[1]
-#            columns_to_show=[]
-#            for column in self.pandda_column_name:
-#                column_name=''
-#                for name in self.all_columns_in_data_source:
-#                    if column==name[1]:
-#                        column_name=name[0]
-#                for n,all_column in enumerate(header):
-#                    if column_name==all_column:
-#                        columns_to_show.append(n)
-#                        break
             columns_to_show=self.get_columns_to_show(self.pandda_column_name,header)
-            # determine number of rows
             n_rows=0
             for x,row in enumerate(data):
                 for y,item in enumerate(columns_to_show):
@@ -2074,8 +2063,13 @@ class XChemExplorer(QtGui.QApplication):
                             n_rows+=1
             self.pandda_analyse_data_table.setRowCount(n_rows)
 
+            self.mounted_crystal_table.setRowCount(n_rows)
+            sample_id_column=self.get_columns_to_show(['Sample ID'],header)
+
             x=0
             for row in data:
+                if str(row[sample_id_column[0]]).lower() == 'none' or str(row[sample_id_column[0]]).replace(' ','') == '':
+                    continue        # do not show rows where sampleID is null
                 sample_id_exists=False
                 crystal_from_of_interest=False
                 # first run through every line and check if conditions above are fulfilled
@@ -2117,7 +2111,6 @@ class XChemExplorer(QtGui.QApplication):
 
     def get_rows_with_sample_id_not_null(self,header,data):
         sample_id_column=self.get_columns_to_show(['Sample ID'],header)
-        print 'sample id',sample_id_column
         n_rows=0
         for row in data:
             print 'id column',str(row[sample_id_column[0]])
