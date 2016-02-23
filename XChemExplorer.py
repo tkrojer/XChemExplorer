@@ -2053,8 +2053,11 @@ class XChemExplorer(QtGui.QApplication):
             header=content[0]
             data=content[1]
             columns_to_show=self.get_columns_to_show(self.pandda_column_name,header)
+            sample_id_column=self.get_columns_to_show(['Sample ID'],header)
             n_rows=0
             for x,row in enumerate(data):
+                if str(row[sample_id_column[0]]).lower() == 'none' or str(row[sample_id_column[0]]).replace(' ','') == '':
+                    continue        # do not show rows where sampleID is null
                 for y,item in enumerate(columns_to_show):
                     if y==1:
                         if crystal_form=='use all datasets':
@@ -2062,9 +2065,6 @@ class XChemExplorer(QtGui.QApplication):
                         elif str(row[item]) == crystal_form:
                             n_rows+=1
             self.pandda_analyse_data_table.setRowCount(n_rows)
-
-            self.mounted_crystal_table.setRowCount(n_rows)
-            sample_id_column=self.get_columns_to_show(['Sample ID'],header)
 
             x=0
             for row in data:
