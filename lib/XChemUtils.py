@@ -225,17 +225,42 @@ class helpers:
         if not os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif')):
             os.system('acedrg --res LIG -i "%s" -o %s' %(smiles,compoundID))
 #            os.system("grade '%s' -resname LIG -ocif %s.cif -opdb %s.pdb" %(smiles,compoundID,compoundID))
+            os.chdir(os.path.join(initial_model_directory,sample,'compound'))
+            if not os.path.isfile(os.path.join(initial_model_directory,sample,'compound','ACEDRG_IN_PROGRESS')):
+                os.system('touch ACEDRG_IN_PROGRESS')
+                Cmds = (
+                    '#!'+os.getenv('SHELL')+'\n'
+                    '\n'
+                    'cd '+os.path.join(initial_model_directory,sample,'compound')+'\n'
+                    '\n'
+                    'acedrg --res LIG -i "%s" -o %s\n' %(smiles,compoundID)+
+                    '\n'
+                    'cd '+os.path.join(initial_model_directory,sample)+'\n'
+                    '\n'
+                    'ln -s compound/*cif .\n'
+                    'ln -s compound/*pdb .\n'
+                    'ln -s compound/*png .\n'
+                    '/bin/rm compound/ACEDRG_IN_PROGRESS\n'
+                )
+                f = open('acedrg.sh','w')
+                f.write(Cmds)
+                f.close()
+                if self.queueing_system_available:
+                    os.system('qsub acedrg.sh')
+                else:
+                    os.system('chmod +x acedrg.sh')
+                    os.system('./acedrg.sh')
 
-        os.chdir(os.path.join(initial_model_directory,sample))
-        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.pdb'))\
-                and not os.path.isfile(os.path.join(initial_model_directory,sample,compoundID+'.pdb')):
-            os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.pdb'),compoundID+'.pdb')
-        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif'))\
-                and not os.path.isfile(os.path.join(initial_model_directory,sample,compoundID+'.cif')):
-            os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif'),compoundID+'.cif')
-        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png'))\
-                and not os.path.isfile(os.path.join(initial_model_directory,sample,compoundID+'.png')):
-            os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png'),compoundID+'.png')
+#        os.chdir(os.path.join(initial_model_directory,sample))
+#        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.pdb'))\
+#                and not os.path.isfile(os.path.join(initial_model_directory,sample,compoundID+'.pdb')):
+#            os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.pdb'),compoundID+'.pdb')
+#        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif'))\
+#                and not os.path.isfile(os.path.join(initial_model_directory,sample,compoundID+'.cif')):
+#            os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif'),compoundID+'.cif')
+#        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png'))\
+#                and not os.path.isfile(os.path.join(initial_model_directory,sample,compoundID+'.png')):
+#            os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png'),compoundID+'.png')
 
 
 class parse:
