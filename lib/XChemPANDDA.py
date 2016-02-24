@@ -29,9 +29,12 @@ class run_pandda_analyse(QtCore.QThread):
                 ' cpus='+self.nproc+'\n'
                 )
             print Cmds
-#            f = open('pandda.sh','w')
-#            f.write(Cmds)
-#            f.close()
-#            os.system('chmod +x pandda.sh')
-#            os.system('./pandda.sh &')
+            f = open('pandda.sh','w')
+            f.write(Cmds)
+            f.close()
+            if self.submit_mode=='local machine':
+                os.system('chmod +x pandda.sh')
+                os.system('./pandda.sh &')
+            else:
+                os.system('qsub pandda.sh')
 
