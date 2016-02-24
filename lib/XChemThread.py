@@ -252,6 +252,31 @@ class start_COOT(QtCore.QThread):
         pickle.dump(self.settings,open('XChemExplorer_settings.pkl','wb'))
         os.system('coot --no-guano --no-state-script --script %s' %(os.getenv('XChemExplorer_DIR')+'/lib/XChemCoot.py'))
 
+class start_pandda_inspect(QtCore.QThread):
+
+    def __init__(self,settings):
+        QtCore.QThread.__init__(self)
+        self.settings=settings
+
+    def run(self):
+        if os.getenv('SHELL') == '/bin/tcsh' or os.getenv('SHELL') == '/bin/csh':
+            source_file=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-csh')
+        elif os.getenv('SHELL') == '/bin/bash':
+            source_file=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')
+        else:
+            source_file=''
+
+        Cmds = (
+                '#!'+os.getenv('SHELL')+'\n'
+                '\n'
+                'source '+source_file+'\n'
+                '\n'
+                'cd '+self.panddas_directory+'\n'
+                '\n'
+                'pandda.inspect\n'
+            )
+        os.system(Cmds)
+
 
 
 class read_intial_refinement_results(QtCore.QThread):
@@ -629,9 +654,10 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                     already_parsed=False
                     if sample in self.data_collection_statistics_dict_collected:
                         for entry in self.data_collection_statistics_dict_collected[sample]:
-                            if logfile==entry[1]:
-                                self.data_collection_statistics_dict[sample].append(entry)
-                                already_parsed=True
+                            if len(entry) > 2:
+                                if logfile==entry[1]:
+                                    self.data_collection_statistics_dict[sample].append(entry)
+                                    already_parsed=True
                     if already_parsed:
                         continue
                     else:

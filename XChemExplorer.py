@@ -585,6 +585,9 @@ class XChemExplorer(QtGui.QApplication):
         launch_panddas_inspect=QtGui.QPushButton("Launch pandda.inspect")
         launch_panddas_inspect.clicked.connect(self.button_clicked)
         panddas_button_hbox.addWidget(launch_panddas_inspect)
+        export_panddas_inspect=QtGui.QPushButton("Export PANDDA Models")
+        export_panddas_inspect.clicked.connect(self.button_clicked)
+        panddas_button_hbox.addWidget(export_panddas_inspect)
         self.tab_dict['PANDDAs'][1].addLayout(panddas_button_hbox)
 
 
@@ -1361,6 +1364,12 @@ class XChemExplorer(QtGui.QApplication):
                     'xtalform':         str(self.pandda_analyse_crystal_from_selection_combobox.currentText())
                         }
             XChemPANDDA.PANDDAs(pandda_params).launch_pandda_inspect()
+            print '==> XCE: starting pandda.inspect'
+            self.work_thread=XChemThread.start_pandda_inspect(self.settings)
+            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.work_thread.start()
+
+
 
         elif str(self.sender().text()).startswith("Show PANDDAs Results"):
             print 'hallo', self.pandda_initial_html_file
