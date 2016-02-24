@@ -1352,14 +1352,20 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 # read table
                 allRows = self.pandda_analyse_data_table.rowCount()
-                for row in range(allRows):
-                    sample=(self.pandda_analyse_data_table.item(row,0).text())
-                    if os.path.isfile(os.path.join(str(self.pandda_input_data_dir_entry.text()).replace('*',sample),'final.pdb')    ):
-                        print 'gigreurhg'
                 tmp_dir=os.path.join(self.panddas_directory[:self.panddas_directory.rfind('/')],'tmp_'+str(self.pandda_analyse_crystal_from_selection_combobox.currentText()))
                 if not os.path.isdir(tmp_dir):
                     os.mkdir(tmp_dir)
                 data_dir=os.path.join(tmp_dir,'*')
+                for row in range(allRows):
+                    sample=(self.pandda_analyse_data_table.item(row,0).text())
+                    if os.path.isfile(os.path.join(str(self.pandda_input_data_dir_entry.text()).replace('*',sample),'final.pdb')    ):
+                        if not os.path.isdir(os.path.join(tmp_dir,sample)):
+                            os.mkdir(os.path.join(tmp_dir,sample))
+                        os.chdir(os.path.join(tmp_dir,sample))
+                        if not os.path.isfile('final.pdb'):
+                            os.symlink(os.path.join(str(self.pandda_input_data_dir_entry.text()).replace('*',sample),'final.pdb'))
+                        if not os.path.isfile('final.mtz'):
+                            os.symlink(os.path.join(str(self.pandda_input_data_dir_entry.text()).replace('*',sample),'final.mtz'))
                 # create softlinks to pseudo datadir
                 # set new data_dir path
 
