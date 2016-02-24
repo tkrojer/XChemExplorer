@@ -276,6 +276,7 @@ class start_pandda_inspect(QtCore.QThread):
                 '\n'
                 'pandda.inspect\n'
             )
+        print Cmds
         os.system(Cmds)
 
 

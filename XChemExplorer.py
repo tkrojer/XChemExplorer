@@ -528,7 +528,7 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_analyse_crystal_from_selection_combobox)
 
         # minimum number of datasets
-        self.pandda_min_build_dataset_label=QtGui.QLabel('output directory')
+        self.pandda_min_build_dataset_label=QtGui.QLabel('min_build_datasets')
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_min_build_dataset_label)
         self.pandda_min_build_dataset_entry = QtGui.QLineEdit()
         self.pandda_min_build_dataset_entry.setText('40')
@@ -1407,6 +1407,9 @@ class XChemExplorer(QtGui.QApplication):
             self.pandda_inspect_html.load(QtCore.QUrl(self.pandda_inspect_html_file))
             self.pandda_inspect_html.show()
 
+        elif str(self.sender().text()).startswith("Export PANDDA Models"):
+            print '==> XCE: exporting pandda models with pandda.export'
+            os.system('pandda.export pandda_dir="'+self.panddas_directory+'" out_dir="'+self.initial_model_directory+'"')
 
 
 
