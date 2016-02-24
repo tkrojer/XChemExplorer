@@ -9,8 +9,11 @@ class run_pandda_analyse(QtCore.QThread):
         QtCore.QThread.__init__(self)
         self.data_directory=pandda_params['data_dir']
         self.panddas_directory=pandda_params['out_dir']
-        self.nproc=pandda_params['nproc']
         self.submit_mode=pandda_params['submit_mode']
+        if self.submit_mode == 'local machine':
+            self.nproc=pandda_params['nproc']
+        else
+            self.nproc='7'
         self.min_build_datasets=pandda_params['min_build_datasets']
 
     def run(self):
