@@ -1363,7 +1363,7 @@ class XChemExplorer(QtGui.QApplication):
                     'nproc':            str(self.pandda_nproc_entry.text()),
                     'xtalform':         str(self.pandda_analyse_crystal_from_selection_combobox.currentText())
                         }
-            XChemPANDDA.PANDDAs(pandda_params).launch_pandda_inspect()
+#            XChemPANDDA.PANDDAs(pandda_params).launch_pandda_inspect()
             print '==> XCE: starting pandda.inspect'
             self.work_thread=XChemThread.start_pandda_inspect(self.settings)
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
