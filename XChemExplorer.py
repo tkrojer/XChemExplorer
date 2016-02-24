@@ -514,7 +514,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.pandda_nproc_label=QtGui.QLabel('number of processors')
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_nproc_label)
-        self.pandda_nproc=multiprocessing.cpu_count()
+        self.pandda_nproc=multiprocessing.cpu_count()-1
         self.pandda_nproc_entry = QtGui.QLineEdit()
         self.pandda_nproc_entry.setText(str(self.pandda_nproc).replace(' ',''))
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_nproc_entry)
@@ -526,15 +526,16 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_crystal_from_selection_combobox.currentIndexChanged.connect(self.pandda_analyse_crystal_from_selection_combobox_changed)
         self.update_pandda_crystal_from_combobox()
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_analyse_crystal_from_selection_combobox)
-#        self.pandda_analyse_crystal_from_selection_combobox.addItem('use all datasets')
-#        if os.path.isfile(os.path.join(self.database_directory,self.data_source_file)):
-#            self.load_crystal_form_from_datasource()
-#            if self.xtalform_dict != {}:
-#                for key in self.xtalform_dict:
-#                    self.pandda_analyse_crystal_from_selection_combobox.addItem(key)
-#        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_analyse_crystal_from_selection_combobox)
 
-        self.pandda_analyse_input_params_vbox.addStretch(10)
+        # minimum number of datasets
+        self.pandda_min_build_dataset_label=QtGui.QLabel('output directory')
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_min_build_dataset_label)
+        self.pandda_min_build_dataset_entry = QtGui.QLineEdit()
+        self.pandda_min_build_dataset_entry.setText('40')
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_min_build_dataset_entry)
+
+
+        self.pandda_analyse_input_params_vbox.addStretch(1)
 
 
         # green 'Run Pandda' button (which is red when pandda run in progress
@@ -1345,15 +1346,30 @@ class XChemExplorer(QtGui.QApplication):
             self.albula_subframes.append(show_diffraction_image)
 
         elif str(self.sender().text()).startswith("Run PANDDAs"):
+
+            if str(self.pandda_analyse_crystal_from_selection_combobox.currentText())=='use all datasets':
+                data_dir=str(self.pandda_input_data_dir_entry.text())
+            else:
+                # read table
+                allRows = self.pandda_analyse_data_table.rowCount()
+                for row in range(allRows):
+                    sample=(self.pandda_analyse_data_table.item(row,0).text())
+                    if os.path.isfile(os.path.join(str(self.pandda_input_data_dir_entry.text()).replace('*',sample),'final.pdb')    ):
+                        print 'gigreurhg'
+                    print sample
+                # create softlinks to pseudo datadir
+                # set new data_dir path
+
             pandda_params = {
-                    'data_dir':         str(self.pandda_input_data_dir_entry.text()),
+                    'data_dir':         data_dir,
                     'out_dir':          str(self.pandda_output_data_dir_entry.text()),
                     'submit_mode':      str(self.pandda_submission_mode_selection_combobox.currentText()),
                     'nproc':            str(self.pandda_nproc_entry.text()),
-                    'xtalform':         str(self.pandda_analyse_crystal_from_selection_combobox.currentText())
+                    'xtalform':         str(self.pandda_analyse_crystal_from_selection_combobox.currentText()),
+                    'min_build_dir':    str(self.pandda_min_build_dataset_entry.text())
                         }
             print pandda_params
-            XChemPANDDA.PANDDAs(pandda_params).run_pandda_analyse()
+#            XChemPANDDA.PANDDAs(pandda_params).run_pandda_analyse()
 
         elif str(self.sender().text()).startswith("Launch pandda.inspect"):
             pandda_params = {
