@@ -17,9 +17,18 @@ class run_pandda_analyse(QtCore.QThread):
         if os.path.isfile(os.path.join(self.panddas_directory,'pandda.running')):
             return None
         else:
+            if os.getenv('SHELL') == '/bin/tcsh' or os.getenv('SHELL') == '/bin/csh':
+                source_file=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-csh')
+            elif os.getenv('SHELL') == '/bin/bash':
+                source_file=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')
+            else:
+                source_file=''
+
             os.chdir(self.panddas_directory)
             Cmds = (
                 '#!'+os.getenv('SHELL')+'\n'
+                '\n'
+                'source '+source_file+'\n'
                 '\n'
                 'cd '+self.panddas_directory+'\n'
                 '\n'
