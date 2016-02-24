@@ -256,7 +256,8 @@ class start_pandda_inspect(QtCore.QThread):
 
     def __init__(self,settings):
         QtCore.QThread.__init__(self)
-        self.settings=settings
+#        self.settings=settings
+        self.panddas_directory=settings['panddas_directory']
 
     def run(self):
         if os.getenv('SHELL') == '/bin/tcsh' or os.getenv('SHELL') == '/bin/csh':
