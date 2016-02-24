@@ -1354,6 +1354,8 @@ class XChemExplorer(QtGui.QApplication):
                 allRows = self.pandda_analyse_data_table.rowCount()
                 for row in range(allRows):
                     sample=(self.pandda_analyse_data_table.item(row,0).text())
+                    print sample
+                    print os.path.join(str(self.pandda_input_data_dir_entry.text()).replace('*',sample),'final.pdb')
                     if os.path.isfile(os.path.join(str(self.pandda_input_data_dir_entry.text()).replace('*',sample),'final.pdb')    ):
                         print 'gigreurhg'
                     print sample
