@@ -1352,7 +1352,7 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 # read table
                 allRows = self.pandda_analyse_data_table.rowCount()
-                tmp_dir=os.path.join(self.panddas_directory[:self.panddas_directory.rfind('/')],'tmp_'+str(self.pandda_analyse_crystal_from_selection_combobox.currentText()))
+                tmp_dir=os.path.join(self.panddas_directory[:self.panddas_directory.rfind('/')],'tmp_pandda_'+str(self.pandda_analyse_crystal_from_selection_combobox.currentText()))
                 if not os.path.isdir(tmp_dir):
                     os.mkdir(tmp_dir)
                 data_dir=os.path.join(tmp_dir,'*')
@@ -1370,15 +1370,15 @@ class XChemExplorer(QtGui.QApplication):
                 # set new data_dir path
 
             pandda_params = {
-                    'data_dir':         data_dir,
-                    'out_dir':          str(self.pandda_output_data_dir_entry.text()),
-                    'submit_mode':      str(self.pandda_submission_mode_selection_combobox.currentText()),
-                    'nproc':            str(self.pandda_nproc_entry.text()),
-                    'xtalform':         str(self.pandda_analyse_crystal_from_selection_combobox.currentText()),
-                    'min_build_dir':    str(self.pandda_min_build_dataset_entry.text())
+                    'data_dir':             data_dir,
+                    'out_dir':              str(self.pandda_output_data_dir_entry.text()),
+                    'submit_mode':          str(self.pandda_submission_mode_selection_combobox.currentText()),
+                    'nproc':                str(self.pandda_nproc_entry.text()),
+                    'xtalform':             str(self.pandda_analyse_crystal_from_selection_combobox.currentText()),
+                    'min_build_datasets':   str(self.pandda_min_build_dataset_entry.text())
                         }
             print pandda_params
-#            XChemPANDDA.PANDDAs(pandda_params).run_pandda_analyse()
+            XChemPANDDA.PANDDAs(pandda_params).run_pandda_analyse()
 
         elif str(self.sender().text()).startswith("Launch pandda.inspect"):
             pandda_params = {
