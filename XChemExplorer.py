@@ -1356,7 +1356,10 @@ class XChemExplorer(QtGui.QApplication):
                     sample=(self.pandda_analyse_data_table.item(row,0).text())
                     if os.path.isfile(os.path.join(str(self.pandda_input_data_dir_entry.text()).replace('*',sample),'final.pdb')    ):
                         print 'gigreurhg'
-                print 'tmp dir',self.panddas_directory[:self.panddas_directory.rfind('/')]
+                tmp_dir=os.path.join(self.panddas_directory[:self.panddas_directory.rfind('/')],'tmp_'+str(self.pandda_analyse_crystal_from_selection_combobox.currentText()))
+                if not os.path.isdir(tmp_dir):
+                    os.mkdir(tmp_dir)
+                data_dir=os.path.join(tmp_dir,'*')
                 # create softlinks to pseudo datadir
                 # set new data_dir path
 
