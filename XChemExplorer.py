@@ -1357,7 +1357,7 @@ class XChemExplorer(QtGui.QApplication):
                     os.mkdir(tmp_dir)
                 data_dir=os.path.join(tmp_dir,'*')
                 for row in range(allRows):
-                    sample=(self.pandda_analyse_data_table.item(row,0).text())
+                    sample=str(self.pandda_analyse_data_table.item(row,0).text())
                     if os.path.isfile(os.path.join(str(self.pandda_input_data_dir_entry.text()).replace('*',sample),'final.pdb')    ):
                         if not os.path.isdir(os.path.join(tmp_dir,sample)):
                             os.mkdir(os.path.join(tmp_dir,sample))
