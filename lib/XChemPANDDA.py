@@ -35,6 +35,7 @@ class run_pandda_analyse(QtCore.QThread):
                 'pandda.analyse data_dirs="'+self.data_directory+'"'
                 ' pdb_style=final.pdb out_dir='+self.panddas_directory+
                 ' min_build_datasets='+self.min_build_datasets+
+                ' maps.ampl_label=FWT maps.phas_label=PHWT'
                 ' cpus='+self.nproc+'\n'
                 )
             print Cmds
