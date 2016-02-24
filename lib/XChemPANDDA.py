@@ -12,7 +12,7 @@ class run_pandda_analyse(QtCore.QThread):
         self.submit_mode=pandda_params['submit_mode']
         if self.submit_mode == 'local machine':
             self.nproc=pandda_params['nproc']
-        else
+        else:
             self.nproc='7'
         self.min_build_datasets=pandda_params['min_build_datasets']
 
