@@ -1363,9 +1363,9 @@ class XChemExplorer(QtGui.QApplication):
                             os.mkdir(os.path.join(tmp_dir,sample))
                         os.chdir(os.path.join(tmp_dir,sample))
                         if not os.path.isfile('final.pdb'):
-                            os.symlink(os.path.join(str(self.pandda_input_data_dir_entry.text()).replace('*',sample),'final.pdb'))
+                            os.symlink(os.path.join(str(self.pandda_input_data_dir_entry.text()).replace('*',sample),'final.pdb'),'final.pdb')
                         if not os.path.isfile('final.mtz'):
-                            os.symlink(os.path.join(str(self.pandda_input_data_dir_entry.text()).replace('*',sample),'final.mtz'))
+                            os.symlink(os.path.join(str(self.pandda_input_data_dir_entry.text()).replace('*',sample),'final.mtz'),'final.mtz')
                 # create softlinks to pseudo datadir
                 # set new data_dir path
 
