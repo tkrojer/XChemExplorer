@@ -1378,7 +1378,9 @@ class XChemExplorer(QtGui.QApplication):
                     'min_build_datasets':   str(self.pandda_min_build_dataset_entry.text())
                         }
             print pandda_params
-            XChemPANDDA.PANDDAs(pandda_params).run_pandda_analyse()
+            self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params)
+            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.work_thread.start()
 
         elif str(self.sender().text()).startswith("Launch pandda.inspect"):
             pandda_params = {
