@@ -1240,6 +1240,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
 
                     # then exactly the same for fast_dp
+                    print os.path.join(visit_directory,'processed',protein_name,xtal,run,'fast_dp','*aimless.log')
                     if os.path.isfile(os.path.join(visit_directory,'processed',protein_name,xtal,run,'fast_dp','*aimless.log')):
                         file_name=os.path.join(runs,'fast_dp','*aimless.log')
                         print 'fast_dp',file_name
