@@ -1052,7 +1052,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                             print self.data_collection_dict[xtal][n]
 
         # save everything so that it's quicker to reload and is available outside DLS
-        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'pickling resultsl'))
+        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'pickling resultsl')
         pickle.dump(self.data_collection_dict,open(  os.path.join(self.database_directory,'test.pkl'),'wb'))
 
         self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results'), self.data_collection_dict)
