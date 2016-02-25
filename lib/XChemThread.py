@@ -1349,13 +1349,18 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                             print 'ur',entry[6]['UniqueReflectionsOverall']
                             print 'comp',entry[6]['CompletenessOverall']
                             print 'isg',entry[6]['IsigOverall']
-                            if isinstance(entry[6]['UniqueReflectionsOverall'],int) and \
-                               isinstance(entry[6]['CompletenessOverall'],float) and \
-                               isinstance(entry[6]['IsigOverall'],float):
-                                print 'hallo'
-                                ranking=entry[6]['UniqueReflectionsOverall']*entry[6]['CompletenessOverall']*entry[6]['IsigOverall']
-                                print 'quality index',ranking
-                                select_stage_three_list.append([index,ranking])
+                            ranking=entry[6]['UniqueReflectionsOverall']*entry[6]['CompletenessOverall']*entry[6]['IsigOverall']
+                            print 'quality index',ranking
+                            select_stage_three_list.append([index,ranking])
+
+
+#                            if isinstance(entry[6]['UniqueReflectionsOverall'],int) and \
+#                               isinstance(entry[6]['CompletenessOverall'],float) and \
+#                               isinstance(entry[6]['IsigOverall'],float):
+#                                print 'hallo'
+#                                ranking=entry[6]['UniqueReflectionsOverall']*entry[6]['CompletenessOverall']*entry[6]['IsigOverall']
+#                                print 'quality index',ranking
+#                                select_stage_three_list.append([index,ranking])
 
 #            for index in select_stage_three_list:
             print 'stage 3',select_stage_three_list
