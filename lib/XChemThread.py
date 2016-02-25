@@ -1349,7 +1349,9 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                             print 'ur',entry[6]['UniqueReflectionsOverall']
                             print 'comp',entry[6]['CompletenessOverall']
                             print 'isg',entry[6]['IsigOverall']
-                            ranking=entry[6]['UniqueReflectionsOverall']*entry[6]['CompletenessOverall']*entry[6]['IsigOverall']
+                            ranking=float(entry[6]['UniqueReflectionsOverall'])*\
+                                    float(entry[6]['CompletenessOverall'])*\
+                                    float(entry[6]['IsigOverall'])
                             print 'quality index',ranking
                             select_stage_three_list.append([index,ranking])
 
