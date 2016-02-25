@@ -896,7 +896,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                         for entry in self.data_collection_dict[xtal]:
                             if len(entry)==9:
                                 print entry[1],entry[2],entry[3],entry[0]
-                                if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[3]==autoproc:
+                                if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[4]==autoproc:
                                     print 'done this autoproc already'
                                     found_autoproc=True
                         if not found_autoproc:
@@ -917,7 +917,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                         found_autoproc=False
                         for entry in self.data_collection_dict[xtal]:
                             if len(entry)==9:
-                                if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[3]==autoproc:
+                                if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[4]==autoproc:
                                     found_autoproc=True
                         if not found_autoproc:
                             aimless_results=parse().GetAimlessLog(file_name)
@@ -934,7 +934,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                         found_autoproc=False
                         for entry in self.data_collection_dict[xtal]:
                             if len(entry)==9:
-                                if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[3]==autoproc:
+                                if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[4]==autoproc:
                                     found_autoproc=True
                         if not found_autoproc:
                             aimless_results=parse().GetAimlessLog(file_name)
