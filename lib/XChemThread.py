@@ -1341,11 +1341,14 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
             select_stage_three_list=[]
             for index in select_stage_two_list:
                 for entry in self.data_collection_dict[xtal]:
-                    print len(entry),entry
+#                    print len(entry),entry
                     if len(entry)>=9 and entry[0]=='logfile':
                         print 'ok first requirement fullfilled'
                         if isinstance(entry[6],dict) and entry[7]==index:
                             print 'ok second requirement fullfilled'
+                            print entry[6]['UniqueReflectionsOverall']
+                            print isinstance(entry[6]['CompletenessOverall']
+                            print isinstance(entry[6]['IsigOverall']
                             if isinstance(entry[6]['UniqueReflectionsOverall'],float) and \
                                isinstance(entry[6]['CompletenessOverall'],float) and \
                                isinstance(entry[6]['IsigOverall'],float):
@@ -1355,13 +1358,14 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
 
 #            for index in select_stage_three_list:
             print 'stage 3',select_stage_three_list
-            best_file_index=max(select_stage_three_list,key=lambda x: x[1])[0]
-            print 'best reso',best_file_index
-            for n,entry in enumerate(self.data_collection_dict[xtal]):
-                if len(entry)==9 and entry[0]=='logfile':
-                    if entry[7]==best_file_index:
-                        self.data_collection_dict[xtal][n][8]=True
-                        print self.data_collection_dict[xtal][n]
+            if not select_stage_three_list==[]
+                best_file_index=max(select_stage_three_list,key=lambda x: x[1])[0]
+                print 'best reso',best_file_index
+                for n,entry in enumerate(self.data_collection_dict[xtal]):
+                    if len(entry)==9 and entry[0]=='logfile':
+                        if entry[7]==best_file_index:
+                            self.data_collection_dict[xtal][n][8]=True
+                            print self.data_collection_dict[xtal][n]
 
             print select_stage_three_list
 
