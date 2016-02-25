@@ -871,8 +871,10 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                     # image files
                     image_files_in_list=False
                     for entry in self.data_collection_dict[xtal]:
-                        if len(entry)==5:
+                        if len(entry)>=5:
+                            print visit,run
                             if entry[0]=='image' and entry[1]==visit and entry[2]==run:
+                                print entry[1],entry[2],entry[0]
                                 print 'done this image already'
                                 image_files_in_list=True
                     if not image_files_in_list:
@@ -891,7 +893,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                         autoproc=file_name.split('/')[len(file_name.split('/'))-3]
                         found_autoproc=False
                         for entry in self.data_collection_dict[xtal]:
-                            if len(entry)==9:
+                            if len(entry)>=9:
                                 if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[4]==autoproc:
                                     found_autoproc=True
                         if not found_autoproc:
@@ -911,7 +913,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                         autoproc=file_name.split('/')[len(file_name.split('/'))-2]
                         found_autoproc=False
                         for entry in self.data_collection_dict[xtal]:
-                            if len(entry)==9:
+                            if len(entry)>=9:
                                 if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[4]==autoproc:
                                     found_autoproc=True
                         if not found_autoproc:
@@ -928,7 +930,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                         autoproc=file_name.split('/')[len(file_name.split('/'))-3]
                         found_autoproc=False
                         for entry in self.data_collection_dict[xtal]:
-                            if len(entry)==9:
+                            if len(entry)>=9:
                                 if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[4]==autoproc:
                                     found_autoproc=True
                         if not found_autoproc:
