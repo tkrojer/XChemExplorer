@@ -1045,7 +1045,6 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                             self.data_collection_dict[xtal][n][8]=True
                             print self.data_collection_dict[xtal][n]
 
-        quit()
         # save everything so that it's quicker to reload and is available outside DLS
         pickle.dump([self.data_collection_dict],
                     open(  os.path.join(self.database_directory,'test.pkl'),'wb'))
