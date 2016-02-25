@@ -945,9 +945,6 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
 
             search_cycle+=1
 
-        print len(self.data_collection_dict)
-
-
         # now we try, somewhat haphazardly, to determine which autoprocessing run is currently the best
 
         # before creating the table with the results, try to guess which one to select
@@ -1054,8 +1051,8 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                             self.data_collection_dict[xtal][n][8]=True
                             print self.data_collection_dict[xtal][n]
 
-        print 'finally: ',len(self.data_collection_dict)
         # save everything so that it's quicker to reload and is available outside DLS
+        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'pickling resultsl'))
         pickle.dump(self.data_collection_dict,open(  os.path.join(self.database_directory,'test.pkl'),'wb'))
 
         self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results'), self.data_collection_dict)
