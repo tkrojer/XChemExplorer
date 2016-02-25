@@ -1343,6 +1343,8 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                 if not found:
                     tmp.append(index)
 
+            quit()
+
             # if none passed Stage 2, carry them over to Stage 3
             if select_stage_two_list == [] and tmp != []:
                 select_stage_two_list=tmp
