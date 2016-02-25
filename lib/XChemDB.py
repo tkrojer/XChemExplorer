@@ -116,6 +116,10 @@ class data_source:
             ['DataProcessingUnitCellVolume',         'DataProcessingUnitCellVolume',            'TEXT'],
             ['DataProcessingAlert',                  'DataProcessingAlert',                     'TEXT'],
 
+            ['DataProcessingRcryst',                  'DataProcessing\nRcryst',                     'TEXT'],
+            ['DataProcessingRfree',                  'DataProcessing\nRfree',                     'TEXT'],
+
+
 #            ['PANDDAstuff',                          'PANDDAstuff',                             'TEXT'],
             ['DimpleResolutionHigh',                 'Dimple\nResolution High',                 'TEXT'],
             ['DimpleRcryst',                        'Dimple\nRcryst',                 'TEXT'],

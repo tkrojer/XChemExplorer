@@ -99,8 +99,6 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_list=[]
         self.visit_list=[]
         self.target=''
-        self.dataset_outcome_dict={}            # contains the dataset outcome buttons
-        self.data_collection_table_dict={}      # contains the dataset table
         self.dataset_outcome_combobox_dict={}
         self.data_collection_dict={}
         self.data_collection_statistics_dict={}
@@ -110,6 +108,11 @@ class XChemExplorer(QtGui.QApplication):
                                                                          self.data_source_file)).return_column_list()
         self.albula_button_dict={}
         self.xtalform_dict={}
+
+        self.dataset_outcome_dict={}            # contains the dataset outcome buttons
+        self.data_collection_table_dict={}      # contains the dataset table
+        self.data_collection_image_dict={}
+        self.main_data_collection_table_exists=False
 
         # command line arguments
         try:
@@ -1488,6 +1491,9 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_dict=dict_list[0]
         self.data_collection_statistics_dict=dict_list[1]
 
+
+        # in case we're just adding things to an exsiting table:
+
         # reset the two dictionaries which contain the buttons and tables for each data collection
         self.dataset_outcome_dict={}
         self.data_collection_table_dict={}
@@ -2157,6 +2163,10 @@ class XChemExplorer(QtGui.QApplication):
             if not str(row[sample_id_column[0]]).lower() != 'none' or not str(row[sample_id_column[0]]).replace(' ','') == '':
                 n_rows+=1
         return n_rows
+
+
+
+
 
 if __name__ == "__main__":
     app=XChemExplorer(sys.argv[1:])

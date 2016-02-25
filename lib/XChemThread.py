@@ -618,6 +618,9 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                     for file_name in glob.glob(os.path.join(runs,'fast_dp','*')):
                         if file_name.endswith('aimless.log') and (self.target in file_name or self.target=='*'):
                             logfile_list.append(file_name)
+                    for file_name in glob.glob(os.path.join(runs,'autoPROC','ap-run','*')):
+                        if file_name.endswith('aimless.log') and (self.target in file_name or self.target=='*'):
+                            logfile_list.append(file_name)
 
 
 
@@ -844,7 +847,6 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                 visit=visit_directory.split('/')[5]
 
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
-#                print 'collected_xtals',collected_xtals
                 # this step is only relevant when several samples are reviewed in one session
                 if 'tmp' in collected_xtals or 'results' in collected_xtals:
                     continue
@@ -853,7 +855,6 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                 protein_name=collected_xtals.split('/')[len(collected_xtals.split('/'))-2]
 
                 # if crystal is not in the data_collection_dict then add a new one
-                print xtal
                 if xtal not in self.data_collection_dict:
                     self.data_collection_dict[xtal]=[]
 
@@ -899,6 +900,9 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 dimple_file=os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2',autoproc,'dimple','final.pdb')
                                 pdb_info=parse().PDBheader(dimple_file)
                                 aimless_results.update(pdb_info)
+                            else:
+                                aimless_results['Rcryst'] = 'n/a'
+                                aimless_results['Rfree']  = 'n/a'
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
 
 
@@ -919,6 +923,9 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 dimple_file=os.path.join(runs,'fast_dp','dimple','final.pdb')
                                 pdb_info=parse().PDBheader(dimple_file)
                                 aimless_results.update(pdb_info)
+                            else:
+                                aimless_results['Rcryst'] = 'n/a'
+                                aimless_results['Rfree']  = 'n/a'
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
 
                     # then exactly the same for autoPROC
@@ -936,6 +943,9 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 dimple_file=os.path.join(runs,'autoPROC','dimple','final.pdb')
                                 pdb_info=parse().PDBheader(dimple_file)
                                 aimless_results.update(pdb_info)
+                            else:
+                                aimless_results['Rcryst'] = 'n/a'
+                                aimless_results['Rfree']  = 'n/a'
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
 
 
@@ -1052,7 +1062,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                             print self.data_collection_dict[xtal][n]
 
         # save everything so that it's quicker to reload and is available outside DLS
-        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'pickling resultsl')
+        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'pickling results')
         pickle.dump(self.data_collection_dict,open(  os.path.join(self.database_directory,'test.pkl'),'wb'))
 
         self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results'), self.data_collection_dict)
