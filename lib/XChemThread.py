@@ -1341,8 +1341,11 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
             select_stage_three_list=[]
             for index in select_stage_two_list:
                 for entry in self.data_collection_dict[xtal]:
+                    print len(entry),entry
                     if len(entry)>=9 and entry[0]=='logfile':
+                        print 'ok first requirement fullfilled'
                         if isinstance(entry[6],dict) and entry[7]==index:
+                            print 'ok second requirement fullfilled'
                             if isinstance(entry[6]['UniqueReflectionsOverall'],float) and \
                                isinstance(entry[6]['CompletenessOverall'],float) and \
                                isinstance(entry[6]['IsigOverall'],float):
