@@ -873,7 +873,6 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                     for entry in self.data_collection_dict[xtal]:
                         if len(entry)==5:
                             if entry[0]=='image' and entry[1]==visit and entry[2]==run:
-                                print 'done this already'
                                 image_files_in_list=True
                     if not image_files_in_list:
                         for image in glob.glob(os.path.join(visit_directory,'jpegs',self.target,xtal,'*')):
@@ -888,14 +887,10 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                     # aimless & Dimple information
                     # first for xia2 runs
                     for file_name in glob.glob(os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2','*','LogFiles','*aimless.log')):
-#                        print file_name
                         autoproc=file_name.split('/')[len(file_name.split('/'))-3]
-#                        print  file_name[:file_name.find(autoproc)]
                         found_autoproc=False
-                        print visit,run,autoproc
                         for entry in self.data_collection_dict[xtal]:
                             if len(entry)==9:
-                                print entry[1],entry[2],entry[3],entry[0]
                                 if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[4]==autoproc:
                                     print 'done this autoproc already'
                                     found_autoproc=True
