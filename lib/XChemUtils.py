@@ -167,14 +167,14 @@ class process:
         os.chdir(self.project_directory+'/'+self.xtalID)
         os.system('touch dimple_run_in_progress')
         os.chdir(self.project_directory+'/'+self.xtalID+'/Dimple')
-        f = open('%s.sh' %self.xtalID,'w')
+        f = open('xce_dimple.sh','w')
         f.write(Cmds)
         f.close()
         if self.queueing_system_available:
-            os.system('qsub %s.sh' %self.xtalID)
+            os.system('qsub xce_dimple.sh')
         else:
-            os.system('chmod +x %s.sh' %self.xtalID)
-            os.system('./%s.sh' %self.xtalID)
+            os.system('chmod +x xce_dimple.sh')
+            os.system('./xce_dimple.sh')
 
 class helpers:
 
