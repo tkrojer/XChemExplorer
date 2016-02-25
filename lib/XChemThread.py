@@ -805,350 +805,6 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 
 
 
-class temp_read_autoprocessing_results_from_disc(QtCore.QThread):
-    def __init__(self,visit_list,target,reference_file_list,database_directory):
-        QtCore.QThread.__init__(self)
-        self.visit_list=visit_list
-        self.target=target
-        self.reference_file_list=reference_file_list
-        self.data_collection_dict={}
-        self.database_directory=database_directory
-
-#        if os.path.isfile(os.path.join(self.database_directory,'data_collection_summary.pkl')):
-#            self.data_collection_dict = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
-
-        # - open data source if possible
-        # - get sampleID, xtbm
-        # - search lab36 folder for respective xtal image
-        # - convert to string and use in data dict
-        # - but images can only be found of XCE is started in the respective labchem directory
-
-    def run(self):
-
-        number_of_visits_to_search=len(self.visit_list)
-        search_cycle=1
-
-        for visit_directory in sorted(self.visit_list):
-            if len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*')))==0:
-                continue
-            progress_step=100/float(len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))))
-            progress=0
-
-            if 'attic' in visit_directory:
-                visit=visit_directory.split('/')[6]
-            else:
-                visit=visit_directory.split('/')[5]
-
-            for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
-                print 'collected_xtals',collected_xtals
-                # this step is only relevant when several samples are reviewed in one session
-                if 'tmp' in collected_xtals or 'results' in collected_xtals:
-                    continue
-
-                xtal=collected_xtals[collected_xtals.rfind('/')+1:]
-                protein_name=collected_xtals.split('/')[len(collected_xtals.split('/'))-2]
-
-                # if crystal is not in the data_collection_dict then add a new one
-                if xtal not in self.data_collection_dict:
-                    self.data_collection_dict[xtal]=[[],[]]
-
-                self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 1 of 2: searching visit '+ \
-                                                                       str(search_cycle)+' of '+str(number_of_visits_to_search)+ \
-                                                                       ' ('+visit+'/'+xtal+')')
-
-                # first check if visit dictionary does already exist
-                if self.data_collection_dict[xtal][1] == []:
-                    visit_dict={}
-                    visit_dict[visit]=[[],[],[]]
-                else:
-                    # not sure how to do this yet
-                    print 'hallo'
-#                    visit_dict=self.data_collection_dict[xtal][1]
-                print visit_dict
-
-                # check if there is already an entry for the current run
-                # obviously create if not and fill in basic information
-                for runs in glob.glob(collected_xtals+'/*'):
-                    run=runs[runs.rfind('/')+1:]
-                    found_run=False
-                    for entry in visit_dict[visit]:
-                        if entry != []:
-                            if entry[0][0]==run:
-                                found_run=True
-                    if not found_run:
-                        timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
-                        diffraction_image_directory=os.path.join(visit_directory,protein_name,xtal)
-                        visit_dict[visit][0].append( [ [run,timestamp,diffraction_image_directory],[],[] ] )
-
-                # iterate again through all the runs visit_dict[visit] dictionary!!!
-                # fill in centred images and aimless logfile information in case missing
-                for runs in visit_dict[visit]:
-                    print runs
-                    run=runs[0][0][0]      # at least one entry must exist by now
-                    print run
-                    # image files
-                    # we only need to check once because centring images are either present
-                    # at the beginning of the run or never
-                    if visit_dict[visit][1] == []:
-                        for image in glob.glob(os.path.join(visit_directory,'jpegs',self.target,xtal,'*')):
-                            if run in image:
-                                if image.endswith('t.png') or image.endswith('_.png'):
-                                    image_name=image[image.rfind('/')+1:]
-                                    image_file=open(image,"rb")
-                                    image_string=base64.b64encode(image_file.read())
-                                    visit_dict[visit][1].append([image_name,image_string])
-
-                    # aimless information
-                    # first for xia2 runs
-                    for file_name in glob.glob(os.path.join(visit_directory,'processed',run,'xia2','*','LogFiles','*aimless.log')):
-                        autoproc=file_name.split('/')[len(file_name.split('/'))-3]
-                        found_autoproc=False
-                        if visit_dict[visit][2] != []:
-                            for aimless_file in visit_dict[visit][2]:
-                                if aimless_file[0]==autoproc:
-                                    found_autoproc=True
-                        if not found_autoproc:
-                            aimless_results=parse().GetAimlessLog(file_name)
-                            visit_dict[visit][2].append(autoproc,file_name,aimless_results,False)
-                    # then exactly the same for fast_dp
-                    if os.path.isfile(os.path.join(visit_directory,'processed',run,'fast_dp','*aimless.log')):
-                        file_name=os.path.join(runs,'fast_dp','*aimless.log')
-                        autoproc=file_name.split('/')[len(file_name.split('/'))-2]
-                        found_autoproc=False
-                        if visit_dict[visit][2] != []:
-                            for aimless_file in visit_dict[visit][2]:
-                                if aimless_file[0]==autoproc:
-                                    found_autoproc=True
-                        if not found_autoproc:
-                            aimless_results=parse().GetAimlessLog(file_name)
-                            visit_dict[visit][2].append(autoproc,file_name,aimless_results,False)       # false for best reso file
-                                                                                                        # because we don't know at this point
-
-                progress += progress_step
-                self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-
-            search_cycle+=1
-
-#        print self.data_collection_dict
-#        quit()
-
-
-        # now we try, somewhat haphazardly, to determine which autoprocessing run is currently the best
-
-        # before creating the table with the results, try to guess which one to select
-        # 1. check if there are reference mtz files
-        # 1a. if so: take all logfiles forward that fit to the first one found
-        #     'fit means': same lattice and delta Vunitcell < 5%
-        # 2. if possible: select all datasets with Rmerge low < 5%
-        # 3. finally select the dataset with
-        #    max(unique_reflections*completeness*Mn(I/sig<I>)
-
-        if not len(self.data_collection_statistics)==0:
-            progress_step=100/float(len(self.data_collection_statistics))
-        progress=0
-
-
-        for xtal in self.data_collection_dict:
-            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 2 of 2: selecting "best" aimless logfile ->'+xtal)
-            # selection stage 1:
-            # similarity to reference files
-            selection_stage_ONE_list=[]
-            if self.reference_file_list != []:
-
-
-
-
-
-
-
-
-
-
-
-
-
-                for reference_file in self.reference_file_list:
-                    for aimless_file in self.data_collection_statistics_dict[sample]:
-                        try:
-                            if not reference_file[4]==0:
-                                unitcell_difference=round((math.fabs(reference_file[4]-aimless_file[25])/reference_file[4])*100,1)
-                                if unitcell_difference < 5 and reference_file[3]==aimless_file[21]:
-                                    select_stage_one_list.append(aimless_file)
-                                    found=1
-                        except IndexError:
-                            pass
-                if not found:                                                   # in case no file fullfils the criteria
-                    for aimless_file in self.data_collection_statistics_dict[sample]:
-                        if aimless_file != []:
-                            select_stage_one_list.append(aimless_file)
-            else:                                                               # in case no reference files are available
-                for aimless_file in self.data_collection_statistics_dict[sample]:
-                    if aimless_file != []:
-                        select_stage_one_list.append(aimless_file)
-
-
-
-
-
-########################################################################################################################
-
-        if not len(self.data_collection_dict)==0:
-            progress_step=100/float(len(self.data_collection_dict))
-        progress=0
-        for sample in sorted(self.data_collection_dict):
-            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 2 of 3: parsing aimless logfiles -> '+sample)
-            self.data_collection_statistics_dict[sample]=[]
-#            print sample,self.data_collection_dict[sample][2]
-            if not self.data_collection_dict[sample][2]==[]:
-                for index,logfile in enumerate(self.data_collection_dict[sample][2]):
-                    already_parsed=False
-                    if sample in self.data_collection_statistics_dict_collected:
-                        for entry in self.data_collection_statistics_dict_collected[sample]:
-                            if logfile==entry[1]:
-                                self.data_collection_statistics_dict[sample].append(entry)
-                                already_parsed=True
-                    if already_parsed:
-                        continue
-                    else:
-                        aimless_results=parse().GetAimlessLog(logfile)
-                        try:
-                            self.data_collection_statistics_dict[sample].append([
-                        index,                                                                                      # 0
-                        logfile,                                                                                    # 1
-                        ['Program',                     aimless_results['AutoProc'],                                                        (200,200,200)],
-                        ['Run',                         aimless_results['Run'],                                                             (200,200,200)],
-                        ['Space\nGroup',                aimless_results['SpaceGroup'],                                                      (200,200,200)],
-                        ['Unit Cell',                   aimless_results['UnitCell'],                                                        (200,200,200)],
-                        ['Resolution\nOverall',         aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionHigh'],             (200,200,200)],
-                        ['Resolution\nInner Shell',     aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionLowInnerShell'],    (200,200,200)],
-                        ['Resolution\nOuter Shell',     aimless_results['ResolutionHighOuterShell']+'-'+aimless_results['ResolutionHigh'],  (200,200,200)],
-                        ['Rmerge\nOverall',             aimless_results['RmergeOverall'],                                                   (200,200,200)],
-                        ['Rmerge\nInner Shell',         aimless_results['RmergeLow'],                                                       (200,200,200)],
-                        ['Rmerge\nOuter Shell',         aimless_results['RmergeHigh'],                                                      (200,200,200)],
-                        ['Mn(I/sig(I))\nOverall',       aimless_results['IsigOverall'],                                                     (200,200,200)],
-                        ['Mn(I/sig(I))\nInner Shell',   aimless_results['IsigLow'],                                                         (200,200,200)],
-                        ['Mn(I/sig(I))\nOuter Shell',   aimless_results['IsigHigh'],                                                        (200,200,200)],
-                        ['Completeness\nOverall',       aimless_results['CompletenessOverall'],                                             (200,200,200)],
-                        ['Completeness\nInner Shell',   aimless_results['CompletenessLow'],                                                 (200,200,200)],
-                        ['Completeness\nOuter Shell',   aimless_results['CompletenessHigh'],                                                (200,200,200)],
-                        ['Multiplicity\nOverall',       aimless_results['MultiplicityOverall'],                                             (200,200,200)],
-                        ['Multiplicity\nInner Shell',   aimless_results['MultiplicityLow'],                                                 (200,200,200)],
-                        ['Multiplicity\nOuter Shell',   aimless_results['MultiplicityHigh'],                                                (200,200,200)],
-                        aimless_results['Lattice'],                                                                 # 21
-                        float(aimless_results['UniqueReflectionsOverall']),                                         # 22
-                        float(aimless_results['CompletenessOverall']),                                              # 23
-                        float(aimless_results['IsigOverall']),                                                      # 24
-                        float(aimless_results['UnitCellVolume']),                                                   # 25
-                        float(aimless_results['RmergeLow']),                                                        # 26
-                        ['best file',False]                                                                                       # 27
-                                        ])
-                        except ValueError:
-                            self.data_collection_statistics_dict[sample].append([
-                        index,                                                                                      # 0
-                        logfile,                                                                                    # 1
-                        ['Program',                     aimless_results['AutoProc'],                                                        (200,200,200)],
-                        ['Run',                         aimless_results['Run'],                                                             (200,200,200)],
-                        ['Space\nGroup',                aimless_results['SpaceGroup'],                                                      (200,200,200)],
-                        ['Unit Cell',                   aimless_results['UnitCell'],                                                        (200,200,200)],
-                        ['Resolution\nOverall',         aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionHigh'],             (200,200,200)],
-                        ['Resolution\nInner Shell',     aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionLowInnerShell'],    (200,200,200)],
-                        ['Resolution\nOuter Shell',     aimless_results['ResolutionHighOuterShell']+'-'+aimless_results['ResolutionHigh'],  (200,200,200)],
-                        ['Rmerge\nOverall',             aimless_results['RmergeOverall'],                                                   (200,200,200)],
-                        ['Rmerge\nInner Shell',         aimless_results['RmergeLow'],                                                       (200,200,200)],
-                        ['Rmerge\nOuter Shell',         aimless_results['RmergeHigh'],                                                      (200,200,200)],
-                        ['Mn(I/sig(I))\nOverall',       aimless_results['IsigOverall'],                                                     (200,200,200)],
-                        ['Mn(I/sig(I))\nInner Shell',   aimless_results['IsigLow'],                                                         (200,200,200)],
-                        ['Mn(I/sig(I))\nOuter Shell',   aimless_results['IsigHigh'],                                                        (200,200,200)],
-                        ['Completeness\nOverall',       aimless_results['CompletenessOverall'],                                             (200,200,200)],
-                        ['Completeness\nInner Shell',   aimless_results['CompletenessLow'],                                                 (200,200,200)],
-                        ['Completeness\nOuter Shell',   aimless_results['CompletenessHigh'],                                                (200,200,200)],
-                        ['Multiplicity\nOverall',       aimless_results['MultiplicityOverall'],                                             (200,200,200)],
-                        ['Multiplicity\nInner Shell',   aimless_results['MultiplicityLow'],                                                 (200,200,200)],
-                        ['Multiplicity\nOuter Shell',   aimless_results['MultiplicityHigh'],                                                (200,200,200)],
-                        aimless_results['Lattice'],                                                                 # 21
-                        0.0,                                         # 22
-                        0.0,                                              # 23
-                        0.0,                                                      # 24
-                        0.0,                                                   # 25
-                        100.0,                                                        # 26
-                        ['best file',False]                                                                                       # 27
-                                        ])
-
-            else:
-                self.data_collection_statistics_dict[sample]+='###'*27
-            progress += progress_step
-            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-
-        # before creating the table with the results, try to guess which one to select
-        # 1. check if there are reference mtz files
-        # 1a. if so: take all logfiles forward that fit to the first one found
-        #     'fit means': same lattice and delta Vunitcell < 5%
-        # 2. if possible: select all datasets with Rmerge low < 5%
-        # 3. finally select the dataset with
-        #    max(unique_reflections*completeness*Mn(I/sig<I>)
-
-        if not len(self.data_collection_statistics_dict)==0:
-            progress_step=100/float(len(self.data_collection_statistics_dict))
-        progress=0
-
-        # if possible, select only the ones which have the same lattice and
-        # a unit cell volume difference of less than 5%
-        for sample in sorted(self.data_collection_statistics_dict):
-            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 3 of 3: selecting "best" aimless logfile ->'+sample)
-            if self.data_collection_statistics_dict[sample][0]=='#':
-                continue
-            select_stage_one_list = []
-            found=0
-            if self.reference_file_list != []:
-                for reference_file in self.reference_file_list:
-                    for aimless_file in self.data_collection_statistics_dict[sample]:
-                        try:
-                            if not reference_file[4]==0:
-                                unitcell_difference=round((math.fabs(reference_file[4]-aimless_file[25])/reference_file[4])*100,1)
-                                if unitcell_difference < 5 and reference_file[3]==aimless_file[21]:
-                                    select_stage_one_list.append(aimless_file)
-                                    found=1
-                        except IndexError:
-                            pass
-                if not found:                                                   # in case no file fullfils the criteria
-                    for aimless_file in self.data_collection_statistics_dict[sample]:
-                        if aimless_file != []:
-                            select_stage_one_list.append(aimless_file)
-            else:                                                               # in case no reference files are available
-                for aimless_file in self.data_collection_statistics_dict[sample]:
-                    if aimless_file != []:
-                        select_stage_one_list.append(aimless_file)
-
-            # if possible, select only the ones with Rmerge < 5%
-            select_stage_two_list=[]
-            for aimless_file in select_stage_one_list:
-                if aimless_file[26] < 0.05:
-                    select_stage_two_list.append(aimless_file)
-            if select_stage_two_list==[]:
-                select_stage_two_list=select_stage_one_list
-
-            # finally, select the file with the highest
-            # max(unique_reflections*completeness*Mn(I/sig<I>)
-            select_stage_three_list=[]
-            for aimless_file in select_stage_two_list:
-                select_stage_three_list.append([aimless_file[0],
-                                                aimless_file[22] \
-                                                * aimless_file[23] \
-                                                * aimless_file[24]])
-            if select_stage_three_list != []:
-                best_file_index=max(select_stage_three_list,key=lambda x: x[1])[0]
-                for index,results in enumerate(self.data_collection_statistics_dict[sample]):
-                    if index==best_file_index:
-                        self.data_collection_statistics_dict[sample][index][27]=['best file',True]
-            progress += progress_step
-            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-
-        # save everything so that it's quicker to reload and is available outside DLS
-        pickle.dump([self.data_collection_dict,self.data_collection_statistics_dict],
-                    open(  os.path.join(self.database_directory,'data_collection_summary.pkl'),'wb'))
-
-        self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results'), [self.data_collection_dict,
-                                                                            self.data_collection_statistics_dict])
 
 
 class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
@@ -1227,7 +883,6 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
 
                     # aimless information
                     # first for xia2 runs
-#                    print os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2','*','LogFiles','*aimless.log')
                     for file_name in glob.glob(os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2','*','LogFiles','*aimless.log')):
                         autoproc=file_name.split('/')[len(file_name.split('/'))-3]
                         found_autoproc=False
@@ -1240,11 +895,8 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
 
                     # then exactly the same for fast_dp
-#                    print os.path.join(visit_directory,'processed',protein_name,xtal,run,'fast_dp','*aimless.log')
-#                    if os.path.isfile(os.path.join(visit_directory,'processed',protein_name,xtal,run,'fast_dp','aimless.log')):
                     if os.path.isfile(os.path.join(runs,'fast_dp','aimless.log')):
                         file_name=os.path.join(runs,'fast_dp','aimless.log')
-                        print 'fast_dp',file_name
                         autoproc=file_name.split('/')[len(file_name.split('/'))-2]
                         found_autoproc=False
                         for entry in self.data_collection_dict[xtal]:
@@ -1256,17 +908,17 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
 
                     # then exactly the same for autoPROC
-#                    if os.path.isfile(os.path.join(visit_directory,'processed',protein_name,xtal,run,'autoPROC','ap-run','aimless.log')):
-#                        file_name=os.path.join(runs,'fast_dp','*aimless.log')
-#                        autoproc=file_name.split('/')[len(file_name.split('/'))-2]
-#                        found_autoproc=False
-#                        for entry in self.data_collection_dict[xtal]:
-#                            if len(entry)==9:
-#                                if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[3]==autoproc:
-#                                    found_autoproc=True
-#                        if not found_autoproc:
-#                            aimless_results=parse().GetAimlessLog(file_name)
-#                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
+                    if os.path.isfile(os.path.join(runs,'autoPROC','ap-run','aimless.log')):
+                        file_name=os.path.join(runs,'autoPROC','ap-run','aimless.log')
+                        autoproc=file_name.split('/')[len(file_name.split('/'))-3]
+                        found_autoproc=False
+                        for entry in self.data_collection_dict[xtal]:
+                            if len(entry)==9:
+                                if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[3]==autoproc:
+                                    found_autoproc=True
+                        if not found_autoproc:
+                            aimless_results=parse().GetAimlessLog(file_name)
+                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
 
 
 
@@ -1345,8 +997,6 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                 if not found:
                     tmp.append(index)
 
-            quit()
-
             # if none passed Stage 2, carry them over to Stage 3
             if select_stage_two_list == [] and tmp != []:
                 select_stage_two_list=tmp
@@ -1367,22 +1017,15 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                             print 'ur',entry[6]['UniqueReflectionsOverall']
                             print 'comp',entry[6]['CompletenessOverall']
                             print 'isg',entry[6]['IsigOverall']
-                            ranking=float(entry[6]['UniqueReflectionsOverall'])*\
-                                    float(entry[6]['CompletenessOverall'])*\
-                                    float(entry[6]['IsigOverall'])
-                            print 'quality index',ranking
-                            select_stage_three_list.append([index,ranking])
+                            try:
+                                ranking=float(entry[6]['UniqueReflectionsOverall'])*\
+                                        float(entry[6]['CompletenessOverall'])*\
+                                        float(entry[6]['IsigOverall'])
+                                print 'quality index',ranking
+                                select_stage_three_list.append([index,ranking])
+                            except ValueError:
+                                pass
 
-
-#                            if isinstance(entry[6]['UniqueReflectionsOverall'],int) and \
-#                               isinstance(entry[6]['CompletenessOverall'],float) and \
-#                               isinstance(entry[6]['IsigOverall'],float):
-#                                print 'hallo'
-#                                ranking=entry[6]['UniqueReflectionsOverall']*entry[6]['CompletenessOverall']*entry[6]['IsigOverall']
-#                                print 'quality index',ranking
-#                                select_stage_three_list.append([index,ranking])
-
-#            for index in select_stage_three_list:
 #            print 'stage 3',select_stage_three_list
             if not select_stage_three_list==[]:
                 best_file_index=max(select_stage_three_list,key=lambda x: x[1])[0]
@@ -1393,7 +1036,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                             self.data_collection_dict[xtal][n][8]=True
 #                            print self.data_collection_dict[xtal][n]
 
-#            print select_stage_three_list
+            print select_stage_three_list
 
         # save everything so that it's quicker to reload and is available outside DLS
         pickle.dump([self.data_collection_dict],
