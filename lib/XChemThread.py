@@ -892,8 +892,10 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                         autoproc=file_name.split('/')[len(file_name.split('/'))-3]
 #                        print  file_name[:file_name.find(autoproc)]
                         found_autoproc=False
+                        print visit,run,autoproc
                         for entry in self.data_collection_dict[xtal]:
                             if len(entry)==9:
+                                print entry[1],entry[2],entry[3],entry[0]
                                 if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[3]==autoproc:
                                     print 'done this autoproc already'
                                     found_autoproc=True
