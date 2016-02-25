@@ -1242,6 +1242,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                     # then exactly the same for fast_dp
                     if os.path.isfile(os.path.join(visit_directory,'processed',protein_name,xtal,run,'fast_dp','*aimless.log')):
                         file_name=os.path.join(runs,'fast_dp','*aimless.log')
+                        print 'fast_dp',file_name
                         autoproc=file_name.split('/')[len(file_name.split('/'))-2]
                         found_autoproc=False
                         for entry in self.data_collection_dict[xtal]:
@@ -1251,6 +1252,19 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                         if not found_autoproc:
                             aimless_results=parse().GetAimlessLog(file_name)
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
+
+                    # then exactly the same for autoPROC
+#                    if os.path.isfile(os.path.join(visit_directory,'processed',protein_name,xtal,run,'autoPROC','ap-run','*aimless.log')):
+#                        file_name=os.path.join(runs,'fast_dp','*aimless.log')
+#                        autoproc=file_name.split('/')[len(file_name.split('/'))-2]
+#                        found_autoproc=False
+#                        for entry in self.data_collection_dict[xtal]:
+#                            if len(entry)==9:
+#                                if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[3]==autoproc:
+#                                    found_autoproc=True
+#                        if not found_autoproc:
+#                            aimless_results=parse().GetAimlessLog(file_name)
+#                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
 
 
 
@@ -1365,7 +1379,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
 #                                select_stage_three_list.append([index,ranking])
 
 #            for index in select_stage_three_list:
-            print 'stage 3',select_stage_three_list
+#            print 'stage 3',select_stage_three_list
             if not select_stage_three_list==[]:
                 best_file_index=max(select_stage_three_list,key=lambda x: x[1])[0]
                 print 'best reso',best_file_index
@@ -1373,9 +1387,9 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                     if len(entry)==9 and entry[0]=='logfile':
                         if entry[7]==best_file_index:
                             self.data_collection_dict[xtal][n][8]=True
-                            print self.data_collection_dict[xtal][n]
+#                            print self.data_collection_dict[xtal][n]
 
-            print select_stage_three_list
+#            print select_stage_three_list
 
         # save everything so that it's quicker to reload and is available outside DLS
         pickle.dump([self.data_collection_dict],
