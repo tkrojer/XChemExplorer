@@ -887,9 +887,6 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
 #                        print file_name
                         autoproc=file_name.split('/')[len(file_name.split('/'))-3]
 #                        print  file_name[:file_name.find(autoproc)]
-                        if os.path.isfile(os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2',autoproc,'dimple','final.pdb')):
-                            dimple_file=os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2',autoproc,'dimple','final.pdb')
-                            print dimple_file
                         found_autoproc=False
                         for entry in self.data_collection_dict[xtal]:
                             if len(entry)==9:
@@ -897,7 +894,14 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     found_autoproc=True
                         if not found_autoproc:
                             aimless_results=parse().GetAimlessLog(file_name)
+                            if os.path.isfile(os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2',autoproc,'dimple','final.pdb')):
+                                dimple_file=os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2',autoproc,'dimple','final.pdb')
+                                pdb_info=parse().PDBheader(dimple_file)
+                                aimless_results.update(pdb_info)
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
+
+
+
 
                     # then exactly the same for fast_dp
                     if os.path.isfile(os.path.join(runs,'fast_dp','aimless.log')):
@@ -1039,7 +1043,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                     if len(entry)==9 and entry[0]=='logfile':
                         if entry[7]==best_file_index:
                             self.data_collection_dict[xtal][n][8]=True
-#                            print self.data_collection_dict[xtal][n]
+                            print self.data_collection_dict[xtal][n]
 
         quit()
         # save everything so that it's quicker to reload and is available outside DLS
