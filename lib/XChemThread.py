@@ -816,8 +816,6 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
         self.data_collection_dict={}
         self.database_directory=database_directory
 
-        if os.path.isfile(os.path.join(self.database_directory,'test.pkl')):
-            self.data_collection_dict = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
 
         # - open data source if possible
         # - get sampleID, xtbm
@@ -826,6 +824,10 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
         # - but images can only be found of XCE is started in the respective labchem directory
 
     def run(self):
+
+        if os.path.isfile(os.path.join(self.database_directory,'test.pkl')):
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'unpickling: '+os.path.join(self.database_directory,'test.pkl'))
+            self.data_collection_dict = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
 
         number_of_visits_to_search=len(self.visit_list)
         search_cycle=1
@@ -851,6 +853,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                 protein_name=collected_xtals.split('/')[len(collected_xtals.split('/'))-2]
 
                 # if crystal is not in the data_collection_dict then add a new one
+                print xtal
                 if xtal not in self.data_collection_dict:
                     self.data_collection_dict[xtal]=[]
 
