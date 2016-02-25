@@ -1351,7 +1351,9 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 select_stage_three_list.append([index,ranking])
 
 #            for index in select_stage_three_list:
+            print 'stage 3',select_stage_three_list
             best_file_index=max(select_stage_three_list,key=lambda x: x[1])[0]
+            print 'best reso',best_file_index
             for n,entry in enumerate(self.data_collection_dict[xtal]):
                 if len(entry)==9 and entry[0]=='logfile':
                     if entry[7]==best_file_index:
