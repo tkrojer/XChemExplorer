@@ -881,9 +881,10 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     self.data_collection_dict[xtal].append(['image',visit,run,timestamp,image_name,image_string])
 
 
-                    # aimless information
+                    # aimless & Dimple information
                     # first for xia2 runs
                     for file_name in glob.glob(os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2','*','LogFiles','*aimless.log')):
+                        print file_name
                         autoproc=file_name.split('/')[len(file_name.split('/'))-3]
                         found_autoproc=False
                         for entry in self.data_collection_dict[xtal]:
@@ -1011,17 +1012,17 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                 for entry in self.data_collection_dict[xtal]:
 #                    print len(entry),entry
                     if len(entry)>=9 and entry[0]=='logfile':
-                        print 'ok first requirement fullfilled'
+#                        print 'ok first requirement fullfilled'
                         if isinstance(entry[6],dict) and entry[7]==index:
-                            print 'ok second requirement fullfilled'
-                            print 'ur',entry[6]['UniqueReflectionsOverall']
-                            print 'comp',entry[6]['CompletenessOverall']
-                            print 'isg',entry[6]['IsigOverall']
+#                            print 'ok second requirement fullfilled'
+#                            print 'ur',entry[6]['UniqueReflectionsOverall']
+#                            print 'comp',entry[6]['CompletenessOverall']
+#                            print 'isg',entry[6]['IsigOverall']
                             try:
                                 ranking=float(entry[6]['UniqueReflectionsOverall'])*\
                                         float(entry[6]['CompletenessOverall'])*\
                                         float(entry[6]['IsigOverall'])
-                                print 'quality index',ranking
+#                                print 'quality index',ranking
                                 select_stage_three_list.append([index,ranking])
                             except ValueError:
                                 pass
@@ -1029,14 +1030,13 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
 #            print 'stage 3',select_stage_three_list
             if not select_stage_three_list==[]:
                 best_file_index=max(select_stage_three_list,key=lambda x: x[1])[0]
-                print 'best reso',best_file_index
+#                print 'best reso',best_file_index
                 for n,entry in enumerate(self.data_collection_dict[xtal]):
                     if len(entry)==9 and entry[0]=='logfile':
                         if entry[7]==best_file_index:
                             self.data_collection_dict[xtal][n][8]=True
 #                            print self.data_collection_dict[xtal][n]
 
-            print select_stage_three_list
 
         # save everything so that it's quicker to reload and is available outside DLS
         pickle.dump([self.data_collection_dict],
