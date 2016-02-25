@@ -884,8 +884,12 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                     # aimless & Dimple information
                     # first for xia2 runs
                     for file_name in glob.glob(os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2','*','LogFiles','*aimless.log')):
-                        print file_name
+#                        print file_name
                         autoproc=file_name.split('/')[len(file_name.split('/'))-3]
+#                        print  file_name[:file_name.find(autoproc)]
+                        if os.path.isfile(os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2',autoproc,'dimple','final.pdb')):
+                            dimple_file=os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2',autoproc,'dimple','final.pdb'))
+                            print dimple_file
                         found_autoproc=False
                         for entry in self.data_collection_dict[xtal]:
                             if len(entry)==9:
