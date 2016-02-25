@@ -1346,9 +1346,9 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                         print 'ok first requirement fullfilled'
                         if isinstance(entry[6],dict) and entry[7]==index:
                             print 'ok second requirement fullfilled'
-                            print entry[6]['UniqueReflectionsOverall']
-                            print isinstance(entry[6]['CompletenessOverall']
-                            print isinstance(entry[6]['IsigOverall']
+                            print 'ur',entry[6]['UniqueReflectionsOverall']
+                            print 'comp',entry[6]['CompletenessOverall']
+                            print 'isg',entry[6]['IsigOverall']
                             if isinstance(entry[6]['UniqueReflectionsOverall'],float) and \
                                isinstance(entry[6]['CompletenessOverall'],float) and \
                                isinstance(entry[6]['IsigOverall'],float):
