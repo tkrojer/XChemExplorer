@@ -827,7 +827,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
 
         if os.path.isfile(os.path.join(self.database_directory,'test.pkl')):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'unpickling: '+os.path.join(self.database_directory,'test.pkl'))
-            self.data_collection_dict = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
+            self.data_collection_dict = pickle.load( open( os.path.join(self.database_directory,'test.pkl'), "rb" ) )
 
         number_of_visits_to_search=len(self.visit_list)
         search_cycle=1
@@ -917,6 +917,10 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     found_autoproc=True
                         if not found_autoproc:
                             aimless_results=parse().GetAimlessLog(file_name)
+                            if os.path.isfile(os.path.join(runs,'fast_dp','dimple','final.pdb')):
+                                dimple_file=os.path.join(runs,'fast_dp','dimple','final.pdb')
+                                pdb_info=parse().PDBheader(dimple_file)
+                                aimless_results.update(pdb_info)
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
 
                     # then exactly the same for autoPROC
@@ -930,6 +934,10 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     found_autoproc=True
                         if not found_autoproc:
                             aimless_results=parse().GetAimlessLog(file_name)
+                            if os.path.isfile(os.path.join(runs,'autoPROC','dimple','final.pdb')):
+                                dimple_file=os.path.join(runs,'autoPROC','dimple','final.pdb')
+                                pdb_info=parse().PDBheader(dimple_file)
+                                aimless_results.update(pdb_info)
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
 
 
