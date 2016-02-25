@@ -952,7 +952,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
 
         for xtal in sorted(self.data_collection_dict):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 2 of 2: selecting "best" aimless logfile ->'+xtal)
-            print 'hello im here now'
+#            print 'hello im here now'
             ############################################################################################
             # STAGE 1:
             # similarity to reference files
@@ -960,7 +960,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
             tmp=[]
             index=0
             for n,entry in enumerate(self.data_collection_dict[xtal]):
-                print entry[0]
+#                print entry[0]
                 found=False
                 if len(entry)==9 and entry[0]=='logfile':
                     if isinstance(entry[6],dict):
@@ -977,7 +977,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                     self.data_collection_dict[xtal][n][7]=index
                     index+=1
 
-            print select_stage_one_list
+ #           print select_stage_one_list
             # if none passed Stage 1, carry them over to Stage 2
             if select_stage_one_list == [] and tmp != []:
                 select_stage_one_list=tmp
@@ -1005,7 +1005,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
             # if none passed Stage 2, carry them over to Stage 3
             if select_stage_two_list == [] and tmp != []:
                 select_stage_two_list=tmp
-            print select_stage_two_list
+#            print select_stage_two_list
 
             ############################################################################################
             # STAGE 3:
