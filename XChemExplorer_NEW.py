@@ -1535,7 +1535,7 @@ class XChemExplorer(QtGui.QApplication):
             # this one should always be there; it may need updating in case another run appears
             # first find latest run
             tmp=[]
-            for entry in self.data_collection_dict:
+            for entry in self.data_collection_dict[xtal]:
                 if entry[0]=='image':
                     print entry[3]
                     tmp.append(entry[3])
