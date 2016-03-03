@@ -1090,7 +1090,7 @@ class XChemExplorer(QtGui.QApplication):
             self.work_thread=XChemThread.NEW_read_autoprocessing_results_from_disc(self.visit_list,
                                                                                self.target,
                                                                                self.reference_file_list,
-                                                                               self.database_directory
+                                                                               self.database_directory,
                                                                                self.data_collection_dict)
             self.explorer_active=1
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
