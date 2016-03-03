@@ -1537,7 +1537,9 @@ class XChemExplorer(QtGui.QApplication):
             tmp=[]
             for entry in self.data_collection_dict:
                 if entry[0]=='image':
+                    print entry[3]
                     tmp.append(entry[3])
+            print tmp
             data_collection_date_time=QtGui.QTableWidgetItem(max(tmp))      # not sure if this is really  as easy as max() !!!
             data_collection_date_time.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
             self.main_data_collection_table.setItem(row, 1, data_collection_date_time)
