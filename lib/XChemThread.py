@@ -1078,6 +1078,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
         for entry in self.data_collection_dict:
             if entry[0]=='image':
                 print entry[3]
+        print ''
         quit()
 
         # save everything so that it's quicker to reload and is available outside DLS
