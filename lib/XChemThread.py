@@ -885,7 +885,10 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 image_files_in_list=True
                                 if entry[7] not in run_number_list:
                                     run_number_list.append(entry[7])
-                    run_number=max(run_number_list)+1
+                    if run_number_list==[]:
+                        run_number=1
+                    else:
+                        run_number=max(run_number_list)+1
                     if not image_files_in_list:
                         image_list=[]
                         for image in glob.glob(os.path.join(visit_directory,'jpegs',self.target,xtal,'*')):
