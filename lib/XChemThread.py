@@ -844,10 +844,14 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
             progress_step=100/float(len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))))
             progress=0
 
+            beamline='n/a'
             if 'attic' in visit_directory:
                 visit=visit_directory.split('/')[6]
+                beamline=visit_directory.split('/')[3]
             else:
                 visit=visit_directory.split('/')[5]
+                beamline=visit_directory.split('/')[2]
+
 
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
                 # this step is only relevant when several samples are reviewed in one session
@@ -902,9 +906,14 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                                                                 diffraction_image,run_number])
 
 
+                    ##########################################################################
                     # aimless & Dimple information
                     # first for xia2 runs
                     for file_name in glob.glob(os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2','*','LogFiles','*aimless.log')):
+                        db_dict={   'DataCollectionVisit':      visit,
+                                    'DataCollectionBeamline':   beamline,
+                                    'DataCollectionDate':       timestamp,
+                                    ''}
                         autoproc=file_name.split('/')[len(file_name.split('/'))-3]
                         found_autoproc=False
                         for entry in self.data_collection_dict[xtal]:
@@ -912,21 +921,26 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[4]==autoproc:
                                     found_autoproc=True
                         if not found_autoproc:
-                            aimless_results=parse().GetAimlessLog(file_name)
+                            aimless_results=parse().read_aimless_logfile(file_name)
+                            db_dict.update(aimless_results)
                             if os.path.isfile(os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2',autoproc,'dimple','final.pdb')):
                                 dimple_file=os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2',autoproc,'dimple','final.pdb')
                                 pdb_info=parse().PDBheader(dimple_file)
-                                aimless_results.update(pdb_info)
+                                db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
+                                db_dict[''DataProcessingRfree''] = pdb_info['Rfree']
                             else:
-                                aimless_results['Rcryst'] = 'n/a'
-                                aimless_results['Rfree']  = 'n/a'
-                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
+                                db_dict['DataProcessingRcryst']  = ''
+                                db_dict[''DataProcessingRfree''] = ''
+                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,0,False])
 
 
 
 
                     # then exactly the same for fast_dp
                     if os.path.isfile(os.path.join(runs,'fast_dp','aimless.log')):
+                        db_dict={   'DataCollectionVisit':      visit,
+                                    'DataCollectionBeamline':   beamline,
+                                    'DataCollectionDate':       timestamp   }
                         file_name=os.path.join(runs,'fast_dp','aimless.log')
                         autoproc=file_name.split('/')[len(file_name.split('/'))-2]
                         found_autoproc=False
@@ -935,18 +949,23 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[4]==autoproc:
                                     found_autoproc=True
                         if not found_autoproc:
-                            aimless_results=parse().GetAimlessLog(file_name)
+                            aimless_results=parse().read_aimless_logfile(file_name)
+                            db_dict.update(aimless_results)
                             if os.path.isfile(os.path.join(runs,'fast_dp','dimple','final.pdb')):
                                 dimple_file=os.path.join(runs,'fast_dp','dimple','final.pdb')
                                 pdb_info=parse().PDBheader(dimple_file)
-                                aimless_results.update(pdb_info)
+                                db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
+                                db_dict[''DataProcessingRfree''] = pdb_info['Rfree']
                             else:
-                                aimless_results['Rcryst'] = 'n/a'
-                                aimless_results['Rfree']  = 'n/a'
-                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
+                                db_dict['DataProcessingRcryst']  = ''
+                                db_dict[''DataProcessingRfree''] = ''
+                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,0,False])
 
                     # then exactly the same for autoPROC
                     if os.path.isfile(os.path.join(runs,'autoPROC','ap-run','aimless.log')):
+                        db_dict={   'DataCollectionVisit':      visit,
+                                    'DataCollectionBeamline':   beamline,
+                                    'DataCollectionDate':       timestamp   }
                         file_name=os.path.join(runs,'autoPROC','ap-run','aimless.log')
                         autoproc=file_name.split('/')[len(file_name.split('/'))-3]
                         found_autoproc=False
@@ -955,15 +974,17 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[4]==autoproc:
                                     found_autoproc=True
                         if not found_autoproc:
-                            aimless_results=parse().GetAimlessLog(file_name)
+                            aimless_results=parse().read_aimless_logfile(file_name)
+                            db_dict.update(aimless_results)
                             if os.path.isfile(os.path.join(runs,'autoPROC','dimple','final.pdb')):
                                 dimple_file=os.path.join(runs,'autoPROC','dimple','final.pdb')
                                 pdb_info=parse().PDBheader(dimple_file)
-                                aimless_results.update(pdb_info)
+                                db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
+                                db_dict[''DataProcessingRfree''] = pdb_info['Rfree']
                             else:
-                                aimless_results['Rcryst'] = 'n/a'
-                                aimless_results['Rfree']  = 'n/a'
-                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,0,False])
+                                db_dict['DataProcessingRcryst']  = ''
+                                db_dict[''DataProcessingRfree''] = ''
+                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,0,False])
 
 
 
@@ -1001,13 +1022,16 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                 found=False
                 if len(entry)==9 and entry[0]=='logfile':
                     if isinstance(entry[6],dict):
-                        if isinstance(entry[6]['UnitCellVolume'],float):
-                            for reference_file in self.reference_file_list:
-                                if not reference_file[4]==0:
-                                    unitcell_difference=round((math.fabs(reference_file[4]-entry[6]['UnitCellVolume'])/reference_file[4])*100,1)
-                                    if unitcell_difference < 5 and reference_file[3]==entry[6]['Lattice']:
-                                        select_stage_one_list.append(index)
-                                        found=True
+                        try:
+                            if isinstance(float(entry[6]['DataProcessingUnitCellVolume']),float):
+                                for reference_file in self.reference_file_list:
+                                    if not reference_file[4]==0:
+                                        unitcell_difference=round((math.fabs(reference_file[4]-float(entry[6]['DataProcessingUnitCellVolume']))/reference_file[4])*100,1)
+                                        if unitcell_difference < 5 and reference_file[3]==entry[6]['DataProcessingLattice']:
+                                            select_stage_one_list.append(index)
+                                            found=True
+                        except ValueError:
+                            pass
                     if not found:
                         tmp.append(index)               # so that if no file passes criterion above
                                                         # or if no reference is given, we still carry over all existing files
@@ -1031,7 +1055,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                     if len(entry)==9 and entry[0]=='logfile':
                         if isinstance(entry[6],dict):
                             try:
-                                if float(entry[6]['RmergeLow']) < 0.05 and entry[7]==index:
+                                if float(entry[6]['DataProcessingRmergeLow']) < 0.05 and entry[7]==index:
                                     select_stage_two_list.append(index)
                                     found=True
                             except ValueError:
@@ -1060,9 +1084,9 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
 #                            print 'comp',entry[6]['CompletenessOverall']
 #                            print 'isg',entry[6]['IsigOverall']
                             try:
-                                ranking=float(entry[6]['UniqueReflectionsOverall'])*\
-                                        float(entry[6]['CompletenessOverall'])*\
-                                        float(entry[6]['IsigOverall'])
+                                ranking=float(entry[6]['DataProcessingUniqueReflectionsOverall'])*\
+                                        float(entry[6]['DataProcessingCompletenessOverall'])*\
+                                        float(entry[6]['DataProcessingIsigOverall'])
 #                                print 'quality index',ranking
                                 select_stage_three_list.append([index,ranking])
                             except ValueError:
@@ -1078,12 +1102,6 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                             self.data_collection_dict[xtal][n][8]=True
                             print self.data_collection_dict[xtal][n]
 
-
-        for entry in self.data_collection_dict:
-            if entry[0]=='image':
-                print entry[3]
-        print ''
-        quit()
 
         # save everything so that it's quicker to reload and is available outside DLS
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'pickling results')

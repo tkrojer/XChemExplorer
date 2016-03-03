@@ -343,6 +343,8 @@ class parse:
             Aimless['AutoProc']='xia2 3dii'
         if 'dials-run' in self.Logfile:
             Aimless['AutoProc']='dials'
+        if 'autoPROC' in self.Logfile:
+            Aimless['AutoProc']='autoPROC'
 
         # get run number from logfile
         # Note: only works if file is in original directory, but not once it lifes in 'inital_model'
@@ -469,6 +471,8 @@ class parse:
             aimless['DataProcessingProgram']='xia2 3dii'
         elif 'dials-run' in logfile:
             aimless['DataProcessingProgram']='dials'
+        elif 'autoPROC' in self.Logfile:
+            aimless['DataProcessingProgram']='autoPROC'
 
         # get run number from logfile
         # Note: only works if file is in original directory, but not once it moved to 'inital_model' folder
