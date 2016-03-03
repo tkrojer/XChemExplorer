@@ -912,8 +912,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                     for file_name in glob.glob(os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2','*','LogFiles','*aimless.log')):
                         db_dict={   'DataCollectionVisit':      visit,
                                     'DataCollectionBeamline':   beamline,
-                                    'DataCollectionDate':       timestamp,
-                                    ''}
+                                    'DataCollectionDate':       timestamp   }
                         autoproc=file_name.split('/')[len(file_name.split('/'))-3]
                         found_autoproc=False
                         for entry in self.data_collection_dict[xtal]:
