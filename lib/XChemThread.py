@@ -810,7 +810,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 
 
 
-class read_autoprocessing_results_from_disc(QtCore.QThread):
+class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
     def __init__(self,visit_list,target,reference_file_list,database_directory,data_collection_dict):
         QtCore.QThread.__init__(self)
         self.visit_list=visit_list
