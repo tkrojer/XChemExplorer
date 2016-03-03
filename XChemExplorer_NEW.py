@@ -1503,7 +1503,7 @@ class XChemExplorer(QtGui.QApplication):
             self.main_data_collection_table.setHorizontalHeaderLabels(['Sample','Date',''])
             self.main_data_collection_table.resizeRowsToContents()
             self.main_data_collection_table.setLineWidth(10)
-            self.data_collection_vbox_for_table.addWidget(table)
+            self.data_collection_vbox_for_table.addWidget(self.main_data_collection_table)
             self.main_data_collection_table_exists=True
 
         column_name = [ 'Program',
