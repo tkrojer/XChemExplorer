@@ -1637,6 +1637,7 @@ class XChemExplorer(QtGui.QApplication):
             #############################################################################
             # data collection outcome box
             if xtal not in self.dataset_outcome_dict:
+                self.dataset_outcome_dict[xtal]=[]
                 # dataset outcome buttons
                 dataset_outcome_groupbox=QtGui.QGroupBox()
                 dataset_outcome_vbox=QtGui.QVBoxLayout()
