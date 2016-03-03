@@ -453,7 +453,8 @@ class parse:
                     'DataProcessingLattice':                        'n/a',
                     'DataProcessingPointGroup':                     'n/a',
                     'DataProcessingUnitCellVolume':                 0,
-                    'DataProcessingAlert':                          '#FF0000' }
+                    'DataProcessingAlert':                          '#FF0000',
+                    'DataCollectionWavelength':                     'n/a' }
 
         spg='n/a'
         a='n/a'
@@ -484,6 +485,8 @@ class parse:
             pass
 
         for line in open(logfile):
+            if 'Wavelength' in line and len(line.split())==2:
+                aimless['DataCollectionWavelength']=line.split()[1]
             if line.startswith('Low resolution limit') and len(line.split())==6:
                 aimless['DataProcessingResolutionLow'] = line.split()[3]
                 aimless['DataProcessingResolutionHighOuterShell'] = line.split()[5]

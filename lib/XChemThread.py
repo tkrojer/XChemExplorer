@@ -810,14 +810,13 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 
 
 
-class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
-#    def __init__(self,visit_list,target,reference_file_list,database_directory,data_colllection_dict):
-    def __init__(self,visit_list,target,reference_file_list,database_directory):
+class read_autoprocessing_results_from_disc(QtCore.QThread):
+    def __init__(self,visit_list,target,reference_file_list,database_directory,data_collection_dict):
         QtCore.QThread.__init__(self)
         self.visit_list=visit_list
         self.target=target
         self.reference_file_list=reference_file_list
-        self.data_collection_dict={}
+        self.data_collection_dict=data_collection_dict
         self.database_directory=database_directory
 
 
@@ -910,9 +909,10 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                     # aimless & Dimple information
                     # first for xia2 runs
                     for file_name in glob.glob(os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2','*','LogFiles','*aimless.log')):
-                        db_dict={   'DataCollectionVisit':      visit,
-                                    'DataCollectionBeamline':   beamline,
-                                    'DataCollectionDate':       timestamp   }
+                        db_dict={   'DataCollectionVisit':          visit,
+                                    'DataCollectionBeamline':       beamline,
+                                    'DataCollectionDate':           timestamp,
+                                    'DataProcessingPathToLogfile':  file_name   }
                         autoproc=file_name.split('/')[len(file_name.split('/'))-3]
                         found_autoproc=False
                         for entry in self.data_collection_dict[xtal]:
@@ -937,9 +937,10 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
 
                     # then exactly the same for fast_dp
                     if os.path.isfile(os.path.join(runs,'fast_dp','aimless.log')):
-                        db_dict={   'DataCollectionVisit':      visit,
-                                    'DataCollectionBeamline':   beamline,
-                                    'DataCollectionDate':       timestamp   }
+                        db_dict={   'DataCollectionVisit':          visit,
+                                    'DataCollectionBeamline':       beamline,
+                                    'DataCollectionDate':           timestamp,
+                                    'DataProcessingPathToLogfile':  file_name   }
                         file_name=os.path.join(runs,'fast_dp','aimless.log')
                         autoproc=file_name.split('/')[len(file_name.split('/'))-2]
                         found_autoproc=False
@@ -962,9 +963,10 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
 
                     # then exactly the same for autoPROC
                     if os.path.isfile(os.path.join(runs,'autoPROC','ap-run','aimless.log')):
-                        db_dict={   'DataCollectionVisit':      visit,
-                                    'DataCollectionBeamline':   beamline,
-                                    'DataCollectionDate':       timestamp   }
+                        db_dict={   'DataCollectionVisit':          visit,
+                                    'DataCollectionBeamline':       beamline,
+                                    'DataCollectionDate':           timestamp,
+                                    'DataProcessingPathToLogfile':  file_name   }
                         file_name=os.path.join(runs,'autoPROC','ap-run','aimless.log')
                         autoproc=file_name.split('/')[len(file_name.split('/'))-3]
                         found_autoproc=False

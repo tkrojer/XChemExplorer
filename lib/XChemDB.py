@@ -54,7 +54,7 @@ class data_source:
             ['MountedTimestamp',                     'MountedTimestamp',                        'TEXT'],
             ['MountingTime',                         'MountingTime',                            'TEXT'],
             ['ispybStatus',                          'ispybStatus',                             'TEXT'],
-            ['DataCollectionVisit',                  'DataCollectionVisit',                     'TEXT'],
+            ['DataCollectionVisit',                  'Visit',                     'TEXT'],
 
             # from XChemExplorer
 
@@ -73,48 +73,49 @@ class data_source:
             ['CrystalFormVolume',                     'Crystal Form\nVolume',                        'TEXT'],
 
 
-            ['DataCollectionBeamline',               'DataCollectionBeamline',                  'TEXT'],
-            ['DataCollectionDate',                   'DataCollectionDate',                      'TEXT'],
+            ['DataCollectionBeamline',               'Beamline',                  'TEXT'],
+            ['DataCollectionDate',                   'Date',                      'TEXT'],
             ['DataCollectionOutcome',                'DataCollection\nOutcome',                   'TEXT'],
-            ['DataCollectionRun',                    'DataCollectionRun',                       'TEXT'],
-            ['DataCollectionComment',                'DataCollectionComment',                   'TEXT'],
+            ['DataCollectionRun',                    'Run',                       'TEXT'],
+            ['DataCollectionComment',                'DataCollection\nComment',                   'TEXT'],
+            ['DataCollectionWavelength',                'Wavelength',                   'TEXT'],
 
-            ['DataProcessingProgram',                'DataProcessingProgram',                   'TEXT'],
+            ['DataProcessingProgram',                'Program',                   'TEXT'],
             ['DataProcessingSpaceGroup',             'DataProcessing\nSpaceGroup',                'TEXT'],
-            ['DataProcessingUnitCell',               'DataProcessingUnitCell',                  'TEXT'],
+            ['DataProcessingUnitCell',               'DataProcessing\nUnitCell',                  'TEXT'],
 
-            ['DataProcessingA',               'DataProcessingA',                  'TEXT'],
-            ['DataProcessingB',               'DataProcessingB',                  'TEXT'],
-            ['DataProcessingC',               'DataProcessingC',                  'TEXT'],
-            ['DataProcessingAlpha',               'DataProcessingAlpha',                  'TEXT'],
-            ['DataProcessingBeta',               'DataProcessingBeta',                  'TEXT'],
-            ['DataProcessingGamma',               'DataProcessingGamma',                  'TEXT'],
+            ['DataProcessingA',               'DataProcessing\nA',                  'TEXT'],
+            ['DataProcessingB',               'DataProcessing\nB',                  'TEXT'],
+            ['DataProcessingC',               'DataProcessing\nC',                  'TEXT'],
+            ['DataProcessingAlpha',               'DataProcessing\nAlpha',                  'TEXT'],
+            ['DataProcessingBeta',               'DataProcessing\nBeta',                  'TEXT'],
+            ['DataProcessingGamma',               'DataProcessing\nGamma',                  'TEXT'],
 
 
 
-            ['DataProcessingResolutionOverall',      'DataProcessingResolutionOverall',         'TEXT'],
-            ['DataProcessingResolutionLow',          'DataProcessingResolutionLow',             'TEXT'],
-            ['DataProcessingResolutionLowInnerShell','DataProcessingResolutionLowInnerShell',   'TEXT'],
-            ['DataProcessingResolutionHigh',         'DataProcessing\nResolutionHigh',            'TEXT'],
-            ['DataProcessingResolutionHighOuterShell','DataProcessingResolutionHighOuterShell', 'TEXT'],
-            ['DataProcessingRmergeOverall',          'DataProcessingRmergeOverall',             'TEXT'],
-            ['DataProcessingRmergeLow',              'DataProcessingRmergeLow',                 'TEXT'],
-            ['DataProcessingRmergeHigh',             'DataProcessingRmergeHigh',                'TEXT'],
-            ['DataProcessingIsigOverall',            'DataProcessingIsigOverall',               'TEXT'],
-            ['DataProcessingIsigLow',                'DataProcessingIsigLow',                   'TEXT'],
-            ['DataProcessingIsigHigh',               'DataProcessingIsigHigh',                  'TEXT'],
-            ['DataProcessingCompletenessOverall',    'DataProcessingCompletenessOverall',       'TEXT'],
-            ['DataProcessingCompletenessLow',        'DataProcessingCompletenessLow',           'TEXT'],
-            ['DataProcessingCompletenessHigh',       'DataProcessingCompletenessHigh',          'TEXT'],
-            ['DataProcessingMultiplicityOverall',    'DataProcessingMultiplicityOverall',       'TEXT'],
-            ['DataProcessingMultiplicityLow',        'DataProcessingMultiplicityLow',           'TEXT'],
-            ['DataProcessingMultiplicityHigh',       'DataProcessingMultiplicityHigh',          'TEXT'],
+            ['DataProcessingResolutionOverall',      'Resolution\nOverall',         'TEXT'],
+            ['DataProcessingResolutionLow',          'Resolution\nLow',             'TEXT'],
+            ['DataProcessingResolutionLowInnerShell','Resolution\nLow (Inner Shell)',   'TEXT'],
+            ['DataProcessingResolutionHigh',         'Resolution\nHigh',            'TEXT'],
+            ['DataProcessingResolutionHighOuterShell','Resolution\nHigh (Outer Shell)', 'TEXT'],
+            ['DataProcessingRmergeOverall',          'Rmerge\nOverall',             'TEXT'],
+            ['DataProcessingRmergeLow',              'Rmerge\nLow',                 'TEXT'],
+            ['DataProcessingRmergeHigh',             'Rmerge\nHigh',                'TEXT'],
+            ['DataProcessingIsigOverall',            'Mn<I/sig(I)>\nOverall',               'TEXT'],
+            ['DataProcessingIsigLow',                'Mn<I/sig(I)>\nLow',                   'TEXT'],
+            ['DataProcessingIsigHigh',               'Mn<I/sig(I)>\nHigh',                  'TEXT'],
+            ['DataProcessingCompletenessOverall',    'Completeness\nOverall',       'TEXT'],
+            ['DataProcessingCompletenessLow',        'Completeness\nLow',           'TEXT'],
+            ['DataProcessingCompletenessHigh',       'Completeness\nHigh',          'TEXT'],
+            ['DataProcessingMultiplicityOverall',    'Multiplicity\nOverall',       'TEXT'],
+            ['DataProcessingMultiplicityLow',        'Multiplicity\nLow',           'TEXT'],
+            ['DataProcessingMultiplicityHigh',       'Multiplicity\nHigh',          'TEXT'],
             ['DataProcessingPathToLogfile',          'DataProcessingPathToLogfile',             'TEXT'],
-            ['DataProcessingUniqueReflectionsOverall','DataProcessingUniqueReflectionsOverall', 'TEXT'],
-            ['DataProcessingLattice',                'DataProcessingLattice',                   'TEXT'],
-            ['DataProcessingPointGroup',             'DataProcessingPointGroup',                'TEXT'],
-            ['DataProcessingUnitCellVolume',         'DataProcessingUnitCellVolume',            'TEXT'],
-            ['DataProcessingAlert',                  'DataProcessingAlert',                     'TEXT'],
+            ['DataProcessingUniqueReflectionsOverall','Unique Reflections\nOverall', 'TEXT'],
+            ['DataProcessingLattice',                'DataProcessing\nLattice',                   'TEXT'],
+            ['DataProcessingPointGroup',             'DataProcessing\nPointGroup',                'TEXT'],
+            ['DataProcessingUnitCellVolume',         'DataProcessing\nUnit Cell Volume',            'TEXT'],
+            ['DataProcessingAlert',                  'DataProcessing\nAlert',                     'TEXT'],
 
             ['DataProcessingRcryst',                  'DataProcessing\nRcryst',                     'TEXT'],
             ['DataProcessingRfree',                  'DataProcessing\nRfree',                     'TEXT'],
@@ -403,5 +404,11 @@ class data_source:
         sample_list_for_coot= cursor.fetchall()
         return sample_list_for_coot
 
-
-
+    def translate_xce_column_list_to_sqlite(self,column_list):
+        out_list=[]
+        for item in column_list:
+            for entry in self.column_list:
+                if entry[1]==item:
+                    out_list.append([item,entry[0]])
+                    break
+        return out_list
