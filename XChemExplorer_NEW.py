@@ -1687,6 +1687,7 @@ class XChemExplorer(QtGui.QApplication):
 
             self.main_data_collection_table.setCellWidget(row, 2, cell_widget)
             self.main_data_collection_table.setColumnWidth(2, 1000)
+            row += 1
 
 #        self.populate_data_collection_summary_table()
 
