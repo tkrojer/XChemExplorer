@@ -67,3 +67,5 @@ DONE - 'Update Datasource': overwrites fields with empty entry: e.g. in case log
 	- Dataset summary not properly shown at dls; maybe datasource is not updated properly
 
 - detect misaligned crystals: add analyse menu to XCE; try detecting my calculating standard deviation of Rmerge per frame from mean Rmerge?!
+
+- SQLite file is read-only: issue warning message
