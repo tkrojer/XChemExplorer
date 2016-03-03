@@ -1519,7 +1519,6 @@ class XChemExplorer(QtGui.QApplication):
 #        table.resizeColumnsToContents()
 
         row = self.main_data_collection_table.rowCount()
-        print 'rows in main table',row
 
         for xtal in sorted(self.data_collection_dict):
 
@@ -1565,16 +1564,23 @@ class XChemExplorer(QtGui.QApplication):
                 hbox_for_button_and_table=QtGui.QHBoxLayout()
                 layout = QtGui.QGridLayout()                    # for crystal images
                 data_collection_table=QtGui.QTableWidget()      # table with data processing results for each pipeline
-                self.data_collection_column_three_dict[xtal]=[cell_widget,vbox_cell,hbox_for_button_and_table,layout,data_collection_table]
                 cell_widget.setLayout(vbox_cell)
                 hbox_for_button_and_table.addWidget(data_collection_table)
                 vbox_cell.addLayout(hbox_for_button_and_table)
+                dataset_outcome_groupbox=QtGui.QGroupBox()
+                dataset_outcome_vbox=QtGui.QVBoxLayout()
+                dataset_outcome_groupbox.setLayout(dataset_outcome_vbox)
+                hbox_for_button_and_table.addWidget(dataset_outcome_groupbox)
+                self.data_collection_column_three_dict[xtal]=[cell_widget,vbox_cell,hbox_for_button_and_table,layout,data_collection_table,
+                                                              dataset_outcome_groupbox,dataset_outcome_vbox]
             else:
                 cell_widget =               self.data_collection_column_three_dict[xtal][0]
                 vbox_cell =                 self.data_collection_column_three_dict[xtal][1]
                 hbox_for_button_and_table = self.data_collection_column_three_dict[xtal][2]
                 layout =                    self.data_collection_column_three_dict[xtal][3]
                 data_collection_table =     self.data_collection_column_three_dict[xtal][4]
+                dataset_outcome_groupbox =  self.data_collection_column_three_dict[xtal][5]
+                dataset_outcome_vbox =      self.data_collection_column_three_dict[xtal][6]
             vbox_cell.addLayout(layout)
 
 
@@ -1641,9 +1647,8 @@ class XChemExplorer(QtGui.QApplication):
             if xtal not in self.dataset_outcome_dict:
                 self.dataset_outcome_dict[xtal]=[]
                 # dataset outcome buttons
-                dataset_outcome_groupbox=QtGui.QGroupBox()
-                dataset_outcome_vbox=QtGui.QVBoxLayout()
-                found_successful_data_collection=True
+#                dataset_outcome_groupbox=QtGui.QGroupBox()
+#                dataset_outcome_vbox=QtGui.QVBoxLayout()
                 for outcome in sorted(self.dataset_outcome):
                     button=QtGui.QPushButton(outcome)
                     button.setAutoExclusive(True)
@@ -1653,8 +1658,8 @@ class XChemExplorer(QtGui.QApplication):
                     button.clicked.connect(self.dataset_outcome_button_change_color)
                     self.dataset_outcome_dict[xtal].append(button)
                     dataset_outcome_vbox.addWidget(button)
-                dataset_outcome_groupbox.setLayout(dataset_outcome_vbox)
-                hbox_for_button_and_table.addWidget(dataset_outcome_groupbox)
+#                dataset_outcome_groupbox.setLayout(dataset_outcome_vbox)
+#                hbox_for_button_and_table.addWidget(dataset_outcome_groupbox)
 
             #############################################################################
             # table for data processing results
@@ -1674,6 +1679,7 @@ class XChemExplorer(QtGui.QApplication):
                     if not entry_already_in_table:
                         data_collection_table.insertRow(row_position)
                         db_dict=entry[6]
+                        print db_dict
                         for column,header in enumerate(diffraction_data_column_name):
                             cell_text=QtGui.QTableWidgetItem()
                             cell_text.setText(str( db_dict[ header[1] ]  ))
