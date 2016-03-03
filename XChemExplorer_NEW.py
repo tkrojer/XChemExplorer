@@ -1537,9 +1537,7 @@ class XChemExplorer(QtGui.QApplication):
             tmp=[]
             for entry in self.data_collection_dict[xtal]:
                 if entry[0]=='image':
-                    print entry[3]
                     tmp.append(entry[3])
-            print tmp
             data_collection_date_time=QtGui.QTableWidgetItem(max(tmp))      # not sure if this is really  as easy as max() !!!
             data_collection_date_time.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
             self.main_data_collection_table.setItem(row, 1, data_collection_date_time)
@@ -1629,7 +1627,7 @@ class XChemExplorer(QtGui.QApplication):
                 # then use image not available from $XChemExplorer_DIR/image/IMAGE_NOT_AVAILABLE.png
                 # not sure how to do this at the moment; it will probably trigger an error that I can catch
                         pixmap = QtGui.QPixmap()
-                        pixmap.loadFromData(base64.b64decode(entry[4][1]))
+                        pixmap.loadFromData(base64.b64decode(encoded_image[1]))
                         label = QtGui.QLabel()
                         label.resize(320,200)
                         label.setPixmap(pixmap.scaled(label.size(), QtCore.Qt.KeepAspectRatio))

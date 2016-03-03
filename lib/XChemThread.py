@@ -900,7 +900,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     image_name=image[image.rfind('/')+1:]
                                     image_file=open(image,"rb")
                                     image_string=base64.b64encode(image_file.read())
-                                    image_list.append( (image_name,image_string) )
+                                    image_list.append( [image_name,image_string] )
                         self.data_collection_dict[xtal].append(['image',visit,run,timestamp,image_list,
                                                                 diffraction_image,run_number])
 
@@ -1088,20 +1088,16 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 ranking=float(entry[6]['DataProcessingUniqueReflectionsOverall'])*\
                                         float(entry[6]['DataProcessingCompletenessOverall'])*\
                                         float(entry[6]['DataProcessingIsigOverall'])
-#                                print 'quality index',ranking
                                 select_stage_three_list.append([index,ranking])
                             except ValueError:
                                 pass
 
-#            print 'stage 3',select_stage_three_list
             if not select_stage_three_list==[]:
                 best_file_index=max(select_stage_three_list,key=lambda x: x[1])[0]
-#                print 'best reso',best_file_index
                 for n,entry in enumerate(self.data_collection_dict[xtal]):
                     if len(entry)==9 and entry[0]=='logfile':
                         if entry[7]==best_file_index:
                             self.data_collection_dict[xtal][n][8]=True
-                            print self.data_collection_dict[xtal][n]
 
 
         # save everything so that it's quicker to reload and is available outside DLS
