@@ -1686,6 +1686,7 @@ class XChemExplorer(QtGui.QApplication):
                             cell_text.setText(str( db_dict[ header[1] ]  ))
                             cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                             data_collection_table.setItem(row_position, column, cell_text)
+                            print 'row_position',row_position,'column',column
                         best_file=entry[8]
                         if best_file:
                             data_collection_table.selectRow(row_position)
