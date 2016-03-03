@@ -1503,6 +1503,7 @@ class XChemExplorer(QtGui.QApplication):
             self.main_data_collection_table.setHorizontalHeaderLabels(['Sample','Date',''])
             self.main_data_collection_table.resizeRowsToContents()
             self.main_data_collection_table.setLineWidth(10)
+            self.main_data_collection_table.setColumnCount(3)
             self.data_collection_vbox_for_table.addWidget(self.main_data_collection_table)
             self.main_data_collection_table_exists=True
 
@@ -1518,6 +1519,7 @@ class XChemExplorer(QtGui.QApplication):
 #        table.resizeColumnsToContents()
 
         row = self.main_data_collection_table.rowCount()
+        print 'rows in main table',row
 
         for xtal in sorted(self.data_collection_dict):
 
