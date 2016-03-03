@@ -811,12 +811,13 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 
 
 class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
-    def __init__(self,visit_list,target,reference_file_list,database_directory,data_colllection_dict):
+#    def __init__(self,visit_list,target,reference_file_list,database_directory,data_colllection_dict):
+    def __init__(self,visit_list,target,reference_file_list,database_directory):
         QtCore.QThread.__init__(self)
         self.visit_list=visit_list
         self.target=target
         self.reference_file_list=reference_file_list
-        self.data_collection_dict=data_colllection_dict
+        self.data_collection_dict={}
         self.database_directory=database_directory
 
 
@@ -829,7 +830,7 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
     def run(self):
 
         # only do once, ignore if just refreshing table
-        if self.data_collection_dict=={}
+        if self.data_collection_dict=={}:
             if os.path.isfile(os.path.join(self.database_directory,'test.pkl')):
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'unpickling: '+os.path.join(self.database_directory,'test.pkl'))
                 self.data_collection_dict = pickle.load( open( os.path.join(self.database_directory,'test.pkl'), "rb" ) )
