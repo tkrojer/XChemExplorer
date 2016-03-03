@@ -811,12 +811,12 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 
 
 class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
-    def __init__(self,visit_list,target,reference_file_list,database_directory):
+    def __init__(self,visit_list,target,reference_file_list,database_directory,data_colllection_dict):
         QtCore.QThread.__init__(self)
         self.visit_list=visit_list
         self.target=target
         self.reference_file_list=reference_file_list
-        self.data_collection_dict={}
+        self.data_collection_dict=data_colllection_dict
         self.database_directory=database_directory
 
 
@@ -828,9 +828,11 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
 
     def run(self):
 
-        if os.path.isfile(os.path.join(self.database_directory,'test.pkl')):
-            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'unpickling: '+os.path.join(self.database_directory,'test.pkl'))
-            self.data_collection_dict = pickle.load( open( os.path.join(self.database_directory,'test.pkl'), "rb" ) )
+        # only do once, ignore if just refreshing table
+        if self.data_collection_dict=={}
+            if os.path.isfile(os.path.join(self.database_directory,'test.pkl')):
+                self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'unpickling: '+os.path.join(self.database_directory,'test.pkl'))
+                self.data_collection_dict = pickle.load( open( os.path.join(self.database_directory,'test.pkl'), "rb" ) )
 
         number_of_visits_to_search=len(self.visit_list)
         search_cycle=1
@@ -866,23 +868,34 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                 # obviously create if not and fill in basic information
                 for runs in glob.glob(collected_xtals+'/*'):
                     run=runs[runs.rfind('/')+1:]
+                    diffraction_image=''
                     timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
-                    diffraction_image_directory=os.path.join(visit_directory,protein_name,xtal)
+                    if os.path.isfile(os.path.join(visit_directory,protein_name,xtal,run+'0001.cbf')):
+                        diffraction_image=os.path.join(visit_directory,protein_name,xtal,run+'0001.cbf')
 
                     # image files
                     image_files_in_list=False
+                    # note: need one more flag which indicates immediately that images belong together
+                    #       this makes it afterwards easier to get them together in the table
+                    run_number_list=[]
                     for entry in self.data_collection_dict[xtal]:
                         if len(entry)>=5:
                             if entry[0]=='image' and entry[1]==visit and entry[2]==run:
                                 image_files_in_list=True
+                                if entry[7] not in run_number_list:
+                                    run_number_list.append(entry[7])
+                    run_number=max(run_number_list)+1
                     if not image_files_in_list:
+                        image_list=[]
                         for image in glob.glob(os.path.join(visit_directory,'jpegs',self.target,xtal,'*')):
                             if run in image:
                                 if image.endswith('t.png') or image.endswith('_.png'):
                                     image_name=image[image.rfind('/')+1:]
                                     image_file=open(image,"rb")
                                     image_string=base64.b64encode(image_file.read())
-                                    self.data_collection_dict[xtal].append(['image',visit,run,timestamp,image_name,image_string])
+                                    image_list.append( (image_name,image_string) )
+                        self.data_collection_dict[xtal].append(['image',visit,run,timestamp,image_list,
+                                                                diffraction_image,run_number])
 
 
                     # aimless & Dimple information
@@ -1060,6 +1073,12 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                         if entry[7]==best_file_index:
                             self.data_collection_dict[xtal][n][8]=True
                             print self.data_collection_dict[xtal][n]
+
+
+        for entry in self.data_collection_dict:
+            if entry[0]=='image':
+                print entry[3]
+        quit()
 
         # save everything so that it's quicker to reload and is available outside DLS
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'pickling results')
