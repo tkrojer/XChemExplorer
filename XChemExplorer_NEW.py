@@ -1669,7 +1669,7 @@ class XChemExplorer(QtGui.QApplication):
             if not xtal in self.data_collection_table_dict:
                 self.data_collection_table_dict[xtal]=[]
             # reminder: ['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,0,False]
-            for entry in self.data_collection_dict:
+            for entry in self.data_collection_dict[xtal]:
                 if entry[0]=='logfile':
                     entry_already_in_table=False
                     for logfile in self.data_collection_table_dict:
