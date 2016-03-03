@@ -437,6 +437,7 @@ class parse:
                     'DataProcessingResolutionLowInnerShell':        'n/a',
                     'DataProcessingResolutionHigh':                 'n/a',
                     'DataProcessingResolutionHighOuterShell':       'n/a',
+                    'DataProcessingResolutionOverall':              'n/a',
                     'DataProcessingRmergeOverall':                  'n/a',
                     'DataProcessingRmergeLow':                      'n/a',
                     'DataProcessingRmergeHigh':                     'n/a',
@@ -538,6 +539,7 @@ class parse:
                                                                                  math.radians(float(gamma)),
                                                                                  aimless['DataProcessingLattice']))
         aimless['DataProcessingUnitCell']=str(a)+' '+str(b)+' '+str(c)+' '+str(alpha)+' '+str(beta)+' '+str(gamma)
+        aimless['DataProcessingResolutionOverall']=str(aimless['DataProcessingResolutionLow'])+' - '+str(aimless['DataProcessingResolutionHigh'])
 
         # Hex Color code:
         # red:      #FF0000
