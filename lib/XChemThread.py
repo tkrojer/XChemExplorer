@@ -926,10 +926,10 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 dimple_file=os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2',autoproc,'dimple','final.pdb')
                                 pdb_info=parse().PDBheader(dimple_file)
                                 db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
-                                db_dict[''DataProcessingRfree''] = pdb_info['Rfree']
+                                db_dict['DataProcessingRfree'] = pdb_info['Rfree']
                             else:
                                 db_dict['DataProcessingRcryst']  = ''
-                                db_dict[''DataProcessingRfree''] = ''
+                                db_dict['DataProcessingRfree'] = ''
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,0,False])
 
 
@@ -954,10 +954,10 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 dimple_file=os.path.join(runs,'fast_dp','dimple','final.pdb')
                                 pdb_info=parse().PDBheader(dimple_file)
                                 db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
-                                db_dict[''DataProcessingRfree''] = pdb_info['Rfree']
+                                db_dict['DataProcessingRfree'] = pdb_info['Rfree']
                             else:
                                 db_dict['DataProcessingRcryst']  = ''
-                                db_dict[''DataProcessingRfree''] = ''
+                                db_dict['DataProcessingRfree'] = ''
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,0,False])
 
                     # then exactly the same for autoPROC
@@ -979,10 +979,10 @@ class tempX_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 dimple_file=os.path.join(runs,'autoPROC','dimple','final.pdb')
                                 pdb_info=parse().PDBheader(dimple_file)
                                 db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
-                                db_dict[''DataProcessingRfree''] = pdb_info['Rfree']
+                                db_dict['DataProcessingRfree'] = pdb_info['Rfree']
                             else:
                                 db_dict['DataProcessingRcryst']  = ''
-                                db_dict[''DataProcessingRfree''] = ''
+                                db_dict['DataProcessingRfree'] = ''
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,0,False])
 
 
