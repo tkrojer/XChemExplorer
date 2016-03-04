@@ -1617,9 +1617,6 @@ class XChemExplorer(QtGui.QApplication):
                 if entry[0]=='image':
                     tmp.append(entry)
 
-            print 'xtal: ',tmp
-
-
             # b) sort by the previously assigned run number
             #    note: entry[6]==run_number
 #            layout=self.data_collection_image_dict[xtal][0]
