@@ -249,8 +249,9 @@ class start_COOT(QtCore.QThread):
         self.settings=settings
 
     def run(self):
-        pickle.dump(self.settings,open('XChemExplorer_settings.pkl','wb'))
-        os.system('coot --no-guano --no-state-script --script %s' %(os.getenv('XChemExplorer_DIR')+'/lib/XChemCoot.py'))
+        cwd=os.getcwd()
+        pickle.dump(self.settings,open(os.path.join(cwd,'XChemExplorer_settings.pkl'),'wb'))
+        os.system('cd %s\ncoot --no-guano --no-state-script --script %s' %(cwd,os.getenv('XChemExplorer_DIR')+'/lib/XChemCoot.py'))
 
 class start_pandda_inspect(QtCore.QThread):
 
