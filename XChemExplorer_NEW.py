@@ -1566,12 +1566,12 @@ class XChemExplorer(QtGui.QApplication):
                 data_collection_table=QtGui.QTableWidget()      # table with data processing results for each pipeline
                 cell_widget.setLayout(vbox_cell)
                 vbox_cell.addLayout(layout)
-                hbox_for_button_and_table.addWidget(dataset_outcome_groupbox)
-                hbox_for_button_and_table.addWidget(data_collection_table)
-                vbox_cell.addLayout(hbox_for_button_and_table)
                 dataset_outcome_groupbox=QtGui.QGroupBox()
                 dataset_outcome_vbox=QtGui.QVBoxLayout()
                 dataset_outcome_groupbox.setLayout(dataset_outcome_vbox)
+                hbox_for_button_and_table.addWidget(dataset_outcome_groupbox)
+                hbox_for_button_and_table.addWidget(data_collection_table)
+                vbox_cell.addLayout(hbox_for_button_and_table)
                 self.data_collection_column_three_dict[xtal]=[cell_widget,vbox_cell,hbox_for_button_and_table,layout,data_collection_table,
                                                               dataset_outcome_groupbox,dataset_outcome_vbox]
             else:
