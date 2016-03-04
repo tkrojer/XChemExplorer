@@ -870,6 +870,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
                 # check if there is already an entry for the current run
                 # obviously create if not and fill in basic information
+                run_number_list=[]
                 for runs in sorted(glob.glob(collected_xtals+'/*')):
                     run=runs[runs.rfind('/')+1:]
                     diffraction_image=''
@@ -880,7 +881,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     # image files
                     # note: need one more flag which indicates immediately that images belong together
                     #       this makes it afterwards easier to get them together in the table
-                    run_number_list=[]
+#                    run_number_list=[]
                     image_files_in_list=False
                     for entry in self.data_collection_dict[xtal]:
                         image_files_in_list=False
@@ -891,7 +892,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             if entry[0]=='image' and entry[1]==visit and entry[2]==run:
                                 print 'already in dict:',run,visit
                                 image_files_in_list=True
-                                run_number_list.append(int(entry[6]))
+#                                run_number_list.append(int(entry[6]))
 
 #                    if not image_files_in_list:
 #                        print 'missing:',run,visit
@@ -903,7 +904,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                         else:
                             run_number=max(run_number_list)+1
                             print 'run_number:',run_number
-
+                        run_number_list.append(run_number)
                     if not image_files_in_list:
                         image_list=[]
                         for image in glob.glob(os.path.join(visit_directory,'jpegs',self.target,xtal,'*')):
