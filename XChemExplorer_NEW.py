@@ -1688,6 +1688,7 @@ class XChemExplorer(QtGui.QApplication):
                         best_file=entry[8]
                         if best_file:
                             data_collection_table.selectRow(row_position)
+                        data_collection_table.setRowHeight(row_position,20)
                         row_position+=1
 
                     self.data_collection_table_dict[xtal].append(['logfile',entry[1],entry[2],entry[3],entry[4]])   # 'logfile' is just added to have
