@@ -886,18 +886,9 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     for entry in self.data_collection_dict[xtal]:
                         image_files_in_list=False
                         if entry[0]=='image':
-                            print 'ok, there is the dict, should not be there during first run'
-                            print entry[0],entry[1],entry[2],entry[3],entry[5],entry[6]
-                            print run
                             if entry[0]=='image' and entry[1]==visit and entry[2]==run:
-                                print 'already in dict:',run,visit
                                 image_files_in_list=True
-#                                run_number_list.append(int(entry[6]))
-
-#                    if not image_files_in_list:
-#                        print 'missing:',run,visit
-#                        run_number_list.append(int(entry[6])+1)
-#                        print run_number_list
+                                break
                     if not image_files_in_list:
                         if run_number_list==[]:
                             run_number=1
