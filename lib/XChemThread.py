@@ -887,7 +887,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             if entry[0]=='image' and entry[1]==visit and entry[2]==run:
                                 image_files_in_list=True
                             if not image_files_in_list:
-                                run_number_list.append(int(entry[6])+1)
+                                print 'ydeyge',entry[6]
+                                run_number_list.append(entry[6])
                     if run_number_list==[]:
                         run_number=1
                     else:
