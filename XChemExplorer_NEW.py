@@ -379,6 +379,7 @@ class XChemExplorer(QtGui.QApplication):
         self.dls_tab_dict['Details'][1].addLayout(data_collection_button_hbox)
         self.target=str(self.target_selection_combobox.currentText())
 
+        self.dls_data_collection_vbox.addWidget(dls_tab_widget)
 
         ######################################################################################
         # Overview Tab
