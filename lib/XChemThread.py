@@ -885,14 +885,17 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     for entry in self.data_collection_dict[xtal]:
                         image_files_in_list=False
                         if entry[0]=='image':
+                            print run
                             if entry[0]=='image' and entry[1]==visit and entry[2]==run:
                                 image_files_in_list=True
                             if not image_files_in_list:
                                 run_number_list.append(int(entry[6])+1)
+                                print run_number_list
                     if run_number_list==[]:
                         run_number=1
-#                    else:
-#                        run_number=max(run_number_list)+1
+                    else:
+                        run_number=max(run_number_list)
+                        print 'run_number:',run_number
                     if not image_files_in_list:
                         image_list=[]
                         for image in glob.glob(os.path.join(visit_directory,'jpegs',self.target,xtal,'*')):
