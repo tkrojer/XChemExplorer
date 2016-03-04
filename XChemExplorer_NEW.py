@@ -1501,7 +1501,7 @@ class XChemExplorer(QtGui.QApplication):
             self.main_data_collection_table=QtGui.QTableWidget()
             self.main_data_collection_table.setSortingEnabled(True)
             self.main_data_collection_table.setHorizontalHeaderLabels(['Sample','Date',''])
-            self.main_data_collection_table.resizeRowsToContents()
+#            self.main_data_collection_table.resizeRowsToContents()
             self.main_data_collection_table.setLineWidth(10)
             self.main_data_collection_table.setColumnCount(3)
             self.data_collection_vbox_for_table.addWidget(self.main_data_collection_table)
@@ -1696,6 +1696,8 @@ class XChemExplorer(QtGui.QApplication):
             self.main_data_collection_table.setCellWidget(row, 2, cell_widget)
             self.main_data_collection_table.setColumnWidth(2, 1000)
             row += 1
+
+        self.main_data_collection_table.resizeRowsToContents()
 
 #        self.populate_data_collection_summary_table()
 
