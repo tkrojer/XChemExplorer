@@ -509,8 +509,8 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
                         os.system('/bin/rm '+sample+'.mtz')
                     if os.path.isfile(sample+'.log'):
                         os.system('/bin/rm '+sample+'.log')
-                    os.symlink('autoprocessing/autoPROC/ap-run/aimless.log',sample+'.log')
-                    os.symlink('autoprocessing/autoPROC/ap-run/truncate.mtz',sample+'.mtz')
+                    os.symlink('autoprocessing/ap-run/aimless.log',sample+'.log')
+                    os.symlink('autoprocessing/ap-run/truncate.mtz',sample+'.mtz')
 
 
                 if 'fast_dp' in path_to_logfile:
