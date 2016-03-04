@@ -473,7 +473,7 @@ class parse:
             aimless['DataProcessingProgram']='xia2 3dii'
         elif 'dials-run' in logfile:
             aimless['DataProcessingProgram']='dials'
-        elif 'autoPROC' in self.Logfile:
+        elif 'autoPROC' in logfile:
             aimless['DataProcessingProgram']='autoPROC'
 
         # get run number from logfile
