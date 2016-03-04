@@ -362,6 +362,8 @@ class XChemExplorer(QtGui.QApplication):
         # @ Details
         self.data_collection_vbox_for_table=QtGui.QVBoxLayout()
         self.dls_tab_dict['Details'][1].addLayout(self.data_collection_vbox_for_table)
+
+
         data_collection_button_hbox=QtGui.QHBoxLayout()
         get_data_collection_button=QtGui.QPushButton("Get New Results from Autoprocessing")
         get_data_collection_button.clicked.connect(self.button_clicked)
@@ -376,10 +378,11 @@ class XChemExplorer(QtGui.QApplication):
         read_pickle_file_button=QtGui.QPushButton("Read Pickle File")
         read_pickle_file_button.clicked.connect(self.button_clicked)
         data_collection_button_hbox.addWidget(read_pickle_file_button)
-        self.dls_tab_dict['Details'][1].addLayout(data_collection_button_hbox)
+#        self.dls_tab_dict['Details'][1].addLayout(data_collection_button_hbox)
         self.target=str(self.target_selection_combobox.currentText())
 
         self.dls_data_collection_vbox.addWidget(dls_tab_widget)
+        self.dls_data_collection_vbox.addLayout(data_collection_button_hbox)
 
         ######################################################################################
         # Overview Tab
