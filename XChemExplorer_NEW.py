@@ -245,7 +245,6 @@ class XChemExplorer(QtGui.QApplication):
                         'Data Source',
                         'Overview',
                         'DLS @ Data Collection',
-                        'DLS @ Summary',
                         'Initial Model',
                         'PANDDAs',
                         'Summary & Refine',
@@ -296,41 +295,33 @@ class XChemExplorer(QtGui.QApplication):
         mounted_crystals_button_hbox.addWidget(update_data_source_button)
         self.tab_dict['Data Source'][1].addLayout(mounted_crystals_button_hbox)
 
-        ######################################################################################
-        # DLS @ Data Collection Tab
-        self.data_collection_vbox_for_table=QtGui.QVBoxLayout()
-        self.tab_dict['DLS @ Data Collection'][1].addLayout(self.data_collection_vbox_for_table)
-        data_collection_button_hbox=QtGui.QHBoxLayout()
-        get_data_collection_button=QtGui.QPushButton("Get New Results from Autoprocessing")
-        get_data_collection_button.clicked.connect(self.button_clicked)
-        data_collection_button_hbox.addWidget(get_data_collection_button)
-        write_files_button=QtGui.QPushButton("Save Files from Autoprocessing in 'inital_model' Folder")
-        write_files_button.clicked.connect(self.button_clicked)
-        data_collection_button_hbox.addWidget(write_files_button)
-        self.target_selection_combobox = QtGui.QComboBox()
-        self.populate_target_selection_combobox(self.target_selection_combobox)
-        self.target_selection_combobox.activated[str].connect(self.target_selection_combobox_activated)
-        data_collection_button_hbox.addWidget(self.target_selection_combobox)
-        read_pickle_file_button=QtGui.QPushButton("Read Pickle File")
-        read_pickle_file_button.clicked.connect(self.button_clicked)
-        data_collection_button_hbox.addWidget(read_pickle_file_button)
-        self.tab_dict['DLS @ Data Collection'][1].addLayout(data_collection_button_hbox)
-        self.target=str(self.target_selection_combobox.currentText())
+
 
         ######################################################################################
-        # Overview Tab
-        self.data_collection_vbox_for_overview=QtGui.QVBoxLayout()
-        self.overview_figure, self.overview_axes = plt.subplots(nrows=2, ncols=2)
-        self.overview_canvas = FigureCanvas(self.overview_figure)
-        self.update_overview()
-        self.data_collection_vbox_for_overview.addWidget(self.overview_canvas)
-        show_overview_button=QtGui.QPushButton("Show Overview")
-        show_overview_button.clicked.connect(self.button_clicked)
-        self.data_collection_vbox_for_overview.addWidget(show_overview_button)
-        self.tab_dict['Overview'][1].addLayout(self.data_collection_vbox_for_overview)
+        # DLS tab
+
+
+
+
+
+
+        self.dls_data_collection_vbox=QtGui.QVBoxLayout()
+        self.tab_dict['DLS @ Data Collection'][1].addLayout(self.dls_data_collection_vbox)
+
+
+        dls_tab_widget = QtGui.QTabWidget()
+        dls_tab_list = [ 'Summary',
+                         'Details'  ]
+        self.dls_tab_dict={}
+        for page in dls_tab_list:
+            tab=QtGui.QWidget()
+            vbox=QtGui.QVBoxLayout(tab)
+            dls_tab_widget.addTab(tab,page)
+            self.dls_tab_dict[page]=[tab,vbox]
+
 
         ######################################################################################
-        # DLS @ Summary
+        # @ Summary
         data_collection_summary_list=[]
         self.data_collection_summary_column_name=[      'Sample ID',
                                                         'Puck',
@@ -364,9 +355,42 @@ class XChemExplorer(QtGui.QApplication):
                 self.data_collection_summary_table.setItem(row, column, cell_text)
         self.data_collection_summary_table.setHorizontalHeaderLabels(self.data_collection_summary_column_name)
         self.data_collection_summarys_vbox_for_table=QtGui.QVBoxLayout()
-        self.tab_dict['DLS @ Summary'][1].addLayout(self.data_collection_summarys_vbox_for_table)
+        self.dls_tab_dict['Summary'][1].addLayout(self.data_collection_summarys_vbox_for_table)
         self.data_collection_summarys_vbox_for_table.addWidget(self.data_collection_summary_table)
 
+        ######################################################################################
+        # @ Details
+        self.data_collection_vbox_for_table=QtGui.QVBoxLayout()
+        self.dls_tab_dict['Details'][1].addLayout(self.data_collection_vbox_for_table)
+        data_collection_button_hbox=QtGui.QHBoxLayout()
+        get_data_collection_button=QtGui.QPushButton("Get New Results from Autoprocessing")
+        get_data_collection_button.clicked.connect(self.button_clicked)
+        data_collection_button_hbox.addWidget(get_data_collection_button)
+        write_files_button=QtGui.QPushButton("Save Files from Autoprocessing in 'inital_model' Folder")
+        write_files_button.clicked.connect(self.button_clicked)
+        data_collection_button_hbox.addWidget(write_files_button)
+        self.target_selection_combobox = QtGui.QComboBox()
+        self.populate_target_selection_combobox(self.target_selection_combobox)
+        self.target_selection_combobox.activated[str].connect(self.target_selection_combobox_activated)
+        data_collection_button_hbox.addWidget(self.target_selection_combobox)
+        read_pickle_file_button=QtGui.QPushButton("Read Pickle File")
+        read_pickle_file_button.clicked.connect(self.button_clicked)
+        data_collection_button_hbox.addWidget(read_pickle_file_button)
+        self.dls_tab_dict['Details'][1].addLayout(data_collection_button_hbox)
+        self.target=str(self.target_selection_combobox.currentText())
+
+
+        ######################################################################################
+        # Overview Tab
+        self.data_collection_vbox_for_overview=QtGui.QVBoxLayout()
+        self.overview_figure, self.overview_axes = plt.subplots(nrows=2, ncols=2)
+        self.overview_canvas = FigureCanvas(self.overview_figure)
+        self.update_overview()
+        self.data_collection_vbox_for_overview.addWidget(self.overview_canvas)
+        show_overview_button=QtGui.QPushButton("Show Overview")
+        show_overview_button.clicked.connect(self.button_clicked)
+        self.data_collection_vbox_for_overview.addWidget(show_overview_button)
+        self.tab_dict['Overview'][1].addLayout(self.data_collection_vbox_for_overview)
 
         ######################################################################################
         # Initial Model Tab

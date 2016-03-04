@@ -881,7 +881,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     # image files
                     # note: need one more flag which indicates immediately that images belong together
                     #       this makes it afterwards easier to get them together in the table
-#                    run_number_list=[]
                     image_files_in_list=False
                     for entry in self.data_collection_dict[xtal]:
                         image_files_in_list=False
@@ -889,6 +888,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             if entry[0]=='image' and entry[1]==visit and entry[2]==run:
                                 image_files_in_list=True
                                 break
+
                     if not image_files_in_list:
                         if run_number_list==[]:
                             run_number=1
@@ -896,6 +896,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             run_number=max(run_number_list)+1
                             print 'run_number:',run_number
                         run_number_list.append(run_number)
+
                     if not image_files_in_list:
                         image_list=[]
                         for image in glob.glob(os.path.join(visit_directory,'jpegs',self.target,xtal,'*')):
@@ -907,7 +908,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     image_list.append( [image_name,image_string] )
                         self.data_collection_dict[xtal].append(['image',visit,run,timestamp,image_list,
                                                                 diffraction_image,run_number])
-
 
                     ##########################################################################
                     # aimless & Dimple information
