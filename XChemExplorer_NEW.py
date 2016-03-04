@@ -1587,7 +1587,8 @@ class XChemExplorer(QtGui.QApplication):
 #            # this is necessary to render table properly
             data_collection_table.resizeRowsToContents()
             data_collection_table.resizeColumnsToContents()
-            data_collection_table.horizontalHeader().setStretchLastSection(False)
+#            data_collection_table.horizontalHeader().setStretchLastSection(False)
+            data_collection_table.horizontalHeader().setStretchLastSection(True)
             data_collection_table.verticalHeader().setStretchLastSection(True)
             data_collection_table.itemSelectionChanged.connect(self.update_selected_autoproc_data_collection_summary_table)
             data_collection_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
