@@ -881,6 +881,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     # note: need one more flag which indicates immediately that images belong together
                     #       this makes it afterwards easier to get them together in the table
                     run_number_list=[]
+                    image_files_in_list=False
                     for entry in self.data_collection_dict[xtal]:
                         image_files_in_list=False
                         if entry[0]=='image':
