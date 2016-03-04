@@ -1621,7 +1621,7 @@ class XChemExplorer(QtGui.QApplication):
             #    note: entry[6]==run_number
 #            layout=self.data_collection_image_dict[xtal][0]
             for entry in sorted(tmp,key=lambda x: x[6]):
-                if xtal=='PHIPA-x1985:'
+                if xtal=='PHIPA-x1985':
                     print 'xtal:',xtal,entry[6],entry[1],entry[2],entry[3],entry[5]
                 run_number=entry[6]
                 images_already_in_table=False
