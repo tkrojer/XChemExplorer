@@ -1696,7 +1696,7 @@ class XChemExplorer(QtGui.QApplication):
                                                                                                                     # same index numbers between lists
 
             data_collection_table.horizontalHeader().setStretchLastSection(False)
-            data_collection_table.verticalHeader().setStretchLastSection(True)
+            data_collection_table.verticalHeader().setStretchLastSection(False)
 
             self.main_data_collection_table.setCellWidget(row, 2, cell_widget)
             self.main_data_collection_table.setColumnWidth(2, 1000)
