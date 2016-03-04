@@ -1585,7 +1585,7 @@ class XChemExplorer(QtGui.QApplication):
 #            vbox_cell.addLayout(layout)
 
 #            # this is necessary to render table properly
-            data_collection_table.resizeRowsToContents()
+#            data_collection_table.resizeRowsToContents()
             data_collection_table.resizeColumnsToContents()
 #            data_collection_table.horizontalHeader().setStretchLastSection(False)
             data_collection_table.horizontalHeader().setStretchLastSection(True)
@@ -1692,7 +1692,7 @@ class XChemExplorer(QtGui.QApplication):
 
                     self.data_collection_table_dict[xtal].append(['logfile',entry[1],entry[2],entry[3],entry[4]])   # 'logfile' is just added to have
                                                                                                                     # same index numbers between lists
-            data_collection_table.setFixedHeight(300)
+#            data_collection_table.setFixedHeight(300)
             data_collection_table.horizontalHeader().setStretchLastSection(False)
             data_collection_table.verticalHeader().setStretchLastSection(False)
 
