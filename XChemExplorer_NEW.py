@@ -341,18 +341,18 @@ class XChemExplorer(QtGui.QApplication):
                                                         'Show Diffraction\nImage'
                                                         ]
 
-        data_collection_summary_list.append(['']*len(self.data_collection_summary_column_name))
+#        data_collection_summary_list.append(['']*len(self.data_collection_summary_column_name))
         self.data_collection_summary_table=QtGui.QTableWidget()
-        self.data_collection_summary_table.setRowCount(len(data_collection_summary_list))
+#        self.data_collection_summary_table.setRowCount(len(data_collection_summary_list))
 #        self.data_collection_summary_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.data_collection_summary_table.setColumnCount(len(self.data_collection_summary_column_name))
         self.data_collection_summary_table.setSortingEnabled(True)
-        for row,line in enumerate(data_collection_summary_list):
-            for column,item in enumerate(line):
-                cell_text=QtGui.QTableWidgetItem()
-                cell_text.setText(str(item))
-                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                self.data_collection_summary_table.setItem(row, column, cell_text)
+#        for row,line in enumerate(data_collection_summary_list):
+#            for column,item in enumerate(line):
+#                cell_text=QtGui.QTableWidgetItem()
+#                cell_text.setText(str(item))
+#                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+#                self.data_collection_summary_table.setItem(row, column, cell_text)
         self.data_collection_summary_table.setHorizontalHeaderLabels(self.data_collection_summary_column_name)
         self.data_collection_summarys_vbox_for_table=QtGui.QVBoxLayout()
         self.dls_tab_dict['Summary'][1].addLayout(self.data_collection_summarys_vbox_for_table)
