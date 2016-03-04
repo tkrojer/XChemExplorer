@@ -1588,8 +1588,7 @@ class XChemExplorer(QtGui.QApplication):
 #            data_collection_table.resizeRowsToContents()
             data_collection_table.resizeColumnsToContents()
 #            data_collection_table.horizontalHeader().setStretchLastSection(False)
-            data_collection_table.horizontalHeader().setStretchLastSection(True)
-            data_collection_table.verticalHeader().setStretchLastSection(True)
+#            data_collection_table.verticalHeader().setStretchLastSection(True)
             data_collection_table.itemSelectionChanged.connect(self.update_selected_autoproc_data_collection_summary_table)
             data_collection_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
             data_collection_table.setColumnCount(len(column_name))
@@ -1693,8 +1692,8 @@ class XChemExplorer(QtGui.QApplication):
                     self.data_collection_table_dict[xtal].append(['logfile',entry[1],entry[2],entry[3],entry[4]])   # 'logfile' is just added to have
                                                                                                                     # same index numbers between lists
 #            data_collection_table.setFixedHeight(300)
-            data_collection_table.horizontalHeader().setStretchLastSection(False)
-            data_collection_table.verticalHeader().setStretchLastSection(False)
+#            data_collection_table.horizontalHeader().setStretchLastSection(False)
+#            data_collection_table.verticalHeader().setStretchLastSection(False)
 
             self.main_data_collection_table.setCellWidget(row, 2, cell_widget)
             self.main_data_collection_table.setColumnWidth(2, 1000)
