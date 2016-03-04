@@ -870,7 +870,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
                 # check if there is already an entry for the current run
                 # obviously create if not and fill in basic information
-                for runs in glob.glob(collected_xtals+'/*'):
+                for runs in sorted(glob.glob(collected_xtals+'/*')):
                     run=runs[runs.rfind('/')+1:]
                     diffraction_image=''
                     timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
