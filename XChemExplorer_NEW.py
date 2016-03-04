@@ -1697,22 +1697,22 @@ class XChemExplorer(QtGui.QApplication):
             self.main_data_collection_table.setColumnWidth(2, 1000)
             row += 1
 
-            # this is necessary to render table properly
-            data_collection_table.resizeRowsToContents()
-            data_collection_table.resizeColumnsToContents()
-            data_collection_table.horizontalHeader().setStretchLastSection(False)
-            data_collection_table.verticalHeader().setStretchLastSection(True)
-            data_collection_table.itemSelectionChanged.connect(self.update_selected_autoproc_data_collection_summary_table)
-            data_collection_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-            data_collection_table.setColumnCount(len(column_name))
-            font = QtGui.QFont()
+        # this is necessary to render table properly
+        data_collection_table.resizeRowsToContents()
+        data_collection_table.resizeColumnsToContents()
+        data_collection_table.horizontalHeader().setStretchLastSection(False)
+        data_collection_table.verticalHeader().setStretchLastSection(True)
+        data_collection_table.itemSelectionChanged.connect(self.update_selected_autoproc_data_collection_summary_table)
+        data_collection_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        data_collection_table.setColumnCount(len(column_name))
+        font = QtGui.QFont()
 #            font.setFamily(_fromUtf8("Verdana"))
 #            font =  self.horizontalHeader().font()
-            font.setPointSize(8)
-            data_collection_table.setFont(font)
-            data_collection_table.setHorizontalHeaderLabels(column_name)
-            data_collection_table.horizontalHeader().setFont(font)
-            data_collection_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        font.setPointSize(8)
+        data_collection_table.setFont(font)
+        data_collection_table.setHorizontalHeaderLabels(column_name)
+        data_collection_table.horizontalHeader().setFont(font)
+        data_collection_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
 
 #        self.populate_data_collection_summary_table()
 
