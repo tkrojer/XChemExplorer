@@ -1627,7 +1627,7 @@ class XChemExplorer(QtGui.QApplication):
                 run_number=entry[6]
                 images_already_in_table=False
                 for image in self.data_collection_image_dict[xtal]:
-                    print 'run_number:',run_number,'dict:'image[0]
+                    print 'run_number:',run_number,'dict:',image[0]
                     if run_number==image[0]:
                         images_already_in_table=True
                         break
