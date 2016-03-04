@@ -878,12 +878,12 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                         diffraction_image=os.path.join(visit_directory,protein_name,xtal,run+'0001.cbf')
 
                     # image files
-                    image_files_in_list=False
                     # note: need one more flag which indicates immediately that images belong together
                     #       this makes it afterwards easier to get them together in the table
                     run_number_list=[]
                     for entry in self.data_collection_dict[xtal]:
-                        if len(entry)>=5:
+                        image_files_in_list=False
+                        if entry[0]=='image':
                             if entry[0]=='image' and entry[1]==visit and entry[2]==run:
                                 image_files_in_list=True
                             if not image_files_in_list:
