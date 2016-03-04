@@ -1679,13 +1679,11 @@ class XChemExplorer(QtGui.QApplication):
                         data_collection_table.insertRow(row_position)
                         db_dict=entry[6]
                         for column,header in enumerate(diffraction_data_column_name):
-                            print 'column',column,'header',header
-                            print 'db_dict',db_dict[ header[1] ]
+                            print 'xtal:',xtal,'column',column,'header',header,'db_dict:',db_dict[ header[1] ]
                             cell_text=QtGui.QTableWidgetItem()
                             cell_text.setText(str( db_dict[ header[1] ]  ))
                             cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                             data_collection_table.setItem(row_position, column, cell_text)
-                            print 'row_position',row_position,'column',column
                         best_file=entry[8]
                         if best_file:
                             data_collection_table.selectRow(row_position)
