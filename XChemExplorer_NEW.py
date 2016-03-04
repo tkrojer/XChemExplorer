@@ -1617,6 +1617,9 @@ class XChemExplorer(QtGui.QApplication):
                 if entry[0]=='image':
                     tmp.append(entry)
 
+            print 'xtal: ',tmp
+
+
             # b) sort by the previously assigned run number
             #    note: entry[6]==run_number
 #            layout=self.data_collection_image_dict[xtal][0]
@@ -1624,6 +1627,7 @@ class XChemExplorer(QtGui.QApplication):
                 run_number=entry[6]
                 images_already_in_table=False
                 for image in self.data_collection_image_dict[xtal]:
+                    print 'run_number:',run_number,'dict:'image[0]
                     if run_number==image[0]:
                         images_already_in_table=True
                         break
@@ -1671,10 +1675,7 @@ class XChemExplorer(QtGui.QApplication):
                 if entry[0]=='logfile':
                     entry_already_in_table=False
                     for logfile in self.data_collection_table_dict[xtal]:
-                        print 'logfile: ',entry[1],entry[2],entry[3],entry[4]
-                        print 'dict:    ',logfile[1],logfile[2],logfile[3],logfile[4]
                         if entry[1]==logfile[1] and entry[2]==logfile[2] and entry[3]==logfile[3] and entry[4]==logfile[4]:
-                            print 'ALREADY IN THERE'
                             entry_already_in_table=True
                             break
                     if not entry_already_in_table:
