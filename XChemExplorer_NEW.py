@@ -1589,7 +1589,7 @@ class XChemExplorer(QtGui.QApplication):
             data_collection_table.resizeColumnsToContents()
 #            data_collection_table.horizontalHeader().setStretchLastSection(False)
 #            data_collection_table.verticalHeader().setStretchLastSection(True)
-            data_collection_table.itemSelectionChanged.connect(self.update_selected_autoproc_data_collection_summary_table)
+#            data_collection_table.itemSelectionChanged.connect(self.update_selected_autoproc_data_collection_summary_table)
             data_collection_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
             data_collection_table.setColumnCount(len(column_name))
             font = QtGui.QFont()
@@ -1621,6 +1621,7 @@ class XChemExplorer(QtGui.QApplication):
             #    note: entry[6]==run_number
 #            layout=self.data_collection_image_dict[xtal][0]
             for entry in sorted(tmp,key=lambda x: x[6]):
+                print 'xtal:',xtal,entry[6],entry[1],entry[2],entry[3],entry[5]
                 run_number=entry[6]
                 images_already_in_table=False
                 for image in self.data_collection_image_dict[xtal]:
