@@ -1695,6 +1695,9 @@ class XChemExplorer(QtGui.QApplication):
                     self.data_collection_table_dict[xtal].append(['logfile',entry[1],entry[2],entry[3],entry[4]])   # 'logfile' is just added to have
                                                                                                                     # same index numbers between lists
 
+            data_collection_table.horizontalHeader().setStretchLastSection(True)
+            data_collection_table.verticalHeader().setStretchLastSection(True)
+
             self.main_data_collection_table.setCellWidget(row, 2, cell_widget)
             self.main_data_collection_table.setColumnWidth(2, 1000)
             row += 1
