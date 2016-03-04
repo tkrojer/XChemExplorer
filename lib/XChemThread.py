@@ -483,6 +483,8 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
                     path_to_procdir=os.path.join('/',*path_to_logfile.split('/')[:len(path_to_logfile.split('/'))-2])
                 if 'fast_dp' in path_to_logfile:
                     path_to_procdir=os.path.join('/',*path_to_logfile.split('/')[:len(path_to_logfile.split('/'))-1])
+                if 'autoPROC' in path_to_logfile:
+                    path_to_procdir=os.path.join('/',*path_to_logfile.split('/')[:len(path_to_logfile.split('/'))-1])
                 os.system('/bin/cp -Rf '+path_to_procdir+' '+os.path.join(self.initial_model_directory,sample,'autoprocessing'))
 
                 # link files
@@ -500,6 +502,17 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
                                 os.system('/bin/rm '+sample+'.log')
                             os.symlink(logfile,sample+'.log')
                             break
+
+                if 'autoPROC' in path_to_logfile:
+                    os.chdir(os.path.join(self.initial_model_directory,sample))
+                    if os.path.isfile(sample+'.mtz'):
+                        os.system('/bin/rm '+sample+'.mtz')
+                    if os.path.isfile(sample+'.log'):
+                        os.system('/bin/rm '+sample+'.log')
+                    os.symlink('autoprocessing/autoPROC/ap-run/aimless.log',sample+'.log')
+                    os.symlink('autoprocessing/autoPROC/ap-run/truncate.mtz',sample+'.mtz')
+
+
                 if 'fast_dp' in path_to_logfile:
                     os.chdir(os.path.join(self.initial_model_directory,sample,'autoprocessing','fast_dp'))
                     os.system("ctruncate -hklin fast_dp.mtz "
@@ -899,6 +912,10 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
                     if not image_files_in_list:
                         image_list=[]
+                        # we're expecting exactly 5 images: 1 x distl; 4 x crystal centring
+                        # for all the ones that are not present, IMAGE_NOT_AVAILABLE.png from
+                        # $XChemExplorer_DIR/image will be used instead
+                        image_counter=0
                         for image in glob.glob(os.path.join(visit_directory,'jpegs',self.target,xtal,'*')):
                             if run in image:
                                 if image.endswith('t.png') or image.endswith('_.png'):
@@ -906,6 +923,12 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     image_file=open(image,"rb")
                                     image_string=base64.b64encode(image_file.read())
                                     image_list.append( [image_name,image_string] )
+                                    image_counter+=1
+                        while image_counter < 5:
+                            image_file=open( os.path.join(os.getenv('XChemExplorer_DIR'),'image','IMAGE_NOT_AVAILABLE.png') ,"rb")
+                            image_string=base64.b64encode(image_file.read())
+                            image_list.append( ['image_'+str(image_counter)+'.png',image_string] )
+                            image_counter+=1
                         self.data_collection_dict[xtal].append(['image',visit,run,timestamp,image_list,
                                                                 diffraction_image,run_number])
 

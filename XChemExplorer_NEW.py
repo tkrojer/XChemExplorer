@@ -113,6 +113,7 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_table_dict={}      # contains the dataset table
         self.data_collection_image_dict={}
         self.data_collection_column_three_dict={}
+        self.data_collection_summary_dict={}
         self.main_data_collection_table_exists=False
 
         # command line arguments
@@ -175,8 +176,9 @@ class XChemExplorer(QtGui.QApplication):
         self.dataset_outcome = {    "success":                      "rgb(200,200,200)",
                                     "Failed - centring failed":     "rgb(200,200,200)",
                                     "Failed - no diffraction":      "rgb(200,200,200)",
-                                    "Failed - processing barfs":    "rgb(200,200,200)",
+                                    "Failed - processing":          "rgb(200,200,200)",
                                     "Failed - loop empty":          "rgb(200,200,200)",
+                                    "Failed - loop broken":         "rgb(200,200,200)",
                                     "Failed - low resolution":      "rgb(200,200,200)",
                                     "Failed - no X-rays":           "rgb(200,200,200)",
                                     "Failed - unknown":             "rgb(200,200,200)"  }
@@ -324,20 +326,13 @@ class XChemExplorer(QtGui.QApplication):
         # @ Summary
         data_collection_summary_list=[]
         self.data_collection_summary_column_name=[      'Sample ID',
-                                                        'Puck',
-                                                        'Position',
                                                         'Date',
                                                         'img1',
                                                         'img2',
                                                         'img3',
                                                         'img4',
+                                                        'img5',
                                                         'Program',
-                                                        'Space\nGroup',
-                                                        'Dataset\nOutcome',
-                                                        'Resolution\nOverall',
-                                                        'Rmerge\nInner Shell',
-                                                        'Mn(I/sig(I))\nOuter Shell',
-                                                        'Completeness\nOverall',
                                                         'Show Diffraction\nImage'
                                                         ]
 
@@ -1649,8 +1644,6 @@ class XChemExplorer(QtGui.QApplication):
             #    note: entry[6]==run_number
 #            layout=self.data_collection_image_dict[xtal][0]
             for entry in sorted(tmp,key=lambda x: x[6]):
-                if xtal=='PHIPA-x1985':
-                    print 'xtal:',xtal,entry[6],entry[1],entry[2],entry[3],entry[5]
                 run_number=entry[6]
                 images_already_in_table=False
                 for image in self.data_collection_image_dict[xtal]:
@@ -1916,67 +1909,45 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def populate_data_collection_summary_table(self):
-        # 1. get length of table
-        # 2. delete all entries
-        self.data_collection_summary_table.setRowCount(0)
+        row = self.data_collection_summary_table.rowCount()
         self.albula_button_dict={}
+        column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
+        for xtal in sorted(self.data_collection_dict):
 
-        self.data_collection_summary_table.setRowCount(len(self.data_collection_statistics_dict))
-        for row,key in enumerate(sorted(self.data_collection_statistics_dict)):
+            if xtal not in self.data_collection_summary_dict:
+                self.data_collection_summary_dict[xtal]=[]
+            else:
+                # not finished: should be updated if new runs appear
+                # but I park this for now
+                continue
+
             # find which dataset_outcome_button is checked
             outcome=''
-            for button in self.dataset_outcome_dict[key]:
+            for button in self.dataset_outcome_dict[xtal]:
                 if button.isChecked():
                     outcome=button.text()
 
             # find which autoprocessing run was thought to be the best
             selected_processing_result=0
-            for n,sample in enumerate(self.data_collection_statistics_dict[key]):
-                # check which row was auto-selected
-                for item in sample:
-                    if isinstance(item, list):
-                        if len(item)==2:
-                            if item[0]=='best file':
-                                if item[1]==True:
-                                    selected_processing_result=n
+            for sample in self.data_collection_statistics_dict[xtal]:
+                if sample[0]=='logfile':
+                    if sample[8]==True:
+                        selected_processing_result=sample[7]
+                        db_dict=entry[6]
 
-#            print self.data_collection_statistics_dict[key][selected_processing_result]
-            # find latest run
-            # take all images from latest run and put in table
+            # find latest run for crystal and diffraction images
             tmp=[]
-            for runs in self.data_collection_dict[key][0]:
-                tmp.append(runs[1])
-            latest_run=''
-            visit=''
-            diffraction_image=''
-            for n,run in enumerate(self.data_collection_dict[key][0]):
-                if run[1]==max(tmp):
-                    latest_run=run[0]
-                    visit=run[2]
-                    if len(run)==4:
-                        diffraction_image=os.path.join(str(run[3]),latest_run+'0001.cbf')
-            images_to_show=[]
-            if latest_run != '':
-                for image in self.data_collection_dict[key][3]:
-                    if latest_run in image[0] and image[0].endswith('t.png'):
-                        images_to_show.append(image)
-#                    for column in sorted(self.data_collection_dict[key][3]):
-#                        if run[0] in column[0]:
-#                            pixmap = QtGui.QPixmap()
-#                            pixmap.loadFromData(base64.b64decode(column[1]))
-#                            label = QtGui.QLabel()
-#                            label.resize(320,200)
-#                            label.setPixmap(pixmap.scaled(label.size(), QtCore.Qt.KeepAspectRatio))
-#                            layout.addWidget(label, (run_number)*2+1, column_number)
-#                            column_number+=1
+            for entry in self.data_collection_dict[xtal]:
+                if entry[0]=='image':
+                    tmp.append(entry)
+            latest_run=max(tmp,key=lambda x: x[0])
 
             image_number=0
-            for column,header in enumerate(self.data_collection_summary_column_name):
+            for column,header in enumerate(column_name):
                 cell_text=QtGui.QTableWidgetItem()
                 if header=='Sample ID':
-                    cell_text.setText(str(key))
-                if header=='Dataset\nOutcome':
-
+                    cell_text.setText(str(xtal))
+                elif header=='DataCollection\nOutcome':
                     dataset_outcome_combobox = QtGui.QComboBox()
                     for outcomeItem in self.dataset_outcome:
                         dataset_outcome_combobox.addItem(outcomeItem)
@@ -1986,45 +1957,38 @@ class XChemExplorer(QtGui.QApplication):
                     dataset_outcome_combobox.setCurrentIndex(index)
 
                     dataset_outcome_combobox.activated[str].connect(self.dataset_outcome_combobox_change_outcome)
-                    self.dataset_outcome_combobox_dict[key]=dataset_outcome_combobox
+                    self.dataset_outcome_combobox_dict[xtal]=dataset_outcome_combobox
                     #cell_text.setText(outcome)
                     continue
 
-                if header.startswith('img'):
-                    if len(images_to_show) > image_number:
-                        pixmap = QtGui.QPixmap()
-                        pixmap.loadFromData(base64.b64decode(images_to_show[image_number][1]))
-                        image = QtGui.QLabel()
-                        image.resize(80,50)
-                        image.setPixmap(pixmap.scaled(image.size(), QtCore.Qt.KeepAspectRatio))
-                        self.data_collection_summary_table.setCellWidget(row, column, image)
-                        image_number+=1
-                        continue
-                    else:
-                        cell_text.setText('')
-                if header=='Puck':
-                    puck='n/a'
-#                    if len(self.data_collection_dict[key])==5:
-#                        puck=self.data_collection_dict[key][4][0]
-                    cell_text.setText(puck)
-                if header=='Position':
-                    position='n/a'
-#                    if len(self.data_collection_dict[key])==5:
-#                        position=self.data_collection_dict[key][4][1]
-                    cell_text.setText(position)
-                if header.startswith('Show'):
-                    start_albula_button=QtGui.QPushButton('Show: '+latest_run+'0001.cbf')
+                elif header.startswith('img'):
+                    img=latest_run[4]
+                    pixmap = QtGui.QPixmap()
+                    # can do this (img[image_number][1]) because made sure in the threading module
+                    # that there are always exactly 5 images in there
+                    pixmap.loadFromData(base64.b64decode(img[image_number][1]))
+                    image = QtGui.QLabel()
+                    image.resize(128,80)
+                    image.setPixmap(pixmap.scaled(image.size(), QtCore.Qt.KeepAspectRatio))
+                    self.data_collection_summary_table.setCellWidget(row, column, image)
+                    image_number+=1
+
+                elif header.startswith('Show'):
+                    start_albula_button=QtGui.QPushButton('Show: '+str(latest_run[5])[str(latest_run[5].rfind('/')+1:)]
                     start_albula_button.clicked.connect(self.button_clicked)
-                    self.albula_button_dict[key]=[start_albula_button,diffraction_image]
+                    self.albula_button_dict[xtal]=[start_albula_button,diffraction_image]
                     self.data_collection_summary_table.setCellWidget(row,column,start_albula_button)
-                for item in self.data_collection_statistics_dict[key][selected_processing_result]:
-                    if isinstance(item, list):
-                        if len(item)==3:
-                            if item[0]==header:
-                                cell_text.setText(str(item[1]))
+                else:
+                    cell_text=QtGui.QTableWidgetItem()
+                    cell_text.setText(str( db_dict[ header[1] ]  ))
+                    cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                    data_collection_table.setItem(row_position, column, cell_text)
+
 
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.data_collection_summary_table.setItem(row, column, cell_text)
+
+            row += 1
 
         self.data_collection_summary_table.resizeRowsToContents()
         self.data_collection_summary_table.resizeColumnsToContents()

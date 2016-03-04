@@ -407,6 +407,9 @@ class data_source:
     def translate_xce_column_list_to_sqlite(self,column_list):
         out_list=[]
         for item in column_list:
+            if item.startwith('img'):
+                out_list.append([item,item])
+                continue
             for entry in self.column_list:
                 if entry[1]==item:
                     out_list.append([item,entry[0]])

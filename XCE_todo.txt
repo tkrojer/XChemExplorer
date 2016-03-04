@@ -70,3 +70,22 @@ DONE - 'Update Datasource': overwrites fields with empty entry: e.g. in case log
 
 - SQLite file is read-only: issue warning message
 - phenix validation -> move to cctbx
+
+
+XCE @ feedback
+
+Alice, 04/03/2016
+
+DLS @ summary is great for that!
+-	1 single page with all the experiments from all possible visits with views of the crystals + stats and diffraction images is great!
+-	Could change the ‘failed’ annotation quickly with the middle mouse wheel and the updates go back to DLS @ Data collection!
+
+Things maybe to add/improve/ questions I have:
+-	Add ‘Failed: loop broken’ (most of the ‘failed’ for me).Minor
+-	Remove puck and position (since they won’t be used) and maybe slightly bigger image of crystals? I couldn’t see empty loops so well . minor
+-	Sorting of the crystals identifiers. It is not really doing it by ascending or descending number currently. Major. Annoying.
+-	Is it possible to sort by failed or success? And then export as csv?
+    Solution: export csv only? For what purpose?
+-	If I now save it to database, it should keep my change (for the annotation), shouldn’t it?
+	Solution: record every change in data_collection_dict and autosave every 60s
+	          idea is to save to database only when files are copied to disc
