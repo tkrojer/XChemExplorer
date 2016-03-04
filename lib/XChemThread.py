@@ -891,10 +891,10 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             if entry[0]=='image' and entry[1]==visit and entry[2]==run:
                                 print 'already in dict:',run,visit
                                 image_files_in_list=True
-                            if not image_files_in_list:
-                                print 'missing:',run,visit
-                                run_number_list.append(int(entry[6])+1)
-                                print run_number_list
+                    if not image_files_in_list:
+                        print 'missing:',run,visit
+                        run_number_list.append(int(entry[6])+1)
+                        print run_number_list
                     if run_number_list==[]:
                         run_number=1
                     else:
