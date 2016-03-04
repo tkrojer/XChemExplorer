@@ -1672,13 +1672,13 @@ class XChemExplorer(QtGui.QApplication):
                     entry_already_in_table=False
                     for logfile in self.data_collection_table_dict:
                         if entry[1]==logfile[1] and entry[2]==logfile[2] and entry[3]==logfile[3] and entry[4]==logfile[4]:
+                            print 'ALREADY IN THERE'
                             entry_already_in_table=True
                             break
                     if not entry_already_in_table:
                         data_collection_table.insertRow(row_position)
                         db_dict=entry[6]
                         for column,header in enumerate(diffraction_data_column_name):
-                            print 'xtal:',xtal,'row:',row_position,'column',column,'header',header,'db_dict:',db_dict[ header[1] ]
                             cell_text=QtGui.QTableWidgetItem()
                             cell_text.setText(str( db_dict[ header[1] ]  ))
                             cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
