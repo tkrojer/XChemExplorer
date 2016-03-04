@@ -1621,7 +1621,8 @@ class XChemExplorer(QtGui.QApplication):
             #    note: entry[6]==run_number
 #            layout=self.data_collection_image_dict[xtal][0]
             for entry in sorted(tmp,key=lambda x: x[6]):
-                print 'xtal:',xtal,entry[6],entry[1],entry[2],entry[3],entry[5]
+                if xtal=='PHIPA-x1985:'
+                    print 'xtal:',xtal,entry[6],entry[1],entry[2],entry[3],entry[5]
                 run_number=entry[6]
                 images_already_in_table=False
                 for image in self.data_collection_image_dict[xtal]:
@@ -1641,7 +1642,7 @@ class XChemExplorer(QtGui.QApplication):
                         label.setPixmap(pixmap.scaled(label.size(), QtCore.Qt.KeepAspectRatio))
                         layout.addWidget(label, run_number, image_number)
                     self.data_collection_image_dict[xtal].append([entry[6],entry[1],entry[2],entry[3],entry[5]])
-            print 'xtal:',xtal,'dict:',self.data_collection_image_dict[xtal]
+#            print 'xtal:',xtal,'dict:',self.data_collection_image_dict[xtal]
             #############################################################################
             # data collection outcome box
             if xtal not in self.dataset_outcome_dict:
