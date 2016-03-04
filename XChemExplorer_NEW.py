@@ -1671,6 +1671,8 @@ class XChemExplorer(QtGui.QApplication):
                 if entry[0]=='logfile':
                     entry_already_in_table=False
                     for logfile in self.data_collection_table_dict:
+                        print 'logfile: ',entry[1],entry[2],entry[3],entry[4]
+                        print 'dict:    ',logfile[1],logfile[2],logfile[3],logfile[4]
                         if entry[1]==logfile[1] and entry[2]==logfile[2] and entry[3]==logfile[3] and entry[4]==logfile[4]:
                             print 'ALREADY IN THERE'
                             entry_already_in_table=True
