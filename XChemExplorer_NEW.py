@@ -1641,7 +1641,7 @@ class XChemExplorer(QtGui.QApplication):
                         label.setPixmap(pixmap.scaled(label.size(), QtCore.Qt.KeepAspectRatio))
                         layout.addWidget(label, run_number, image_number)
                     self.data_collection_image_dict[xtal].append([entry[6],entry[1],entry[2],entry[3],entry[5]])
-
+            print 'xtal:',xtal,'dict:',self.data_collection_image_dict[xtal]
             #############################################################################
             # data collection outcome box
             if xtal not in self.dataset_outcome_dict:
