@@ -1724,7 +1724,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.main_data_collection_table.resizeRowsToContents()
 
-#        self.populate_data_collection_summary_table()
+        self.populate_data_collection_summary_table()
 
         #-----------------------------------------------------------------------------------------------
 
