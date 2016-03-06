@@ -1929,7 +1929,7 @@ class XChemExplorer(QtGui.QApplication):
 
             # find which autoprocessing run was thought to be the best
             selected_processing_result=0
-            for sample in self.data_collection_statistics_dict[xtal]:
+            for sample in self.data_collection_dict[xtal]:
                 if sample[0]=='logfile':
                     if sample[8]==True:
                         selected_processing_result=sample[7]
