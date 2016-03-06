@@ -1961,7 +1961,7 @@ class XChemExplorer(QtGui.QApplication):
                     #cell_text.setText(outcome)
                     continue
 
-                elif header.startswith('img'):
+                elif header[0].startswith('img'):
                     img=latest_run[4]
                     pixmap = QtGui.QPixmap()
                     # can do this (img[image_number][1]) because made sure in the threading module
