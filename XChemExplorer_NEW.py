@@ -1933,7 +1933,7 @@ class XChemExplorer(QtGui.QApplication):
                 if sample[0]=='logfile':
                     if sample[8]==True:
                         selected_processing_result=sample[7]
-                        db_dict=entry[6]
+                        db_dict=sample[6]
 
             # find latest run for crystal and diffraction images
             tmp=[]
