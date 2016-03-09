@@ -1978,6 +1978,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def populate_data_collection_summary_table(self):
         row = self.data_collection_summary_table.rowCount()
+        print 'summary table row count: ',row
         self.albula_button_dict={}
         column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
         for xtal in sorted(self.data_collection_dict):
@@ -1987,7 +1988,8 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 # not finished: should be updated if new runs appear
                 # but I park this for now
-                continue
+                print 'hallo'
+#                continue
 
             # find which dataset_outcome_button is checked
             outcome=''
@@ -2060,6 +2062,7 @@ class XChemExplorer(QtGui.QApplication):
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.data_collection_summary_table.setItem(row, column, cell_text)
 
+            print 'row iterator: ',row
             row += 1
 
         self.data_collection_summary_table.resizeRowsToContents()
