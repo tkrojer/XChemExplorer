@@ -933,9 +933,9 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
     def min_Rfree(self,xtal):
         tmp=[]
-        db_dict=self.data_collection_dict[xtal][6]
         for entry in self.data_collection_dict[xtal]:
             if entry[0]=='logfile':
+                db_dict=entry[6]
                 index=entry[7]
                 try:
                     tmp.append([index, float(db_dict['DataProcessingRfree']) ] )
@@ -948,9 +948,9 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
     def min_resolution(self,xtal):
         tmp=[]
-        db_dict=self.data_collection_dict[xtal][6]
         for entry in self.data_collection_dict[xtal]:
             if entry[0]=='logfile':
+                db_dict=entry[6]
                 index=entry[7]
                 try:
                     tmp.append([index, float(db_dict['DataProcessingResolutionHigh']) ] )
