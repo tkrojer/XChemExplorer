@@ -2015,7 +2015,7 @@ class XChemExplorer(QtGui.QApplication):
             image_number=0
             for column,header in enumerate(column_name):
                 print column,header
-                cell_text=QtGui.QTableWidgetItem()
+#                cell_text=QtGui.QTableWidgetItem()
                 if header[0]=='Sample ID':
                     cell_text=QtGui.QTableWidgetItem()
                     cell_text.setText(str(xtal))
