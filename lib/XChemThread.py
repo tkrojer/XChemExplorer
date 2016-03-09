@@ -925,6 +925,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
             best_file_index=min(input_list,key=lambda x: x[1])[0]
         elif min_max=='max':
             best_file_index=max(input_list,key=lambda x: x[1])[0]
+        print 'bestfile',best_file_index
         for n,entry in enumerate(self.data_collection_dict[xtal]):
             if len(entry)==9 and entry[0]=='logfile':
                 if entry[7]==best_file_index:
@@ -967,7 +968,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         progress=0
 
         for xtal in sorted(self.data_collection_dict):
-            print 'here',xtal
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 2 of 2: selecting "best" aimless logfile ->'+xtal)
             # overwrite previous selection, i.e. set flag to False
             for n,entry in enumerate(self.data_collection_dict[xtal]):
