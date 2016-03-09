@@ -76,6 +76,8 @@ DONE - 'Update Datasource': overwrites fields with empty entry: e.g. in case log
 - things like 'suggest additional crystal form' are really slow, because it queries the filesystem, but it probably should ask the data source
   -> update data source should be the only point where it does this?
 
+- data collection summary table: does not seem that latest run is taken
+  
 XCE @ feedback
 
 Alice, 04/03/2016

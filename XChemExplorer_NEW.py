@@ -2012,8 +2012,6 @@ class XChemExplorer(QtGui.QApplication):
 
             image_number=0
             for column,header in enumerate(column_name):
-                print column,header
-#                cell_text=QtGui.QTableWidgetItem()
                 if header[0]=='Sample ID':
                     cell_text=QtGui.QTableWidgetItem()
                     cell_text.setText(str(xtal))
@@ -2030,7 +2028,6 @@ class XChemExplorer(QtGui.QApplication):
 
                     dataset_outcome_combobox.activated[str].connect(self.dataset_outcome_combobox_change_outcome)
                     self.dataset_outcome_combobox_dict[xtal]=dataset_outcome_combobox
-                    #cell_text.setText(outcome)
                     continue
 
                 elif header[0].startswith('img'):
@@ -2060,8 +2057,6 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                     self.data_collection_summary_table.setItem(row, column, cell_text)
 
-
-            print 'row iterator: ',row
             row += 1
 
         self.data_collection_summary_table.resizeRowsToContents()

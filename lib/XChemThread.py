@@ -1061,19 +1061,31 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                         # for all the ones that are not present, IMAGE_NOT_AVAILABLE.png from
                         # $XChemExplorer_DIR/image will be used instead
                         image_counter=0
-                        for image in glob.glob(os.path.join(visit_directory,'jpegs',self.target,xtal,'*')):
+                        # first four images are the crystal centring images
+                        for image in sorted(glob.glob(os.path.join(visit_directory,'jpegs',self.target,xtal,'*t.png'))):
                             if run in image:
-                                if image.endswith('t.png') or image.endswith('_.png'):
-                                    image_name=image[image.rfind('/')+1:]
-                                    image_file=open(image,"rb")
-                                    image_string=base64.b64encode(image_file.read())
-                                    image_list.append( [image_name,image_string] )
-                                    image_counter+=1
-                        while image_counter < 5:
+#                                if image.endswith('t.png') or image.endswith('_.png'):
+                                image_name=image[image.rfind('/')+1:]
+                                image_file=open(image,"rb")
+                                image_string=base64.b64encode(image_file.read())
+                                image_list.append( [image_name,image_string] )
+                                image_counter+=1
+                        while image_counter < 4:
                             image_file=open( os.path.join(os.getenv('XChemExplorer_DIR'),'image','IMAGE_NOT_AVAILABLE.png') ,"rb")
                             image_string=base64.b64encode(image_file.read())
                             image_list.append( ['image_'+str(image_counter)+'.png',image_string] )
                             image_counter+=1
+                        # now comes the distl plot
+                        if os.path.isfile(os.path.join(visit_directory,'jpegs',self.target,xtal,xtal+'.png')):
+                            image_file=os.path.join(visit_directory,'jpegs',self.target,xtal,xtal+'.png')
+                            image_name=xtal+'.png'
+                            image_file=open(image,"rb")
+                            image_string=base64.b64encode(image_file.read())
+                            image_list.append( [image_name,image_string] )
+                        else:
+                            image_file=open( os.path.join(os.getenv('XChemExplorer_DIR'),'image','IMAGE_NOT_AVAILABLE.png') ,"rb")
+                            image_string=base64.b64encode(image_file.read())
+                            image_list.append( ['image_'+str(image_counter)+'.png',image_string] )
                         self.data_collection_dict[xtal].append(['image',visit,run,timestamp,image_list,
                                                                 diffraction_image,run_number])
 
