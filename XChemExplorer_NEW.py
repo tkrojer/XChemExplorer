@@ -1976,6 +1976,7 @@ class XChemExplorer(QtGui.QApplication):
         for xtal in sorted(self.data_collection_dict):
 
             if xtal not in self.data_collection_summary_dict:
+                self.data_collection_summary_table.insertRow(row)
                 self.data_collection_summary_dict[xtal]=[]
             else:
                 # not finished: should be updated if new runs appear
