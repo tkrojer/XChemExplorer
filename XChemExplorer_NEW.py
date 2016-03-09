@@ -2017,7 +2017,7 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text=QtGui.QTableWidgetItem()
                     cell_text.setText(str(xtal))
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                    self.data_collection_summary_table.setItem(row_position, column, cell_text)
+                    self.data_collection_summary_table.setItem(row, column, cell_text)
                 elif header=='DataCollection\nOutcome':
                     dataset_outcome_combobox = QtGui.QComboBox()
                     for outcomeItem in self.dataset_outcome:
@@ -2054,7 +2054,7 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text=QtGui.QTableWidgetItem()
                     cell_text.setText(str( db_dict[ header[1] ]  ))
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                    self.data_collection_summary_table.setItem(row_position, column, cell_text)
+                    self.data_collection_summary_table.setItem(row, column, cell_text)
 
 
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
