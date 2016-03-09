@@ -1742,9 +1742,6 @@ class XChemExplorer(QtGui.QApplication):
                             cell_text.setText(str( db_dict[ header[1] ]  ))
                             cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                             data_collection_table.setItem(row_position, column, cell_text)
-#                        best_file=entry[8]
-#                        if best_file:
-#                            data_collection_table.selectRow(row_position)
                         data_collection_table.setRowHeight(row_position,20)
                         row_position+=1
 
@@ -1753,21 +1750,28 @@ class XChemExplorer(QtGui.QApplication):
 #            data_collection_table.setFixedHeight(300)
 #            data_collection_table.horizontalHeader().setStretchLastSection(False)
 #            data_collection_table.verticalHeader().setStretchLastSection(False)
-#            allRows = data_collection_table.rowCount()
-#            for row in range(allRows):
 
-            # select best resolution file
+            # select best resolution file + set data collection outcome
             # the assumption is that index in data_collection_dict and row number are identical
+            # the assumption for data collection outcome is that as long as a logfile is found, it's a success
+            logfile_found=False
             for entry in self.data_collection_dict[xtal]:
                 if entry[0]=='logfile':
                     index=entry[7]
                     best_file=entry[8]
+                    logfile_found=True
                     if best_file:
                         data_collection_table.selectRow(index)
-
-#            tmpx=data_collection_table.selectionModel().selectedRows()
-#            for index in tmpx:
-#                print index.row()
+            if logfile_found:
+                for button in self.dataset_outcome_dict[xtal]:
+                    if button.text()=='success':
+                        button.setChecked(True)
+                        button.setStyleSheet("background-color: rgb(0,255,0)")
+            else:
+                for button in self.dataset_outcome_dict[xtal]:
+                    if button.text()=='Failed - unknown':
+                        button.setChecked(True)
+                        button.setStyleSheet("background-color: rgb(255,0,0)")
 
             self.main_data_collection_table.setCellWidget(row, 2, cell_widget)
             self.main_data_collection_table.setColumnWidth(2, 1000)
