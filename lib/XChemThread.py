@@ -918,13 +918,13 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                         except ValueError:
                             pass
         if not select_stage_three_list==[]:
-            self.set_best_file_to_true(xtal,'max')
+            self.set_best_file_to_true(xtal,'max',select_stage_three_list)
 
-    def set_best_file_to_true(self,xtal,min_max):
+    def set_best_file_to_true(self,xtal,min_max,input_list):
         if min_max=='min':
-            best_file_index=min(select_stage_three_list,key=lambda x: x[1])[0]
+            best_file_index=min(input_list,key=lambda x: x[1])[0]
         elif min_max=='max':
-            best_file_index=max(select_stage_three_list,key=lambda x: x[1])[0]
+            best_file_index=max(input_list,key=lambda x: x[1])[0]
         for n,entry in enumerate(self.data_collection_dict[xtal]):
             if len(entry)==9 and entry[0]=='logfile':
                 if entry[7]==best_file_index:
@@ -942,7 +942,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                 except ValueError:
                     pass
         if tmp != []:
-            self.set_best_file_to_true(xtal,'min')
+            self.set_best_file_to_true(xtal,'min',tmp)
         else:
             self.min_resolution(xtal)
 
@@ -957,7 +957,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                 except ValueError:
                     pass
         if tmp != []:
-            self.set_best_file_to_true(xtal,'min')
+            self.set_best_file_to_true(xtal,'min',tmp)
 
     def select_best_dataset(self):
         if not len(self.data_collection_dict)==0:
