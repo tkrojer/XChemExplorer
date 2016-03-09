@@ -1760,6 +1760,9 @@ class XChemExplorer(QtGui.QApplication):
 #            data_collection_table.setFixedHeight(300)
 #            data_collection_table.horizontalHeader().setStretchLastSection(False)
 #            data_collection_table.verticalHeader().setStretchLastSection(False)
+#            allRows = data_collection_table.rowCount()
+#            for row in range(allRows):
+            print indexes=data_collection_table.selectionModel().selectedRows()
 
             self.main_data_collection_table.setCellWidget(row, 2, cell_widget)
             self.main_data_collection_table.setColumnWidth(2, 1000)
