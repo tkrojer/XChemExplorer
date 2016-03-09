@@ -2043,9 +2043,10 @@ class XChemExplorer(QtGui.QApplication):
 
                 elif header[0].startswith('Show'):
                     diffraction_image=latest_run[5]
+                    diffraction_image_name=diffraction_image[diffraction_image.rfind('/')+1:]
                     print 'diffraction image',diffraction_image
 #                    start_albula_button=QtGui.QPushButton('Show: '+str(latest_run[5])[str(latest_run[5].rfind('/')+1:)])
-                    start_albula_button=QtGui.QPushButton('Show: ')
+                    start_albula_button=QtGui.QPushButton('Show: \n'+diffraction_image_name)
                     start_albula_button.clicked.connect(self.button_clicked)
                     self.albula_button_dict[xtal]=[start_albula_button,diffraction_image]
                     self.data_collection_summary_table.setCellWidget(row,column,start_albula_button)
