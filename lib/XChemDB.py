@@ -410,6 +410,12 @@ class data_source:
             if item.startswith('img'):
                 out_list.append([item,item])
                 continue
+            if item.startswith('DataCollection\nOutcome'):
+                out_list.append([item,item])
+                continue
+            if item.startswith('Show'):
+                out_list.append([item,item])
+                continue
             for entry in self.column_list:
                 if entry[1]==item:
                     out_list.append([item,entry[0]])
