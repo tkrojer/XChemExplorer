@@ -2014,8 +2014,11 @@ class XChemExplorer(QtGui.QApplication):
             for column,header in enumerate(column_name):
                 print header
                 cell_text=QtGui.QTableWidgetItem()
-                if header=='Sample ID':
+                if header[0]=='Sample ID':
+                    cell_text=QtGui.QTableWidgetItem()
                     cell_text.setText(str(xtal))
+                    cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                    data_collection_table.setItem(row_position, column, cell_text)
                 elif header=='DataCollection\nOutcome':
                     dataset_outcome_combobox = QtGui.QComboBox()
                     for outcomeItem in self.dataset_outcome:
