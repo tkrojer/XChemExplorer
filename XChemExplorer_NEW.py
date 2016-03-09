@@ -2012,6 +2012,7 @@ class XChemExplorer(QtGui.QApplication):
 
             image_number=0
             for column,header in enumerate(column_name):
+                print header
                 cell_text=QtGui.QTableWidgetItem()
                 if header=='Sample ID':
                     cell_text.setText(str(xtal))
