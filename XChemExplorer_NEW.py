@@ -2015,7 +2015,7 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text.setText(str(xtal))
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                     self.data_collection_summary_table.setItem(row, column, cell_text)
-                elif header=='DataCollection\nOutcome':
+                elif header[0]=='DataCollection\nOutcome':
                     dataset_outcome_combobox = QtGui.QComboBox()
                     for outcomeItem in self.dataset_outcome:
                         dataset_outcome_combobox.addItem(outcomeItem)
