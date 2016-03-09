@@ -2041,7 +2041,7 @@ class XChemExplorer(QtGui.QApplication):
                     self.data_collection_summary_table.setCellWidget(row, column, image)
                     image_number+=1
 
-                elif header.startswith('Show'):
+                elif header[0].startswith('Show'):
 #                    start_albula_button=QtGui.QPushButton('Show: '+str(latest_run[5])[str(latest_run[5].rfind('/')+1:)])
                     start_albula_button=QtGui.QPushButton('Show: ')
                     start_albula_button.clicked.connect(self.button_clicked)
