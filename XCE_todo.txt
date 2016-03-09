@@ -71,6 +71,10 @@ DONE - 'Update Datasource': overwrites fields with empty entry: e.g. in case log
 - SQLite file is read-only: issue warning message
 - phenix validation -> move to cctbx
 
+- allowed unit cell difference in settings must be integer at the moment, otherwise XCE barfs
+
+- things like 'suggest additional crystal form' are really slow, because it queries the filesystem, but it probably should ask the data source
+  -> update data source should be the only point where it does this?
 
 XCE @ feedback
 

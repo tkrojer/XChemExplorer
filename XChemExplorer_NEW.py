@@ -80,6 +80,19 @@ class XChemExplorer(QtGui.QApplication):
             self.ccp4_scratch_directory=os.getenv('CCP4_SCR')
             self.panddas_directory=self.current_directory
 
+        self.preferences_data_to_copy = [
+            ['All Files in the respective auto-processing directory',   'everything'],
+            ['aimless logiles and merged mtz only',                     'mtz_log_only']
+                    ]
+
+        self.preferences_selection_mechanism = [    'IsigI*Comp*UniqueRefl',
+                                                    'highest_resolution',
+                                                    'lowest_Rfree'              ]
+
+        self.preferences =  {   'processed_data_to_copy':       'everything',
+                                'dataset_selection_mechanism':  'IsigI*Comp*UniqueRefl' }
+
+
 
         self.settings =     {'current_directory':       self.current_directory,
                              'project_directory':       self.project_directory,
@@ -92,7 +105,8 @@ class XChemExplorer(QtGui.QApplication):
                              'data_source':             os.path.join(self.database_directory,self.data_source_file),
                              'ccp4_scratch':            self.ccp4_scratch_directory,
                              'unitcell_difference':     self.allowed_unitcell_difference_percent,
-                             'filename_root':           self.filename_root   }
+                             'filename_root':           self.filename_root,
+                             'preferences':             self.preferences        }
 
 
         # Settings @ Lists
@@ -250,7 +264,9 @@ class XChemExplorer(QtGui.QApplication):
                         'Initial Model',
                         'PANDDAs',
                         'Summary & Refine',
-                        'Crystal Form'  ]
+                        'Crystal Form',
+                        'Preferences'   ]
+
         self.tab_dict={}
         for page in tab_list:
             tab=QtGui.QWidget()
@@ -769,6 +785,31 @@ class XChemExplorer(QtGui.QApplication):
 #        self.data_collection_vbox_for_settings.addStretch(1)
         ######################################################################################
 
+        ######################################################################################
+        # Preferences
+        self.vbox_for_preferences=QtGui.QVBoxLayout()
+        self.tab_dict['Preferences'][1].addLayout(self.vbox_for_preferences)
+
+        self.vbox_for_preferences.addWidget(QtGui.QLabel('Select amount of processed data you wish to copy to initial_model directory:'))
+        self.preferences_data_to_copy_combobox = QtGui.QComboBox()
+        for item in self.preferences_data_to_copy:
+            self.preferences_data_to_copy_combobox.addItem(item[0])
+        self.preferences_data_to_copy_combobox.currentIndexChanged.connect(self.preferences_data_to_copy_combobox_changed)
+        self.vbox_for_preferences.addWidget(self.preferences_data_to_copy_combobox)
+
+        self.vbox_for_preferences.addWidget(QtGui.QLabel('Dataset Selection Mechanism:'))
+        self.preferences_selection_mechanism_combobox = QtGui.QComboBox()
+        for item in self.preferences_selection_mechanism:
+            self.preferences_selection_mechanism_combobox.addItem(item)
+        self.preferences_selection_mechanism_combobox.currentIndexChanged.connect(self.preferences_selection_mechanism_combobox_changed)
+        self.vbox_for_preferences.addWidget(self.preferences_selection_mechanism_combobox)
+
+        self.vbox_for_preferences.addStretch(1)
+
+        ######################################################################################
+
+
+
         self.status_bar=QtGui.QStatusBar()
         self.progress_bar=QtGui.QProgressBar()
         self.progress_bar.setMaximum(100)
@@ -907,6 +948,7 @@ class XChemExplorer(QtGui.QApplication):
         if os.path.isfile(os.path.join(self.database_directory,self.data_source_file)):
             self.load_crystal_form_from_datasource()
             if self.xtalform_dict != {}:
+                print self.xtalform_dict
                 for key in self.xtalform_dict:
                     self.pandda_analyse_crystal_from_selection_combobox.addItem(key)
 
@@ -1114,7 +1156,8 @@ class XChemExplorer(QtGui.QApplication):
                                                                                self.target,
                                                                                self.reference_file_list,
                                                                                self.database_directory,
-                                                                               self.data_collection_dict)
+                                                                               self.data_collection_dict,
+                                                                               self.preferences )
             self.explorer_active=1
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
@@ -1817,6 +1860,16 @@ class XChemExplorer(QtGui.QApplication):
         crystal_form = self.pandda_analyse_crystal_from_selection_combobox.currentText()
         self.populate_pandda_analyse_input_table(crystal_form)
 
+    def preferences_data_to_copy_combobox_changed(self,i):
+        text = str(self.preferences_selection_mechanism_combobox.currentText())
+        for item in self.preferences_data_to_copy:
+            if item[0] == text:
+                self.preferences['processed_data_to_copy']=item[1]
+                break
+
+    def preferences_selection_mechanism_combobox_changed(self,i):
+        text = str(self.preferences_selection_mechanism_combobox.currentText())
+        self.preferences['dataset_selection_mechanism']=text
 
     def get_reference_file_list(self,reference_root):
         # check available reference files
