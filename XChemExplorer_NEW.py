@@ -2060,8 +2060,8 @@ class XChemExplorer(QtGui.QApplication):
                     self.data_collection_summary_table.setItem(row, column, cell_text)
 
 
-                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                self.data_collection_summary_table.setItem(row, column, cell_text)
+#                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+#                self.data_collection_summary_table.setItem(row, column, cell_text)
 
             print 'row iterator: ',row
             row += 1
