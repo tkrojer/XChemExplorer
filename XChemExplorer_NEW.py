@@ -1763,7 +1763,7 @@ class XChemExplorer(QtGui.QApplication):
 #            allRows = data_collection_table.rowCount()
 #            for row in range(allRows):
             tmpx=data_collection_table.selectionModel().selectedRows()
-            for index in tempx:
+            for index in tmpx:
                 print index.row()
 #            print int(tmpx)
 
