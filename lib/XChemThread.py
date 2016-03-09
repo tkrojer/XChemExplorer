@@ -1076,16 +1076,17 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             image_list.append( ['image_'+str(image_counter)+'.png',image_string] )
                             image_counter+=1
                         # now comes the distl plot
-                        if os.path.isfile(os.path.join(visit_directory,'jpegs',self.target,xtal,xtal+'.png')):
-                            image_file=os.path.join(visit_directory,'jpegs',self.target,xtal,xtal+'.png')
-                            image_name=xtal+'.png'
+                        if os.path.isfile(os.path.join(visit_directory,'jpegs',self.target,xtal,run+'.png')):
+                            image_file=os.path.join(visit_directory,'jpegs',self.target,xtal,run+'.png')
+                            image_name=run+'.png'
                             image_file=open(image,"rb")
                             image_string=base64.b64encode(image_file.read())
                             image_list.append( [image_name,image_string] )
                         else:
+                            image_name=run+'.png'
                             image_file=open( os.path.join(os.getenv('XChemExplorer_DIR'),'image','IMAGE_NOT_AVAILABLE.png') ,"rb")
                             image_string=base64.b64encode(image_file.read())
-                            image_list.append( ['image_'+str(image_counter)+'.png',image_string] )
+                            image_list.append( [image_name,image_string] )
                         self.data_collection_dict[xtal].append(['image',visit,run,timestamp,image_list,
                                                                 diffraction_image,run_number])
 
