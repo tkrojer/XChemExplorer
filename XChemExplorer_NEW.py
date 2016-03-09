@@ -1763,7 +1763,9 @@ class XChemExplorer(QtGui.QApplication):
 #            allRows = data_collection_table.rowCount()
 #            for row in range(allRows):
             tmpx=data_collection_table.selectionModel().selectedRows()
-            print int(tmpx)
+            for index in tempx:
+                print index.row()
+#            print int(tmpx)
 
             self.main_data_collection_table.setCellWidget(row, 2, cell_widget)
             self.main_data_collection_table.setColumnWidth(2, 1000)
