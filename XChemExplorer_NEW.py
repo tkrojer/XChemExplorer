@@ -359,7 +359,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.data_collection_summarys_vbox_for_table=QtGui.QVBoxLayout()
         self.dls_tab_dict['Summary'][1].addLayout(self.data_collection_summarys_vbox_for_table)
-#        self.data_collection_summarys_vbox_for_table.addWidget(self.data_collection_summary_table)
+        self.data_collection_summarys_vbox_for_table.addWidget(self.data_collection_summary_table)
 
         ######################################################################################
         # @ Details
@@ -1558,12 +1558,11 @@ class XChemExplorer(QtGui.QApplication):
         if not self.main_data_collection_table_exists:
             self.main_data_collection_table=QtGui.QTableWidget()
             self.main_data_collection_table.setSortingEnabled(True)
+            self.main_data_collection_table.setColumnCount(3)
             self.main_data_collection_table.setHorizontalHeaderLabels(['Sample','Date',''])
 #            self.main_data_collection_table.resizeRowsToContents()
             self.main_data_collection_table.setLineWidth(10)
-            self.main_data_collection_table.setColumnCount(3)
             self.data_collection_vbox_for_table.addWidget(self.main_data_collection_table)
-            self.data_collection_summarys_vbox_for_table.addWidget(self.data_collection_summary_table)
             self.main_data_collection_table_exists=True
 
         column_name = [ 'Program',
