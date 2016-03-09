@@ -410,9 +410,6 @@ class data_source:
             if item.startswith('img'):
                 out_list.append([item,item])
                 continue
-            if item.startswith('DataCollection\nOutcome'):
-                out_list.append([item,item])
-                continue
             if item.startswith('Show'):
                 out_list.append([item,item])
                 continue

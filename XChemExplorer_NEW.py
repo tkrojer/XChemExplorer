@@ -343,6 +343,7 @@ class XChemExplorer(QtGui.QApplication):
         data_collection_summary_list=[]
         self.data_collection_summary_column_name=[      'Sample ID',
                                                         'Date',
+                                                        'DataCollection\nOutcome',
                                                         'img1',
                                                         'img2',
                                                         'img3',
