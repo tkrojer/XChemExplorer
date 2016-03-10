@@ -597,6 +597,7 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
         progress=0
         self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
         for sample in sorted(data_dict):
+            print '\n\n\nSAMPLE',sample
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing files from data processing to inital_model folder -> '+sample)
             # 'logfile',visit,run,timestamp,autoproc
             visit=data_dict[sample][1]
@@ -605,6 +606,7 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
             db_dict=data_dict[sample][6]
             path_to_procdir=db_dict['DataProcessingDirectoryOriginal']
             path_to_logfile=db_dict['DataProcessingPathToLogfile']
+            print 'original log:',path_to_logfile
             path_to_mtzfile=db_dict['DataProcessingPathToMTZfile']
             mtz_filename=db_dict['DataProcessingMTZfileName']
             log_filename=db_dict['DataProcessingLOGfileName']
@@ -647,15 +649,16 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
                         os.system("ctruncate -hklin fast_dp.mtz "
                                   "-hklout ctruncate.mtz -colin '/*/*/[IMEAN,SIGIMEAN]' "
                                   "> ctruncate.log")
-                    if 'xia2' in path_to_logfile:
-                        path_to_logfile=os.path.join('autoprocessing',visit+'-'+run+autoproc)+'/'+ '/'.join(path_to_logfile.split('/')[len(path_to_logfile.split('/'))-3:len(path_to_logfile.split('/'))-1])
-                        path_to_mtzfile=os.path.join('autoprocessing',visit+'-'+run+autoproc)+'/'+ '/'.join(path_to_mtzfile.split('/')[len(path_to_mtzfile.split('/'))-3:len(path_to_logfile.split('/'))-1])
-                    elif 'fast_dp' in path_to_logfile:
-                        path_to_logfile=os.path.join('autoprocessing',visit+'-'+run+autoproc,'fast_dp')
-                        path_to_mtzfile=os.path.join('autoprocessing',visit+'-'+run+autoproc,'fast_dp')
-                    elif 'autoPROC' in path_to_logfile:
-                        path_to_logfile=os.path.join('autoprocessing',visit+'-'+run+autoproc,'autoPROC','ap-run')
-                        path_to_mtzfile=os.path.join('autoprocessing',visit+'-'+run+autoproc,'autoPROC','ap-run')
+                if 'xia2' in path_to_logfile:
+                    path_to_logfile=os.path.join('autoprocessing',visit+'-'+run+autoproc)+'/'+ '/'.join(path_to_logfile.split('/')[len(path_to_logfile.split('/'))-3:len(path_to_logfile.split('/'))-1])
+                    path_to_mtzfile=os.path.join('autoprocessing',visit+'-'+run+autoproc)+'/'+ '/'.join(path_to_mtzfile.split('/')[len(path_to_mtzfile.split('/'))-3:len(path_to_logfile.split('/'))-1])
+                elif 'fast_dp' in path_to_logfile:
+                    path_to_logfile=os.path.join('autoprocessing',visit+'-'+run+autoproc,'fast_dp')
+                    path_to_mtzfile=os.path.join('autoprocessing',visit+'-'+run+autoproc,'fast_dp')
+                    mtz_filename='ctruncate.mtz'
+                elif 'autoPROC' in path_to_logfile:
+                    path_to_logfile=os.path.join('autoprocessing',visit+'-'+run+autoproc,'autoPROC','ap-run')
+                    path_to_mtzfile=os.path.join('autoprocessing',visit+'-'+run+autoproc,'autoPROC','ap-run')
 
             print sample
             print path_to_logfile
