@@ -537,6 +537,7 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
     def __init__(self,dataset_outcome_dict,
                       data_collection_table_dict,
                       data_collection_column_three_dict,
+                      data_collection_dict,
                       database_directory,data_source_file,
                       initial_model_directory,
                       preferences):
@@ -544,6 +545,7 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
         self.dataset_outcome_dict=dataset_outcome_dict
         self.data_collection_table_dict=data_collection_table_dict
         self.data_collection_column_three_dict=data_collection_column_three_dict
+        self.data_collection_dict=data_collection_dict
         self.database_directory=database_directory
         self.data_source_file=data_source_file
         self.initial_model_directory=initial_model_directory
@@ -571,13 +573,13 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
                 for index in sorted(indexes):
                     selected_processing_result=index.row()
                 print 'Sample:',sample,'index',selected_processing_result,'outcome',str(outcome)
-
-
-#        for entry in self.data_collection_dict[sample]:
-#            if entry[0]=='logfile':
-#                if entry[7]==selected_processing_result:
-#                    db_dict=entry[6]
-
+                for entry in self.data_collection_dict[sample]:
+                    if entry[0]=='logfile':
+                        if entry[7]==selected_processing_result:
+                            db_dict=entry[6]
+                            db_dict['DataCollectionOutcome']=str(outcome)
+                            data_source.update_data_source(sample,db_dict)
+            
         # put dataset outcome in db_dict
 
 
