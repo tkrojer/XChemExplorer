@@ -587,6 +587,7 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
                             data_dict[sample]=entry
                             db_dict['DataCollectionOutcome']=str(outcome)
                             data_source.update_insert_data_source(sample,db_dict)
+                            print entry
                             break
 
             progress += progress_step
