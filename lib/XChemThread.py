@@ -1194,7 +1194,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     for entry in self.data_collection_dict[xtal]:
                         if entry[0]=='logfile':
                             aimless_index_list.append(entry[7])
-                    if aimless_index_list==[]
+                    if aimless_index_list==[]:
                         aimless_index=1
                     else:
                         aimless_index=max(aimless_index_list)
