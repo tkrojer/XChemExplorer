@@ -1979,6 +1979,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def populate_data_collection_summary_table(self):
         row = self.data_collection_summary_table.rowCount()
+        print 'last row',row
         self.albula_button_dict={}
         column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
         for xtal in sorted(self.data_collection_dict):
