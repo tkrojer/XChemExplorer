@@ -559,6 +559,11 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
 
         data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
 
+        # Step 1 not only updates the data source, but it also finds out which data we need to copy in Step 2
+        # -> create 'data_dict' which contains all the necessary info so that we don't have to repeat
+        #    it in Step 2.
+        data_dict={}
+
         ########################################################
         # 1. update data source for all samples
         for sample in sorted(self.dataset_outcome_dict):
@@ -575,15 +580,14 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
             else:
                 for index in sorted(indexes):
                     selected_processing_result=index.row()
-                print 'Sample:',sample,'index',selected_processing_result,'outcome',str(outcome)
                 for entry in self.data_collection_dict[sample]:
                     if entry[0]=='logfile':
-                        print 'here i am'
                         if entry[7]==selected_processing_result:
                             db_dict=entry[6]
-                            print db_dict
+                            data_dict[sample]=entry
                             db_dict['DataCollectionOutcome']=str(outcome)
                             data_source.update_insert_data_source(sample,db_dict)
+                            break
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
@@ -591,18 +595,19 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
         ########################################################
         # 2. copy files
         progress=0
-        for sample in sorted(self.dataset_outcome_dict):
+        for sample in sorted(data_dict):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing files from data processing to inital_model folder -> '+sample)
+            # 'logfile',visit,run,timestamp,autoproc
+            visit=data_dict[sample][1]
+            run=data_dict[sample][2]
+            autoproc=data_dict[sample][4]
 
-            # ignore all samples that failed somehow
-            if logfile==None or str(outcome).startswith('Failed'):
-                continue
-
+            print sample,visit,run,autoproc
             # create all the directories if necessary
-            if not os.path.isdir(os.path.join(self.initial_model_directory,sample)):
-                os.mkdir(os.path.join(self.initial_model_directory,sample))
-            if not os.path.isdir(os.path.join(self.initial_model_directory,sample,'autoprocessing')):
-                os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing'))
+#            if not os.path.isdir(os.path.join(self.initial_model_directory,sample)):
+#                os.mkdir(os.path.join(self.initial_model_directory,sample))
+#            if not os.path.isdir(os.path.join(self.initial_model_directory,sample,'autoprocessing')):
+#                os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing'))
 
 #            if logfile != None:
 #                path_to_logfile=self.data_collection_statistics_dict[sample][index.row()][1]
@@ -1262,6 +1267,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             else:
                                 db_dict['DataProcessingRcryst']  = ''
                                 db_dict['DataProcessingRfree'] = ''
+                            db_dict['DataProcessingProgram']=autoproc
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False])
                             aimless_index+=1
 
@@ -1294,6 +1300,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             else:
                                 db_dict['DataProcessingRcryst']  = ''
                                 db_dict['DataProcessingRfree'] = ''
+                            db_dict['DataProcessingProgram']=autoproc
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False])
                             aimless_index+=1
 
@@ -1323,6 +1330,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             else:
                                 db_dict['DataProcessingRcryst']  = ''
                                 db_dict['DataProcessingRfree'] = ''
+                            db_dict['DataProcessingProgram']=autoproc
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False])
                             aimless_index+=1
 
