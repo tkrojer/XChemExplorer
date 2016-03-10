@@ -533,6 +533,101 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
         self.emit(QtCore.SIGNAL("finished()"))
 
 
+class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
+    def __init__(self,dataset_outcome_dict,data_collection_table_dict,data_collection_statistics_dict,
+                 database_directory,data_source_file,initial_model_directory):
+        QtCore.QThread.__init__(self)
+        self.dataset_outcome_dict=dataset_outcome_dict
+        self.data_collection_table_dict=data_collection_table_dict
+        self.data_collection_statistics_dict=data_collection_statistics_dict
+        self.database_directory=database_directory
+        self.data_source_file=data_source_file
+        self.initial_model_directory=initial_model_directory
+
+    def run(self):
+        if not len(self.dataset_outcome_dict)==0:
+            progress_step=100/float(len(self.dataset_outcome_dict))
+        progress=0
+        data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
+        for sample in sorted(self.dataset_outcome_dict):
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing files from data processing to inital_model folder -> '+sample)
+            outcome=''
+            for button in self.dataset_outcome_dict[sample]:
+                if button.isChecked():
+                    outcome=button.text()
+            indexes=self.data_collection_table_dict[sample].selectionModel().selectedRows()
+#            print 'Sample:',sample,'index',indexes
+#            if indexes == []:       # i.e. no logfile exists
+#                logfile=None
+#            else:
+#                for index in sorted(indexes):
+#                    logfile=self.data_collection_statistics_dict[sample][index.row()][1]
+#            if self.data_source_file != '':
+#                data_dict=data_source.get_data_dict_to_save_autoprocessing_results_to_data_source(sample,str(outcome),logfile)
+#                data_source.update_data_source(sample,data_dict)
+
+            # create all the directories if necessary
+#            if not os.path.isdir(os.path.join(self.initial_model_directory,sample)):
+#                os.mkdir(os.path.join(self.initial_model_directory,sample))
+#            if not os.path.isdir(os.path.join(self.initial_model_directory,sample,'autoprocessing')):
+#                os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing'))
+
+#            if logfile != None:
+#                path_to_logfile=self.data_collection_statistics_dict[sample][index.row()][1]
+                # copy files
+#                if 'xia2' in path_to_logfile:
+#                    path_to_procdir=os.path.join('/',*path_to_logfile.split('/')[:len(path_to_logfile.split('/'))-2])
+#                if 'fast_dp' in path_to_logfile:
+#                    path_to_procdir=os.path.join('/',*path_to_logfile.split('/')[:len(path_to_logfile.split('/'))-1])
+#                if 'autoPROC' in path_to_logfile:
+#                    path_to_procdir=os.path.join('/',*path_to_logfile.split('/')[:len(path_to_logfile.split('/'))-1])
+#                os.system('/bin/cp -Rf '+path_to_procdir+' '+os.path.join(self.initial_model_directory,sample,'autoprocessing'))
+
+                # link files
+#                if 'xia2' in path_to_logfile:
+#                    os.chdir(os.path.join(self.initial_model_directory,sample))
+#                    for datafile in glob.glob('autoprocessing/*/DataFiles/*'):
+#                        if datafile.endswith('free.mtz'):
+#                            if os.path.isfile(sample+'.mtz'):
+#                                os.system('/bin/rm '+sample+'.mtz')
+#                            os.symlink(datafile,sample+'.mtz')
+#                            break
+#                    for logfile in glob.glob('autoprocessing/*/LogFiles/*'):
+#                        if logfile.endswith('aimless.log'):
+#                            if os.path.isfile(sample+'.log'):
+#                                os.system('/bin/rm '+sample+'.log')
+#                            os.symlink(logfile,sample+'.log')
+#                            break
+
+#                if 'autoPROC' in path_to_logfile:
+#                    os.chdir(os.path.join(self.initial_model_directory,sample))
+#                    if os.path.isfile(sample+'.mtz'):
+#                        os.system('/bin/rm '+sample+'.mtz')
+#                    if os.path.isfile(sample+'.log'):
+#                        os.system('/bin/rm '+sample+'.log')
+#                    os.symlink('autoprocessing/ap-run/aimless.log',sample+'.log')
+#                    os.symlink('autoprocessing/ap-run/truncate.mtz',sample+'.mtz')
+
+
+#                if 'fast_dp' in path_to_logfile:
+#                    os.chdir(os.path.join(self.initial_model_directory,sample,'autoprocessing','fast_dp'))
+#                    os.system("ctruncate -hklin fast_dp.mtz "
+#                              "-hklout ctruncate.mtz -colin '/*/*/[IMEAN,SIGIMEAN]' "
+#                              "> ctruncate.log")
+#                    os.chdir(os.path.join(self.initial_model_directory,sample))
+#                    if os.path.isfile(sample+'.mtz'):
+#                        os.system('/bin/rm '+sample+'.mtz')
+#                    if os.path.isfile(sample+'.log'):
+#                        os.system('/bin/rm '+sample+'.log')
+#                    os.symlink('autoprocessing/fast_dp/aimless.log',sample+'.log')
+#                    os.symlink('autoprocessing/fast_dp/ctruncate.mtz',sample+'.mtz')
+
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+        self.emit(QtCore.SIGNAL("finished()"))
+
+
 
 class read_autoprocessing_results_from_disc(QtCore.QThread):
     def __init__(self,visit_list,target,reference_file_list,database_directory):
@@ -920,6 +1015,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         if not select_stage_three_list==[]:
             self.set_best_file_to_true(xtal,'max',select_stage_three_list)
 
+
+
     def set_best_file_to_true(self,xtal,min_max,input_list):
         if min_max=='min':
             best_file_index=min(input_list,key=lambda x: x[1])[0]
@@ -930,6 +1027,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
             if len(entry)==9 and entry[0]=='logfile':
                 if entry[7]==best_file_index:
                     self.data_collection_dict[xtal][n][8]=True
+
 
 
     def min_Rfree(self,xtal):
@@ -947,6 +1045,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         else:
             self.min_resolution(xtal)
 
+
+
     def min_resolution(self,xtal):
         tmp=[]
         for entry in self.data_collection_dict[xtal]:
@@ -959,6 +1059,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     pass
         if tmp != []:
             self.set_best_file_to_true(xtal,'min',tmp)
+
+
 
     def select_best_dataset(self):
         if not len(self.data_collection_dict)==0:
@@ -1029,6 +1131,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                 # check if there is already an entry for the current run
                 # obviously create if not and fill in basic information
                 run_number_list=[]
+                aimless_index_list=[]
                 for runs in sorted(glob.glob(collected_xtals+'/*')):
                     run=runs[runs.rfind('/')+1:]
                     diffraction_image=''
@@ -1036,9 +1139,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     if os.path.isfile(os.path.join(visit_directory,protein_name,xtal,run+'0001.cbf')):
                         diffraction_image=os.path.join(visit_directory,protein_name,xtal,run+'0001.cbf')
 
+                    ###############################################################
                     # image files
-                    # note: need one more flag which indicates immediately that images belong together
-                    #       this makes it afterwards easier to get them together in the table
                     image_files_in_list=False
                     for entry in self.data_collection_dict[xtal]:
                         image_files_in_list=False
@@ -1049,22 +1151,20 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
                     if not image_files_in_list:
                         if run_number_list==[]:
-                            run_number=1
-                        else:
+                            run_number=1                                # every run gets and keeps(!) a unique digit assigned
+                        else:                                           # the order is arbitrary
                             run_number=max(run_number_list)+1
-                            print 'run_number:',run_number
                         run_number_list.append(run_number)
 
                     if not image_files_in_list:
                         image_list=[]
-                        # we're expecting exactly 5 images: 1 x distl; 4 x crystal centring
+                        # we're expecting exactly 5 images: 1 x distl plot; 4 x crystal centring images
                         # for all the ones that are not present, IMAGE_NOT_AVAILABLE.png from
                         # $XChemExplorer_DIR/image will be used instead
                         image_counter=0
                         # first four images are the crystal centring images
                         for image in sorted(glob.glob(os.path.join(visit_directory,'jpegs',self.target,xtal,'*t.png'))):
                             if run in image:
-#                                if image.endswith('t.png') or image.endswith('_.png'):
                                 image_name=image[image.rfind('/')+1:]
                                 image_file=open(image,"rb")
                                 image_string=base64.b64encode(image_file.read())
@@ -1076,19 +1176,22 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             image_list.append( ['image_'+str(image_counter)+'.png',image_string] )
                             image_counter+=1
                         # now comes the distl plot
+                        image_name=run+'.png'
                         if os.path.isfile(os.path.join(visit_directory,'jpegs',self.target,xtal,run+'.png')):
-                            image_file=os.path.join(visit_directory,'jpegs',self.target,xtal,run+'.png')
-                            image_name=run+'.png'
-                            image_file=open(image,"rb")
+                            image_file=open(os.path.join(visit_directory,'jpegs',self.target,xtal,run+'.png'),"rb")
                             image_string=base64.b64encode(image_file.read())
                             image_list.append( [image_name,image_string] )
                         else:
-                            image_name=run+'.png'
                             image_file=open( os.path.join(os.getenv('XChemExplorer_DIR'),'image','IMAGE_NOT_AVAILABLE.png') ,"rb")
                             image_string=base64.b64encode(image_file.read())
                             image_list.append( [image_name,image_string] )
                         self.data_collection_dict[xtal].append(['image',visit,run,timestamp,image_list,
                                                                 diffraction_image,run_number])
+
+
+                    # before we start, check if there are already entries in the aimless_index_list
+                    # this list contains integers which serve a unique identifier for each autoprocessing outcome
+
 
                     ##########################################################################
                     # aimless & Dimple information

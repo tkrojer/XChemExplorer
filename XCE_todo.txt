@@ -77,6 +77,9 @@ DONE - 'Update Datasource': overwrites fields with empty entry: e.g. in case log
   -> update data source should be the only point where it does this?
 
 - data collection summary table: does not seem that latest run is taken
+
+Write helper script which updates datasource after every refinement, dimple run. So that in the future there is no more time consuming parsing.
+
   
 XCE @ feedback
 
