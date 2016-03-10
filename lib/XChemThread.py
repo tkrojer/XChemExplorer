@@ -575,8 +575,10 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
                 print 'Sample:',sample,'index',selected_processing_result,'outcome',str(outcome)
                 for entry in self.data_collection_dict[sample]:
                     if entry[0]=='logfile':
+                        print 'here i am'
                         if entry[7]==selected_processing_result:
                             db_dict=entry[6]
+                            print db_dict
                             db_dict['DataCollectionOutcome']=str(outcome)
                             data_source.update_data_source(sample,db_dict)
 
