@@ -648,14 +648,20 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
                                   "-hklout ctruncate.mtz -colin '/*/*/[IMEAN,SIGIMEAN]' "
                                   "> ctruncate.log")
                     if 'xia2' in path_to_logfile:
-                        path_to_logfile=os.path.join('autoprocessing',visit+'-'+run+autoproc)+'/'+ '/'.join(path_to_logfile.split('/')[len(path_to_logfile.split('/'))-3:])
-                        path_to_mtzfile=os.path.join('autoprocessing',visit+'-'+run+autoproc)+'/'+ '/'.join(path_to_mtzfile.split('/')[len(path_to_mtzfile.split('/'))-3:])
+                        path_to_logfile=os.path.join('autoprocessing',visit+'-'+run+autoproc)+'/'+ '/'.join(path_to_logfile.split('/')[len(path_to_logfile.split('/'))-3:len(path_to_logfile.split('/'))-1])
+                        path_to_mtzfile=os.path.join('autoprocessing',visit+'-'+run+autoproc)+'/'+ '/'.join(path_to_mtzfile.split('/')[len(path_to_mtzfile.split('/'))-3:len(path_to_logfile.split('/'))-1])
                     elif 'fast_dp' in path_to_logfile:
                         path_to_logfile=os.path.join('autoprocessing',visit+'-'+run+autoproc,'fast_dp')
                         path_to_mtzfile=os.path.join('autoprocessing',visit+'-'+run+autoproc,'fast_dp')
                     elif 'autoPROC' in path_to_logfile:
                         path_to_logfile=os.path.join('autoprocessing',visit+'-'+run+autoproc,'autoPROC','ap-run')
                         path_to_mtzfile=os.path.join('autoprocessing',visit+'-'+run+autoproc,'autoPROC','ap-run')
+
+            print sample
+            print path_to_logfile
+            print log_filename
+            print path_to_mtzfile
+            print mtz_filename
 
             # move up to sample directory and link respective files
             # first remove any old symbolic links
