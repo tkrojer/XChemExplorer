@@ -534,20 +534,27 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
 
 
 class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
-    def __init__(self,dataset_outcome_dict,data_collection_table_dict,data_collection_statistics_dict,
-                 database_directory,data_source_file,initial_model_directory):
+    def __init__(self,dataset_outcome_dict,
+                      data_collection_table_dict,
+                      data_collection_column_three_dict,
+                      database_directory,data_source_file,
+                      initial_model_directory,
+                      preferences):
         QtCore.QThread.__init__(self)
         self.dataset_outcome_dict=dataset_outcome_dict
         self.data_collection_table_dict=data_collection_table_dict
-        self.data_collection_statistics_dict=data_collection_statistics_dict
+        self.data_collection_column_three_dict=data_collection_column_three_dict
         self.database_directory=database_directory
         self.data_source_file=data_source_file
         self.initial_model_directory=initial_model_directory
+        self.processed_data_to_copy=preferences['processed_data_to_copy']
 
     def run(self):
+
         if not len(self.dataset_outcome_dict)==0:
             progress_step=100/float(len(self.dataset_outcome_dict))
         progress=0
+
         data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
         for sample in sorted(self.dataset_outcome_dict):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing files from data processing to inital_model folder -> '+sample)
@@ -555,8 +562,20 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
             for button in self.dataset_outcome_dict[sample]:
                 if button.isChecked():
                     outcome=button.text()
-            indexes=self.data_collection_table_dict[sample].selectionModel().selectedRows()
-            print 'Sample:',sample,'index',indexes
+            indexes=self.data_collection_column_three_dict[sample].selectionModel().selectedRows()
+            print 'Sample:',sample,'index',indexes,'outcome',str(outcome)
+
+
+#        for entry in self.data_collection_dict[sample]:
+#            if entry[0]=='logfile':
+#                if entry[7]==selected_processing_result:
+#                    db_dict=entry[6]
+
+        # put dataset outcome in db_dict
+
+
+        # first update data source for all samples and then do the copying
+
 #            if indexes == []:       # i.e. no logfile exists
 #                logfile=None
 #            else:
