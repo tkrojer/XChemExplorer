@@ -110,8 +110,16 @@ class data_source:
             ['DataProcessingMultiplicityOverall',    'Multiplicity\nOverall',       'TEXT'],
             ['DataProcessingMultiplicityLow',        'Multiplicity\nLow',           'TEXT'],
             ['DataProcessingMultiplicityHigh',       'Multiplicity\nHigh',          'TEXT'],
+
+            # the data source is a bit exploding with entries like the ones below,
+            # but the many different filenames and folder structures of Diamond autoprocessing makes it necessary
             ['DataProcessingPathToLogfile',          'DataProcessingPathToLogfile',             'TEXT'],
             ['DataProcessingPathToMTZfile',          'DataProcessingPathToMTZfile',             'TEXT'],
+            ['DataProcessingLOGfileName',          'DataProcessingLOGfileName',             'TEXT'],
+            ['DataProcessingMTZfileName',          'DataProcessingMTZfileName',             'TEXT'],
+            ['DataProcessingDirectoryOriginal',          'DataProcessingDirectoryOriginal',             'TEXT'],
+
+
 
             ['DataProcessingUniqueReflectionsOverall','Unique Reflections\nOverall', 'TEXT'],
             ['DataProcessingLattice',                'DataProcessing\nLattice',                   'TEXT'],
