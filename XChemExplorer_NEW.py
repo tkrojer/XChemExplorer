@@ -1735,7 +1735,6 @@ class XChemExplorer(QtGui.QApplication):
                     logfile_list.append(entry)
             for entry in sorted(logfile_list,key=lambda x: x[7]):               # sort by aimless_index and so make sure
                 entry_already_in_table=False                                    # that aimless_index == row
-                print 'xtal',xtal,'autoproc',entry[4],'aimless_index',entry[7]
                 for logfile in self.data_collection_table_dict[xtal]:
                     if entry[1]==logfile[1] and entry[2]==logfile[2] and entry[3]==logfile[3] and entry[4]==logfile[4]:
                         entry_already_in_table=True
@@ -2081,7 +2080,6 @@ class XChemExplorer(QtGui.QApplication):
             if self.data_collection_column_three_dict[key][4]==self.sender():
                 sample=key
                 break
-        print 'sample to change',sample
         indexes=self.sender().selectionModel().selectedRows()
         for index in sorted(indexes):
             selected_processing_result=index.row()

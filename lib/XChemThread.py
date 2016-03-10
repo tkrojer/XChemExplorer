@@ -587,7 +587,6 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
                             data_dict[sample]=entry
                             db_dict['DataCollectionOutcome']=str(outcome)
                             data_source.update_insert_data_source(sample,db_dict)
-                            print entry
                             break
 
             progress += progress_step
@@ -609,6 +608,7 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
             path_to_mtzfile=db_dict['DataProcessingPathToMTZfile']
             mtz_filename=db_dict['DataProcessingMTZfileName']
             log_filename=db_dict['DataProcessingLOGfileName']
+            dimple_destination=''
             path_to_dimple_pdbfile=db_dict['DataProcessingPathToDimplePDBfile']
             path_to_dimple_mtzfile=db_dict['DataProcessingPathToDimpleMTZfile']
 
@@ -622,6 +622,13 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
                 os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing'))
             if not os.path.isdir(os.path.join(self.initial_model_directory,sample,'autoprocessing',visit+'-'+run+autoproc)):
                 os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing',visit+'-'+run+autoproc))
+
+            if path_to_dimple_pdbfile != '':
+                if not os.path.isdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple')):
+                    os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple'))
+                if not os.path.isdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple',visit+'-'+run+autoproc)):
+                    os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple',visit+'-'+run+autoproc))
+                dimple_destination=os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple',visit+'-'+run+autoproc)
 
             os.chdir(os.path.join(self.initial_model_directory,sample,'autoprocessing',visit+'-'+run+autoproc))
 
@@ -675,7 +682,16 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
             os.symlink(os.path.join(path_to_mtzfile,mtz_filename),sample+'.mtz')
             os.symlink(os.path.join(path_to_logfile,log_filename),sample+'.log')
 
-
+            # dimple files
+            if dimple_destination != '':
+                if os.path.islink(os.path.join(self.initial_model_directory,sample,'refine.mtz')):
+                    os.system('/bin/rm '+os.path.join(self.initial_model_directory,sample,'refine.mtz'))
+                if os.path.islink(os.path.join(self.initial_model_directory,sample,'refine.pdb')):
+                    os.system('/bin/rm '+os.path.join(self.initial_model_directory,sample,'refine.pdb'))
+                os.system('/bin/cp '+path_to_dimple_mtzfile+' '+dimple_destination)
+                os.system('/bin/cp '+path_to_dimple_pdbfile+' '+dimple_destination)
+                os.symlink(os.path.join(dimple_destination,'final.pdb'),'refine.pdb')
+                os.symlink(os.path.join(dimple_destination,'final.mtz'),'refine.mtz')
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
