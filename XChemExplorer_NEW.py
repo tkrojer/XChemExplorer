@@ -1881,8 +1881,9 @@ class XChemExplorer(QtGui.QApplication):
 
     def preferences_data_to_copy_combobox_changed(self,i):
         text = str(self.preferences_selection_mechanism_combobox.currentText())
-        print 'changing something'
+        print 'changing something',text
         for item in self.preferences_data_to_copy:
+            print item[0]
             if item[0] == text:
                 self.preferences['processed_data_to_copy']=item[1]
                 print 'prefs',self.preferences['processed_data_to_copy']
