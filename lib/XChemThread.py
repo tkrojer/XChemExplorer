@@ -1348,13 +1348,13 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
                     # then exactly the same for fast_dp
                     if os.path.isfile(os.path.join(runs,'fast_dp','aimless.log')):
+                        file_name=os.path.join(runs,'fast_dp','aimless.log')
                         db_dict={   'DataCollectionVisit':              visit,
                                     'DataCollectionBeamline':           beamline,
                                     'DataCollectionDate':               timestamp,
                                     'DataProcessingPathToLogfile':      file_name,
                                     'DataProcessingLOGfileName':        'aimless.log',
                                     'DataProcessingDirectoryOriginal':  os.path.join(runs,'fast_dp')    }
-                        file_name=os.path.join(runs,'fast_dp','aimless.log')
                         if os.path.isfile(os.path.join(runs,'fast_dp','fast_dp.mtz')):
                             db_dict['DataProcessingPathToMTZfile']=os.path.join(runs,'fast_dp','fast_dp.mtz')
                             db_dict['DataProcessingMTZfileName']='fast_dp.mtz'
@@ -1381,13 +1381,13 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
                     # then exactly the same for autoPROC
                     if os.path.isfile(os.path.join(runs,'autoPROC','ap-run','aimless.log')):
+                        file_name=os.path.join(runs,'autoPROC','ap-run','aimless.log')
                         db_dict={   'DataCollectionVisit':              visit,
                                     'DataCollectionBeamline':           beamline,
                                     'DataCollectionDate':               timestamp,
                                     'DataProcessingPathToLogfile':      file_name,
                                     'DataProcessingLOGfileName':        'aimless.log',
                                     'DataProcessingDirectoryOriginal':  os.path.join(runs,'autoPROC')   }
-                        file_name=os.path.join(runs,'autoPROC','ap-run','aimless.log')
                         if os.path.isfile(os.path.join(runs,'autoPROC','ap-run','truncate-unique.mtz')):
                             db_dict['DataProcessingPathToMTZfile']=os.path.join(runs,'autoPROC','ap-run','truncate-unique.mtz')
                             db_dict['DataProcessingMTZfileName']='truncate-unique.mtz'
