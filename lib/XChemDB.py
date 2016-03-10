@@ -129,6 +129,8 @@ class data_source:
 
             ['DataProcessingRcryst',                  'DataProcessing\nRcryst',                     'TEXT'],
             ['DataProcessingRfree',                  'DataProcessing\nRfree',                     'TEXT'],
+            ['DataProcessingPathToDimplePDBfile',          'DataProcessingPathToDimplePDBfile',             'TEXT'],
+            ['DataProcessingPathToDimpleMTZfile',          'DataProcessingPathToDimpleMTZfile',             'TEXT'],
 
 
 #            ['PANDDAstuff',                          'PANDDAstuff',                             'TEXT'],

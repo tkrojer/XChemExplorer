@@ -598,7 +598,6 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
         progress=0
         self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
         for sample in sorted(data_dict):
-            print '\n\n\nSAMPLE',sample
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing files from data processing to inital_model folder -> '+sample)
             # 'logfile',visit,run,timestamp,autoproc
             visit=data_dict[sample][1]
@@ -607,12 +606,15 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
             db_dict=data_dict[sample][6]
             path_to_procdir=db_dict['DataProcessingDirectoryOriginal']
             path_to_logfile=db_dict['DataProcessingPathToLogfile']
-            print 'original log:',path_to_logfile
             path_to_mtzfile=db_dict['DataProcessingPathToMTZfile']
             mtz_filename=db_dict['DataProcessingMTZfileName']
             log_filename=db_dict['DataProcessingLOGfileName']
+            path_to_dimple_pdbfile=db_dict['DataProcessingPathToDimplePDBfile']
+            path_to_dimple_mtzfile=db_dict['DataProcessingPathToDimpleMTZfile']
 
             print sample,visit,run,autoproc
+            print 'dimple',path_to_dimple_pdbfile,path_to_dimple_mtzfile
+
             # create all the directories if necessary
             if not os.path.isdir(os.path.join(self.initial_model_directory,sample)):
                 os.mkdir(os.path.join(self.initial_model_directory,sample))
@@ -663,12 +665,6 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
                     path_to_logfile=os.path.join('autoprocessing',visit+'-'+run+autoproc,'autoPROC','ap-run')
                     path_to_mtzfile=os.path.join('autoprocessing',visit+'-'+run+autoproc,'autoPROC','ap-run')
 
-            print sample
-            print path_to_logfile
-            print log_filename
-            print path_to_mtzfile
-            print mtz_filename
-
             # move up to sample directory and link respective files
             # first remove any old symbolic links
             os.chdir(os.path.join(self.initial_model_directory,sample))
@@ -680,55 +676,6 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
             os.symlink(os.path.join(path_to_logfile,log_filename),sample+'.log')
 
 
-#            if logfile != None:
-#                path_to_logfile=self.data_collection_statistics_dict[sample][index.row()][1]
-                # copy files
-#                if 'xia2' in path_to_logfile:
-#                    path_to_procdir=os.path.join('/',*path_to_logfile.split('/')[:len(path_to_logfile.split('/'))-2])
-#                if 'fast_dp' in path_to_logfile:
-#                    path_to_procdir=os.path.join('/',*path_to_logfile.split('/')[:len(path_to_logfile.split('/'))-1])
-#                if 'autoPROC' in path_to_logfile:
-#                    path_to_procdir=os.path.join('/',*path_to_logfile.split('/')[:len(path_to_logfile.split('/'))-1])
-#                os.system('/bin/cp -Rf '+path_to_procdir+' '+os.path.join(self.initial_model_directory,sample,'autoprocessing'))
-
-                # link files
-#                if 'xia2' in path_to_logfile:
-#                    os.chdir(os.path.join(self.initial_model_directory,sample))
-#                    for datafile in glob.glob('autoprocessing/*/DataFiles/*'):
-#                        if datafile.endswith('free.mtz'):
-#                            if os.path.isfile(sample+'.mtz'):
-#                                os.system('/bin/rm '+sample+'.mtz')
-#                            os.symlink(datafile,sample+'.mtz')
-#                            break
-#                    for logfile in glob.glob('autoprocessing/*/LogFiles/*'):
-#                        if logfile.endswith('aimless.log'):
-#                            if os.path.isfile(sample+'.log'):
-#                                os.system('/bin/rm '+sample+'.log')
-#                            os.symlink(logfile,sample+'.log')
-#                            break
-
-#                if 'autoPROC' in path_to_logfile:
-#                    os.chdir(os.path.join(self.initial_model_directory,sample))
-#                    if os.path.isfile(sample+'.mtz'):
-#                        os.system('/bin/rm '+sample+'.mtz')
-#                    if os.path.isfile(sample+'.log'):
-#                        os.system('/bin/rm '+sample+'.log')
-#                    os.symlink('autoprocessing/ap-run/aimless.log',sample+'.log')
-#                    os.symlink('autoprocessing/ap-run/truncate.mtz',sample+'.mtz')
-
-
-#                if 'fast_dp' in path_to_logfile:
-#                    os.chdir(os.path.join(self.initial_model_directory,sample,'autoprocessing','fast_dp'))
-#                    os.system("ctruncate -hklin fast_dp.mtz "
-#                              "-hklout ctruncate.mtz -colin '/*/*/[IMEAN,SIGIMEAN]' "
-#                              "> ctruncate.log")
-#                    os.chdir(os.path.join(self.initial_model_directory,sample))
-#                    if os.path.isfile(sample+'.mtz'):
-#                        os.system('/bin/rm '+sample+'.mtz')
-#                    if os.path.isfile(sample+'.log'):
-#                        os.system('/bin/rm '+sample+'.log')
-#                    os.symlink('autoprocessing/fast_dp/aimless.log',sample+'.log')
-#                    os.symlink('autoprocessing/fast_dp/ctruncate.mtz',sample+'.mtz')
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
@@ -1336,9 +1283,13 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             if os.path.isfile(os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2',autoproc,'dimple','final.pdb')):
                                 dimple_file=os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2',autoproc,'dimple','final.pdb')
                                 pdb_info=parse().PDBheader(dimple_file)
+                                db_dict['DataProcessingPathToDimplePDBfile']=dimple_file
+                                db_dict['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
                                 db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
                                 db_dict['DataProcessingRfree'] = pdb_info['Rfree']
                             else:
+                                db_dict['DataProcessingPathToDimplePDBfile']=''
+                                db_dict['DataProcessingPathToDimpleMTZfile']=''
                                 db_dict['DataProcessingRcryst']  = ''
                                 db_dict['DataProcessingRfree'] = ''
                             db_dict['DataProcessingProgram']=autoproc
@@ -1372,9 +1323,13 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             if os.path.isfile(os.path.join(runs,'fast_dp','dimple','final.pdb')):
                                 dimple_file=os.path.join(runs,'fast_dp','dimple','final.pdb')
                                 pdb_info=parse().PDBheader(dimple_file)
+                                db_dict['DataProcessingPathToDimplePDBfile']=dimple_file
+                                db_dict['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
                                 db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
                                 db_dict['DataProcessingRfree'] = pdb_info['Rfree']
                             else:
+                                db_dict['DataProcessingPathToDimplePDBfile']=''
+                                db_dict['DataProcessingPathToDimpleMTZfile']=''
                                 db_dict['DataProcessingRcryst']  = ''
                                 db_dict['DataProcessingRfree'] = ''
                             db_dict['DataProcessingProgram']=autoproc
@@ -1405,9 +1360,13 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             if os.path.isfile(os.path.join(runs,'autoPROC','dimple','final.pdb')):
                                 dimple_file=os.path.join(runs,'autoPROC','dimple','final.pdb')
                                 pdb_info=parse().PDBheader(dimple_file)
+                                db_dict['DataProcessingPathToDimplePDBfile']=dimple_file
+                                db_dict['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
                                 db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
                                 db_dict['DataProcessingRfree'] = pdb_info['Rfree']
                             else:
+                                db_dict['DataProcessingPathToDimplePDBfile']=''
+                                db_dict['DataProcessingPathToDimpleMTZfile']=''
                                 db_dict['DataProcessingRcryst']  = ''
                                 db_dict['DataProcessingRfree'] = ''
                             db_dict['DataProcessingProgram']=autoproc
