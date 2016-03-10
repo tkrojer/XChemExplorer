@@ -1754,6 +1754,7 @@ class XChemExplorer(QtGui.QApplication):
 #            data_collection_table.setFixedHeight(300)
 #            data_collection_table.horizontalHeader().setStretchLastSection(False)
 #            data_collection_table.verticalHeader().setStretchLastSection(False)
+            data_collection_table.itemSelectionChanged.connect(self.update_selected_autoproc_data_collection_summary_table)
 
             # select best resolution file + set data collection outcome
             # the assumption is that index in data_collection_dict and row number are identical
@@ -1979,7 +1980,6 @@ class XChemExplorer(QtGui.QApplication):
 
     def populate_data_collection_summary_table(self):
         row = self.data_collection_summary_table.rowCount()
-        print 'last row',row
         self.albula_button_dict={}
         column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
         for xtal in sorted(self.data_collection_dict):
@@ -2084,24 +2084,30 @@ class XChemExplorer(QtGui.QApplication):
         for index in sorted(indexes):
             selected_processing_result=index.row()
 
+        for entry in self.data_collection_dict[sample]:
+            if entry[7]==selected_processing_result:
+                db_dict=entry[6]
+
+        column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
 
         rows_in_table=self.data_collection_summary_table.rowCount()
         for row in range(rows_in_table):
             if self.data_collection_summary_table.item(row,0).text()==sample:
-#                print self.data_collection_summary_table.item(row,0).text()
-                for column,header in enumerate(self.data_collection_summary_column_name):
-                    cell_text=QtGui.QTableWidgetItem()
-                    if header=='Sample ID':
+                for column,header in enumerate(column_name):
+                    if header[0]=='Sample ID':
                         continue
-                    if header=='Dataset\nOutcome':
+                    elif header[0]=='DataCollection\nOutcome':
                         continue
-                    for item in self.data_collection_statistics_dict[sample][selected_processing_result]:
-                        if isinstance(item, list):
-                            if len(item)==3:
-                                if item[0]==header:
-                                    cell_text.setText(str(item[1]))
-                    cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                    self.data_collection_summary_table.setItem(row, column, cell_text)
+                    elif header[0].startswith('img'):
+                        continue
+                    elif header[0].startswith('Show'):
+                        continue
+                    else:
+                        cell_text=QtGui.QTableWidgetItem()
+                        cell_text.setText(str( db_dict[ header[1] ]  ))
+                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                        self.data_collection_summary_table.setItem(row, column, cell_text)
+
 
     def populate_data_source_table(self,header,data):
         self.mounted_crystal_table.setColumnCount(0)
