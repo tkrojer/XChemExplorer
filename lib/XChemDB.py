@@ -261,6 +261,39 @@ class data_source:
             cursor.execute("UPDATE mainTable SET "+update_string[:-1]+" WHERE CrystalName="+"'"+sampleID+"'")
             connect.commit()
 
+    def update_insert_data_source(self,sampleID,data_dict):
+        connect=sqlite3.connect(self.data_source_file)
+        cursor = connect.cursor()
+        cursor.execute('Select CrystalName FROM mainTable')
+        available_columns=[]
+        cursor.execute("SELECT * FROM mainTable")
+        for column in cursor.description:           # only update existing columns in data source
+            available_columns.append(column[0])
+        if self.check_if_sample_exists_in_data_source(sampleID):
+            for key in data_dict:
+                value=data_dict[key]
+                if key=='ID' or key=='CrystalName':
+                    continue
+                if not str(value).replace(' ','')=='':  # ignore empty fields
+                    update_string=str(key)+'='+"'"+str(value)+"'"
+                    cursor.execute("UPDATE mainTable SET "+update_string+" WHERE CrystalName="+"'"+sampleID+"';")
+        else:
+            column_string='CrystalName'+','
+            value_string="'"+sampleID+"'"+','
+            for key in data_dict:
+                value=data_dict[key]
+                if key=='ID':
+                    continue
+                if key not in available_columns:
+                    continue
+                if not str(value).replace(' ','')=='':  # ignore if nothing in csv field
+                    value_string+="'"+str(value)+"'"+','
+                    column_string+=key+','
+            cursor.execute("INSERT INTO mainTable ("+column_string[:-1]+") VALUES ("+value_string[:-1]+");")
+        connect.commit()
+
+
+
     def update_insert_not_null_fields_only(self,sampleID,data_dict):
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
