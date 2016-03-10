@@ -1880,7 +1880,7 @@ class XChemExplorer(QtGui.QApplication):
         self.populate_pandda_analyse_input_table(crystal_form)
 
     def preferences_data_to_copy_combobox_changed(self,i):
-        text = str(self.preferences_selection_mechanism_combobox.currentText())
+        text = str(self.preferences_data_to_copy_combobox.currentText())
         print 'changing something',text
         for item in self.preferences_data_to_copy:
             print item[0]
