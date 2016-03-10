@@ -564,7 +564,13 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
                     outcome=button.text()
             # elf.data_collection_column_three_dict[sample][4] is where the data collection table lives
             indexes=self.data_collection_column_three_dict[sample][4].selectionModel().selectedRows()
-            print 'Sample:',sample,'index',indexes,'outcome',str(outcome)
+
+            if indexes == []:       # i.e. no logfile exists
+                logfile=None
+            else:
+                for index in sorted(indexes):
+                    selected_processing_result=index.row()
+                print 'Sample:',sample,'index',selected_processing_result,'outcome',str(outcome)
 
 
 #        for entry in self.data_collection_dict[sample]:
