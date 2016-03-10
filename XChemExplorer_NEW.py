@@ -2079,14 +2079,15 @@ class XChemExplorer(QtGui.QApplication):
             if self.data_collection_column_three_dict[key][4]==self.sender():
                 sample=key
                 break
-
+        print 'sample to change',sample
         indexes=self.sender().selectionModel().selectedRows()
         for index in sorted(indexes):
             selected_processing_result=index.row()
 
         for entry in self.data_collection_dict[sample]:
-            if entry[7]==selected_processing_result:
-                db_dict=entry[6]
+            if entry[0]=='logfile':
+                if entry[7]==selected_processing_result:
+                    db_dict=entry[6]
 
         column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
 
