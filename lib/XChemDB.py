@@ -111,6 +111,8 @@ class data_source:
             ['DataProcessingMultiplicityLow',        'Multiplicity\nLow',           'TEXT'],
             ['DataProcessingMultiplicityHigh',       'Multiplicity\nHigh',          'TEXT'],
             ['DataProcessingPathToLogfile',          'DataProcessingPathToLogfile',             'TEXT'],
+            ['DataProcessingPathToMTZfile',          'DataProcessingPathToMTZfile',             'TEXT'],
+
             ['DataProcessingUniqueReflectionsOverall','Unique Reflections\nOverall', 'TEXT'],
             ['DataProcessingLattice',                'DataProcessing\nLattice',                   'TEXT'],
             ['DataProcessingPointGroup',             'DataProcessing\nPointGroup',                'TEXT'],

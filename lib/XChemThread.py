@@ -558,13 +558,16 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
         progress=0
 
         data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
+
+        ########################################################
+        # 1. update data source for all samples
         for sample in sorted(self.dataset_outcome_dict):
-            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing files from data processing to inital_model folder -> '+sample)
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating data source for '+sample)
             outcome=''
             for button in self.dataset_outcome_dict[sample]:
                 if button.isChecked():
                     outcome=button.text()
-            # elf.data_collection_column_three_dict[sample][4] is where the data collection table lives
+            # self.data_collection_column_three_dict[sample][4] is where the data collection table lives
             indexes=self.data_collection_column_three_dict[sample][4].selectionModel().selectedRows()
 
             if indexes == []:       # i.e. no logfile exists
@@ -582,25 +585,24 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
                             db_dict['DataCollectionOutcome']=str(outcome)
                             data_source.update_insert_data_source(sample,db_dict)
 
-        # put dataset outcome in db_dict
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
+        ########################################################
+        # 2. copy files
+        progress=0
+        for sample in sorted(self.dataset_outcome_dict):
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing files from data processing to inital_model folder -> '+sample)
 
-        # first update data source for all samples and then do the copying
-
-#            if indexes == []:       # i.e. no logfile exists
-#                logfile=None
-#            else:
-#                for index in sorted(indexes):
-#                    logfile=self.data_collection_statistics_dict[sample][index.row()][1]
-#            if self.data_source_file != '':
-#                data_dict=data_source.get_data_dict_to_save_autoprocessing_results_to_data_source(sample,str(outcome),logfile)
-#                data_source.update_data_source(sample,data_dict)
+            # ignore all samples that failed somehow
+            if logfile==None or str(outcome).startswith('Failed'):
+                continue
 
             # create all the directories if necessary
-#            if not os.path.isdir(os.path.join(self.initial_model_directory,sample)):
-#                os.mkdir(os.path.join(self.initial_model_directory,sample))
-#            if not os.path.isdir(os.path.join(self.initial_model_directory,sample,'autoprocessing')):
-#                os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing'))
+            if not os.path.isdir(os.path.join(self.initial_model_directory,sample)):
+                os.mkdir(os.path.join(self.initial_model_directory,sample))
+            if not os.path.isdir(os.path.join(self.initial_model_directory,sample,'autoprocessing')):
+                os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing'))
 
 #            if logfile != None:
 #                path_to_logfile=self.data_collection_statistics_dict[sample][index.row()][1]
@@ -1237,6 +1239,12 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     'DataCollectionBeamline':       beamline,
                                     'DataCollectionDate':           timestamp,
                                     'DataProcessingPathToLogfile':  file_name   }
+                        # try to find free.mtz file
+                        data_path='/'.join(file_name.split('/')[:len(file_name.split('/'))-2])
+                        for data_file in glob.glob(os.path.join(data_path,'DataFiles','*')):
+                            if 'free' in data_file:
+                                db_dict['DataProcessingPathToMTZfile']=data_file
+                                break
                         autoproc=file_name.split('/')[len(file_name.split('/'))-3]
                         found_autoproc=False
                         for entry in self.data_collection_dict[xtal]:
@@ -1267,6 +1275,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     'DataCollectionDate':           timestamp,
                                     'DataProcessingPathToLogfile':  file_name   }
                         file_name=os.path.join(runs,'fast_dp','aimless.log')
+                        if os.path.isfile(os.path.join(runs,'fast_dp','fast_dp.mtz')):
+                            db_dict['DataProcessingPathToMTZfile']=os.path.join(runs,'fast_dp','fast_dp.mtz')
                         autoproc=file_name.split('/')[len(file_name.split('/'))-2]
                         found_autoproc=False
                         for entry in self.data_collection_dict[xtal]:
@@ -1294,6 +1304,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     'DataCollectionDate':           timestamp,
                                     'DataProcessingPathToLogfile':  file_name   }
                         file_name=os.path.join(runs,'autoPROC','ap-run','aimless.log')
+                        if os.path.isfile(os.path.join(runs,'autoPROC','ap-run','truncate-unique.mtz')):
+                            db_dict['DataProcessingPathToMTZfile']=os.path.join(runs,'autoPROC','ap-run','truncate-unique.mtz')
                         autoproc=file_name.split('/')[len(file_name.split('/'))-3]
                         found_autoproc=False
                         for entry in self.data_collection_dict[xtal]:
