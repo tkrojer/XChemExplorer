@@ -1162,11 +1162,12 @@ class XChemExplorer(QtGui.QApplication):
         elif self.explorer_active==0 and self.data_source_set==True \
             and self.sender().text()=="Save Files from Autoprocessing in 'inital_model' Folder":
             self.work_thread=XChemThread.NEW_save_autoprocessing_results_to_disc(self.dataset_outcome_dict,
-                                                                 self.data_collection_table_dict,
-                                                                 self.data_collection_column_three_dict,
-                                                                 self.database_directory,self.data_source_file,
-                                                                 self.initial_model_directory,
-                                                                 self.preferences)
+                                                                                 self.data_collection_table_dict,
+                                                                                 self.data_collection_column_three_dict,
+                                                                                 self.data_collection_dict,
+                                                                                 self.database_directory,self.data_source_file,
+                                                                                 self.initial_model_directory,
+                                                                                 self.preferences)
             self.explorer_active=1
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)

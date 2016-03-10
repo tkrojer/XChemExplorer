@@ -579,7 +579,7 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
                             db_dict=entry[6]
                             db_dict['DataCollectionOutcome']=str(outcome)
                             data_source.update_data_source(sample,db_dict)
-            
+
         # put dataset outcome in db_dict
 
 
