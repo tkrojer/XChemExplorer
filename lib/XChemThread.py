@@ -1191,7 +1191,13 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
                     # before we start, check if there are already entries in the aimless_index_list
                     # this list contains integers which serve a unique identifier for each autoprocessing outcome
-
+                    for entry in self.data_collection_dict[xtal]:
+                        if entry[0]=='logfile':
+                            aimless_index_list.append(entry[7])
+                    if aimless_index_list==[]
+                        aimless_index=1
+                    else:
+                        aimless_index=max(aimless_index_list)
 
                     ##########################################################################
                     # aimless & Dimple information
@@ -1218,7 +1224,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             else:
                                 db_dict['DataProcessingRcryst']  = ''
                                 db_dict['DataProcessingRfree'] = ''
-                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,0,False])
+                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False])
+                            aimless_index+=1
 
 
 
@@ -1247,7 +1254,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             else:
                                 db_dict['DataProcessingRcryst']  = ''
                                 db_dict['DataProcessingRfree'] = ''
-                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,0,False])
+                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False])
+                            aimless_index+=1
 
                     # then exactly the same for autoPROC
                     if os.path.isfile(os.path.join(runs,'autoPROC','ap-run','aimless.log')):
@@ -1273,7 +1281,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             else:
                                 db_dict['DataProcessingRcryst']  = ''
                                 db_dict['DataProcessingRfree'] = ''
-                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,0,False])
+                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False])
+                            aimless_index+=1
 
 
 
@@ -1281,13 +1290,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                 self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
             search_cycle+=1
-
-        # assign unique id/index
-        index=0
-        for n,entry in enumerate(sorted(self.data_collection_dict[xtal])):
-            if len(entry)==9 and entry[0]=='logfile':
-                self.data_collection_dict[xtal][n][7]=index
-                index+=1
 
         # finally decide which dataset should be pre-selected
         self.select_best_dataset()
