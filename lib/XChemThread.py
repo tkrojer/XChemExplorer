@@ -556,7 +556,7 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
                 if button.isChecked():
                     outcome=button.text()
             indexes=self.data_collection_table_dict[sample].selectionModel().selectedRows()
-#            print 'Sample:',sample,'index',indexes
+            print 'Sample:',sample,'index',indexes
 #            if indexes == []:       # i.e. no logfile exists
 #                logfile=None
 #            else:
