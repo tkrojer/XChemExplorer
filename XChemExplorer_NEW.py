@@ -1726,27 +1726,30 @@ class XChemExplorer(QtGui.QApplication):
             row_position=data_collection_table.rowCount()
             if not xtal in self.data_collection_table_dict:
                 self.data_collection_table_dict[xtal]=[]
-            # reminder: ['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,0,False]
+            # reminder: ['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,<aimless_index>,False]
+            logfile_list=[]
             for entry in self.data_collection_dict[xtal]:
                 if entry[0]=='logfile':
-                    entry_already_in_table=False
-                    for logfile in self.data_collection_table_dict[xtal]:
-                        if entry[1]==logfile[1] and entry[2]==logfile[2] and entry[3]==logfile[3] and entry[4]==logfile[4]:
-                            entry_already_in_table=True
-                            break
-                    if not entry_already_in_table:
-                        data_collection_table.insertRow(row_position)
-                        db_dict=entry[6]
-                        for column,header in enumerate(diffraction_data_column_name):
-                            cell_text=QtGui.QTableWidgetItem()
-                            cell_text.setText(str( db_dict[ header[1] ]  ))
-                            cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                            data_collection_table.setItem(row_position, column, cell_text)
-                        data_collection_table.setRowHeight(row_position,20)
-                        row_position+=1
+                    logfile_list.append(entry)
+            for entry in sorted(logfile_list,key=lambda x: x[7]):               # sort by aimless_index and so make sure
+                entry_already_in_table=False                                    # that aimless_index == row
+                for logfile in self.data_collection_table_dict[xtal]:
+                    if entry[1]==logfile[1] and entry[2]==logfile[2] and entry[3]==logfile[3] and entry[4]==logfile[4]:
+                        entry_already_in_table=True
+                        break
+                if not entry_already_in_table:
+                    data_collection_table.insertRow(row_position)
+                    db_dict=entry[6]
+                    for column,header in enumerate(diffraction_data_column_name):
+                        cell_text=QtGui.QTableWidgetItem()
+                        cell_text.setText(str( db_dict[ header[1] ]  ))
+                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                        data_collection_table.setItem(row_position, column, cell_text)
+                    data_collection_table.setRowHeight(row_position,20)
+                    row_position+=1
 
-                    self.data_collection_table_dict[xtal].append(['logfile',entry[1],entry[2],entry[3],entry[4]])   # 'logfile' is just added to have
-                                                                                                                    # same index numbers between lists
+                self.data_collection_table_dict[xtal].append(['logfile',entry[1],entry[2],entry[3],entry[4]])   # 'logfile' is just added to have
+                                                                                                                # same index numbers between lists
 #            data_collection_table.setFixedHeight(300)
 #            data_collection_table.horizontalHeader().setStretchLastSection(False)
 #            data_collection_table.verticalHeader().setStretchLastSection(False)
@@ -1975,7 +1978,6 @@ class XChemExplorer(QtGui.QApplication):
 
     def populate_data_collection_summary_table(self):
         row = self.data_collection_summary_table.rowCount()
-        print 'summary table row count: ',row
         self.albula_button_dict={}
         column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
         for xtal in sorted(self.data_collection_dict):

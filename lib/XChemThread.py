@@ -1151,7 +1151,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
                     if not image_files_in_list:
                         if run_number_list==[]:
-                            run_number=1                                # every run gets and keeps(!) a unique digit assigned
+                            run_number=0                                # every run gets and keeps(!) a unique digit assigned
                         else:                                           # the order is arbitrary
                             run_number=max(run_number_list)+1
                         run_number_list.append(run_number)
@@ -1195,7 +1195,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                         if entry[0]=='logfile':
                             aimless_index_list.append(entry[7])
                     if aimless_index_list==[]:
-                        aimless_index=1
+                        aimless_index=0
                     else:
                         aimless_index=max(aimless_index_list)
 
