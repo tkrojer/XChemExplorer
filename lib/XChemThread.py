@@ -1304,7 +1304,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     'DataCollectionDate':               timestamp,
                                     'DataProcessingPathToLogfile':      file_name,
                                     'DataProcessingLOGfileName':        file_name[file_name.rfind('/')+1:],
-                                    'DataProcessingDirectoryOriginal':  '/'.join(file_name.split('/')[:len(file_name.split('/'))-3])    }
+                                    'DataProcessingDirectoryOriginal':  '/'.join(file_name.split('/')[:len(file_name.split('/'))-2])    }
                         # try to find free.mtz file
                         data_path='/'.join(file_name.split('/')[:len(file_name.split('/'))-2])
                         for data_file in glob.glob(os.path.join(data_path,'DataFiles','*')):
