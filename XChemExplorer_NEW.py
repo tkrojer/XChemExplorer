@@ -1585,6 +1585,9 @@ class XChemExplorer(QtGui.QApplication):
         for xtal in sorted(self.data_collection_dict):
             new_row_added=False
             mtz_already_in_inital_model_directory=False
+            xtal_in_table=False
+            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.mtz')):
+                mtz_already_in_inital_model_directory=True
             # first check if this sample exists in the table
             # use the outcome dict as an indicator since every sample should have one
 
@@ -1599,9 +1602,6 @@ class XChemExplorer(QtGui.QApplication):
                 # check if an entry and widgets exist in self.data_collection_column_three_dict
                 if xtal in self.data_collection_column_three_dict:
                     current_row =    self.data_collection_column_three_dict[xtal][7][0]
-                    # check if there is a <sample>.mtz file in the initial_model directory
-                    if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.mtz')):
-                        mtz_already_in_inital_model_directory=True
 
 
             # column 2: data collection date
@@ -1654,6 +1654,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.data_collection_column_three_dict[xtal]=[cell_widget,vbox_cell,hbox_for_button_and_table,layout,data_collection_table,
                                                               dataset_outcome_groupbox,dataset_outcome_vbox,
                                                               [row,sample_ID,data_collection_date_time]]
+                xtal_in_table=True
                 # Note: sample_ID & data_collection_date_time do not belong to column3, but I want to keep a
                 # record of them togther with their row for later coloring purposes
             else:
@@ -1805,7 +1806,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.main_data_collection_table.setColumnWidth(2, 1000)
                 row += 1
 
-            if mtz_already_in_inital_model_directory:
+            if xtal_in_table and mtz_already_in_inital_model_directory:
                 self.main_data_collection_table.item(current_row, 0).setBackground(QtGui.QColor(100,100,150))
                 self.main_data_collection_table.item(current_row, 1).setBackground(QtGui.QColor(100,100,150))
 
