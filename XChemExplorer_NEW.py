@@ -1585,23 +1585,23 @@ class XChemExplorer(QtGui.QApplication):
 
             # first check if this sample exists in the table
             # use the outcome dict as an indicator since every sample should have one
+
+            # column 1: sample ID
             if xtal not in self.dataset_outcome_dict:
                 self.main_data_collection_table.insertRow(row)
-
-                # column 1: sample ID
                 sample_ID=QtGui.QTableWidgetItem(xtal)
                 sample_ID.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.main_data_collection_table.setItem(row, 0, sample_ID)
-
             else:
                 # check if there is a <sample>.mtz file in the initial_model directory
                 if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.mtz')):
                     # check if an entry and widgets exist in self.data_collection_column_three_dict
                         if xtal in self.data_collection_column_three_dict:
-                            row_ID =    self.data_collection_column_three_dict[xtal][7][0]
-                            sample_ID = self.data_collection_column_three_dict[xtal][7][1]
-#                            self.main_data_collection_table.sample_ID(row_ID, 0).setBackground(QtGui.QColor(100,100,150))
-                            self.main_data_collection_table.item(row_ID, 0).setBackground(QtGui.QColor(100,100,150))
+                            current_row =    self.data_collection_column_three_dict[xtal][7][0]
+                            self.main_data_collection_table.item(current_row, 0).setBackground(QtGui.QColor(100,100,150))
+                            self.main_data_collection_table.item(current_row, 1).setBackground(QtGui.QColor(100,100,150))
+                            self.main_data_collection_table.item(current_row, 2).setBackground(QtGui.QColor(100,100,150))
+
 
             # column 2: data collection date
             # this one should always be there; it may need updating in case another run appears
@@ -1610,9 +1610,13 @@ class XChemExplorer(QtGui.QApplication):
             for entry in self.data_collection_dict[xtal]:
                 if entry[0]=='image':
                     tmp.append(entry[3])
-            data_collection_date_time=QtGui.QTableWidgetItem(max(tmp))      # not sure if this is really  as easy as max() !!!
-            data_collection_date_time.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-            self.main_data_collection_table.setItem(row, 1, data_collection_date_time)
+            latest_run=max(tmp)     # not sure if this is really  as easy as max() !!!
+            if xtal not in self.dataset_outcome_dict:
+                data_collection_date_time=QtGui.QTableWidgetItem(latest_run)
+                data_collection_date_time.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                self.main_data_collection_table.setItem(row, 1, data_collection_date_time)
+            else:
+                print str(self.main_data_collection_table.item(current_row,1).text())
 
             # column 3:
             # ---------------------------------------------------------|
