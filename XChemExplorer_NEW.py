@@ -1784,7 +1784,7 @@ class XChemExplorer(QtGui.QApplication):
 #            data_collection_table.verticalHeader().setStretchLastSection(False)
             data_collection_table.itemSelectionChanged.connect(self.update_selected_autoproc_data_collection_summary_table)
             data_collection_table.cellClicked.connect(self.user_update_selected_autoproc_data_collection_summary_table)
-            
+
             # select best resolution file + set data collection outcome
             # the assumption is that index in data_collection_dict and row number are identical
             # the assumption for data collection outcome is that as long as a logfile is found, it's a success
@@ -2111,7 +2111,10 @@ class XChemExplorer(QtGui.QApplication):
 #            self.data_collection_summary_table.resizeColumnsToContents()
 
     def user_update_selected_autoproc_data_collection_summary_table(self):
-        print 'HEREREREGEUFEUFUEGF'
+        print 'HEREREREGEUFEUFUEGF',self.sender()
+        for key in self.data_collection_column_three_dict:
+            if self.data_collection_column_three_dict[key][4]==self.sender():
+                print key
 
     def update_selected_autoproc_data_collection_summary_table(self):
         print 'updating event'
