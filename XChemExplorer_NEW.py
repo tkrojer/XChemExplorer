@@ -1570,7 +1570,8 @@ class XChemExplorer(QtGui.QApplication):
             self.main_data_collection_table_exists=True
 
         column_name = [ 'Program',
-                        'Resolution\nOverall' ]
+                        'Resolution\nOverall',
+                        'DataProcessing\nRfree' ]
 
         # need to do this because db_dict keys are SQLite column names
         diffraction_data_column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(column_name)
