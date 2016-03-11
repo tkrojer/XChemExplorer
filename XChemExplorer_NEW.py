@@ -1583,13 +1583,14 @@ class XChemExplorer(QtGui.QApplication):
         row = self.main_data_collection_table.rowCount()
 
         for xtal in sorted(self.data_collection_dict):
-
+            new_row_added=False
             # first check if this sample exists in the table
             # use the outcome dict as an indicator since every sample should have one
 
             # column 1: sample ID
             if xtal not in self.dataset_outcome_dict:
                 self.main_data_collection_table.insertRow(row)
+                new_row_added=True
                 sample_ID=QtGui.QTableWidgetItem(xtal)
                 sample_ID.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.main_data_collection_table.setItem(row, 0, sample_ID)
@@ -1601,7 +1602,6 @@ class XChemExplorer(QtGui.QApplication):
                             current_row =    self.data_collection_column_three_dict[xtal][7][0]
                             self.main_data_collection_table.item(current_row, 0).setBackground(QtGui.QColor(100,100,150))
                             self.main_data_collection_table.item(current_row, 1).setBackground(QtGui.QColor(100,100,150))
-#                            self.main_data_collection_table.item(current_row, 2).setBackground(QtGui.QColor(100,100,150))
 
 
             # column 2: data collection date
@@ -1611,16 +1611,16 @@ class XChemExplorer(QtGui.QApplication):
             for entry in self.data_collection_dict[xtal]:
                 if entry[0]=='image':
                     tmp.append( [entry[3],datetime.strptime(entry[3], '%Y-%m-%d %H:%M:%S')])
-            print 'tmp',tmp
             latest_run=max(tmp,key=lambda x: x[1])[0]
-            print 'latest_run',latest_run
-#            latest_run=max(tmp)     # not sure if this is really  as easy as max() !!!
             if xtal not in self.dataset_outcome_dict:
                 data_collection_date_time=QtGui.QTableWidgetItem(latest_run)
                 data_collection_date_time.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.main_data_collection_table.setItem(row, 1, data_collection_date_time)
             else:
                 current_run_time=str(self.main_data_collection_table.item(current_row,1).text())
+                # try to update in case newer run appears
+                if current_run_time != latest_run:
+                    self.main_data_collection_table.item(current_row,1).setText(latest_run)
 
             # column 3:
             # ---------------------------------------------------------|
@@ -1800,9 +1800,10 @@ class XChemExplorer(QtGui.QApplication):
                         button.setChecked(True)
                         button.setStyleSheet("background-color: rgb(255,0,0)")
 
-            self.main_data_collection_table.setCellWidget(row, 2, cell_widget)
-            self.main_data_collection_table.setColumnWidth(2, 1000)
-            row += 1
+            if new_row_added:
+                self.main_data_collection_table.setCellWidget(row, 2, cell_widget)
+                self.main_data_collection_table.setColumnWidth(2, 1000)
+                row += 1
 
         self.main_data_collection_table.resizeRowsToContents()
 
