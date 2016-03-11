@@ -1593,6 +1593,15 @@ class XChemExplorer(QtGui.QApplication):
                 sample_ID.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.main_data_collection_table.setItem(row, 0, sample_ID)
 
+            else:
+                # check if there is a <sample>.mtz file in the initial_model directory
+                if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.mtz')):
+                    # check if an entry and widgets exist in self.data_collection_column_three_dict
+                        if xtal in self.data_collection_column_three_dict:
+                            row_ID =    self.data_collection_column_three_dict[xtal][7][1]
+                            sample_ID = self.data_collection_column_three_dict[xtal][7][1]
+                            self.main_data_collection_table.item(row_ID, 0).setBackground(QtGui.QColor(100,100,150))
+
             # column 2: data collection date
             # this one should always be there; it may need updating in case another run appears
             # first find latest run
@@ -1634,7 +1643,10 @@ class XChemExplorer(QtGui.QApplication):
                 hbox_for_button_and_table.addWidget(data_collection_table)
                 vbox_cell.addLayout(hbox_for_button_and_table)
                 self.data_collection_column_three_dict[xtal]=[cell_widget,vbox_cell,hbox_for_button_and_table,layout,data_collection_table,
-                                                              dataset_outcome_groupbox,dataset_outcome_vbox]
+                                                              dataset_outcome_groupbox,dataset_outcome_vbox,
+                                                              [row,sample_ID,data_collection_date_time]]
+                # Note: sample_ID & data_collection_date_time do not belong to column3, but I want to keep a
+                # record of them togther with their row for later coloring purposes
             else:
                 cell_widget =               self.data_collection_column_three_dict[xtal][0]
                 vbox_cell =                 self.data_collection_column_three_dict[xtal][1]
