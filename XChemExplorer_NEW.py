@@ -2044,10 +2044,15 @@ class XChemExplorer(QtGui.QApplication):
                         db_dict=sample[6]
 
             # find latest run for crystal and diffraction images
+#            tmp=[]
+#            for entry in self.data_collection_dict[xtal]:
+#                if entry[0]=='image':
+#                    tmp.append(entry)
+#            latest_run=max(tmp,key=lambda x: x[0])
             tmp=[]
             for entry in self.data_collection_dict[xtal]:
                 if entry[0]=='image':
-                    tmp.append( [entry[3],datetime.strptime(entry[3], '%Y-%m-%d %H:%M:%S')])
+                    tmp.append( [entry, '%Y-%m-%d %H:%M:%S')])
             latest_run=max(tmp,key=lambda x: x[1])[0]
 
 
