@@ -1583,6 +1583,7 @@ class XChemExplorer(QtGui.QApplication):
         row = self.main_data_collection_table.rowCount()
 
         for xtal in sorted(self.data_collection_dict):
+            # here are some switches that come in handy
             new_row_added=False
             mtz_already_in_inital_model_directory=False
             xtal_in_table=False
@@ -1652,9 +1653,10 @@ class XChemExplorer(QtGui.QApplication):
                 hbox_for_button_and_table.addWidget(dataset_outcome_groupbox)
                 hbox_for_button_and_table.addWidget(data_collection_table)
                 vbox_cell.addLayout(hbox_for_button_and_table)
+                selection_changed_by_user=False
                 self.data_collection_column_three_dict[xtal]=[cell_widget,vbox_cell,hbox_for_button_and_table,layout,data_collection_table,
                                                               dataset_outcome_groupbox,dataset_outcome_vbox,
-                                                              [row,sample_ID,data_collection_date_time]]
+                                                              [row,sample_ID,data_collection_date_time],selection_changed_by_user]
                 xtal_in_table=True
                 # Note: sample_ID & data_collection_date_time do not belong to column3, but I want to keep a
                 # record of them togther with their row for later coloring purposes
@@ -1666,6 +1668,7 @@ class XChemExplorer(QtGui.QApplication):
                 data_collection_table =     self.data_collection_column_three_dict[xtal][4]
                 dataset_outcome_groupbox =  self.data_collection_column_three_dict[xtal][5]
                 dataset_outcome_vbox =      self.data_collection_column_three_dict[xtal][6]
+                selection_changed_by_user = self.data_collection_column_three_dict[xtal][8]
 #            vbox_cell.addLayout(layout)
 
 #            # this is necessary to render table properly
@@ -1790,7 +1793,9 @@ class XChemExplorer(QtGui.QApplication):
                     best_file=entry[8]
                     logfile_found=True
                     if best_file:
-                        data_collection_table.selectRow(index)
+                        # we change the selection only if the user did not touch it, assuming that he/she knows best
+                        if not selection_changed_by_user:
+                            data_collection_table.selectRow(index)
             if logfile_found:
                 for button in self.dataset_outcome_dict[xtal]:
                     if button.text()=='success':
@@ -2107,6 +2112,8 @@ class XChemExplorer(QtGui.QApplication):
         for key in self.data_collection_column_three_dict:
             if self.data_collection_column_three_dict[key][4]==self.sender():
                 sample=key
+                # the user changed the selection, i.e. no automated selection will update it
+                self.data_collection_column_three_dict[sample][8]=True
                 break
         indexes=self.sender().selectionModel().selectedRows()
         for index in sorted(indexes):
