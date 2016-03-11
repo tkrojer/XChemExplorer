@@ -2111,18 +2111,16 @@ class XChemExplorer(QtGui.QApplication):
 #            self.data_collection_summary_table.resizeColumnsToContents()
 
     def user_update_selected_autoproc_data_collection_summary_table(self):
-        print 'HEREREREGEUFEUFUEGF',self.sender()
         for key in self.data_collection_column_three_dict:
             if self.data_collection_column_three_dict[key][4]==self.sender():
-                print key
+                # the user changed the selection, i.e. no automated selection will update it
+                self.data_collection_column_three_dict[key][8]=True
 
     def update_selected_autoproc_data_collection_summary_table(self):
         print 'updating event'
         for key in self.data_collection_column_three_dict:
             if self.data_collection_column_three_dict[key][4]==self.sender():
                 sample=key
-                # the user changed the selection, i.e. no automated selection will update it
-                self.data_collection_column_three_dict[sample][8]=True
                 break
         indexes=self.sender().selectionModel().selectedRows()
         for index in sorted(indexes):
