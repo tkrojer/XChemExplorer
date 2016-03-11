@@ -1771,6 +1771,7 @@ class XChemExplorer(QtGui.QApplication):
                     db_dict=entry[6]
                     for column,header in enumerate(diffraction_data_column_name):
                         cell_text=QtGui.QTableWidgetItem()
+                        cell_text.connect(self.user_update_selected_autoproc_data_collection_summary_table)
                         cell_text.setText(str( db_dict[ header[1] ]  ))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         data_collection_table.setItem(row_position, column, cell_text)
@@ -2108,6 +2109,9 @@ class XChemExplorer(QtGui.QApplication):
                 self.data_collection_summary_table.setItem(row, 3, cell_text)
 #            self.data_collection_summary_table.resizeRowsToContents()
 #            self.data_collection_summary_table.resizeColumnsToContents()
+
+    def user_update_selected_autoproc_data_collection_summary_table(self):
+        print 'HEREREREGEUFEUFUEGF'
 
     def update_selected_autoproc_data_collection_summary_table(self):
         print 'updating event'
