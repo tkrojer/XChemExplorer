@@ -1600,7 +1600,7 @@ class XChemExplorer(QtGui.QApplication):
                             current_row =    self.data_collection_column_three_dict[xtal][7][0]
                             self.main_data_collection_table.item(current_row, 0).setBackground(QtGui.QColor(100,100,150))
                             self.main_data_collection_table.item(current_row, 1).setBackground(QtGui.QColor(100,100,150))
-                            self.main_data_collection_table.item(current_row, 2).setBackground(QtGui.QColor(100,100,150))
+#                            self.main_data_collection_table.item(current_row, 2).setBackground(QtGui.QColor(100,100,150))
 
 
             # column 2: data collection date
