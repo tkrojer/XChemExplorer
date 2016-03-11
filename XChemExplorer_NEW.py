@@ -1598,6 +1598,7 @@ class XChemExplorer(QtGui.QApplication):
                 sample_ID=QtGui.QTableWidgetItem(xtal)
                 sample_ID.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.main_data_collection_table.setItem(row, 0, sample_ID)
+                current_row=row
             else:
                 # check if an entry and widgets exist in self.data_collection_column_three_dict
                 if xtal in self.data_collection_column_three_dict:
