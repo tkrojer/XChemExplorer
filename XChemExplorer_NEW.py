@@ -2110,6 +2110,7 @@ class XChemExplorer(QtGui.QApplication):
 #            self.data_collection_summary_table.resizeColumnsToContents()
 
     def update_selected_autoproc_data_collection_summary_table(self):
+        print 'updating event'
         for key in self.data_collection_column_three_dict:
             if self.data_collection_column_three_dict[key][4]==self.sender():
                 sample=key
