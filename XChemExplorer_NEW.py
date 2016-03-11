@@ -1771,7 +1771,6 @@ class XChemExplorer(QtGui.QApplication):
                     db_dict=entry[6]
                     for column,header in enumerate(diffraction_data_column_name):
                         cell_text=QtGui.QTableWidgetItem()
-                        cell_text.cellClicked.connect(self.user_update_selected_autoproc_data_collection_summary_table)
                         cell_text.setText(str( db_dict[ header[1] ]  ))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         data_collection_table.setItem(row_position, column, cell_text)
@@ -1784,7 +1783,8 @@ class XChemExplorer(QtGui.QApplication):
 #            data_collection_table.horizontalHeader().setStretchLastSection(False)
 #            data_collection_table.verticalHeader().setStretchLastSection(False)
             data_collection_table.itemSelectionChanged.connect(self.update_selected_autoproc_data_collection_summary_table)
-
+            data_collection_table.cellClicked.connect(self.user_update_selected_autoproc_data_collection_summary_table)
+            
             # select best resolution file + set data collection outcome
             # the assumption is that index in data_collection_dict and row number are identical
             # the assumption for data collection outcome is that as long as a logfile is found, it's a success
