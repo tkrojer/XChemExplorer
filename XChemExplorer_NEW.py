@@ -1,5 +1,6 @@
 import os, sys, glob
 import getopt
+from datetime import datetime
 
 # diffraction image viewing only possible at DLS
 sys.path.append('/dls_sw/apps/albula/3.1/dectris/albula/3.1/python')
