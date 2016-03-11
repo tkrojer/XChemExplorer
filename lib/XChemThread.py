@@ -586,6 +586,7 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
                             db_dict=entry[6]
                             data_dict[sample]=entry
                             db_dict['DataCollectionOutcome']=str(outcome)
+                            db_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
                             data_source.update_insert_data_source(sample,db_dict)
                             break
 

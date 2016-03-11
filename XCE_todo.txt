@@ -80,6 +80,7 @@ DONE - 'Update Datasource': overwrites fields with empty entry: e.g. in case log
 
 Write helper script which updates datasource after every refinement, dimple run. So that in the future there is no more time consuming parsing.
 
+- use last_updated column in data_source
   
 XCE @ feedback
 
@@ -98,3 +99,6 @@ Things maybe to add/improve/ questions I have:
 -	If I now save it to database, it should keep my change (for the annotation), shouldn’t it?
 	Solution: record every change in data_collection_dict and autosave every 60s
 	          idea is to save to database only when files are copied to disc
+
+Notes to broadcast:
+if user selects a specific data processing result, then it will be ignored if 'Get Data Collection...' is re-run

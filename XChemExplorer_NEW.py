@@ -2047,8 +2047,10 @@ class XChemExplorer(QtGui.QApplication):
             tmp=[]
             for entry in self.data_collection_dict[xtal]:
                 if entry[0]=='image':
-                    tmp.append(entry)
-            latest_run=max(tmp,key=lambda x: x[0])
+                    tmp.append( [entry[3],datetime.strptime(entry[3], '%Y-%m-%d %H:%M:%S')])
+            latest_run=max(tmp,key=lambda x: x[1])[0]
+
+
 
             image_number=0
             for column,header in enumerate(column_name):

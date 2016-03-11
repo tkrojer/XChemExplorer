@@ -156,7 +156,8 @@ class data_source:
             ['RefinementPathToRefinementFolder',     'RefinementPathToRefinementFolder',        'TEXT'],
             ['RefinementLigandConfidence',           'Ligand\nConfidence',                      'TEXT'],
 
-            ['AssayIC50',                            'AssayIC50',                               'TEXT']
+            ['AssayIC50',                            'AssayIC50',                               'TEXT'],
+            ['LastUpdated',                            'LastUpdated',                               'TEXT']
         ]
 
     def create_missing_columns(self):
