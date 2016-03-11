@@ -1609,14 +1609,17 @@ class XChemExplorer(QtGui.QApplication):
             tmp=[]
             for entry in self.data_collection_dict[xtal]:
                 if entry[0]=='image':
-                    tmp.append(entry[3])
-            latest_run=max(tmp)     # not sure if this is really  as easy as max() !!!
+                    tmp.append( [entry[3],datetime.strptime(entry[3], '%Y-%m-%d %H:%M:%S')])
+            print 'tmp',tmp
+            latest_run=max(tmp,key=lambda x: x[1])[0]
+            print 'latest_run',latest_run
+#            latest_run=max(tmp)     # not sure if this is really  as easy as max() !!!
             if xtal not in self.dataset_outcome_dict:
                 data_collection_date_time=QtGui.QTableWidgetItem(latest_run)
                 data_collection_date_time.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.main_data_collection_table.setItem(row, 1, data_collection_date_time)
             else:
-                print str(self.main_data_collection_table.item(current_row,1).text())
+                current_run_time=str(self.main_data_collection_table.item(current_row,1).text())
 
             # column 3:
             # ---------------------------------------------------------|
