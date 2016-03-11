@@ -1598,9 +1598,10 @@ class XChemExplorer(QtGui.QApplication):
                 if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.mtz')):
                     # check if an entry and widgets exist in self.data_collection_column_three_dict
                         if xtal in self.data_collection_column_three_dict:
-                            row_ID =    self.data_collection_column_three_dict[xtal][7][1]
+                            row_ID =    self.data_collection_column_three_dict[xtal][7][0]
                             sample_ID = self.data_collection_column_three_dict[xtal][7][1]
-                            self.main_data_collection_table.sample_ID(row_ID, 0).setBackground(QtGui.QColor(100,100,150))
+#                            self.main_data_collection_table.sample_ID(row_ID, 0).setBackground(QtGui.QColor(100,100,150))
+                            self.main_data_collection_table.item(row_ID, 0).setBackground(QtGui.QColor(100,100,150))
 
             # column 2: data collection date
             # this one should always be there; it may need updating in case another run appears
