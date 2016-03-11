@@ -2052,7 +2052,7 @@ class XChemExplorer(QtGui.QApplication):
             tmp=[]
             for entry in self.data_collection_dict[xtal]:
                 if entry[0]=='image':
-                    tmp.append( [entry, '%Y-%m-%d %H:%M:%S')])
+                    tmp.append( [entry,datetime.strptime(entry[3], '%Y-%m-%d %H:%M:%S')])
             latest_run=max(tmp,key=lambda x: x[1])[0]
 
 
