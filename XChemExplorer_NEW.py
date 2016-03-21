@@ -1144,7 +1144,10 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 self.data_source_set=True
                 self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
-            print 'hhh',self.database_directory,self.data_source_file
+            print 'hhh'
+            print self.database_directory
+            print self.data_source_file
+            print '---'
             XChemDB.data_source(self.settings['data_source']).create_missing_columns()
         if self.sender().text()=='Select Data Collection Directory':
             dir_name = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
