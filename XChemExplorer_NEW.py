@@ -1015,6 +1015,9 @@ class XChemExplorer(QtGui.QApplication):
             self.database_directory=pickled_settings['database_directory']
             self.settings['database_directory']=self.database_directory
 
+            self.data_collection_summary_file=pickled_settings['data_collection_summary']
+            self.data_collection_summary_file_label.setText(self.data_collection_summary_file)
+
             self.data_source_file=pickled_settings['data_source']
             if self.data_source_file != '':
                 self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
@@ -1223,14 +1226,16 @@ class XChemExplorer(QtGui.QApplication):
             self.work_thread.start()
 
         elif self.explorer_active==0 and self.data_source_set==True \
-            and self.sender().text()=="Save Files from Autoprocessing in 'inital_model' Folder":
+            and self.sender().text()=="Save Files from Autoprocessing in 'inital_model' Folder" \
+            and self.data_collection_summary_file != '':
             self.work_thread=XChemThread.NEW_save_autoprocessing_results_to_disc(self.dataset_outcome_dict,
                                                                                  self.data_collection_table_dict,
                                                                                  self.data_collection_column_three_dict,
                                                                                  self.data_collection_dict,
                                                                                  self.database_directory,self.data_source_file,
                                                                                  self.initial_model_directory,
-                                                                                 self.preferences)
+                                                                                 self.preferences,
+                                                                                 self.data_collection_summary_file)
             self.explorer_active=1
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)

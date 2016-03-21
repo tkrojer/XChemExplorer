@@ -992,7 +992,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 
 
 class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
-    def __init__(self,visit_list,target,reference_file_list,database_directory,data_collection_dict,preferences):
+    def __init__(self,visit_list,target,reference_file_list,database_directory,data_collection_dict,preferences,data_collection_summary_file):
         QtCore.QThread.__init__(self)
         self.visit_list=visit_list
         self.target=target
@@ -1000,6 +1000,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         self.data_collection_dict=data_collection_dict
         self.database_directory=database_directory
         self.selection_mechanism=preferences['dataset_selection_mechanism']
+        self.data_collection_summary_file=data_collection_summary_file
 
 
         # - open data source if possible
@@ -1161,9 +1162,9 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
         # only do once, ignore if just refreshing table
         if self.data_collection_dict=={}:
-            if os.path.isfile(os.path.join(self.database_directory,'test.pkl')):
-                self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'unpickling: '+os.path.join(self.database_directory,'test.pkl'))
-                self.data_collection_dict = pickle.load( open( os.path.join(self.database_directory,'test.pkl'), "rb" ) )
+            if os.path.isfile(self.data_collection_summary_file):
+                self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'unpickling: '+self.data_collection_summary_file)
+                self.data_collection_dict = pickle.load( open(self.data_collection_summary_file, "rb" ) )
 
         number_of_visits_to_search=len(self.visit_list)
         search_cycle=1
@@ -1401,6 +1402,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
         # save everything so that it's quicker to reload and is available outside DLS
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'pickling results')
-        pickle.dump(self.data_collection_dict,open(  os.path.join(self.database_directory,'test.pkl'),'wb'))
+        pickle.dump(self.data_collection_dict,open(self.data_collection_summary_file,'wb'))
 
         self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results'), self.data_collection_dict)
