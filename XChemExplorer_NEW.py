@@ -759,7 +759,7 @@ class XChemExplorer(QtGui.QApplication):
         settings_buttoon_beamline_directory.clicked.connect(self.settings_button_clicked)
         settings_hbox_beamline_directory.addWidget(settings_buttoon_beamline_directory)
 #        self.data_collection_vbox_for_settings.addLayout(settings_hbox_beamline_directory)
-        settings_beamline_frame.addLayout(settings_hbox_beamline_directory)
+        settings_beamline_frame.setLayout(settings_hbox_beamline_directory)
         self.data_collection_vbox_for_settings.addWidget(settings_beamline_frame)
 
         self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nCCP4_SCR Directory:'))
