@@ -1131,7 +1131,7 @@ class XChemExplorer(QtGui.QApplication):
 #            self.database_directory_label.setText(self.database_directory)
             self.settings['database_directory']=self.database_directory
         if self.sender().text()=='Select Data Source File':
-            filepath_temp=str(QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select File', self.database_directory,'*.sqlite'))
+            filepath_temp=QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select File', self.database_directory,'*.sqlite')
             print 'filepath_temp',filepath_temp
             filepath=tuple(filepath_temp)[0]
             print 'file:',filepath
