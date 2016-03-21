@@ -1162,10 +1162,10 @@ class XChemExplorer(QtGui.QApplication):
 
         if self.sender().text()=='Select Existing\nCollection Summary File':
             if self.data_collection_summary_file != '':
-                filepath_temp=str(QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select File', self.data_collection_summary_file[:self.data_collection_summary_file.rfind('/')],'*.pkl'))
+                filepath_temp=QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select File', self.data_collection_summary_file[:self.data_collection_summary_file.rfind('/')],'*.pkl')
             else:
-                filepath_temp=str(QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select File', os.getcwd(),'*.pkl'))
-            filepath=tuple(filepath_temp)[0]
+                filepath_temp=QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select File', os.getcwd(),'*.pkl')
+            filepath=str(tuple(filepath_temp)[0])
             self.data_collection_summary_file=filepath
             self.data_collection_summary_file_label.setText(self.data_collection_summary_file)
             self.settings['data_collection_summary']=self.data_collection_summary_file
