@@ -735,7 +735,7 @@ class XChemExplorer(QtGui.QApplication):
 #        settings_hbox_database_directory.addWidget(settings_buttoon_database_directory)
 #        self.data_collection_vbox_for_settings.addLayout(settings_hbox_database_directory)
         settings_hbox_data_source_file=QtGui.QHBoxLayout()
-        self.data_source_file_label=QtGui.QLabel(self.data_source_file)
+        self.data_source_file_label=QtGui.QLabel(os.path.join(self.database_directory,self.data_source_file))
         settings_hbox_data_source_file.addWidget(self.data_source_file_label)
         settings_buttoon_data_source_file=QtGui.QPushButton('Select Data Source File')
         settings_buttoon_data_source_file.clicked.connect(self.settings_button_clicked)
@@ -1013,7 +1013,7 @@ class XChemExplorer(QtGui.QApplication):
             self.reference_directory_label.setText(self.reference_directory)
 #            self.database_directory_label.setText(self.database_directory)
             self.beamline_directory_label.setText(self.beamline_directory)
-            self.data_source_file_label.setText(self.data_source_file)
+            self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
             self.ccp4_scratch_directory_label.setText(self.ccp4_scratch_directory)
             self.adjust_allowed_unit_cell_difference.setText(str(self.allowed_unitcell_difference_percent))
             self.reference_file_list=self.get_reference_file_list(' ')
@@ -1081,7 +1081,7 @@ class XChemExplorer(QtGui.QApplication):
             filepath=str(QtGui.QFileDialog.getOpenFileName(self.window,'Select File', self.database_directory))
             self.data_source_file =   filepath.split('/')[-1]
             self.database_directory = filepath[:filepath.rfind('/')]
-            self.data_source_file_label.setText(self.data_source_file)
+            self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
 #            self.database_directory_label.setText(str(self.database_directory))
             self.settings['database_directory']=self.database_directory
             self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
@@ -1144,7 +1144,7 @@ class XChemExplorer(QtGui.QApplication):
                 if self.data_source_file=='':
                     self.database_directory=file_name[:file_name.rfind('/')]
                     self.data_source_file=file_name[file_name.rfind('/')+1:]
-                    self.data_source_file_label.setText(self.data_source_file)
+                    self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
 #                    self.database_directory_label.setText(str(self.database_directory))
                     self.settings['database_directory']=self.database_directory
                     self.settings['data_source']=self.data_source_file
