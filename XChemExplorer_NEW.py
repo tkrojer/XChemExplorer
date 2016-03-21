@@ -1133,7 +1133,7 @@ class XChemExplorer(QtGui.QApplication):
         if self.sender().text()=='Select Data Source File':
             filepath_temp=QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select File', self.database_directory,'*.sqlite')
             print 'filepath_temp',filepath_temp
-            filepath=tuple(filepath_temp)[0]
+            filepath=str(tuple(filepath_temp)[0])
             print 'file:',filepath
             self.data_source_file =   filepath.split('/')[-1]
             self.database_directory = filepath[:filepath.rfind('/')]
