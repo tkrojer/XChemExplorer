@@ -998,10 +998,8 @@ class XChemExplorer(QtGui.QApplication):
 
     def open_config_file(self):
 #        file_name = QtGui.QFileDialog.getOpenFileName(self.window,'Open file', self.current_directory)
-        file_name = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Open file', self.current_directory,'*.conf')
-        print file_name
-        print tuple(file_name)
-        print tuple(file_name)[0]
+        file_name_temp = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Open file', self.current_directory,'*.conf')
+        file_name=tuple(file_name_temp)[0]
         try:
             pickled_settings = pickle.load(open(file_name,"rb"))
             if pickled_settings['beamline_directory'] != self.beamline_directory:
@@ -1133,7 +1131,8 @@ class XChemExplorer(QtGui.QApplication):
 #            self.database_directory_label.setText(self.database_directory)
             self.settings['database_directory']=self.database_directory
         if self.sender().text()=='Select Data Source File':
-            filepath=str(QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select File', self.database_directory,'*.sqlite'))
+            filepath_temp=str(QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select File', self.database_directory,'*.sqlite'))
+            filepath=tuple(filepath_temp)[0]
             self.data_source_file =   filepath.split('/')[-1]
             self.database_directory = filepath[:filepath.rfind('/')]
 #            self.database_directory_label.setText(str(self.database_directory))
@@ -1157,9 +1156,10 @@ class XChemExplorer(QtGui.QApplication):
 
         if self.sender().text()=='Select Existing\nCollection Summary File':
             if self.data_collection_summary_file != '':
-                filepath=str(QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select File', self.data_collection_summary_file[:self.data_collection_summary_file.rfind('/')],'*.pkl'))
+                filepath_temp=str(QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select File', self.data_collection_summary_file[:self.data_collection_summary_file.rfind('/')],'*.pkl'))
             else:
-                filepath=str(QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select File', os.getcwd(),'*.pkl'))
+                filepath_temp=str(QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select File', os.getcwd(),'*.pkl'))
+            filepath=tuple(filepath_temp)[0]
             self.data_collection_summary_file=filepath
             self.data_collection_summary_file_label.setText(self.data_collection_summary_file)
             self.settings['data_collection_summary']=self.data_collection_summary_file
