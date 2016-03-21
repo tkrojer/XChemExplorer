@@ -677,11 +677,11 @@ class XChemExplorer(QtGui.QApplication):
 #        settings_buttoon_project_directory.clicked.connect(self.settings_button_clicked)
 #        settings_hbox_project_directory.addWidget(settings_buttoon_project_directory)
 #        self.data_collection_vbox_for_settings.addLayout(settings_hbox_project_directory)
-        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nInitial Model Directory:'))
+        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nProject Directory:'))
         settings_hbox_initial_model_directory=QtGui.QHBoxLayout()
         self.initial_model_directory_label=QtGui.QLabel(self.initial_model_directory)
         settings_hbox_initial_model_directory.addWidget(self.initial_model_directory_label)
-        settings_buttoon_initial_model_directory=QtGui.QPushButton('Select Initial Model Directory')
+        settings_buttoon_initial_model_directory=QtGui.QPushButton('Select Project Directory')
         settings_buttoon_initial_model_directory.clicked.connect(self.settings_button_clicked)
         settings_hbox_initial_model_directory.addWidget(settings_buttoon_initial_model_directory)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_initial_model_directory)
@@ -725,29 +725,31 @@ class XChemExplorer(QtGui.QApplication):
         settings_buttoon_reference_directory.clicked.connect(self.settings_button_clicked)
         settings_hbox_reference_directory.addWidget(settings_buttoon_reference_directory)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_reference_directory)
+
         self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nData Source:'))
-        settings_hbox_database_directory=QtGui.QHBoxLayout()
-
-        self.database_directory_label=QtGui.QLabel(self.database_directory)
-        settings_hbox_database_directory.addWidget(self.database_directory_label)
-        settings_buttoon_database_directory=QtGui.QPushButton('Select Data Source Directory')
-        settings_buttoon_database_directory.clicked.connect(self.settings_button_clicked)
-        settings_hbox_database_directory.addWidget(settings_buttoon_database_directory)
-        self.data_collection_vbox_for_settings.addLayout(settings_hbox_database_directory)
-
+#        settings_hbox_database_directory=QtGui.QHBoxLayout()
+#        self.database_directory_label=QtGui.QLabel(self.database_directory)
+#        settings_hbox_database_directory.addWidget(self.database_directory_label)
+#        settings_buttoon_database_directory=QtGui.QPushButton('Select Data Source Directory')
+#        settings_buttoon_database_directory.clicked.connect(self.settings_button_clicked)
+#        settings_hbox_database_directory.addWidget(settings_buttoon_database_directory)
+#        self.data_collection_vbox_for_settings.addLayout(settings_hbox_database_directory)
         settings_hbox_data_source_file=QtGui.QHBoxLayout()
         self.data_source_file_label=QtGui.QLabel(self.data_source_file)
         settings_hbox_data_source_file.addWidget(self.data_source_file_label)
         settings_buttoon_data_source_file=QtGui.QPushButton('Select Data Source File')
         settings_buttoon_data_source_file.clicked.connect(self.settings_button_clicked)
         settings_hbox_data_source_file.addWidget(settings_buttoon_data_source_file)
+        create_new_data_source_button=QtGui.QPushButton("Create New Data\nSource (SQLite)")
+        create_new_data_source_button.clicked.connect(self.button_clicked)
+        settings_hbox_data_source_file.addWidget(create_new_data_source_button)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_data_source_file)
 
-        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nBeamline Directory:'))
+        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nData Collection Directory:'))
         settings_hbox_beamline_directory=QtGui.QHBoxLayout()
         self.beamline_directory_label=QtGui.QLabel(self.beamline_directory)
         settings_hbox_beamline_directory.addWidget(self.beamline_directory_label)
-        settings_buttoon_beamline_directory=QtGui.QPushButton('Select Beamline Directory')
+        settings_buttoon_beamline_directory=QtGui.QPushButton('Select Data Collection Directory')
         settings_buttoon_beamline_directory.clicked.connect(self.settings_button_clicked)
         settings_hbox_beamline_directory.addWidget(settings_buttoon_beamline_directory)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_beamline_directory)
@@ -1110,6 +1112,9 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def change_allowed_unitcell_difference_percent(self,text):
+        print 'here'
+        print text
+        print int(text)
         self.allowed_unitcell_difference_percent=int(text)
         self.settings['unitcell_difference']=self.adjust_allowed_unit_cell_difference
 
