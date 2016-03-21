@@ -1093,11 +1093,11 @@ class XChemExplorer(QtGui.QApplication):
         self.window.move((screen.width()-size.width())/2, (screen.height()-size.height())/2)
 
     def settings_button_clicked(self):
+#        if self.sender().text()=='Select Project Directory':
+#            self.project_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
+#            self.project_directory_label.setText(self.project_directory)
+#            self.settings['project_directory']=self.project_directory
         if self.sender().text()=='Select Project Directory':
-            self.project_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
-            self.project_directory_label.setText(self.project_directory)
-            self.settings['project_directory']=self.project_directory
-        if self.sender().text()=='Select Initial Model Directory':
             self.initial_model_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.initial_model_directory_label.setText(self.initial_model_directory)
             self.settings['initial_model_directory']=self.initial_model_directory
