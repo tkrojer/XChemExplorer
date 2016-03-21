@@ -1000,6 +1000,8 @@ class XChemExplorer(QtGui.QApplication):
 #        file_name = QtGui.QFileDialog.getOpenFileName(self.window,'Open file', self.current_directory)
         file_name = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Open file', self.current_directory,'*.conf')
         print file_name
+        print tuple(file_name)
+        print tuple(file_name)[0]
         try:
             pickled_settings = pickle.load(open(file_name,"rb"))
             if pickled_settings['beamline_directory'] != self.beamline_directory:
