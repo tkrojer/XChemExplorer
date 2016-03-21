@@ -1071,7 +1071,7 @@ class XChemExplorer(QtGui.QApplication):
             self.update_status_bar('Sorry, this is not a XChemExplorer config file!')
 
     def save_config_file(self):
-        file_name = QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.current_directory)
+        file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.current_directory))
         #make sure that the file always has .conf extension
         if str(file_name).rfind('.') != -1:
             file_name=file_name[:file_name.rfind('.')]+'.conf'
