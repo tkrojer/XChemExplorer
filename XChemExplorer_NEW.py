@@ -1131,7 +1131,7 @@ class XChemExplorer(QtGui.QApplication):
             if self.data_collection_summary_file != '':
                 filepath=str(QtGui.QFileDialog.getOpenFileName(self.window,'Select File', self.data_collection_summary_file[:self.data_collection_summary_file.rfind('/')]))
             else:
-                filepath=str(QtGui.QFileDialog.getOpenFileName(self.window,'Select File', os.getcwd())
+                filepath=str(QtGui.QFileDialog.getOpenFileName(self.window,'Select File', os.getcwd()))
             self.data_collection_summary_file=filepath
             self.data_collection_summary_file_label.setText(self.data_collection_summary_file)
             self.settings['data_collection_summary']=self.data_collection_summary_file
