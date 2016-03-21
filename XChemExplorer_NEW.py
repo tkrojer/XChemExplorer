@@ -748,7 +748,7 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_data_source_file.addWidget(create_new_data_source_button)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_data_source_file)
 
-        settings_beamline_frame = QtGui.QFrame(self)
+        settings_beamline_frame = QtGui.QFrame()
         settings_beamline_frame.setFrameShape(QtGui.QFrame.StyledPanel)
 
         self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nData Collection Directory:'))
