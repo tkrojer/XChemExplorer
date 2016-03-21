@@ -1112,8 +1112,17 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def change_allowed_unitcell_difference_percent(self,text):
-        self.allowed_unitcell_difference_percent=int(text)
-        self.settings['unitcell_difference']=self.adjust_allowed_unit_cell_difference
+        try:
+            self.allowed_unitcell_difference_percent=int(text)
+            self.settings['unitcell_difference']=self.adjust_allowed_unit_cell_difference
+        except ValueError:
+            if text.find('.') != -1:
+                self.allowed_unitcell_difference_percent=int(text[:text.find('.')])
+                self.settings['unitcell_difference']=self.adjust_allowed_unit_cell_difference
+            else:
+                pass
+        print self.allowed_unitcell_difference_percent
+
 
     def change_filename_root(self,text):
         self.filename_root=str(text)
