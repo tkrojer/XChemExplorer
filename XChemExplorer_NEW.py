@@ -1616,7 +1616,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def check_write_permissions_of_data_source(self):
         write_enabled=True
-        if not os.access(os.path.join(self.database_directory,self.data_source_file)):
+        if not os.access(os.path.join(self.database_directory,self.data_source_file),os.W_OK):
             QtGui.QMessageBox.warning(self.window, "Data Source Problem",
                                       '\n- Data Source is Read-Only\n',
                         QtGui.QMessageBox.Cancel, QtGui.QMessageBox.NoButton,
