@@ -1058,6 +1058,11 @@ class XChemExplorer(QtGui.QApplication):
 
     def save_config_file(self):
         file_name = QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.current_directory)
+        #make sure that the file always has .conf extension
+        if file_name.rfind('.') != -1:
+            file_name=file_name[:file_name.rfind('.')]+'.conf'
+        else:
+            file_name=file_name+'.conf'
         pickle.dump(self.settings,open(file_name,'wb'))
 
     def update_reference_files(self,reference_root):
@@ -1148,7 +1153,7 @@ class XChemExplorer(QtGui.QApplication):
             if file_name.rfind('.') != -1:
                 file_name=file_name[:file_name.rfind('.')]+'.pkl'
             else:
-                file_name=file_name+'.sqlite'
+                file_name=file_name+'.pkl'
             self.data_collection_summary_file=file_name
             self.data_collection_summary_file_label.setText(self.data_collection_summary_file)
             self.settings['data_collection_summary']=self.data_collection_summary_file
