@@ -748,18 +748,21 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_data_source_file.addWidget(create_new_data_source_button)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_data_source_file)
 
+        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nData Collection Directory'))
+
         settings_beamline_frame = QtGui.QFrame()
         settings_beamline_frame.setFrameShape(QtGui.QFrame.StyledPanel)
+        settings_beamline_vbox = QtGui.QVBoxLayout()
 
-        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nData Collection Directory:'))
         settings_hbox_beamline_directory=QtGui.QHBoxLayout()
         self.beamline_directory_label=QtGui.QLabel(self.beamline_directory)
         settings_hbox_beamline_directory.addWidget(self.beamline_directory_label)
         settings_buttoon_beamline_directory=QtGui.QPushButton('Select Data Collection Directory')
         settings_buttoon_beamline_directory.clicked.connect(self.settings_button_clicked)
         settings_hbox_beamline_directory.addWidget(settings_buttoon_beamline_directory)
-#        self.data_collection_vbox_for_settings.addLayout(settings_hbox_beamline_directory)
-        settings_beamline_frame.setLayout(settings_hbox_beamline_directory)
+
+        settings_beamline_vbox.addLayout(settings_hbox_beamline_directory)
+        settings_beamline_frame.setLayout(settings_beamline_vbox)
         self.data_collection_vbox_for_settings.addWidget(settings_beamline_frame)
 
         self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nCCP4_SCR Directory:'))
