@@ -997,7 +997,8 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def open_config_file(self):
-        file_name = QtGui.QFileDialog.getOpenFileName(self.window,'Open file', self.current_directory)
+#        file_name = QtGui.QFileDialog.getOpenFileName(self.window,'Open file', self.current_directory)
+        file_name = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Open file', self.current_directory,'*.pkl')
 
         try:
             pickled_settings = pickle.load(open(file_name,"rb"))
