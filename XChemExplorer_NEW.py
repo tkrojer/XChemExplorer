@@ -735,7 +735,10 @@ class XChemExplorer(QtGui.QApplication):
 #        settings_hbox_database_directory.addWidget(settings_buttoon_database_directory)
 #        self.data_collection_vbox_for_settings.addLayout(settings_hbox_database_directory)
         settings_hbox_data_source_file=QtGui.QHBoxLayout()
-        self.data_source_file_label=QtGui.QLabel(os.path.join(self.database_directory,self.data_source_file))
+        if self.data_source_file != ''
+            self.data_source_file_label=QtGui.QLabel(os.path.join(self.database_directory,self.data_source_file))
+        else:
+            self.data_source_file_label=QtGui.QLabel('')
         settings_hbox_data_source_file.addWidget(self.data_source_file_label)
         settings_buttoon_data_source_file=QtGui.QPushButton('Select Data Source File')
         settings_buttoon_data_source_file.clicked.connect(self.settings_button_clicked)
