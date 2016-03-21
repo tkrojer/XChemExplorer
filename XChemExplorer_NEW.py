@@ -1116,8 +1116,8 @@ class XChemExplorer(QtGui.QApplication):
             self.allowed_unitcell_difference_percent=int(text)
             self.settings['unitcell_difference']=self.adjust_allowed_unit_cell_difference
         except ValueError:
-            if text.find('.') != -1:
-                self.allowed_unitcell_difference_percent=int(text[:text.find('.')])
+            if str(text).find('.') != -1:
+                self.allowed_unitcell_difference_percent=int(str(text)[:str(text).find('.')])
                 self.settings['unitcell_difference']=self.adjust_allowed_unit_cell_difference
             else:
                 pass
