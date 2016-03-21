@@ -1126,7 +1126,7 @@ class XChemExplorer(QtGui.QApplication):
             self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
             self.data_source_set=True
             XChemDB.data_source(self.settings['data_source']).create_missing_columns()
-        if self.sender().text()=='Select Beamline Directory':
+        if self.sender().text()=='Select Data Collection Directory':
             dir_name = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             if dir_name != self.beamline_directory:
                 self.beamline_directory=dir_name
