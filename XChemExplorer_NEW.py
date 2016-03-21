@@ -1131,9 +1131,9 @@ class XChemExplorer(QtGui.QApplication):
 #            self.database_directory_label.setText(self.database_directory)
             self.settings['database_directory']=self.database_directory
         if self.sender().text()=='Select Data Source File':
-            filepath_temp=str(QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select File', self.database_directory,'*.sqlite'))
-            filepath=tuple(filepath_temp)[0]
-            print 'file:',filepath
+            filepath=str(QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select File', self.database_directory,'*.sqlite'))
+#            filepath=tuple(filepath_temp)[0]
+#            print 'file:',filepath
             self.data_source_file =   filepath.split('/')[-1]
             self.database_directory = filepath[:filepath.rfind('/')]
 #            self.database_directory_label.setText(str(self.database_directory))
@@ -1145,10 +1145,10 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 self.data_source_set=True
                 self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
-            print 'hhh'
-            print self.database_directory
-            print self.data_source_file
-            print '---'
+#            print 'hhh'
+#            print self.database_directory
+#            print self.data_source_file
+#            print '---'
             XChemDB.data_source(self.settings['data_source']).create_missing_columns()
         if self.sender().text()=='Select Data Collection Directory':
             dir_name = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
