@@ -1136,6 +1136,16 @@ class XChemExplorer(QtGui.QApplication):
             self.data_collection_summary_file_label.setText(self.data_collection_summary_file)
             self.settings['data_collection_summary']=self.data_collection_summary_file
 
+        if self.sender().text()=='Assign New\nCollection Summary File':
+            if self.data_collection_summary_file != '':
+                file_name = QtGui.QFileDialog.getSaveFileName(self.window,'New file', self.data_collection_summary_file[:self.data_collection_summary_file.rfind('/')])
+            else:
+                file_name = QtGui.QFileDialog.getSaveFileName(self.window,'New file', self.current_directory)
+            self.data_collection_summary_file=file_name
+            self.data_collection_summary_file_label.setText(self.data_collection_summary_file)
+            self.settings['data_collection_summary']=self.data_collection_summary_file
+
+
         if self.sender().text()=='Select CCP4_SCR Directory':
             self.ccp4_scratch_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.ccp4_scratch_directory_label.setText(self.ccp4_scratch_directory)
