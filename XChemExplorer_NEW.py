@@ -1011,7 +1011,7 @@ class XChemExplorer(QtGui.QApplication):
             self.panddas_directory_label.setText(self.panddas_directory)
 #            self.refine_model_directory_label.setText(self.refine_model_directory)
             self.reference_directory_label.setText(self.reference_directory)
-            self.database_directory_label.setText(self.database_directory)
+#            self.database_directory_label.setText(self.database_directory)
             self.beamline_directory_label.setText(self.beamline_directory)
             self.data_source_file_label.setText(self.data_source_file)
             self.ccp4_scratch_directory_label.setText(self.ccp4_scratch_directory)
@@ -1075,14 +1075,14 @@ class XChemExplorer(QtGui.QApplication):
             self.settings['reference_directory']=self.reference_directory
         if self.sender().text()=='Select Data Source Directory':
             self.database_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
-            self.database_directory_label.setText(self.database_directory)
+#            self.database_directory_label.setText(self.database_directory)
             self.settings['database_directory']=self.database_directory
         if self.sender().text()=='Select Data Source File':
             filepath=str(QtGui.QFileDialog.getOpenFileName(self.window,'Select File', self.database_directory))
             self.data_source_file =   filepath.split('/')[-1]
             self.database_directory = filepath[:filepath.rfind('/')]
             self.data_source_file_label.setText(self.data_source_file)
-            self.database_directory_label.setText(str(self.database_directory))
+#            self.database_directory_label.setText(str(self.database_directory))
             self.settings['database_directory']=self.database_directory
             self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
             self.data_source_set=True
@@ -1145,7 +1145,7 @@ class XChemExplorer(QtGui.QApplication):
                     self.database_directory=file_name[:file_name.rfind('/')]
                     self.data_source_file=file_name[file_name.rfind('/')+1:]
                     self.data_source_file_label.setText(self.data_source_file)
-                    self.database_directory_label.setText(str(self.database_directory))
+#                    self.database_directory_label.setText(str(self.database_directory))
                     self.settings['database_directory']=self.database_directory
                     self.settings['data_source']=self.data_source_file
                     self.data_source_set=True
