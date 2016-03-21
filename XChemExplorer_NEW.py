@@ -81,6 +81,7 @@ class XChemExplorer(QtGui.QApplication):
             self.data_source_file=''
             self.ccp4_scratch_directory=os.getenv('CCP4_SCR')
             self.panddas_directory=self.current_directory
+            self.data_collection_summary_file=''
 
         self.preferences_data_to_copy = [
             ['All Files in the respective auto-processing directory',   'everything'],
