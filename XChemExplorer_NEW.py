@@ -1150,7 +1150,7 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 file_name = QtGui.QFileDialog.getSaveFileName(self.window,'New file', self.current_directory)
             #make sure that the file always has .pkl extension
-            if file_name.rfind('.') != -1:
+            if str(file_name).rfind('.') != -1:
                 file_name=file_name[:file_name.rfind('.')]+'.pkl'
             else:
                 file_name=file_name+'.pkl'
