@@ -48,7 +48,7 @@ class XChemExplorer(QtGui.QApplication):
             self.reference_directory=os.path.join(self.project_directory,'processing','reference')
             self.database_directory=os.path.join(self.project_directory,'processing','database')
             self.data_source_file=''
-            self.data_collection_summary_file=os.path.join(self.database_directory,str(os.getcwd().split('/')[5])+'summary.pkl')
+            self.data_collection_summary_file=os.path.join(self.database_directory,str(os.getcwd().split('/')[5])+'_summary.pkl')
             if os.path.isfile(os.path.join(self.project_directory,'processing','lab36','soakDBDataFile.sqlite')):
                 self.data_source_file='soakDBDataFile.sqlite'
                 self.database_directory=os.path.join(self.project_directory,'processing','lab36')
@@ -770,6 +770,15 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_data_collection_summary_file=QtGui.QHBoxLayout()
         self.data_collection_summary_file_label=QtGui.QLabel(self.data_collection_summary_file)
         settings_hbox_data_collection_summary_file.addWidget(self.data_collection_summary_file_label)
+        settings_button_data_collection_summary_file=QtGui.QPushButton('Select Existing\nCollection Summary File')
+        settings_button_data_collection_summary_file.clicked.connect(self.settings_button_clicked)
+        settings_hbox_data_collection_summary_file.addWidget(settings_button_data_collection_summary_file)
+
+        settings_button_new_data_collection_summary_file=QtGui.QPushButton('Assign New\nCollection Summary File')
+        settings_button_new_data_collection_summary_file.clicked.connect(self.settings_button_clicked)
+        settings_hbox_data_collection_summary_file.addWidget(settings_button_new_data_collection_summary_file)
+
+
         settings_beamline_vbox.addLayout(settings_hbox_data_collection_summary_file)
 
         settings_beamline_frame.setLayout(settings_beamline_vbox)
@@ -1117,6 +1126,16 @@ class XChemExplorer(QtGui.QApplication):
                 self.populate_target_selection_combobox(self.target_selection_combobox)
             self.beamline_directory_label.setText(self.beamline_directory)
             self.settings['beamline_directory']=self.beamline_directory
+
+        if self.sender().text()=='Select Existing\nCollection Summary File':
+            if self.data_collection_summary_file != '':
+                filepath=str(QtGui.QFileDialog.getOpenFileName(self.window,'Select File', self.data_collection_summary_file[:self.data_collection_summary_file.rfind('/')]))
+            else:
+                filepath=str(QtGui.QFileDialog.getOpenFileName(self.window,'Select File', os.getcwd())
+            self.data_collection_summary_file=filepath
+            self.data_collection_summary_file_label.setText(self.data_collection_summary_file)
+            self.settings['data_collection_summary']=self.data_collection_summary_file
+
         if self.sender().text()=='Select CCP4_SCR Directory':
             self.ccp4_scratch_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.ccp4_scratch_directory_label.setText(self.ccp4_scratch_directory)
