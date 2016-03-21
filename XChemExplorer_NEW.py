@@ -855,7 +855,11 @@ class XChemExplorer(QtGui.QApplication):
 #        self.timer = QtCore.QBasicTimer()
 #        self.window.showMaximized()
         self.window.show()
-        print 'herereererere'
+
+        if self.data_source_file != '':
+            write_enabled=self.check_write_permissions_of_data_source()
+            if not write_enabled:
+                self.data_source_set=False
 
     def color_run_panddas_button(self):
         if os.path.isfile(os.path.join(self.panddas_directory,'PANDDA_RUN_IN_PROGRESS')):
@@ -1025,6 +1029,10 @@ class XChemExplorer(QtGui.QApplication):
                 # this is probably not necessary
                 if os.path.isfile(self.settings['data_source']):
                     self.data_source_set=True
+                    write_enabled=self.check_write_permissions_of_data_source()
+                    if not write_enabled:
+                        self.data_source_set=False
+
 #                    XChemDB.data_source(self.settings['data_source']).create_missing_columns()
 #                else:
 #                    XChemDB.data_source(self.settings['data_source']).create_empty_data_source_file()
@@ -1125,7 +1133,11 @@ class XChemExplorer(QtGui.QApplication):
 #            self.database_directory_label.setText(str(self.database_directory))
             self.settings['database_directory']=self.database_directory
             self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
-            self.data_source_set=True
+            write_enabled=self.check_write_permissions_of_data_source()
+            if not write_enabled:
+                self.data_source_set=False
+            else:
+                self.data_source_set=True
             XChemDB.data_source(self.settings['data_source']).create_missing_columns()
         if self.sender().text()=='Select Data Collection Directory':
             dir_name = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
@@ -1603,11 +1615,14 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def check_write_permissions_of_data_source(self):
+        write_enabled=True
         if not os.access(os.path.join(self.database_directory,self.data_source_file)):
             QtGui.QMessageBox.warning(self.window, "Data Source Problem",
                                       '\n- Data Source is Read-Only\n',
                         QtGui.QMessageBox.Cancel, QtGui.QMessageBox.NoButton,
                         QtGui.QMessageBox.NoButton)
+            write_enabled=False
+        return write_enabled
 
 
     def no_data_source_selected(self):
