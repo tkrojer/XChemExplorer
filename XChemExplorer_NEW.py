@@ -1030,6 +1030,7 @@ class XChemExplorer(QtGui.QApplication):
                 if os.path.isfile(self.settings['data_source']):
                     write_enabled=self.check_write_permissions_of_data_source()
                     if not write_enabled:
+                        self.data_source_file_label.setText('')
                         self.data_source_set=False
                     else:
                         self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
@@ -1060,7 +1061,6 @@ class XChemExplorer(QtGui.QApplication):
             self.reference_directory_label.setText(self.reference_directory)
 #            self.database_directory_label.setText(self.database_directory)
             self.beamline_directory_label.setText(self.beamline_directory)
-            self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
             self.ccp4_scratch_directory_label.setText(self.ccp4_scratch_directory)
             self.adjust_allowed_unit_cell_difference.setText(str(self.allowed_unitcell_difference_percent))
             self.reference_file_list=self.get_reference_file_list(' ')
@@ -1622,7 +1622,7 @@ class XChemExplorer(QtGui.QApplication):
         write_enabled=True
         if not os.access(os.path.join(self.database_directory,self.data_source_file),os.W_OK):
             QtGui.QMessageBox.warning(self.window, "Data Source Problem",
-                                      '\n- Data Source is Read-Only\n',
+                                      '\nData Source is Read-Only\n',
                         QtGui.QMessageBox.Cancel, QtGui.QMessageBox.NoButton,
                         QtGui.QMessageBox.NoButton)
             write_enabled=False
