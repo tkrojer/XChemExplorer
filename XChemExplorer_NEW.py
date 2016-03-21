@@ -49,7 +49,7 @@ class XChemExplorer(QtGui.QApplication):
             self.database_directory=os.path.join(self.project_directory,'processing','database')
             self.data_source_file=''
             self.data_collection_summary_file=os.path.join(self.database_directory,str(os.getcwd().split('/')[5])+'_summary.pkl')
-            if os.path.isfile(os.path.join(self.project_directory,'processing','lab36','soakDBDataFile.sqlite')):
+            if os.path.isfile(os.path.join(self.project_directory,'processing','database','soakDBDataFile.sqlite')):
                 self.data_source_file='soakDBDataFile.sqlite'
                 self.database_directory=os.path.join(self.project_directory,'processing','lab36')
                 self.data_source_set=True
@@ -265,7 +265,7 @@ class XChemExplorer(QtGui.QApplication):
                         'Data Source',
                         'Overview',
                         'DLS @ Data Collection',
-                        'Initial Model',
+                        'Initial Refinement',
                         'PANDDAs',
                         'Summary & Refine',
                         'Crystal Form',
@@ -405,14 +405,14 @@ class XChemExplorer(QtGui.QApplication):
         self.tab_dict['Overview'][1].addLayout(self.data_collection_vbox_for_overview)
 
         ######################################################################################
-        # Initial Model Tab
+        # Initial Refinement Tab
         initial_model_checkbutton_hbox=QtGui.QHBoxLayout()
         select_sample_for_dimple = QtGui.QCheckBox('(de-)select all samples for DIMPLE')
         select_sample_for_dimple.toggle()
         select_sample_for_dimple.setChecked(False)
         select_sample_for_dimple.stateChanged.connect(self.set_run_dimple_flag)
         initial_model_checkbutton_hbox.addWidget(select_sample_for_dimple)
-        self.tab_dict['Initial Model'][1].addLayout(initial_model_checkbutton_hbox)
+        self.tab_dict['Initial Refinement'][1].addLayout(initial_model_checkbutton_hbox)
         self.initial_model_vbox_for_table=QtGui.QVBoxLayout()
         self.initial_model_column_name = [  'SampleID',
                                             'Run\nDimple',
@@ -430,7 +430,7 @@ class XChemExplorer(QtGui.QApplication):
         self.initial_model_table.setSortingEnabled(True)
         self.initial_model_table.setHorizontalHeaderLabels(self.initial_model_column_name)
         self.initial_model_vbox_for_table.addWidget(self.initial_model_table)
-        self.tab_dict['Initial Model'][1].addLayout(self.initial_model_vbox_for_table)
+        self.tab_dict['Initial Refinement'][1].addLayout(self.initial_model_vbox_for_table)
         initial_model_button_hbox=QtGui.QHBoxLayout()
         get_initial_model_button=QtGui.QPushButton("Check for inital Refinement")
         get_initial_model_button.clicked.connect(self.button_clicked)
@@ -451,7 +451,7 @@ class XChemExplorer(QtGui.QApplication):
 #        run_panddas_button=QtGui.QPushButton("Run PANDDAs")
 #        run_panddas_button.clicked.connect(self.button_clicked)
 #        initial_model_button_hbox.addWidget(run_panddas_button)
-        self.tab_dict['Initial Model'][1].addLayout(initial_model_button_hbox)
+        self.tab_dict['Initial Refinement'][1].addLayout(initial_model_button_hbox)
 
         ######################################################################################
         # Summary & Refine Tab
@@ -530,12 +530,17 @@ class XChemExplorer(QtGui.QApplication):
         # right hand side: input parameters for PANDDAs run
         self.pandda_analyse_input_params_vbox=QtGui.QVBoxLayout()
 
+        pandda_input_dir_hbox=QtGui.QHBoxLayout()
         self.pandda_input_data_dir_label=QtGui.QLabel('data directory')
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_input_data_dir_label)
         self.pandda_input_data_dir_entry = QtGui.QLineEdit()
         self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory,'*','Dimple','dimple'))
         self.pandda_input_data_dir_entry.setFixedWidth(400)
-        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_input_data_dir_entry)
+        pandda_input_dir_hbox.addWidget(self.pandda_input_data_dir_entry)
+        self.select_pandda_input_dir_button=QtGui.QPushButton("Select Input Template")
+        self.select_pandda_input_dir_button.clicked.connect(self.select_pandda_input_template)
+        pandda_input_dir_hbox.addWidget(self.select_pandda_input_dir_button)
+        self.pandda_analyse_input_params_vbox.addLayout(pandda_input_dir_hbox)
 
         self.pandda_output_dir_label=QtGui.QLabel('output directory')
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_output_dir_label)
@@ -1106,6 +1111,19 @@ class XChemExplorer(QtGui.QApplication):
         size = self.window.geometry()
         self.window.move((screen.width()-size.width())/2, (screen.height()-size.height())/2)
 
+    def select_pandda_input_template(self):
+        filepath_temp=QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select Example MTZ File', self.database_directory,'*.mtz')
+        filepath=str(tuple(filepath_temp)[0])
+        mtzin=filepath.split('/')[-1]
+        subdir=os.path.join(*filepath.split('/')[len(self.initial_model_directory.split('/'))+1:len(filepath.split('/'))-1])
+        print 'mtzin',mtzin,'subdir',subdir
+        # check if more than min_build_dataset exist in spefified directories
+        print 'cc',os.path.join(self.initial_model_directory,'*',subdir,mtzin)
+        for file in glob.glob(os.path.join(self.initial_model_directory,'*',subdir,mtzin)):
+            print file
+#        self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory,'*',subdir))
+
+
     def settings_button_clicked(self):
 #        if self.sender().text()=='Select Project Directory':
 #            self.project_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
@@ -1132,9 +1150,7 @@ class XChemExplorer(QtGui.QApplication):
             self.settings['database_directory']=self.database_directory
         if self.sender().text()=='Select Data Source File':
             filepath_temp=QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select File', self.database_directory,'*.sqlite')
-            print 'filepath_temp',filepath_temp
             filepath=str(tuple(filepath_temp)[0])
-            print 'file:',filepath
             self.data_source_file =   filepath.split('/')[-1]
             self.database_directory = filepath[:filepath.rfind('/')]
 #            self.database_directory_label.setText(str(self.database_directory))
@@ -1146,10 +1162,6 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 self.data_source_set=True
                 self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
-#            print 'hhh'
-#            print self.database_directory
-#            print self.data_source_file
-#            print '---'
             XChemDB.data_source(self.settings['data_source']).create_missing_columns()
         if self.sender().text()=='Select Data Collection Directory':
             dir_name = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
@@ -1629,7 +1641,6 @@ class XChemExplorer(QtGui.QApplication):
 
     def check_write_permissions_of_data_source(self):
         write_enabled=True
-        print 'fileeee',os.path.join(self.database_directory,self.data_source_file)
         if not os.access(os.path.join(self.database_directory,self.data_source_file),os.W_OK):
             QtGui.QMessageBox.warning(self.window, "Data Source Problem",
                                       '\nData Source is Read-Only\n',
