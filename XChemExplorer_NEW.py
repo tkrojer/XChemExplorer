@@ -855,6 +855,7 @@ class XChemExplorer(QtGui.QApplication):
 #        self.timer = QtCore.QBasicTimer()
 #        self.window.showMaximized()
         self.window.show()
+        print 'herereererere'
 
     def color_run_panddas_button(self):
         if os.path.isfile(os.path.join(self.panddas_directory,'PANDDA_RUN_IN_PROGRESS')):
@@ -1600,6 +1601,13 @@ class XChemExplorer(QtGui.QApplication):
                 else:
                     self.xtalform_dict[name]=[pg,vol,[a,b,c,alpha,beta,gamma],spg]
 
+
+    def check_write_permissions_of_data_source(self):
+        if not os.access(os.path.join(self.database_directory,self.data_source_file)):
+            QtGui.QMessageBox.warning(self.window, "Data Source Problem",
+                                      '\n- Data Source is Read-Only\n',
+                        QtGui.QMessageBox.Cancel, QtGui.QMessageBox.NoButton,
+                        QtGui.QMessageBox.NoButton)
 
 
     def no_data_source_selected(self):
