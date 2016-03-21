@@ -1112,9 +1112,6 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def change_allowed_unitcell_difference_percent(self,text):
-        print 'here'
-        print text
-        print int(text)
         self.allowed_unitcell_difference_percent=int(text)
         self.settings['unitcell_difference']=self.adjust_allowed_unit_cell_difference
 
