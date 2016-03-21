@@ -998,7 +998,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def open_config_file(self):
 #        file_name = QtGui.QFileDialog.getOpenFileName(self.window,'Open file', self.current_directory)
-        file_name = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Open file', self.current_directory,'*.pkl')
+        file_name = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Open file', self.current_directory,'*.conf')
 
         try:
             pickled_settings = pickle.load(open(file_name,"rb"))
@@ -1131,7 +1131,7 @@ class XChemExplorer(QtGui.QApplication):
 #            self.database_directory_label.setText(self.database_directory)
             self.settings['database_directory']=self.database_directory
         if self.sender().text()=='Select Data Source File':
-            filepath=str(QtGui.QFileDialog.getOpenFileName(self.window,'Select File', self.database_directory))
+            filepath=str(QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select File', self.database_directory,'*.sqlite'))
             self.data_source_file =   filepath.split('/')[-1]
             self.database_directory = filepath[:filepath.rfind('/')]
 #            self.database_directory_label.setText(str(self.database_directory))
@@ -1155,9 +1155,9 @@ class XChemExplorer(QtGui.QApplication):
 
         if self.sender().text()=='Select Existing\nCollection Summary File':
             if self.data_collection_summary_file != '':
-                filepath=str(QtGui.QFileDialog.getOpenFileName(self.window,'Select File', self.data_collection_summary_file[:self.data_collection_summary_file.rfind('/')]))
+                filepath=str(QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select File', self.data_collection_summary_file[:self.data_collection_summary_file.rfind('/')],'*.pkl'))
             else:
-                filepath=str(QtGui.QFileDialog.getOpenFileName(self.window,'Select File', os.getcwd()))
+                filepath=str(QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select File', os.getcwd(),'*.pkl'))
             self.data_collection_summary_file=filepath
             self.data_collection_summary_file_label.setText(self.data_collection_summary_file)
             self.settings['data_collection_summary']=self.data_collection_summary_file
