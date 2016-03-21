@@ -48,6 +48,7 @@ class XChemExplorer(QtGui.QApplication):
             self.reference_directory=os.path.join(self.project_directory,'processing','reference')
             self.database_directory=os.path.join(self.project_directory,'processing','database')
             self.data_source_file=''
+            self.data_collection_summary_file=os.path.join(self.database_directory,str(os.getcwd().split('/')[5])+'summary.pkl')
             if os.path.isfile(os.path.join(self.project_directory,'processing','lab36','soakDBDataFile.sqlite')):
                 self.data_source_file='soakDBDataFile.sqlite'
                 self.database_directory=os.path.join(self.project_directory,'processing','lab36')
@@ -98,6 +99,7 @@ class XChemExplorer(QtGui.QApplication):
         self.settings =     {'current_directory':       self.current_directory,
                              'project_directory':       self.project_directory,
                              'beamline_directory':      self.beamline_directory,
+                             'data_collection_summary': self.data_collection_summary_file,
                              'initial_model_directory': self.initial_model_directory,
                              'refine_model_directory':  self.refine_model_directory,
                              'panddas_directory':       self.panddas_directory,
@@ -748,6 +750,8 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_data_source_file.addWidget(create_new_data_source_button)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_data_source_file)
 
+        #################
+        # Data Collection
         self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nData Collection Directory'))
 
         settings_beamline_frame = QtGui.QFrame()
@@ -760,10 +764,16 @@ class XChemExplorer(QtGui.QApplication):
         settings_buttoon_beamline_directory=QtGui.QPushButton('Select Data Collection Directory')
         settings_buttoon_beamline_directory.clicked.connect(self.settings_button_clicked)
         settings_hbox_beamline_directory.addWidget(settings_buttoon_beamline_directory)
-
         settings_beamline_vbox.addLayout(settings_hbox_beamline_directory)
+
+        settings_hbox_data_collection_summary_file=QtGui.QHBoxLayout()
+        self.data_collection_summary_file_label=QtGui.QLabel(self.data_collection_summary_file)
+        settings_hbox_data_collection_summary_file.addWidget(self.data_collection_summary_file_label)
+        settings_beamline_vbox.addLayout(settings_hbox_data_collection_summary_file)
+
         settings_beamline_frame.setLayout(settings_beamline_vbox)
         self.data_collection_vbox_for_settings.addWidget(settings_beamline_frame)
+        #################
 
         self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nCCP4_SCR Directory:'))
         settings_hbox_ccp4_scratch_directory=QtGui.QHBoxLayout()
