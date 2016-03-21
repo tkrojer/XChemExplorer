@@ -1144,6 +1144,11 @@ class XChemExplorer(QtGui.QApplication):
                 file_name = QtGui.QFileDialog.getSaveFileName(self.window,'New file', self.data_collection_summary_file[:self.data_collection_summary_file.rfind('/')])
             else:
                 file_name = QtGui.QFileDialog.getSaveFileName(self.window,'New file', self.current_directory)
+            #make sure that the file always has .pkl extension
+            if file_name.rfind('.') != -1:
+                file_name=file_name[:file_name.rfind('.')]+'.pkl'
+            else:
+                file_name=file_name+'.sqlite'
             self.data_collection_summary_file=file_name
             self.data_collection_summary_file_label.setText(self.data_collection_summary_file)
             self.settings['data_collection_summary']=self.data_collection_summary_file
@@ -1189,7 +1194,7 @@ class XChemExplorer(QtGui.QApplication):
         if self.data_source_set==False:
             if self.sender().text()=="Create New Data\nSource (SQLite)":
                 file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
-                #make sure that the file always has .csv extension
+                #make sure that the file always has .sqlite extension
                 if file_name.rfind('.') != -1:
                     file_name=file_name[:file_name.rfind('.')]+'.sqlite'
                 else:
