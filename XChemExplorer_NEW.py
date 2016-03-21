@@ -1028,10 +1028,14 @@ class XChemExplorer(QtGui.QApplication):
                 self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
                 # this is probably not necessary
                 if os.path.isfile(self.settings['data_source']):
-                    self.data_source_set=True
                     write_enabled=self.check_write_permissions_of_data_source()
                     if not write_enabled:
                         self.data_source_set=False
+                    else:
+                        self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
+                        self.data_source_set=True
+
+
 
 #                    XChemDB.data_source(self.settings['data_source']).create_missing_columns()
 #                else:
@@ -1129,7 +1133,6 @@ class XChemExplorer(QtGui.QApplication):
             filepath=str(QtGui.QFileDialog.getOpenFileName(self.window,'Select File', self.database_directory))
             self.data_source_file =   filepath.split('/')[-1]
             self.database_directory = filepath[:filepath.rfind('/')]
-            self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
 #            self.database_directory_label.setText(str(self.database_directory))
             self.settings['database_directory']=self.database_directory
             self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
@@ -1138,6 +1141,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.data_source_set=False
             else:
                 self.data_source_set=True
+                self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
             XChemDB.data_source(self.settings['data_source']).create_missing_columns()
         if self.sender().text()=='Select Data Collection Directory':
             dir_name = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
