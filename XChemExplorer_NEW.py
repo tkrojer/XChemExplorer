@@ -84,8 +84,9 @@ class XChemExplorer(QtGui.QApplication):
             self.data_collection_summary_file=''
 
         self.preferences_data_to_copy = [
-            ['All Files in the respective auto-processing directory',   'everything'],
-            ['aimless logiles and merged mtz only',                     'mtz_log_only']
+            ['All Files in the respective auto-processing directory',           'everything'],
+            ['aimless logiles and merged mtz only',                             'mtz_log_only'],
+            ['aimless logiles and merged mtz of all auto-processing pipelines', 'mtz_log_of_all_pipelines']
                     ]
 
         self.preferences_selection_mechanism = [    'IsigI*Comp*UniqueRefl',
@@ -531,8 +532,7 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_input_params_vbox=QtGui.QVBoxLayout()
 
         pandda_input_dir_hbox=QtGui.QHBoxLayout()
-        self.pandda_input_data_dir_label=QtGui.QLabel('data directory')
-        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_input_data_dir_label)
+        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('data directory'))
         self.pandda_input_data_dir_entry = QtGui.QLineEdit()
         self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory,'*','Dimple','dimple'))
         self.pandda_input_data_dir_entry.setFixedWidth(400)
@@ -542,39 +542,58 @@ class XChemExplorer(QtGui.QApplication):
         pandda_input_dir_hbox.addWidget(self.select_pandda_input_dir_button)
         self.pandda_analyse_input_params_vbox.addLayout(pandda_input_dir_hbox)
 
-        self.pandda_output_dir_label=QtGui.QLabel('output directory')
-        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_output_dir_label)
+        pandda_pdb_style_hbox=QtGui.QHBoxLayout()
+        pandda_pdb_style_hbox.addWidget(QtGui.QLabel('pdb style'))
+        self.pandda_pdb_style_entry=QtGui.QLineEdit()
+        self.pandda_pdb_style_entry.setText('final.pdb')
+        self.pandda_pdb_style_entry.setFixedWidth(200)
+        pandda_pdb_style_hbox.addWidget(self.pandda_pdb_style_entry)
+        self.pandda_analyse_input_params_vbox.addLayout(pandda_pdb_style_hbox)
+
+        pandda_mtz_style_hbox=QtGui.QHBoxLayout()
+        pandda_mtz_style_hbox.addWidget(QtGui.QLabel('mtz style'))
+        self.pandda_mtz_style_entry=QtGui.QLineEdit()
+        self.pandda_mtz_style_entry.setText('final.mtz')
+        self.pandda_mtz_style_entry.setFixedWidth(200)
+        pandda_mtz_style_hbox.addWidget(self.pandda_mtz_style_entry)
+        self.pandda_analyse_input_params_vbox.addLayout(pandda_mtz_style_hbox)
+
+        pandda_output_dir_hbox=QtGui.QHBoxLayout()
+        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('output directory'))
         self.pandda_output_data_dir_entry = QtGui.QLineEdit()
         self.pandda_output_data_dir_entry.setText(self.panddas_directory)
-        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_output_data_dir_entry)
+        self.pandda_output_data_dir_entry.setFixedWidth(400)
+        pandda_output_dir_hbox.addWidget(self.pandda_output_data_dir_entry)
+        self.select_pandda_output_dir_button=QtGui.QPushButton("Select PANNDAs Directory")
+        self.select_pandda_output_dir_button.clicked.connect(self.settings_button_clicked)
+        pandda_output_dir_hbox.addWidget(self.select_pandda_output_dir_button)
+        self.pandda_analyse_input_params_vbox.addLayout(pandda_output_dir_hbox)
 
         # qstat or local machine
-        self.pandda_submission_mode_label=QtGui.QLabel('submit')
-        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_submission_mode_label)
+        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('submit'))
         self.pandda_submission_mode_selection_combobox = QtGui.QComboBox()
         self.pandda_submission_mode_selection_combobox.addItem('local machine')
         if self.external_software['qsub']:
             self.pandda_submission_mode_selection_combobox.addItem('qsub')
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_submission_mode_selection_combobox)
 
-        self.pandda_nproc_label=QtGui.QLabel('number of processors')
-        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_nproc_label)
+        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('number of processors'))
         self.pandda_nproc=multiprocessing.cpu_count()-1
         self.pandda_nproc_entry = QtGui.QLineEdit()
         self.pandda_nproc_entry.setText(str(self.pandda_nproc).replace(' ',''))
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_nproc_entry)
 
         # run pandda on specific crystalform only
-        self.pandda_analyse_crystal_from_label=QtGui.QLabel('Use Specific Crystal Form Only')
-        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_analyse_crystal_from_label)
+        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('Use Specific Crystal Form Only'))
         self.pandda_analyse_crystal_from_selection_combobox = QtGui.QComboBox()
         self.pandda_analyse_crystal_from_selection_combobox.currentIndexChanged.connect(self.pandda_analyse_crystal_from_selection_combobox_changed)
         self.update_pandda_crystal_from_combobox()
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_analyse_crystal_from_selection_combobox)
 
+        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('\n\n\nExpert Parameters (need rarely changing):\n'))
+
         # minimum number of datasets
-        self.pandda_min_build_dataset_label=QtGui.QLabel('min_build_datasets')
-        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_min_build_dataset_label)
+        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('min_build_datasets'))
         self.pandda_min_build_dataset_entry = QtGui.QLineEdit()
         self.pandda_min_build_dataset_entry.setText('40')
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_min_build_dataset_entry)
@@ -1112,17 +1131,32 @@ class XChemExplorer(QtGui.QApplication):
         self.window.move((screen.width()-size.width())/2, (screen.height()-size.height())/2)
 
     def select_pandda_input_template(self):
-        filepath_temp=QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select Example MTZ File', self.database_directory,'*.mtz')
+        filepath_temp=QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select Example PDB or MTZ File', self.initial_model_directory,'*.pdb;;*.mtz')
         filepath=str(tuple(filepath_temp)[0])
-        mtzin=filepath.split('/')[-1]
-        subdir=os.path.join(*filepath.split('/')[len(self.initial_model_directory.split('/'))+1:len(filepath.split('/'))-1])
-        print 'mtzin',mtzin,'subdir',subdir
-        # check if more than min_build_dataset exist in spefified directories
-        print 'cc',os.path.join(self.initial_model_directory,'*',subdir,mtzin)
-        for file in glob.glob(os.path.join(self.initial_model_directory,'*',subdir,mtzin)):
-            print file
-#        self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory,'*',subdir))
-
+        pdbin=filepath.split('/')[-1]
+        if filepath.endswith('.pdb'):
+            pdbin=filepath.split('/')[-1]
+            mtzin_temp=pdbin.replace('.pdb','.mtz')
+            if os.path.isfile(filepath.replace(pdbin,mtzin_temp)):
+                mtzin=mtzin_temp
+            else:
+                mtzin=''
+        if filepath.endswith('.mtz'):
+            mtzin=filepath.split('/')[-1]
+            pdbin_temp=pdbin.replace('.mtz','.pdb')
+            if os.path.isfile(filepath.replace(mtzin,pdbin_temp)):
+                pdbin=pdbin_temp
+            else:
+                pdbin=''
+        if len(filepath.split('/'))-len(self.initial_model_directory.split('/'))==2:
+            self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory,'*'))
+        elif len(filepath.split('/'))-len(self.initial_model_directory.split('/')) > 2:
+            subdir=os.path.join(*filepath.split('/')[len(self.initial_model_directory.split('/'))+1:len(filepath.split('/'))-1])
+            self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory,'*',subdir))
+        else:
+            pass
+        self.pandda_pdb_style_entry.setText(pdbin)
+        self.pandda_mtz_style_entry.setText(mtzin)
 
     def settings_button_clicked(self):
 #        if self.sender().text()=='Select Project Directory':
@@ -1557,7 +1591,8 @@ class XChemExplorer(QtGui.QApplication):
                     'submit_mode':          str(self.pandda_submission_mode_selection_combobox.currentText()),
                     'nproc':                str(self.pandda_nproc_entry.text()),
                     'xtalform':             str(self.pandda_analyse_crystal_from_selection_combobox.currentText()),
-                    'min_build_datasets':   str(self.pandda_min_build_dataset_entry.text())
+                    'min_build_datasets':   str(self.pandda_min_build_dataset_entry.text()),
+                    'pdb_style':            str(self.pandda_pdb_style_entry.text())
                         }
             print pandda_params
             self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params)
@@ -2420,5 +2455,19 @@ class XChemExplorer(QtGui.QApplication):
 
 
 if __name__ == "__main__":
+#    print '\n\n\n'
+#    print '     ######################################################################'
+#    print '     #                                                                    #'
+#    print '     # XCHEMEXPLORER - multi dataset analysis                             #'
+#    print '     #                                                                    #'
+#    print '     # Version: 0.1                                                       #'
+#    print '     #                                                                    #'
+#    print '     # Date:                                                              #'
+#    print '     #                                                                    #'
+#    print '     # Author: Tobias Krojer, Structural Genomics Consortium, Oxford, UK  #'
+#    print '     #         tobias.krojer@sgc.ox.ac.uk                                 #'
+#    print '     #                                                                    #'
+#    print '     ######################################################################'
+#    print '\n\n\n'
     app=XChemExplorer(sys.argv[1:])
 

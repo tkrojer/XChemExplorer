@@ -1,7 +1,7 @@
 import os, sys, glob
 from datetime import datetime
 from PyQt4 import QtGui, QtCore
-
+from XChemUtils import mtztools
 
 class run_pandda_analyse(QtCore.QThread):
 
@@ -15,6 +15,8 @@ class run_pandda_analyse(QtCore.QThread):
         else:
             self.nproc='7'
         self.min_build_datasets=pandda_params['min_build_datasets']
+        self.pdb_style=pandda_params['pdb_style']
+        self.mtz_style=pandda_params['mtz_style']
 
     def run(self):
         if os.path.isfile(os.path.join(self.panddas_directory,'pandda.running')):
@@ -35,19 +37,89 @@ class run_pandda_analyse(QtCore.QThread):
                 '\n'
                 'cd '+self.panddas_directory+'\n'
                 '\n'
-                'pandda.analyse data_dirs="'+self.data_directory+'"'
-                ' pdb_style=final.pdb out_dir='+self.panddas_directory+
+                'pandda.analyse '
+                ' data_dirs="'+self.data_directory+'"'
+                ' out_dir='+self.panddas_directory+
                 ' min_build_datasets='+self.min_build_datasets+
                 ' maps.ampl_label=FWT maps.phas_label=PHWT'
-                ' cpus='+self.nproc+'\n'
+                ' cpus='+self.nproc+
+                ' pdb_style='+self.pdb_style+
+                ' mtz_style='+self.mtz_style+'\n'
                 )
             print Cmds
-            f = open('pandda.sh','w')
-            f.write(Cmds)
-            f.close()
-            if self.submit_mode=='local machine':
-                os.system('chmod +x pandda.sh')
-                os.system('./pandda.sh &')
-            else:
-                os.system('qsub pandda.sh')
 
+#            f = open('pandda.sh','w')
+#            f.write(Cmds)
+#            f.close()
+#            if self.submit_mode=='local machine':
+#                os.system('chmod +x pandda.sh')
+#                os.system('./pandda.sh &')
+#            else:
+#                os.system('qsub pandda.sh')
+
+class check_if_pandda_can_run:
+
+    # reasons why pandda cannot be run
+    # - there is currently a job running in the pandda directory
+    # - min datasets available is too low
+    # - required input paramters are not complete
+    # - map amplitude and phase labels don't exist
+
+    def __init__(self,pandda_params):
+        self.data_directory=pandda_params['data_dir']
+        self.panddas_directory=pandda_params['out_dir']
+        self.min_build_datasets=pandda_params['min_build_datasets']
+        self.pdb_style=pandda_params['pdb_style']
+        self.mtz_style=pandda_params['mtz_style']
+
+        self.problem_found=False
+        self.error_code=-1
+
+    def analyse_pdb_style(self):
+        pdb_found=False
+        for file in glob.glob(os.path.join(self.data_directory,self.pdb_style)):
+            if os.path.isfile(file):
+                pdb_found=True
+                break
+        if not pdb_found:
+            self.error_code=1
+            message=self.warning_messages()
+        return message
+
+    def analyse_mtz_style(self):
+        mtz_found=False
+        for file in glob.glob(os.path.join(self.data_directory,self.mtz_style)):
+            if os.path.isfile(file):
+                mtz_found=True
+                break
+        if not mtz_found:
+            self.error_code=2
+            message=self.warning_messages()
+        return message
+
+    def analyse_min_build_dataset(self):
+        counter=0
+        for file in glob.glob(os.path.join(self.data_directory,self.mtz_style)):
+            if os.path.isfile(file):
+                counter+=1
+        if counter <= self.min_build_datasets:
+            self.error_code=3
+            message=self.warning_messages()
+        return message
+
+#    def analyse_amplitude_and_phase_labels(self):
+
+
+#    def analyse_all_input_parameter(self):
+#        print 'hallo'
+
+    def warning_messages(self):
+        message=''
+        if self.error_code==1:
+            message='PDB file does not exist'
+        if self.error_code==2:
+            message='MTZ file does not exist'
+        if self.error_code==3:
+            message='Not enough datasets available'
+
+        return message

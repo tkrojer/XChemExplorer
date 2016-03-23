@@ -861,6 +861,35 @@ class mtztools:
 
         return mtz
 
+    def get_all_columns_as_dict(self):
+        column_dict = { 'F':        [],
+                        'I':        [],
+                        'SIG':      [],
+                        'PHS':      [],
+                        'FOM':      [],
+                        'RFREE':    []  }
+        startline=1000000
+        mtzdmp=subprocess.Popen(['mtzdmp',self.mtzfile],stdout=subprocess.PIPE)
+        for n,line in enumerate(iter(mtzdmp.stdout.readline,'')):
+            if line.startswith(' Col Sort    Min    Max    Num'):
+                startline=n+2
+            if n >= startline and len(line.split()) > 10:
+                if line.split()[10] == 'F':
+                    column_dict['F'].append(line.split()[11])
+                if line.split()[10] == 'J':
+                    column_dict['I'].append(line.split()[11])
+                if line.split()[10] == 'Q':
+                    column_dict['SIG'].append(line.split()[11])
+                if line.split()[10] == 'I':
+                    column_dict['RFREE'].append(line.split()[11])
+                if line.split()[10] == 'P':
+                    column_dict['PHS'].append(line.split()[11])
+                if line.split()[10] == 'W':
+                    column_dict['FOM'].append(line.split()[11])
+
+        return column_dict
+
+
 class queue:
 
     def jobs_in_queue(self):

@@ -613,9 +613,6 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
             path_to_dimple_pdbfile=db_dict['DataProcessingPathToDimplePDBfile']
             path_to_dimple_mtzfile=db_dict['DataProcessingPathToDimpleMTZfile']
 
-            print sample,visit,run,autoproc
-            print 'dimple',path_to_dimple_pdbfile,path_to_dimple_mtzfile
-
             # create all the directories if necessary
             if not os.path.isdir(os.path.join(self.initial_model_directory,sample)):
                 os.mkdir(os.path.join(self.initial_model_directory,sample))
@@ -631,75 +628,108 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
                     os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple',visit+'-'+run+autoproc))
                 dimple_destination=os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple',visit+'-'+run+autoproc)
 
-            os.chdir(os.path.join(self.initial_model_directory,sample,'autoprocessing',visit+'-'+run+autoproc))
-
             if self.processed_data_to_copy=='mtz_log_only':
-                # don't do anything if file already exists
-                if not os.path.isfile(mtz_filename):
-                    os.system('/bin/cp '+path_to_logfile+' .')
-                    os.system('/bin/cp '+path_to_mtzfile+' .')
-                    if 'fast_dp.mtz' in path_to_mtzfile:
-                        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running ctruncate on fast_dp output of '+sample)
-                        os.system("ctruncate -hklin fast_dp.mtz "
-                                  "-hklout ctruncate.mtz -colin '/*/*/[IMEAN,SIGIMEAN]' "
-                                  "> ctruncate.log")
-                # in case the user copied the results from several data processing pipelines and just wants to
-                # set the current one
-                path_to_logfile=os.path.join('autoprocessing',visit+'-'+run+autoproc)
-                path_to_mtzfile=os.path.join('autoprocessing',visit+'-'+run+autoproc)
-                if 'fast_dp' in path_to_mtzfile:
-                    mtz_filename='ctruncate.mtz'
+                path_to_logfile,path_to_mtzfile,mtz_filename=self.copy_mtz_and_logfiles_only(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile)
+                self.link_mtz_log_files_to_sample_directory(sample,autoproc,path_to_procdir,path_to_logfile,path_to_mtzfile)
+                self.copy_and_link_selected_dimple_files(dimple_destination,sample,path_to_dimple_mtzfile,path_to_dimple_pdbfile)
 
             elif self.processed_data_to_copy=='everything':
-                # in this case, ignore if directory already exists
-                if not os.path.isdir(autoproc):
-                    os.system('/bin/cp -Rf '+path_to_procdir+' .')
-                    if 'fast_dp' in path_to_mtzfile:
-                        os.chdir('fast_dp')
-                        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running ctruncate on fast_dp output of '+sample)
-                        os.system("ctruncate -hklin fast_dp.mtz "
-                                  "-hklout ctruncate.mtz -colin '/*/*/[IMEAN,SIGIMEAN]' "
-                                  "> ctruncate.log")
-                if 'xia2' in path_to_logfile:
-                    print 'before',path_to_mtzfile
-                    path_to_logfile=os.path.join('autoprocessing',visit+'-'+run+autoproc)+'/'+ '/'.join(path_to_logfile.split('/')[len(path_to_logfile.split('/'))-3:len(path_to_logfile.split('/'))-1])
-                    path_to_mtzfile=os.path.join('autoprocessing',visit+'-'+run+autoproc)+'/'+ '/'.join(path_to_mtzfile.split('/')[len(path_to_mtzfile.split('/'))-3:len(path_to_mtzfile.split('/'))-1])
-                    print 'after',path_to_mtzfile
-                elif 'fast_dp' in path_to_logfile:
-                    path_to_logfile=os.path.join('autoprocessing',visit+'-'+run+autoproc,'fast_dp')
-                    path_to_mtzfile=os.path.join('autoprocessing',visit+'-'+run+autoproc,'fast_dp')
-                    mtz_filename='ctruncate.mtz'
-                elif 'autoPROC' in path_to_logfile:
-                    path_to_logfile=os.path.join('autoprocessing',visit+'-'+run+autoproc,'autoPROC','ap-run')
-                    path_to_mtzfile=os.path.join('autoprocessing',visit+'-'+run+autoproc,'autoPROC','ap-run')
+                path_to_logfile,path_to_mtzfile,mtz_filename=self.copy_complete_autoprocessing_folder(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile)
+                self.link_mtz_log_files_to_sample_directory(sample,autoproc,path_to_procdir,path_to_logfile,path_to_mtzfile)
+                self.copy_and_link_selected_dimple_files(dimple_destination,sample,path_to_dimple_mtzfile,path_to_dimple_pdbfile)
 
-            # move up to sample directory and link respective files
-            # first remove any old symbolic links
-            os.chdir(os.path.join(self.initial_model_directory,sample))
-            if os.path.islink(os.path.join(self.initial_model_directory,sample,sample+'.mtz')):
-                os.system('/bin/rm '+os.path.join(self.initial_model_directory,sample,sample+'.mtz'))
-            if os.path.islink(os.path.join(self.initial_model_directory,sample,sample+'.log')):
-                os.system('/bin/rm '+os.path.join(self.initial_model_directory,sample,sample+'.log'))
-            os.symlink(os.path.join(path_to_mtzfile,mtz_filename),sample+'.mtz')
-            os.symlink(os.path.join(path_to_logfile,log_filename),sample+'.log')
-
-            # dimple files
-            if dimple_destination != '':
-                if os.path.islink(os.path.join(self.initial_model_directory,sample,'refine.mtz')):
-                    os.system('/bin/rm '+os.path.join(self.initial_model_directory,sample,'refine.mtz'))
-                if os.path.islink(os.path.join(self.initial_model_directory,sample,'refine.pdb')):
-                    os.system('/bin/rm '+os.path.join(self.initial_model_directory,sample,'refine.pdb'))
-                os.system('/bin/cp '+path_to_dimple_mtzfile+' '+dimple_destination)
-                os.system('/bin/cp '+path_to_dimple_pdbfile+' '+dimple_destination)
-                os.symlink(os.path.join(dimple_destination,'final.pdb'),'refine.pdb')
-                os.symlink(os.path.join(dimple_destination,'final.mtz'),'refine.mtz')
+            elif self.processed_data_to_copy=='mtz_log_of_all_pipelines':
+                for entry in self.data_collection_dict[sample]:
+                    if entry[0]=='logfile':
+                        db_dict=entry[6]
+                        path_to_procdir=db_dict['DataProcessingDirectoryOriginal']
+                        path_to_logfile=db_dict['DataProcessingPathToLogfile']
+                        path_to_mtzfile=db_dict['DataProcessingPathToMTZfile']
+                        mtz_filename=db_dict['DataProcessingMTZfileName']
+                        log_filename=db_dict['DataProcessingLOGfileName']
+                        dimple_destination=''
+                        path_to_dimple_pdbfile=db_dict['DataProcessingPathToDimplePDBfile']
+                        path_to_dimple_mtzfile=db_dict['DataProcessingPathToDimpleMTZfile']
+                        print entry
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
         self.emit(QtCore.SIGNAL("finished()"))
 
+    def copy_and_link_selected_dimple_files(self,dimple_destination,sample,path_to_dimple_mtzfile,path_to_dimple_pdbfile):
+        # dimple files
+        if dimple_destination != '':
+            if os.path.islink(os.path.join(self.initial_model_directory,sample,'refine.mtz')):
+                os.system('/bin/rm '+os.path.join(self.initial_model_directory,sample,'refine.mtz'))
+            if os.path.islink(os.path.join(self.initial_model_directory,sample,'refine.pdb')):
+                os.system('/bin/rm '+os.path.join(self.initial_model_directory,sample,'refine.pdb'))
+            os.system('/bin/cp '+path_to_dimple_mtzfile+' '+dimple_destination)
+            os.system('/bin/cp '+path_to_dimple_pdbfile+' '+dimple_destination)
+            os.symlink(os.path.join(dimple_destination,'final.pdb'),'refine.pdb')
+            os.symlink(os.path.join(dimple_destination,'final.mtz'),'refine.mtz')
 
+
+    def link_mtz_log_files_to_sample_directory(self,sample,autoproc,path_to_procdir,path_to_logfile,path_to_mtzfile):
+        # move up to sample directory and link respective files
+        # first remove any old symbolic links
+        os.chdir(os.path.join(self.initial_model_directory,sample))
+        if os.path.islink(os.path.join(self.initial_model_directory,sample,sample+'.mtz')):
+            os.system('/bin/rm '+os.path.join(self.initial_model_directory,sample,sample+'.mtz'))
+        if os.path.islink(os.path.join(self.initial_model_directory,sample,sample+'.log')):
+            os.system('/bin/rm '+os.path.join(self.initial_model_directory,sample,sample+'.log'))
+        os.symlink(os.path.join('autoprocessing',visit+'-'+run+autoproc,autoproc,sample+'.mtz'),sample+'.mtz')
+        os.symlink(os.path.join('autoprocessing',visit+'-'+run+autoproc,autoproc,sample+'.log'),sample+'.log')
+
+    def copy_mtz_and_logfiles_only(self,sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename):
+        os.chdir(os.path.join(self.initial_model_directory,sample,'autoprocessing',visit+'-'+run+autoproc))
+        # don't do anything if file already exists
+        if not os.path.isfile(mtz_filename):
+            os.system('/bin/cp '+path_to_logfile+' .')
+            os.system('/bin/cp '+path_to_mtzfile+' .')
+            if 'fast_dp.mtz' in path_to_mtzfile:
+                self.run_ctruncate(sample)
+        # in case the user copied the results from several data processing pipelines and just wants to
+        # set the current one
+        path_to_logfile=os.path.join('autoprocessing',visit+'-'+run+autoproc)
+        path_to_mtzfile=os.path.join('autoprocessing',visit+'-'+run+autoproc)
+        if 'fast_dp' in path_to_mtzfile:
+            mtz_filename='ctruncate.mtz'
+        return path_to_logfile,path_to_mtzfile,mtz_filename
+
+    def copy_complete_autoprocessing_folder(self,sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename):
+        os.chdir(os.path.join(self.initial_model_directory,sample,'autoprocessing',visit+'-'+run+autoproc))
+        # in this case, ignore if directory already exists
+        if not os.path.isdir(autoproc):
+            os.system('/bin/cp -Rf '+path_to_procdir+' .')
+            if 'xia2' in path_to_logfile:
+#                path_to_logfile=os.path.join('autoprocessing',visit+'-'+run+autoproc)+'/'+ '/'.join(path_to_logfile.split('/')[len(path_to_logfile.split('/'))-3:len(path_to_logfile.split('/'))-1])
+#                path_to_mtzfile=os.path.join('autoprocessing',visit+'-'+run+autoproc)+'/'+ '/'.join(path_to_mtzfile.split('/')[len(path_to_mtzfile.split('/'))-3:len(path_to_mtzfile.split('/'))-1])
+                path_to_logfile='./'+'/'.join(path_to_logfile.split('/')[len(path_to_logfile.split('/'))-3:len(path_to_logfile.split('/'))-1])
+                path_to_mtzfile='./'+'/'.join(path_to_mtzfile.split('/')[len(path_to_mtzfile.split('/'))-3:len(path_to_mtzfile.split('/'))-1])
+            elif 'fast_dp' in path_to_logfile:
+                os.chdir('fast_dp')
+                self.run_ctruncate(sample)
+                os.chdir(os.path.join(self.initial_model_directory,sample,'autoprocessing',visit+'-'+run+autoproc))
+#                path_to_logfile=os.path.join('autoprocessing',visit+'-'+run+autoproc,'fast_dp')
+#                path_to_mtzfile=os.path.join('autoprocessing',visit+'-'+run+autoproc,'fast_dp')
+                path_to_logfile=os.path.join('./','fast_dp')
+                path_to_mtzfile=os.path.join('./','fast_dp')
+                mtz_filename='ctruncate.mtz'
+            elif 'autoPROC' in path_to_logfile:
+                path_to_logfile=os.path.join('./','autoPROC','ap-run')
+                path_to_mtzfile=os.path.join('./','autoPROC','ap-run')
+
+            os.symlink(os.path.join(path_to_mtzfile,mtz_filename),sample+'.mtz')
+            os.symlink(os.path.join(path_to_logfile,log_filename),sample+'.log')
+
+        return path_to_logfile,path_to_mtzfile,mtz_filename
+
+    def run_ctruncate(self,sample):
+        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running ctruncate on fast_dp output of '+sample)
+        os.system("ctruncate -hklin fast_dp.mtz "
+                            "-hklout ctruncate.mtz -colin '/*/*/[IMEAN,SIGIMEAN]' "
+                            "> ctruncate.log")
 
 class read_autoprocessing_results_from_disc(QtCore.QThread):
     def __init__(self,visit_list,target,reference_file_list,database_directory):
