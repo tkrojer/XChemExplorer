@@ -135,7 +135,7 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_summary_dict={}
         self.main_data_collection_table_exists=False
         self.timer_to_check_for_new_data_collection = QtCore.QTimer()
-        self.timer_to_check_for_new_data_collection.timeout.connect(self.test_timer)
+        self.timer_to_check_for_new_data_collection.timeout.connect(self.check_for_new_autoprocessing)
 
         # command line arguments
 #        try:
@@ -2201,15 +2201,15 @@ class XChemExplorer(QtGui.QApplication):
 
     def continously_check_for_new_data_collection(self,state):
         if state == QtCore.Qt.Checked:
-            print 'timer start'
+            print '==> checking automatically every 120s for new data collection'
             self.timer_to_check_for_new_data_collection.start(120000)
         else:
             print 'timer stop'
             self.timer_to_check_for_new_data_collection.stop()
 
-    def test_timer(self):
-        print '==> XCE: checking for new data collection'
-        self.check_for_new_autoprocessing()
+#    def test_timer(self):
+#        print '==> XCE: checking for new data collection'
+#        self.check_for_new_autoprocessing()
 
     def populate_data_collection_summary_table(self):
         row = self.data_collection_summary_table.rowCount()
