@@ -1,5 +1,5 @@
 import os, sys, glob
-import getopt
+#import getopt
 from datetime import datetime
 
 # diffraction image viewing only possible at DLS
@@ -134,51 +134,53 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_column_three_dict={}
         self.data_collection_summary_dict={}
         self.main_data_collection_table_exists=False
+        self.timer_to_check_for_new_data_collection = QtCore.QTimer()
+        self.timer_to_check_for_new_data_collection.timeout.connect(self.test_timer)
 
         # command line arguments
-        try:
-            opts, args = getopt.getopt(sys.argv[1:], "hc:b:d:", ["help", "config=","beamline=","datasource="])
-        except getopt.GetoptError:
-            print 'Sorry, command line option does not exist'
-            sys.exit()
-        for o, a in opts:
-            if o in ("-h", "--help"):
-                print 'avail able command line options:'
-                print '-c,--config:     config file'
-                print '-b,--beamline:   beamline directory'
-                print '-d,--datasource: data source file'
-                sys.exit()
-            elif o in ("-c", "--config"):
-                pickled_settings = pickle.load(open(os.path.abspath(a),"rb"))
-                self.beamline_directory=pickled_settings['beamline_directory']
-                self.settings['beamline_directory']=self.beamline_directory
-                self.initial_model_directory=pickled_settings['initial_model_directory']
-                self.settings['initial_model_directory']=self.initial_model_directory
-                self.database_directory=pickled_settings['database_directory']
-                self.settings['database_directory']=self.database_directory
-                self.data_source_file=pickled_settings['data_source']
-                self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
-                if os.path.isfile(self.settings['data_source']):
-                    XChemDB.data_source(self.settings['data_source']).create_missing_columns()
-                    self.data_source_set=True
-                else:       # in case just an empty file was specified
-                    XChemDB.data_source(self.settings['data_source']).create_empty_data_source_file()
-                    self.data_source_set=True
-                self.ccp4_scratch_directory=pickled_settings['ccp4_scratch']
-                self.settings['ccp4_scratch']=self.ccp4_scratch_directory
-                self.allowed_unitcell_difference_percent=pickled_settings['unitcell_difference']
-            elif o in ("-b", "--beamline"):
-                self.beamline_directory=os.path.abspath(a)
-            elif o in ("-d", "--datasource"):
-                tmp=os.path.abspath(a)
-                self.database_directory=tmp[:tmp.rfind('/')]
-                self.data_source_file=tmp[tmp.rfind('/')+1:]
-                self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
-                if os.path.isfile(self.settings['data_source']):
-                    XChemDB.data_source(self.settings['data_source']).create_missing_columns()
-                else:
-                    XChemDB.data_source(self.settings['data_source']).create_empty_data_source_file()
-                self.data_source_set=True
+#        try:
+#            opts, args = getopt.getopt(sys.argv[1:], "hc:b:d:", ["help", "config=","beamline=","datasource="])
+#        except getopt.GetoptError:
+#            print 'Sorry, command line option does not exist'
+#            sys.exit()
+#        for o, a in opts:
+#            if o in ("-h", "--help"):
+#                print 'avail able command line options:'
+#                print '-c,--config:     config file'
+#                print '-b,--beamline:   beamline directory'
+#                print '-d,--datasource: data source file'
+#                sys.exit()
+#            elif o in ("-c", "--config"):
+#                pickled_settings = pickle.load(open(os.path.abspath(a),"rb"))
+#                self.beamline_directory=pickled_settings['beamline_directory']
+#                self.settings['beamline_directory']=self.beamline_directory
+#                self.initial_model_directory=pickled_settings['initial_model_directory']
+#                self.settings['initial_model_directory']=self.initial_model_directory
+#                self.database_directory=pickled_settings['database_directory']
+#                self.settings['database_directory']=self.database_directory
+#                self.data_source_file=pickled_settings['data_source']
+#                self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
+#                if os.path.isfile(self.settings['data_source']):
+#                    XChemDB.data_source(self.settings['data_source']).create_missing_columns()
+#                    self.data_source_set=True
+#                else:       # in case just an empty file was specified
+#                    XChemDB.data_source(self.settings['data_source']).create_empty_data_source_file()
+#                    self.data_source_set=True
+#                self.ccp4_scratch_directory=pickled_settings['ccp4_scratch']
+#                self.settings['ccp4_scratch']=self.ccp4_scratch_directory
+#                self.allowed_unitcell_difference_percent=pickled_settings['unitcell_difference']
+#            elif o in ("-b", "--beamline"):
+#                self.beamline_directory=os.path.abspath(a)
+#            elif o in ("-d", "--datasource"):
+#                tmp=os.path.abspath(a)
+#                self.database_directory=tmp[:tmp.rfind('/')]
+#                self.data_source_file=tmp[tmp.rfind('/')+1:]
+#                self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
+#                if os.path.isfile(self.settings['data_source']):
+#                    XChemDB.data_source(self.settings['data_source']).create_missing_columns()
+#                else:
+#                    XChemDB.data_source(self.settings['data_source']).create_empty_data_source_file()
+#                self.data_source_set=True
 
 
         self.target_list,self.visit_list=self.get_target_and_visit_list()
@@ -331,6 +333,11 @@ class XChemExplorer(QtGui.QApplication):
         self.dls_data_collection_vbox=QtGui.QVBoxLayout()
         self.tab_dict['DLS @ Data Collection'][1].addLayout(self.dls_data_collection_vbox)
 
+        check_for_new_data_collection = QtGui.QCheckBox('Check for new data collection every two minutes')
+        check_for_new_data_collection.toggle()
+        check_for_new_data_collection.setChecked(False)
+        check_for_new_data_collection.stateChanged.connect(self.continously_check_for_new_data_collection)
+        self.dls_data_collection_vbox.addWidget(check_for_new_data_collection)
 
         dls_tab_widget = QtGui.QTabWidget()
         dls_tab_list = [ 'Summary',
@@ -1290,23 +1297,25 @@ class XChemExplorer(QtGui.QApplication):
                 pass
 
 
+        if self.sender().text()=='Get New Results from Autoprocessing':
+            self.check_for_new_autoprocessing()
 
-        if self.explorer_active==0 and self.data_source_set==True \
-            and self.sender().text()=='Get New Results from Autoprocessing':
-            self.work_thread=XChemThread.NEW_read_autoprocessing_results_from_disc(self.visit_list,
-                                                                               self.target,
-                                                                               self.reference_file_list,
-                                                                               self.database_directory,
-                                                                               self.data_collection_dict,
-                                                                               self.preferences,
-                                                                               self.data_collection_summary_file )
-            self.explorer_active=1
-            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-            self.connect(self.work_thread, QtCore.SIGNAL("create_widgets_for_autoprocessing_results"),
-                                                     self.create_widgets_for_autoprocessing_results)
-            self.work_thread.start()
+#        if self.explorer_active==0 and self.data_source_set==True \
+#            and self.sender().text()=='Get New Results from Autoprocessing':
+#            self.work_thread=XChemThread.NEW_read_autoprocessing_results_from_disc(self.visit_list,
+#                                                                               self.target,
+#                                                                               self.reference_file_list,
+#                                                                               self.database_directory,
+#                                                                               self.data_collection_dict,
+#                                                                               self.preferences,
+#                                                                               self.data_collection_summary_file )
+#            self.explorer_active=1
+#            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+#            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+#            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#            self.connect(self.work_thread, QtCore.SIGNAL("create_widgets_for_autoprocessing_results"),
+#                                                     self.create_widgets_for_autoprocessing_results)
+#            self.work_thread.start()
 
         elif self.explorer_active==0 and self.data_source_set==True \
             and self.sender().text()=="Save Files from Autoprocessing in 'inital_model' Folder" \
@@ -1628,6 +1637,24 @@ class XChemExplorer(QtGui.QApplication):
             print '==> XCE: exporting pandda models with pandda.export'
             os.system('pandda.export pandda_dir="'+self.panddas_directory+'" out_dir="'+self.initial_model_directory+'"')
 
+
+
+    def check_for_new_autoprocessing(self):
+        if self.explorer_active==0 and self.data_source_set==True:
+            self.work_thread=XChemThread.NEW_read_autoprocessing_results_from_disc(self.visit_list,
+                                                                               self.target,
+                                                                               self.reference_file_list,
+                                                                               self.database_directory,
+                                                                               self.data_collection_dict,
+                                                                               self.preferences,
+                                                                               self.data_collection_summary_file )
+            self.explorer_active=1
+            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.connect(self.work_thread, QtCore.SIGNAL("create_widgets_for_autoprocessing_results"),
+                                                     self.create_widgets_for_autoprocessing_results)
+            self.work_thread.start()
 
 
 
@@ -2172,7 +2199,17 @@ class XChemExplorer(QtGui.QApplication):
             for key in self.initial_model_dimple_dict:
                 self.initial_model_dimple_dict[key][0].setChecked(False)
 
+    def continously_check_for_new_data_collection(self,state):
+        if state == QtCore.Qt.Checked:
+            print 'timer start'
+            self.timer_to_check_for_new_data_collection.start(120000)
+        else:
+            print 'timer stop'
+            self.timer_to_check_for_new_data_collection.stop()
 
+    def test_timer(self):
+        print '==> XCE: checking for new data collection'
+        self.check_for_new_autoprocessing()
 
     def populate_data_collection_summary_table(self):
         row = self.data_collection_summary_table.rowCount()
