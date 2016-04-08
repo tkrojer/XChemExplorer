@@ -635,7 +635,7 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
                 self.copy_and_link_selected_dimple_files(dimple_destination,sample,path_to_dimple_mtzfile,path_to_dimple_pdbfile)
 
             elif self.processed_data_to_copy=='everything':
-                path_to_logfile,path_to_mtzfile,mtz_filename=self.copy_complete_autoprocessing_folder(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename)
+                path_to_logfile,path_to_mtzfile,mtz_filename,log_filename=self.copy_complete_autoprocessing_folder(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename)
                 self.link_mtz_log_files_to_sample_directory(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename)
                 self.copy_and_link_selected_dimple_files(dimple_destination,sample,path_to_dimple_mtzfile,path_to_dimple_pdbfile)
 
@@ -726,7 +726,13 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
             os.symlink(os.path.join(path_to_mtzfile,mtz_filename),sample+'.mtz')
             os.symlink(os.path.join(path_to_logfile,log_filename),sample+'.log')
 
-        return path_to_logfile,path_to_mtzfile,mtz_filename
+        # since all mtz/log files are already linked  as <sample>.mtz/log in visit+'-'+run+autoproc directory
+        path_to_mtzfile=os.path.join(self.initial_model_directory,sample,'autoprocessing',visit+'-'+run+autoproc)
+        mtz_filename=sample+'.mtz'
+        path_to_logfile=os.path.join(self.initial_model_directory,sample,'autoprocessing',visit+'-'+run+autoproc)
+        log_filename=sample+'.log'
+
+        return path_to_logfile,path_to_mtzfile,mtz_filename,log_filename
 
     def run_ctruncate(self,sample):
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running ctruncate on fast_dp output of '+sample)
