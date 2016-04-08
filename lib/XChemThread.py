@@ -1086,7 +1086,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
         ############################################################################################
         # STAGE 2:
-        # if possible, select only the ones with Rmerge < 5%
+        # if possible, select only the ones with Rmerge < 10%
         select_stage_two_list=[]
         tmp=[]
         for index in select_stage_one_list:
@@ -1096,7 +1096,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                 if len(entry)==9 and entry[0]=='logfile':
                     if isinstance(entry[6],dict):
                         try:
-                            if float(entry[6]['DataProcessingRmergeLow']) < 0.05 and entry[7]==index:
+                            if float(entry[6]['DataProcessingRmergeLow']) < 0.1 and entry[7]==index:
                                 select_stage_two_list.append(index)
                                 found=True
                         except ValueError:
