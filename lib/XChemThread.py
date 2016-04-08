@@ -379,7 +379,6 @@ class read_intial_refinement_results(QtCore.QThread):
                 if os.path.isfile(os.path.join(self.initial_model_directory,sample,str(compoundID[0][0])+'.cif')):
                     cif_file=os.path.realpath(os.path.join(self.initial_model_directory,sample,str(compoundID[0][0])+'.cif'))
 
-            print os.path.join(self.initial_model_directory,sample,sample+'.log')
             if os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'.log')):
                 scaling_logfile=os.path.realpath(os.path.join(self.initial_model_directory,sample,sample+'.log'))
                 db_dict={'DataProcessingPathToLogfile': scaling_logfile }
@@ -400,7 +399,6 @@ class read_intial_refinement_results(QtCore.QThread):
             if os.path.isfile(os.path.join(self.initial_model_directory,sample,'Dimple','dimple','final.mtz')):
                 db_dict['DimplePathToMTZ']=os.path.join(self.initial_model_directory,sample,'Dimple','dimple','final.mtz')
             if db_dict != {}:
-                print db_dict
                 db.update_insert_not_null_fields_only(sample,db_dict)
 
             # update data source only if field is null
