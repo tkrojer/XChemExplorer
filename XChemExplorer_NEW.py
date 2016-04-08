@@ -354,7 +354,11 @@ class XChemExplorer(QtGui.QApplication):
         # @ Summary
         data_collection_summary_list=[]
         self.data_collection_summary_column_name=[      'Sample ID',
-                                                        'Date',
+                                                        #'Date',
+                                                        'Resolution\nHigh',
+                                                        'DataProcessing\nSpaceGroup',
+                                                        'Mn<I/sig(I)>\nHigh',
+                                                        'Rmerge\nLow',
                                                         'DataCollection\nOutcome',
                                                         'img1',
                                                         'img2',
