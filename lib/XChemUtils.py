@@ -54,11 +54,11 @@ class process:
                     '   END\n'
                     'EOF\n'
                     '\n'
-                    '#freerflag hklin cad.mtz hklout %s << EOF > freerflag.log\n' %self.mtz_free +
-                    '#   COMPLETE FREE=FreeR_flag\n'
-                    '#   END\n'
-                    '#EOF\n'
-                    'uniqueify -f FreeR_flag cad.mtz ../%s\n' %self.mtz_free
+                    'freerflag hklin cad.mtz hklout ../%s << EOF > freerflag.log\n' %self.mtz_free +
+                    '   COMPLETE FREE=FreeR_flag\n'
+                    '   END\n'
+                    'EOF\n'
+                    '#uniqueify -f FreeR_flag cad.mtz ../%s\n' %self.mtz_free
                     )
             else:
                 Cmds = (
@@ -76,7 +76,8 @@ class process:
                     '   END\n'
                     'EOF\n'
                     '\n'
-                    'uniqueify cad.mtz ../%s\n' %self.mtz_free
+                    'freerflag hklin cad.mtz hklout ../%s > freerflag.log\n' %self.mtz_free +
+                    '#uniqueify cad.mtz ../%s\n' %self.mtz_free
                     )
 #            os.chdir(os.path.join(self.project_directory,self.xtalID))
 #            os.system(Cmds)
