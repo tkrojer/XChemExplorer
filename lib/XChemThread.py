@@ -630,12 +630,12 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
 
             if self.processed_data_to_copy=='mtz_log_only':
                 path_to_logfile,path_to_mtzfile,mtz_filename=self.copy_mtz_and_logfiles_only(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename)
-                self.link_mtz_log_files_to_sample_directory(sample,autoproc,path_to_procdir,path_to_logfile,path_to_mtzfile)
+                self.link_mtz_log_files_to_sample_directory(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile)
                 self.copy_and_link_selected_dimple_files(dimple_destination,sample,path_to_dimple_mtzfile,path_to_dimple_pdbfile)
 
             elif self.processed_data_to_copy=='everything':
                 path_to_logfile,path_to_mtzfile,mtz_filename=self.copy_complete_autoprocessing_folder(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename)
-                self.link_mtz_log_files_to_sample_directory(sample,autoproc,path_to_procdir,path_to_logfile,path_to_mtzfile)
+                self.link_mtz_log_files_to_sample_directory(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile)
                 self.copy_and_link_selected_dimple_files(dimple_destination,sample,path_to_dimple_mtzfile,path_to_dimple_pdbfile)
 
             elif self.processed_data_to_copy=='mtz_log_of_all_pipelines':
@@ -670,7 +670,7 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
             os.symlink(os.path.join(dimple_destination,'final.mtz'),'refine.mtz')
 
 
-    def link_mtz_log_files_to_sample_directory(self,sample,autoproc,path_to_procdir,path_to_logfile,path_to_mtzfile):
+    def link_mtz_log_files_to_sample_directory(self,sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile):
         # move up to sample directory and link respective files
         # first remove any old symbolic links
         os.chdir(os.path.join(self.initial_model_directory,sample))
