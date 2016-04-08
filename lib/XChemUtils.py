@@ -548,7 +548,7 @@ class parse:
         # gray:     #E0E0E0
 
         if aimless['DataProcessingResolutionHigh']=='n/a' or aimless['DataProcessingRmergeLow'] =='n/a':
-            aimless['Alert'] = '#FF0000'
+            aimless['DataProcessingAlert'] = '#FF0000'
         else:
             if float(aimless['DataProcessingResolutionHigh']) > 3.5 or float(aimless['DataProcessingRmergeLow']) > 0.1:
                 aimless['DataProcessingAlert'] = '#FF0000'
