@@ -325,11 +325,6 @@ class XChemExplorer(QtGui.QApplication):
         ######################################################################################
         # DLS tab
 
-
-
-
-
-
         self.dls_data_collection_vbox=QtGui.QVBoxLayout()
         self.tab_dict['DLS @ Data Collection'][1].addLayout(self.dls_data_collection_vbox)
 
@@ -388,9 +383,15 @@ class XChemExplorer(QtGui.QApplication):
         get_data_collection_button=QtGui.QPushButton("Get New Results from Autoprocessing")
         get_data_collection_button.clicked.connect(self.button_clicked)
         data_collection_button_hbox.addWidget(get_data_collection_button)
+
         write_files_button=QtGui.QPushButton("Save Files from Autoprocessing in 'inital_model' Folder")
         write_files_button.clicked.connect(self.button_clicked)
         data_collection_button_hbox.addWidget(write_files_button)
+
+        rerun_dimple_button=QtGui.QPushButton("Rerun Dimple on Everything")
+        rerun_dimple_button.clicked.connect(self.button_clicked)
+        data_collection_button_hbox.addWidget(rerun_dimple_button)
+
         self.target_selection_combobox = QtGui.QComboBox()
         self.populate_target_selection_combobox(self.target_selection_combobox)
         self.target_selection_combobox.activated[str].connect(self.target_selection_combobox_activated)
@@ -1337,6 +1338,15 @@ class XChemExplorer(QtGui.QApplication):
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.work_thread.start()
+
+        elif self.explorer_active==0 and self.data_source_set==True \
+            and self.sender().text()=="Rerun Dimple on Everything":
+            for entry in self.data_collection_dict[xtal]:
+                if entry[0]=='logfile':
+                    db_dict=entry[6]
+                    print xtal,db_dict['DataProcessingPathToMTZfile']
+
+
 
         elif self.explorer_active==0 and self.data_source_set==True \
             and self.sender().text()=="Read Pickle File":
