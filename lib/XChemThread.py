@@ -417,7 +417,7 @@ class read_intial_refinement_results(QtCore.QThread):
                         'RefinementPathToRefinementFolder': path_to_refinement_folder,
                         'RefinementCIF':                    cif_file}
             db.update_data_source(sample,db_dict)
-
+            print sample,db_dict
             initial_model_list.append( [ sample,
                                         run_dimple,
                                         resolution_high,
