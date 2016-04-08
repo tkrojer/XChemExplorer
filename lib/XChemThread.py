@@ -629,12 +629,12 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
                 dimple_destination=os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple',visit+'-'+run+autoproc)
 
             if self.processed_data_to_copy=='mtz_log_only':
-                path_to_logfile,path_to_mtzfile,mtz_filename=self.copy_mtz_and_logfiles_only(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile)
+                path_to_logfile,path_to_mtzfile,mtz_filename=self.copy_mtz_and_logfiles_only(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename)
                 self.link_mtz_log_files_to_sample_directory(sample,autoproc,path_to_procdir,path_to_logfile,path_to_mtzfile)
                 self.copy_and_link_selected_dimple_files(dimple_destination,sample,path_to_dimple_mtzfile,path_to_dimple_pdbfile)
 
             elif self.processed_data_to_copy=='everything':
-                path_to_logfile,path_to_mtzfile,mtz_filename=self.copy_complete_autoprocessing_folder(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile)
+                path_to_logfile,path_to_mtzfile,mtz_filename=self.copy_complete_autoprocessing_folder(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename)
                 self.link_mtz_log_files_to_sample_directory(sample,autoproc,path_to_procdir,path_to_logfile,path_to_mtzfile)
                 self.copy_and_link_selected_dimple_files(dimple_destination,sample,path_to_dimple_mtzfile,path_to_dimple_pdbfile)
 
