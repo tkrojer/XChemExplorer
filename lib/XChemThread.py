@@ -379,8 +379,8 @@ class read_intial_refinement_results(QtCore.QThread):
                 if os.path.isfile(os.path.join(self.initial_model_directory,sample,str(compoundID[0][0])+'.cif')):
                     cif_file=os.path.realpath(os.path.join(self.initial_model_directory,sample,str(compoundID[0][0])+'.cif'))
 
+            print os.path.join(self.initial_model_directory,sample,sample+'.log')
             if os.path.isfile(os.path.join(self.initial_model_directory,sample,sample+'.log')):
-                print 'here'
                 scaling_logfile=os.path.realpath(os.path.join(self.initial_model_directory,sample,sample+'.log'))
                 db_dict={'DataProcessingPathToLogfile': scaling_logfile }
                 # update path to logfile: might have changed if data were copied to different location
