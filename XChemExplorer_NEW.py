@@ -1758,6 +1758,9 @@ class XChemExplorer(QtGui.QApplication):
 
         column_name = [ 'Program',
                         'Resolution\nOverall',
+                        'DataProcessing\nSpaceGroup',
+                        'Mn<I/sig(I)>\nHigh',
+                        'Rmerge\nLow',
                         'DataProcessing\nRfree' ]
 
         # need to do this because db_dict keys are SQLite column names
@@ -2234,11 +2237,13 @@ class XChemExplorer(QtGui.QApplication):
 
             # find which autoprocessing run was thought to be the best
             selected_processing_result=0
+            found_db_dict=False
             for sample in self.data_collection_dict[xtal]:
                 if sample[0]=='logfile':
                     if sample[8]==True:
                         selected_processing_result=sample[7]
                         db_dict=sample[6]
+                        found_db_dict=True
 
             # find latest run for crystal and diffraction images
 #            tmp=[]
@@ -2295,7 +2300,11 @@ class XChemExplorer(QtGui.QApplication):
                     self.data_collection_summary_table.setCellWidget(row,column,start_albula_button)
                 else:
                     cell_text=QtGui.QTableWidgetItem()
-                    cell_text.setText(str( db_dict[ header[1] ]  ))
+                    # in case data collection failed for whatever reason
+                    if found_db_dict:
+                        cell_text.setText(str( db_dict[ header[1] ]  ))
+                    else:
+                        cell_text.setText('')
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                     self.data_collection_summary_table.setItem(row, column, cell_text)
 
