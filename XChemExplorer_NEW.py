@@ -2294,7 +2294,7 @@ class XChemExplorer(QtGui.QApplication):
             # table for data processing results
             # check if results from particular pipeline are already in table;
             # not really looking at the table here, but compare it to self.data_collection_table_dict
-            row_position=data_collection_table.rowCount()
+#            row_position=data_collection_table.rowCount()
             if not xtal in self.data_collection_table_dict:
                 self.data_collection_table_dict[xtal]=[]
             # reminder: ['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,<aimless_index>,False]
