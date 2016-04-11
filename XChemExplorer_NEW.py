@@ -2109,15 +2109,15 @@ class XChemExplorer(QtGui.QApplication):
 #            self.data_collection_vbox_for_table.addWidget(self.main_data_collection_table)
 #            self.main_data_collection_table_exists=True
 
-#        column_name = [ 'Program',
-#                        'Resolution\nOverall',
-#                        'DataProcessing\nSpaceGroup',
-#                        'Mn<I/sig(I)>\nHigh',
-#                        'Rmerge\nLow',
-#                        'DataProcessing\nRfree' ]
+        column_name = [ 'Program',
+                        'Resolution\nOverall',
+                        'DataProcessing\nSpaceGroup',
+                        'Mn<I/sig(I)>\nHigh',
+                        'Rmerge\nLow',
+                        'DataProcessing\nRfree' ]
 
         # need to do this because db_dict keys are SQLite column names
-#        diffraction_data_column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(column_name)
+        diffraction_data_column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(column_name)
 
 #        table.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 #        table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
