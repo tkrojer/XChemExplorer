@@ -764,7 +764,7 @@ class XChemExplorer(QtGui.QApplication):
         self.adjust_acceptable_low_resolution_limit.setFixedWidth(200)
         self.adjust_acceptable_low_resolution_limit.setText(str(self.acceptable_low_resolution_limit_for_data))
         self.adjust_acceptable_low_resolution_limit.textChanged[str].connect(self.change_acceptable_low_resolution_limit)
-        settings_hbox_adjust_acceptable_low_resolution_limit.addWidget(self.adjust_acceptable_low_resolution_limit)
+        settings_hbox_acceptable_low_resolution_limit.addWidget(self.adjust_acceptable_low_resolution_limit)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_adjust_acceptable_low_resolution_limit)
 
 #        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nRefine Model Directory:'))
