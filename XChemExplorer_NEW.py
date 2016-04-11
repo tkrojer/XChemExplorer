@@ -2601,7 +2601,7 @@ class XChemExplorer(QtGui.QApplication):
         self.albula_button_dict={}
         column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
         for xtal in sorted(self.data_collection_dict):
-
+            print xtal
             if xtal not in self.data_collection_summary_dict:
                 self.data_collection_summary_table.insertRow(row)
                 self.data_collection_summary_dict[xtal]=[]
