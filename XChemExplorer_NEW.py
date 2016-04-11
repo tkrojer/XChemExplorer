@@ -2349,7 +2349,7 @@ class XChemExplorer(QtGui.QApplication):
                     show_data_collection_details_checkbox=QtGui.QCheckBox()
                     show_data_collection_details_checkbox.toggle()
                     show_data_collection_details_checkbox.setChecked(False)
-                    show_data_collection_details_checkbox.connect(self.show_data_collection_details)
+#                    show_data_collection_details_checkbox.connect(self.show_data_collection_details)
                     self.data_collection_summary_table.setCellWidget(row,column,show_data_collection_details_checkbox)
                     self.data_collection_summary_dict[xtal].append(show_data_collection_details_checkbox)
                 else:
