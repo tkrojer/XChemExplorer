@@ -1786,7 +1786,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def create_widgets_for_autoprocessing_results(self,data_dict):
-        self.status_bar.showMessage('Building widgets for data processing results')
+        self.status_bar.showMessage('Building details table for data processing results')
         self.data_collection_dict=data_dict
 
         # make sure not to overwrite previous selections!
@@ -2255,13 +2255,16 @@ class XChemExplorer(QtGui.QApplication):
         if self.data_collection_details_currently_on_display != None:
             print self.data_collection_details_currently_on_display
             self.data_collection_summarys_vbox_for_details.removeWidget(self.data_collection_details_currently_on_display)
+            self.data_collection_details_currently_on_display.hide()
             self.data_collection_details_currently_on_display.deleteLater()
+            self.data_collection_details_currently_on_display=None
+            print self.data_collection_details_currently_on_display
 
         for key in self.data_collection_summary_dict:
             if self.data_collection_summary_dict[key][0]==self.sender():
                 if self.sender().isChecked():
                     print key
-#                self.data_collection_summary_dict[key][0].setChecked(True)
+                self.data_collection_summary_dict[key][0].setChecked(True)
                 tmpText=QtGui.QLabel(key)
                 self.data_collection_summarys_vbox_for_details.addWidget(tmpText)
                 self.data_collection_details_currently_on_display=tmpText
@@ -2282,6 +2285,7 @@ class XChemExplorer(QtGui.QApplication):
 #        self.check_for_new_autoprocessing()
 
     def populate_data_collection_summary_table(self):
+        self.status_bar.showMessage('Building summary table for data processing results')
         row = self.data_collection_summary_table.rowCount()
         self.albula_button_dict={}
         column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
