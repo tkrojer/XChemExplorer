@@ -426,7 +426,11 @@ class XChemExplorer(QtGui.QApplication):
         for puck in range(37):
             for position in range(16):
                 print puck, position
-#                layout.addWidget(label, run_number, image_number)
+                if puck==0:
+                    self.dewar_configuration_layout.addWidget(QtGui.QLabel(position), puck, position)
+                if position==0:
+                    self.dewar_configuration_layout.addWidget(QtGui.QLabel(puck), puck, position)
+
 #        self.data_collection_summarys_vbox_for_details=QtGui.QVBoxLayout()
 #        self.data_collection_details_currently_on_display=None
 #        self.dls_tab_dict['Summary'][1].addLayout(self.data_collection_summarys_vbox_for_details)
@@ -2284,7 +2288,7 @@ class XChemExplorer(QtGui.QApplication):
                     print key
                 self.data_collection_summary_dict[key][0].setChecked(True)
                 self.data_collection_details_currently_on_display=QtGui.QLabel(key)
-                self.data_collection_summarys_vbox_for_details.addWidget(tmpText)
+                self.data_collection_summarys_vbox_for_details.addWidget(self.data_collection_details_currently_on_display)
                 print 'new widget:', self.data_collection_details_currently_on_display
             else:
                 # un-check all other ones
