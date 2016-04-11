@@ -2261,7 +2261,7 @@ class XChemExplorer(QtGui.QApplication):
                         break
                 if not images_already_in_table:
 #                    for image_number,encoded_image in enumerate(entry[4]):
-                    for image_number,encoded_image in enumerate(sorted(  entry[4],key=lambda z: z[0]  )):
+#                    for image_number,encoded_image in enumerate(sorted(  entry[4],key=lambda z: z[0]  )):
                 # not if there is a run, but images are for whatever reason not present in self.data_collection_dict
                 # then use image not available from $XChemExplorer_DIR/image/IMAGE_NOT_AVAILABLE.png
                 # not sure how to do this at the moment; it will probably trigger an error that I can catch
