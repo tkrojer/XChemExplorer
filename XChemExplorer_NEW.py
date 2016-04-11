@@ -1784,6 +1784,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def create_widgets_for_autoprocessing_results(self,data_dict):
+        self.status_bar.showMessage('Building widgets for data processing results')
         self.data_collection_dict=data_dict
 
         # make sure not to overwrite previous selections!
@@ -2248,6 +2249,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def show_data_collection_details(self,state):
         for key in self.data_collection_summary_dict:
+            print key,self.sender(),self.data_collection_summary_dict[key]
             if self.data_collection_summary_dict[key]==self.sender():
                 print key
 
@@ -2368,6 +2370,8 @@ class XChemExplorer(QtGui.QApplication):
 
         self.data_collection_summary_table.resizeRowsToContents()
         self.data_collection_summary_table.resizeColumnsToContents()
+        self.status_bar.showMessage('idle')
+
 
     def update_outcome_data_collection_summary_table(self,sample,outcome):
         rows_in_table=self.data_collection_summary_table.rowCount()
