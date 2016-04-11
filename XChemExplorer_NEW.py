@@ -2260,8 +2260,8 @@ class XChemExplorer(QtGui.QApplication):
 #                self.data_collection_summary_dict[key][0].setChecked(True)
 #                self.data_collection_summarys_vbox_for_details.addWidget(QtGui.QLabel(key))
 #            else:
-#                # un-check all other ones
-#                self.data_collection_summary_dict[key][0].setChecked(False)
+                # un-check all other ones
+                self.data_collection_summary_dict[key][0].setChecked(False)
 
     def continously_check_for_new_data_collection(self,state):
         if state == QtCore.Qt.Checked:
