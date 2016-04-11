@@ -2274,10 +2274,11 @@ class XChemExplorer(QtGui.QApplication):
         # first remove currently displayed widget
         if self.data_collection_details_currently_on_display != None:
             print self.data_collection_details_currently_on_display
-#            self.data_collection_details_currently_on_display.hide()
+            self.data_collection_details_currently_on_display.hide()
 #            self.data_collection_summarys_vbox_for_details.removeWidget(self.data_collection_details_currently_on_display)
 #            self.data_collection_details_currently_on_display.deleteLater()
-            self.data_collection_details_currently_on_display.setParent(None)
+
+#            self.data_collection_details_currently_on_display.setParent(None)
 #            sip.delete(self.data_collection_details_currently_on_display)
             self.data_collection_details_currently_on_display=None
             print self.data_collection_details_currently_on_display
