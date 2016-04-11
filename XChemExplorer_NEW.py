@@ -2288,7 +2288,7 @@ class XChemExplorer(QtGui.QApplication):
                 if self.sender().isChecked():
                     print key
 #                    self.data_collection_summary_dict[key][0].setChecked(True)
-                    self.data_collection_details_currently_on_display=self.data_collection_column_three_dict[xtal][4]
+                    self.data_collection_details_currently_on_display=self.data_collection_column_three_dict[key][4]
                     self.data_collection_summarys_vbox_for_details.addWidget(self.data_collection_details_currently_on_display)
                     print 'new widget:', self.data_collection_details_currently_on_display
             else:
