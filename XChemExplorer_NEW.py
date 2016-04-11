@@ -2249,9 +2249,10 @@ class XChemExplorer(QtGui.QApplication):
 
     def show_data_collection_details(self,state):
         for key in self.data_collection_summary_dict:
-#            print key,self.sender(),self.data_collection_summary_dict[key]
             if self.data_collection_summary_dict[key][0]==self.sender():
-                print key
+                self.data_collection_summary_dict[key][0].setChecked(True)
+                self.data_collection_summarys_vbox_for_details.addWidget(QtGui.QLabel(key))
+
             else:
                 # un-check all other ones
                 self.data_collection_summary_dict[key][0].setChecked(False)
