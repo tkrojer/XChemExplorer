@@ -2576,7 +2576,7 @@ class XChemExplorer(QtGui.QApplication):
                 if self.sender().isChecked():
                     print key
 #                    self.data_collection_summary_dict[key][0].setChecked(True)
-                    self.data_collection_details_currently_on_display=self.data_collection_column_three_dict[key][4]
+                    self.data_collection_details_currently_on_display=self.data_collection_column_three_dict[key][0]
                     self.data_collection_summarys_vbox_for_details.addWidget(self.data_collection_details_currently_on_display)
                     print 'new widget:', self.data_collection_details_currently_on_display
             else:
@@ -2722,7 +2722,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def update_selected_autoproc_data_collection_summary_table(self):
         for key in self.data_collection_column_three_dict:
-            if self.data_collection_column_three_dict[key][4]==self.sender():
+            if self.data_collection_column_three_dict[key][0]==self.sender():
                 sample=key
                 break
         indexes=self.sender().selectionModel().selectedRows()
