@@ -428,18 +428,16 @@ class XChemExplorer(QtGui.QApplication):
             for position in range(17):
                 frame=QtGui.QFrame()
                 frame.setFrameShape(QtGui.QFrame.StyledPanel)
+                vbox_for_frame=QtGui.QVBoxLayout()
                 if puck==0 and position != 0:
                     label=QtGui.QLabel(str(position))
-                    frame.addWidget(label)
-                    self.dewar_configuration_layout.addWidget(frame, position, puck)
                 elif position==0 and puck != 0:
                     label=QtGui.QLabel(str(puck))
-                    frame.addWidget(label)
-                    self.dewar_configuration_layout.addWidget(frame, position, puck)
                 else:
                     label=QtGui.QLabel('x')
-                    frame.addWidget(label)
-                    self.dewar_configuration_layout.addWidget(frame, position, puck)
+                vbox_for_frame.addWidget(label)
+                frame.setLayout(vbox_for_frame)
+                self.dewar_configuration_layout.addWidget(frame, position, puck)
 
 #        self.data_collection_summarys_vbox_for_details=QtGui.QVBoxLayout()
 #        self.data_collection_details_currently_on_display=None
