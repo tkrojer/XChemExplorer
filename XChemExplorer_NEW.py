@@ -2247,7 +2247,9 @@ class XChemExplorer(QtGui.QApplication):
                 self.initial_model_dimple_dict[key][0].setChecked(False)
 
     def show_data_collection_details(self,state):
-        print 'checked'
+        for key in self.data_collection_summary_dict:
+            if self.data_collection_summary_dict[key]==self.sender():
+                print key
 
     def continously_check_for_new_data_collection(self,state):
         if state == QtCore.Qt.Checked:
@@ -2349,7 +2351,7 @@ class XChemExplorer(QtGui.QApplication):
                     show_data_collection_details_checkbox=QtGui.QCheckBox()
                     show_data_collection_details_checkbox.toggle()
                     show_data_collection_details_checkbox.setChecked(False)
-#                    show_data_collection_details_checkbox.connect(self.show_data_collection_details)
+                    show_data_collection_details_checkbox.stateChanged.connect(self.show_data_collection_details)
                     self.data_collection_summary_table.setCellWidget(row,column,show_data_collection_details_checkbox)
                     self.data_collection_summary_dict[xtal].append(show_data_collection_details_checkbox)
                 else:
