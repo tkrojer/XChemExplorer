@@ -2278,7 +2278,7 @@ class XChemExplorer(QtGui.QApplication):
                 # dataset outcome buttons
 #                dataset_outcome_groupbox=QtGui.QGroupBox()
 #                dataset_outcome_vbox=QtGui.QVBoxLayout()
-                for outcome in sorted(self.dataset_outcome):
+#                for outcome in sorted(self.dataset_outcome):
 #                    button=QtGui.QPushButton(outcome)
 #                    button.setAutoExclusive(True)
 #                    button.setCheckable(True)
