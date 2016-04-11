@@ -2199,7 +2199,7 @@ class XChemExplorer(QtGui.QApplication):
 #                self.data_collection_column_three_dict[xtal]=[cell_widget,vbox_cell,hbox_for_button_and_table,layout,data_collection_table,
 #                                                              dataset_outcome_groupbox,dataset_outcome_vbox,
 #                                                              [row,sample_ID,data_collection_date_time],selection_changed_by_user]
-                self.data_collection_column_three_dict[xtal]=[data_collection_table,,selection_changed_by_user]
+                self.data_collection_column_three_dict[xtal]=[data_collection_table,selection_changed_by_user]
                 xtal_in_table=True
                 # Note: sample_ID & data_collection_date_time do not belong to column3, but I want to keep a
                 # record of them togther with their row for later coloring purposes
