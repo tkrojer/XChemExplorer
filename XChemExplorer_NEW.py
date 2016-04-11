@@ -758,7 +758,7 @@ class XChemExplorer(QtGui.QApplication):
 
         settings_hbox_acceptable_low_resolution_limit=QtGui.QHBoxLayout()
         self.adjust_acceptable_low_resolution_limit_label=QtGui.QLabel('Acceptable low resolution limit for datasets (in Angstrom):')
-        settings_hbox_acceptable_low_resolution_limit.addWidget(self.adjust_acceptable_low_resolution_limit)
+        settings_hbox_acceptable_low_resolution_limit.addWidget(self.acceptable_low_resolution_limit)
         settings_hbox_acceptable_low_resolution_limit.addStretch(1)
         self.adjust_acceptable_low_resolution_limit = QtGui.QLineEdit()
         self.adjust_acceptable_low_resolution_limit.setFixedWidth(200)
