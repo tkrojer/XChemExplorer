@@ -2561,8 +2561,8 @@ class XChemExplorer(QtGui.QApplication):
         # first remove currently displayed widget
         if self.data_collection_details_currently_on_display != None:
             print self.data_collection_details_currently_on_display
-            self.data_collection_details_currently_on_display.hide()
-#            self.data_collection_summarys_vbox_for_details.removeWidget(self.data_collection_details_currently_on_display)
+#            self.data_collection_details_currently_on_display.hide()
+            self.data_collection_summarys_vbox_for_details.removeWidget(self.data_collection_details_currently_on_display)
 #            self.data_collection_details_currently_on_display.deleteLater()
 
 #            self.data_collection_details_currently_on_display.setParent(None)
@@ -2601,7 +2601,6 @@ class XChemExplorer(QtGui.QApplication):
         self.albula_button_dict={}
         column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
         for xtal in sorted(self.data_collection_dict):
-            print xtal
             if xtal not in self.data_collection_summary_dict:
                 self.data_collection_summary_table.insertRow(row)
                 self.data_collection_summary_dict[xtal]=[]
@@ -2716,9 +2715,9 @@ class XChemExplorer(QtGui.QApplication):
 
     def user_update_selected_autoproc_data_collection_summary_table(self):
         for key in self.data_collection_column_three_dict:
-            if self.data_collection_column_three_dict[key][4]==self.sender():
+            if self.data_collection_column_three_dict[key][0]==self.sender():
                 # the user changed the selection, i.e. no automated selection will update it
-                self.data_collection_column_three_dict[key][8]=True
+                self.data_collection_column_three_dict[key][1]=True
 
     def update_selected_autoproc_data_collection_summary_table(self):
         for key in self.data_collection_column_three_dict:
