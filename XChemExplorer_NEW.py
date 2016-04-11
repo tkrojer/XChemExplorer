@@ -2197,7 +2197,7 @@ class XChemExplorer(QtGui.QApplication):
 #                hbox_for_button_and_table.addWidget(dataset_outcome_groupbox)
 #                hbox_for_button_and_table.addWidget(data_collection_table)
 #                vbox_cell.addLayout(hbox_for_button_and_table)
-#                selection_changed_by_user=False
+                selection_changed_by_user=False
 #                self.data_collection_column_three_dict[xtal]=[cell_widget,vbox_cell,hbox_for_button_and_table,layout,data_collection_table,
 #                                                              dataset_outcome_groupbox,dataset_outcome_vbox,
 #                                                              [row,sample_ID,data_collection_date_time],selection_changed_by_user]
@@ -2205,15 +2205,15 @@ class XChemExplorer(QtGui.QApplication):
                 xtal_in_table=True
                 # Note: sample_ID & data_collection_date_time do not belong to column3, but I want to keep a
                 # record of them togther with their row for later coloring purposes
-#            else:
+            else:
 #                cell_widget =               self.data_collection_column_three_dict[xtal][0]
 #                vbox_cell =                 self.data_collection_column_three_dict[xtal][1]
 #                hbox_for_button_and_table = self.data_collection_column_three_dict[xtal][2]
 #                layout =                    self.data_collection_column_three_dict[xtal][3]
-#                data_collection_table =     self.data_collection_column_three_dict[xtal][4]
+                data_collection_table =     self.data_collection_column_three_dict[xtal][0]
 #                dataset_outcome_groupbox =  self.data_collection_column_three_dict[xtal][5]
 #                dataset_outcome_vbox =      self.data_collection_column_three_dict[xtal][6]
-#                selection_changed_by_user = self.data_collection_column_three_dict[xtal][8]
+                selection_changed_by_user = self.data_collection_column_three_dict[xtal][1]
 #            vbox_cell.addLayout(layout)
 
 #            # this is necessary to render table properly
