@@ -2089,6 +2089,283 @@ class XChemExplorer(QtGui.QApplication):
 
         #-----------------------------------------------------------------------------------------------
 
+    def create_widgets_for_autoprocessing_results_only(self,data_dict):
+        self.status_bar.showMessage('Building details table for data processing results')
+        self.data_collection_dict=data_dict
+
+        # make sure not to overwrite previous selections!
+
+        # in case we're just adding things to an existing table:
+
+#        if not self.main_data_collection_table_exists:
+#            self.main_data_collection_table=QtGui.QTableWidget()
+#            self.main_data_collection_table.setSortingEnabled(True)
+#            self.main_data_collection_table.setColumnCount(3)
+#            self.main_data_collection_table.setHorizontalHeaderLabels(['Sample','Date',''])
+##            self.main_data_collection_table.resizeRowsToContents()
+#            self.main_data_collection_table.setLineWidth(10)
+#            self.data_collection_vbox_for_table.addWidget(self.main_data_collection_table)
+#            self.main_data_collection_table_exists=True
+
+#        column_name = [ 'Program',
+#                        'Resolution\nOverall',
+#                        'DataProcessing\nSpaceGroup',
+#                        'Mn<I/sig(I)>\nHigh',
+#                        'Rmerge\nLow',
+#                        'DataProcessing\nRfree' ]
+
+        # need to do this because db_dict keys are SQLite column names
+        diffraction_data_column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(column_name)
+
+#        table.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+#        table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+#        table.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.MinimumExpanding)
+#        table.resizeColumnsToContents()
+
+#        row = self.main_data_collection_table.rowCount()
+
+        for xtal in sorted(self.data_collection_dict):
+#            # here are some switches that come in handy
+#            new_row_added=False
+            mtz_already_in_inital_model_directory=False
+#            xtal_in_table=False
+            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.mtz')):
+                mtz_already_in_inital_model_directory=True
+            # first check if this sample exists in the table
+            # use the outcome dict as an indicator since every sample should have one
+
+            # column 1: sample ID
+#            if xtal not in self.dataset_outcome_dict:
+#                self.main_data_collection_table.insertRow(row)
+#                new_row_added=True
+#                sample_ID=QtGui.QTableWidgetItem(xtal)
+#                sample_ID.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+#                self.main_data_collection_table.setItem(row, 0, sample_ID)
+#                current_row=row
+#            else:
+#                # check if an entry and widgets exist in self.data_collection_column_three_dict
+#                if xtal in self.data_collection_column_three_dict:
+#                    current_row =    self.data_collection_column_three_dict[xtal][7][0]
+
+
+            # column 2: data collection date
+            # this one should always be there; it may need updating in case another run appears
+            # first find latest run
+            tmp=[]
+            for entry in self.data_collection_dict[xtal]:
+                if entry[0]=='image':
+                    tmp.append( [entry[3],datetime.strptime(entry[3], '%Y-%m-%d %H:%M:%S')])
+            latest_run=max(tmp,key=lambda x: x[1])[0]
+#            if xtal not in self.dataset_outcome_dict:
+#                data_collection_date_time=QtGui.QTableWidgetItem(latest_run)
+#                data_collection_date_time.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+#                self.main_data_collection_table.setItem(row, 1, data_collection_date_time)
+#            else:
+#                current_run_time=str(self.main_data_collection_table.item(current_row,1).text())
+#                # try to update in case newer run appears
+#                if current_run_time != latest_run:
+#                    self.main_data_collection_table.item(current_row,1).setText(latest_run)
+
+            # column 3:
+            # ---------------------------------------------------------|
+            # |                                                        |
+            # | crystal images                                         |
+            # |                                                        |
+            # |--------------------------------------------------------|
+            # |         |                                              |
+            # | dataset |                                              |
+            # | outcome | table for data processing results            |
+            # | buttons |                                              |
+            # |         |                                              |
+            # |--------------------------------------------------------|
+
+            # first check if it does already exist
+            if xtal not in self.data_collection_column_three_dict:
+                # geneerate all the widgets which can later be appended and add them to the dictionary
+#                cell_widget=QtGui.QWidget()
+#                vbox_cell=QtGui.QVBoxLayout(cell_widget)        # this is the main vbox for column 3
+#                hbox_for_button_and_table=QtGui.QHBoxLayout()
+#                layout = QtGui.QGridLayout()                    # for crystal images
+                data_collection_table=QtGui.QTableWidget()      # table with data processing results for each pipeline
+#                cell_widget.setLayout(vbox_cell)
+#                vbox_cell.addLayout(layout)
+#                dataset_outcome_groupbox=QtGui.QGroupBox()
+#                dataset_outcome_vbox=QtGui.QVBoxLayout()
+#                dataset_outcome_groupbox.setLayout(dataset_outcome_vbox)
+#                hbox_for_button_and_table.addWidget(dataset_outcome_groupbox)
+#                hbox_for_button_and_table.addWidget(data_collection_table)
+#                vbox_cell.addLayout(hbox_for_button_and_table)
+#                selection_changed_by_user=False
+#                self.data_collection_column_three_dict[xtal]=[cell_widget,vbox_cell,hbox_for_button_and_table,layout,data_collection_table,
+#                                                              dataset_outcome_groupbox,dataset_outcome_vbox,
+#                                                              [row,sample_ID,data_collection_date_time],selection_changed_by_user]
+                self.data_collection_column_three_dict[xtal]=[data_collection_table,,selection_changed_by_user]
+                xtal_in_table=True
+                # Note: sample_ID & data_collection_date_time do not belong to column3, but I want to keep a
+                # record of them togther with their row for later coloring purposes
+#            else:
+#                cell_widget =               self.data_collection_column_three_dict[xtal][0]
+#                vbox_cell =                 self.data_collection_column_three_dict[xtal][1]
+#                hbox_for_button_and_table = self.data_collection_column_three_dict[xtal][2]
+#                layout =                    self.data_collection_column_three_dict[xtal][3]
+#                data_collection_table =     self.data_collection_column_three_dict[xtal][4]
+#                dataset_outcome_groupbox =  self.data_collection_column_three_dict[xtal][5]
+#                dataset_outcome_vbox =      self.data_collection_column_three_dict[xtal][6]
+#                selection_changed_by_user = self.data_collection_column_three_dict[xtal][8]
+#            vbox_cell.addLayout(layout)
+
+#            # this is necessary to render table properly
+#            data_collection_table.resizeRowsToContents()
+#            data_collection_table.resizeColumnsToContents()
+#            data_collection_table.horizontalHeader().setStretchLastSection(False)
+#            data_collection_table.verticalHeader().setStretchLastSection(True)
+#            data_collection_table.itemSelectionChanged.connect(self.update_selected_autoproc_data_collection_summary_table)
+            data_collection_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+            data_collection_table.setColumnCount(len(column_name))
+            font = QtGui.QFont()
+##            font.setFamily(_fromUtf8("Verdana"))
+##            font =  self.horizontalHeader().font()
+            font.setPointSize(8)
+            data_collection_table.setFont(font)
+            data_collection_table.setHorizontalHeaderLabels(column_name)
+            data_collection_table.horizontalHeader().setFont(font)
+            data_collection_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+
+
+            #############################################################################
+            # crystal images
+            # first check there are new images that are not displayed yet; i.e. they are not in the self.data_collection_image_dict
+            if xtal not in self.data_collection_image_dict:
+                # OK this is the first time
+                self.data_collection_image_dict[xtal]=[]
+
+            # sort crystal images by timestamp
+            # reminder: ['image',visit,run,timestamp,image_list,diffraction_image,run_number]
+            # a) get only image entries from self.data_collection_dict
+            tmp=[]
+            for entry in self.data_collection_dict[xtal]:
+                if entry[0]=='image':
+                    tmp.append(entry)
+
+            # b) sort by the previously assigned run number
+            #    note: entry[6]==run_number
+#            layout=self.data_collection_image_dict[xtal][0]
+            for entry in sorted(tmp,key=lambda x: x[6]):
+                run_number=entry[6]
+                images_already_in_table=False
+                for image in self.data_collection_image_dict[xtal]:
+                    if run_number==image[0]:
+                        images_already_in_table=True
+                        break
+                if not images_already_in_table:
+#                    for image_number,encoded_image in enumerate(entry[4]):
+                    for image_number,encoded_image in enumerate(sorted(  entry[4],key=lambda z: z[0]  )):
+                # not if there is a run, but images are for whatever reason not present in self.data_collection_dict
+                # then use image not available from $XChemExplorer_DIR/image/IMAGE_NOT_AVAILABLE.png
+                # not sure how to do this at the moment; it will probably trigger an error that I can catch
+                        pixmap = QtGui.QPixmap()
+                        pixmap.loadFromData(base64.b64decode(encoded_image[1]))
+                        label = QtGui.QLabel()
+                        label.resize(320,200)
+                        label.setPixmap(pixmap.scaled(label.size(), QtCore.Qt.KeepAspectRatio))
+                        layout.addWidget(label, run_number, image_number)
+                    self.data_collection_image_dict[xtal].append([entry[6],entry[1],entry[2],entry[3],entry[5]])
+#            print 'xtal:',xtal,'dict:',self.data_collection_image_dict[xtal]
+            #############################################################################
+            # data collection outcome box
+            if xtal not in self.dataset_outcome_dict:
+                self.dataset_outcome_dict[xtal]=[]
+                # dataset outcome buttons
+#                dataset_outcome_groupbox=QtGui.QGroupBox()
+#                dataset_outcome_vbox=QtGui.QVBoxLayout()
+                for outcome in sorted(self.dataset_outcome):
+#                    button=QtGui.QPushButton(outcome)
+#                    button.setAutoExclusive(True)
+#                    button.setCheckable(True)
+#                    button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[outcome])
+#                    button.setFixedHeight(14)
+#                    button.clicked.connect(self.dataset_outcome_button_change_color)
+#                    self.dataset_outcome_dict[xtal].append(button)
+#                    dataset_outcome_vbox.addWidget(button)
+#                dataset_outcome_groupbox.setLayout(dataset_outcome_vbox)
+#                hbox_for_button_and_table.addWidget(dataset_outcome_groupbox)
+
+            #############################################################################
+            # table for data processing results
+            # check if results from particular pipeline are already in table;
+            # not really looking at the table here, but compare it to self.data_collection_table_dict
+            row_position=data_collection_table.rowCount()
+            if not xtal in self.data_collection_table_dict:
+                self.data_collection_table_dict[xtal]=[]
+            # reminder: ['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,<aimless_index>,False]
+            logfile_list=[]
+            for entry in self.data_collection_dict[xtal]:
+                if entry[0]=='logfile':
+                    logfile_list.append(entry)
+            for entry in sorted(logfile_list,key=lambda x: x[7]):               # sort by aimless_index and so make sure
+                entry_already_in_table=False                                    # that aimless_index == row
+                for logfile in self.data_collection_table_dict[xtal]:
+                    if entry[1]==logfile[1] and entry[2]==logfile[2] and entry[3]==logfile[3] and entry[4]==logfile[4]:
+                        entry_already_in_table=True
+                        break
+                if not entry_already_in_table:
+                    data_collection_table.insertRow(row_position)
+                    db_dict=entry[6]
+                    for column,header in enumerate(diffraction_data_column_name):
+                        cell_text=QtGui.QTableWidgetItem()
+                        cell_text.setText(str( db_dict[ header[1] ]  ))
+                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                        data_collection_table.setItem(row_position, column, cell_text)
+                    data_collection_table.setRowHeight(row_position,20)
+                    row_position+=1
+
+                self.data_collection_table_dict[xtal].append(['logfile',entry[1],entry[2],entry[3],entry[4]])   # 'logfile' is just added to have
+                                                                                                                # same index numbers between lists
+#            data_collection_table.setFixedHeight(300)
+#            data_collection_table.horizontalHeader().setStretchLastSection(False)
+#            data_collection_table.verticalHeader().setStretchLastSection(False)
+            data_collection_table.itemSelectionChanged.connect(self.update_selected_autoproc_data_collection_summary_table)
+            data_collection_table.cellClicked.connect(self.user_update_selected_autoproc_data_collection_summary_table)
+
+            # select best resolution file + set data collection outcome
+            # the assumption is that index in data_collection_dict and row number are identical
+            # the assumption for data collection outcome is that as long as a logfile is found, it's a success
+            logfile_found=False
+            for entry in self.data_collection_dict[xtal]:
+                if entry[0]=='logfile':
+                    index=entry[7]
+                    best_file=entry[8]
+                    logfile_found=True
+                    if best_file:
+                        # we change the selection only if the user did not touch it, assuming that he/she knows best
+                        if not selection_changed_by_user:
+                            data_collection_table.selectRow(index)
+#            if logfile_found:
+#                for button in self.dataset_outcome_dict[xtal]:
+#                    if button.text()=='success':
+#                        button.setChecked(True)
+#                        button.setStyleSheet("background-color: rgb(0,255,0)")
+#            else:
+#                for button in self.dataset_outcome_dict[xtal]:
+#                    if button.text()=='Failed - unknown':
+#                        button.setChecked(True)
+#                        button.setStyleSheet("background-color: rgb(255,0,0)")
+
+#            if new_row_added:
+#                self.main_data_collection_table.setCellWidget(row, 2, cell_widget)
+#                self.main_data_collection_table.setColumnWidth(2, 1000)
+#                row += 1
+
+#            if xtal_in_table and mtz_already_in_inital_model_directory:
+#                self.main_data_collection_table.item(current_row, 0).setBackground(QtGui.QColor(100,100,150))
+#                self.main_data_collection_table.item(current_row, 1).setBackground(QtGui.QColor(100,100,150))
+
+#        self.main_data_collection_table.resizeRowsToContents()
+
+        self.populate_data_collection_summary_table()
+
+        #-----------------------------------------------------------------------------------------------
+
     def update_xtalfrom_table(self,xtalform_dict):
         self.xtalform_dict=xtalform_dict
 #        for key in self.xtalform_dict:
@@ -2333,10 +2610,10 @@ class XChemExplorer(QtGui.QApplication):
 #                continue
 
             # find which dataset_outcome_button is checked
-            outcome=''
-            for button in self.dataset_outcome_dict[xtal]:
-                if button.isChecked():
-                    outcome=button.text()
+#            outcome=''
+#            for button in self.dataset_outcome_dict[xtal]:
+#                if button.isChecked():
+#                    outcome=button.text()
 
             # find which autoprocessing run was thought to be the best
             selected_processing_result=0
@@ -2375,8 +2652,8 @@ class XChemExplorer(QtGui.QApplication):
                         dataset_outcome_combobox.addItem(outcomeItem)
                     self.data_collection_summary_table.setCellWidget(row, column, dataset_outcome_combobox)
 
-                    index = dataset_outcome_combobox.findText(str(outcome), QtCore.Qt.MatchFixedString)
-                    dataset_outcome_combobox.setCurrentIndex(index)
+#                    index = dataset_outcome_combobox.findText(str(outcome), QtCore.Qt.MatchFixedString)
+#                    dataset_outcome_combobox.setCurrentIndex(index)
 
                     dataset_outcome_combobox.activated[str].connect(self.dataset_outcome_combobox_change_outcome)
                     self.dataset_outcome_combobox_dict[xtal]=dataset_outcome_combobox
