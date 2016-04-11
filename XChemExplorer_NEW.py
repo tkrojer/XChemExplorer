@@ -424,8 +424,8 @@ class XChemExplorer(QtGui.QApplication):
 #        self.dewar_configuration_dict
         self.dewar_configuration_layout = QtGui.QGridLayout()
 
-        for puck in range(37):
-            for position in range(16):
+        for puck in range(38):
+            for position in range(17):
                 if puck==0 and position != 0:
                     self.dewar_configuration_layout.addWidget(QtGui.QLabel(str(position)), position, puck)
                 if position==0 and puck != 0:
@@ -2288,7 +2288,7 @@ class XChemExplorer(QtGui.QApplication):
                 if self.sender().isChecked():
                     print key
 #                    self.data_collection_summary_dict[key][0].setChecked(True)
-                    self.data_collection_details_currently_on_display=QtGui.QLabel(key)
+                    self.data_collection_details_currently_on_display=self.data_collection_column_three_dict[xtal][4]
                     self.data_collection_summarys_vbox_for_details.addWidget(self.data_collection_details_currently_on_display)
                     print 'new widget:', self.data_collection_details_currently_on_display
             else:
