@@ -35,6 +35,7 @@ class XChemExplorer(QtGui.QApplication):
 
         # general settings
         self.allowed_unitcell_difference_percent=5
+        self.acceptable_low_resolution_limit_for_data=3
         self.filename_root='${samplename}'
         self.data_source_set=False
 
@@ -110,6 +111,7 @@ class XChemExplorer(QtGui.QApplication):
                              'data_source':             os.path.join(self.database_directory,self.data_source_file),
                              'ccp4_scratch':            self.ccp4_scratch_directory,
                              'unitcell_difference':     self.allowed_unitcell_difference_percent,
+                             'too_low_resolution_data': self.acceptable_low_resolution_limit_for_data,
                              'filename_root':           self.filename_root,
                              'preferences':             self.preferences        }
 
@@ -336,7 +338,8 @@ class XChemExplorer(QtGui.QApplication):
 
         dls_tab_widget = QtGui.QTabWidget()
         dls_tab_list = [ 'Summary',
-                         'Details'  ]
+                         'Details',
+                         'Dewar'    ]
         self.dls_tab_dict={}
         for page in dls_tab_list:
             tab=QtGui.QWidget()
@@ -360,7 +363,7 @@ class XChemExplorer(QtGui.QApplication):
                                                         'img3',
                                                         'img4',
                                                         'img5',
-                                                        'Program',
+                                                        'Show\nDetails',
                                                         'Show Diffraction\nImage'
                                                         ]
 
@@ -369,8 +372,14 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_summary_table.setSortingEnabled(True)
         self.data_collection_summary_table.setHorizontalHeaderLabels(self.data_collection_summary_column_name)
 
+        # table
         self.data_collection_summarys_vbox_for_table=QtGui.QVBoxLayout()
         self.dls_tab_dict['Summary'][1].addLayout(self.data_collection_summarys_vbox_for_table)
+
+        # another vbox for details to be shown
+        self.data_collection_summarys_vbox_for_details=QtGui.QVBoxLayout()
+        self.dls_tab_dict['Summary'][1].addLayout(self.data_collection_summarys_vbox_for_details)
+
         self.data_collection_summarys_vbox_for_table.addWidget(self.data_collection_summary_table)
 
         ######################################################################################
@@ -747,6 +756,17 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_adjust_allowed_unit_cell_difference.addWidget(self.adjust_allowed_unit_cell_difference)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_adjust_allowed_unit_cell_difference)
 
+        settings_hbox_acceptable_low_resolution_limit=QtGui.QHBoxLayout()
+        self.adjust_acceptable_low_resolution_limit_label=QtGui.QLabel('Acceptable low resolution limit for datasets (in Angstrom):')
+        settings_hbox_acceptable_low_resolution_limit.addWidget(self.adjust_acceptable_low_resolution_limit)
+        settings_hbox_acceptable_low_resolution_limit.addStretch(1)
+        self.adjust_acceptable_low_resolution_limit = QtGui.QLineEdit()
+        self.adjust_acceptable_low_resolution_limit.setFixedWidth(200)
+        self.adjust_acceptable_low_resolution_limit.setText(str(self.acceptable_low_resolution_limit_for_data))
+        self.adjust_acceptable_low_resolution_limit.textChanged[str].connect(self.change_acceptable_low_resolution_limit)
+        settings_hbox_adjust_acceptable_low_resolution_limit.addWidget(self.adjust_acceptable_low_resolution_limit)
+        self.data_collection_vbox_for_settings.addLayout(settings_hbox_adjust_acceptable_low_resolution_limit)
+
 #        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nRefine Model Directory:'))
 #        settings_hbox_refine_model_directory=QtGui.QHBoxLayout()
 #        self.refine_model_directory_label=QtGui.QLabel(self.refine_model_directory)
@@ -1084,6 +1104,7 @@ class XChemExplorer(QtGui.QApplication):
             self.settings['ccp4_scratch']=self.ccp4_scratch_directory
 
             self.allowed_unitcell_difference_percent=pickled_settings['unitcell_difference']
+            self.acceptable_low_resolution_limit_for_data=pickled_settings['too_low_resolution_data']
 
             reference_directory_temp=pickled_settings['reference_directory']
             if reference_directory_temp != self.reference_directory:
@@ -1100,6 +1121,7 @@ class XChemExplorer(QtGui.QApplication):
             self.beamline_directory_label.setText(self.beamline_directory)
             self.ccp4_scratch_directory_label.setText(self.ccp4_scratch_directory)
             self.adjust_allowed_unit_cell_difference.setText(str(self.allowed_unitcell_difference_percent))
+            self.adjust_acceptable_low_resolution_limit.setText(str(self.acceptable_low_resolution_limit_for_data))
             self.reference_file_list=self.get_reference_file_list(' ')
 
 
@@ -1262,14 +1284,22 @@ class XChemExplorer(QtGui.QApplication):
     def change_allowed_unitcell_difference_percent(self,text):
         try:
             self.allowed_unitcell_difference_percent=int(text)
-            self.settings['unitcell_difference']=self.adjust_allowed_unit_cell_difference
+            self.settings['unitcell_difference']=self.allowed_unitcell_difference_percent
         except ValueError:
             if str(text).find('.') != -1:
                 self.allowed_unitcell_difference_percent=int(str(text)[:str(text).find('.')])
-                self.settings['unitcell_difference']=self.adjust_allowed_unit_cell_difference
+                self.settings['unitcell_difference']=self.allowed_unitcell_difference_percent
             else:
                 pass
-        print self.allowed_unitcell_difference_percent
+
+    def change_acceptable_low_resolution_limit(self,text):
+        try:
+            self.acceptable_low_resolution_limit_for_data=float(text)
+            self.settings['too_low_resolution_data']=self.acceptable_low_resolution_limit_for_data
+        except ValueError:
+            pass
+
+
 
 
     def change_filename_root(self,text):
@@ -2216,6 +2246,9 @@ class XChemExplorer(QtGui.QApplication):
             for key in self.initial_model_dimple_dict:
                 self.initial_model_dimple_dict[key][0].setChecked(False)
 
+    def show_data_collection_details(self,state):
+        print 'checked'
+
     def continously_check_for_new_data_collection(self,state):
         if state == QtCore.Qt.Checked:
             print '==> checking automatically every 120s for new data collection'
@@ -2305,13 +2338,20 @@ class XChemExplorer(QtGui.QApplication):
                     self.data_collection_summary_table.setCellWidget(row, column, image)
                     image_number+=1
 
-                elif header[0].startswith('Show'):
+                elif header[0].startswith('Show Diffraction\nImage'):
                     diffraction_image=latest_run[5]
                     diffraction_image_name=diffraction_image[diffraction_image.rfind('/')+1:]
                     start_albula_button=QtGui.QPushButton('Show: \n'+diffraction_image_name)
                     start_albula_button.clicked.connect(self.button_clicked)
                     self.albula_button_dict[xtal]=[start_albula_button,diffraction_image]
                     self.data_collection_summary_table.setCellWidget(row,column,start_albula_button)
+                elif header[0].startswith('Show\nDetails'):
+                    show_data_collection_details_checkbox=QtGui.QCheckBox()
+                    show_data_collection_details_checkbox.toggle()
+                    show_data_collection_details_checkbox.setChecked(False)
+                    show_data_collection_details_checkbox.connect(self.show_data_collection_details)
+                    self.data_collection_summary_table.setCellWidget(row,column,show_data_collection_details_checkbox)
+                    self.data_collection_summary_dict[xtal].append(show_data_collection_details_checkbox)
                 else:
                     cell_text=QtGui.QTableWidgetItem()
                     # in case data collection failed for whatever reason
