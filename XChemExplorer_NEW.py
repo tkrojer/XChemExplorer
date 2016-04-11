@@ -427,9 +427,9 @@ class XChemExplorer(QtGui.QApplication):
             for position in range(16):
                 print puck, position
                 if puck==0:
-                    self.dewar_configuration_layout.addWidget(QtGui.QLabel(position), puck, position)
+                    self.dewar_configuration_layout.addWidget(QtGui.QLabel(str(position)), puck, position)
                 if position==0:
-                    self.dewar_configuration_layout.addWidget(QtGui.QLabel(puck), puck, position)
+                    self.dewar_configuration_layout.addWidget(QtGui.QLabel(str(puck)), puck, position)
 
 #        self.data_collection_summarys_vbox_for_details=QtGui.QVBoxLayout()
 #        self.data_collection_details_currently_on_display=None
