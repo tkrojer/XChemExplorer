@@ -195,6 +195,7 @@ class XChemExplorer(QtGui.QApplication):
         self.albula = None
         self.albula_subframes=[]
         self.show_diffraction_image = None
+        self.data_collection_details_currently_on_display=None      # can be any widget to be displayed in data collection summary tab
 
         self.dataset_outcome = {    "success":                      "rgb(200,200,200)",
                                     "Failed - centring failed":     "rgb(200,200,200)",
@@ -378,6 +379,7 @@ class XChemExplorer(QtGui.QApplication):
 
         # another vbox for details to be shown
         self.data_collection_summarys_vbox_for_details=QtGui.QVBoxLayout()
+        self.data_collection_details_currently_on_display=None
         self.dls_tab_dict['Summary'][1].addLayout(self.data_collection_summarys_vbox_for_details)
 
         self.data_collection_summarys_vbox_for_table.addWidget(self.data_collection_summary_table)
@@ -2248,14 +2250,18 @@ class XChemExplorer(QtGui.QApplication):
                 self.initial_model_dimple_dict[key][0].setChecked(False)
 
     def show_data_collection_details(self,state):
+        # first remove currently displayed widget
+        if self.data_collection_details_currently_on_display != None:
+            self.data_collection_summarys_vbox_for_details.removeWidget(self.data_collection_details_currently_on_display)
+
         for key in self.data_collection_summary_dict:
             if self.data_collection_summary_dict[key][0]==self.sender():
-                self.data_collection_summary_dict[key][0].setChecked(True)
-                self.data_collection_summarys_vbox_for_details.addWidget(QtGui.QLabel(key))
-
-            else:
-                # un-check all other ones
-                self.data_collection_summary_dict[key][0].setChecked(False)
+                print key
+#                self.data_collection_summary_dict[key][0].setChecked(True)
+#                self.data_collection_summarys_vbox_for_details.addWidget(QtGui.QLabel(key))
+#            else:
+#                # un-check all other ones
+#                self.data_collection_summary_dict[key][0].setChecked(False)
 
     def continously_check_for_new_data_collection(self,state):
         if state == QtCore.Qt.Checked:
