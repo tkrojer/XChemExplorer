@@ -2252,6 +2252,9 @@ class XChemExplorer(QtGui.QApplication):
 #            print key,self.sender(),self.data_collection_summary_dict[key]
             if self.data_collection_summary_dict[key][0]==self.sender():
                 print key
+            else:
+                # un-check all other ones
+                self.data_collection_summary_dict[key][0].setChecked(False)
 
     def continously_check_for_new_data_collection(self,state):
         if state == QtCore.Qt.Checked:
