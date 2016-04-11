@@ -421,8 +421,8 @@ class XChemExplorer(QtGui.QApplication):
         ######################################################################################
         # @ Dewar
 
-        for puck in range(1,37):
-            for position in range(1,16):
+        for puck in range(37):
+            for position in range(16):
                 print puck, position
 
 #        self.data_collection_summarys_vbox_for_details=QtGui.QVBoxLayout()
@@ -2269,8 +2269,9 @@ class XChemExplorer(QtGui.QApplication):
         if self.data_collection_details_currently_on_display != None:
             print self.data_collection_details_currently_on_display
 #            self.data_collection_details_currently_on_display.hide()
-            self.data_collection_summarys_vbox_for_details.removeWidget(self.data_collection_details_currently_on_display)
+#            self.data_collection_summarys_vbox_for_details.removeWidget(self.data_collection_details_currently_on_display)
 #            self.data_collection_details_currently_on_display.deleteLater()
+            self.data_collection_details_currently_on_display.setParent(None)
             sip.delete(self.data_collection_details_currently_on_display)
             self.data_collection_details_currently_on_display=None
             print self.data_collection_details_currently_on_display
