@@ -2265,12 +2265,12 @@ class XChemExplorer(QtGui.QApplication):
                 # not if there is a run, but images are for whatever reason not present in self.data_collection_dict
                 # then use image not available from $XChemExplorer_DIR/image/IMAGE_NOT_AVAILABLE.png
                 # not sure how to do this at the moment; it will probably trigger an error that I can catch
-                        pixmap = QtGui.QPixmap()
-                        pixmap.loadFromData(base64.b64decode(encoded_image[1]))
-                        label = QtGui.QLabel()
-                        label.resize(320,200)
-                        label.setPixmap(pixmap.scaled(label.size(), QtCore.Qt.KeepAspectRatio))
-                        layout.addWidget(label, run_number, image_number)
+#                        pixmap = QtGui.QPixmap()
+#                        pixmap.loadFromData(base64.b64decode(encoded_image[1]))
+#                        label = QtGui.QLabel()
+#                        label.resize(320,200)
+#                        label.setPixmap(pixmap.scaled(label.size(), QtCore.Qt.KeepAspectRatio))
+#                        layout.addWidget(label, run_number, image_number)
                     self.data_collection_image_dict[xtal].append([entry[6],entry[1],entry[2],entry[3],entry[5]])
 #            print 'xtal:',xtal,'dict:',self.data_collection_image_dict[xtal]
             #############################################################################
