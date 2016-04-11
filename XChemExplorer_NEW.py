@@ -2250,10 +2250,12 @@ class XChemExplorer(QtGui.QApplication):
                 self.initial_model_dimple_dict[key][0].setChecked(False)
 
     def show_data_collection_details(self,state):
+        print 'ACTIVE'
         # first remove currently displayed widget
         if self.data_collection_details_currently_on_display != None:
             print self.data_collection_details_currently_on_display
             self.data_collection_summarys_vbox_for_details.removeWidget(self.data_collection_details_currently_on_display)
+            self.data_collection_details_currently_on_display.deleteLater()
 
         for key in self.data_collection_summary_dict:
             if self.data_collection_summary_dict[key][0]==self.sender():
