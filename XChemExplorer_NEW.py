@@ -1,6 +1,7 @@
 import os, sys, glob
 #import getopt
 from datetime import datetime
+import sip
 
 # diffraction image viewing only possible at DLS
 sys.path.append('/dls_sw/apps/albula/3.1/dectris/albula/3.1/python')
@@ -419,6 +420,10 @@ class XChemExplorer(QtGui.QApplication):
 
         ######################################################################################
         # @ Dewar
+
+        for puck in range(1,37):
+            for position in range(1,16):
+                print puck, position
 
 #        self.data_collection_summarys_vbox_for_details=QtGui.QVBoxLayout()
 #        self.data_collection_details_currently_on_display=None
@@ -2263,9 +2268,10 @@ class XChemExplorer(QtGui.QApplication):
         # first remove currently displayed widget
         if self.data_collection_details_currently_on_display != None:
             print self.data_collection_details_currently_on_display
-            self.data_collection_details_currently_on_display.hide()
+#            self.data_collection_details_currently_on_display.hide()
             self.data_collection_summarys_vbox_for_details.removeWidget(self.data_collection_details_currently_on_display)
-            self.data_collection_details_currently_on_display.deleteLater()
+#            self.data_collection_details_currently_on_display.deleteLater()
+            sip.delete(self.data_collection_details_currently_on_display)
             self.data_collection_details_currently_on_display=None
             print self.data_collection_details_currently_on_display
 
