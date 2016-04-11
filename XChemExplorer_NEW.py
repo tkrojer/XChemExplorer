@@ -2249,8 +2249,8 @@ class XChemExplorer(QtGui.QApplication):
 
     def show_data_collection_details(self,state):
         for key in self.data_collection_summary_dict:
-            print key,self.sender(),self.data_collection_summary_dict[key]
-            if self.data_collection_summary_dict[key]==self.sender():
+#            print key,self.sender(),self.data_collection_summary_dict[key]
+            if self.data_collection_summary_dict[key][0]==self.sender():
                 print key
 
     def continously_check_for_new_data_collection(self,state):
