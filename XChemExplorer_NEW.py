@@ -123,6 +123,7 @@ class XChemExplorer(QtGui.QApplication):
         self.target=''
         self.dataset_outcome_combobox_dict={}
         self.data_collection_dict={}
+        self.dewar_configuration_dict={}
         self.data_collection_statistics_dict={}
         self.initial_model_dimple_dict={}       # contains toggle button if dimple should be run
         self.reference_file_list=[]
@@ -420,15 +421,15 @@ class XChemExplorer(QtGui.QApplication):
 
         ######################################################################################
         # @ Dewar
-
+#        self.dewar_configuration_dict
         self.dewar_configuration_layout = QtGui.QGridLayout()
 
         for puck in range(37):
             for position in range(16):
-                if puck==0:
-                    self.dewar_configuration_layout.addWidget(QtGui.QLabel(str(position)), puck, position)
-                if position==0:
-                    self.dewar_configuration_layout.addWidget(QtGui.QLabel(str(puck)), puck, position)
+                if puck==0 and position != 0:
+                    self.dewar_configuration_layout.addWidget(QtGui.QLabel(str(position)), position, puck)
+                if position==0 and puck != 0:
+                    self.dewar_configuration_layout.addWidget(QtGui.QLabel(str(puck)), position, puck)
 
 #        self.data_collection_summarys_vbox_for_details=QtGui.QVBoxLayout()
 #        self.data_collection_details_currently_on_display=None
@@ -2283,12 +2284,13 @@ class XChemExplorer(QtGui.QApplication):
 
         for key in self.data_collection_summary_dict:
             if self.data_collection_summary_dict[key][0]==self.sender():
+                print key
                 if self.sender().isChecked():
                     print key
-                self.data_collection_summary_dict[key][0].setChecked(True)
-                self.data_collection_details_currently_on_display=QtGui.QLabel(key)
-                self.data_collection_summarys_vbox_for_details.addWidget(self.data_collection_details_currently_on_display)
-                print 'new widget:', self.data_collection_details_currently_on_display
+#                    self.data_collection_summary_dict[key][0].setChecked(True)
+                    self.data_collection_details_currently_on_display=QtGui.QLabel(key)
+                    self.data_collection_summarys_vbox_for_details.addWidget(self.data_collection_details_currently_on_display)
+                    print 'new widget:', self.data_collection_details_currently_on_display
             else:
                 # un-check all other ones
                 self.data_collection_summary_dict[key][0].setChecked(False)
