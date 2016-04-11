@@ -416,6 +416,15 @@ class XChemExplorer(QtGui.QApplication):
         self.dls_data_collection_vbox.addWidget(dls_tab_widget)
         self.dls_data_collection_vbox.addLayout(data_collection_button_hbox)
 
+
+        ######################################################################################
+        # @ Dewar
+
+#        self.data_collection_summarys_vbox_for_details=QtGui.QVBoxLayout()
+#        self.data_collection_details_currently_on_display=None
+#        self.dls_tab_dict['Summary'][1].addLayout(self.data_collection_summarys_vbox_for_details)
+
+
         ######################################################################################
         # Overview Tab
         self.data_collection_vbox_for_overview=QtGui.QVBoxLayout()
@@ -2254,8 +2263,8 @@ class XChemExplorer(QtGui.QApplication):
         # first remove currently displayed widget
         if self.data_collection_details_currently_on_display != None:
             print self.data_collection_details_currently_on_display
-            self.data_collection_summarys_vbox_for_details.removeWidget(self.data_collection_details_currently_on_display)
             self.data_collection_details_currently_on_display.hide()
+            self.data_collection_summarys_vbox_for_details.removeWidget(self.data_collection_details_currently_on_display)
             self.data_collection_details_currently_on_display.deleteLater()
             self.data_collection_details_currently_on_display=None
             print self.data_collection_details_currently_on_display
