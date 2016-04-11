@@ -429,7 +429,9 @@ class XChemExplorer(QtGui.QApplication):
                 frame=QtGui.QFrame()
                 frame.setFrameShape(QtGui.QFrame.StyledPanel)
                 vbox_for_frame=QtGui.QVBoxLayout()
-                if puck==0 and position != 0:
+                if puck==0 and position == 0:
+                    label=QtGui.QLabel('')
+                elif puck==0 and position != 0:
                     label=QtGui.QLabel(str(position))
                 elif position==0 and puck != 0:
                     label=QtGui.QLabel(str(puck))
@@ -1726,8 +1728,8 @@ class XChemExplorer(QtGui.QApplication):
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-            self.connect(self.work_thread, QtCore.SIGNAL("create_widgets_for_autoprocessing_results"),
-                                                     self.create_widgets_for_autoprocessing_results)
+            self.connect(self.work_thread, QtCore.SIGNAL("create_widgets_for_autoprocessing_results_only"),
+                                                     self.create_widgets_for_autoprocessing_results_only)
             self.work_thread.start()
 
 
