@@ -2259,7 +2259,9 @@ class XChemExplorer(QtGui.QApplication):
                 if self.sender().isChecked():
                     print key
 #                self.data_collection_summary_dict[key][0].setChecked(True)
-#                self.data_collection_summarys_vbox_for_details.addWidget(QtGui.QLabel(key))
+                tmpText=QtGui.QLabel(key)
+                self.data_collection_summarys_vbox_for_details.addWidget(tmpText)
+                self.data_collection_details_currently_on_display=tmpText
             else:
                 # un-check all other ones
                 self.data_collection_summary_dict[key][0].setChecked(False)
