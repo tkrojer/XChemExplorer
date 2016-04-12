@@ -1408,6 +1408,8 @@ class XChemExplorer(QtGui.QApplication):
                     if entry[0]=='logfile':
                         db_dict=entry[6]
                         print xtal, db_dict['DataProcessingPathToMTZfile']
+                        print xtal, db_dict['DataProcessingPointGroup']
+                        print xtal, db_dict['DataProcessingUnitCellVolume']
                         # check if suitable reference file is available
             for reference in self.reference_file_list:
                 print reference
