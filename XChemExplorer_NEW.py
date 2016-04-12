@@ -2447,10 +2447,18 @@ class XChemExplorer(QtGui.QApplication):
 #            sip.delete(self.data_collection_details_currently_on_display)
             self.data_collection_details_currently_on_display=None
 
+        tmp=[]
+        allRows = self.data_collection_summary_table.rowCount()
+        for table_row in range(allRows):
+            tmp.append(self.data_collection_summary_table.item(table_row,0).text(),table_row)
+
         for key in self.data_collection_summary_dict:
             if self.data_collection_summary_dict[key][3]==self.sender():
                 if self.sender().isChecked():
-                    print key
+                    for item in tmp:
+                        if item[0]==self.sender():
+                            for column in self.data_collection_summary_table.columnCount():
+                                self.data_collection_summary_table.item(item[1], column).setBackground(QtGui.QColor(255,255,150))
                     self.data_collection_details_currently_on_display=self.data_collection_column_three_dict[key][0]
                     self.data_collection_summarys_vbox_for_details.addWidget(self.data_collection_details_currently_on_display)
 #                    self.data_collection_summarys_vbox_for_details.setSizeConstraint(QtGui.QLayout.SetMinimumSize)
@@ -2458,7 +2466,7 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 # un-check all other ones
                 self.data_collection_summary_dict[key][3].setChecked(False)
-        print self.data_collection_summary_table.columnCount()
+#        print self.data_collection_summary_table.columnCount()
 #            if xtal_in_table and mtz_already_in_inital_model_directory:
 #                self.main_data_collection_table.item(current_row, 0).setBackground(QtGui.QColor(100,100,150))
 #                self.main_data_collection_table.item(current_row, 1).setBackground(QtGui.QColor(100,100,150))
