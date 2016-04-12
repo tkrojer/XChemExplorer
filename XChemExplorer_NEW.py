@@ -2538,14 +2538,14 @@ class XChemExplorer(QtGui.QApplication):
             latest_run=max(tmp,key=lambda x: x[1])[0]
 
 
-            new_run_for_exisiting_crystal=False
+            new_run_for_exisiting_crystal_or_new_sample=True
             if not new_xtal:
                 # check if newer run appeared
                 old_run_timestamp=self.data_collection_summary_dict[xtal][2][3]
                 new_run_timestamp=latest_run[3]
                 print old_run_timestamp,new_run_timestamp
-                if old_run_timestamp != new_run_timestamp:
-                    new_run_for_exisiting_crystal=True
+                if old_run_timestamp == new_run_timestamp:
+                    new_run_for_exisiting_crystal_or_new_sample=False
             # this gets updated every time it runs
             self.data_collection_summary_dict[xtal]=[outcome,db_dict,latest_run]
 
@@ -2554,8 +2554,9 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 allRows = self.data_collection_summary_table.rowCount()
                 for table_row in range(allRows):
-                    print table_row,self.data_collection_summary_table.item(table_row,0).text()
-
+                    if self.data_collection_summary_table.item(table_row,0).text() == xtal:
+                        current_row=table_row
+                        break
 
             image_number=0
             for column,header in enumerate(column_name):
@@ -2565,35 +2566,41 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                     self.data_collection_summary_table.setItem(current_row, column, cell_text)
                 elif header[0]=='DataCollection\nOutcome':
-                    dataset_outcome_combobox = QtGui.QComboBox()
-                    for outcomeItem in self.dataset_outcome:
-                        dataset_outcome_combobox.addItem(outcomeItem)
-                    self.data_collection_summary_table.setCellWidget(current_row, column, dataset_outcome_combobox)
+                    if new_xtal
+                        dataset_outcome_combobox = QtGui.QComboBox()
+                        for outcomeItem in self.dataset_outcome:
+                            dataset_outcome_combobox.addItem(outcomeItem)
+                        self.data_collection_summary_table.setCellWidget(current_row, column, dataset_outcome_combobox)
                     index = dataset_outcome_combobox.findText(str(outcome), QtCore.Qt.MatchFixedString)
                     dataset_outcome_combobox.setCurrentIndex(index)
                     dataset_outcome_combobox.activated[str].connect(self.dataset_outcome_combobox_change_outcome)
-                    self.dataset_outcome_combobox_dict[xtal]=dataset_outcome_combobox
+#                    self.dataset_outcome_combobox_dict[xtal]=dataset_outcome_combobox
                     continue
 
                 elif header[0].startswith('img'):
-                    img=latest_run[4]
-                    pixmap = QtGui.QPixmap()
-                    # can do this (img[image_number][1]) because made sure in the threading module
-                    # that there are always exactly 5 images in there
-                    pixmap.loadFromData(base64.b64decode(img[image_number][1]))
-                    image = QtGui.QLabel()
-                    image.resize(128,80)
-                    image.setPixmap(pixmap.scaled(image.size(), QtCore.Qt.KeepAspectRatio))
-                    self.data_collection_summary_table.setCellWidget(current_row, column, image)
-                    image_number+=1
+                    if new_run_for_exisiting_crystal_or_new_sample:
+                        img=latest_run[4]
+                        pixmap = QtGui.QPixmap()
+                        # can do this (img[image_number][1]) because made sure in the threading module
+                        # that there are always exactly 5 images in there
+                        pixmap.loadFromData(base64.b64decode(img[image_number][1]))
+                        image = QtGui.QLabel()
+                        image.resize(128,80)
+                        image.setPixmap(pixmap.scaled(image.size(), QtCore.Qt.KeepAspectRatio))
+                        self.data_collection_summary_table.setCellWidget(current_row, column, image)
+                        image_number+=1
 
                 elif header[0].startswith('Show Diffraction\nImage'):
-                    diffraction_image=latest_run[5]
-                    diffraction_image_name=diffraction_image[diffraction_image.rfind('/')+1:]
-                    start_albula_button=QtGui.QPushButton('Show: \n'+diffraction_image_name)
-                    start_albula_button.clicked.connect(self.button_clicked)
-                    self.albula_button_dict[xtal]=[start_albula_button,diffraction_image]
-                    self.data_collection_summary_table.setCellWidget(current_row,column,start_albula_button)
+                    if new_run_for_exisiting_crystal_or_new_sample:
+                        diffraction_image=latest_run[5]
+                        diffraction_image_name=diffraction_image[diffraction_image.rfind('/')+1:]
+                        if new_xtal:
+                            start_albula_button=QtGui.QPushButton('Show: \n'+diffraction_image_name)
+                            start_albula_button.clicked.connect(self.button_clicked)
+                            self.albula_button_dict[xtal]=[start_albula_button,diffraction_image]
+                            self.data_collection_summary_table.setCellWidget(current_row,column,start_albula_button)
+                        else:
+                            self.albula_button_dict[xtal][1]=diffraction_image
                 elif header[0].startswith('Show\nDetails'):
                     show_data_collection_details_checkbox=QtGui.QCheckBox()
                     show_data_collection_details_checkbox.toggle()
