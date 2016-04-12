@@ -2456,11 +2456,12 @@ class XChemExplorer(QtGui.QApplication):
                 if self.sender().isChecked():
                     for item in tmp:
                         if item[0]==key:
-                            for column in range(self.data_collection_summary_table.columnCount()):
-                                try:
-                                    self.data_collection_summary_table.item(item[1], column).setBackground(QtGui.QColor(255,255,150))
-                                except AttributeError:
-                                    pass
+                            self.data_collection_summary_table.selectRow(item[1])
+#                            for column in range(self.data_collection_summary_table.columnCount()):
+#                                try:
+#                                    self.data_collection_summary_table.item(item[1], column).setBackground(QtGui.QColor(255,255,150))
+#                                except AttributeError:
+#                                    pass
                     self.data_collection_details_currently_on_display=self.data_collection_column_three_dict[key][0]
                     self.data_collection_summarys_vbox_for_details.addWidget(self.data_collection_details_currently_on_display)
 #                    self.data_collection_summarys_vbox_for_details.setSizeConstraint(QtGui.QLayout.SetMinimumSize)
