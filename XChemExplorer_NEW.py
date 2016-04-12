@@ -1,14 +1,12 @@
 import os, sys, glob
-#import getopt
 from datetime import datetime
-import sip
 
-# diffraction image viewing only possible at DLS
-sys.path.append('/dls_sw/apps/albula/3.1/dectris/albula/3.1/python')
-try:
-    import dectris.albula
-except (ImportError,RuntimeError):
-    pass
+## diffraction image viewing only possible at DLS
+#sys.path.append('/dls_sw/apps/albula/3.1/dectris/albula/3.1/python')
+#try:
+#    import dectris.albula
+#except (ImportError,RuntimeError):
+#    pass
 
 from PyQt4 import QtGui, QtCore, QtWebKit
 
@@ -341,7 +339,7 @@ class XChemExplorer(QtGui.QApplication):
 
         dls_tab_widget = QtGui.QTabWidget()
         dls_tab_list = [ 'Summary',
-                         'Details',
+                         #'Details',
                          'Dewar'    ]
         self.dls_tab_dict={}
         for page in dls_tab_list:
