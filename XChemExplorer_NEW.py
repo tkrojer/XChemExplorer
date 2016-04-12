@@ -2453,7 +2453,7 @@ class XChemExplorer(QtGui.QApplication):
                     print key
                     self.data_collection_details_currently_on_display=self.data_collection_column_three_dict[key][0]
                     self.data_collection_summarys_vbox_for_details.addWidget(self.data_collection_details_currently_on_display)
-                    self.data_collection_summarys_vbox_for_details.setMaximumHeight(200)
+                    self.data_collection_summarys_vbox_for_details..setSizeConstraint(QtGui.QLayout.SetMinimumSize)
                     self.data_collection_details_currently_on_display.show()
             else:
                 # un-check all other ones
