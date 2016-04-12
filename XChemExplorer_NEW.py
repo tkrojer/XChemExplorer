@@ -1411,9 +1411,16 @@ class XChemExplorer(QtGui.QApplication):
                         print xtal, db_dict['DataProcessingPointGroup']
                         print xtal, db_dict['DataProcessingUnitCellVolume']
                         # check if suitable reference file is available
+            suitable_reference=[]
             for reference in self.reference_file_list:
-                print reference
-
+                # first we need one in the same pointgroup
+                if reference[5]==db_dict['DataProcessingPointGroup']:
+                    try:
+                        difference=math.fabs(1-(float(db_dict['DataProcessingUnitCellVolume'])/float(reference[4])))
+                        suitable_reference.append([reference[0],difference])
+            if suitable_reference != []:
+                reference_file=min(suitable_reference,key=lambda x: x[1])[0]
+                print os.path.join(self.reference_directory,reference_file+'.pdb')
 
 
 
