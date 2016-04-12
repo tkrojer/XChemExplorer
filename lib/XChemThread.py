@@ -1298,6 +1298,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                         # now comes the distl plot
                         image_name=run+'.png'
                         if os.path.isfile(os.path.join(visit_directory,'jpegs',self.target,xtal,run+'.png')):
+                            print 'gg'
                             print os.stat(os.path.join(visit_directory,'jpegs',self.target,xtal,run+'.png')).st_size
                             if os.stat(os.path.join(visit_directory,'jpegs',self.target,xtal,run+'.png')).st_size != 0:
                                 image_file=open(os.path.join(visit_directory,'jpegs',self.target,xtal,run+'.png'),"rb")
