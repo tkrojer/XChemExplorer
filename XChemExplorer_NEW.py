@@ -2453,11 +2453,15 @@ class XChemExplorer(QtGui.QApplication):
                     print key
                     self.data_collection_details_currently_on_display=self.data_collection_column_three_dict[key][0]
                     self.data_collection_summarys_vbox_for_details.addWidget(self.data_collection_details_currently_on_display)
-                    self.data_collection_summarys_vbox_for_details.setSizeConstraint(QtGui.QLayout.SetMinimumSize)
+#                    self.data_collection_summarys_vbox_for_details.setSizeConstraint(QtGui.QLayout.SetMinimumSize)
                     self.data_collection_details_currently_on_display.show()
             else:
                 # un-check all other ones
                 self.data_collection_summary_dict[key][3].setChecked(False)
+        print self.data_collection_summary_table.columnCount()
+#            if xtal_in_table and mtz_already_in_inital_model_directory:
+#                self.main_data_collection_table.item(current_row, 0).setBackground(QtGui.QColor(100,100,150))
+#                self.main_data_collection_table.item(current_row, 1).setBackground(QtGui.QColor(100,100,150))
 
     def continously_check_for_new_data_collection(self,state):
         if state == QtCore.Qt.Checked:
