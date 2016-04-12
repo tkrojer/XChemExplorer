@@ -2572,12 +2572,12 @@ class XChemExplorer(QtGui.QApplication):
                             dataset_outcome_combobox.addItem(outcomeItem)
                         self.data_collection_summary_table.setCellWidget(current_row, column, dataset_outcome_combobox)
                         dataset_outcome_combobox.activated[str].connect(self.dataset_outcome_combobox_change_outcome)
+                        self.dataset_outcome_combobox_dict[xtal]=dataset_outcome_combobox
+                    index = self.dataset_outcome_combobox_dict[xtal].findText(str(outcome), QtCore.Qt.MatchFixedString)
+                    self.dataset_outcome_combobox_dict[xtal].setCurrentIndex(index)
 #                    index = dataset_outcome_combobox.findText(str(outcome), QtCore.Qt.MatchFixedString)
 #                    dataset_outcome_combobox.setCurrentIndex(index)
 #                    dataset_outcome_combobox.activated[str].connect(self.dataset_outcome_combobox_change_outcome)
-                    index = self.data_collection_summary_table.item(current_row,column).findText(str(outcome), QtCore.Qt.MatchFixedString)
-                    self.data_collection_summary_table.item(current_row,column).setCurrentIndex(index)
-#                    self.dataset_outcome_combobox_dict[xtal]=dataset_outcome_combobox
                     continue
 
                 elif header[0].startswith('img'):
