@@ -1638,6 +1638,7 @@ class XChemExplorer(QtGui.QApplication):
             for key in self.albula_button_dict:
                 if self.albula_button_dict[key][0]==self.sender():
                     print self.albula_button_dict[key]
+                    os.system('dials.image_viewer '+self.albula_button_dict[key][1])
 #                    diffraction_image=self.albula_button_dict[key][1]
 #            if not self.albula:
 #                self.albula = dectris.albula.openMainFrame()
