@@ -2509,6 +2509,7 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 outcome="Failed - unknown"
             self.dataset_outcome_dict[xtal]=outcome
+            print xtal,outcome
 
             # find which autoprocessing run was thought to be the best
             selected_processing_result=0
