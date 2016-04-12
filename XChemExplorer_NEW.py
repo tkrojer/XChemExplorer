@@ -1401,6 +1401,15 @@ class XChemExplorer(QtGui.QApplication):
             self.work_thread.start()
 
         elif self.explorer_active==0 and self.data_source_set==True \
+            and self.sender().text()=="Rerun Dimple on Everything" \
+            and self.data_collection_summary_file != '':
+            for xtal in self.data_collection_dict:
+                for entry in self.data_collection_dict[xtal]:
+                    if entry[0]=='logfile':
+                        db_dict=entry[6]
+                        print xtal, db_dict['DataProcessingPathToMTZfile']
+
+        elif self.explorer_active==0 and self.data_source_set==True \
             and self.sender().text()=="Rerun Dimple on Everything":
             for entry in self.data_collection_dict[xtal]:
                 if entry[0]=='logfile':
