@@ -2448,16 +2448,17 @@ class XChemExplorer(QtGui.QApplication):
             self.data_collection_details_currently_on_display=None
 
         for key in self.data_collection_summary_dict:
-            if self.data_collection_summary_dict[key][0]==self.sender():
+            print self.data_collection_summary_dict[key]
+            if self.data_collection_summary_dict[key][3]==self.sender():
                 if self.sender().isChecked():
                     print key
-                    self.data_collection_details_currently_on_display=self.data_collection_column_three_dict[key][0]
+                    self.data_collection_details_currently_on_display=self.data_collection_column_three_dict[key][3]
                     self.data_collection_summarys_vbox_for_details.addWidget(self.data_collection_details_currently_on_display)
                     self.data_collection_summarys_vbox_for_details.minimumSize()
                     self.data_collection_details_currently_on_display.show()
             else:
                 # un-check all other ones
-                self.data_collection_summary_dict[key][0].setChecked(False)
+                self.data_collection_summary_dict[key][3].setChecked(False)
 
     def continously_check_for_new_data_collection(self,state):
         if state == QtCore.Qt.Checked:
@@ -2514,14 +2515,17 @@ class XChemExplorer(QtGui.QApplication):
 
 
             new_run_for_exisiting_crystal_or_new_sample=True
-            if not new_xtal:
+            if new_xtal:
+                self.data_collection_summary_dict[xtal]=[outcome,db_dict,latest_run]
+            else:
                 # check if newer run appeared
                 old_run_timestamp=self.data_collection_summary_dict[xtal][2][3]
                 new_run_timestamp=latest_run[3]
                 if old_run_timestamp == new_run_timestamp:
                     new_run_for_exisiting_crystal_or_new_sample=False
-            # this gets updated every time it runs
-            self.data_collection_summary_dict[xtal]=[outcome,db_dict,latest_run]
+                else:
+                    checkbox_for_details=self.data_collection_summary_dict[xtal[3]
+                    self.data_collection_summary_dict[xtal]=[outcome,db_dict,latest_run,checkbox_for_details]
 
             if new_xtal:
                 current_row=row
