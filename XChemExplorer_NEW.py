@@ -1408,6 +1408,12 @@ class XChemExplorer(QtGui.QApplication):
                     if entry[0]=='logfile':
                         db_dict=entry[6]
                         print xtal, db_dict['DataProcessingPathToMTZfile']
+                        # check if suitable reference file is available
+            for reference in self.reference_file_list:
+                print reference
+
+
+
 
         elif self.explorer_active==0 and self.data_source_set==True \
             and self.sender().text()=="Rerun Dimple on Everything":
