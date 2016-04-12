@@ -1302,6 +1302,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             image_string=base64.b64encode(image_file.read())
                             image_list.append( [image_name,image_string] )
                         else:
+                            print runs
                             image_file=open( os.path.join(os.getenv('XChemExplorer_DIR'),'image','IMAGE_NOT_AVAILABLE.png') ,"rb")
                             image_string=base64.b64encode(image_file.read())
                             image_list.append( [image_name,image_string] )
