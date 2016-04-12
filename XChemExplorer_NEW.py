@@ -386,10 +386,11 @@ class XChemExplorer(QtGui.QApplication):
 
         ######################################################################################
         # @ Details
-        self.data_collection_vbox_for_table=QtGui.QVBoxLayout()
-        self.dls_tab_dict['Details'][1].addLayout(self.data_collection_vbox_for_table)
+#        self.data_collection_vbox_for_table=QtGui.QVBoxLayout()
+#        self.dls_tab_dict['Details'][1].addLayout(self.data_collection_vbox_for_table)
 
-
+        ######################################################################################
+        # @ Buttons
         data_collection_button_hbox=QtGui.QHBoxLayout()
         get_data_collection_button=QtGui.QPushButton("Get New Results from Autoprocessing")
         get_data_collection_button.clicked.connect(self.button_clicked)
