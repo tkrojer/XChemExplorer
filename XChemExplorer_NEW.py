@@ -1418,6 +1418,8 @@ class XChemExplorer(QtGui.QApplication):
                     try:
                         difference=math.fabs(1-(float(db_dict['DataProcessingUnitCellVolume'])/float(reference[4])))
                         suitable_reference.append([reference[0],difference])
+                    except ValueError:
+                        continue
             if suitable_reference != []:
                 reference_file=min(suitable_reference,key=lambda x: x[1])[0]
                 print os.path.join(self.reference_directory,reference_file+'.pdb')
