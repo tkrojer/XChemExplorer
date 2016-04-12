@@ -1298,11 +1298,13 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                         # now comes the distl plot
                         image_name=run+'.png'
                         if os.path.isfile(os.path.join(visit_directory,'jpegs',self.target,xtal,run+'.png')):
-                            image_file=open(os.path.join(visit_directory,'jpegs',self.target,xtal,run+'.png'),"rb")
+                            if os.stat(os.path.join(visit_directory,'jpegs',self.target,xtal,run+'.png')).st_size != 0:
+                                image_file=open(os.path.join(visit_directory,'jpegs',self.target,xtal,run+'.png'),"rb")
+                            else:
+                                image_file=open( os.path.join(os.getenv('XChemExplorer_DIR'),'image','IMAGE_NOT_AVAILABLE.png') ,"rb")
                             image_string=base64.b64encode(image_file.read())
                             image_list.append( [image_name,image_string] )
                         else:
-                            print runs
                             image_file=open( os.path.join(os.getenv('XChemExplorer_DIR'),'image','IMAGE_NOT_AVAILABLE.png') ,"rb")
                             image_string=base64.b64encode(image_file.read())
                             image_list.append( [image_name,image_string] )
