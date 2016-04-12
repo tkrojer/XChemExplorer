@@ -2524,7 +2524,7 @@ class XChemExplorer(QtGui.QApplication):
                 if old_run_timestamp == new_run_timestamp:
                     new_run_for_exisiting_crystal_or_new_sample=False
                 else:
-                    checkbox_for_details=self.data_collection_summary_dict[xtal[3]
+                    checkbox_for_details=self.data_collection_summary_dict[xtal][3]
                     self.data_collection_summary_dict[xtal]=[outcome,db_dict,latest_run,checkbox_for_details]
 
             if new_xtal:
