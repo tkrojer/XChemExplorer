@@ -2477,10 +2477,13 @@ class XChemExplorer(QtGui.QApplication):
         row = self.data_collection_summary_table.rowCount()
         self.albula_button_dict={}
         column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
+        new_xtal=False
         for xtal in sorted(self.data_collection_dict):
             if xtal not in self.data_collection_summary_dict:
                 self.data_collection_summary_table.insertRow(row)
                 self.data_collection_summary_dict[xtal]=[]
+                # self.data_collection_summary_dict[xtal]=[outcome,db_dict,image,diffraction_image]
+                new_xtal=True
             else:
                 # not finished: should be updated if new runs appear
                 # but I park this for now
@@ -2501,6 +2504,8 @@ class XChemExplorer(QtGui.QApplication):
                                 too_low_resolution=False
                         except ValueError:
                             pass
+            if not logfile_found:
+                db_dict={}
 
             if logfile_found and not too_low_resolution:
                 outcome="success"
@@ -2509,17 +2514,16 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 outcome="Failed - unknown"
             self.dataset_outcome_dict[xtal]=outcome
-            print xtal,outcome
 
-            # find which autoprocessing run was thought to be the best
-            selected_processing_result=0
-            found_db_dict=False
-            for sample in self.data_collection_dict[xtal]:
-                if sample[0]=='logfile':
-                    if sample[8]==True:
-                        selected_processing_result=sample[7]
-                        db_dict=sample[6]
-                        found_db_dict=True
+#            # find which autoprocessing run was thought to be the best
+#            selected_processing_result=0
+#            found_db_dict=False
+#            for sample in self.data_collection_dict[xtal]:
+#                if sample[0]=='logfile':
+#                    if sample[8]==True:
+#                        selected_processing_result=sample[7]
+#                        db_dict=sample[6]
+#                        found_db_dict=True
 
             # find latest run for crystal and diffraction images
 #            tmp=[]
@@ -2534,6 +2538,24 @@ class XChemExplorer(QtGui.QApplication):
             latest_run=max(tmp,key=lambda x: x[1])[0]
 
 
+            new_run_for_exisiting_crystal=False
+            if not new_xtal:
+                # check if newer run appeared
+                old_run_timestamp=self.data_collection_summary_dict[xtal][2][3]
+                new_run_timestamp=latest_run[3]
+                print old_run_timestamp,new_run_timestamp
+                if old_run_timestamp != new_run_timestamp:
+                    new_run_for_exisiting_crystal=True
+            # this gets updated every time it runs
+            self.data_collection_summary_dict[xtal]=[outcome,db_dict,latest_run]
+
+            if new_xtal:
+                current_row=row
+            else:
+                allRows = self.data_collection_summary_table.rowCount()
+                for table_row in range(allRows):
+                    print table_row,self.data_collection_summary_table.item(row,0).text()
+
 
             image_number=0
             for column,header in enumerate(column_name):
@@ -2541,12 +2563,12 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text=QtGui.QTableWidgetItem()
                     cell_text.setText(str(xtal))
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                    self.data_collection_summary_table.setItem(row, column, cell_text)
+                    self.data_collection_summary_table.setItem(current_row, column, cell_text)
                 elif header[0]=='DataCollection\nOutcome':
                     dataset_outcome_combobox = QtGui.QComboBox()
                     for outcomeItem in self.dataset_outcome:
                         dataset_outcome_combobox.addItem(outcomeItem)
-                    self.data_collection_summary_table.setCellWidget(row, column, dataset_outcome_combobox)
+                    self.data_collection_summary_table.setCellWidget(current_row, column, dataset_outcome_combobox)
                     index = dataset_outcome_combobox.findText(str(outcome), QtCore.Qt.MatchFixedString)
                     dataset_outcome_combobox.setCurrentIndex(index)
                     dataset_outcome_combobox.activated[str].connect(self.dataset_outcome_combobox_change_outcome)
@@ -2562,7 +2584,7 @@ class XChemExplorer(QtGui.QApplication):
                     image = QtGui.QLabel()
                     image.resize(128,80)
                     image.setPixmap(pixmap.scaled(image.size(), QtCore.Qt.KeepAspectRatio))
-                    self.data_collection_summary_table.setCellWidget(row, column, image)
+                    self.data_collection_summary_table.setCellWidget(current_row, column, image)
                     image_number+=1
 
                 elif header[0].startswith('Show Diffraction\nImage'):
@@ -2571,13 +2593,13 @@ class XChemExplorer(QtGui.QApplication):
                     start_albula_button=QtGui.QPushButton('Show: \n'+diffraction_image_name)
                     start_albula_button.clicked.connect(self.button_clicked)
                     self.albula_button_dict[xtal]=[start_albula_button,diffraction_image]
-                    self.data_collection_summary_table.setCellWidget(row,column,start_albula_button)
+                    self.data_collection_summary_table.setCellWidget(current_row,column,start_albula_button)
                 elif header[0].startswith('Show\nDetails'):
                     show_data_collection_details_checkbox=QtGui.QCheckBox()
                     show_data_collection_details_checkbox.toggle()
                     show_data_collection_details_checkbox.setChecked(False)
                     show_data_collection_details_checkbox.stateChanged.connect(self.show_data_collection_details)
-                    self.data_collection_summary_table.setCellWidget(row,column,show_data_collection_details_checkbox)
+                    self.data_collection_summary_table.setCellWidget(current_row,column,show_data_collection_details_checkbox)
                     self.data_collection_summary_dict[xtal].append(show_data_collection_details_checkbox)
                 else:
                     cell_text=QtGui.QTableWidgetItem()
@@ -2587,7 +2609,7 @@ class XChemExplorer(QtGui.QApplication):
                     else:
                         cell_text.setText('')
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                    self.data_collection_summary_table.setItem(row, column, cell_text)
+                    self.data_collection_summary_table.setItem(current_row, column, cell_text)
 
             row += 1
 
