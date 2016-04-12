@@ -2450,7 +2450,7 @@ class XChemExplorer(QtGui.QApplication):
         tmp=[]
         allRows = self.data_collection_summary_table.rowCount()
         for table_row in range(allRows):
-            tmp.append(self.data_collection_summary_table.item(table_row,0).text(),table_row)
+            tmp.append([self.data_collection_summary_table.item(table_row,0).text(),table_row])
 
         for key in self.data_collection_summary_dict:
             if self.data_collection_summary_dict[key][3]==self.sender():
