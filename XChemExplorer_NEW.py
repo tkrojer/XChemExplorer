@@ -2554,7 +2554,7 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 allRows = self.data_collection_summary_table.rowCount()
                 for table_row in range(allRows):
-                    print table_row,self.data_collection_summary_table.item(row,0).text()
+                    print table_row,self.data_collection_summary_table.item(table_row,0).text()
 
 
             image_number=0
