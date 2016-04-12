@@ -2604,7 +2604,7 @@ class XChemExplorer(QtGui.QApplication):
                 else:
                     cell_text=QtGui.QTableWidgetItem()
                     # in case data collection failed for whatever reason
-                    if found_db_dict:
+                    if logfile_found:
                         cell_text.setText(str( db_dict[ header[1] ]  ))
                     else:
                         cell_text.setText('')
