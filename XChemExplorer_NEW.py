@@ -2437,7 +2437,6 @@ class XChemExplorer(QtGui.QApplication):
                 self.initial_model_dimple_dict[key][0].setChecked(False)
 
     def show_data_collection_details(self,state):
-        print '\n\n\nACTIVE'
         # first remove currently displayed widget
         if self.data_collection_details_currently_on_display != None:
             self.data_collection_details_currently_on_display.hide()
@@ -2458,7 +2457,10 @@ class XChemExplorer(QtGui.QApplication):
                     for item in tmp:
                         if item[0]==key:
                             for column in range(self.data_collection_summary_table.columnCount()):
-                                self.data_collection_summary_table.item(item[1], column).setBackground(QtGui.QColor(255,255,150))
+                                try:
+                                    self.data_collection_summary_table.item(item[1], column).setBackground(QtGui.QColor(255,255,150))
+                                except AttributeError:
+                                    pass
                     self.data_collection_details_currently_on_display=self.data_collection_column_three_dict[key][0]
                     self.data_collection_summarys_vbox_for_details.addWidget(self.data_collection_details_currently_on_display)
 #                    self.data_collection_summarys_vbox_for_details.setSizeConstraint(QtGui.QLayout.SetMinimumSize)
