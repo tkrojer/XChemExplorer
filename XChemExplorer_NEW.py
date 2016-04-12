@@ -1637,14 +1637,15 @@ class XChemExplorer(QtGui.QApplication):
             diffraction_image=''
             for key in self.albula_button_dict:
                 if self.albula_button_dict[key][0]==self.sender():
-                    diffraction_image=self.albula_button_dict[key][1]
-            if not self.albula:
-                self.albula = dectris.albula.openMainFrame()
-            for frame in self.albula_subframes:
-                frame.close()
-            show_diffraction_image = self.albula.openSubFrame()
-            show_diffraction_image.loadFile(os.path.join(diffraction_image))
-            self.albula_subframes.append(show_diffraction_image)
+                    print self.albula_button_dict[key]
+#                    diffraction_image=self.albula_button_dict[key][1]
+#            if not self.albula:
+#                self.albula = dectris.albula.openMainFrame()
+#            for frame in self.albula_subframes:
+#                frame.close()
+#            show_diffraction_image = self.albula.openSubFrame()
+#            show_diffraction_image.loadFile(os.path.join(diffraction_image))
+#            self.albula_subframes.append(show_diffraction_image)
 
         elif str(self.sender().text()).startswith("Run PANDDAs"):
 
@@ -2484,11 +2485,6 @@ class XChemExplorer(QtGui.QApplication):
                 self.data_collection_summary_dict[xtal]=[]
                 # self.data_collection_summary_dict[xtal]=[outcome,db_dict,image,diffraction_image]
                 new_xtal=True
-            else:
-                # not finished: should be updated if new runs appear
-                # but I park this for now
-                print 'hallo'
-#                continue
 
             # check for dataset outcome
             outcome=''
@@ -2515,22 +2511,7 @@ class XChemExplorer(QtGui.QApplication):
                 outcome="Failed - unknown"
             self.dataset_outcome_dict[xtal]=outcome
 
-#            # find which autoprocessing run was thought to be the best
-#            selected_processing_result=0
-#            found_db_dict=False
-#            for sample in self.data_collection_dict[xtal]:
-#                if sample[0]=='logfile':
-#                    if sample[8]==True:
-#                        selected_processing_result=sample[7]
-#                        db_dict=sample[6]
-#                        found_db_dict=True
-
             # find latest run for crystal and diffraction images
-#            tmp=[]
-#            for entry in self.data_collection_dict[xtal]:
-#                if entry[0]=='image':
-#                    tmp.append(entry)
-#            latest_run=max(tmp,key=lambda x: x[0])
             tmp=[]
             for entry in self.data_collection_dict[xtal]:
                 if entry[0]=='image':
@@ -2543,7 +2524,6 @@ class XChemExplorer(QtGui.QApplication):
                 # check if newer run appeared
                 old_run_timestamp=self.data_collection_summary_dict[xtal][2][3]
                 new_run_timestamp=latest_run[3]
-                print old_run_timestamp,new_run_timestamp
                 if old_run_timestamp == new_run_timestamp:
                     new_run_for_exisiting_crystal_or_new_sample=False
             # this gets updated every time it runs
@@ -2575,9 +2555,6 @@ class XChemExplorer(QtGui.QApplication):
                         self.dataset_outcome_combobox_dict[xtal]=dataset_outcome_combobox
                     index = self.dataset_outcome_combobox_dict[xtal].findText(str(outcome), QtCore.Qt.MatchFixedString)
                     self.dataset_outcome_combobox_dict[xtal].setCurrentIndex(index)
-#                    index = dataset_outcome_combobox.findText(str(outcome), QtCore.Qt.MatchFixedString)
-#                    dataset_outcome_combobox.setCurrentIndex(index)
-#                    dataset_outcome_combobox.activated[str].connect(self.dataset_outcome_combobox_change_outcome)
                     continue
 
                 elif header[0].startswith('img'):
