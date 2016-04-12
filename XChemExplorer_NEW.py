@@ -2452,7 +2452,7 @@ class XChemExplorer(QtGui.QApplication):
             if self.data_collection_summary_dict[key][3]==self.sender():
                 if self.sender().isChecked():
                     print key
-                    self.data_collection_details_currently_on_display=self.data_collection_column_three_dict[key][3]
+                    self.data_collection_details_currently_on_display=self.data_collection_column_three_dict[key][0]
                     self.data_collection_summarys_vbox_for_details.addWidget(self.data_collection_details_currently_on_display)
                     self.data_collection_summarys_vbox_for_details.minimumSize()
                     self.data_collection_details_currently_on_display.show()
