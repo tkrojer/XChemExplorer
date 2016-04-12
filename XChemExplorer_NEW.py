@@ -2571,9 +2571,12 @@ class XChemExplorer(QtGui.QApplication):
                         for outcomeItem in self.dataset_outcome:
                             dataset_outcome_combobox.addItem(outcomeItem)
                         self.data_collection_summary_table.setCellWidget(current_row, column, dataset_outcome_combobox)
-                    index = dataset_outcome_combobox.findText(str(outcome), QtCore.Qt.MatchFixedString)
-                    dataset_outcome_combobox.setCurrentIndex(index)
-                    dataset_outcome_combobox.activated[str].connect(self.dataset_outcome_combobox_change_outcome)
+                        dataset_outcome_combobox.activated[str].connect(self.dataset_outcome_combobox_change_outcome)
+#                    index = dataset_outcome_combobox.findText(str(outcome), QtCore.Qt.MatchFixedString)
+#                    dataset_outcome_combobox.setCurrentIndex(index)
+#                    dataset_outcome_combobox.activated[str].connect(self.dataset_outcome_combobox_change_outcome)
+                    index = self.data_collection_summary_table.item(current_row,column).findText(str(outcome), QtCore.Qt.MatchFixedString)
+                    self.data_collection_summary_table.item(current_row,column).setCurrentIndex(index)
 #                    self.dataset_outcome_combobox_dict[xtal]=dataset_outcome_combobox
                     continue
 
