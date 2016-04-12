@@ -1637,16 +1637,10 @@ class XChemExplorer(QtGui.QApplication):
             diffraction_image=''
             for key in self.albula_button_dict:
                 if self.albula_button_dict[key][0]==self.sender():
-                    print self.albula_button_dict[key]
-                    os.system('dials.image_viewer '+self.albula_button_dict[key][1])
-#                    diffraction_image=self.albula_button_dict[key][1]
-#            if not self.albula:
-#                self.albula = dectris.albula.openMainFrame()
-#            for frame in self.albula_subframes:
-#                frame.close()
-#            show_diffraction_image = self.albula.openSubFrame()
-#            show_diffraction_image.loadFile(os.path.join(diffraction_image))
-#            self.albula_subframes.append(show_diffraction_image)
+                    print '==> XCE: starting dials.image_viewer'
+                    self.work_thread=XChemThread.start_dials_image_viewer(self.albula_button_dict[key][1])
+                    self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+                    self.work_thread.start()
 
         elif str(self.sender().text()).startswith("Run PANDDAs"):
 

@@ -280,6 +280,14 @@ class start_pandda_inspect(QtCore.QThread):
         print Cmds
         os.system(Cmds)
 
+class start_dials_image_viewer(QtCore.QThread):
+
+    def __init__(self,diffraction_image):
+        QtCore.QThread.__init__(self)
+        self.diffraction_image=diffraction_image
+
+    def run(self):
+        os.system('dials.image_viewer '+self.diffraction_image)
 
 
 class read_intial_refinement_results(QtCore.QThread):
