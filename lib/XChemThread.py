@@ -224,7 +224,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             ref_mtz =               item[4]
             ref_cif =               item[5]
 
-            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running dimple -> '+xtal,visit_run_autoproc)
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running dimple -> '+xtal+'+'+visit_run_autoproc)
 
 #            if not os.path.isdir(os.path.join(self.initial_model_directory,sample)):
 #                os.mkdir(os.path.join(self.initial_model_directory,sample))
