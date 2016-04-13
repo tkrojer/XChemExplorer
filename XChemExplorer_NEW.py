@@ -378,6 +378,7 @@ class XChemExplorer(QtGui.QApplication):
         ######################################################################################
         # @ Dewar
         self.dewar_configuration_dict={}
+        self.dewar_label_active=''
         self.dewar_configuration_layout = QtGui.QGridLayout()
 
         # create context menu
@@ -922,16 +923,16 @@ class XChemExplorer(QtGui.QApplication):
     def on_context_menu(self, point):
         # show context menu
         self.popMenu.exec_(self.sender().mapToGlobal(point))
+        for key in self.dewar_configuration_dict:
+            if self.dewar_configuration_dict[key]==self.sender():
+                self.dewar_label_active=key
+
+    def flag_sample_for_recollection(self):
+        self.dewar_configuration_dict[self.dewar_label_active].setStyleSheet("background-color: yellow")
 #        for key in self.dewar_configuration_dict:
 #            if self.dewar_configuration_dict[key]==self.sender():
 #                print key
-
-    def flag_sample_for_recollection(self):
-        print 'do'
-        for key in self.dewar_configuration_dict:
-            if self.dewar_configuration_dict[key]==self.sender():
-                print key
-                self.sender().setStyleSheet("background-color: yellow")
+#                self.sender().setStyleSheet("background-color: yellow")
 
     def undo_flag_sample_for_recollection(self):
         print 'undo'
