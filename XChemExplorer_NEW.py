@@ -2655,7 +2655,7 @@ class XChemExplorer(QtGui.QApplication):
                             self.data_collection_summary_table.setCellWidget(current_row,column,start_albula_button)
                         else:
                             self.albula_button_dict[xtal][1]=diffraction_image
-                        print self.albula_button_dict[xtal]
+                    print self.albula_button_dict[xtal]
                 elif header[0].startswith('Show\nDetails'):
                     if new_xtal:
                         show_data_collection_details_checkbox=QtGui.QCheckBox()
