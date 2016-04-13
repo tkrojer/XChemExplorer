@@ -326,6 +326,8 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_summarys_vbox_for_table=QtGui.QVBoxLayout()
         self.dls_tab_dict['Summary'][1].addLayout(self.data_collection_summarys_vbox_for_table)
 
+        self.vbox_for_preferences.addStretch(1)
+
         # another vbox for details to be shown
         self.data_collection_summarys_vbox_for_details=QtGui.QVBoxLayout()
         self.data_collection_details_currently_on_display=None
@@ -2274,6 +2276,7 @@ class XChemExplorer(QtGui.QApplication):
 #            data_collection_table.verticalHeader().setStretchLastSection(False)
             data_collection_table.itemSelectionChanged.connect(self.update_selected_autoproc_data_collection_summary_table)
             data_collection_table.cellClicked.connect(self.user_update_selected_autoproc_data_collection_summary_table)
+            data_collection_table.setSizePolicy(QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Minimum)
 
             # select best resolution file + set data collection outcome
             # the assumption is that index in data_collection_dict and row number are identical
@@ -2660,7 +2663,6 @@ class XChemExplorer(QtGui.QApplication):
                             self.data_collection_summary_table.setCellWidget(current_row,column,start_albula_button)
                         else:
                             self.albula_button_dict[xtal][1]=diffraction_image
-                    print self.albula_button_dict[xtal]
                 elif header[0].startswith('Show\nDetails'):
                     if new_xtal:
                         show_data_collection_details_checkbox=QtGui.QCheckBox()
