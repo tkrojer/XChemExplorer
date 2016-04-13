@@ -42,10 +42,10 @@ class XChemExplorer(QtGui.QApplication):
             self.database_directory=os.path.join(self.project_directory,'processing','database')
             self.data_source_file=''
             self.data_collection_summary_file=os.path.join(self.database_directory,str(os.getcwd().split('/')[5])+'_summary.pkl')
-            if os.path.isfile(os.path.join(self.project_directory,'processing','database','soakDBDataFile.sqlite')):
-                self.data_source_file='soakDBDataFile.sqlite'
-                self.database_directory=os.path.join(self.project_directory,'processing','lab36')
-                self.data_source_set=True
+#            if os.path.isfile(os.path.join(self.project_directory,'processing','database','soakDBDataFile.sqlite')):
+#                self.data_source_file='soakDBDataFile.sqlite'
+#                self.database_directory=os.path.join(self.project_directory,'processing','lab36')
+#                self.data_source_set=True
 #                XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).create_missing_columns()
             self.ccp4_scratch_directory=os.path.join(self.project_directory,'processing','tmp')
 
@@ -383,11 +383,12 @@ class XChemExplorer(QtGui.QApplication):
 
         # create context menu
         self.popMenu = QtGui.QMenu()
-#        loadxxxxx=QtGui.QAction("Open Config File", self.window)
-        recollect=QtGui.QAction("recollect",        self.window)
+        recollect=QtGui.QAction("recollect", self.window)
         recollect.triggered.connect(self.flag_sample_for_recollection)
+        undo_recollect=QtGui.QAction("undo", self.window)
+        undo_recollect.triggered.connect(self.undo_flag_sample_for_recollection)
         self.popMenu.addAction(recollect)
-        self.popMenu.addAction(QtGui.QAction('undo', self.window))
+        self.popMenu.addAction(undo_recollect)
 
         for puck in range(38):
             for position in range(17):
