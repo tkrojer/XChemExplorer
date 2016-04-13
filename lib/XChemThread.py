@@ -674,9 +674,9 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
                     if entry[0]=='logfile':
                         if entry[7]==selected_processing_result:
                             db_dict=entry[6]
-                            data_dict[sample]=entry
                             db_dict['DataCollectionOutcome']=str(outcome)
                             db_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
+                            data_dict[sample]=entry
                             data_source.update_insert_data_source(sample,db_dict)
                             break
 
@@ -1491,10 +1491,12 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit+'-'+run+autoproc,'dimple','final.pdb')):
                                         dimple_file=os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit+'-'+run+autoproc,'dimple','final.pdb')
                                         pdb_info=parse().PDBheader(dimple_file)
-                                        db_dict['DataProcessingPathToDimplePDBfile']=dimple_file
-                                        db_dict['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
-                                        db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
-                                        db_dict['DataProcessingRfree'] = pdb_info['Rfree']
+                                        db_dict_old=self.data_collection_dict[xtal][n][6]
+                                        db_dict_old['DataProcessingPathToDimplePDBfile']=dimple_file
+                                        db_dict_old['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
+                                        db_dict_old['DataProcessingRcryst']  = pdb_info['Rcryst']
+                                        db_dict_old['DataProcessingRfree'] = pdb_info['Rfree']
+                                        self.data_collection_dict[xtal][n][6]=db_dict_old
                         if not found_autoproc:
                             aimless_results=parse().read_aimless_logfile(file_name)
                             db_dict.update(aimless_results)
@@ -1544,10 +1546,12 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit+'-'+run+autoproc,'dimple','final.pdb')):
                                         dimple_file=os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit+'-'+run+autoproc,'dimple','final.pdb')
                                         pdb_info=parse().PDBheader(dimple_file)
-                                        db_dict['DataProcessingPathToDimplePDBfile']=dimple_file
-                                        db_dict['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
-                                        db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
-                                        db_dict['DataProcessingRfree'] = pdb_info['Rfree']
+                                        db_dict_old=self.data_collection_dict[xtal][n][6]
+                                        db_dict_old['DataProcessingPathToDimplePDBfile']=dimple_file
+                                        db_dict_old['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
+                                        db_dict_old['DataProcessingRcryst']  = pdb_info['Rcryst']
+                                        db_dict_old['DataProcessingRfree'] = pdb_info['Rfree']
+                                        self.data_collection_dict[xtal][n][6]=db_dict_old
                         if not found_autoproc:
                             aimless_results=parse().read_aimless_logfile(file_name)
                             db_dict.update(aimless_results)
