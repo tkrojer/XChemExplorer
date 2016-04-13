@@ -402,7 +402,7 @@ class XChemExplorer(QtGui.QApplication):
                     label=QtGui.QPushButton('x')
                     label.clicked.connect(self.show_html_summary_in_firefox)
 #                    # how to right click on button
-#                    self.dewar_configuration_dict[]=button
+                    self.dewar_configuration_dict[puck+'-'+position]=button
                     label.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
                     label.customContextMenuRequested.connect(self.on_context_menu)
 #                    label=QtGui.QLabel('x')
@@ -921,6 +921,10 @@ class XChemExplorer(QtGui.QApplication):
     def on_context_menu(self, point):
         # show context menu
         print 'ggg'
+        print self.sender()
+        for key in self.dewar_configuration_dict:
+            if self.dewar_configuration_dict[key]==self.sender():
+                print key
 #        self.popMenu.exec_(self.button.mapToGlobal(point))
 
     def flag_sample_for_recollection(self):
