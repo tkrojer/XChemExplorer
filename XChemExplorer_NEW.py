@@ -41,11 +41,11 @@ class XChemExplorer(QtGui.QApplication):
             self.reference_directory=os.path.join(self.project_directory,'processing','reference')
             self.database_directory=os.path.join(self.project_directory,'processing','database')
             self.data_source_file=''
-#            self.data_collection_summary_file=os.path.join(self.database_directory,str(os.getcwd().split('/')[5])+'_summary.pkl')
-#            if os.path.isfile(os.path.join(self.project_directory,'processing','database','soakDBDataFile.sqlite')):
-#                self.data_source_file='soakDBDataFile.sqlite'
-#                self.database_directory=os.path.join(self.project_directory,'processing','lab36')
-#                self.data_source_set=True
+            self.data_collection_summary_file=os.path.join(self.database_directory,str(os.getcwd().split('/')[5])+'_summary.pkl')
+            if os.path.isfile(os.path.join(self.project_directory,'processing','database','soakDBDataFile.sqlite')):
+                self.data_source_file='soakDBDataFile.sqlite'
+                self.database_directory=os.path.join(self.project_directory,'processing','lab36')
+                self.data_source_set=True
 #                XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).create_missing_columns()
             self.ccp4_scratch_directory=os.path.join(self.project_directory,'processing','tmp')
 
@@ -400,13 +400,13 @@ class XChemExplorer(QtGui.QApplication):
                 elif position==0 and puck != 0:
                     label=QtGui.QLabel(str(puck))
                 else:
-                    label=QtGui.QPushButton('x')
-                    label.clicked.connect(self.show_html_summary_in_firefox)
+#                    label=QtGui.QPushButton('x')
+#                    label.clicked.connect(self.show_html_summary_in_firefox)
 #                    # how to right click on button
-                    self.dewar_configuration_dict[str(puck)+'-'+str(position)]=label
-                    label.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-                    label.customContextMenuRequested.connect(self.on_context_menu)
-#                    label=QtGui.QLabel('x')
+#                    self.dewar_configuration_dict[str(puck)+'-'+str(position)]=label
+#                    label.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+#                    label.customContextMenuRequested.connect(self.on_context_menu)
+                    label=QtGui.QLabel('x')
                 vbox_for_frame.addWidget(label)
                 frame.setLayout(vbox_for_frame)
                 self.dewar_configuration_layout.addWidget(frame, position, puck)
