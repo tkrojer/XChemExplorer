@@ -254,7 +254,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     '\n'
                     +ccp4_scratch+
                     '\n'
-                    'dimple %s %s %s %s' %(mtzin,ref_pdb,ref_mtz,ref_cif) +
+                    'dimple %s %s %s %s\n' %(mtzin,ref_pdb,ref_mtz,ref_cif) +
                     '\n'
                     'fft hklin final.mtz mapout 2fofc.map << EOF\n'
                     ' labin F1=2FOFCWT PHI=PH2FOFCWT\n'
@@ -267,7 +267,14 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     '/bin/rm dimple_run_in_progress\n'
                     )
 
-            print Cmds
+            f = open('xce_dimple.sh','w')
+            f.write(Cmds)
+            f.close()
+            if self.queueing_system_available:
+                os.system('qsub xce_dimple.sh')
+            else:
+                os.system('chmod +x xce_dimple.sh')
+                os.system('./xce_dimple.sh')
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)

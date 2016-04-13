@@ -1163,7 +1163,7 @@ class XChemExplorer(QtGui.QApplication):
             run=entry[2]
             autoproc=entry[4]
 
-            reference_file_pdb=os.path.join(self.reference_directory,reference_file+'.mtz')
+            reference_file_pdb=os.path.join(self.reference_directory,reference_file+'.pdb')
 
             if os.path.isfile(os.path.join(self.reference_directory,reference_file+'.mtz')):
                 reference_file_mtz=' -R '+os.path.join(self.reference_directory,reference_file+'.mtz')
