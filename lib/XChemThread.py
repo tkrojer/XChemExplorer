@@ -1432,8 +1432,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             aimless_results=parse().read_aimless_logfile(file_name)
                             db_dict.update(aimless_results)
                             # first check if user ran dimple already manually
-                            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit_run_autoproc,'dimple','final.pdb')):
-                                dimple_file=os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit_run_autoproc,'dimple','final.pdb')
+                            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit+'-'+run+autoproc,'dimple','final.pdb')):
+                                dimple_file=os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit+'-'+run+autoproc,'dimple','final.pdb')
                                 pdb_info=parse().PDBheader(dimple_file)
                                 db_dict['DataProcessingPathToDimplePDBfile']=dimple_file
                                 db_dict['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
@@ -1481,8 +1481,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             aimless_results=parse().read_aimless_logfile(file_name)
                             db_dict.update(aimless_results)
                             # first check if user ran dimple already manually
-                            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit_run_autoproc,'dimple','final.pdb')):
-                                dimple_file=os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit_run_autoproc,'dimple','final.pdb')
+                            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit+'-'+run+autoproc,'dimple','final.pdb')):
+                                dimple_file=os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit+'-'+run+autoproc,'dimple','final.pdb')
                                 pdb_info=parse().PDBheader(dimple_file)
                                 db_dict['DataProcessingPathToDimplePDBfile']=dimple_file
                                 db_dict['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
@@ -1526,8 +1526,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             aimless_results=parse().read_aimless_logfile(file_name)
                             db_dict.update(aimless_results)
                             # first check if user ran dimple already manually
-                            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit_run_autoproc,'dimple','final.pdb')):
-                                dimple_file=os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit_run_autoproc,'dimple','final.pdb')
+                            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit+'-'+run+autoproc,'dimple','final.pdb')):
+                                dimple_file=os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit+'-'+run+autoproc,'dimple','final.pdb')
                                 pdb_info=parse().PDBheader(dimple_file)
                                 db_dict['DataProcessingPathToDimplePDBfile']=dimple_file
                                 db_dict['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
