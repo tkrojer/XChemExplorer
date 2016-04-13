@@ -201,6 +201,94 @@ class create_png_and_cif_of_compound(QtCore.QThread):
         self.emit(QtCore.SIGNAL("finished()"))
 
 
+class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
+    def __init__(self,sample_list,initial_model_directory,external_software):
+        QtCore.QThread.__init__(self)
+        self.sample_list=sample_list
+        self.initial_model_directory=initial_model_directory
+        self.queueing_system_available=external_software['qsub']
+    def run(self):
+        progress_step=1
+        if len(self.sample_list) != 0:
+            progress_step=100/float(len(self.sample_list))
+        progress=0
+        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+        for item in self.sample_list:
+
+            xtal =                  item[0]
+            visit_run_autoproc =    item[1]
+            mtzin =                 item[2]
+            ref_dir =               item[3]
+            ref_pdb =               os.path.join(ref_dir,item[4])
+            ref_mtz =               os.path.join(ref_dir,item[5])
+            ref_cif =               os.path.join(ref_dir,item[6])
+
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running dimple -> '+xtal,visit_run_autoproc)
+
+            if not os.path.isdir(os.path.join(self.initial_model_directory,sample)):
+                os.mkdir(os.path.join(self.initial_model_directory,sample))
+            if not os.path.isdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple')):
+                os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple'))
+            if not os.path.isdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple',visit_run_autoproc)):
+                os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple',visit_run_autoproc))
+            os.chdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple',visit_run_autoproc))
+
+            if ref_mtz != '':
+                ref_mtz=' -R '+ref_mtz
+
+            if self.queueing_system_available:
+                top_line='#PBS -joe -N XCE_dimple'
+            else:
+                top_line='#!'+os.getenv('SHELL')
+
+            if 'csh' in os.getenv('SHELL'):
+                ccp4_scratch='setenv CCP4_SCR '+self.ccp4_scratch_directory+'\n'
+            elif 'bash' in os.getenv('SHELL'):
+                ccp4_scratch='export CCP4_SCR='+self.ccp4_scratch_directory+'\n'
+            else:
+                ccp4_scratch=''
+
+            Cmds = (
+                    '%s\n' %top_line+
+                    '\n'
+                    'cd %s\n' %os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple',visit_run_autoproc) +
+                    '\n'
+                    +ccp4_scratch+
+                    '\n'
+                'dimple %s ../%s %s.pdb dimple' %(ref_lib,self.mtz_free,self.reference) +
+                '\n'
+                'cd %s/%s\n' %(self.project_directory,self.xtalID) +
+                '\n'
+                '/bin/rm refine.pdb\n'
+                '/bin/rm refine.mtz\n'
+                'ln -s Dimple/dimple/final.pdb refine.pdb\n'
+                'ln -s Dimple/dimple/final.mtz refine.mtz\n'
+                '\n'
+                'fft hklin refine.mtz mapout 2fofc.map << EOF\n'
+                ' labin F1=2FOFCWT PHI=PH2FOFCWT\n'
+                'EOF\n'
+                '\n'
+                'fft hklin refine.mtz mapout fofc.map << EOF\n'
+                ' labin F1=FOFCWT PHI=PHFOFCWT\n'
+                'EOF\n'
+                '\n'
+                'fft hklin refine.mtz mapout 2fofc.map << EOF\n'
+                ' labin F1=FWT PHI=PHWT\n'
+                'EOF\n'
+                '\n'
+                'fft hklin refine.mtz mapout fofc.map << EOF\n'
+                ' labin F1=DELFWT PHI=PHDELWT\n'
+                'EOF\n'
+                '\n'
+                '/bin/rm dimple_run_in_progress\n'
+                )
+
+
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+
 
 class run_dimple_on_selected_samples(QtCore.QThread):
     def __init__(self,settings,initial_model_dimple_dict,external_software,ccp4_scratch,filename_root):
@@ -575,10 +663,10 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
         # 1. update data source for all samples
         for sample in sorted(self.dataset_outcome_dict):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating data source for '+sample)
-            outcome=''
-            for button in self.dataset_outcome_dict[sample]:
-                if button.isChecked():
-                    outcome=button.text()
+            outcome=self.dataset_outcome_dict[sample]
+#            for button in self.dataset_outcome_dict[sample]:
+#                if button.isChecked():
+#                    outcome=button.text()
             # self.data_collection_column_three_dict[sample][0] is where the data collection table lives
             indexes=self.data_collection_column_three_dict[sample][0].selectionModel().selectedRows()
 

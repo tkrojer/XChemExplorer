@@ -1,13 +1,6 @@
 import os, sys, glob
 from datetime import datetime
 
-## diffraction image viewing only possible at DLS
-#sys.path.append('/dls_sw/apps/albula/3.1/dectris/albula/3.1/python')
-#try:
-#    import dectris.albula
-#except (ImportError,RuntimeError):
-#    pass
-
 from PyQt4 import QtGui, QtCore, QtWebKit
 
 import pickle
@@ -127,7 +120,7 @@ class XChemExplorer(QtGui.QApplication):
         self.reference_file_list=[]
         self.all_columns_in_data_source=XChemDB.data_source(os.path.join(self.database_directory,
                                                                          self.data_source_file)).return_column_list()
-        self.albula_button_dict={}
+        self.albula_button_dict={}              # using dials.image_viewer instead of albula, but keep name for dictionary
         self.xtalform_dict={}
 
         self.dataset_outcome_dict={}            # contains the dataset outcome buttons
@@ -138,52 +131,6 @@ class XChemExplorer(QtGui.QApplication):
         self.main_data_collection_table_exists=False
         self.timer_to_check_for_new_data_collection = QtCore.QTimer()
         self.timer_to_check_for_new_data_collection.timeout.connect(self.check_for_new_autoprocessing)
-
-        # command line arguments
-#        try:
-#            opts, args = getopt.getopt(sys.argv[1:], "hc:b:d:", ["help", "config=","beamline=","datasource="])
-#        except getopt.GetoptError:
-#            print 'Sorry, command line option does not exist'
-#            sys.exit()
-#        for o, a in opts:
-#            if o in ("-h", "--help"):
-#                print 'avail able command line options:'
-#                print '-c,--config:     config file'
-#                print '-b,--beamline:   beamline directory'
-#                print '-d,--datasource: data source file'
-#                sys.exit()
-#            elif o in ("-c", "--config"):
-#                pickled_settings = pickle.load(open(os.path.abspath(a),"rb"))
-#                self.beamline_directory=pickled_settings['beamline_directory']
-#                self.settings['beamline_directory']=self.beamline_directory
-#                self.initial_model_directory=pickled_settings['initial_model_directory']
-#                self.settings['initial_model_directory']=self.initial_model_directory
-#                self.database_directory=pickled_settings['database_directory']
-#                self.settings['database_directory']=self.database_directory
-#                self.data_source_file=pickled_settings['data_source']
-#                self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
-#                if os.path.isfile(self.settings['data_source']):
-#                    XChemDB.data_source(self.settings['data_source']).create_missing_columns()
-#                    self.data_source_set=True
-#                else:       # in case just an empty file was specified
-#                    XChemDB.data_source(self.settings['data_source']).create_empty_data_source_file()
-#                    self.data_source_set=True
-#                self.ccp4_scratch_directory=pickled_settings['ccp4_scratch']
-#                self.settings['ccp4_scratch']=self.ccp4_scratch_directory
-#                self.allowed_unitcell_difference_percent=pickled_settings['unitcell_difference']
-#            elif o in ("-b", "--beamline"):
-#                self.beamline_directory=os.path.abspath(a)
-#            elif o in ("-d", "--datasource"):
-#                tmp=os.path.abspath(a)
-#                self.database_directory=tmp[:tmp.rfind('/')]
-#                self.data_source_file=tmp[tmp.rfind('/')+1:]
-#                self.settings['data_source']=os.path.join(self.database_directory,self.data_source_file)
-#                if os.path.isfile(self.settings['data_source']):
-#                    XChemDB.data_source(self.settings['data_source']).create_missing_columns()
-#                else:
-#                    XChemDB.data_source(self.settings['data_source']).create_empty_data_source_file()
-#                self.data_source_set=True
-
 
         self.target_list,self.visit_list=self.get_target_and_visit_list()
 
@@ -400,9 +347,18 @@ class XChemExplorer(QtGui.QApplication):
         write_files_button.clicked.connect(self.button_clicked)
         data_collection_button_hbox.addWidget(write_files_button)
 
-        rerun_dimple_button=QtGui.QPushButton("Rerun Dimple on Everything")
-        rerun_dimple_button.clicked.connect(self.button_clicked)
-        data_collection_button_hbox.addWidget(rerun_dimple_button)
+#        rerun_dimple_button=QtGui.QPushButton("Rerun Dimple on Everything")
+#        rerun_dimple_button.clicked.connect(self.button_clicked)
+#        data_collection_button_hbox.addWidget(rerun_dimple_button)
+
+        rerun_dimple_combobox=QtGui.QComboBox()
+        cmd_list = [    '---------- select command ----------',
+                        'Run Dimple if final.pdb cannot be found ',
+                        'Rerun Dimple on Everything'    ]
+        for cmd in cmd_list
+            rerun_dimple_combobox.addItem(cmd)
+        self.target_selection_combobox.activated[str].connect(self.rerun_dimple_on_autoprocessing_files)
+        data_collection_button_hbox.addWidget(rerun_dimple_combobox)
 
         self.target_selection_combobox = QtGui.QComboBox()
         self.populate_target_selection_combobox(self.target_selection_combobox)
@@ -1190,6 +1146,61 @@ class XChemExplorer(QtGui.QApplication):
     def target_selection_combobox_activated(self,text):
         self.target=str(text)
 
+    def get_job_list_for_dimple_rerun(self,job_list,db_dict):
+        suitable_reference=[]
+        for reference in self.reference_file_list:
+            # first we need one in the same pointgroup
+            if reference[5]==db_dict['DataProcessingPointGroup']:
+                try:
+                    difference=math.fabs(1-(float(db_dict['DataProcessingUnitCellVolume'])/float(reference[4])))
+                    suitable_reference.append([reference[0],difference])
+                except ValueError:
+                    continue
+        if suitable_reference != []:
+            reference_file=min(suitable_reference,key=lambda x: x[1])[0]
+            visit=entry[1]
+            run=entry[2]
+            autoproc=entry[4]
+            if os.path.isfile(os.path.join(self.reference_directory,reference_file+'.mtz')):
+                reference_file_mtz=os.path.isfile(os.path.join(self.reference_directory,reference_file+'.mtz'))
+            else:
+                reference_file_mtz=''
+            job_list.append([   xtal,
+                                visit+'-'+run+autoproc,
+                                db_dict['DataProcessingPathToMTZfile'],
+                                os.path.join(self.reference_directory,reference_file+'.pdb'),
+                                reference_file_mtz  ])
+        return job_list
+
+    def rerun_dimple_on_autoprocessing_files(self,text):
+#                cmd_list = [    '---------- select command ----------',
+#                        'Run Dimple if final.pdb cannot be found ',
+#                        'Rerun Dimple on Everything'    ]
+        if self.sender().text()=="---------- select command ----------":
+            pass
+        if self.explorer_active==0 and self.data_source_set==True and self.data_collection_summary_file != '':
+            job_list=[]
+            for xtal in self.data_collection_dict:
+                for entry in self.data_collection_dict[xtal]:
+                    if entry[0]=='logfile':
+                        db_dict=entry[6]
+                        if os.path.isfile(db_dict['DataProcessingPathToMTZfile']):
+                            if self.sender().text()=='Run Dimple if final.pdb cannot be found ' \
+                               and notos.path.isfile(db_dict['DataProcessingPathToDimplePDBfile']):
+                                job_list=self.get_job_list_for_dimple_rerun(job_list,db_dict)
+                            elif self.sender().text()=='Rerun Dimple on Everything':
+                                job_list=self.get_job_list_for_dimple_rerun(job_list,db_dict)
+
+            if job_list != []:
+                print job_list
+#                self.work_thread=XChemThread.NEW_save_autoprocessing_results_to_disc(job_list,self.initial_model_directory,self.external_software)
+#                self.explorer_active=1
+#                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#                self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+#                self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+#                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#                self.work_thread.start()
+
     def center_main_window(self):
         screen = QtGui.QDesktopWidget().screenGeometry()
         size = self.window.geometry()
@@ -1366,23 +1377,6 @@ class XChemExplorer(QtGui.QApplication):
         if self.sender().text()=='Get New Results from Autoprocessing':
             self.check_for_new_autoprocessing()
 
-#        if self.explorer_active==0 and self.data_source_set==True \
-#            and self.sender().text()=='Get New Results from Autoprocessing':
-#            self.work_thread=XChemThread.NEW_read_autoprocessing_results_from_disc(self.visit_list,
-#                                                                               self.target,
-#                                                                               self.reference_file_list,
-#                                                                               self.database_directory,
-#                                                                               self.data_collection_dict,
-#                                                                               self.preferences,
-#                                                                               self.data_collection_summary_file )
-#            self.explorer_active=1
-#            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-#            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-#            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-#            self.connect(self.work_thread, QtCore.SIGNAL("create_widgets_for_autoprocessing_results"),
-#                                                     self.create_widgets_for_autoprocessing_results)
-#            self.work_thread.start()
-
         elif self.explorer_active==0 and self.data_source_set==True \
             and self.sender().text()=="Save Files from Autoprocessing in 'inital_model' Folder" \
             and self.data_collection_summary_file != '':
@@ -1400,35 +1394,12 @@ class XChemExplorer(QtGui.QApplication):
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.work_thread.start()
 
-        elif self.explorer_active==0 and self.data_source_set==True \
-            and self.sender().text()=="Rerun Dimple on Everything" \
-            and self.data_collection_summary_file != '':
-            for xtal in self.data_collection_dict:
-                for entry in self.data_collection_dict[xtal]:
-                    if entry[0]=='logfile':
-                        db_dict=entry[6]
-                        # check if suitable reference file is available
-                        suitable_reference=[]
-                        for reference in self.reference_file_list:
-                            # first we need one in the same pointgroup
-                            if reference[5]==db_dict['DataProcessingPointGroup']:
-                                try:
-                                    difference=math.fabs(1-(float(db_dict['DataProcessingUnitCellVolume'])/float(reference[4])))
-                                    suitable_reference.append([reference[0],difference])
-                                except ValueError:
-                                    continue
-                        if suitable_reference != []:
-                            reference_file=min(suitable_reference,key=lambda x: x[1])[0]
-                            print xtal, db_dict['DataProcessingPathToMTZfile'],os.path.join(self.reference_directory,reference_file+'.pdb')
-
-
-
-        elif self.explorer_active==0 and self.data_source_set==True \
-            and self.sender().text()=="Rerun Dimple on Everything":
-            for entry in self.data_collection_dict[xtal]:
-                if entry[0]=='logfile':
-                    db_dict=entry[6]
-                    print xtal,db_dict['DataProcessingPathToMTZfile']
+#        elif self.explorer_active==0 and self.data_source_set==True \
+#            and self.sender().text()=="Rerun Dimple on Everything":
+#            for entry in self.data_collection_dict[xtal]:
+#                if entry[0]=='logfile':
+#                    db_dict=entry[6]
+#                    print xtal,db_dict['DataProcessingPathToMTZfile']
 
 
 
