@@ -326,8 +326,6 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_summarys_vbox_for_table=QtGui.QVBoxLayout()
         self.dls_tab_dict['Summary'][1].addLayout(self.data_collection_summarys_vbox_for_table)
 
-        self.vbox_for_preferences.addStretch(1)
-
         # another vbox for details to be shown
         self.data_collection_summarys_vbox_for_details=QtGui.QVBoxLayout()
         self.data_collection_details_currently_on_display=None
