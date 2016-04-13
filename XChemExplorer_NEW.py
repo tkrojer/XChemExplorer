@@ -2440,7 +2440,7 @@ class XChemExplorer(QtGui.QApplication):
         for key in self.dataset_outcome_combobox_dict:
             if self.dataset_outcome_combobox_dict[key]==self.sender():
                 dataset=key
-        self.dataset_outcome_dict[xtal]=outcome
+        self.dataset_outcome_dict[key]=outcome
 
 #        for button in self.dataset_outcome_dict[dataset]:
 #            if str(button.text())==outcome:
