@@ -1196,12 +1196,10 @@ class XChemExplorer(QtGui.QApplication):
         reply = msgBox.exec_();
 
         print reply
-#        if reply == QtGui.QMessageBox.Yes:
-#            print 'yes'
-#            event.accept()
-#        else:
-#            print 'no'
-#            event.ignore()
+        if reply == 0:
+            print 'go go go'
+        elif reply == 1:
+            print 'ok, seems sounds sensible'
 
 
     def rerun_dimple_on_autoprocessing_files(self,i):
