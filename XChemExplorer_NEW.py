@@ -357,7 +357,7 @@ class XChemExplorer(QtGui.QApplication):
                         'Rerun Dimple on Everything'    ]
         for cmd in cmd_list:
             rerun_dimple_combobox.addItem(cmd)
-        self.target_selection_combobox.activated[str].connect(self.rerun_dimple_on_autoprocessing_files)
+        rerun_dimple_combobox.activated[str].connect(self.rerun_dimple_on_autoprocessing_files)
         data_collection_button_hbox.addWidget(rerun_dimple_combobox)
 
         self.target_selection_combobox = QtGui.QComboBox()
