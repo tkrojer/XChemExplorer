@@ -201,12 +201,13 @@ class create_png_and_cif_of_compound(QtCore.QThread):
         self.emit(QtCore.SIGNAL("finished()"))
 
 
-class run_dimple_on_selected_autoprocessing_files(QtCore.QThread):
-    def __init__(self,sample_list,initial_model_directory,external_software):
+class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
+    def __init__(self,sample_list,initial_model_directory,external_software,ccp4_scratch_directory):
         QtCore.QThread.__init__(self)
         self.sample_list=sample_list
         self.initial_model_directory=initial_model_directory
         self.queueing_system_available=external_software['qsub']
+        self.ccp4_scratch_directory=ccp4_scratch_directory
     def run(self):
         progress_step=1
         if len(self.sample_list) != 0:
@@ -225,16 +226,14 @@ class run_dimple_on_selected_autoprocessing_files(QtCore.QThread):
 
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running dimple -> '+xtal,visit_run_autoproc)
 
-            if not os.path.isdir(os.path.join(self.initial_model_directory,sample)):
-                os.mkdir(os.path.join(self.initial_model_directory,sample))
-            if not os.path.isdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple')):
-                os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple'))
-            if not os.path.isdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple',visit_run_autoproc)):
-                os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple',visit_run_autoproc))
-            os.chdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple',visit_run_autoproc))
-
-            if ref_mtz != '':
-                ref_mtz=' -R '+ref_mtz
+#            if not os.path.isdir(os.path.join(self.initial_model_directory,sample)):
+#                os.mkdir(os.path.join(self.initial_model_directory,sample))
+#            if not os.path.isdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple')):
+#                os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple'))
+#            if not os.path.isdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple',visit_run_autoproc)):
+#                os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple',visit_run_autoproc))
+#            os.chdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple',visit_run_autoproc))
+#            os.system('touch dimple_run_in_progress')
 
             if self.queueing_system_available:
                 top_line='#PBS -joe -N XCE_dimple'
@@ -255,34 +254,20 @@ class run_dimple_on_selected_autoprocessing_files(QtCore.QThread):
                     '\n'
                     +ccp4_scratch+
                     '\n'
-                'dimple %s ../%s %s.pdb dimple' %(ref_lib,self.mtz_free,self.reference) +
-                '\n'
-                'cd %s/%s\n' %(self.project_directory,self.xtalID) +
-                '\n'
-                '/bin/rm refine.pdb\n'
-                '/bin/rm refine.mtz\n'
-                'ln -s Dimple/dimple/final.pdb refine.pdb\n'
-                'ln -s Dimple/dimple/final.mtz refine.mtz\n'
-                '\n'
-                'fft hklin refine.mtz mapout 2fofc.map << EOF\n'
-                ' labin F1=2FOFCWT PHI=PH2FOFCWT\n'
-                'EOF\n'
-                '\n'
-                'fft hklin refine.mtz mapout fofc.map << EOF\n'
-                ' labin F1=FOFCWT PHI=PHFOFCWT\n'
-                'EOF\n'
-                '\n'
-                'fft hklin refine.mtz mapout 2fofc.map << EOF\n'
-                ' labin F1=FWT PHI=PHWT\n'
-                'EOF\n'
-                '\n'
-                'fft hklin refine.mtz mapout fofc.map << EOF\n'
-                ' labin F1=DELFWT PHI=PHDELWT\n'
-                'EOF\n'
-                '\n'
-                '/bin/rm dimple_run_in_progress\n'
-                )
+                    'dimple %s %s %s %s' %(mtzin,ref_pdb,ref_mtz,ref_cif) +
+                    '\n'
+                    'fft hklin final.mtz mapout 2fofc.map << EOF\n'
+                    ' labin F1=2FOFCWT PHI=PH2FOFCWT\n'
+                    'EOF\n'
+                    '\n'
+                    'fft hklin final.mtz mapout fofc.map << EOF\n'
+                    ' labin F1=FOFCWT PHI=PHFOFCWT\n'
+                    'EOF\n'
+                    '\n'
+                    '/bin/rm dimple_run_in_progress\n'
+                    )
 
+            print Cmds
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)

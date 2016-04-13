@@ -1185,19 +1185,22 @@ class XChemExplorer(QtGui.QApplication):
 
     def check_before_running_dimple(self,n_jobs):
 
-#        reply = QtGui.QMessageBox.question( 'Message',
-#                                            "Do you really want to run %s Dimple jobs?" %n_jobs,
-#                                            QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
-
         msgBox = QtGui.QMessageBox()
         msgBox.setText("Do you really want to run %s Dimple jobs?" %n_jobs)
         msgBox.addButton(QtGui.QPushButton('Accept'), QtGui.QMessageBox.YesRole)
         msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
         reply = msgBox.exec_();
 
-        print reply
         if reply == 0:
-            print 'go go go'
+            self.status_bar.showMessage('preparing %s DIMPLE jobs' %n_jobs)
+            self.explorer_active=1
+            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.work_thread.start()
+
+
         elif reply == 1:
             print 'ok, seems sounds sensible'
 
@@ -1220,16 +1223,8 @@ class XChemExplorer(QtGui.QApplication):
                                 job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
 
             if job_list != []:
-                print job_list
-                print len(job_list)
                 self.check_before_running_dimple(len(job_list))
-#                self.work_thread=XChemThread.run_dimple_on_selected_autoprocessing_files(job_list,self.initial_model_directory,self.external_software)
-#                self.explorer_active=1
-#                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-#                self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-#                self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-#                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-#                self.work_thread.start()
+                self.work_thread=XChemThread.run_dimple_on_all_autoprocessing_files(job_list,self.initial_model_directory,self.external_software),self.ccp4_scratch_directory
 
     def center_main_window(self):
         screen = QtGui.QDesktopWidget().screenGeometry()
