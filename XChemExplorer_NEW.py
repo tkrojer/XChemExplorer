@@ -925,7 +925,7 @@ class XChemExplorer(QtGui.QApplication):
         for key in self.dewar_configuration_dict:
             if self.dewar_configuration_dict[key]==self.sender():
                 print key
-#        self.popMenu.exec_(self.button.mapToGlobal(point))
+                self.popMenu.exec_(self.sender().mapToGlobal(point))
 
     def flag_sample_for_recollection(self):
         print 'do'
