@@ -226,13 +226,13 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
 
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running dimple -> '+xtal+'+'+visit_run_autoproc)
 
-            if not os.path.isdir(os.path.join(self.initial_model_directory,sample)):
-                os.mkdir(os.path.join(self.initial_model_directory,sample))
-            if not os.path.isdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple')):
-                os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple'))
-            if not os.path.isdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple',visit_run_autoproc)):
-                os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple',visit_run_autoproc))
-            os.chdir(os.path.join(self.initial_model_directory,sample,'autoprocessing_dimple',visit_run_autoproc))
+            if not os.path.isdir(os.path.join(self.initial_model_directory,xtal)):
+                os.mkdir(os.path.join(self.initial_model_directory,xtal))
+            if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple')):
+                os.mkdir(os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple'))
+            if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit_run_autoproc)):
+                os.mkdir(os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit_run_autoproc))
+            os.chdir(os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit_run_autoproc))
             os.system('touch dimple_run_in_progress')
 
             if self.queueing_system_available:
