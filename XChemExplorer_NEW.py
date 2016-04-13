@@ -385,7 +385,7 @@ class XChemExplorer(QtGui.QApplication):
 #        loadxxxxx=QtGui.QAction("Open Config File", self.window)
         recollect=QtGui.QAction("recollect",        self.window)
         recollect.triggered.connect(self.flag_sample_for_recollection)
-        self.popMenu.addAction(QtGui.QAction('recollect', self.window))
+        self.popMenu.addAction(recollect, self.window))
         self.popMenu.addAction(QtGui.QAction('undo', self.window))
 
         for puck in range(38):
@@ -400,13 +400,13 @@ class XChemExplorer(QtGui.QApplication):
                 elif position==0 and puck != 0:
                     label=QtGui.QLabel(str(puck))
                 else:
-#                    label=QtGui.QPushButton('x')
-#                    label.clicked.connect(self.show_html_summary_in_firefox)
-#                    # how to right click on button
-#                    self.dewar_configuration_dict[str(puck)+'-'+str(position)]=label
-#                    label.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-#                    label.customContextMenuRequested.connect(self.on_context_menu)
-                    label=QtGui.QLabel('x')
+                    label=QtGui.QPushButton('x')
+                    label.clicked.connect(self.show_html_summary_in_firefox)
+                    # how to right click on button
+                    self.dewar_configuration_dict[str(puck)+'-'+str(position)]=label
+                    label.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+                    label.customContextMenuRequested.connect(self.on_context_menu)
+#                    label=QtGui.QLabel('x')
                 vbox_for_frame.addWidget(label)
                 frame.setLayout(vbox_for_frame)
                 self.dewar_configuration_layout.addWidget(frame, position, puck)
