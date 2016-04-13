@@ -692,7 +692,6 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing files from data processing to inital_model folder -> '+sample)
             # 'logfile',visit,run,timestamp,autoproc
             # Don't write files for something that's labelled as Failed
-            print sample,data_dict
             db_dict=data_dict[sample][6]
             if str(db_dict['DataCollectionOutcome']).startswith('Failed'):
                 continue

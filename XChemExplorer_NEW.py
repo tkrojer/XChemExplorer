@@ -392,11 +392,12 @@ class XChemExplorer(QtGui.QApplication):
                 elif position==0 and puck != 0:
                     label=QtGui.QLabel(str(puck))
                 else:
-#                    button=QtGui.QPushButton('x')
-#                    button.clicked.connect(self.show_html_summary_in_firefox)
+                    label=QtGui.QPushButton('x')
+                    label.clicked.connect(self.show_html_summary_in_firefox)
 #                    # how to right click on button
 #                    self.dewar_configuration_dict[]=button
-                    label=QtGui.QLabel('x')
+#                    button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+#                    label=QtGui.QLabel('x')
                 vbox_for_frame.addWidget(label)
                 frame.setLayout(vbox_for_frame)
                 self.dewar_configuration_layout.addWidget(frame, position, puck)
@@ -908,6 +909,10 @@ class XChemExplorer(QtGui.QApplication):
             write_enabled=self.check_write_permissions_of_data_source()
             if not write_enabled:
                 self.data_source_set=False
+
+
+    def show_html_summary_in_firefox(self):
+        print 'hallo'
 
     def color_run_panddas_button(self):
         if os.path.isfile(os.path.join(self.panddas_directory,'PANDDA_RUN_IN_PROGRESS')):
