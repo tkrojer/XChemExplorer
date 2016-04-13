@@ -673,12 +673,11 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
                 for entry in self.data_collection_dict[sample]:
                     if entry[0]=='logfile':
                         if entry[7]==selected_processing_result:
-                            entry_old=entry
                             db_dict=entry[6]
                             db_dict['DataCollectionOutcome']=str(outcome)
                             db_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
-                            entry_old[6]=db_dict
-                            data_dict[sample]=entry_old
+                            entry[6]=db_dict
+                            data_dict[sample]=entry
                             data_source.update_insert_data_source(sample,db_dict)
                             break
 
@@ -694,12 +693,12 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
             # 'logfile',visit,run,timestamp,autoproc
             # Don't write files for something that's labelled as Failed
             print sample,data_dict
-            if str(data_dict['DataCollectionOutcome']).startswith('Failed'):
+            db_dict=data_dict[sample][6]
+            if str(db_dict['DataCollectionOutcome']).startswith('Failed'):
                 continue
             visit=data_dict[sample][1]
             run=data_dict[sample][2]
             autoproc=data_dict[sample][4]
-            db_dict=data_dict[sample][6]
             path_to_procdir=db_dict['DataProcessingDirectoryOriginal']
             path_to_logfile=db_dict['DataProcessingPathToLogfile']
             path_to_mtzfile=db_dict['DataProcessingPathToMTZfile']
