@@ -1161,16 +1161,38 @@ class XChemExplorer(QtGui.QApplication):
             visit=entry[1]
             run=entry[2]
             autoproc=entry[4]
+
+            reference_file_pdb=os.path.join(self.reference_directory,reference_file+'.mtz')
+
             if os.path.isfile(os.path.join(self.reference_directory,reference_file+'.mtz')):
-                reference_file_mtz=os.path.isfile(os.path.join(self.reference_directory,reference_file+'.mtz'))
+                reference_file_mtz=' -R '+os.path.isfile(os.path.join(self.reference_directory,reference_file+'.mtz'))
             else:
                 reference_file_mtz=''
+
+            if os.path.isfile(os.path.join(self.reference_directory,reference_file+'.cif')):
+                reference_file_cif=' --libin '+os.path.isfile(os.path.join(self.reference_directory,reference_file+'.cif'))
+            else:
+                reference_file_cif=''
+
             job_list.append([   xtal,
                                 visit+'-'+run+autoproc,
                                 db_dict['DataProcessingPathToMTZfile'],
-                                os.path.join(self.reference_directory,reference_file+'.pdb'),
-                                reference_file_mtz  ])
+                                reference_file_pdb,
+                                reference_file_mtz,
+                                reference_file_cif  ])
         return job_list
+
+    def check_before_running_dimple(self, event):
+
+        reply = QtGui.QMessageBox.question(self, 'Message',
+            "Do you really want to run XXX Dimple jobs?", QtGui.QMessageBox.Yes |
+            QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+
+        if reply == QtGui.QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
+
 
     def rerun_dimple_on_autoprocessing_files(self,text):
 #                cmd_list = [    '---------- select command ----------',
@@ -1193,7 +1215,9 @@ class XChemExplorer(QtGui.QApplication):
 
             if job_list != []:
                 print job_list
-#                self.work_thread=XChemThread.NEW_save_autoprocessing_results_to_disc(job_list,self.initial_model_directory,self.external_software)
+                print len(job_list)
+                self.check_before_running_dimple()
+#                self.work_thread=XChemThread.run_dimple_on_selected_autoprocessing_files(job_list,self.initial_model_directory,self.external_software)
 #                self.explorer_active=1
 #                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
 #                self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)

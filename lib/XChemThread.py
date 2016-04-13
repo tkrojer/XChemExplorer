@@ -201,7 +201,7 @@ class create_png_and_cif_of_compound(QtCore.QThread):
         self.emit(QtCore.SIGNAL("finished()"))
 
 
-class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
+class run_dimple_on_selected_autoprocessing_files(QtCore.QThread):
     def __init__(self,sample_list,initial_model_directory,external_software):
         QtCore.QThread.__init__(self)
         self.sample_list=sample_list
@@ -219,10 +219,9 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             xtal =                  item[0]
             visit_run_autoproc =    item[1]
             mtzin =                 item[2]
-            ref_dir =               item[3]
-            ref_pdb =               os.path.join(ref_dir,item[4])
-            ref_mtz =               os.path.join(ref_dir,item[5])
-            ref_cif =               os.path.join(ref_dir,item[6])
+            ref_pdb =               item[3])
+            ref_mtz =               item[4])
+            ref_cif =               item[5])
 
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running dimple -> '+xtal,visit_run_autoproc)
 
