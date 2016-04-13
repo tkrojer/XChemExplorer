@@ -219,9 +219,9 @@ class run_dimple_on_selected_autoprocessing_files(QtCore.QThread):
             xtal =                  item[0]
             visit_run_autoproc =    item[1]
             mtzin =                 item[2]
-            ref_pdb =               item[3])
-            ref_mtz =               item[4])
-            ref_cif =               item[5])
+            ref_pdb =               item[3]
+            ref_mtz =               item[4]
+            ref_cif =               item[5]
 
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running dimple -> '+xtal,visit_run_autoproc)
 
