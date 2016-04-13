@@ -1165,12 +1165,12 @@ class XChemExplorer(QtGui.QApplication):
             reference_file_pdb=os.path.join(self.reference_directory,reference_file+'.mtz')
 
             if os.path.isfile(os.path.join(self.reference_directory,reference_file+'.mtz')):
-                reference_file_mtz=' -R '+os.path.isfile(os.path.join(self.reference_directory,reference_file+'.mtz'))
+                reference_file_mtz=' -R '+os.path.join(self.reference_directory,reference_file+'.mtz')
             else:
                 reference_file_mtz=''
 
             if os.path.isfile(os.path.join(self.reference_directory,reference_file+'.cif')):
-                reference_file_cif=' --libin '+os.path.isfile(os.path.join(self.reference_directory,reference_file+'.cif'))
+                reference_file_cif=' --libin '+os.path.join(self.reference_directory,reference_file+'.cif')
             else:
                 reference_file_cif=''
 
