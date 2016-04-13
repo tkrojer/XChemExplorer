@@ -1185,15 +1185,22 @@ class XChemExplorer(QtGui.QApplication):
 
     def check_before_running_dimple(self,n_jobs):
 
-        reply = QtGui.QMessageBox.question( 'Message',
-                                            "Do you really want to run %s Dimple jobs?" %n_jobs,
-                                            QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+#        reply = QtGui.QMessageBox.question( 'Message',
+#                                            "Do you really want to run %s Dimple jobs?" %n_jobs,
+#                                            QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
 
-        if reply == QtGui.QMessageBox.Yes:
-            print 'yes'
+        msgBox = QtGui.QMessageBox()
+        msgBox.setText("Do you really want to run %s Dimple jobs?" %n_jobs)
+        msgBox.addButton(QtGui.QPushButton('Accept'), QtGui.QMessageBox.YesRole)
+        msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
+        reply = msgBox.exec_();
+
+        print reply
+#        if reply == QtGui.QMessageBox.Yes:
+#            print 'yes'
 #            event.accept()
-        else:
-            print 'no'
+#        else:
+#            print 'no'
 #            event.ignore()
 
 
