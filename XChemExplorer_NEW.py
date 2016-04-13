@@ -925,7 +925,9 @@ class XChemExplorer(QtGui.QApplication):
         self.popMenu.exec_(self.sender().mapToGlobal(point))
         for key in self.dewar_configuration_dict:
             if self.dewar_configuration_dict[key]==self.sender():
+                print 'found'
                 self.dewar_label_active=key
+                print self.dewar_label_active
 
     def flag_sample_for_recollection(self):
         self.dewar_configuration_dict[self.dewar_label_active].setStyleSheet("background-color: yellow")
