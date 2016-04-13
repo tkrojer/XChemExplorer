@@ -1219,11 +1219,11 @@ class XChemExplorer(QtGui.QApplication):
                                 job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
 
             if job_list != []:
-                self.check_before_running_dimple(len(job_list))
                 self.work_thread=XChemThread.run_dimple_on_all_autoprocessing_files(    job_list,
                                                                                         self.initial_model_directory,
                                                                                         self.external_software,
                                                                                         self.ccp4_scratch_directory )
+                self.check_before_running_dimple(len(job_list))
 
     def center_main_window(self):
         screen = QtGui.QDesktopWidget().screenGeometry()
