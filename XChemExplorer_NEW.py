@@ -397,20 +397,26 @@ class XChemExplorer(QtGui.QApplication):
                 vbox_for_frame=QtGui.QVBoxLayout()
                 if puck==0 and position == 0:
                     label=QtGui.QLabel('')
+                    vbox_for_frame.addWidget(label)
+                    frame.setLayout(vbox_for_frame)
                 elif puck==0 and position != 0:
                     label=QtGui.QLabel(str(position))
+                    vbox_for_frame.addWidget(label)
+                    frame.setLayout(vbox_for_frame)
                 elif position==0 and puck != 0:
                     label=QtGui.QLabel(str(puck))
+                    vbox_for_frame.addWidget(label)
+                    frame.setLayout(vbox_for_frame)
                 else:
-#                    label=QtGui.QPushButton('x')
-#                    label.clicked.connect(self.show_html_summary_in_firefox)
+#                    frame=QtGui.QPushButton('x')
+#                    frame.clicked.connect(self.show_html_summary_in_firefox)
 #                    # how to right click on button
-#                    self.dewar_configuration_dict[str(puck)+'-'+str(position)]=label
-#                    label.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-#                    label.customContextMenuRequested.connect(self.on_context_menu)
+#                    self.dewar_configuration_dict[str(puck)+'-'+str(position)]=frame
+#                    frame.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+#                    frame.customContextMenuRequested.connect(self.on_context_menu)
                     label=QtGui.QLabel('x')
-                vbox_for_frame.addWidget(label)
-                frame.setLayout(vbox_for_frame)
+                    vbox_for_frame.addWidget(label)
+                    frame.setLayout(vbox_for_frame)
                 self.dewar_configuration_layout.addWidget(frame, position, puck)
 
 #        self.data_collection_summarys_vbox_for_details=QtGui.QVBoxLayout()
@@ -936,7 +942,7 @@ class XChemExplorer(QtGui.QApplication):
 #                self.sender().setStyleSheet("background-color: yellow")
 
     def undo_flag_sample_for_recollection(self):
-        print 'undo'
+        self.dewar_configuration_dict[self.dewar_label_active].setStyleSheet("background-color: gray")
 
     def show_html_summary_in_firefox(self):
         print 'hallo'
@@ -2650,12 +2656,13 @@ class XChemExplorer(QtGui.QApplication):
                         else:
                             self.albula_button_dict[xtal][1]=diffraction_image
                 elif header[0].startswith('Show\nDetails'):
-                    show_data_collection_details_checkbox=QtGui.QCheckBox()
-                    show_data_collection_details_checkbox.toggle()
-                    show_data_collection_details_checkbox.setChecked(False)
-                    show_data_collection_details_checkbox.stateChanged.connect(self.show_data_collection_details)
-                    self.data_collection_summary_table.setCellWidget(current_row,column,show_data_collection_details_checkbox)
-                    self.data_collection_summary_dict[xtal].append(show_data_collection_details_checkbox)
+                    if new_xtal:
+                        show_data_collection_details_checkbox=QtGui.QCheckBox()
+                        show_data_collection_details_checkbox.toggle()
+                        show_data_collection_details_checkbox.setChecked(False)
+                        show_data_collection_details_checkbox.stateChanged.connect(self.show_data_collection_details)
+                        self.data_collection_summary_table.setCellWidget(current_row,column,show_data_collection_details_checkbox)
+                        self.data_collection_summary_dict[xtal].append(show_data_collection_details_checkbox)
                 else:
                     cell_text=QtGui.QTableWidgetItem()
                     # in case data collection failed for whatever reason
