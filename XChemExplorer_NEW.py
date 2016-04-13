@@ -1183,11 +1183,11 @@ class XChemExplorer(QtGui.QApplication):
                                 reference_file_cif  ])
         return job_list
 
-    def check_before_running_dimple(self):
+    def check_before_running_dimple(self,n_jobs):
 
-        reply = QtGui.QMessageBox.question(self, 'Message',
-            "Do you really want to run XXX Dimple jobs?", QtGui.QMessageBox.Yes |
-            QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+        reply = QtGui.QMessageBox.question( 'Message',
+                                            "Do you really want to run %s Dimple jobs?" %n_jobs,
+                                            QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
 
         if reply == QtGui.QMessageBox.Yes:
             print 'yes'
@@ -1217,7 +1217,7 @@ class XChemExplorer(QtGui.QApplication):
             if job_list != []:
                 print job_list
                 print len(job_list)
-                self.check_before_running_dimple()
+                self.check_before_running_dimple(len(job_list))
 #                self.work_thread=XChemThread.run_dimple_on_selected_autoprocessing_files(job_list,self.initial_model_directory,self.external_software)
 #                self.explorer_active=1
 #                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
