@@ -385,7 +385,7 @@ class XChemExplorer(QtGui.QApplication):
 #        loadxxxxx=QtGui.QAction("Open Config File", self.window)
         recollect=QtGui.QAction("recollect",        self.window)
         recollect.triggered.connect(self.flag_sample_for_recollection)
-        self.popMenu.addAction(recollect, self.window))
+        self.popMenu.addAction(recollect, self.window)
         self.popMenu.addAction(QtGui.QAction('undo', self.window))
 
         for puck in range(38):
