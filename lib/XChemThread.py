@@ -1428,6 +1428,14 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             if len(entry)>=9:
                                 if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[4]==autoproc:
                                     found_autoproc=True
+                                    # need to check this because user may have run this later and otherwise he would need to delete pkl file to pick it up
+                                    if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit+'-'+run+autoproc,'dimple','final.pdb')):
+                                        dimple_file=os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit+'-'+run+autoproc,'dimple','final.pdb')
+                                        pdb_info=parse().PDBheader(dimple_file)
+                                        db_dict['DataProcessingPathToDimplePDBfile']=dimple_file
+                                        db_dict['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
+                                        db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
+                                        db_dict['DataProcessingRfree'] = pdb_info['Rfree']
                         if not found_autoproc:  # i.e. this run is not in pkl file yet
                             aimless_results=parse().read_aimless_logfile(file_name)
                             db_dict.update(aimless_results)
@@ -1477,6 +1485,14 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             if len(entry)>=9:
                                 if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[4]==autoproc:
                                     found_autoproc=True
+                                    # need to check this because user may have run this later and otherwise he would need to delete pkl file to pick it up
+                                    if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit+'-'+run+autoproc,'dimple','final.pdb')):
+                                        dimple_file=os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit+'-'+run+autoproc,'dimple','final.pdb')
+                                        pdb_info=parse().PDBheader(dimple_file)
+                                        db_dict['DataProcessingPathToDimplePDBfile']=dimple_file
+                                        db_dict['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
+                                        db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
+                                        db_dict['DataProcessingRfree'] = pdb_info['Rfree']
                         if not found_autoproc:
                             aimless_results=parse().read_aimless_logfile(file_name)
                             db_dict.update(aimless_results)
@@ -1522,6 +1538,14 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             if len(entry)>=9:
                                 if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[4]==autoproc:
                                     found_autoproc=True
+                                    # need to check this because user may have run this later and otherwise he would need to delete pkl file to pick it up
+                                    if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit+'-'+run+autoproc,'dimple','final.pdb')):
+                                        dimple_file=os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit+'-'+run+autoproc,'dimple','final.pdb')
+                                        pdb_info=parse().PDBheader(dimple_file)
+                                        db_dict['DataProcessingPathToDimplePDBfile']=dimple_file
+                                        db_dict['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
+                                        db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
+                                        db_dict['DataProcessingRfree'] = pdb_info['Rfree']
                         if not found_autoproc:
                             aimless_results=parse().read_aimless_logfile(file_name)
                             db_dict.update(aimless_results)
