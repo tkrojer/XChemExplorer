@@ -1201,10 +1201,6 @@ class XChemExplorer(QtGui.QApplication):
             self.work_thread.start()
 
 
-        elif reply == 1:
-            print 'ok, seems sounds sensible'
-
-
     def rerun_dimple_on_autoprocessing_files(self,i):
         text = str(self.rerun_dimple_combobox.currentText())
         if text=="---------- select command ----------":
@@ -1224,7 +1220,10 @@ class XChemExplorer(QtGui.QApplication):
 
             if job_list != []:
                 self.check_before_running_dimple(len(job_list))
-                self.work_thread=XChemThread.run_dimple_on_all_autoprocessing_files(job_list,self.initial_model_directory,self.external_software),self.ccp4_scratch_directory
+                self.work_thread=XChemThread.run_dimple_on_all_autoprocessing_files(    job_list,
+                                                                                        self.initial_model_directory,
+                                                                                        self.external_software,
+                                                                                        self.ccp4_scratch_directory )
 
     def center_main_window(self):
         screen = QtGui.QDesktopWidget().screenGeometry()
