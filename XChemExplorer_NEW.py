@@ -1146,7 +1146,7 @@ class XChemExplorer(QtGui.QApplication):
     def target_selection_combobox_activated(self,text):
         self.target=str(text)
 
-    def get_job_list_for_dimple_rerun(self,job_list,db_dict,entry):
+    def get_job_list_for_dimple_rerun(self,xtal,job_list,db_dict,entry):
         suitable_reference=[]
         for reference in self.reference_file_list:
             # first we need one in the same pointgroup
@@ -1207,9 +1207,9 @@ class XChemExplorer(QtGui.QApplication):
                         if os.path.isfile(db_dict['DataProcessingPathToMTZfile']):
                             if text=='Run Dimple if final.pdb cannot be found ' \
                                and notos.path.isfile(db_dict['DataProcessingPathToDimplePDBfile']):
-                                job_list=self.get_job_list_for_dimple_rerun(job_list,db_dict,entry)
+                                job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
                             elif text=='Rerun Dimple on Everything':
-                                job_list=self.get_job_list_for_dimple_rerun(job_list,db_dict,entry)
+                                job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
 
             if job_list != []:
                 print job_list
