@@ -383,7 +383,8 @@ class XChemExplorer(QtGui.QApplication):
         # create context menu
         self.popMenu = QtGui.QMenu()
 #        loadxxxxx=QtGui.QAction("Open Config File", self.window)
-#        recollect=QtGui.QAction("recollect",        self.flag_sample_for_recollection)
+        recollect=QtGui.QAction("recollect",        self.window)
+        recollect.triggered.connect(self.flag_sample_for_recollection)
         self.popMenu.addAction(QtGui.QAction('recollect', self.window))
         self.popMenu.addAction(QtGui.QAction('undo', self.window))
 
@@ -920,15 +921,16 @@ class XChemExplorer(QtGui.QApplication):
 
     def on_context_menu(self, point):
         # show context menu
-        print 'ggg'
-        print self.sender()
-        for key in self.dewar_configuration_dict:
-            if self.dewar_configuration_dict[key]==self.sender():
-                print key
-                self.popMenu.exec_(self.sender().mapToGlobal(point))
+        self.popMenu.exec_(self.sender().mapToGlobal(point))
+#        for key in self.dewar_configuration_dict:
+#            if self.dewar_configuration_dict[key]==self.sender():
+#                print key
 
     def flag_sample_for_recollection(self):
         print 'do'
+        for key in self.dewar_configuration_dict:
+            if self.dewar_configuration_dict[key]==self.sender():
+                print key
 
     def undo_flag_sample_for_recollection(self):
         print 'undo'
