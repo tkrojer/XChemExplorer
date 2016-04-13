@@ -382,7 +382,8 @@ class XChemExplorer(QtGui.QApplication):
 
         # create context menu
         self.popMenu = QtGui.QMenu()
-        recollect=QtGui.QAction('recollect', self.flag_sample_for_recollection)
+        loadxxxxx=QtGui.QAction("Open Config File", self.window)
+        recollect=QtGui.QAction("recollect",        self.flag_sample_for_recollection)
 #        self.popMenu.addAction(QtGui.QAction('recollect', self.flag_sample_for_recollection))
 #        self.popMenu.addAction(QtGui.QAction('undo', self.undo_flag_sample_for_recollection))
 
