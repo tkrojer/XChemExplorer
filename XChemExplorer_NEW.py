@@ -380,6 +380,11 @@ class XChemExplorer(QtGui.QApplication):
         self.dewar_configuration_dict={}
         self.dewar_configuration_layout = QtGui.QGridLayout()
 
+        # create context menu
+        self.popMenu = QtGui.QMenu()
+        self.popMenu.addAction(QtGui.QAction('recollect', self.flag_sample_for_recollection))
+        self.popMenu.addAction(QtGui.QAction('undo', self.undo_flag_sample_for_recollection))
+
         for puck in range(38):
             for position in range(17):
                 frame=QtGui.QFrame()
@@ -396,7 +401,8 @@ class XChemExplorer(QtGui.QApplication):
                     label.clicked.connect(self.show_html_summary_in_firefox)
 #                    # how to right click on button
 #                    self.dewar_configuration_dict[]=button
-#                    button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+                    label.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+                    label.customContextMenuRequested.connect(self.on_context_menu)
 #                    label=QtGui.QLabel('x')
                 vbox_for_frame.addWidget(label)
                 frame.setLayout(vbox_for_frame)
@@ -910,6 +916,16 @@ class XChemExplorer(QtGui.QApplication):
             if not write_enabled:
                 self.data_source_set=False
 
+    def on_context_menu(self, point):
+        # show context menu
+        print 'ggg'
+#        self.popMenu.exec_(self.button.mapToGlobal(point))
+
+    def flag_sample_for_recollection(self):
+        print 'do'
+
+    def undo_flag_sample_for_recollection(self):
+        print 'undo'
 
     def show_html_summary_in_firefox(self):
         print 'hallo'
