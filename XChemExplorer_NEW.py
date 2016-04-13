@@ -304,6 +304,7 @@ class XChemExplorer(QtGui.QApplication):
                                                         'Resolution\nHigh',
                                                         'DataProcessing\nSpaceGroup',
                                                         'Mn<I/sig(I)>\nHigh',
+                                                        'DataProcessing\nRfree',
                                                         'Rmerge\nLow',
                                                         'DataCollection\nOutcome',
                                                         'img1',
@@ -376,7 +377,7 @@ class XChemExplorer(QtGui.QApplication):
 
         ######################################################################################
         # @ Dewar
-#        self.dewar_configuration_dict
+        self.dewar_configuration_dict={}
         self.dewar_configuration_layout = QtGui.QGridLayout()
 
         for puck in range(38):
@@ -391,6 +392,10 @@ class XChemExplorer(QtGui.QApplication):
                 elif position==0 and puck != 0:
                     label=QtGui.QLabel(str(puck))
                 else:
+#                    button=QtGui.QPushButton('x')
+#                    button.clicked.connect(self.show_html_summary_in_firefox)
+#                    # how to right click on button
+#                    self.dewar_configuration_dict[]=button
                     label=QtGui.QLabel('x')
                 vbox_for_frame.addWidget(label)
                 frame.setLayout(vbox_for_frame)
@@ -1736,7 +1741,8 @@ class XChemExplorer(QtGui.QApplication):
                                                                                self.database_directory,
                                                                                self.data_collection_dict,
                                                                                self.preferences,
-                                                                               self.data_collection_summary_file )
+                                                                               self.data_collection_summary_file,
+                                                                               self.initial_model_directory )
             self.explorer_active=1
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
