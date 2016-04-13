@@ -351,14 +351,14 @@ class XChemExplorer(QtGui.QApplication):
 #        rerun_dimple_button.clicked.connect(self.button_clicked)
 #        data_collection_button_hbox.addWidget(rerun_dimple_button)
 
-        rerun_dimple_combobox=QtGui.QComboBox()
+        self.rerun_dimple_combobox=QtGui.QComboBox()
         cmd_list = [    '---------- select command ----------',
                         'Run Dimple if final.pdb cannot be found ',
                         'Rerun Dimple on Everything'    ]
         for cmd in cmd_list:
-            rerun_dimple_combobox.addItem(cmd)
-        rerun_dimple_combobox.activated[str].connect(self.rerun_dimple_on_autoprocessing_files)
-        data_collection_button_hbox.addWidget(rerun_dimple_combobox)
+            self.rerun_dimple_combobox.addItem(cmd)
+        self.rerun_dimple_combobox.activated[str].connect(self.rerun_dimple_on_autoprocessing_files)
+        data_collection_button_hbox.addWidget(self.rerun_dimple_combobox)
 
         self.target_selection_combobox = QtGui.QComboBox()
         self.populate_target_selection_combobox(self.target_selection_combobox)
@@ -1194,11 +1194,9 @@ class XChemExplorer(QtGui.QApplication):
             event.ignore()
 
 
-    def rerun_dimple_on_autoprocessing_files(self,text):
-#                cmd_list = [    '---------- select command ----------',
-#                        'Run Dimple if final.pdb cannot be found ',
-#                        'Rerun Dimple on Everything'    ]
-        if self.sender().text()=="---------- select command ----------":
+    def rerun_dimple_on_autoprocessing_files(self,i):
+        text = str(self.rerun_dimple_combobox.currentText())
+        if text=="---------- select command ----------":
             pass
         if self.explorer_active==0 and self.data_source_set==True and self.data_collection_summary_file != '':
             job_list=[]
@@ -1207,10 +1205,10 @@ class XChemExplorer(QtGui.QApplication):
                     if entry[0]=='logfile':
                         db_dict=entry[6]
                         if os.path.isfile(db_dict['DataProcessingPathToMTZfile']):
-                            if self.sender().text()=='Run Dimple if final.pdb cannot be found ' \
+                            if text=='Run Dimple if final.pdb cannot be found ' \
                                and notos.path.isfile(db_dict['DataProcessingPathToDimplePDBfile']):
                                 job_list=self.get_job_list_for_dimple_rerun(job_list,db_dict)
-                            elif self.sender().text()=='Rerun Dimple on Everything':
+                            elif text=='Rerun Dimple on Everything':
                                 job_list=self.get_job_list_for_dimple_rerun(job_list,db_dict)
 
             if job_list != []:
