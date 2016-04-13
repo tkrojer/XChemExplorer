@@ -1147,6 +1147,7 @@ class XChemExplorer(QtGui.QApplication):
         self.target=str(text)
 
     def get_job_list_for_dimple_rerun(self,xtal,job_list,db_dict,entry):
+        self.status_bar.showMessage('checking: '+str(db_dict['DataProcessingPathToMTZfile']))
         suitable_reference=[]
         for reference in self.reference_file_list:
             # first we need one in the same pointgroup
@@ -1182,16 +1183,18 @@ class XChemExplorer(QtGui.QApplication):
                                 reference_file_cif  ])
         return job_list
 
-    def check_before_running_dimple(self, event):
+    def check_before_running_dimple(self):
 
         reply = QtGui.QMessageBox.question(self, 'Message',
             "Do you really want to run XXX Dimple jobs?", QtGui.QMessageBox.Yes |
             QtGui.QMessageBox.No, QtGui.QMessageBox.No)
 
         if reply == QtGui.QMessageBox.Yes:
-            event.accept()
+            print 'yes'
+#            event.accept()
         else:
-            event.ignore()
+            print 'no'
+#            event.ignore()
 
 
     def rerun_dimple_on_autoprocessing_files(self,i):
