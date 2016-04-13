@@ -7,6 +7,7 @@ import pickle
 import base64
 import math
 import multiprocessing
+import webbrowser
 
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 from XChemUtils import parse
@@ -946,6 +947,9 @@ class XChemExplorer(QtGui.QApplication):
 
     def show_html_summary_in_firefox(self):
         print 'hallo'
+#        new=2
+#        url='http://www.thesgc.org'
+#        webbrowser.open(url,new=new)
 
     def color_run_panddas_button(self):
         if os.path.isfile(os.path.join(self.panddas_directory,'PANDDA_RUN_IN_PROGRESS')):
@@ -2524,6 +2528,8 @@ class XChemExplorer(QtGui.QApplication):
 #                                    self.data_collection_summary_table.item(item[1], column).setBackground(QtGui.QColor(255,255,150))
 #                                except AttributeError:
 #                                    pass
+                    print 'ooo'
+                    print self.data_collection_column_three_dict[key][0].mainWindow.frameGeometry().height()
                     self.data_collection_details_currently_on_display=self.data_collection_column_three_dict[key][0]
                     self.data_collection_summarys_vbox_for_details.addWidget(self.data_collection_details_currently_on_display)
 #                    self.data_collection_summarys_vbox_for_details.setSizeConstraint(QtGui.QLayout.SetMinimumSize)
