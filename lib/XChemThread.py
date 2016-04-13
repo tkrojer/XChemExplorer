@@ -659,6 +659,7 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
         for sample in sorted(self.dataset_outcome_dict):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating data source for '+sample)
             outcome=self.dataset_outcome_dict[sample]
+            print sample,outcome
 #            for button in self.dataset_outcome_dict[sample]:
 #                if button.isChecked():
 #                    outcome=button.text()
@@ -677,8 +678,8 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
                             db_dict['DataCollectionOutcome']=str(outcome)
                             db_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
                             entry[6]=db_dict
-                            print entry
-                            print entry[6]
+#                            print entry
+#                            print entry[6]
                             data_dict[sample]=entry
                             data_source.update_insert_data_source(sample,db_dict)
                             break
