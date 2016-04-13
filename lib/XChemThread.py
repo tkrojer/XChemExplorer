@@ -659,7 +659,6 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
         for sample in sorted(self.dataset_outcome_dict):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating data source for '+sample)
             outcome=self.dataset_outcome_dict[sample]
-            print sample,outcome
 #            for button in self.dataset_outcome_dict[sample]:
 #                if button.isChecked():
 #                    outcome=button.text()
@@ -674,13 +673,16 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
                 for entry in self.data_collection_dict[sample]:
                     if entry[0]=='logfile':
                         if entry[7]==selected_processing_result:
+                            print entry
+                            entry_old=entry
                             db_dict=entry[6]
                             db_dict['DataCollectionOutcome']=str(outcome)
                             db_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
-                            entry[6]=db_dict
+                            entry_old[6]=db_dict
 #                            print entry
 #                            print entry[6]
-                            data_dict[sample]=entry
+                            data_dict[sample]=entry_old
+                            print entry_old
                             data_source.update_insert_data_source(sample,db_dict)
                             break
 
@@ -695,7 +697,6 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing files from data processing to inital_model folder -> '+sample)
             # 'logfile',visit,run,timestamp,autoproc
             # Don't write files for something that's labelled as Failed
-            print sample
             if str(data_dict['DataCollectionOutcome']).startswith('Failed'):
                 continue
             visit=data_dict[sample][1]
