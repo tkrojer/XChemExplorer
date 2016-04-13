@@ -674,11 +674,12 @@ class NEW_save_autoprocessing_results_to_disc(QtCore.QThread):
                     if entry[0]=='logfile':
                         if entry[7]==selected_processing_result:
                             db_dict=entry[6]
-                            listin=entry
                             db_dict['DataCollectionOutcome']=str(outcome)
                             db_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
-                            listin[6]=db_dict
-                            data_dict[sample]=listin
+                            entry[6]=db_dict
+                            print entry
+                            print entry[6]
+                            data_dict[sample]=entry
                             data_source.update_insert_data_source(sample,db_dict)
                             break
 
