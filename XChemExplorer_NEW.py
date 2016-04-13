@@ -1183,16 +1183,16 @@ class XChemExplorer(QtGui.QApplication):
                                 reference_file_cif  ])
         return job_list
 
-    def check_before_running_dimple(self,n_jobs):
+    def check_before_running_dimple(self,job_list):
 
         msgBox = QtGui.QMessageBox()
-        msgBox.setText("Do you really want to run %s Dimple jobs?" %n_jobs)
+        msgBox.setText("Do you really want to run %s Dimple jobs?" %len(job_list))
         msgBox.addButton(QtGui.QPushButton('Accept'), QtGui.QMessageBox.YesRole)
         msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
         reply = msgBox.exec_();
 
         if reply == 0:
-            self.status_bar.showMessage('preparing %s DIMPLE jobs' %n_jobs)
+            self.status_bar.showMessage('preparing %s DIMPLE jobs' %len(job_list))
             self.work_thread=XChemThread.run_dimple_on_all_autoprocessing_files(    job_list,
                                                                                     self.initial_model_directory,
                                                                                     self.external_software,
@@ -1223,7 +1223,7 @@ class XChemExplorer(QtGui.QApplication):
                                 job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
 
             if job_list != []:
-                self.check_before_running_dimple(len(job_list))
+                self.check_before_running_dimple(job_list)
 
     def center_main_window(self):
         screen = QtGui.QDesktopWidget().screenGeometry()
