@@ -2529,8 +2529,7 @@ class XChemExplorer(QtGui.QApplication):
 #                                    self.data_collection_summary_table.item(item[1], column).setBackground(QtGui.QColor(255,255,150))
 #                                except AttributeError:
 #                                    pass
-                    print 'ooo'
-                    print self.data_collection_column_three_dict[key][0].frameGeometry().height()
+#                    print self.data_collection_column_three_dict[key][0].frameGeometry().height()
                     self.data_collection_details_currently_on_display=self.data_collection_column_three_dict[key][0]
                     self.data_collection_summarys_vbox_for_details.addWidget(self.data_collection_details_currently_on_display)
 #                    self.data_collection_summarys_vbox_for_details.setSizeConstraint(QtGui.QLayout.SetMinimumSize)
