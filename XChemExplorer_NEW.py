@@ -408,15 +408,15 @@ class XChemExplorer(QtGui.QApplication):
                     vbox_for_frame.addWidget(label)
                     frame.setLayout(vbox_for_frame)
                 else:
-                    frame=QtGui.QPushButton('x')
-                    frame.clicked.connect(self.show_html_summary_in_firefox)
-                    # how to right click on button
-                    self.dewar_configuration_dict[str(puck)+'-'+str(position)]=frame
-                    frame.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-                    frame.customContextMenuRequested.connect(self.on_context_menu)
-#                    label=QtGui.QLabel('x')
-#                    vbox_for_frame.addWidget(label)
-#                    frame.setLayout(vbox_for_frame)
+#                    frame=QtGui.QPushButton('x')
+#                    frame.clicked.connect(self.show_html_summary_in_firefox)
+#                    # how to right click on button
+#                    self.dewar_configuration_dict[str(puck)+'-'+str(position)]=frame
+#                    frame.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+#                    frame.customContextMenuRequested.connect(self.on_context_menu)
+                    label=QtGui.QLabel('x')
+                    vbox_for_frame.addWidget(label)
+                    frame.setLayout(vbox_for_frame)
                 self.dewar_configuration_layout.addWidget(frame, position, puck)
 
 #        self.data_collection_summarys_vbox_for_details=QtGui.QVBoxLayout()
