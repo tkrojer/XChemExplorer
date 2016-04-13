@@ -382,8 +382,8 @@ class XChemExplorer(QtGui.QApplication):
 
         # create context menu
         self.popMenu = QtGui.QMenu()
-        self.popMenu.addAction(QtGui.QAction('recollect', self.flag_sample_for_recollection))
-        self.popMenu.addAction(QtGui.QAction('undo', self.undo_flag_sample_for_recollection))
+#        self.popMenu.addAction(QtGui.QAction('recollect', self.flag_sample_for_recollection))
+#        self.popMenu.addAction(QtGui.QAction('undo', self.undo_flag_sample_for_recollection))
 
         for puck in range(38):
             for position in range(17):
