@@ -966,7 +966,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def show_html_summary_in_firefox(self,xtal):
         html_summary=self.albula_button_dict[xtal][2]
-        print html_summary
+        print 'html_summary',html_summary
         new=2
         webbrowser.open(html_summary,new=new)
 

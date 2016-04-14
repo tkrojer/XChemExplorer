@@ -1392,8 +1392,13 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             image_file=open( os.path.join(os.getenv('XChemExplorer_DIR'),'image','IMAGE_NOT_AVAILABLE.png') ,"rb")
                             image_string=base64.b64encode(image_file.read())
                             image_list.append( [image_name,image_string] )
+                        # and finally comes the html page
+                        if os.path.isfile(os.path.join(visit_directory,'jpegs',self.target,xtal,run+'index.html')):
+                            html_summary=os.path.join(visit_directory,'jpegs',self.target,xtal,run+'index.html')
+                        else:
+                            html_summary=''
                         self.data_collection_dict[xtal].append(['image',visit,run,timestamp,image_list,
-                                                                diffraction_image,run_number])
+                                                                diffraction_image,run_number,html_summary])
 
 
                     # before we start, check if there are already entries in the aimless_index_list
