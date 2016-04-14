@@ -2745,10 +2745,10 @@ class XChemExplorer(QtGui.QApplication):
             logfile_found=False
             for entry in self.data_collection_dict[sample]:
                 if entry[0]=='logfile':
-                logfile_found=True
-                    if entry[8]:    # if this was auto-selected best resolution file
-                    db_dict=entry[6]
-                    resolution_high=db_dict['DataProcessingResolutionHigh']
+                    logfile_found=True
+                        if entry[8]:    # if this was auto-selected best resolution file
+                        db_dict=entry[6]
+                        resolution_high=db_dict['DataProcessingResolutionHigh']
             if not logfile_found:
                 resolution_high='no logfile'
             outcome=str(self.dataset_outcome_combobox_dict[sample]currentText())
