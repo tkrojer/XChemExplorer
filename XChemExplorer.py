@@ -2753,6 +2753,7 @@ class XChemExplorer(QtGui.QApplication):
                 if not logfile_found:
                     resolution_high='no logfile'
                 self.dewar_configuration_dict[puck_position].setText(sample+'\n'+resolution_high)
+                self.dewar_configuration_dict[puck_position].setStyleSheet("font-size:5px;border-width: 0px")
                 outcome=str(self.dataset_outcome_combobox_dict[sample].currentText())
                 if outcome=="success":
                     self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: green")
