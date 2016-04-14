@@ -2773,40 +2773,40 @@ class XChemExplorer(QtGui.QApplication):
                 # the user changed the selection, i.e. no automated selection will update it
                 self.data_collection_column_three_dict[key][1]=True
 
-#    def update_selected_autoproc_data_collection_summary_table(self):
-#        for key in self.data_collection_column_three_dict:
-#            if self.data_collection_column_three_dict[key][0]==self.sender():
-#                sample=key
-#                break
-#        indexes=self.sender().selectionModel().selectedRows()
-#        for index in sorted(indexes):
-#            selected_processing_result=index.row()
-#
-#        for entry in self.data_collection_dict[sample]:
-#            if entry[0]=='logfile':
-#                if entry[7]==selected_processing_result:
-#                    db_dict=entry[6]
-#
-#        column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
-#
-#        rows_in_table=self.data_collection_summary_table.rowCount()
-#        for row in range(rows_in_table):
-#            if self.data_collection_summary_table.item(row,0).text()==sample:
-#                for column,header in enumerate(column_name):
-#                    if header[0]=='Sample ID':
-#                        continue
-#                    elif header[0]=='DataCollection\nOutcome':
-#                        continue
-#                    elif header[0].startswith('img'):
-#                        continue
-#                    elif header[0].startswith('Show'):
-#                        continue
-#                    else:
-#                        cell_text=QtGui.QTableWidgetItem()
-#                        cell_text.setText(str( db_dict[ header[1] ]  ))
-#                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-#                        self.data_collection_summary_table.setItem(row, column, cell_text)
-#
+    def update_selected_autoproc_data_collection_summary_table(self):
+        for key in self.data_collection_column_three_dict:
+            if self.data_collection_column_three_dict[key][0]==self.sender():
+                sample=key
+                break
+        indexes=self.sender().selectionModel().selectedRows()
+        for index in sorted(indexes):
+            selected_processing_result=index.row()
+
+        for entry in self.data_collection_dict[sample]:
+            if entry[0]=='logfile':
+                if entry[7]==selected_processing_result:
+                    db_dict=entry[6]
+
+        column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
+
+        rows_in_table=self.data_collection_summary_table.rowCount()
+        for row in range(rows_in_table):
+            if self.data_collection_summary_table.item(row,0).text()==sample:
+                for column,header in enumerate(column_name):
+                    if header[0]=='Sample ID':
+                        continue
+                    elif header[0]=='DataCollection\nOutcome':
+                        continue
+                    elif header[0].startswith('img'):
+                        continue
+                    elif header[0].startswith('Show'):
+                        continue
+                    else:
+                        cell_text=QtGui.QTableWidgetItem()
+                        cell_text.setText(str( db_dict[ header[1] ]  ))
+                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                        self.data_collection_summary_table.setItem(row, column, cell_text)
+
 
     def populate_data_source_table(self,header,data):
         self.mounted_crystal_table.setColumnCount(0)
