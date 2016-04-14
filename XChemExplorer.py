@@ -43,11 +43,11 @@ class XChemExplorer(QtGui.QApplication):
             self.database_directory=os.path.join(self.project_directory,'processing','database')
             self.data_source_file=''
             self.data_collection_summary_file=os.path.join(self.database_directory,str(os.getcwd().split('/')[5])+'_summary.pkl')
-            if os.path.isfile(os.path.join(self.project_directory,'processing','database','soakDBDataFile.sqlite')):
-                self.data_source_file='soakDBDataFile.sqlite'
-                self.database_directory=os.path.join(self.project_directory,'processing','lab36')
-                self.data_source_set=True
-                XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).create_missing_columns()
+#            if os.path.isfile(os.path.join(self.project_directory,'processing','database','soakDBDataFile.sqlite')):
+#                self.data_source_file='soakDBDataFile.sqlite'
+#                self.database_directory=os.path.join(self.project_directory,'processing','lab36')
+#                self.data_source_set=True
+#                XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).create_missing_columns()
             self.ccp4_scratch_directory=os.path.join(self.project_directory,'processing','tmp')
 
             if not os.path.isdir(self.beamline_directory):
@@ -2953,8 +2953,11 @@ class XChemExplorer(QtGui.QApplication):
         return n_rows
 
     def update_data_source(self,sample,db_dict):
-        data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
-        data_source.update_insert_data_source(sample,db_dict)
+        try:
+            data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
+            data_source.update_insert_data_source(sample,db_dict)
+        except sqlite3.OperationalError:
+            pass
 
 
 if __name__ == "__main__":
