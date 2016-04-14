@@ -2751,6 +2751,7 @@ class XChemExplorer(QtGui.QApplication):
                         resolution_high=db_dict['DataProcessingResolutionHigh']
             if not logfile_found:
                 resolution_high='no logfile'
+            self.dewar_configuration_dict[puck_position].setText(sample+'\n'+resolution_high)
             outcome=str(self.dataset_outcome_combobox_dict[sample].currentText())
             if outcome=="success":
                 col='green'
