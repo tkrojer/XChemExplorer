@@ -300,6 +300,44 @@ class parse:
                                     '23':   ['P23','F23','I23','P213','I213'],
                                     '432':  ['P432','P4232','F432','F4132','I432','P4332','P4132','I4132' ] }
 
+        self.aimless = {    'DataProcessingProgram':                        'n/a',
+                            'DataCollectionRun':                            'n/a',
+                            'DataProcessingSpaceGroup':                     'n/a',
+                            'DataProcessingUnitCell':                       'n/a',
+                            'DataProcessingA':                              'n/a',
+                            'DataProcessingB':                              'n/a',
+                            'DataProcessingC':                              'n/a',
+                            'DataProcessingAlpha':                          'n/a',
+                            'DataProcessingBeta':                           'n/a',
+                            'DataProcessingGamma':                          'n/a',
+                            'DataProcessingResolutionLow':                  'n/a',
+                            'DataProcessingResolutionLowInnerShell':        'n/a',
+                            'DataProcessingResolutionHigh':                 'n/a',
+                            'DataProcessingResolutionHighOuterShell':       'n/a',
+                            'DataProcessingResolutionOverall':              'n/a',
+                            'DataProcessingRmergeOverall':                  'n/a',
+                            'DataProcessingRmergeLow':                      'n/a',
+                            'DataProcessingRmergeHigh':                     'n/a',
+                            'DataProcessingIsigOverall':                    'n/a',
+                            'DataProcessingIsigLow':                        'n/a',
+                            'DataProcessingIsigHigh':                       'n/a',
+                            'DataProcessingCompletenessOverall':            'n/a',
+                            'DataProcessingCompletenessLow':                'n/a',
+                            'DataProcessingCompletenessHigh':               'n/a',
+                            'DataProcessingMultiplicityOverall':            'n/a',
+                            'DataProcessingMultiplicityLow':                'n/a',
+                            'DataProcessingMultiplicityHigh':               'n/a',
+                            'DataProcessingCChalfOverall':                  'n/a',
+                            'DataProcessingCChalfLow':                      'n/a',
+                            'DataProcessingCChalfHigh':                     'n/a',
+                            'DataProcessingResolutionHigh1.5sigma':         'n/a',
+                            'DataProcessingUniqueReflectionsOverall':       'n/a',
+                            'DataProcessingLattice':                        'n/a',
+                            'DataProcessingPointGroup':                     'n/a',
+                            'DataProcessingUnitCellVolume':                 0,
+                            'DataProcessingAlert':                          '#FF0000',
+                            'DataCollectionWavelength':                     'n/a'   }
+
 
     def GetAimlessLog(self,Logfile):
         self.Logfile=Logfile
@@ -421,46 +459,12 @@ class parse:
 
         return Aimless
 
+    def return_empty_aimless_dict_for_db(self):
+        return self.aimless
+
     def read_aimless_logfile(self,logfile):
         # essentially same as above, but compatible with datasource
         # will hopefully supersede function above
-        aimless = { 'DataProcessingProgram':                        'n/a',
-                    'DataCollectionRun':                            'n/a',
-                    'DataProcessingSpaceGroup':                     'n/a',
-                    'DataProcessingUnitCell':                       'n/a',
-                    'DataProcessingA':                              'n/a',
-                    'DataProcessingB':                              'n/a',
-                    'DataProcessingC':                              'n/a',
-                    'DataProcessingAlpha':                          'n/a',
-                    'DataProcessingBeta':                           'n/a',
-                    'DataProcessingGamma':                          'n/a',
-                    'DataProcessingResolutionLow':                  'n/a',
-                    'DataProcessingResolutionLowInnerShell':        'n/a',
-                    'DataProcessingResolutionHigh':                 'n/a',
-                    'DataProcessingResolutionHighOuterShell':       'n/a',
-                    'DataProcessingResolutionOverall':              'n/a',
-                    'DataProcessingRmergeOverall':                  'n/a',
-                    'DataProcessingRmergeLow':                      'n/a',
-                    'DataProcessingRmergeHigh':                     'n/a',
-                    'DataProcessingIsigOverall':                    'n/a',
-                    'DataProcessingIsigLow':                        'n/a',
-                    'DataProcessingIsigHigh':                       'n/a',
-                    'DataProcessingCompletenessOverall':            'n/a',
-                    'DataProcessingCompletenessLow':                'n/a',
-                    'DataProcessingCompletenessHigh':               'n/a',
-                    'DataProcessingMultiplicityOverall':            'n/a',
-                    'DataProcessingMultiplicityLow':                'n/a',
-                    'DataProcessingMultiplicityHigh':               'n/a',
-                    'DataProcessingCChalfOverall':                  'n/a',
-                    'DataProcessingCChalfLow':                      'n/a',
-                    'DataProcessingCChalfHigh':                     'n/a',
-                    'DataProcessingResolutionHigh1.5sigma':         'n/a',
-                    'DataProcessingUniqueReflectionsOverall':       'n/a',
-                    'DataProcessingLattice':                        'n/a',
-                    'DataProcessingPointGroup':                     'n/a',
-                    'DataProcessingUnitCellVolume':                 0,
-                    'DataProcessingAlert':                          '#FF0000',
-                    'DataCollectionWavelength':                     'n/a' }
 
         spg='n/a'
         a='n/a'
@@ -471,60 +475,60 @@ class parse:
         gamma='n/a'
 
         if 'fast_dp' in logfile:
-            aimless['DataProcessingProgram']='fast_dp'
+            self.aimless['DataProcessingProgram']='fast_dp'
         elif '3d-run' in logfile:
-            aimless['DataProcessingProgram']='xia2 3d'
+            self.aimless['DataProcessingProgram']='xia2 3d'
         elif '3dii-run' in logfile:
-            aimless['DataProcessingProgram']='xia2 3dii'
+            self.aimless['DataProcessingProgram']='xia2 3dii'
         elif 'dials-run' in logfile:
-            aimless['DataProcessingProgram']='dials'
+            self.aimless['DataProcessingProgram']='dials'
         elif 'autoPROC' in logfile:
-            aimless['DataProcessingProgram']='autoPROC'
+            self.aimless['DataProcessingProgram']='autoPROC'
 
         # get run number from logfile
         # Note: only works if file is in original directory, but not once it moved to 'inital_model' folder
 #        print self.Logfile.split('/')[9].split('_')[1]
 #        if len(self.Logfile.split('/'))>8 and len(self.Logfile.split('/')[9].split('_'))==1:
         try:
-            aimless['DataCollectionRun']=logfile.split('/')[9].split('_')[1]
+            self.aimless['DataCollectionRun']=logfile.split('/')[9].split('_')[1]
         except IndexError:
             pass
 
         resolution_at_sigma_line=100000000
         for line_number,line in enumerate(open(logfile)):
             if 'Wavelength' in line and len(line.split())==2:
-                aimless['DataCollectionWavelength']=line.split()[1]
+                self.aimless['DataCollectionWavelength']=line.split()[1]
             if line.startswith('Low resolution limit') and len(line.split())==6:
-                aimless['DataProcessingResolutionLow'] = line.split()[3]
-                aimless['DataProcessingResolutionHighOuterShell'] = line.split()[5]
+                self.aimless['DataProcessingResolutionLow'] = line.split()[3]
+                self.aimless['DataProcessingResolutionHighOuterShell'] = line.split()[5]
             if line.startswith('High resolution limit') and len(line.split())==6:
-                aimless['DataProcessingResolutionHigh'] = line.split()[3]
-                aimless['DataProcessingResolutionLowInnerShell'] = line.split()[4]
+                self.aimless['DataProcessingResolutionHigh'] = line.split()[3]
+                self.aimless['DataProcessingResolutionLowInnerShell'] = line.split()[4]
             if line.startswith('Rmerge  (all I+ and I-)') and len(line.split())==8:
-                aimless['DataProcessingRmergeOverall'] = line.split()[5]
-                aimless['DataProcessingRmergeLow'] = line.split()[6]
-                aimless['DataProcessingRmergeHigh']  = line.split()[7]
+                self.aimless['DataProcessingRmergeOverall'] = line.split()[5]
+                self.aimless['DataProcessingRmergeLow'] = line.split()[6]
+                self.aimless['DataProcessingRmergeHigh']  = line.split()[7]
             if line.startswith('Mean((I)/sd(I))') and len(line.split())==4:
-                aimless['DataProcessingIsigOverall'] = line.split()[1]
-                aimless['DataProcessingIsigHigh'] = line.split()[3]
-                aimless['DataProcessingIsigLow'] = line.split()[2]
+                self.aimless['DataProcessingIsigOverall'] = line.split()[1]
+                self.aimless['DataProcessingIsigHigh'] = line.split()[3]
+                self.aimless['DataProcessingIsigLow'] = line.split()[2]
             if line.startswith('Completeness') and len(line.split())==4:
-                aimless['DataProcessingCompletenessOverall'] = line.split()[1]
-                aimless['DataProcessingCompletenessHigh'] = line.split()[3]
-                aimless['DataProcessingCompletenessLow'] = line.split()[2]
+                self.aimless['DataProcessingCompletenessOverall'] = line.split()[1]
+                self.aimless['DataProcessingCompletenessHigh'] = line.split()[3]
+                self.aimless['DataProcessingCompletenessLow'] = line.split()[2]
             if line.startswith('Multiplicity') and len(line.split())==4:
-                aimless['DataProcessingMultiplicityOverall'] = line.split()[1]
-                aimless['DataProcessingMultiplicityHigh'] = line.split()[3]
-                aimless['DataProcessingMultiplicityLow'] = line.split()[3]
+                self.aimless['DataProcessingMultiplicityOverall'] = line.split()[1]
+                self.aimless['DataProcessingMultiplicityHigh'] = line.split()[3]
+                self.aimless['DataProcessingMultiplicityLow'] = line.split()[3]
             if line.startswith('Mn(I) half-set correlation CC(1/2)') and len(line.split())==7:
-                aimless['DataProcessingCChalfOverall'] = line.split()[4]
-                aimless['DataProcessingCChalfLow'] = line.split()[5]
-                aimless['DataProcessingCChalfHigh'] = line.split()[6]
+                self.aimless['DataProcessingCChalfOverall'] = line.split()[4]
+                self.aimless['DataProcessingCChalfLow'] = line.split()[5]
+                self.aimless['DataProcessingCChalfHigh'] = line.split()[6]
             if line.startswith('Estimates of resolution limits: overall'):
                 resolution_at_sigma_line=line_number+2
             if line_number==resolution_at_sigma_line:
                 if len(line.split())==7:
-                    aimless['DataProcessingResolutionHigh1.5sigma']=line.split()[6][:-1]
+                    self.aimless['DataProcessingResolutionHigh1.5sigma']=line.split()[6][:-1]
             if line.startswith('Average unit cell:') and len(line.split())==9:
                 tmp = []
                 tmp.append(line.split())
@@ -534,27 +538,27 @@ class parse:
                 alpha = int(float(tmp[0][6]))
                 beta = int(float(tmp[0][7]))
                 gamma = int(float(tmp[0][8]))
-                aimless['DataProcessingA']=str(a)
-                aimless['DataProcessingB']=str(b)
-                aimless['DataProcessingC']=str(c)
-                aimless['DataProcessingAlpha']=str(alpha)
-                aimless['DataProcessingBeta']=str(beta)
-                aimless['DataProcessingGamma']=str(gamma)
+                self.aimless['DataProcessingA']=str(a)
+                self.aimless['DataProcessingB']=str(b)
+                self.aimless['DataProcessingC']=str(c)
+                self.aimless['DataProcessingAlpha']=str(alpha)
+                self.aimless['DataProcessingBeta']=str(beta)
+                self.aimless['DataProcessingGamma']=str(gamma)
             if line.startswith('Total number unique') and len(line.split())==6:
-                aimless['DataProcessingUniqueReflectionsOverall']=line.split()[3]
+                self.aimless['DataProcessingUniqueReflectionsOverall']=line.split()[3]
             if line.startswith('Space group:'):
-                aimless['DataProcessingSpaceGroup']=line.replace('Space group: ','')[:-1]
-                aimless['DataProcessingLattice']=self.get_lattice_from_space_group(aimless['DataProcessingSpaceGroup'])
-                aimless['DataProcessingPointGroup']=self.get_pointgroup_from_space_group(aimless['DataProcessingSpaceGroup'])
+                self.aimless['DataProcessingSpaceGroup']=line.replace('Space group: ','')[:-1]
+                self.aimless['DataProcessingLattice']=self.get_lattice_from_space_group(self.aimless['DataProcessingSpaceGroup'])
+                self.aimless['DataProcessingPointGroup']=self.get_pointgroup_from_space_group(self.aimless['DataProcessingSpaceGroup'])
                 if a != 'n/a' and b != 'n/a' and c != 'n/a' and \
-                   alpha != 'n/a' and beta != 'n/a' and gamma != 'n/a' and aimless['DataProcessingLattice'] != 'n/a':
-                    aimless['DataProcessingUnitCellVolume']=str(self.calc_unitcell_volume_from_logfile(float(a),float(b),float(c),
+                   alpha != 'n/a' and beta != 'n/a' and gamma != 'n/a' and self.aimless['DataProcessingLattice'] != 'n/a':
+                    self.aimless['DataProcessingUnitCellVolume']=str(self.calc_unitcell_volume_from_logfile(float(a),float(b),float(c),
                                                                                  math.radians(float(alpha)),
                                                                                  math.radians(float(beta)),
                                                                                  math.radians(float(gamma)),
-                                                                                 aimless['DataProcessingLattice']))
-        aimless['DataProcessingUnitCell']=str(a)+' '+str(b)+' '+str(c)+' '+str(alpha)+' '+str(beta)+' '+str(gamma)
-        aimless['DataProcessingResolutionOverall']=str(aimless['DataProcessingResolutionLow'])+' - '+str(aimless['DataProcessingResolutionHigh'])
+                                                                                 self.aimless['DataProcessingLattice']))
+        self.aimless['DataProcessingUnitCell']=str(a)+' '+str(b)+' '+str(c)+' '+str(alpha)+' '+str(beta)+' '+str(gamma)
+        self.aimless['DataProcessingResolutionOverall']=str(self.aimless['DataProcessingResolutionLow'])+' - '+str(self.aimless['DataProcessingResolutionHigh'])
 
         # Hex Color code:
         # red:      #FF0000
@@ -562,18 +566,18 @@ class parse:
         # green:    #00FF00
         # gray:     #E0E0E0
 
-        if aimless['DataProcessingResolutionHigh']=='n/a' or aimless['DataProcessingRmergeLow'] =='n/a':
-            aimless['DataProcessingAlert'] = '#FF0000'
+        if self.aimless['DataProcessingResolutionHigh']=='n/a' or self.aimless['DataProcessingRmergeLow'] =='n/a':
+            self.aimless['DataProcessingAlert'] = '#FF0000'
         else:
-            if float(aimless['DataProcessingResolutionHigh']) > 3.5 or float(aimless['DataProcessingRmergeLow']) > 0.1:
-                aimless['DataProcessingAlert'] = '#FF0000'
-            if (float(aimless['DataProcessingResolutionHigh']) <= 3.5 and float(aimless['DataProcessingResolutionHigh']) > 2.5) or \
-               (float(aimless['DataProcessingRmergeLow']) <= 0.1 and float(aimless['DataProcessingRmergeLow']) > 0.05):
-                aimless['DataProcessingAlert'] = '#FF9900'
-            if float(aimless['DataProcessingResolutionHigh']) <= 2.5 and float(aimless['DataProcessingRmergeLow']) <= 0.05:
-                aimless['DataProcessingAlert'] = '#00FF00'
+            if float(self.aimless['DataProcessingResolutionHigh']) > 3.5 or float(self.aimless['DataProcessingRmergeLow']) > 0.1:
+                self.aimless['DataProcessingAlert'] = '#FF0000'
+            if (float(self.aimless['DataProcessingResolutionHigh']) <= 3.5 and float(self.aimless['DataProcessingResolutionHigh']) > 2.5) or \
+               (float(self.aimless['DataProcessingRmergeLow']) <= 0.1 and float(self.aimless['DataProcessingRmergeLow']) > 0.05):
+                self.aimless['DataProcessingAlert'] = '#FF9900'
+            if float(self.aimless['DataProcessingResolutionHigh']) <= 2.5 and float(self.aimless['DataProcessingRmergeLow']) <= 0.05:
+                self.aimless['DataProcessingAlert'] = '#00FF00'
 
-        return aimless
+        return self.aimless
 
 
 
