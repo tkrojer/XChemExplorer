@@ -965,7 +965,7 @@ class XChemExplorer(QtGui.QApplication):
         self.dewar_configuration_dict[self.dewar_label_active].setStyleSheet("background-color: gray")
 
     def show_html_summary_in_firefox(self,xtal):
-        html_summary=self.albula_button_dict[key][2]
+        html_summary=self.albula_button_dict[xtal][2]
         new=2
         webbrowser.open(html_summary,new=new)
 
