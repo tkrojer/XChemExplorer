@@ -169,7 +169,7 @@ class data_source:
         connect=sqlite3.connect(self.data_source_file)
         connect.row_factory = sqlite3.Row
         cursor = connect.cursor()
-        cursor.execute("SELECT * FROM mainTable")
+        cursor.execute("SELECT * FROM mainTable;")
         for column in cursor.description:
             existing_columns.append(column[0])
         for column in self.column_list:
