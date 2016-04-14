@@ -2752,9 +2752,9 @@ class XChemExplorer(QtGui.QApplication):
             if not logfile_found:
                 resolution_high='no logfile'
             outcome=str(self.dataset_outcome_combobox_dict[sample].currentText())
-            if outcome="success":
+            if outcome=="success":
                 col='green'
-            elif outcome="Failed - low resolution":
+            elif outcome=="Failed - low resolution":
                 col='orange'
             else:
                 col='red'
