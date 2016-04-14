@@ -2714,8 +2714,8 @@ class XChemExplorer(QtGui.QApplication):
                     self.data_collection_summary_table.setItem(current_row, column, cell_text)
 
             # update data source
-            if db_dict != {}:
-                self.update_data_source(xtal,db_dict)
+#            if db_dict != {}:
+#                self.update_data_source(xtal,db_dict)
 
             row += 1
 
