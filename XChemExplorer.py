@@ -964,11 +964,10 @@ class XChemExplorer(QtGui.QApplication):
     def undo_flag_sample_for_recollection(self):
         self.dewar_configuration_dict[self.dewar_label_active].setStyleSheet("background-color: gray")
 
-    def show_html_summary_in_firefox(self):
-        print 'hallo'
-#        new=2
-#        url='http://www.thesgc.org'
-#        webbrowser.open(url,new=new)
+    def show_html_summary_in_firefox(self,xtal):
+        html_summary=self.albula_button_dict[key][2]
+        new=2
+        webbrowser.open(html_summary,new=new)
 
     def color_run_panddas_button(self):
         if os.path.isfile(os.path.join(self.panddas_directory,'PANDDA_RUN_IN_PROGRESS')):
@@ -1720,6 +1719,7 @@ class XChemExplorer(QtGui.QApplication):
             diffraction_image=''
             for key in self.albula_button_dict:
                 if self.albula_button_dict[key][0]==self.sender():
+                    self.show_html_summary_in_firefox(key)
                     print '==> XCE: starting dials.image_viewer'
                     self.work_thread=XChemThread.start_dials_image_viewer(self.albula_button_dict[key][1])
                     self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
@@ -2681,10 +2681,14 @@ class XChemExplorer(QtGui.QApplication):
                     if new_run_for_exisiting_crystal_or_new_sample:
                         diffraction_image=latest_run[5]
                         diffraction_image_name=diffraction_image[diffraction_image.rfind('/')+1:]
+                        try:    # need to try because older pkl file may not have this item in list
+                            html_summary=latest_run[7]
+                        except IndexError:
+                            html_summary=''
                         if new_xtal:
                             start_albula_button=QtGui.QPushButton('Show: \n'+diffraction_image_name)
                             start_albula_button.clicked.connect(self.button_clicked)
-                            self.albula_button_dict[xtal]=[start_albula_button,diffraction_image]
+                            self.albula_button_dict[xtal]=[start_albula_button,diffraction_image,html_summary]
                             self.data_collection_summary_table.setCellWidget(current_row,column,start_albula_button)
                         else:
                             self.albula_button_dict[xtal][1]=diffraction_image
