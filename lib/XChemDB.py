@@ -97,6 +97,7 @@ class data_source:
             ['DataProcessingResolutionLow',          'Resolution\nLow',             'TEXT'],
             ['DataProcessingResolutionLowInnerShell','Resolution\nLow (Inner Shell)',   'TEXT'],
             ['DataProcessingResolutionHigh',         'Resolution\nHigh',            'TEXT'],
+            ['DataProcessingResolutionHigh1.5sigma',         'Resolution\n[Mn<I/sig(I)> = 1.5]', 'TEXT'],
             ['DataProcessingResolutionHighOuterShell','Resolution\nHigh (Outer Shell)', 'TEXT'],
             ['DataProcessingRmergeOverall',          'Rmerge\nOverall',             'TEXT'],
             ['DataProcessingRmergeLow',              'Rmerge\nLow',                 'TEXT'],
@@ -110,6 +111,9 @@ class data_source:
             ['DataProcessingMultiplicityOverall',    'Multiplicity\nOverall',       'TEXT'],
             ['DataProcessingMultiplicityLow',        'Multiplicity\nLow',           'TEXT'],
             ['DataProcessingMultiplicityHigh',       'Multiplicity\nHigh',          'TEXT'],
+            ['DataProcessingCChalfOverall',    'CC(1/2)\nOverall',       'TEXT'],
+            ['DataProcessingCChalfLow',        'CC(1/2)\nLow',           'TEXT'],
+            ['DataProcessingCChalfHigh',       'CC(1/2)\nHigh',          'TEXT'],
 
             # the data source is a bit exploding with entries like the ones below,
             # but the many different filenames and folder structures of Diamond autoprocessing makes it necessary

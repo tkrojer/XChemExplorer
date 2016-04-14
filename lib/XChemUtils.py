@@ -451,6 +451,10 @@ class parse:
                     'DataProcessingMultiplicityOverall':            'n/a',
                     'DataProcessingMultiplicityLow':                'n/a',
                     'DataProcessingMultiplicityHigh':               'n/a',
+                    'DataProcessingCChalfOverall':                  'n/a',
+                    'DataProcessingCChalfLow':                      'n/a',
+                    'DataProcessingCChalfHigh':                     'n/a',
+                    'DataProcessingResolutionHigh1.5sigma':         'n/a',
                     'DataProcessingUniqueReflectionsOverall':       'n/a',
                     'DataProcessingLattice':                        'n/a',
                     'DataProcessingPointGroup':                     'n/a',
@@ -486,7 +490,8 @@ class parse:
         except IndexError:
             pass
 
-        for line in open(logfile):
+        resolution_at_sigma_line=100000000
+        for line_number,line in enumerate(open(logfile)):
             if 'Wavelength' in line and len(line.split())==2:
                 aimless['DataCollectionWavelength']=line.split()[1]
             if line.startswith('Low resolution limit') and len(line.split())==6:
@@ -511,6 +516,15 @@ class parse:
                 aimless['DataProcessingMultiplicityOverall'] = line.split()[1]
                 aimless['DataProcessingMultiplicityHigh'] = line.split()[3]
                 aimless['DataProcessingMultiplicityLow'] = line.split()[3]
+            if line.startswith('Mn(I) half-set correlation CC(1/2)') and len(line.split())==7:
+                aimless['DataProcessingCChalfOverall'] = line.split()[4]
+                aimless['DataProcessingCChalfLow'] = line.split()[5]
+                aimless['DataProcessingCChalfHigh'] = line.split()[6]
+            if line.startswith('Estimates of resolution limits: overall'):
+                resolution_at_sigma_line=line_number+2
+            if line_number==resolution_at_sigma_line:
+                if len(line.split())==7:
+                    aimless['DataProcessingResolutionHigh1.5sigma']=line.split()[6][:-1]
             if line.startswith('Average unit cell:') and len(line.split())==9:
                 tmp = []
                 tmp.append(line.split())

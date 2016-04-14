@@ -410,16 +410,17 @@ class XChemExplorer(QtGui.QApplication):
                     vbox_for_frame.addWidget(label)
                     frame.setLayout(vbox_for_frame)
                 else:
-#                    frame=QtGui.QPushButton('x')
-#                    frame.clicked.connect(self.show_html_summary_in_firefox)
-#                    # how to right click on button
-#                    self.dewar_configuration_dict[str(puck)+'-'+str(position)]=frame
-#                    self.dewar_sample_configuration_dict[str(puck)+'-'+str(position)]=[]
-#                    frame.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-#                    frame.customContextMenuRequested.connect(self.on_context_menu)
-                    label=QtGui.QLabel('x')
-                    vbox_for_frame.addWidget(label)
-                    frame.setLayout(vbox_for_frame)
+                    frame=QtGui.QPushButton('')
+                    frame.setStyleSheet("font-size:9px;border-width: 0px")
+                    frame.clicked.connect(self.show_html_summary_in_firefox)
+                    # how to right click on button
+                    self.dewar_configuration_dict[str(puck)+'-'+str(position)]=frame
+                    self.dewar_sample_configuration_dict[str(puck)+'-'+str(position)]=[]
+                    frame.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+                    frame.customContextMenuRequested.connect(self.on_context_menu)
+#                    label=QtGui.QLabel('x')
+#                    vbox_for_frame.addWidget(label)
+#                    frame.setLayout(vbox_for_frame)
                 self.dewar_configuration_layout.addWidget(frame, position, puck)
 
 #        self.data_collection_summarys_vbox_for_details=QtGui.QVBoxLayout()
@@ -2717,46 +2718,46 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_summary_table.resizeColumnsToContents()
         self.status_bar.showMessage('idle')
 
-#        self.update_dewar_configuration_tab()
+        self.update_dewar_configuration_tab()
 
-#    def update_dewar_configuration_tab(self):
-#
-#        # sample status and color code:
-#        # 1 -   green:    collected and 'good' data
-#        # 2 -   orange:   collected and some data
-#        # 3 -   red:      collected, but no logfile
-#        # 4 -   blue:     sample in dewar, but not yet collected
-#        # 5 -   grey:     no sample in respective dewar position
-#        # 6 -   yellow:   flagged for re-collection
-#
-#        # first find out what is currently in the dewar
-#        self.get_dewar_configuration()
-#        occupied_positions=[]
-#        for puck_position in self.dewar_sample_configuration_dict:
-#            sample=self.dewar_sample_configuration_dict[puck_position]
-#            sample_found=False   # if sample not found in data_collection_dict then sample has not been collected yet
-#            if sample not in self.data_collection_dict:
-#                col='blue'
-#                # color and name respective button
-#                continue
-#            else:
-#                occupied_positions.append(puck_position)
-#            logfile_found=False
-#            for entry in self.data_collection_dict[sample]:
-#                if entry[0]=='logfile':
-#                logfile_found=True
-#                    if entry[8]:    # if this was auto-selected best resolution file
-#                    db_dict=entry[6]
-#                    resolution_high=db_dict['DataProcessingResolutionHigh']
-#            if not logfile_found:
-#                resolution_high='no logfile'
-#            outcome=str(self.dataset_outcome_combobox_dict[sample]currentText())
-#            if outcome="success":
-#                col='green'
-#            elif outcome="Failed - low resolution":
-#                col='orange'
-#            else:
-#                col='red'
+    def update_dewar_configuration_tab(self):
+
+        # sample status and color code:
+        # 1 -   green:    collected and 'good' data
+        # 2 -   orange:   collected and some data
+        # 3 -   red:      collected, but no logfile
+        # 4 -   blue:     sample in dewar, but not yet collected
+        # 5 -   grey:     no sample in respective dewar position
+        # 6 -   yellow:   flagged for re-collection
+
+        # first find out what is currently in the dewar
+        self.get_dewar_configuration()
+        occupied_positions=[]
+        for puck_position in self.dewar_sample_configuration_dict:
+            sample=self.dewar_sample_configuration_dict[puck_position]
+            sample_found=False   # if sample not found in data_collection_dict then sample has not been collected yet
+            if sample not in self.data_collection_dict:
+                col='blue'
+                # color and name respective button
+                continue
+            else:
+                occupied_positions.append(puck_position)
+            logfile_found=False
+            for entry in self.data_collection_dict[sample]:
+                if entry[0]=='logfile':
+                logfile_found=True
+                    if entry[8]:    # if this was auto-selected best resolution file
+                    db_dict=entry[6]
+                    resolution_high=db_dict['DataProcessingResolutionHigh']
+            if not logfile_found:
+                resolution_high='no logfile'
+            outcome=str(self.dataset_outcome_combobox_dict[sample]currentText())
+            if outcome="success":
+                col='green'
+            elif outcome="Failed - low resolution":
+                col='orange'
+            else:
+                col='red'
 
 
 
