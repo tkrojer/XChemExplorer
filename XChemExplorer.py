@@ -2741,6 +2741,7 @@ class XChemExplorer(QtGui.QApplication):
             sample=self.dewar_sample_configuration_dict[puck_position]
             if sample != []:
                 print sample
+                self.dewar_configuration_dict[puck_position].setText(sample)
             if sample==[]:
                 col='gray'
             continue
