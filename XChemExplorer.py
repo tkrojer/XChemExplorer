@@ -2739,6 +2739,8 @@ class XChemExplorer(QtGui.QApplication):
         for puck_position in self.dewar_sample_configuration_dict:
 #            print puck_position
             sample=self.dewar_sample_configuration_dict[puck_position]
+            if sample != []:
+                print sample
             if sample==[]:
                 col='gray'
             continue
