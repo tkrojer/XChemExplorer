@@ -2734,6 +2734,7 @@ class XChemExplorer(QtGui.QApplication):
         self.get_dewar_configuration()
         occupied_positions=[]
         for puck_position in self.dewar_sample_configuration_dict:
+            print puck_position
             sample=self.dewar_sample_configuration_dict[puck_position]
             sample_found=False   # if sample not found in data_collection_dict then sample has not been collected yet
             if sample not in self.data_collection_dict:
@@ -2752,6 +2753,7 @@ class XChemExplorer(QtGui.QApplication):
             if not logfile_found:
                 resolution_high='no logfile'
             self.dewar_configuration_dict[puck_position].setText(sample+'\n'+resolution_high)
+            print self.dewar_configuration_dict[puck_position]
             outcome=str(self.dataset_outcome_combobox_dict[sample].currentText())
             if outcome=="success":
                 col='green'
