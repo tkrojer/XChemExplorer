@@ -2713,6 +2713,10 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                     self.data_collection_summary_table.setItem(current_row, column, cell_text)
 
+            # update data source
+            if db_dict != {}:
+                self.update_data_source(xtal,db_dict)
+
             row += 1
 
         self.data_collection_summary_table.resizeRowsToContents()
@@ -2760,7 +2764,7 @@ class XChemExplorer(QtGui.QApplication):
                     self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: orange")
                 else:
                     self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: red")
-                self.dewar_configuration_dict[puck_position].setStyleSheet("font-size:5px;border-width: 0px")
+                self.dewar_configuration_dict[puck_position].setStyleSheet("font-size:7px;border-width: 0px")
 
 
 
@@ -2948,8 +2952,9 @@ class XChemExplorer(QtGui.QApplication):
                 n_rows+=1
         return n_rows
 
-
-
+    def update_data_source(self,sample,db_dict):
+        data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
+        data_source.update_insert_data_source(sample,db_dict)
 
 
 if __name__ == "__main__":
