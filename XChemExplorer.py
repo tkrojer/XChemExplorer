@@ -2736,6 +2736,7 @@ class XChemExplorer(QtGui.QApplication):
         for puck_position in self.dewar_sample_configuration_dict:
             print puck_position
             sample=self.dewar_sample_configuration_dict[puck_position]
+            print sample
             sample_found=False   # if sample not found in data_collection_dict then sample has not been collected yet
             if sample not in self.data_collection_dict:
                 col='blue'
