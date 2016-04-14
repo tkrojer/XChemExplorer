@@ -411,7 +411,7 @@ class XChemExplorer(QtGui.QApplication):
                     frame.setLayout(vbox_for_frame)
                 else:
                     frame=QtGui.QPushButton('')
-                    frame.setStyleSheet("font-size:9px;border-width: 0px")
+                    frame.setStyleSheet("font-size:5px;border-width: 0px")
                     frame.clicked.connect(self.show_html_summary_in_firefox)
                     # how to right click on button
                     self.dewar_configuration_dict[str(puck)+'-'+str(position)]=frame
@@ -2733,44 +2733,33 @@ class XChemExplorer(QtGui.QApplication):
 
         # first find out what is currently in the dewar
         self.get_dewar_configuration()
-        print 'here'
-        print self.dewar_sample_configuration_dict
         occupied_positions=[]
         for puck_position in self.dewar_sample_configuration_dict:
-#            print puck_position
             sample=self.dewar_sample_configuration_dict[puck_position]
-            if sample != []:
-                print sample
-                self.dewar_configuration_dict[puck_position].setText(sample)
             if sample==[]:
-                col='gray'
-            continue
-#            print sample
-            sample_found=False   # if sample not found in data_collection_dict then sample has not been collected yet
-            if sample not in self.data_collection_dict:
-                col='blue'
-                # color and name respective button
+                self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: gray")
                 continue
+            elif sample not in self.data_collection_dict:
+                self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: blue")
+                # color and name respective button
             else:
-                occupied_positions.append(puck_position)
-            logfile_found=False
-            for entry in self.data_collection_dict[sample]:
-                if entry[0]=='logfile':
-                    logfile_found=True
-                    if entry[8]:    # if this was auto-selected best resolution file
-                        db_dict=entry[6]
-                        resolution_high=db_dict['DataProcessingResolutionHigh']
-            if not logfile_found:
-                resolution_high='no logfile'
-            self.dewar_configuration_dict[puck_position].setText(sample+'\n'+resolution_high)
-            print self.dewar_configuration_dict[puck_position]
-            outcome=str(self.dataset_outcome_combobox_dict[sample].currentText())
-            if outcome=="success":
-                col='green'
-            elif outcome=="Failed - low resolution":
-                col='orange'
-            else:
-                col='red'
+                logfile_found=False
+                for entry in self.data_collection_dict[sample]:
+                    if entry[0]=='logfile':
+                        logfile_found=True
+                        if entry[8]:    # if this was auto-selected best resolution file
+                            db_dict=entry[6]
+                            resolution_high=db_dict['DataProcessingResolutionHigh']
+                if not logfile_found:
+                    resolution_high='no logfile'
+                self.dewar_configuration_dict[puck_position].setText(sample+'\n'+resolution_high)
+                outcome=str(self.dataset_outcome_combobox_dict[sample].currentText())
+                if outcome=="success":
+                    self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: green")
+                elif outcome=="Failed - low resolution":
+                    self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: orange")
+                else:
+                    self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: red")
 
 
 
