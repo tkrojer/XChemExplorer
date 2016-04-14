@@ -944,6 +944,7 @@ class XChemExplorer(QtGui.QApplication):
                     container_reference=line[line.find('>')+1:line.rfind('<')]
                 if 'sample_location' in line:
                     sample_location=line[line.find('>')+1:line.rfind('<')]
+            print prefix,container_reference,sample_location
             self.dewar_sample_configuration_dict[str(container_reference)+'-'+str(sample_location)]=prefix
 
 
@@ -2734,12 +2735,12 @@ class XChemExplorer(QtGui.QApplication):
         self.get_dewar_configuration()
         occupied_positions=[]
         for puck_position in self.dewar_sample_configuration_dict:
-            print puck_position
+#            print puck_position
             sample=self.dewar_sample_configuration_dict[puck_position]
             if sample==[]:
                 col='gray'
             continue
-            print sample
+#            print sample
             sample_found=False   # if sample not found in data_collection_dict then sample has not been collected yet
             if sample not in self.data_collection_dict:
                 col='blue'
