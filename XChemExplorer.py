@@ -2733,6 +2733,8 @@ class XChemExplorer(QtGui.QApplication):
 
         # first find out what is currently in the dewar
         self.get_dewar_configuration()
+        print 'here'
+        print self.dewar_sample_configuration_dict
         occupied_positions=[]
         for puck_position in self.dewar_sample_configuration_dict:
 #            print puck_position
