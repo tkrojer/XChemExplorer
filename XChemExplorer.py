@@ -2751,7 +2751,7 @@ class XChemExplorer(QtGui.QApplication):
                         resolution_high=db_dict['DataProcessingResolutionHigh']
             if not logfile_found:
                 resolution_high='no logfile'
-            outcome=str(self.dataset_outcome_combobox_dict[sample]currentText())
+            outcome=str(self.dataset_outcome_combobox_dict[sample].currentText())
             if outcome="success":
                 col='green'
             elif outcome="Failed - low resolution":
