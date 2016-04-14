@@ -2956,7 +2956,7 @@ class XChemExplorer(QtGui.QApplication):
         try:
             data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
             data_source.update_insert_data_source(sample,db_dict)
-        except sqlite3.OperationalError:
+        except sqlite3.OperationalError,NameError:
             pass
 
 
