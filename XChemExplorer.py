@@ -2325,6 +2325,7 @@ class XChemExplorer(QtGui.QApplication):
                                 # entry[7]==aimless_index, i.e. row number
                                 cell_text=QtGui.QTableWidgetItem()
                                 cell_text.setText(str( db_dict[ header[1] ]  ))
+                                print str( db_dict[ header[1] ]  )
                                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                                 data_collection_table.setItem(entry[7], column, cell_text)
                                 break
