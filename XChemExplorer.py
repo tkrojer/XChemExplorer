@@ -253,12 +253,24 @@ class XChemExplorer(QtGui.QApplication):
         save_mounted_crystals_button=QtGui.QPushButton("Save Samples\nTo Datasource")
         save_mounted_crystals_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(save_mounted_crystals_button)
+
+
+        frame=QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+        vbox=QtGui.QVBoxLayout()
         create_png_of_soaked_compound_button=QtGui.QPushButton("Create PDB/CIF/PNG\nfiles of Compound")
         create_png_of_soaked_compound_button.clicked.connect(self.button_clicked)
-        mounted_crystals_button_hbox.addWidget(create_png_of_soaked_compound_button)
-        create_new_data_source_button=QtGui.QPushButton("Create New Data\nSource (SQLite)")
-        create_new_data_source_button.clicked.connect(self.button_clicked)
-        mounted_crystals_button_hbox.addWidget(create_new_data_source_button)
+        vbox.addWidget(create_png_of_soaked_compound_button)
+        check_status_create_png_of_soaked_compound_button=QtGui.QPushButton("Check\nStatus")
+        check_status_create_png_of_soaked_compound_button.clicked.connect(self.button_clicked)
+        vbox.addWidget(check_status_create_png_of_soaked_compound_button)
+        frame.addLayout(vbox)
+        mounted_crystals_button_hbox.addWidget(frame)
+
+
+#        create_new_data_source_button=QtGui.QPushButton("Create New Data\nSource (SQLite)")
+#        create_new_data_source_button.clicked.connect(self.button_clicked)
+#        mounted_crystals_button_hbox.addWidget(create_new_data_source_button)
         import_csv_into_data_source_button=QtGui.QPushButton("Import CSV file\ninto Data Source")
         import_csv_into_data_source_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(import_csv_into_data_source_button)
