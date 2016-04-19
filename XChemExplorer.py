@@ -1171,10 +1171,7 @@ class XChemExplorer(QtGui.QApplication):
                     else:
                         self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
                         self.data_source_set=True
-
-
-
-#                    XChemDB.data_source(self.settings['data_source']).create_missing_columns()
+                        XChemDB.data_source(self.settings['data_source']).create_missing_columns()
 #                else:
 #                    XChemDB.data_source(self.settings['data_source']).create_empty_data_source_file()
 #                self.data_source_set=True
