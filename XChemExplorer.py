@@ -1244,7 +1244,9 @@ class XChemExplorer(QtGui.QApplication):
         for reference in self.reference_file_list:
             # first we need one in the same pointgroup
             if reference[5]==db_dict['DataProcessingPointGroup']:
+                print 'here'
                 try:
+                    print 'herer'
                     difference=math.fabs(1-(float(db_dict['DataProcessingUnitCellVolume'])/float(reference[4])))
                     print difference
                     suitable_reference.append([reference[0],difference])
