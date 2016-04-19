@@ -2716,11 +2716,11 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text.setText(str( db_dict[ header[1] ]  ))
                     else:
                         if header[0].startswith('Resolution\n[Mn<I/sig(I)> = 1.5]'):
-                            cell_text.setText('')='999'
+                            cell_text.setText('999')
                         elif header[0].startswith('DataProcessing\nRfree'):
-                            cell_text.setText('')='999'
+                            cell_text.setText('999')
                         elif header[0].startswith('Rmerge\nLow'):
-                            cell_text.setText('')='999'
+                            cell_text.setText('999')
                         else:
                             cell_text.setText('')
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
