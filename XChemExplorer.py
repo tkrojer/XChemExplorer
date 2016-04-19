@@ -377,14 +377,22 @@ class XChemExplorer(QtGui.QApplication):
         write_files_button.clicked.connect(self.button_clicked)
         data_collection_button_hbox.addWidget(write_files_button)
 
+        frame=QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+        hbox=QtGui.QHBoxLayout()
         self.rerun_dimple_combobox=QtGui.QComboBox()
         cmd_list = [    '----------- Need to run DIMPLE? ------------',
                         'Run Dimple if final.pdb cannot be found ',
                         'Rerun Dimple on Everything'    ]
         for cmd in cmd_list:
             self.rerun_dimple_combobox.addItem(cmd)
-        self.rerun_dimple_combobox.activated[str].connect(self.rerun_dimple_on_autoprocessing_files)
-        data_collection_button_hbox.addWidget(self.rerun_dimple_combobox)
+        hbox.addWidget(self.rerun_dimple_combobox)
+
+        rerun_dimple_button=QtGui.QPushButton("Run")
+        rerun_dimple_button.clicked.connect(self.button_clicked)
+        hbox.addWidget(rerun_dimple_button)
+        frame.setLayout(hbox)
+        data_collection_button_hbox.addWidget(frame)
 
         self.target_selection_combobox = QtGui.QComboBox()
         self.populate_target_selection_combobox(self.target_selection_combobox)

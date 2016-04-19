@@ -195,7 +195,7 @@ class helpers:
     def pil_rdkit_exist(self):
         return self.pil_rdkit_present
 
-    def make_png(self,initial_model_directory,sample,compoundID,smiles,queueing_system_available):
+    def make_png(self,initial_model_directory,sample,compoundID.replace(' ',''),smiles,queueing_system_available):
 
         if not os.path.isdir(os.path.join(initial_model_directory,sample)):
             os.mkdir(os.path.join(initial_model_directory,sample))
