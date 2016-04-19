@@ -1276,6 +1276,8 @@ class XChemExplorer(QtGui.QApplication):
                                 reference_file_pdb,
                                 reference_file_mtz,
                                 reference_file_cif  ])
+        print 'firufru'
+        print job_list
         return job_list
 
     def check_before_running_dimple(self,job_list):
