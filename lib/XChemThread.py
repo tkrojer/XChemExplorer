@@ -1464,10 +1464,10 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
                                 db_dict['DataProcessingRfree'] = pdb_info['Rfree']
                             else:
-                                db_dict['DataProcessingPathToDimplePDBfile']=''
-                                db_dict['DataProcessingPathToDimpleMTZfile']=''
-                                db_dict['DataProcessingRcryst']  = ''
-                                db_dict['DataProcessingRfree'] = ''
+                                db_dict['DataProcessingPathToDimplePDBfile']='not found'
+                                db_dict['DataProcessingPathToDimpleMTZfile']='not found'
+                                db_dict['DataProcessingRcryst']  = '999'
+                                db_dict['DataProcessingRfree'] = '999'
                             db_dict['DataProcessingProgram']=autoproc
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False])
                             aimless_index+=1
@@ -1522,10 +1522,10 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
                                 db_dict['DataProcessingRfree'] = pdb_info['Rfree']
                             else:
-                                db_dict['DataProcessingPathToDimplePDBfile']=''
-                                db_dict['DataProcessingPathToDimpleMTZfile']=''
-                                db_dict['DataProcessingRcryst']  = ''
-                                db_dict['DataProcessingRfree'] = ''
+                                db_dict['DataProcessingPathToDimplePDBfile']='not found'
+                                db_dict['DataProcessingPathToDimpleMTZfile']='not found'
+                                db_dict['DataProcessingRcryst']  = '999'
+                                db_dict['DataProcessingRfree'] = '999'
                             db_dict['DataProcessingProgram']=autoproc
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False])
                             aimless_index+=1
@@ -1577,10 +1577,10 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
                                 db_dict['DataProcessingRfree'] = pdb_info['Rfree']
                             else:
-                                db_dict['DataProcessingPathToDimplePDBfile']=''
-                                db_dict['DataProcessingPathToDimpleMTZfile']=''
-                                db_dict['DataProcessingRcryst']  = ''
-                                db_dict['DataProcessingRfree'] = ''
+                                db_dict['DataProcessingPathToDimplePDBfile']='not found'
+                                db_dict['DataProcessingPathToDimpleMTZfile']='not found'
+                                db_dict['DataProcessingRcryst']  = '999'
+                                db_dict['DataProcessingRfree'] = '999'
                             db_dict['DataProcessingProgram']=autoproc
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False])
                             aimless_index+=1
