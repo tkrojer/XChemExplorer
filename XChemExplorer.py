@@ -381,8 +381,7 @@ class XChemExplorer(QtGui.QApplication):
         frame.setFrameShape(QtGui.QFrame.StyledPanel)
         hbox=QtGui.QHBoxLayout()
         self.rerun_dimple_combobox=QtGui.QComboBox()
-        cmd_list = [    '----------- Need to run DIMPLE? ------------',
-                        'Run Dimple if final.pdb cannot be found ',
+        cmd_list = [    'Run Dimple if final.pdb cannot be found ',
                         'Rerun Dimple on Everything'    ]
         for cmd in cmd_list:
             self.rerun_dimple_combobox.addItem(cmd)
@@ -1302,10 +1301,8 @@ class XChemExplorer(QtGui.QApplication):
             self.work_thread.start()
 
 
-    def rerun_dimple_on_autoprocessing_files(self,i):
+    def rerun_dimple_on_autoprocessing_files(self):
         text = str(self.rerun_dimple_combobox.currentText())
-        if text=="----------- Need to run DIMPLE? ------------":
-            pass
         if self.explorer_active==0 and self.data_source_set==True and self.data_collection_summary_file != '':
             job_list=[]
             for xtal in self.data_collection_dict:
@@ -1730,6 +1727,9 @@ class XChemExplorer(QtGui.QApplication):
 
         elif str(self.sender().text()).startswith("Show Overview"):
             self.update_overview()
+
+        elif self.sender().text()=='Run':
+            self.rerun_dimple_on_autoprocessing_files()
 
         elif str(self.sender().text()).startswith('Show: '):
             diffraction_image=''
