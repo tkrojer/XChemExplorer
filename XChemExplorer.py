@@ -208,6 +208,7 @@ class XChemExplorer(QtGui.QApplication):
         menu_bar = QtGui.QMenuBar()
         file = menu_bar.addMenu("&File")
 #        settings = menu_bar.addMenu("&Settings")
+        datasource_menu = menu_bar.addMenu("&Data Source")
         help = menu_bar.addMenu("&Help")
 
         file.addAction(load)
@@ -238,7 +239,14 @@ class XChemExplorer(QtGui.QApplication):
         # Data Source Tab
         self.data_source_columns_to_display=[   'Sample ID',
                                                 'Compound ID',
-                                                'Smiles'           ]
+                                                'Smiles',
+                                                'Visit',
+                                                'Resolution\n[Mn<I/sig(I)> = 1.5]',
+                                                'Refinement\nRfree',
+                                                'Data Collection\nDate',
+                                                'Puck',
+                                                'PuckPosition',
+                                                'Ligand\nConfidence'    ]
         self.mounted_crystal_table=QtGui.QTableWidget()
         self.mounted_crystal_table.setSortingEnabled(True)
         self.mounted_crystal_table.resizeColumnsToContents()
@@ -277,9 +285,15 @@ class XChemExplorer(QtGui.QApplication):
         export_csv_from_data_source_button=QtGui.QPushButton("Export CSV file\nfrom Data Source")
         export_csv_from_data_source_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(export_csv_from_data_source_button)
-        select_data_source_columns_to_display_button=QtGui.QPushButton("Select Columns")
-        select_data_source_columns_to_display_button.clicked.connect(self.button_clicked)
-        mounted_crystals_button_hbox.addWidget(select_data_source_columns_to_display_button)
+#        select_data_source_columns_to_display_button=QtGui.QPushButton("Select Columns")
+#        select_data_source_columns_to_display_button.clicked.connect(self.button_clicked)
+#        mounted_crystals_button_hbox.addWidget(select_data_source_columns_to_display_button)
+
+#        datasource_menu = menu_bar.addMenu("&Data Source")
+        select_datasource_columns_to_display_menu_item=QtGui.QAction("Select Columns", self.window)
+        select_datasource_columns_to_display_menu_item.triggered.connect(self.select_datasource_columns_to_display)
+        datasource_menu.addAction(select_datasource_columns_to_display_menu_item)
+
         update_data_source_button=QtGui.QPushButton("Update\nDatasource")
         update_data_source_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(update_data_source_button)
@@ -1785,6 +1799,15 @@ class XChemExplorer(QtGui.QApplication):
             os.system('pandda.export pandda_dir="'+self.panddas_directory+'" out_dir="'+self.initial_model_directory+'"')
 
 
+
+    def select_datasource_columns_to_display(self):
+        self.data_source_columns_to_display, ok = XChemDialogs.select_columns_to_show(
+            os.path.join(self.database_directory,self.data_source_file)).return_selected_columns()
+        content=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
+        header=content[0]
+        data=content[1]
+        self.populate_data_source_table(header,data)
+
     def check_status_create_png_of_soaked_compound(self):
         for folder in glob.glob(os.path.join(self.initial_model_directory,'*','compound')):
             print folder
@@ -2913,11 +2936,13 @@ class XChemExplorer(QtGui.QApplication):
         return n_rows
 
     def update_data_source(self,sample,db_dict):
-        try:
-            data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
-            data_source.update_insert_data_source(sample,db_dict)
-        except sqlite3.OperationalError,NameError:
-            pass
+        data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
+        print db_dict
+#        try:
+#            data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
+#            data_source.update_insert_data_source(sample,db_dict)
+#        except sqlite3.OperationalError,NameError:
+#            pass
 
 def find_entry_point():
     if os.getcwd().startswith('/dls'):

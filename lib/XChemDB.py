@@ -74,7 +74,7 @@ class data_source:
 
 
             ['DataCollectionBeamline',               'Beamline',                  'TEXT'],
-            ['DataCollectionDate',                   'Date',                      'TEXT'],
+            ['DataCollectionDate',                   'Data Collection\nDate',                      'TEXT'],
             ['DataCollectionOutcome',                'DataCollection\nOutcome',                   'TEXT'],
             ['DataCollectionRun',                    'Run',                       'TEXT'],
             ['DataCollectionComment',                'DataCollection\nComment',                   'TEXT'],
