@@ -257,14 +257,14 @@ class XChemExplorer(QtGui.QApplication):
 
         frame=QtGui.QFrame()
         frame.setFrameShape(QtGui.QFrame.StyledPanel)
-        vbox=QtGui.QVBoxLayout()
+        hbox=QtGui.QHBoxLayout()
         create_png_of_soaked_compound_button=QtGui.QPushButton("Create PDB/CIF/PNG\nfiles of Compound")
         create_png_of_soaked_compound_button.clicked.connect(self.button_clicked)
-        vbox.addWidget(create_png_of_soaked_compound_button)
+        hbox.addWidget(create_png_of_soaked_compound_button)
         check_status_create_png_of_soaked_compound_button=QtGui.QPushButton("Check\nStatus")
         check_status_create_png_of_soaked_compound_button.clicked.connect(self.button_clicked)
-        vbox.addWidget(check_status_create_png_of_soaked_compound_button)
-        frame.setLayout(vbox)
+        hbox.addWidget(check_status_create_png_of_soaked_compound_button)
+        frame.setLayout(hbox)
         mounted_crystals_button_hbox.addWidget(frame)
 
 
