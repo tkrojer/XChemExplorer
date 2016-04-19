@@ -17,6 +17,7 @@ import XChemThread
 import XChemDB
 import XChemDialogs
 import XChemPANDDA
+import XChemToolTips
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -246,7 +247,8 @@ class XChemExplorer(QtGui.QApplication):
         self.mounted_crystals_vbox_for_table.addWidget(self.mounted_crystal_table)
         mounted_crystals_button_hbox=QtGui.QHBoxLayout()
         get_mounted_crystals_button=QtGui.QPushButton("Load Samples\nFrom Datasource")
-        get_mounted_crystals_button.setToolTip('This is a <b>QPushButton</b> widget')
+        dd=XChemToolTips.load_samples_from_datasource()
+#        get_mounted_crystals_button.setToolTip(XChemToolTips)
         get_mounted_crystals_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(get_mounted_crystals_button)
         save_mounted_crystals_button=QtGui.QPushButton("Save Samples\nTo Datasource")
