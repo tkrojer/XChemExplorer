@@ -330,7 +330,7 @@ class parse:
                             'DataProcessingCChalfOverall':                  'n/a',
                             'DataProcessingCChalfLow':                      'n/a',
                             'DataProcessingCChalfHigh':                     'n/a',
-                            'DataProcessingResolutionHigh1-5sigma':         'n/a',
+                            'DataProcessingResolutionHigh15sigma':         'n/a',
                             'DataProcessingUniqueReflectionsOverall':       'n/a',
                             'DataProcessingLattice':                        'n/a',
                             'DataProcessingPointGroup':                     'n/a',
@@ -528,7 +528,7 @@ class parse:
                 resolution_at_sigma_line=line_number+2
             if line_number==resolution_at_sigma_line:
                 if len(line.split())==7:
-                    self.aimless['DataProcessingResolutionHigh1-5sigma']=line.split()[6][:-1]
+                    self.aimless['DataProcessingResolutionHigh15sigma']=line.split()[6][:-1]
             if line.startswith('Average unit cell:') and len(line.split())==9:
                 tmp = []
                 tmp.append(line.split())
