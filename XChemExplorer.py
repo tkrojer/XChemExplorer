@@ -264,7 +264,7 @@ class XChemExplorer(QtGui.QApplication):
         check_status_create_png_of_soaked_compound_button=QtGui.QPushButton("Check\nStatus")
         check_status_create_png_of_soaked_compound_button.clicked.connect(self.button_clicked)
         vbox.addWidget(check_status_create_png_of_soaked_compound_button)
-        frame.addLayout(vbox)
+        frame.setLayout(vbox)
         mounted_crystals_button_hbox.addWidget(frame)
 
 
