@@ -1837,7 +1837,7 @@ class XChemExplorer(QtGui.QApplication):
             last_timestamp=max(timestamp_list)
         else:
             last_timestamp='n/a'
-        message='Samples:'+str(number_of_samples)+'jobs running:'+str(running)+'jobs finished'+str(cif_file_generated)+'last job submmitted'+str(last_timestamp)
+        message='Datasets: '+str(number_of_samples)+', jobs running: '+str(running)+', jobs finished: '+str(cif_file_generated)+', last job submmitted: '+str(last_timestamp)
         self.status_bar.showMessage(message)
 
     def check_for_new_autoprocessing(self):
