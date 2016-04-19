@@ -648,25 +648,27 @@ class parse:
 
         if os.path.isfile(pdbfile):
             for line in open(pdbfile):
-                if line.startswith('REMARK   3   R VALUE     (WORKING + TEST SET) :'):
-                    PDBinfo['Rcryst']=line.split()[9]
-                    if float(PDBinfo['Rcryst']) > 0.4:
-                        PDBinfo['Alert']='#FF0000'
-                    if float(PDBinfo['Rcryst']) <= 0.4 and float(PDBinfo['Rcryst']) >= 0.3:
-                        PDBinfo['Alert']='#FF9900'
-                    if float(PDBinfo['Rcryst']) < 0.3:
-                        PDBinfo['Alert']='#00FF00'
-                if line.startswith('REMARK   3   FREE R VALUE                     :'):
-                    PDBinfo['Rfree']=line.split()[6]
-                    if float(PDBinfo['Rfree']) > 0.4:
-                        PDBinfo['Alert']='#FF0000'
-                    if float(PDBinfo['Rfree']) <= 0.4 and float(PDBinfo['Rfree']) >= 0.3:
-                        PDBinfo['Alert']='#FF9900'
-                    if float(PDBinfo['Rfree']) < 0.3:
-                        PDBinfo['Alert']='#00FF00'
+                try:
+                    if line.startswith('REMARK   3   R VALUE     (WORKING + TEST SET) :'):
+                        PDBinfo['Rcryst']=line.split()[9]
+                        if float(PDBinfo['Rcryst']) > 0.4:
+                            PDBinfo['Alert']='#FF0000'
+                        if float(PDBinfo['Rcryst']) <= 0.4 and float(PDBinfo['Rcryst']) >= 0.3:
+                            PDBinfo['Alert']='#FF9900'
+                        if float(PDBinfo['Rcryst']) < 0.3:
+                            PDBinfo['Alert']='#00FF00'
+                    if line.startswith('REMARK   3   FREE R VALUE                     :'):
+                        PDBinfo['Rfree']=line.split()[6]
+                        if float(PDBinfo['Rfree']) > 0.4:
+                            PDBinfo['Alert']='#FF0000'
+                        if float(PDBinfo['Rfree']) <= 0.4 and float(PDBinfo['Rfree']) >= 0.3:
+                            PDBinfo['Alert']='#FF9900'
+                        if float(PDBinfo['Rfree']) < 0.3:
+                            PDBinfo['Alert']='#00FF00'
+                except ValueError:
+                    pass
                 if line.startswith('REMARK   3   RESOLUTION RANGE HIGH (ANGSTROMS) :'):
                     PDBinfo['ResolutionHigh']=line.split()[7]
-
                 if line.startswith('REMARK   3   BOND LENGTHS REFINED ATOMS        (A):'):
                     PDBinfo['rmsdBonds'] = line.split()[9]
                 if line.startswith('REMARK   3   BOND ANGLES REFINED ATOMS   (DEGREES):'):
