@@ -533,6 +533,7 @@ class GUI(object):
         self.Todo=[]
 #        self.Todo=self.db.get_samples_for_coot(self.selection_mode)
         tmp=self.db.get_samples_for_coot(self.selection_mode)
+        print tmp
         for item in tmp:
             self.Todo.append(list(item))
         for item in self.Todo:
