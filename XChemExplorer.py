@@ -1827,7 +1827,7 @@ class XChemExplorer(QtGui.QApplication):
             for cif_file in glob.glob(os.path.join(folder,'*.cif')):
                 if os.path.isfile(cif_file):
                     cif_file_generated += 1
-        print 'status',number_of_samples,running,cif_file_generated,max(timestamp_list)
+        print 'status',number_of_samples,running,cif_file_generated
 
     def check_for_new_autoprocessing(self):
         if self.explorer_active==0 and self.data_source_set==True:
