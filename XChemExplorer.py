@@ -2713,7 +2713,10 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text=QtGui.QTableWidgetItem()
                     # in case data collection failed for whatever reason
                     if logfile_found:
-                        cell_text.setText(str( db_dict[ header[1] ]  ))
+                        try:
+                            cell_text.setText(str( db_dict[ header[1] ]  ))
+                        except KeyError:                # older pkl files may not have all the columns
+                            cell_text.setText('n/a')
                     else:
                         if header[0].startswith('Resolution\n[Mn<I/sig(I)> = 1.5]'):
                             cell_text.setText('999')
