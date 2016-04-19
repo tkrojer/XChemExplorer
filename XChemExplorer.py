@@ -331,9 +331,8 @@ class XChemExplorer(QtGui.QApplication):
         data_collection_summary_list=[]
         self.data_collection_summary_column_name=[      'Sample ID',
                                                         #'Date',
-                                                        'Resolution\nHigh',
+                                                        'Resolution\n[Mn<I/sig(I)> = 1.5]',
                                                         'DataProcessing\nSpaceGroup',
-                                                        'Mn<I/sig(I)>\nHigh',
                                                         'DataProcessing\nRfree',
                                                         'Rmerge\nLow',
                                                         'DataCollection\nOutcome',
@@ -2716,7 +2715,14 @@ class XChemExplorer(QtGui.QApplication):
                     if logfile_found:
                         cell_text.setText(str( db_dict[ header[1] ]  ))
                     else:
-                        cell_text.setText('')
+                        if header[0].startswith('Resolution\n[Mn<I/sig(I)> = 1.5]'):
+                            cell_text.setText('')='999'
+                        elif header[0].startswith('DataProcessing\nRfree'):
+                            cell_text.setText('')='999'
+                        elif header[0].startswith('Rmerge\nLow'):
+                            cell_text.setText('')='999'
+                        else:
+                            cell_text.setText('')
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                     self.data_collection_summary_table.setItem(current_row, column, cell_text)
 
