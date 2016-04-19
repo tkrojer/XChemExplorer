@@ -1701,6 +1701,8 @@ class XChemExplorer(QtGui.QApplication):
                     self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                     self.work_thread.start()
 
+        elif self.sender().text()=="Check\nStatus":
+            self.check_status_create_png_of_soaked_compound()
 
         elif str(self.sender().text()).startswith("Show Overview"):
             self.update_overview()
@@ -1783,6 +1785,9 @@ class XChemExplorer(QtGui.QApplication):
             os.system('pandda.export pandda_dir="'+self.panddas_directory+'" out_dir="'+self.initial_model_directory+'"')
 
 
+    def check_status_create_png_of_soaked_compound(self):
+        for folder in glob.glob(os.path.join(self.initial_model_directory,'*','compound')):
+            print folder
 
     def check_for_new_autoprocessing(self):
         if self.explorer_active==0 and self.data_source_set==True:
