@@ -43,11 +43,11 @@ class XChemExplorer(QtGui.QApplication):
             self.database_directory=os.path.join(self.project_directory,'processing','database')
             self.data_source_file=''
             self.data_collection_summary_file=os.path.join(self.database_directory,str(os.getcwd().split('/')[5])+'_summary.pkl')
-#            if os.path.isfile(os.path.join(self.project_directory,'processing','database','soakDBDataFile.sqlite')):
-#                self.data_source_file='soakDBDataFile.sqlite'
-#                self.database_directory=os.path.join(self.project_directory,'processing','lab36')
-#                self.data_source_set=True
-#                XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).create_missing_columns()
+            if os.path.isfile(os.path.join(self.project_directory,'processing','database','soakDBDataFile.sqlite')):
+                self.data_source_file='soakDBDataFile.sqlite'
+                self.database_directory=os.path.join(self.project_directory,'processing','lab36')
+                self.data_source_set=True
+                XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).create_missing_columns()
             self.ccp4_scratch_directory=os.path.join(self.project_directory,'processing','tmp')
 
             if not os.path.isdir(self.beamline_directory):
@@ -192,6 +192,7 @@ class XChemExplorer(QtGui.QApplication):
         self.window.setWindowTitle("XChemExplorer")
 #        self.center_main_window()
 
+        ######################################################################################
         # Menu Widget
         load=QtGui.QAction("Open Config File", self.window)
         load.setShortcut('Ctrl+O')
@@ -239,7 +240,6 @@ class XChemExplorer(QtGui.QApplication):
                                                 'Smiles'           ]
         self.mounted_crystal_table=QtGui.QTableWidget()
         self.mounted_crystal_table.setSortingEnabled(True)
-#        self.mounted_crystal_table.setColumnWidth(0,250)
         self.mounted_crystal_table.resizeColumnsToContents()
         self.mounted_crystals_vbox_for_table=QtGui.QVBoxLayout()
         self.tab_dict['Data Source'][1].addLayout(self.mounted_crystals_vbox_for_table)
@@ -349,12 +349,8 @@ class XChemExplorer(QtGui.QApplication):
         write_files_button.clicked.connect(self.button_clicked)
         data_collection_button_hbox.addWidget(write_files_button)
 
-#        rerun_dimple_button=QtGui.QPushButton("Rerun Dimple on Everything")
-#        rerun_dimple_button.clicked.connect(self.button_clicked)
-#        data_collection_button_hbox.addWidget(rerun_dimple_button)
-
         self.rerun_dimple_combobox=QtGui.QComboBox()
-        cmd_list = [    '---------- select command ----------',
+        cmd_list = [    '----------- Need to run DIMPLE? ------------',
                         'Run Dimple if final.pdb cannot be found ',
                         'Rerun Dimple on Everything'    ]
         for cmd in cmd_list:
@@ -1275,7 +1271,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def rerun_dimple_on_autoprocessing_files(self,i):
         text = str(self.rerun_dimple_combobox.currentText())
-        if text=="---------- select command ----------":
+        if text=="----------- Need to run DIMPLE? ------------":
             pass
         if self.explorer_active==0 and self.data_source_set==True and self.data_collection_summary_file != '':
             job_list=[]
@@ -1486,15 +1482,6 @@ class XChemExplorer(QtGui.QApplication):
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.work_thread.start()
 
-#        elif self.explorer_active==0 and self.data_source_set==True \
-#            and self.sender().text()=="Rerun Dimple on Everything":
-#            for entry in self.data_collection_dict[xtal]:
-#                if entry[0]=='logfile':
-#                    db_dict=entry[6]
-#                    print xtal,db_dict['DataProcessingPathToMTZfile']
-
-
-
         elif self.explorer_active==0 and self.data_source_set==True \
             and self.sender().text()=="Read Pickle File":
             summary = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
@@ -1611,14 +1598,6 @@ class XChemExplorer(QtGui.QApplication):
             self.update_reference_files(reference_root)
 
 
-#                if self.initial_model_dimple_dict != {}
-#                    for key in self.initial_model_dimple_dict:
-#
-#                    self.initial_model_dimple_dict[key][0].setChecked(True)
-### thing that I forgot: if reference directory is chosen -> update reference file list
-### if difference between old and new recalculate already if references appeared in initial_model table
-
-
         elif self.sender().text()=="Load Samples\nFrom Datasource":
             content=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
             header=content[0]
@@ -1664,18 +1643,12 @@ class XChemExplorer(QtGui.QApplication):
 
 
         elif self.sender().text()=="Select Columns":
-            print 'hallo'
-#            input_params = [os.path.join(self.database_directory,self.data_source_file),self.data_source_columns_to_display]
-#            self.data_source_columns_to_display, ok = XChemDialogs.select_columns_to_show(input_params).return_selected_columns()
             self.data_source_columns_to_display, ok = XChemDialogs.select_columns_to_show(
                 os.path.join(self.database_directory,self.data_source_file)).return_selected_columns()
             content=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
             header=content[0]
             data=content[1]
             self.populate_data_source_table(header,data)
-
-#            date, time, ok = XChemDialogs.DateDialog.getDateTime()
-#            print 'WERE HERE',str(date),str(time),str(ok)
 
         elif self.sender().text()=="Create PDB/CIF/PNG\nfiles of Compound":
             if helpers().pil_rdkit_exist()==False:
@@ -2320,27 +2293,6 @@ class XChemExplorer(QtGui.QApplication):
                         # we change the selection only if the user did not touch it, assuming that he/she knows best
                         if not selection_changed_by_user:
                             data_collection_table.selectRow(index)
-#            if logfile_found:
-#                for button in self.dataset_outcome_dict[xtal]:
-#                    if button.text()=='success':
-#                        button.setChecked(True)
-#                        button.setStyleSheet("background-color: rgb(0,255,0)")
-#            else:
-#                for button in self.dataset_outcome_dict[xtal]:
-#                    if button.text()=='Failed - unknown':
-#                        button.setChecked(True)
-#                        button.setStyleSheet("background-color: rgb(255,0,0)")
-
-#            if new_row_added:
-#                self.main_data_collection_table.setCellWidget(row, 2, cell_widget)
-#                self.main_data_collection_table.setColumnWidth(2, 1000)
-#                row += 1
-
-#            if xtal_in_table and mtz_already_in_inital_model_directory:
-#                self.main_data_collection_table.item(current_row, 0).setBackground(QtGui.QColor(100,100,150))
-#                self.main_data_collection_table.item(current_row, 1).setBackground(QtGui.QColor(100,100,150))
-
-#        self.main_data_collection_table.resizeRowsToContents()
 
         self.populate_data_collection_summary_table()
 
@@ -2348,23 +2300,8 @@ class XChemExplorer(QtGui.QApplication):
 
     def update_xtalfrom_table(self,xtalform_dict):
         self.xtalform_dict=xtalform_dict
-#        for key in self.xtalform_dict:
-#            db_dict = {
-#                'CrystalFormName':          key,
-#                'CrystalFormSpaceGroup':    xtalform_dict[key][3],
-#                'CrystalFormPointGroup':    xtalform_dict[key][0],
-#                'CrystalFormA':             xtalform_dict[key][2][0],
-#                'CrystalFormB':             xtalform_dict[key][2][1],
-#                'CrystalFormC':             xtalform_dict[key][2][2],
-#                'CrystalFormAlpha':         xtalform_dict[key][2][3],
-#                'CrystalFormBeta':          xtalform_dict[key][2][4],
-#                'CrystalFormGamma':         xtalform_dict[key][2][5],
-#                'CrystalFormVolume':        xtalform_dict[key][1]       }
-#            print db_dict
-
         self.crystal_form_table.setRowCount(0)
         self.crystal_form_table.setRowCount(len(self.xtalform_dict))
-#        self.crystal_form_table.setColumnCount(len(self.crystal_form_column_name)-1)
         self.crystal_form_table.setColumnCount(len(self.crystal_form_column_name))
         all_columns_in_datasource=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).return_column_list()
         for y,key in enumerate(sorted(self.xtalform_dict)):
@@ -2783,6 +2720,7 @@ class XChemExplorer(QtGui.QApplication):
         for key in self.data_collection_column_three_dict:
             if self.data_collection_column_three_dict[key][0]==self.sender():
                 # the user changed the selection, i.e. no automated selection will update it
+                print '==> XCE: user changed selection'
                 self.data_collection_column_three_dict[key][1]=True
 
     def update_selected_autoproc_data_collection_summary_table(self):
@@ -2798,6 +2736,8 @@ class XChemExplorer(QtGui.QApplication):
             if entry[0]=='logfile':
                 if entry[7]==selected_processing_result:
                     db_dict=entry[6]
+                    # update datasource
+                    self.update_data_source(sample,db_dict)
 
         column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
 
@@ -2818,6 +2758,7 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text.setText(str( db_dict[ header[1] ]  ))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.data_collection_summary_table.setItem(row, column, cell_text)
+
 
 
     def populate_data_source_table(self,header,data):
@@ -2959,6 +2900,10 @@ class XChemExplorer(QtGui.QApplication):
         except sqlite3.OperationalError,NameError:
             pass
 
+def find_entry_point():
+    if os.getcwd().startswith('/dls'):
+        print 'seems we are at DLS'
+
 
 if __name__ == "__main__":
 #    print '\n\n\n'
@@ -2975,5 +2920,8 @@ if __name__ == "__main__":
 #    print '     #                                                                    #'
 #    print '     ######################################################################'
 #    print '\n\n\n'
+
+    find_entry_point()
+
     app=XChemExplorer(sys.argv[1:])
 
