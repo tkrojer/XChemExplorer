@@ -1832,7 +1832,12 @@ class XChemExplorer(QtGui.QApplication):
             for cif_file in glob.glob(os.path.join(folder,'*.cif')):
                 if os.path.isfile(cif_file):
                     cif_file_generated += 1
-        print 'status',number_of_samples,running,cif_file_generated
+        if timestamp_list != []:
+            last_timestamp=max(timestamp_list)
+        else:
+            last_timestamp='n/a'
+        message='Samples:'+number_of_samples+'jobs running:'+running+'jobs finished'+cif_file_generated+'last job submmitted'+last_timestamp
+        self.status_bar.showMessage(message)
 
     def check_for_new_autoprocessing(self):
         if self.explorer_active==0 and self.data_source_set==True:
