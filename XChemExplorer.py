@@ -259,6 +259,7 @@ class XChemExplorer(QtGui.QApplication):
         get_mounted_crystals_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(get_mounted_crystals_button)
         save_mounted_crystals_button=QtGui.QPushButton("Save Samples\nTo Datasource")
+        save_mounted_crystals_button.setToolTip(XChemToolTips.save_samples_to_datasource())
         save_mounted_crystals_button.clicked.connect(self.button_clicked)
         mounted_crystals_button_hbox.addWidget(save_mounted_crystals_button)
 
