@@ -1304,6 +1304,7 @@ class XChemExplorer(QtGui.QApplication):
         if self.explorer_active==0 and self.data_source_set==True and self.data_collection_summary_file != '':
             job_list=[]
             for xtal in self.data_collection_dict:
+                print xtal
                 for entry in self.data_collection_dict[xtal]:
                     if entry[0]=='logfile':
                         db_dict=entry[6]
