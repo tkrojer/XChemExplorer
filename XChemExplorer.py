@@ -1244,11 +1244,8 @@ class XChemExplorer(QtGui.QApplication):
         for reference in self.reference_file_list:
             # first we need one in the same pointgroup
             if reference[5]==db_dict['DataProcessingPointGroup']:
-                print 'here'
                 try:
-                    print 'herer'
                     difference=math.fabs(1-(float(db_dict['DataProcessingUnitCellVolume'])/float(reference[4])))
-                    print difference
                     suitable_reference.append([reference[0],difference])
                 except ValueError:
                     continue
@@ -1276,8 +1273,6 @@ class XChemExplorer(QtGui.QApplication):
                                 reference_file_pdb,
                                 reference_file_mtz,
                                 reference_file_cif  ])
-        print 'firufru'
-        print job_list
         return job_list
 
     def check_before_running_dimple(self,job_list):
@@ -1309,11 +1304,9 @@ class XChemExplorer(QtGui.QApplication):
         if self.explorer_active==0 and self.data_source_set==True and self.data_collection_summary_file != '':
             job_list=[]
             for xtal in self.data_collection_dict:
-                print xtal
                 for entry in self.data_collection_dict[xtal]:
                     if entry[0]=='logfile':
                         db_dict=entry[6]
-                        print db_dict
                         try:
                             if os.path.isfile(db_dict['DataProcessingPathToMTZfile']):
                                 if text=='Run Dimple if final.pdb cannot be found ' \
@@ -1821,8 +1814,20 @@ class XChemExplorer(QtGui.QApplication):
         self.populate_data_source_table(header,data)
 
     def check_status_create_png_of_soaked_compound(self):
+        number_of_samples=0
+        running=0
+        timestamp_list=[]
+        cif_file_generated=0
         for folder in glob.glob(os.path.join(self.initial_model_directory,'*','compound')):
-            print folder
+            number_of_samples += 1
+            if os.path.isfile(os.path.join(folder,'ACEDRG_IN_PROGRESS')):
+                running += 1
+                timestamp=datetime.fromtimestamp(os.path.getmtime(os.path.join(folder,'ACEDRG_IN_PROGRESS'))).strftime('%Y-%m-%d %H:%M:%S')
+                timestamp_list.append(timestamp)
+            for cif_file in glob.glob(os.path.join(folder,'*.cif')):
+                if os.path.isfile(cif_file):
+                    cif_file_generated += 1
+        print 'status',number_of_samples,running,cif_file_generated,max(timestamp_list)
 
     def check_for_new_autoprocessing(self):
         if self.explorer_active==0 and self.data_source_set==True:

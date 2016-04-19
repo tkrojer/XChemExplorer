@@ -238,9 +238,9 @@ class helpers:
                     '\n'
                     'cd '+os.path.join(initial_model_directory,sample)+'\n'
                     '\n'
-                    'ln -s compound/*cif .\n'
-                    'ln -s compound/*pdb .\n'
-                    'ln -s compound/*png .\n'
+                    'ln -s compound/%s.cif .\n' %compoundID+
+                    'ln -s compound/%s.pdb .\n' %compoundID+
+                    'ln -s compound/%s.png .\n' %compoundID+
                     '/bin/rm compound/ACEDRG_IN_PROGRESS\n'
                 )
                 f = open('acedrg.sh','w')
