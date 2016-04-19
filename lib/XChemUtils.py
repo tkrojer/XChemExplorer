@@ -195,18 +195,18 @@ class helpers:
     def pil_rdkit_exist(self):
         return self.pil_rdkit_present
 
-    def make_png(self,initial_model_directory,sample,compoundID.replace(' ',''),smiles,queueing_system_available):
+    def make_png(self,initial_model_directory,sample,compoundID,smiles,queueing_system_available):
 
         if not os.path.isdir(os.path.join(initial_model_directory,sample)):
             os.mkdir(os.path.join(initial_model_directory,sample))
 
         # remove symbolic links if present
-#        if os.path.isfile(os.path.join(initial_model_directory,sample,compoundID+'.pdb')):
-#            os.system('/bin/rm '+os.path.join(initial_model_directory,sample,compoundID+'.pdb'))
-#        if os.path.isfile(os.path.join(initial_model_directory,sample,compoundID+'.cif')):
-#            os.system('/bin/rm '+os.path.join(initial_model_directory,sample,compoundID+'.cif'))
-#        if os.path.isfile(os.path.join(initial_model_directory,sample,compoundID+'.png')):
-#            os.system('/bin/rm '+os.path.join(initial_model_directory,sample,compoundID+'.png'))
+#        if os.path.isfile(os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.pdb')):
+#            os.system('/bin/rm '+os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.pdb'))
+#        if os.path.isfile(os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.cif')):
+#            os.system('/bin/rm '+os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.cif'))
+#        if os.path.isfile(os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.png')):
+#            os.system('/bin/rm '+os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.png'))
 
         # remove compound directory if present
 #        if os.path.isdir(os.path.join(initial_model_directory,sample,'compound')):
@@ -217,15 +217,15 @@ class helpers:
 
         os.chdir(os.path.join(initial_model_directory,sample,'compound'))
 
-        if not os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png')):
+        if not os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID.replace(' ','')+'.png')):
             mol = Chem.MolFromSmiles(smiles)
             AllChem.Compute2DCoords(mol)
             # Draw to a file
-            Draw.MolToFile(mol, "%s.png" %compoundID)
+            Draw.MolToFile(mol, "%s.png" %compoundID.replace(' ',''))
 
-        if not os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif')):
-#            os.system('acedrg --res LIG -i "%s" -o %s' %(smiles,compoundID))
-#            os.system("grade '%s' -resname LIG -ocif %s.cif -opdb %s.pdb" %(smiles,compoundID,compoundID))
+        if not os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID.replace(' ','')+'.cif')):
+#            os.system('acedrg --res LIG -i "%s" -o %s' %(smiles,compoundID.replace(' ','')))
+#            os.system("grade '%s' -resname LIG -ocif %s.cif -opdb %s.pdb" %(smiles,compoundID.replace(' ',''),compoundID.replace(' ','')))
             os.chdir(os.path.join(initial_model_directory,sample,'compound'))
             if not os.path.isfile(os.path.join(initial_model_directory,sample,'compound','ACEDRG_IN_PROGRESS')):
                 os.system('touch ACEDRG_IN_PROGRESS')
@@ -234,13 +234,13 @@ class helpers:
                     '\n'
                     'cd '+os.path.join(initial_model_directory,sample,'compound')+'\n'
                     '\n'
-                    'acedrg --res LIG -i "%s" -o %s\n' %(smiles,compoundID)+
+                    'acedrg --res LIG -i "%s" -o %s\n' %(smiles,compoundID.replace(' ',''))+
                     '\n'
                     'cd '+os.path.join(initial_model_directory,sample)+'\n'
                     '\n'
-                    'ln -s compound/%s.cif .\n' %compoundID+
-                    'ln -s compound/%s.pdb .\n' %compoundID+
-                    'ln -s compound/%s.png .\n' %compoundID+
+                    'ln -s compound/%s.cif .\n' %compoundID.replace(' ','')+
+                    'ln -s compound/%s.pdb .\n' %compoundID.replace(' ','')+
+                    'ln -s compound/%s.png .\n' %compoundID.replace(' ','')+
                     '/bin/rm compound/ACEDRG_IN_PROGRESS\n'
                 )
                 f = open('acedrg.sh','w')
@@ -253,15 +253,15 @@ class helpers:
                     os.system('./acedrg.sh')
 
 #        os.chdir(os.path.join(initial_model_directory,sample))
-#        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.pdb'))\
-#                and not os.path.isfile(os.path.join(initial_model_directory,sample,compoundID+'.pdb')):
-#            os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.pdb'),compoundID+'.pdb')
-#        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif'))\
-#                and not os.path.isfile(os.path.join(initial_model_directory,sample,compoundID+'.cif')):
-#            os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.cif'),compoundID+'.cif')
-#        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png'))\
-#                and not os.path.isfile(os.path.join(initial_model_directory,sample,compoundID+'.png')):
-#            os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID+'.png'),compoundID+'.png')
+#        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID.replace(' ','')+'.pdb'))\
+#                and not os.path.isfile(os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.pdb')):
+#            os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID.replace(' ','')+'.pdb'),compoundID.replace(' ','')+'.pdb')
+#        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID.replace(' ','')+'.cif'))\
+#                and not os.path.isfile(os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.cif')):
+#            os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID.replace(' ','')+'.cif'),compoundID.replace(' ','')+'.cif')
+#        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID.replace(' ','')+'.png'))\
+#                and not os.path.isfile(os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.png')):
+#            os.symlink(os.path.join(initial_model_directory,sample,'compound',compoundID.replace(' ','')+'.png'),compoundID.replace(' ','')+'.png')
 
 
 class parse:
