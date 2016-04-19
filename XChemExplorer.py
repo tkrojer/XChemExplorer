@@ -1308,6 +1308,7 @@ class XChemExplorer(QtGui.QApplication):
                 for entry in self.data_collection_dict[xtal]:
                     if entry[0]=='logfile':
                         db_dict=entry[6]
+                        print db_dict
                         try:
                             if os.path.isfile(db_dict['DataProcessingPathToMTZfile']):
                                 if text=='Run Dimple if final.pdb cannot be found ' \
