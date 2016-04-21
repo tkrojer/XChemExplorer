@@ -1,3 +1,67 @@
+def dataset_task_tip():
+    tip =   (   'describes what you can do'   )
+    return tip
+
+def dataset_task_run_button_tip():
+    tip =   (   'Run dataset'   )
+    return tip
+
+def dataset_task_status_button_tip():
+    tip =   (   'Status dataset'   )
+    return tip
+
+def map_cif_file_task_tip():
+    tip =   (   'describes what you can do'   )
+    return tip
+
+def map_cif_file_task_run_button_tip():
+    tip =   (   'Run map_cif_file'   )
+    return tip
+
+def map_cif_file_task_status_button_tip():
+    tip =   (   'Status map_cif_file'   )
+    return tip
+
+def panddas_file_task_tip():
+    tip =   (   'describes what you can do'   )
+    return tip
+
+def panddas_file_task_run_button_tip():
+    tip =   (   'Run panddas_file'   )
+    return tip
+
+def panddas_file_task_status_button_tip():
+    tip =   (   'Status panddas_file'   )
+    return tip
+
+def refine_file_task_tip():
+    tip =   (   'describes what you can do'   )
+    return tip
+
+def refine_file_task_run_button_tip():
+    tip =   (   'Run refine_file'   )
+    return tip
+
+def refine_file_task_status_button_tip():
+    tip =   (   'Status refine_file'   )
+    return tip
+
+def validation_file_task_tip():
+    tip =   (   'describes what you can do'   )
+    return tip
+
+def validation_file_task_run_button_tip():
+    tip =   (   'Run validation_file'   )
+    return tip
+
+def validation_file_task_status_button_tip():
+    tip =   (   'Status validation_file'   )
+    return tip
+
+
+
+
+
 def load_samples_from_datasource():
     tip =   (   'loads all information\n'
                 'which is currently in the\n'

@@ -8,15 +8,6 @@ class select_columns_to_show(QtGui.QDialog):
         super(select_columns_to_show, self).__init__(parent)
         self.columns_in_data_source=XChemDB.data_source(data_source_file).return_column_list()
 
-#    def __init__(self, input_params,parent = None):
-#        super(select_columns_to_show, self).__init__(parent)
-#        self.columns_in_data_source=XChemDB.data_source(input_params[0]).return_column_list()
-#        self.active_columns=input_params[1]
-#        print self.active_columns
-
-
-
-
         self.column_dict={}
 
         layout = QtGui.QVBoxLayout(self)
