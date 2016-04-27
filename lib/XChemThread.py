@@ -10,6 +10,7 @@ import pickle
 import base64
 import math
 import subprocess
+from datetime import datetime
 
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 from XChemUtils import process
@@ -545,7 +546,7 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
         progress=0
         data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
         for sample in sorted(self.dataset_outcome_dict):
-            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing files from data processing to inital_model folder -> '+sample)
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing files from data processing to project folder -> '+sample)
             outcome=''
             for button in self.dataset_outcome_dict[sample]:
                 if button.isChecked():
@@ -1124,7 +1125,15 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 
 
 class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
-    def __init__(self,visit_list,target,reference_file_list,database_directory,data_collection_dict,preferences,data_collection_summary_file,initial_model_directory):
+    def __init__(self,visit_list,
+                 target,
+                 reference_file_list,
+                 database_directory,
+                 data_collection_dict,
+                 preferences,
+                 data_collection_summary_file,
+                 initial_model_directory,
+                 rescore_only):
         QtCore.QThread.__init__(self)
         self.visit_list=visit_list
         self.target=target
@@ -1134,12 +1143,19 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         self.selection_mechanism=preferences['dataset_selection_mechanism']
         self.data_collection_summary_file=data_collection_summary_file
         self.initial_model_directory=initial_model_directory
+        self.rescore_only=rescore_only
 
         # - open data source if possible
         # - get sampleID, xtbm
         # - search lab36 folder for respective xtal image
         # - convert to string and use in data dict
         # - but images can only be found of XCE is started in the respective labchem directory
+
+    def run(self):
+        if self.rescore_only:
+            self.rescore_and_reset_pkl_file()
+        else:
+            self.parse_file_system()
 
     def max_IsigI_Completeness_Reflections(self,xtal):
         # before creating the table with the results, try to guess which one to select
@@ -1288,10 +1304,79 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
+    def update_datasource(self):
+        if not len(self.data_collection_dict)==0:
+            progress_step=100/float(len(self.data_collection_dict))
+        else:
+            progress_step=1
+        progress=0
+
+        for sample in sorted(self.data_collection_dict):
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating data source for '+sample)
+            logfile_found=False
+            user_changed_selection=False
+            db_dict={}
+            db_dict['DataCollectionOutcome']='Failed - unknown'
+            tmpList=[]
+            for entry in self.data_collection_dict[sample]:
+                if entry[0]=='user_changed_selection':
+                    user_changed_selection=True
+                if entry[0]=='logfile':
+                    if entry[8]:        # the best auto-selected or user selected output
+                        db_dict=entry[6]
+                        logfile_found=True
+                        try:
+                            if float(db_dict['DataProcessingResolutionHigh']) <= float(self.acceptable_low_resolution_limit_for_data):
+                                db_dict['DataCollectionOutcome']='success'
+                            else:
+                                db_dict['DataCollectionOutcome']='Failed - low resolution'
+                        except ValueError:
+                            db_dict['DataCollectionOutcome']='Failed - unknown'
+                        db_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
+                if entry[0]=='image':
+                    if len(entry) >= 9:     # need this because some older pkl files won't have the beamline added
+                        tmpList.append([datetime.strptime(entry[3], '%Y-%m-%d %H:%M:%S'),entry[1],entry[2],entry[8]])
+                    else:
+                        tmpList.append([datetime.strptime(entry[3], '%Y-%m-%d %H:%M:%S'),entry[1],entry[2],'I04-1'])
+
+            if not logfile_found:
+                # find latest data collection in tmpList
+                latest_run=max(tmpList,key=lambda x: x[0])
+                db_dict={   'DataCollectionVisit':              latest_run[1],
+                            'DataCollectionBeamline':           latest_run[3],
+                            'DataCollectionDate':               latest_run[0],
+                            'DataCollectionOutcome':            'Failed - unknown'    }
+
+            if self.rescore_only:
+                data_source.update_insert_data_source(sample,db_dict)
+            elif user_changed_selection==False:     # if user changed the selection, then ignore
+                data_source.update_insert_data_source(sample,db_dict)
+
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
 
-    def run(self):
+    def rescore_and_reset_pkl_file(self):
+        # remove 'user_changed_selection' flag from dictionary
+        for xtal in self.data_collection_dict:
+            for entry in self.data_collection_dict[xtal]:
+                if entry[0]=='user_changed_selection':
+                    self.data_collection_dict[xtal].remove(entry)
 
+        # and now select again the best dataset
+        self.select_best_dataset()
+
+        # and now update datasource
+        self.update_datasource()
+
+        # save everything so that it's quicker to reload and is available outside DLS
+        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'pickling results')
+        pickle.dump(self.data_collection_dict,open(self.data_collection_summary_file,'wb'))
+
+        self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results_only'), self.data_collection_dict)
+
+
+    def parse_file_system(self):
         # only do once, ignore if just refreshing table
         if self.data_collection_dict=={}:
             if os.path.isfile(self.data_collection_summary_file):
@@ -1398,7 +1483,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                         else:
                             html_summary=''
                         self.data_collection_dict[xtal].append(['image',visit,run,timestamp,image_list,
-                                                                diffraction_image,run_number,html_summary])
+                                                                diffraction_image,run_number,html_summary,beamline])
 
 
                     # before we start, check if there are already entries in the aimless_index_list
@@ -1469,7 +1554,9 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 db_dict['DataProcessingRcryst']  = '999'
                                 db_dict['DataProcessingRfree'] = '999'
                             db_dict['DataProcessingProgram']=autoproc
-                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False])
+                            # Note: [8]: best automatically selected file=True
+                            #       [9]: the moment the user changes the selection manully this changes to True
+                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False,False])
                             aimless_index+=1
 
 
@@ -1527,7 +1614,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 db_dict['DataProcessingRcryst']  = '999'
                                 db_dict['DataProcessingRfree'] = '999'
                             db_dict['DataProcessingProgram']=autoproc
-                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False])
+                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False,False])
                             aimless_index+=1
 
                     # then exactly the same for autoPROC
@@ -1582,7 +1669,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 db_dict['DataProcessingRcryst']  = '999'
                                 db_dict['DataProcessingRfree'] = '999'
                             db_dict['DataProcessingProgram']=autoproc
-                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False])
+                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False,False])
                             aimless_index+=1
 
 
@@ -1594,6 +1681,9 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
         # finally decide which dataset should be pre-selected
         self.select_best_dataset()
+
+        # and now update datasource
+        self.update_datasource()
 
         # save everything so that it's quicker to reload and is available outside DLS
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'pickling results')

@@ -363,6 +363,17 @@ class data_source:
         csvWriter.writerows([header]+rows)
 
 
+#    def load_samples_from_data_source(self):
+#        header=[]
+#        data=[]
+#        connect=sqlite3.connect(self.data_source_file)
+#        cursor = connect.cursor()
+#        cursor.execute("SELECT * FROM mainTable")
+#        for column in cursor.description:
+#            header.append(column[0])
+#        data = cursor.fetchall()
+#        return ([header,data])
+
     def load_samples_from_data_source(self):
         header=[]
         data=[]
@@ -372,7 +383,7 @@ class data_source:
         for column in cursor.description:
             header.append(column[0])
         data = cursor.fetchall()
-        return ([header,data])
+        return header,data
 
 
 
