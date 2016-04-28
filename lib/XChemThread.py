@@ -1368,7 +1368,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
             found=False
             if entry[0]=='logfile':
                 index=self.data_collection_dict[xtal][n][7]
-                print 'index',index
                 if isinstance(entry[6],dict):
                     try:
                         if isinstance(float(entry[6]['DataProcessingUnitCellVolume']),float):
@@ -1383,11 +1382,11 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                 if not found:
                     tmp.append(index)               # so that if no file passes criterion above
                                                     # or if no reference is given, we still carry over all existing files
-        print 'found',found
+
         # if none passed Stage 1, carry them over to Stage 2
         if select_stage_one_list == [] and tmp != []:
             select_stage_one_list=tmp
-        print select_stage_one_list
+
 
         ############################################################################################
         # STAGE 2:
@@ -1412,7 +1411,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         # if none passed Stage 2, carry them over to Stage 3
         if select_stage_two_list == [] and tmp != []:
             select_stage_two_list=tmp
-        print 'stage 2',select_stage_two_list
 
         ############################################################################################
         # STAGE 3:
@@ -1427,10 +1425,10 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             ranking=float(entry[6]['DataProcessingUniqueReflectionsOverall'])*\
                                     float(entry[6]['DataProcessingCompletenessOverall'])*\
                                     float(entry[6]['DataProcessingIsigOverall'])
-                            print 'ranking',ranking
                             select_stage_three_list.append([index,ranking])
                         except ValueError:
                             pass
+        print 'stage 3',select_stage_three_list
         if not select_stage_three_list==[]:
             self.set_best_file_to_true(xtal,'max',select_stage_three_list)
 
