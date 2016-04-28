@@ -2055,7 +2055,8 @@ class XChemExplorer(QtGui.QApplication):
                                                                                 self.data_collection_summary_file,
                                                                                 self.initial_model_directory,
                                                                                 rescore_only,
-                                                                                self.acceptable_low_resolution_limit_for_data)
+                                                                                self.acceptable_low_resolution_limit_for_data,
+                                                                                os.path.join(self.database_directory,self.data_source_file))
             self.explorer_active=1
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)

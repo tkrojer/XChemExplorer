@@ -1323,7 +1323,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                  data_collection_summary_file,
                  initial_model_directory,
                  rescore_only,
-                 acceptable_low_resolution_limit_for_data):
+                 acceptable_low_resolution_limit_for_data,
+                 data_source_file):
         QtCore.QThread.__init__(self)
         self.visit_list=visit_list
         self.target=target
@@ -1335,6 +1336,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         self.initial_model_directory=initial_model_directory
         self.rescore_only=rescore_only
         self.acceptable_low_resolution_limit_for_data=acceptable_low_resolution_limit_for_data
+        self.data_source=XChemDB.data_source(os.path.join(data_source_file))
 
         # - open data source if possible
         # - get sampleID, xtbm
@@ -1539,9 +1541,9 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             'DataCollectionOutcome':            'Failed - unknown'    }
 
             if self.rescore_only:
-                data_source.update_insert_data_source(sample,db_dict)
+                self.data_source.update_insert_data_source(sample,db_dict)
             elif user_changed_selection==False:     # if user changed the selection, then ignore
-                data_source.update_insert_data_source(sample,db_dict)
+                self.data_source.update_insert_data_source(sample,db_dict)
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
