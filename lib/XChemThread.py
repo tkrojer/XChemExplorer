@@ -1369,7 +1369,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
             if entry[0]=='logfile':
                 index=self.data_collection_dict[xtal][n][7]
                 print 'index',index
-                print entry[6]
                 if isinstance(entry[6],dict):
                     try:
                         if isinstance(float(entry[6]['DataProcessingUnitCellVolume']),float):
@@ -1386,9 +1385,9 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                                     # or if no reference is given, we still carry over all existing files
         print 'found',found
         # if none passed Stage 1, carry them over to Stage 2
-        print select_stage_one_list
         if select_stage_one_list == [] and tmp != []:
             select_stage_one_list=tmp
+        print select_stage_one_list
 
         ############################################################################################
         # STAGE 2:
