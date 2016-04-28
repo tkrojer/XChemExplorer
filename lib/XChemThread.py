@@ -1441,7 +1441,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         for n,entry in enumerate(self.data_collection_dict[xtal]):
             if entry[0]=='logfile':
                 if entry[7]==best_file_index:
-                    print xtal,n
                     self.data_collection_dict[xtal][n][8]=True
                 else:
                     self.data_collection_dict[xtal][n][8]=False

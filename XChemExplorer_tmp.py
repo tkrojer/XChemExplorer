@@ -2066,7 +2066,7 @@ class XChemExplorer(QtGui.QApplication):
             self.work_thread.start()
 
     def save_files_to_initial_model_folder(self):
-        self.work_thread=XChemThread.NEW_save_autoprocessing_results_to_disc(self.dataset_outcome_dict,
+        self.work_thread=XChemThread.LATEST_save_autoprocessing_results_to_disc(self.dataset_outcome_dict,
                                                                              self.data_collection_table_dict,
                                                                              self.data_collection_column_three_dict,
                                                                              self.data_collection_dict,
@@ -2797,8 +2797,12 @@ class XChemExplorer(QtGui.QApplication):
                     # update datasource
                     self.update_data_source(sample,db_dict)
 
-        column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
+        # update Overview table
+        self.update_header_and_data_from_datasource()
+        self.populate_and_update_data_source_table()
 
+        # update 'Datasets' table
+        column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
         rows_in_table=self.data_collection_summary_table.rowCount()
         for row in range(rows_in_table):
             if self.data_collection_summary_table.item(row,0).text()==sample:
