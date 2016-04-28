@@ -2572,10 +2572,10 @@ class XChemExplorer(QtGui.QApplication):
             db_dict={}
             for entry in self.data_collection_dict[xtal]:
                 if entry[0]=='logfile':
-                    print 'found'
                     logfile_found=True
                     if entry[8]:    # if this was auto-selected best resolution file
                         db_dict=entry[6]
+                        print 'found'
                         try:
                             if float(db_dict['DataProcessingResolutionHigh']) <= float(self.acceptable_low_resolution_limit_for_data):
                                 too_low_resolution=False
@@ -2583,7 +2583,7 @@ class XChemExplorer(QtGui.QApplication):
                             pass
             if not logfile_found:
                 db_dict={}
-
+            print sample,db_dict
             if logfile_found and not too_low_resolution:
                 outcome="success"
             elif logfile_found and too_low_resolution:
