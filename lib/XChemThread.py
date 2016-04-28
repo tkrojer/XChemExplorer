@@ -1427,6 +1427,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             ranking=float(entry[6]['DataProcessingUniqueReflectionsOverall'])*\
                                     float(entry[6]['DataProcessingCompletenessOverall'])*\
                                     float(entry[6]['DataProcessingIsigOverall'])
+                            print 'ranking',ranking
                             select_stage_three_list.append([index,ranking])
                         except ValueError:
                             pass
