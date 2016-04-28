@@ -2572,6 +2572,7 @@ class XChemExplorer(QtGui.QApplication):
             db_dict={}
             for entry in self.data_collection_dict[xtal]:
                 if entry[0]=='logfile':
+                    print 'found'
                     logfile_found=True
                     if entry[8]:    # if this was auto-selected best resolution file
                         db_dict=entry[6]
