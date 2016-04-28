@@ -1718,6 +1718,7 @@ class XChemExplorer(QtGui.QApplication):
     def prepare_and_run_task(self,instruction):
 
         if instruction=='Get New Results from Autoprocessing':
+            print 'here'
             self.check_for_new_autoprocessing_or_rescore(False)
 
         elif instruction=="Save Files from Autoprocessing to Project Folder" :
