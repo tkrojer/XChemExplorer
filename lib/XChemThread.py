@@ -7,6 +7,7 @@ from PyQt4 import QtGui, QtCore
 
 import time
 import pickle
+import cPickle
 import base64
 import math
 import subprocess
@@ -1297,7 +1298,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         if self.data_collection_dict=={}:
             if os.path.isfile(self.data_collection_summary_file):
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'unpickling: '+self.data_collection_summary_file)
-                self.data_collection_dict = pickle.load( open(self.data_collection_summary_file, "rb" ) )
+#                self.data_collection_dict = pickle.load( open(self.data_collection_summary_file, "rb" ) )
+                self.data_collection_dict = cPickle.load( open(self.data_collection_summary_file, "rb" ) )
 
         number_of_visits_to_search=len(self.visit_list)
         search_cycle=1
@@ -1603,6 +1605,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
         # save everything so that it's quicker to reload and is available outside DLS
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'pickling results')
-        pickle.dump(self.data_collection_dict,open(self.data_collection_summary_file,'wb'))
+#        pickle.dump(self.data_collection_dict,open(self.data_collection_summary_file,'wb'))
+        cPickle.dump(self.data_collection_dict,open(self.data_collection_summary_file,'wb'))
 
         self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results_only'), self.data_collection_dict)
