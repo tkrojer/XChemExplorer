@@ -1412,6 +1412,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         # if none passed Stage 2, carry them over to Stage 3
         if select_stage_two_list == [] and tmp != []:
             select_stage_two_list=tmp
+        print 'stage 2',select_stage_two_list
 
         ############################################################################################
         # STAGE 3:
