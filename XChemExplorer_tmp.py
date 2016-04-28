@@ -1727,7 +1727,7 @@ class XChemExplorer(QtGui.QApplication):
             self.check_for_new_autoprocessing_or_rescore(True)
 
         elif instruction=="Read PKL file":
-            summary = pickle.load( open( self.data_collection_summary_file), "rb" ) )
+            summary = pickle.load( open( self.data_collection_summary_file), "rb" )
             self.create_widgets_for_autoprocessing_results(summary)
 
         elif instruction=='Run DIMPLE on All Autoprocessing MTZ files':
