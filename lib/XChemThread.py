@@ -1383,6 +1383,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     tmp.append(index)               # so that if no file passes criterion above
                                                     # or if no reference is given, we still carry over all existing files
         # if none passed Stage 1, carry them over to Stage 2
+        print select_stage_one_list
         if select_stage_one_list == [] and tmp != []:
             select_stage_one_list=tmp
 
@@ -1484,7 +1485,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         else:
             progress_step=1
         progress=0
-        print self.selection_mechanism
+
         for xtal in sorted(self.data_collection_dict):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 2 of 2: selecting "best" aimless logfile ->'+xtal)
             # overwrite previous selection, only if flag not present
