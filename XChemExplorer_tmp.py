@@ -2569,6 +2569,7 @@ class XChemExplorer(QtGui.QApplication):
             outcome=''
             logfile_found=False
             too_low_resolution=True
+            db_dict={}
             for entry in self.data_collection_dict[xtal]:
                 if entry[0]=='logfile':
                     logfile_found=True
