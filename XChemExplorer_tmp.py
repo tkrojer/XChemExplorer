@@ -91,7 +91,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.preferences_data_to_copy = [
             ['aimless logiles and merged mtz only',                             'mtz_log_only'],
-            ['All Files in the respective auto-processing directory',           'everything'],
+            #['All Files in the respective auto-processing directory',           'everything'],
                     ]
 
         self.preferences_selection_mechanism = [    'IsigI*Comp*UniqueRefl',
@@ -570,11 +570,22 @@ class XChemExplorer(QtGui.QApplication):
         self.dls_data_collection_vbox=QtGui.QVBoxLayout()
         self.tab_dict[self.workflow_dict['Datasets']][1].addLayout(self.dls_data_collection_vbox)
 
+        hbox=QtGui.QHBoxLayout()
         check_for_new_data_collection = QtGui.QCheckBox('Check for new data collection every two minutes')
         check_for_new_data_collection.toggle()
         check_for_new_data_collection.setChecked(False)
         check_for_new_data_collection.stateChanged.connect(self.continously_check_for_new_data_collection)
-        self.dls_data_collection_vbox.addWidget(check_for_new_data_collection)
+        hbox.addWidget(check_for_new_data_collection)
+        hbox.addWidget(QtGui.QLabel('                                             '))
+        hbox.addWidget(QtGui.QLabel('Select Target: '))
+        self.target_selection_combobox = QtGui.QComboBox()
+        self.populate_target_selection_combobox(self.target_selection_combobox)
+        self.target_selection_combobox.activated[str].connect(self.target_selection_combobox_activated)
+        hbox.addWidget(self.target_selection_combobox)
+        self.target=str(self.target_selection_combobox.currentText())
+
+        self.dls_data_collection_vbox.addLayout(hbox)
+
 
         dls_tab_widget = QtGui.QTabWidget()
         dls_tab_list = [ 'Summary',
@@ -643,15 +654,7 @@ class XChemExplorer(QtGui.QApplication):
 #        hbox.addWidget(rerun_dimple_button)
 #        frame.setLayout(hbox)
 #        data_collection_button_hbox.addWidget(frame)
-## IMPORTANT : needs tp be moved to settings tab
-#        self.target_selection_combobox = QtGui.QComboBox()
-#        self.populate_target_selection_combobox(self.target_selection_combobox)
-#        self.target_selection_combobox.activated[str].connect(self.target_selection_combobox_activated)
-#        data_collection_button_hbox.addWidget(self.target_selection_combobox)
-#        read_pickle_file_button=QtGui.QPushButton("Read Pickle File")
-#        read_pickle_file_button.clicked.connect(self.button_clicked)
-#        data_collection_button_hbox.addWidget(read_pickle_file_button)
-#        self.target=str(self.target_selection_combobox.currentText())
+
 
         self.dls_data_collection_vbox.addWidget(dls_tab_widget)
 #        self.dls_data_collection_vbox.addLayout(data_collection_button_hbox)
@@ -1461,26 +1464,6 @@ class XChemExplorer(QtGui.QApplication):
                                 reference_file_cif  ])
         return job_list
 
-    def check_before_running_dimple(self,job_list):
-
-        msgBox = QtGui.QMessageBox()
-        msgBox.setText("Do you really want to run %s Dimple jobs?" %len(job_list))
-        msgBox.addButton(QtGui.QPushButton('Go'), QtGui.QMessageBox.YesRole)
-        msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
-        reply = msgBox.exec_();
-
-        if reply == 0:
-            self.status_bar.showMessage('preparing %s DIMPLE jobs' %len(job_list))
-            self.work_thread=XChemThread.run_dimple_on_all_autoprocessing_files(    job_list,
-                                                                                    self.initial_model_directory,
-                                                                                    self.external_software,
-                                                                                    self.ccp4_scratch_directory )
-            self.explorer_active=1
-            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-            self.work_thread.start()
 
 
     def rerun_dimple_on_autoprocessing_files(self):
@@ -1505,6 +1488,51 @@ class XChemExplorer(QtGui.QApplication):
 
             if job_list != []:
                 self.check_before_running_dimple(job_list)
+
+    def rerun_dimple_on_all_autoprocessing_files(self):
+        print '==> XCE: running DIMPLE on ALL auto-processing files'
+        job_list=[]
+        for xtal in self.data_collection_dict:
+            for entry in self.data_collection_dict[xtal]:
+                if entry[0]=='logfile':
+                    db_dict=entry[6]
+                    print db_dict['DataProcessingPathToMTZfile']
+#                        try:
+#                            if os.path.isfile(db_dict['DataProcessingPathToMTZfile']):
+#                                if text=='Run Dimple if final.pdb cannot be found ' \
+#                                 and not os.path.isfile(db_dict['DataProcessingPathToDimplePDBfile']):
+#                                    job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
+#                                elif text=='Rerun Dimple on Everything':
+#                                    job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
+#                        # thought this is not necessary, because 'logfile' entry in dict is only made if logfile is present
+#                        # however, came across case where autoPROC generated logile and aimless.mtz, but not truncate.mtz
+#                        except KeyError:
+#                            pass
+#            if job_list != []:
+#                self.check_before_running_dimple(job_list)
+
+
+    def check_before_running_dimple(self,job_list):
+
+        msgBox = QtGui.QMessageBox()
+        msgBox.setText("Do you really want to run %s Dimple jobs?" %len(job_list))
+        msgBox.addButton(QtGui.QPushButton('Go'), QtGui.QMessageBox.YesRole)
+        msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
+        reply = msgBox.exec_();
+
+        if reply == 0:
+            self.status_bar.showMessage('preparing %s DIMPLE jobs' %len(job_list))
+            self.work_thread=XChemThread.run_dimple_on_all_autoprocessing_files(    job_list,
+                                                                                    self.initial_model_directory,
+                                                                                    self.external_software,
+                                                                                    self.ccp4_scratch_directory )
+            self.explorer_active=1
+            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.work_thread.start()
+
 
     def center_main_window(self):
         screen = QtGui.QDesktopWidget().screenGeometry()
@@ -1702,8 +1730,14 @@ class XChemExplorer(QtGui.QApplication):
             summary = pickle.load( open( os.path.join(self.database_directory,'data_collection_summary.pkl'), "rb" ) )
             self.create_widgets_for_autoprocessing_results(summary)
 
+        elif instruction=='Run DIMPLE on All Autoprocessing MTZ files':
+            self.rerun_dimple_on_all_autoprocessing_files()
 
+        elif instruction=='Run DIMPLE on selected MTZ files':
+            print 'hallo'
 
+        elif instruction=='Create CIF/PDB/PNG file of soaked compound':
+            self.create_cif_pdb_png_files()
 
 
 #        elif instruction=="Check for inital Refinement" or \
@@ -2043,7 +2077,30 @@ class XChemExplorer(QtGui.QApplication):
         self.work_thread.start()
 
 
-
+    def create_cif_pdb_png_files(self):
+        tmp=self.db.execute_statement("select CrystalName,CompoundCode,CompoundSmiles from mainTable where CrystalName is not '' and CompoundSmiles is not '' and CompoundSmiles is not NULL;")
+        compound_list=[]
+        for item in tmp:
+            if str(item[1])=='' or str(item[1])=='NULL':
+                compoundID='compound'
+            else:
+                compoundID=str(item[1])
+            compound_list.append([str(item[0]),compoundID,str(item[2])])
+        if compound_list != []:
+            print '==> XCE: trying to create cif and pdb files for ',len(compound_list),' compounds using ACEDRG...'
+            if self.external_software['qsub']:
+                print '==> XCE: will try sending ',len(compound_list),' jobs to your computer cluster!'
+            else:
+                print '==> XCE: apparently no cluster available, so will run',len(compound_list),' sequential jobs on one core of your local machine.'
+                print '==> XCE: this could take a while...'
+#            self.explorer_active=1
+#            self.work_thread=XChemThread.create_png_and_cif_of_compound(self.external_software,
+#                                                                        self.initial_model_directory,
+#                                                                        compound_list)
+#            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+#            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+#            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#            self.work_thread.start()
 
 
 
