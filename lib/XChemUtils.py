@@ -494,7 +494,7 @@ class parse:
         except IndexError:
             pass
 
-        resolution_at_sigma_line=100000000
+        resolution_at_sigma_line_overall_found=False
         for line_number,line in enumerate(open(logfile)):
             if 'Wavelength' in line and len(line.split())==2:
                 self.aimless['DataCollectionWavelength']=line.split()[1]
@@ -525,10 +525,11 @@ class parse:
                 self.aimless['DataProcessingCChalfLow'] = line.split()[5]
                 self.aimless['DataProcessingCChalfHigh'] = line.split()[6]
             if line.startswith('Estimates of resolution limits: overall'):
-                resolution_at_sigma_line=line_number+2
-            if line_number==resolution_at_sigma_line:
-                if len(line.split())==7:
+                resolution_at_sigma_line_overall_found=True
+            if resolution_at_sigma_line_overall_found:
+                if 'from Mn(I/sd)' in line and len(line.split())==7:
                     self.aimless['DataProcessingResolutionHigh15sigma']=line.split()[6][:-1]
+                    resolution_at_sigma_line_overall_found=False
             if line.startswith('Average unit cell:') and len(line.split())==9:
                 tmp = []
                 tmp.append(line.split())
