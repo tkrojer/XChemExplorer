@@ -1382,6 +1382,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                 if not found:
                     tmp.append(index)               # so that if no file passes criterion above
                                                     # or if no reference is given, we still carry over all existing files
+        print 'found',found
         # if none passed Stage 1, carry them over to Stage 2
         print select_stage_one_list
         if select_stage_one_list == [] and tmp != []:
