@@ -2046,7 +2046,6 @@ class XChemExplorer(QtGui.QApplication):
         else:
             start_thread=True
         if start_thread:
-            print 'here2'
             self.work_thread=XChemThread.NEW_read_autoprocessing_results_from_disc(self.visit_list,
                                                                                 self.target,
                                                                                 self.reference_file_list,
@@ -2055,7 +2054,8 @@ class XChemExplorer(QtGui.QApplication):
                                                                                 self.preferences,
                                                                                 self.data_collection_summary_file,
                                                                                 self.initial_model_directory,
-                                                                                rescore_only)
+                                                                                rescore_only,
+                                                                                self.acceptable_low_resolution_limit_for_data)
             self.explorer_active=1
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
