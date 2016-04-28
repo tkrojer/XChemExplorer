@@ -1428,7 +1428,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             select_stage_three_list.append([index,ranking])
                         except ValueError:
                             pass
-        print 'stage 3',select_stage_three_list
         if not select_stage_three_list==[]:
             self.set_best_file_to_true(xtal,'max',select_stage_three_list)
 
@@ -1439,6 +1438,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
             best_file_index=min(input_list,key=lambda x: x[1])[0]
         elif min_max=='max':
             best_file_index=max(input_list,key=lambda x: x[1])[0]
+            print 'bestfile',best_file_index
         for n,entry in enumerate(self.data_collection_dict[xtal]):
             if len(entry)==9 and entry[0]=='logfile':
                 if entry[7]==best_file_index:
