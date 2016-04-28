@@ -1366,7 +1366,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         tmp=[]
         for n,entry in enumerate(self.data_collection_dict[xtal]):
             found=False
-            if len(entry)==9 and entry[0]=='logfile':
+            if entry[0]=='logfile':
                 index=self.data_collection_dict[xtal][n][7]
                 if isinstance(entry[6],dict):
                     try:
@@ -1396,7 +1396,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
             # this may be completely over the top!
             found=False
             for entry in self.data_collection_dict[xtal]:
-                if len(entry)==9 and entry[0]=='logfile':
+                if entry[0]=='logfile':
                     if isinstance(entry[6],dict):
                         try:
                             if float(entry[6]['DataProcessingRmergeLow']) < 0.1 and entry[7]==index:
@@ -1418,7 +1418,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         select_stage_three_list=[]
         for index in select_stage_two_list:
             for entry in self.data_collection_dict[xtal]:
-                if len(entry)>=9 and entry[0]=='logfile':
+                if entry[0]=='logfile':
                     if isinstance(entry[6],dict) and entry[7]==index:
                         try:
                             ranking=float(entry[6]['DataProcessingUniqueReflectionsOverall'])*\
