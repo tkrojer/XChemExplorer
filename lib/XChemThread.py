@@ -878,7 +878,8 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
                     run=entry[2]
                     autoproc=entry[4]
                     db_dict=entry[6]
-                    if str(db_dict['DataCollectionOutcome']).startswith('Failed'):
+                    outcome=self.dataset_outcome_dict[sample]
+                    if outcome.startswith('Failed'):
                         continue
                     self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing all files from data processing to project folder -> '+sample+', visit: '+visit+', run: '+run+', program: '+autoproc)
                     path_to_procdir=db_dict['DataProcessingDirectoryOriginal']
