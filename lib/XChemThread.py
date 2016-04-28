@@ -1322,7 +1322,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                  preferences,
                  data_collection_summary_file,
                  initial_model_directory,
-                 rescore_only):
+                 rescore_only,
+                 acceptable_low_resolution_limit_for_data):
         QtCore.QThread.__init__(self)
         self.visit_list=visit_list
         self.target=target
@@ -1333,6 +1334,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         self.data_collection_summary_file=data_collection_summary_file
         self.initial_model_directory=initial_model_directory
         self.rescore_only=rescore_only
+        self.acceptable_low_resolution_limit_for_data=acceptable_low_resolution_limit_for_data
 
         # - open data source if possible
         # - get sampleID, xtbm
