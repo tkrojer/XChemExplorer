@@ -1484,13 +1484,19 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         else:
             progress_step=1
         progress=0
-
+        print self.selection_mechanism
         for xtal in sorted(self.data_collection_dict):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 2 of 2: selecting "best" aimless logfile ->'+xtal)
-            # overwrite previous selection, i.e. set flag to False
-            for n,entry in enumerate(self.data_collection_dict[xtal]):
-                if entry[0]=='logfile':
-                    self.data_collection_dict[xtal][n][8]=False
+            # overwrite previous selection, only if flag not present
+            overwrite_previous_selection=True
+            for entry in self.data_collection_dict[xtal]:
+                if entry[0]=='user_changed_selection':
+                    overwrite_previous_selection=False
+                    break
+            if overwrite_previous_selection:
+                for n,entry in enumerate(self.data_collection_dict[xtal]):
+                    if entry[0]=='logfile':
+                        self.data_collection_dict[xtal][n][8]=False
             if self.selection_mechanism=='IsigI*Comp*UniqueRefl':
                 self.max_IsigI_Completeness_Reflections(xtal)
             elif self.selection_mechanism=='lowest_Rfree':
