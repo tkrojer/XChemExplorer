@@ -2031,7 +2031,6 @@ class XChemExplorer(QtGui.QApplication):
         self.status_bar.showMessage(message)
 
     def check_for_new_autoprocessing_or_rescore(self,rescore_only):
-        print 'here1'
         start_thread=False
         if rescore_only:
             # first pop up a warning message as this will overwrite all user selections
@@ -2044,6 +2043,8 @@ class XChemExplorer(QtGui.QApplication):
                 start_thread=True
             else:
                 start_thread=False
+        else:
+            start_thread=True
         if start_thread:
             print 'here2'
             self.work_thread=XChemThread.NEW_read_autoprocessing_results_from_disc(self.visit_list,
