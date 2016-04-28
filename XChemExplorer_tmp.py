@@ -2583,7 +2583,7 @@ class XChemExplorer(QtGui.QApplication):
                             pass
             if not logfile_found:
                 db_dict={}
-            print sample,db_dict
+            print xtal,db_dict
             if logfile_found and not too_low_resolution:
                 outcome="success"
             elif logfile_found and too_low_resolution:
