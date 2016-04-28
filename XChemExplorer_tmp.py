@@ -2796,7 +2796,7 @@ class XChemExplorer(QtGui.QApplication):
                 if entry[7]==selected_processing_result:
                     db_dict=entry[6]
                     # update datasource
-                    print db_dict
+#                    print db_dict
                     self.update_data_source(sample,db_dict)
 
         # update Overview table
