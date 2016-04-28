@@ -1369,6 +1369,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
             if entry[0]=='logfile':
                 index=self.data_collection_dict[xtal][n][7]
                 print 'index',index
+                print entry[6]
                 if isinstance(entry[6],dict):
                     try:
                         if isinstance(float(entry[6]['DataProcessingUnitCellVolume']),float):
