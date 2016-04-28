@@ -2312,7 +2312,6 @@ class XChemExplorer(QtGui.QApplication):
                                 # entry[7]==aimless_index, i.e. row number
                                 cell_text=QtGui.QTableWidgetItem()
                                 cell_text.setText(str( db_dict[ header[1] ]  ))
-                                print str( db_dict[ header[1] ]  )
                                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                                 data_collection_table.setItem(entry[7], column, cell_text)
                                 break
@@ -3025,7 +3024,6 @@ class XChemExplorer(QtGui.QApplication):
 
     def update_data_source(self,sample,db_dict):
         data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
-        print db_dict
 #        try:
 #            data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
 #            data_source.update_insert_data_source(sample,db_dict)
