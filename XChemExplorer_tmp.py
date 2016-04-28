@@ -2554,7 +2554,7 @@ class XChemExplorer(QtGui.QApplication):
             self.timer_to_check_for_new_data_collection.stop()
 
     def populate_data_collection_summary_table(self):
-        self.status_bar.showMessage('Building summary table for data processing results')
+        self.status_bar.showMessage('Building summary table for data processing results; be patient this may take a while')
         row = self.data_collection_summary_table.rowCount()
         column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
         new_xtal=False
@@ -2703,6 +2703,11 @@ class XChemExplorer(QtGui.QApplication):
 
         self.data_collection_summary_table.resizeRowsToContents()
         self.data_collection_summary_table.resizeColumnsToContents()
+
+        self.status_bar.showMessage('updating Overview table')
+        self.update_header_and_data_from_datasource()
+        self.populate_and_update_data_source_table()
+
         self.status_bar.showMessage('idle')
 
         self.update_dewar_configuration_tab()
