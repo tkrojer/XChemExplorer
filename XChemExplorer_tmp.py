@@ -2009,7 +2009,7 @@ class XChemExplorer(QtGui.QApplication):
 #        content=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
 #        header=content[0]
 #        data=content[1]
-        self.populate_and_update_data_source_table()
+        elf.populate_and_update_data_source_tableelf.populate_and_update_data_source_table()
 
     def check_status_create_png_of_soaked_compound(self):
         number_of_samples=0
@@ -2707,7 +2707,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.status_bar.showMessage('updating Overview table')
         self.update_header_and_data_from_datasource()
-        self.populate_and_update_data_source_table()
+#        self.populate_and_update_data_source_table()
 
         self.status_bar.showMessage('idle')
 
