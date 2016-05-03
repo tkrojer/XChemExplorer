@@ -1545,7 +1545,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     # need to check this because user may have run this later and otherwise he would need to delete pkl file to pick it up
                                     if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')):
                                         dimple_file=os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')
-                                        print 'b',dimple_file
                                         pdb_info=parse().PDBheader(dimple_file)
                                         db_dict_old=self.data_collection_dict[xtal][n][6]
                                         db_dict_old['DataProcessingPathToDimplePDBfile']=dimple_file
@@ -1559,7 +1558,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             # first check if user ran dimple already manually
                             if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')):
                                 dimple_file=os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')
-                                print 'b',dimple_file
                                 pdb_info=parse().PDBheader(dimple_file)
                                 db_dict['DataProcessingPathToDimplePDBfile']=dimple_file
                                 db_dict['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
@@ -1567,14 +1565,12 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 db_dict['DataProcessingRfree'] = pdb_info['Rfree']
                             elif os.path.isfile(os.path.join(runs,'fast_dp','dimple','final.pdb')):
                                 dimple_file=os.path.join(runs,'fast_dp','dimple','final.pdb')
-                                print 'c',dimple_file
                                 pdb_info=parse().PDBheader(dimple_file)
                                 db_dict['DataProcessingPathToDimplePDBfile']=dimple_file
                                 db_dict['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
                                 db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
                                 db_dict['DataProcessingRfree'] = pdb_info['Rfree']
                             else:
-                                print 'd'
                                 db_dict['DataProcessingPathToDimplePDBfile']=''
                                 db_dict['DataProcessingPathToDimpleMTZfile']=''
                                 db_dict['DataProcessingRcryst']  = '999'
