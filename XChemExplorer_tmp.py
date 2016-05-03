@@ -2800,8 +2800,8 @@ class XChemExplorer(QtGui.QApplication):
                     self.update_data_source(sample,db_dict)
 
         # update Overview table
-        self.update_header_and_data_from_datasource()
-        self.populate_and_update_data_source_table()
+#        self.update_header_and_data_from_datasource()
+#        self.populate_and_update_data_source_table()
 
         # update 'Datasets' table
         column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
