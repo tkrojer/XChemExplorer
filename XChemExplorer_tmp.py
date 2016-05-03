@@ -282,10 +282,9 @@ class XChemExplorer(QtGui.QApplication):
         # @ Update from datasource button ###################################################
         #
 
-        update_from_datasource_button=QtGui.QPushButton("Updae From\nDatasource")
+        update_from_datasource_button=QtGui.QPushButton("Update From\nDatasource")
         update_from_datasource_button.setToolTip(XChemToolTips.update_from_datasource_button_tip())
         update_from_datasource_button.clicked.connect(self.datasource_menu_reload_samples)
-        vboxTask.addWidget(update_from_datasource_button)
 
         #
         # @ Datasets ########################################################################
@@ -1205,6 +1204,7 @@ class XChemExplorer(QtGui.QApplication):
         vbox_main.addWidget(self.main_tab_widget)
 
         hboxTaskFrames=QtGui.QHBoxLayout()
+        hboxTaskFrames.addWidget(update_from_datasource_button)
         hboxTaskFrames.addWidget(frame_dataset_task)
         hboxTaskFrames.addWidget(frame_map_cif_file_task)
         hboxTaskFrames.addWidget(frame_panddas_file_task)
