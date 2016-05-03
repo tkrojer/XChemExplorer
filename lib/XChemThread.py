@@ -885,6 +885,7 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
                     self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing all files from data processing to project folder -> '+sample+', visit: '+visit+', run: '+run+', program: '+autoproc)
                     path_to_procdir=db_dict['DataProcessingDirectoryOriginal']
                     path_to_logfile=db_dict['DataProcessingPathToLogfile']
+                    print 'path to logfile',path_to_logfile
                     path_to_mtzfile=db_dict['DataProcessingPathToMTZfile']
                     mtz_filename=db_dict['DataProcessingMTZfileName']
                     log_filename=db_dict['DataProcessingLOGfileName']
@@ -901,13 +902,11 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
                         os.mkdir(os.path.join(self.initial_model_directory,sample,'autoprocessing',visit+'-'+run+autoproc))
 
                     if path_to_dimple_pdbfile != '':
-                        print 'path to dimple pdb file',path_to_dimple_pdbfile
                         if not os.path.isdir(os.path.join(self.initial_model_directory,sample,'dimple')):
                             os.mkdir(os.path.join(self.initial_model_directory,sample,'dimple'))
                         if not os.path.isdir(os.path.join(self.initial_model_directory,sample,'dimple',visit+'-'+run+autoproc)):
                             os.mkdir(os.path.join(self.initial_model_directory,sample,'dimple',visit+'-'+run+autoproc))
                         dimple_destination=os.path.join(self.initial_model_directory,sample,'dimple',visit+'-'+run+autoproc)
-                        print 'dimple destination',dimple_destination
 
                     if self.processed_data_to_copy=='mtz_log_only':
                         path_to_logfile,path_to_mtzfile,mtz_filename=self.copy_mtz_and_logfiles_only(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename)
