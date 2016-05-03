@@ -221,7 +221,7 @@ class data_source:
         data = cursor.fetchall()
         for n,item in enumerate(data[0]):
             print data
-            db_dict[header[n]]=str(item[0])
+            db_dict[header[n]]=str(item)
         print db_dict
 
 
