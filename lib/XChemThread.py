@@ -999,8 +999,8 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
             # so if we continue refining, then we do so against the correct file
             # think that REFMAC does not tinker with F,SIGF as long as there is no twinning
             if os.path.isfile(sample+'.free.mtz'): os.system('/bin/rm '+sample+'.free.mtz')
-                os.symlink(os.path.join(dimple_destination,'final.mtz'),sample+'.free.mtz')
-                mtzfree=os.path.join(dimple_destination,'final.mtz')
+            os.symlink(os.path.join(dimple_destination,'final.mtz'),sample+'.free.mtz')
+            mtzfree=os.path.join(dimple_destination,'final.mtz')
         return mtzfree
 
 
