@@ -885,8 +885,9 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
                     self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing all files from data processing to project folder -> '+sample+', visit: '+visit+', run: '+run+', program: '+autoproc)
                     path_to_procdir=db_dict['DataProcessingDirectoryOriginal']
                     path_to_logfile=db_dict['DataProcessingPathToLogfile']
-                    print 'path to logfile',path_to_logfile
                     path_to_mtzfile=db_dict['DataProcessingPathToMTZfile']
+                    if path_to_mtzfile=='':     # in case a log file exists, but the job did not produce an mtz file
+                        continue
                     mtz_filename=db_dict['DataProcessingMTZfileName']
                     log_filename=db_dict['DataProcessingLOGfileName']
                     dimple_destination=''
@@ -1456,6 +1457,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     'DataCollectionBeamline':           beamline,
                                     'DataCollectionDate':               timestamp,
                                     'DataProcessingPathToLogfile':      file_name,
+                                    'DataProcessingPathToMTZfile':      '',
                                     'DataProcessingLOGfileName':        file_name[file_name.rfind('/')+1:],
                                     'DataProcessingDirectoryOriginal':  '/'.join(file_name.split('/')[:len(file_name.split('/'))-2])    }
                         # try to find free.mtz file
@@ -1521,6 +1523,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     'DataCollectionBeamline':           beamline,
                                     'DataCollectionDate':               timestamp,
                                     'DataProcessingPathToLogfile':      file_name,
+                                    'DataProcessingPathToMTZfile':      '',
                                     'DataProcessingLOGfileName':        'aimless.log',
                                     'DataProcessingDirectoryOriginal':  os.path.join(runs,'fast_dp')    }
                         if os.path.isfile(os.path.join(runs,'fast_dp','fast_dp.mtz')):
@@ -1576,6 +1579,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     'DataCollectionBeamline':           beamline,
                                     'DataCollectionDate':               timestamp,
                                     'DataProcessingPathToLogfile':      file_name,
+                                    'DataProcessingPathToMTZfile':      '',
                                     'DataProcessingLOGfileName':        'aimless.log',
                                     'DataProcessingDirectoryOriginal':  os.path.join(runs,'autoPROC')   }
                         if os.path.isfile(os.path.join(runs,'autoPROC','ap-run','truncate-unique.mtz')):
