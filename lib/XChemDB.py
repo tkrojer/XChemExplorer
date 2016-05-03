@@ -219,7 +219,7 @@ class data_source:
             header.append(column[0])
         print header
         data = cursor.fetchall()
-        for n,item in enumerate(data):
+        for n,item in enumerate(data[0]):
             print data
             db_dict[header[n]]=str(item[0])
         print db_dict
