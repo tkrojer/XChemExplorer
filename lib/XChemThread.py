@@ -908,7 +908,7 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
                         dimple_destination=os.path.join(self.initial_model_directory,sample,'dimple',visit+'-'+run+autoproc)
 
                     if self.processed_data_to_copy=='mtz_log_only':
-                        path_to_logfile,path_to_mtzfile,mtz_filename=self.copy_mtz_and_logfiles_only(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename)
+                        path_to_logfile,path_to_mtzfile,mtz_filename=self.copy_mtz_and_logfiles_only(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename)
                         db_dict['DataProcessingPathToLogfile']=path_to_logfile
                         db_dict['DataProcessingPathToMTZfile']=path_to_mtzfile
                         self.copy_and_link_selected_dimple_files(dimple_destination,sample,path_to_dimple_mtzfile,path_to_dimple_pdbfile)
@@ -936,7 +936,7 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
                                     db_dict['DataCollectionOutcome']=self.dataset_outcome_dict[sample]
                                     db_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
                                     data_source.update_insert_data_source(sample,db_dict)
-                                    self.link_mtz_log_files_to_sample_directory(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename)
+                                    self.link_mtz_log_files_to_sample_directory(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename,dimple_destination)
                                     break
 
 
@@ -952,17 +952,22 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
     def copy_and_link_selected_dimple_files(self,dimple_destination,sample,path_to_dimple_mtzfile,path_to_dimple_pdbfile):
         # dimple files
         if dimple_destination != '':
-            if os.path.islink(os.path.join(self.initial_model_directory,sample,'refine.mtz')):
-                os.system('/bin/rm '+os.path.join(self.initial_model_directory,sample,'refine.mtz'))
-            if os.path.islink(os.path.join(self.initial_model_directory,sample,'refine.pdb')):
-                os.system('/bin/rm '+os.path.join(self.initial_model_directory,sample,'refine.pdb'))
-            os.system('/bin/cp '+path_to_dimple_mtzfile+' '+dimple_destination)
-            os.system('/bin/cp '+path_to_dimple_pdbfile+' '+dimple_destination)
-            os.symlink(os.path.join(dimple_destination,'final.pdb'),'refine.pdb')
-            os.symlink(os.path.join(dimple_destination,'final.mtz'),'refine.mtz')
+            os.chdir(dimple_destination)
+            if not os.path.isfile('final.pdb'):
+                os.system('/bin/cp '+path_to_dimple_pdbfile+' .')
+            if not os.path.isfile('final.mtz'):
+                os.system('/bin/cp '+path_to_dimple_mtzfile+' .')
+#            if os.path.islink(os.path.join(self.initial_model_directory,sample,'refine.mtz')):
+#                os.system('/bin/rm '+os.path.join(self.initial_model_directory,sample,'refine.mtz'))
+#            if os.path.islink(os.path.join(self.initial_model_directory,sample,'refine.pdb')):
+#                os.system('/bin/rm '+os.path.join(self.initial_model_directory,sample,'refine.pdb'))
+#            os.system('/bin/cp '+path_to_dimple_mtzfile+' '+dimple_destination)
+#            os.system('/bin/cp '+path_to_dimple_pdbfile+' '+dimple_destination)
+#            os.symlink(os.path.join(dimple_destination,'final.pdb'),'refine.pdb')
+#            os.symlink(os.path.join(dimple_destination,'final.mtz'),'refine.mtz')
 
 
-    def link_mtz_log_files_to_sample_directory(self,sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename):
+    def link_mtz_log_files_to_sample_directory(self,sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename,dimple_destination):
         # move up to sample directory and link respective files
         # first remove any old symbolic links
         os.chdir(os.path.join(self.initial_model_directory,sample))
@@ -970,17 +975,47 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
             os.system('/bin/rm '+os.path.join(self.initial_model_directory,sample,sample+'.mtz'))
         if os.path.islink(os.path.join(self.initial_model_directory,sample,sample+'.log')):
             os.system('/bin/rm '+os.path.join(self.initial_model_directory,sample,sample+'.log'))
-#        os.symlink(os.path.join('autoprocessing',visit+'-'+run+autoproc,autoproc,sample+'.mtz'),sample+'.mtz')
-#        os.symlink(os.path.join('autoprocessing',visit+'-'+run+autoproc,autoproc,sample+'.log'),sample+'.log')
-        os.symlink(os.path.join(path_to_mtzfile,mtz_filename),sample+'.mtz')
-        os.symlink(os.path.join(path_to_logfile,log_filename),sample+'.log')
+        # then link new files
+        os.symlink(os.path.join(path_to_mtzfile,sample+'.mtz'),sample+'.mtz')
+        os.symlink(os.path.join(path_to_logfile,sample+'.log'),sample+'.log')
+        if dimple_destination != '':
+            # check if dimple files exist
+            if os.path.isfile(os.path.join(dimple_destination,'final.pdb')):
+                # remove old symbolic links if necessary
+                if os.path.isfile('dimple.pdb'): os.system('/bin/rm dimple.pdb')
+                os.symlink(os.path.join(dimple_destination,'final.pdb'),'dimple.pdb')
+            if os.path.isfile(os.path.join(dimple_destination,'final.mtz')):
+                # remove old symbolic links if necessary
+                if os.path.isfile('dimple.mtz'): os.system('/bin/rm dimple.mtz')
+                os.symlink(os.path.join(dimple_destination,'final.mtz'),'dimple.mtz')
+            # if no refinement was carried out yet, then we also want to link the dimple files to refine.pdb/refine.log
+            # so that we can look at them with the COOT plugin
+            found_previous_refinement=False
+            for dirs in glob.glob('*'):
+                if os.path.isdir(dirs) and dirs.startswith('Refine_'):
+                    found_previous_refinement=True
+                    break
+            if not found_previous_refinement:
+                # first delete possible old symbolic links
+                if os.path.isfile('refine.pdb'): os.system('/bin/rm refine.pdb')
+                os.symlink('dimple.pdb','refine.pdb')
+                if os.path.isfile('refine.mtz'): os.system('/bin/rm refine.mtz')
+                os.symlink('dimple.mtz','refine.mtz')
 
-    def copy_mtz_and_logfiles_only(self,sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename):
+
+    def copy_mtz_and_logfiles_only(self,sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename):
         os.chdir(os.path.join(self.initial_model_directory,sample,'autoprocessing',visit+'-'+run+autoproc))
         # don't do anything if file already exists
         if not os.path.isfile(mtz_filename):
-            os.system('/bin/cp '+path_to_logfile+' .')
             os.system('/bin/cp '+path_to_mtzfile+' .')
+        if not os.path.isfile(log_filename):
+            os.system('/bin/cp '+path_to_logfile+' .')
+        # filenames may be rather long and cryptic, but we link them to <sample>.mtz, <sample>.log;
+        # won't have to worry later what they're called; even though info is stored in pkl file
+        if not os.path.isfile(sample+'.mtz'):
+            os.symlink(mtz_filename,sample+'.mtz')
+        if not os.path.isfile(sample+'.log'):
+            os.symlink(log_filename,sample+'.log')
         # in case the user copied the results from several data processing pipelines and just wants to
         # set the current one
         path_to_logfile=os.path.join('autoprocessing',visit+'-'+run+autoproc)

@@ -279,6 +279,15 @@ class XChemExplorer(QtGui.QApplication):
         self.workflow_widget_dict = {}
 
         #
+        # @ Update from datasource button ###################################################
+        #
+
+        update_from_datasource_button=QtGui.QPushButton("Updae From\nDatasource")
+        update_from_datasource_button.setToolTip(XChemToolTips.update_from_datasource_button_tip())
+        update_from_datasource_button.clicked.connect(self.datasource_menu_reload_samples)
+        vboxTask.addWidget(update_from_datasource_button)
+
+        #
         # @ Datasets ########################################################################
         #
 
