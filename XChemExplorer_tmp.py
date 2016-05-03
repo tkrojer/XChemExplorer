@@ -1506,17 +1506,9 @@ class XChemExplorer(QtGui.QApplication):
                 if entry[0]=='logfile':
                     db_dict=entry[6]
                     print db_dict['DataProcessingPathToMTZfile']
-#                        try:
-#                            if os.path.isfile(db_dict['DataProcessingPathToMTZfile']):
-#                                if text=='Run Dimple if final.pdb cannot be found ' \
-#                                 and not os.path.isfile(db_dict['DataProcessingPathToDimplePDBfile']):
-#                                    job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
-#                                elif text=='Rerun Dimple on Everything':
-#                                    job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
-#                        # thought this is not necessary, because 'logfile' entry in dict is only made if logfile is present
-#                        # however, came across case where autoPROC generated logile and aimless.mtz, but not truncate.mtz
-#                        except KeyError:
-#                            pass
+                    print db_dict['DataProcessingMTZfileName']
+#                    if os.path.isfile(db_dict['DataProcessingPathToMTZfile']):
+#                        job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
 #            if job_list != []:
 #                self.check_before_running_dimple(job_list)
 

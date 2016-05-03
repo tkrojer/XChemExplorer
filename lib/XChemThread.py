@@ -879,7 +879,6 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
             if indexes != []:       # i.e. logfile exists
                 for index in sorted(indexes):
                     selected_processing_result=index.row()
-                    print sample,'selected row',selected_processing_result
 
             for n,entry in enumerate(self.data_collection_dict[sample]):
                 if entry[0]=='logfile':
@@ -919,8 +918,8 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
 
                     if self.processed_data_to_copy=='mtz_log_only':
                         path_to_logfile,path_to_mtzfile,mtz_filename=self.copy_mtz_and_logfiles_only(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename)
-                        db_dict['DataProcessingPathToLogfile']=path_to_logfile
-                        db_dict['DataProcessingPathToMTZfile']=path_to_mtzfile
+                        db_dict['DataProcessingPathToLogfile']=os.path.join(self.initial_model_directory,sample,path_to_logfile)
+                        db_dict['DataProcessingPathToMTZfile']=os.path.join(self.initial_model_directory,sample,path_to_mtzfile)
                         self.copy_and_link_selected_dimple_files(dimple_destination,sample,path_to_dimple_mtzfile,path_to_dimple_pdbfile)
                         db_dict['DataProcessingPathToDimplePDBfile']=dimple_destination
                         db_dict['DataProcessingPathToDimpleMTZfile']=dimple_destination
@@ -936,16 +935,11 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
 
                 # update data source if this is the selected file
                 if entry[7]==selected_processing_result:
-                    print '\n\n\n\n\n\n'
-                    print sample
-                    print '\n\n'
                     db_dict=entry[6]
                     db_dict['DataCollectionOutcome']=self.dataset_outcome_dict[sample]
                     db_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
-#                                    print db_dict
+                    db_dict['RefinementMTZfree']=self.link_mtz_log_files_to_sample_directory(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename,dimple_destination)
                     data_source.update_insert_data_source(sample,db_dict)
-                    self.link_mtz_log_files_to_sample_directory(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename,dimple_destination)
-
 
 
             progress += progress_step
@@ -964,17 +958,10 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
                 os.system('/bin/cp '+path_to_dimple_pdbfile+' .')
             if not os.path.isfile('final.mtz'):
                 os.system('/bin/cp '+path_to_dimple_mtzfile+' .')
-#            if os.path.islink(os.path.join(self.initial_model_directory,sample,'refine.mtz')):
-#                os.system('/bin/rm '+os.path.join(self.initial_model_directory,sample,'refine.mtz'))
-#            if os.path.islink(os.path.join(self.initial_model_directory,sample,'refine.pdb')):
-#                os.system('/bin/rm '+os.path.join(self.initial_model_directory,sample,'refine.pdb'))
-#            os.system('/bin/cp '+path_to_dimple_mtzfile+' '+dimple_destination)
-#            os.system('/bin/cp '+path_to_dimple_pdbfile+' '+dimple_destination)
-#            os.symlink(os.path.join(dimple_destination,'final.pdb'),'refine.pdb')
-#            os.symlink(os.path.join(dimple_destination,'final.mtz'),'refine.mtz')
 
 
     def link_mtz_log_files_to_sample_directory(self,sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename,dimple_destination):
+        mtzfree=''
         # move up to sample directory and link respective files
         # first remove any old symbolic links
         os.chdir(os.path.join(self.initial_model_directory,sample))
@@ -1008,6 +995,13 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
                 os.symlink('dimple.pdb','refine.pdb')
                 if os.path.isfile('refine.mtz'): os.system('/bin/rm refine.mtz')
                 os.symlink('dimple.mtz','refine.mtz')
+            # remove any previous <sample>.free.mtz file, and link new dimple.mtz
+            # so if we continue refining, then we do so against the correct file
+            # think that REFMAC does not tinker with F,SIGF as long as there is no twinning
+            if os.path.isfile(sample+'.free.mtz'): os.system('/bin/rm '+sample+'.free.mtz')
+                os.symlink(os.path.join(dimple_destination,'final.mtz'),sample+'.free.mtz')
+                mtzfree=os.path.join(dimple_destination,'final.mtz')
+        return mtzfree
 
 
     def copy_mtz_and_logfiles_only(self,sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename):
