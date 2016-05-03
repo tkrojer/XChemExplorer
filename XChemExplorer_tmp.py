@@ -2158,7 +2158,9 @@ class XChemExplorer(QtGui.QApplication):
         for key in self.albula_button_dict:
             if self.albula_button_dict[key][0]==self.sender():
                 indexes=self.data_collection_column_three_dict[key][0].selectionModel().selectedRows()
-                print 'selected index',indexes
+                for index in sorted(indexes):
+                    selected_processing_result=index.row()
+                    print 'selected index: ',selected_processing_result
 #                self.show_html_summary_in_firefox(key)
 #                print '==> XCE: starting dials.image_viewer'
 #                self.work_thread=XChemThread.start_dials_image_viewer(self.albula_button_dict[key][1])
@@ -2944,11 +2946,8 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_data_table.setColumnCount(len(self.pandda_column_name))
         self.pandda_analyse_data_table.setRowCount(0)
         if os.path.isfile(os.path.join(self.database_directory,self.data_source_file)):
-            content=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
-            header=content[0]
-            data=content[1]
-            columns_to_show=self.get_columns_to_show(self.pandda_column_name,header)
-            sample_id_column=self.get_columns_to_show(['Sample ID'],header)
+            columns_to_show=self.get_columns_to_show(self.pandda_column_name)
+            sample_id_column=self.get_columns_to_show(['Sample ID'])
             n_rows=0
             for x,row in enumerate(data):
                 if str(row[sample_id_column[0]]).lower() == 'none' or str(row[sample_id_column[0]]).replace(' ','') == '':
