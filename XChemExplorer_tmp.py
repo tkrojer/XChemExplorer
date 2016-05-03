@@ -1470,8 +1470,8 @@ class XChemExplorer(QtGui.QApplication):
                     db_dict=entry[6]
                     if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])):
                         job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
-            if job_list != []:
-                self.check_before_running_dimple(job_list)
+        if job_list != []:
+            self.check_before_running_dimple(job_list)
 
 
     def get_job_list_for_dimple_rerun(self,xtal,job_list,db_dict,entry):
@@ -1505,7 +1505,7 @@ class XChemExplorer(QtGui.QApplication):
 
             job_list.append([   xtal,
                                 visit+'-'+run+autoproc,
-                                db_dict['DataProcessingPathToMTZfile'],
+                                os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName']),
                                 reference_file_pdb,
                                 reference_file_mtz,
                                 reference_file_cif  ])
