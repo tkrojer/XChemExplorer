@@ -2730,7 +2730,7 @@ class XChemExplorer(QtGui.QApplication):
         # 6 -   yellow:   flagged for re-collection
 
         # first find out what is currently in the dewar
-        self.dewar_sample_configuration_dict=self.get_dewar_configuration()
+#        self.dewar_sample_configuration_dict=self.get_dewar_configuration()
 
         occupied_positions=[]
         for puck_position in self.dewar_sample_configuration_dict:
