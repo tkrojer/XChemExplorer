@@ -1738,7 +1738,7 @@ class XChemExplorer(QtGui.QApplication):
         elif instruction=='Run DIMPLE on selected MTZ files':
             all_samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not '';")
             for sample in all_samples_in_db:
-                print str(sample)
+                print str(sample[0])
 
 #            self.explorer_active=1
 #            self.work_thread=XChemThread.read_intial_refinement_results(self.initial_model_directory,
