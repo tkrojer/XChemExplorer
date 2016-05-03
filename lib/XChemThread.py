@@ -872,7 +872,15 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
         # 1. copy files
         progress=0
         self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-        for sample in sorted(self.data_collection_dict):
+            selected_processing_result='n/a'
+            # find out which row was selected in respective data collection table
+            for sample in sorted(self.data_collection_dict):
+                indexes=self.data_collection_column_three_dict[sample][0].selectionModel().selectedRows()
+                if indexes != []:       # i.e. logfile exists
+                    for index in sorted(indexes):
+                        selected_processing_result=index.row()
+                        print sample,'selected row',selected_processing_result
+
             for n,entry in enumerate(self.data_collection_dict[sample]):
                 if entry[0]=='logfile':
                     visit=entry[1]
@@ -926,25 +934,17 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
 #                        self.link_mtz_log_files_to_sample_directory(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename)
 #                        self.copy_and_link_selected_dimple_files(dimple_destination,sample,path_to_dimple_mtzfile,path_to_dimple_pdbfile)
 
-                    # update data source if this is the selected file
-                    indexes=self.data_collection_column_three_dict[sample][0].selectionModel().selectedRows()
-                    if indexes != []:       # i.e. logfile exists
-                        for index in sorted(indexes):
-                            selected_processing_result=index.row()
-                        for entry in self.data_collection_dict[sample]:
-                            if entry[0]=='logfile':
-                                print entry[7],selected_processing_result
-                                if entry[7]==selected_processing_result:
-                                    print '\n\n\n\n\n\n'
-                                    print sample
-                                    print '\n\n'
-                                    db_dict=entry[6]
-                                    db_dict['DataCollectionOutcome']=self.dataset_outcome_dict[sample]
-                                    db_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
+                # update data source if this is the selected file
+                if entry[7]==selected_processing_result:
+                    print '\n\n\n\n\n\n'
+                    print sample
+                    print '\n\n'
+                    db_dict=entry[6]
+                    db_dict['DataCollectionOutcome']=self.dataset_outcome_dict[sample]
+                    db_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
 #                                    print db_dict
-                                    data_source.update_insert_data_source(sample,db_dict)
-                                    self.link_mtz_log_files_to_sample_directory(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename,dimple_destination)
-                                    break
+                    data_source.update_insert_data_source(sample,db_dict)
+                    self.link_mtz_log_files_to_sample_directory(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename,dimple_destination)
 
 
 
