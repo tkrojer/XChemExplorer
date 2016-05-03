@@ -1743,7 +1743,7 @@ class XChemExplorer(QtGui.QApplication):
                                                                                      self.data_source_file),
                                                                         self.allowed_unitcell_difference_percent,
                                                                         self.filename_root,
-                                                                        update_datasource_only)
+                                                                        False)
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
