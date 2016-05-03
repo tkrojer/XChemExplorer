@@ -217,6 +217,7 @@ class data_source:
         cursor.execute("select * from mainTable where CrystalName='%s';" %sampleID)
         for column in cursor.description:
             header.append(column[0])
+        print header
         data = cursor.fetchall()
         for n,item in enumerate(data):
             db_dict[header[n]]=str(item[0])
