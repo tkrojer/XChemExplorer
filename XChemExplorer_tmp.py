@@ -1937,11 +1937,13 @@ class XChemExplorer(QtGui.QApplication):
             diffraction_image=''
             for key in self.albula_button_dict:
                 if self.albula_button_dict[key][0]==self.sender():
-                    self.show_html_summary_in_firefox(key)
-                    print '==> XCE: starting dials.image_viewer'
-                    self.work_thread=XChemThread.start_dials_image_viewer(self.albula_button_dict[key][1])
-                    self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-                    self.work_thread.start()
+                    indexes=self.data_collection_column_three_dict[key][0].selectionModel().selectedRows()
+                    print 'selected index',indexes
+#                    self.show_html_summary_in_firefox(key)
+#                    print '==> XCE: starting dials.image_viewer'
+#                    self.work_thread=XChemThread.start_dials_image_viewer(self.albula_button_dict[key][1])
+#                    self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#                    self.work_thread.start()
 
         elif str(self.sender().text()).startswith("Run PANDDAs"):
 
