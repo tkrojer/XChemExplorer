@@ -220,6 +220,7 @@ class data_source:
         print header
         data = cursor.fetchall()
         for n,item in enumerate(data):
+            print data
             db_dict[header[n]]=str(item[0])
         print db_dict
 
