@@ -1736,7 +1736,19 @@ class XChemExplorer(QtGui.QApplication):
             self.rerun_dimple_on_all_autoprocessing_files()
 
         elif instruction=='Run DIMPLE on selected MTZ files':
-            print 'hallo'
+            self.explorer_active=1
+            self.work_thread=XChemThread.read_intial_refinement_results(self.initial_model_directory,
+                                                                        self.reference_file_list,
+                                                                        os.path.join(self.database_directory,
+                                                                                     self.data_source_file),
+                                                                        self.allowed_unitcell_difference_percent,
+                                                                        self.filename_root,
+                                                                        update_datasource_only)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.connect(self.work_thread, QtCore.SIGNAL("create_initial_model_table"),self.create_initial_model_table)
+            self.work_thread.start()
 
         elif instruction=='Create CIF/PDB/PNG file of soaked compound':
             self.create_cif_pdb_png_files()
@@ -2149,15 +2161,11 @@ class XChemExplorer(QtGui.QApplication):
     def show_html_summary_and_diffraction_image(self):
         for key in self.albula_button_dict:
             if self.albula_button_dict[key][0]==self.sender():
-                indexes=self.data_collection_column_three_dict[key][0].selectionModel().selectedRows()
-                for index in sorted(indexes):
-                    selected_processing_result=index.row()
-                    print 'selected index: ',selected_processing_result
-#                self.show_html_summary_in_firefox(key)
-#                print '==> XCE: starting dials.image_viewer'
-#                self.work_thread=XChemThread.start_dials_image_viewer(self.albula_button_dict[key][1])
-#                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-#                self.work_thread.start()
+                self.show_html_summary_in_firefox(key)
+                print '==> XCE: starting dials.image_viewer'
+                self.work_thread=XChemThread.start_dials_image_viewer(self.albula_button_dict[key][1])
+                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+                self.work_thread.start()
 
 
 
@@ -2395,11 +2403,17 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def create_initial_model_table(self,initial_model_list):
+#        column_list=[]
+#
+#        self.header,self.data=self.db.load_samples_from_data_source()
+#        column_name=self.db.translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
+#
 
         self.initial_model_dimple_dict={}
         self.initial_model_table.setColumnCount(len(initial_model_list[0])-1)
         self.initial_model_table.setRowCount(0)
         self.initial_model_table.setRowCount(len(initial_model_list))
+
 
         for n,line in enumerate(initial_model_list):
             for column,item in enumerate(line[:-1]):
