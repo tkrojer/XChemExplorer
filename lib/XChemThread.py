@@ -872,14 +872,14 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
         # 1. copy files
         progress=0
         self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-            selected_processing_result='n/a'
+        for sample in sorted(self.data_collection_dict):
             # find out which row was selected in respective data collection table
-            for sample in sorted(self.data_collection_dict):
-                indexes=self.data_collection_column_three_dict[sample][0].selectionModel().selectedRows()
-                if indexes != []:       # i.e. logfile exists
-                    for index in sorted(indexes):
-                        selected_processing_result=index.row()
-                        print sample,'selected row',selected_processing_result
+            selected_processing_result='n/a'
+            indexes=self.data_collection_column_three_dict[sample][0].selectionModel().selectedRows()
+            if indexes != []:       # i.e. logfile exists
+                for index in sorted(indexes):
+                    selected_processing_result=index.row()
+                    print sample,'selected row',selected_processing_result
 
             for n,entry in enumerate(self.data_collection_dict[sample]):
                 if entry[0]=='logfile':
