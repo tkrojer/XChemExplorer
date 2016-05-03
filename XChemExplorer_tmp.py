@@ -1933,18 +1933,6 @@ class XChemExplorer(QtGui.QApplication):
         elif self.sender().text()=='Run':
             self.rerun_dimple_on_autoprocessing_files()
 
-        elif str(self.sender().text()).startswith('Show: '):
-            diffraction_image=''
-            for key in self.albula_button_dict:
-                if self.albula_button_dict[key][0]==self.sender():
-                    indexes=self.data_collection_column_three_dict[key][0].selectionModel().selectedRows()
-                    print 'selected index',indexes
-#                    self.show_html_summary_in_firefox(key)
-#                    print '==> XCE: starting dials.image_viewer'
-#                    self.work_thread=XChemThread.start_dials_image_viewer(self.albula_button_dict[key][1])
-#                    self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-#                    self.work_thread.start()
-
         elif str(self.sender().text()).startswith("Run PANDDAs"):
 
             if str(self.pandda_analyse_crystal_from_selection_combobox.currentText())=='use all datasets':
@@ -2164,6 +2152,19 @@ class XChemExplorer(QtGui.QApplication):
 #                    pass
 #                else:
 #                    self.xtalform_dict[name]=[pg,vol,[a,b,c,alpha,beta,gamma],spg]
+
+
+    def show_html_summary_and_diffraction_image(self):
+        for key in self.albula_button_dict:
+            if self.albula_button_dict[key][0]==self.sender():
+                indexes=self.data_collection_column_three_dict[key][0].selectionModel().selectedRows()
+                print 'selected index',indexes
+#                self.show_html_summary_in_firefox(key)
+#                print '==> XCE: starting dials.image_viewer'
+#                self.work_thread=XChemThread.start_dials_image_viewer(self.albula_button_dict[key][1])
+#                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#                self.work_thread.start()
+
 
 
     def need_to_switch_main_tab(self,task_index):
@@ -2674,7 +2675,7 @@ class XChemExplorer(QtGui.QApplication):
                             html_summary=''
                         if new_xtal:
                             start_albula_button=QtGui.QPushButton('Show: \n'+diffraction_image_name)
-                            start_albula_button.clicked.connect(self.button_clicked)
+                            start_albula_button.clicked.connect(self.show_html_summary_and_diffraction_image)
                             self.albula_button_dict[xtal]=[start_albula_button,diffraction_image,html_summary]
                             self.data_collection_summary_table.setCellWidget(current_row,column,start_albula_button)
                         else:
