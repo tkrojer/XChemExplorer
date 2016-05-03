@@ -933,6 +933,7 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
                             selected_processing_result=index.row()
                         for entry in self.data_collection_dict[sample]:
                             if entry[0]=='logfile':
+                                print entry[7],selected_processing_result
                                 if entry[7]==selected_processing_result:
                                     print '\n\n\n\n\n\n'
                                     print sample
@@ -940,7 +941,7 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
                                     db_dict=entry[6]
                                     db_dict['DataCollectionOutcome']=self.dataset_outcome_dict[sample]
                                     db_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
-                                    print db_dict
+#                                    print db_dict
                                     data_source.update_insert_data_source(sample,db_dict)
                                     self.link_mtz_log_files_to_sample_directory(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename,dimple_destination)
                                     break
