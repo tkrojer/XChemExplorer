@@ -208,6 +208,16 @@ class data_source:
         output=cursor.fetchall()
         return output
 
+    def get_db_dict_for_sample(self,sampleID):
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+        cursor.execute("select * from mainTable where CrystalName='%s';" %sampleID)
+        output=cursor.fetchall()
+        for item in output:
+            print output
+
+
+
     def check_if_sample_exists_in_data_source(self,sampleID):
         sample_exists=False
         existing_samples_in_db=self.get_all_samples_in_data_source_as_list()
@@ -472,6 +482,18 @@ class data_source:
                 out_list.append([item,item])
                 continue
             if item.startswith('Show'):
+                out_list.append([item,item])
+                continue
+            if item.startswith('Run\nDimple'):
+                out_list.append([item,item])
+                continue
+            if item.startswith('Reference\nSpaceGroup'):
+                out_list.append([item,item])
+                continue
+            if item.startswith('Difference\nUC Volume (%)'):
+                out_list.append([item,item])
+                continue
+            if item.startswith('Reference File'):
                 out_list.append([item,item])
                 continue
             for entry in self.column_list:

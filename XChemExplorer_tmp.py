@@ -1736,19 +1736,23 @@ class XChemExplorer(QtGui.QApplication):
             self.rerun_dimple_on_all_autoprocessing_files()
 
         elif instruction=='Run DIMPLE on selected MTZ files':
-            self.explorer_active=1
-            self.work_thread=XChemThread.read_intial_refinement_results(self.initial_model_directory,
-                                                                        self.reference_file_list,
-                                                                        os.path.join(self.database_directory,
-                                                                                     self.data_source_file),
-                                                                        self.allowed_unitcell_difference_percent,
-                                                                        self.filename_root,
-                                                                        False)
-            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-            self.connect(self.work_thread, QtCore.SIGNAL("create_initial_model_table"),self.create_initial_model_table)
-            self.work_thread.start()
+            all_samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not '';")
+            for sample in all_samples_in_db:
+                print str(sample)
+
+#            self.explorer_active=1
+#            self.work_thread=XChemThread.read_intial_refinement_results(self.initial_model_directory,
+#                                                                        self.reference_file_list,
+#                                                                        os.path.join(self.database_directory,
+#                                                                                     self.data_source_file),
+#                                                                        self.allowed_unitcell_difference_percent,
+#                                                                        self.filename_root,
+#                                                                        False)
+#            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+#            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+#            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#            self.connect(self.work_thread, QtCore.SIGNAL("create_initial_model_table"),self.create_initial_model_table)
+#            self.work_thread.start()
 
         elif instruction=='Create CIF/PDB/PNG file of soaked compound':
             self.create_cif_pdb_png_files()
@@ -2403,10 +2407,18 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def create_initial_model_table(self,initial_model_list):
-#        column_list=[]
-#
-#        self.header,self.data=self.db.load_samples_from_data_source()
-#        column_name=self.db.translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
+        column_list=[   'Run\nDimple',
+                        'Resolution\n[Mn<I/sig(I)> = 1.5]',
+                        'Dimple\nRcryst',
+                        'Dimple\nRfree',
+                        'DataProcessing\nSpaceGroup',
+                        'Reference\nSpaceGroup',
+                        'Difference\nUC Volume (%)',
+                        'Reference File',
+                        'DataProcessing\nUnitCell'      ]
+
+        self.header,self.data=self.db.load_samples_from_data_source()
+        column_name=self.db.translate_xce_column_list_to_sqlite(column_list)
 #
 
         self.initial_model_dimple_dict={}
