@@ -209,12 +209,18 @@ class data_source:
         return output
 
     def get_db_dict_for_sample(self,sampleID):
+        db_dict={}
+        header=[]
+        data=[]
         connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
         cursor = connect.cursor()
         cursor.execute("select * from mainTable where CrystalName='%s';" %sampleID)
-        output=cursor.fetchall()
-        for item in output:
-            print output
+        for column in cursor.description:
+            header.append(column[0])
+        data = cursor.fetchall()
+        for n,item in enumerate(data):
+            db_dict[header[n]]=str(item[0])
+        print db_dict
 
 
 
