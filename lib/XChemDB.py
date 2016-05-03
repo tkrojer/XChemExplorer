@@ -219,9 +219,12 @@ class data_source:
             header.append(column[0])
         data = cursor.fetchall()
         for n,item in enumerate(data[0]):
-            print item
             db_dict[header[n]]=str(item)
-#        print db_dict
+
+        print '\n\n\n\n'
+        print sampleID
+        print '\n'
+        print db_dict
 
 
 
