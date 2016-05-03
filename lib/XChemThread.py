@@ -935,8 +935,6 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
                                     db_dict=entry[6]
                                     db_dict['DataCollectionOutcome']=self.dataset_outcome_dict[sample]
                                     db_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
-                                    entry[6]=db_dict
-                                    data_dict[sample]=entry
                                     data_source.update_insert_data_source(sample,db_dict)
                                     self.link_mtz_log_files_to_sample_directory(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename)
                                     break
