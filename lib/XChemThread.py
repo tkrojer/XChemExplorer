@@ -842,7 +842,8 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
                       data_collection_dict,
                       database_directory,data_source_file,
                       initial_model_directory,
-                      preferences):
+                      preferences,
+                      data_collection_summary_file):
         QtCore.QThread.__init__(self)
         self.dataset_outcome_dict=dataset_outcome_dict
         self.data_collection_table_dict=data_collection_table_dict
@@ -852,6 +853,7 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
         self.data_source_file=data_source_file
         self.initial_model_directory=initial_model_directory
         self.processed_data_to_copy=preferences['processed_data_to_copy']
+        self.data_collection_summary_file=data_collection_summary_file
 
     def run(self):
 

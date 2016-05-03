@@ -2065,7 +2065,8 @@ class XChemExplorer(QtGui.QApplication):
                                                                              self.data_collection_dict,
                                                                              self.database_directory,self.data_source_file,
                                                                              self.initial_model_directory,
-                                                                             self.preferences)
+                                                                             self.preferences,
+                                                                             self.data_collection_summary_file)
         self.explorer_active=1
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
