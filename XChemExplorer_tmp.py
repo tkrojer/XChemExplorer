@@ -746,6 +746,14 @@ class XChemExplorer(QtGui.QApplication):
         select_sample_for_dimple.setChecked(False)
         select_sample_for_dimple.stateChanged.connect(self.set_run_dimple_flag)
         initial_model_checkbutton_hbox.addWidget(select_sample_for_dimple)
+
+        self.reference_file_list=self.get_reference_file_list(' ')
+        self.reference_file_selection_combobox = QtGui.QComboBox()
+        self.populate_reference_combobox(self.reference_file_selection_combobox)
+        initial_model_checkbutton_hbox.addWidget(self.reference_file_selection_combobox)
+
+
+
         self.tab_dict[self.workflow_dict['Maps']][1].addLayout(initial_model_checkbutton_hbox)
         self.initial_model_vbox_for_table=QtGui.QVBoxLayout()
         self.initial_model_column_name = [  'SampleID',
@@ -775,10 +783,12 @@ class XChemExplorer(QtGui.QApplication):
 #        refresh_inital_model_button=QtGui.QPushButton("Refresh")
 #        refresh_inital_model_button.clicked.connect(self.button_clicked)
 #        initial_model_button_hbox.addWidget(refresh_inital_model_button)
+
 #        self.reference_file_list=self.get_reference_file_list(' ')
 #        self.reference_file_selection_combobox = QtGui.QComboBox()
 #        self.populate_reference_combobox(self.reference_file_selection_combobox)
 #        initial_model_button_hbox.addWidget(self.reference_file_selection_combobox)
+
 #        set_new_reference_button=QtGui.QPushButton("Set New Reference (if applicable)")
 #        set_new_reference_button.clicked.connect(self.button_clicked)
 #        initial_model_button_hbox.addWidget(set_new_reference_button)
@@ -1737,23 +1747,11 @@ class XChemExplorer(QtGui.QApplication):
 
         elif instruction=='Run DIMPLE on selected MTZ files':
             all_samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not '';")
+            dict_for_map_table={}
             for sample in all_samples_in_db:
-                print str(sample[0])
-                self.db.get_db_dict_for_sample(str(sample[0]))
-
-#            self.explorer_active=1
-#            self.work_thread=XChemThread.read_intial_refinement_results(self.initial_model_directory,
-#                                                                        self.reference_file_list,
-#                                                                        os.path.join(self.database_directory,
-#                                                                                     self.data_source_file),
-#                                                                        self.allowed_unitcell_difference_percent,
-#                                                                        self.filename_root,
-#                                                                        False)
-#            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-#            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-#            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-#            self.connect(self.work_thread, QtCore.SIGNAL("create_initial_model_table"),self.create_initial_model_table)
-#            self.work_thread.start()
+                db_dict=self.db.get_db_dict_for_sample(str(sample[0]))
+                dict_for_map_table[sample]=db_dict
+            self.create_initial_model_table(dict_for_map_table)
 
         elif instruction=='Create CIF/PDB/PNG file of soaked compound':
             self.create_cif_pdb_png_files()
@@ -2407,7 +2405,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
 
-    def create_initial_model_table(self,initial_model_list):
+    def create_initial_model_table(self,dict_for_map_table):
         column_list=[   'Run\nDimple',
                         'Resolution\n[Mn<I/sig(I)> = 1.5]',
                         'Dimple\nRcryst',

@@ -220,12 +220,7 @@ class data_source:
         data = cursor.fetchall()
         for n,item in enumerate(data[0]):
             db_dict[header[n]]=str(item)
-
-        print '\n\n\n\n'
-        print sampleID
-        print '\n'
-        print db_dict
-
+        return db_dict
 
 
     def check_if_sample_exists_in_data_source(self,sampleID):
