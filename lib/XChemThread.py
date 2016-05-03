@@ -935,13 +935,13 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
 #                        self.link_mtz_log_files_to_sample_directory(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename)
 #                        self.copy_and_link_selected_dimple_files(dimple_destination,sample,path_to_dimple_mtzfile,path_to_dimple_pdbfile)
 
-                # update data source if this is the selected file
-                if entry[7]==selected_processing_result:
-                    db_dict=entry[6]
-                    db_dict['DataCollectionOutcome']=self.dataset_outcome_dict[sample]
-                    db_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
-                    db_dict['RefinementMTZfree']=self.link_mtz_log_files_to_sample_directory(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename,dimple_destination)
-                    data_source.update_insert_data_source(sample,db_dict)
+                    # update data source if this is the selected file
+                    if entry[7]==selected_processing_result:
+                        db_dict=entry[6]
+                        db_dict['DataCollectionOutcome']=self.dataset_outcome_dict[sample]
+                        db_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
+                        db_dict['RefinementMTZfree']=self.link_mtz_log_files_to_sample_directory(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename,dimple_destination)
+                        data_source.update_insert_data_source(sample,db_dict)
 
 
             progress += progress_step
