@@ -230,11 +230,11 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
 
             if not os.path.isdir(os.path.join(self.initial_model_directory,xtal)):
                 os.mkdir(os.path.join(self.initial_model_directory,xtal))
-            if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple')):
-                os.mkdir(os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple'))
-            if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit_run_autoproc)):
-                os.mkdir(os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit_run_autoproc))
-            os.chdir(os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit_run_autoproc))
+            if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'dimple')):
+                os.mkdir(os.path.join(self.initial_model_directory,xtal,'dimple'))
+            if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc)):
+                os.mkdir(os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc))
+            os.chdir(os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc))
             os.system('touch dimple_run_in_progress')
 
             if self.queueing_system_available:
@@ -258,7 +258,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     '\n'
                     'dimple %s %s %s %s dimple\n' %(mtzin,ref_pdb,ref_mtz,ref_cif) +
                     '\n'
-                    'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit_run_autoproc,'dimple') +
+                    'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc,'dimple') +
                     '\n'
                     'fft hklin final.mtz mapout 2fofc.map << EOF\n'
                     ' labin F1=2FOFCWT PHI=PH2FOFCWT\n'
@@ -267,6 +267,12 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     'fft hklin final.mtz mapout fofc.map << EOF\n'
                     ' labin F1=FOFCWT PHI=PHFOFCWT\n'
                     'EOF\n'
+                    '\n'
+                    'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc) +
+                    'ln -s dimple/final.pdb .\n'
+                    'ln -s dimple/final.mtz .\n'
+                    'ln -s dimple/2fofc.map .\n'
+                    'ln -s dimple/fofc.map .\n'
                     '\n'
                     'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit_run_autoproc) +
                     '\n'
