@@ -2410,6 +2410,7 @@ class XChemExplorer(QtGui.QApplication):
         column_name=self.db.translate_xce_column_list_to_sqlite(self.inital_model_column_list)
 
         for xtal in sorted(dict_for_map_table):
+            db_dict=dict_for_map_table[xtal]
             new_xtal=False
             row=self.initial_model_table.rowCount()
             if xtal not in self.initial_model_dimple_dict:
@@ -2434,6 +2435,18 @@ class XChemExplorer(QtGui.QApplication):
                         run_dimple.toggle()
                         self.initial_model_table.setCellWidget(current_row, column, run_dimple)
                         run_dimple.setChecked(True)
+
+
+                else:
+                    cell_text=QtGui.QTableWidgetItem()
+                    cell_text.setText(str( db_dict[ header[1] ]  ))
+                    cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                    self.initial_model_table.setItem(current_row, column, cell_text)
+
+
+
+
+
 #                    self.initial_model_dimple_dict[line[0]]=run_dimple
 
 
