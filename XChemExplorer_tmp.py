@@ -2421,13 +2421,28 @@ class XChemExplorer(QtGui.QApplication):
         column_name=self.db.translate_xce_column_list_to_sqlite(column_list)
 #
 
-        self.initial_model_dimple_dict={}
         self.initial_model_table.setColumnCount(len(column_list))
-        self.initial_model_table.setRowCount(0)
-        self.initial_model_table.setRowCount(len(dict_for_map_table))
+#        self.initial_model_table.setRowCount(0)
+#        self.initial_model_table.setRowCount(len(dict_for_map_table))
 
-        for column,header in enumerate(column_name):
-            print column,header
+        for xtal in sorted(dict_for_map_table):
+            row=self.initial_model_table.rowCount()
+            if xtal not in self.initial_model_dimple_dict:
+                self.initial_model_table.insertRow(row)
+                current_row=row
+                self.initial_model_dimple_dict[xtal]=[]
+            else:
+                for table_row in range(row):
+                    if self.initial_model_table.item(table_row,0).text() == xtal:
+                        current_row=table_row
+                        break
+            for column,header in enumerate(column_name):
+                if header[0]=='Sample ID':
+                    cell_text=QtGui.QTableWidgetItem()
+                    cell_text.setText(str(xtal))
+                    cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                    self.initial_model_table.setItem(current_row, column, cell_text)
+                print column,header
 
 
 #        for n,line in enumerate(initial_model_list):
