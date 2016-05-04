@@ -2412,7 +2412,7 @@ class XChemExplorer(QtGui.QApplication):
             if reference[5]==db_dict['DataProcessingPointGroup']:
                 try:
                     difference=math.fabs(1-(float(db_dict['DataProcessingUnitCellVolume'])/float(reference[4])))
-                    suitable_reference.append([reference[0],difference])
+                    suitable_reference.append([reference,difference])
                 except ValueError:
                     continue
         if suitable_reference != []:
