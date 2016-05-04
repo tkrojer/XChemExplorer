@@ -2408,17 +2408,15 @@ class XChemExplorer(QtGui.QApplication):
 
         self.header,self.data=self.db.load_samples_from_data_source()
         column_name=self.db.translate_xce_column_list_to_sqlite(self.inital_model_column_list)
-#
-
-#        self.initial_model_table.setRowCount(0)
-#        self.initial_model_table.setRowCount(len(dict_for_map_table))
 
         for xtal in sorted(dict_for_map_table):
+            new_xtal=False
             row=self.initial_model_table.rowCount()
             if xtal not in self.initial_model_dimple_dict:
                 self.initial_model_table.insertRow(row)
                 current_row=row
                 self.initial_model_dimple_dict[xtal]=[]
+                new_xtal=True
             else:
                 for table_row in range(row):
                     if self.initial_model_table.item(table_row,0).text() == xtal:
@@ -2430,7 +2428,13 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text.setText(str(xtal))
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                     self.initial_model_table.setItem(current_row, column, cell_text)
-                print column,header
+                elif header[0]=='Run\nDimple':
+                    if new_xtal:
+                        run_dimple = QtGui.QCheckBox()
+                        run_dimple.toggle()
+                        self.initial_model_table.setCellWidget(current_row, column, run_dimple)
+                        run_dimple.setChecked(True)
+#                    self.initial_model_dimple_dict[line[0]]=run_dimple
 
 
 #        for n,line in enumerate(initial_model_list):
