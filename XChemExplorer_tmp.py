@@ -1750,7 +1750,7 @@ class XChemExplorer(QtGui.QApplication):
             dict_for_map_table={}
             for sample in all_samples_in_db:
                 db_dict=self.db.get_db_dict_for_sample(str(sample[0]))
-                dict_for_map_table[sample]=db_dict
+                dict_for_map_table[str(sample[0])]=db_dict
             self.create_initial_model_table(dict_for_map_table)
 
         elif instruction=='Create CIF/PDB/PNG file of soaked compound':
