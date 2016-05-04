@@ -752,25 +752,24 @@ class XChemExplorer(QtGui.QApplication):
         self.populate_reference_combobox(self.reference_file_selection_combobox)
         initial_model_checkbutton_hbox.addWidget(self.reference_file_selection_combobox)
 
-
-
         self.tab_dict[self.workflow_dict['Maps']][1].addLayout(initial_model_checkbutton_hbox)
         self.initial_model_vbox_for_table=QtGui.QVBoxLayout()
-        self.initial_model_column_name = [  'SampleID',
-                                            'Run\nDimple',
-                                            'Resolution',
-                                            'Rcryst',
-                                            'Rfree',
-                                            'Space Group\nautoprocessing',
-                                            'Space Group\nreference',
-                                            'Difference\nUnit Cell Volume (%)',
-                                            'Reference File',
-                                            'Unit Cell\nautoprocessing',
-                                            'Unit Cell\nreference'  ]
+        self.inital_model_column_list=[   'Sample ID',
+                        'Run\nDimple',
+                        'Resolution\n[Mn<I/sig(I)> = 1.5]',
+                        'Dimple\nRcryst',
+                        'Dimple\nRfree',
+                        'DataProcessing\nSpaceGroup',
+                        'Reference\nSpaceGroup',
+                        'Difference\nUC Volume (%)',
+                        'Reference File',
+                        'DataProcessing\nUnitCell'      ]
+
         self.initial_model_table=QtGui.QTableWidget()
         self.initial_model_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.initial_model_table.setSortingEnabled(True)
-        self.initial_model_table.setHorizontalHeaderLabels(self.initial_model_column_name)
+        self.initial_model_table.setColumnCount(len(self.inital_model_column_list))
+        self.initial_model_table.setHorizontalHeaderLabels(self.inital_model_column_list)
         self.initial_model_vbox_for_table.addWidget(self.initial_model_table)
         self.tab_dict[self.workflow_dict['Maps']][1].addLayout(self.initial_model_vbox_for_table)
 #        initial_model_button_hbox=QtGui.QHBoxLayout()
@@ -2406,22 +2405,11 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def create_initial_model_table(self,dict_for_map_table):
-        column_list=[   'Sample ID',
-                        'Run\nDimple',
-                        'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                        'Dimple\nRcryst',
-                        'Dimple\nRfree',
-                        'DataProcessing\nSpaceGroup',
-                        'Reference\nSpaceGroup',
-                        'Difference\nUC Volume (%)',
-                        'Reference File',
-                        'DataProcessing\nUnitCell'      ]
 
         self.header,self.data=self.db.load_samples_from_data_source()
-        column_name=self.db.translate_xce_column_list_to_sqlite(column_list)
+        column_name=self.db.translate_xce_column_list_to_sqlite(self.inital_model_column_list)
 #
 
-        self.initial_model_table.setColumnCount(len(column_list))
 #        self.initial_model_table.setRowCount(0)
 #        self.initial_model_table.setRowCount(len(dict_for_map_table))
 
@@ -2474,7 +2462,6 @@ class XChemExplorer(QtGui.QApplication):
 ##                initial_model_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
 #        self.initial_model_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
 #        self.initial_model_table.resizeColumnsToContents()
-#        self.initial_model_table.setHorizontalHeaderLabels(self.initial_model_column_name)
 
     def pandda_analyse_crystal_from_selection_combobox_changed(self,i):
         crystal_form = self.pandda_analyse_crystal_from_selection_combobox.currentText()
