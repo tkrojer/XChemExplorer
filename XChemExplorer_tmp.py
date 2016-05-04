@@ -2403,6 +2403,22 @@ class XChemExplorer(QtGui.QApplication):
         self.crystal_form_table.setHorizontalHeaderLabels(self.crystal_form_column_name)
 
 
+    def find_suitable_reference_file(self,db_dict):
+        reference_file=''
+        self.status_bar.showMessage('checking: '+str(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])))
+        suitable_reference=[]
+        for reference in self.reference_file_list:
+            # first we need one in the same pointgroup
+            if reference[5]==db_dict['DataProcessingPointGroup']:
+                try:
+                    difference=math.fabs(1-(float(db_dict['DataProcessingUnitCellVolume'])/float(reference[4])))
+                    suitable_reference.append([reference[0],difference])
+                except ValueError:
+                    continue
+        if suitable_reference != []:
+            reference_file=min(suitable_reference,key=lambda x: x[1])
+        return reference_file
+
 
     def create_initial_model_table(self,dict_for_map_table):
 
@@ -2411,41 +2427,44 @@ class XChemExplorer(QtGui.QApplication):
 
         for xtal in sorted(dict_for_map_table):
             db_dict=dict_for_map_table[xtal]
-            new_xtal=False
-            row=self.initial_model_table.rowCount()
-            if xtal not in self.initial_model_dimple_dict:
-                self.initial_model_table.insertRow(row)
-                current_row=row
-                self.initial_model_dimple_dict[xtal]=[]
-                new_xtal=True
-            else:
-                for table_row in range(row):
-                    if self.initial_model_table.item(table_row,0).text() == xtal:
-                        current_row=table_row
-                        break
-            for column,header in enumerate(column_name):
-                if header[0]=='Sample ID':
-                    cell_text=QtGui.QTableWidgetItem()
-                    cell_text.setText(str(xtal))
-                    cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                    self.initial_model_table.setItem(current_row, column, cell_text)
-                elif header[0]=='Run\nDimple':
-                    if new_xtal:
-                        run_dimple = QtGui.QCheckBox()
-                        run_dimple.toggle()
-                        self.initial_model_table.setCellWidget(current_row, column, run_dimple)
-                        run_dimple.setChecked(True)
-                elif header[0]=='Reference\nSpaceGroup':
-                    continue
-                elif header[0]=='Difference\nUC Volume (%)':
-                    continue
-                elif header[0]=='Reference File':
-                    continue
+            if str(db_dict['DataCollectionOutcome']).lower().startswith('success'):
+                reference_file=self.find_suitable_reference_file(db_dict)
+                print reference_file
+                new_xtal=False
+                row=self.initial_model_table.rowCount()
+                if xtal not in self.initial_model_dimple_dict:
+                    self.initial_model_table.insertRow(row)
+                    current_row=row
+                    self.initial_model_dimple_dict[xtal]=[]
+                    new_xtal=True
                 else:
-                    cell_text=QtGui.QTableWidgetItem()
-                    cell_text.setText(str( db_dict[ header[1] ]  ))
-                    cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                    self.initial_model_table.setItem(current_row, column, cell_text)
+                    for table_row in range(row):
+                        if self.initial_model_table.item(table_row,0).text() == xtal:
+                            current_row=table_row
+                            break
+                for column,header in enumerate(column_name):
+                    if header[0]=='Sample ID':
+                        cell_text=QtGui.QTableWidgetItem()
+                        cell_text.setText(str(xtal))
+                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                        self.initial_model_table.setItem(current_row, column, cell_text)
+                    elif header[0]=='Run\nDimple':
+                        if new_xtal:
+                            run_dimple = QtGui.QCheckBox()
+                            run_dimple.toggle()
+                            self.initial_model_table.setCellWidget(current_row, column, run_dimple)
+                            run_dimple.setChecked(True)
+                    elif header[0]=='Reference\nSpaceGroup':
+                        continue
+                    elif header[0]=='Difference\nUC Volume (%)':
+                        continue
+                    elif header[0]=='Reference File':
+                        continue
+                    else:
+                        cell_text=QtGui.QTableWidgetItem()
+                        cell_text.setText(str( db_dict[ header[1] ]  ))
+                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                        self.initial_model_table.setItem(current_row, column, cell_text)
 
 
 
