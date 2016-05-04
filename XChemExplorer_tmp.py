@@ -2465,7 +2465,7 @@ class XChemExplorer(QtGui.QApplication):
                     elif header[0]=='Difference\nUC Volume (%)':
                         cell_text=QtGui.QTableWidgetItem()
                         if reference_file != []:
-                            cell_text.setText(str( reference_file[1]  ))
+                            cell_text.setText(str( round(float(reference_file[1]),1)  ))
                         else:
                             cell_text.setText('')
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
