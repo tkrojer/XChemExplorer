@@ -2406,7 +2406,8 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def create_initial_model_table(self,dict_for_map_table):
-        column_list=[   'Run\nDimple',
+        column_list=[   'Sample ID',
+                        'Run\nDimple',
                         'Resolution\n[Mn<I/sig(I)> = 1.5]',
                         'Dimple\nRcryst',
                         'Dimple\nRfree',
@@ -2421,41 +2422,44 @@ class XChemExplorer(QtGui.QApplication):
 #
 
         self.initial_model_dimple_dict={}
-        self.initial_model_table.setColumnCount(len(initial_model_list[0])-1)
+        self.initial_model_table.setColumnCount(len(column_list))
         self.initial_model_table.setRowCount(0)
-        self.initial_model_table.setRowCount(len(initial_model_list))
+        self.initial_model_table.setRowCount(len(dict_for_map_table))
+
+        for column,header in enumerate(column_name):
+            print column,header
 
 
-        for n,line in enumerate(initial_model_list):
-            for column,item in enumerate(line[:-1]):
-                if column==1:
-                    run_dimple = QtGui.QCheckBox()
-                    run_dimple.toggle()
-                    self.initial_model_table.setCellWidget(n, column, run_dimple)
-                    run_dimple.setChecked(line[1])
-#                    self.initial_model_dimple_dict[line[0]]=run_dimple
-                elif column==8:
-                    # don't need to connect, because only the displayed text will be read out
-                    reference_file_selection_combobox = QtGui.QComboBox()
-#                    for reference_file in self.reference_file_list:
-#                        reference_file_selection_combobox.addItem(reference_file[0])
-                    self.populate_reference_combobox(reference_file_selection_combobox)
-                    self.initial_model_table.setCellWidget(n, column, reference_file_selection_combobox)
-                    index = reference_file_selection_combobox.findText(str(line[8]), QtCore.Qt.MatchFixedString)
-                    reference_file_selection_combobox.setCurrentIndex(index)
-                else:
-                    cell_text=QtGui.QTableWidgetItem()
-                    cell_text.setText(str(item))
-                    cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                    self.initial_model_table.setItem(n, column, cell_text)
-            self.initial_model_dimple_dict[line[0]]=[run_dimple,reference_file_selection_combobox]
-#                r=item
-#                g=item
-#                b=item
-#                initial_model_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
-        self.initial_model_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        self.initial_model_table.resizeColumnsToContents()
-        self.initial_model_table.setHorizontalHeaderLabels(self.initial_model_column_name)
+#        for n,line in enumerate(initial_model_list):
+#            for column,item in enumerate(line[:-1]):
+#                if column==1:
+#                    run_dimple = QtGui.QCheckBox()
+#                    run_dimple.toggle()
+#                    self.initial_model_table.setCellWidget(n, column, run_dimple)
+#                    run_dimple.setChecked(line[1])
+##                    self.initial_model_dimple_dict[line[0]]=run_dimple
+#                elif column==8:
+#                    # don't need to connect, because only the displayed text will be read out
+#                    reference_file_selection_combobox = QtGui.QComboBox()
+##                    for reference_file in self.reference_file_list:
+##                        reference_file_selection_combobox.addItem(reference_file[0])
+#                    self.populate_reference_combobox(reference_file_selection_combobox)
+#                    self.initial_model_table.setCellWidget(n, column, reference_file_selection_combobox)
+#                    index = reference_file_selection_combobox.findText(str(line[8]), QtCore.Qt.MatchFixedString)
+#                    reference_file_selection_combobox.setCurrentIndex(index)
+#                else:
+#                    cell_text=QtGui.QTableWidgetItem()
+#                    cell_text.setText(str(item))
+#                    cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+#                    self.initial_model_table.setItem(n, column, cell_text)
+#            self.initial_model_dimple_dict[line[0]]=[run_dimple,reference_file_selection_combobox]
+##                r=item
+##                g=item
+##                b=item
+##                initial_model_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
+#        self.initial_model_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+#        self.initial_model_table.resizeColumnsToContents()
+#        self.initial_model_table.setHorizontalHeaderLabels(self.initial_model_column_name)
 
     def pandda_analyse_crystal_from_selection_combobox_changed(self,i):
         crystal_form = self.pandda_analyse_crystal_from_selection_combobox.currentText()
