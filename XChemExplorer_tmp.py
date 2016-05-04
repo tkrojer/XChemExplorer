@@ -2966,7 +2966,7 @@ class XChemExplorer(QtGui.QApplication):
             columns_to_show=self.get_columns_to_show(self.pandda_column_name)
             sample_id_column=self.get_columns_to_show(['Sample ID'])
             n_rows=0
-            for x,row in enumerate(data):
+            for x,row in enumerate(self.data):
                 if str(row[sample_id_column[0]]).lower() == 'none' or str(row[sample_id_column[0]]).replace(' ','') == '':
                     continue        # do not show rows where sampleID is null
                 for y,item in enumerate(columns_to_show):
@@ -2978,7 +2978,7 @@ class XChemExplorer(QtGui.QApplication):
             self.pandda_analyse_data_table.setRowCount(n_rows)
 
             x=0
-            for row in data:
+            for row in self.data:
                 if str(row[sample_id_column[0]]).lower() == 'none' or str(row[sample_id_column[0]]).replace(' ','') == '':
                     continue        # do not show rows where sampleID is null
                 sample_id_exists=False
