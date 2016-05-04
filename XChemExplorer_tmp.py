@@ -2435,8 +2435,12 @@ class XChemExplorer(QtGui.QApplication):
                         run_dimple.toggle()
                         self.initial_model_table.setCellWidget(current_row, column, run_dimple)
                         run_dimple.setChecked(True)
-
-
+                elif header[0]=='Reference\nSpaceGroup':
+                    continue
+                elif header[0]=='Difference\nUC Volume (%)':
+                    continue
+                elif header[0]=='Reference File':
+                    continue
                 else:
                     cell_text=QtGui.QTableWidgetItem()
                     cell_text.setText(str( db_dict[ header[1] ]  ))
