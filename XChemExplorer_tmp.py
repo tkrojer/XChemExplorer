@@ -923,7 +923,7 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('Use Specific Crystal Form Only'))
         self.pandda_analyse_crystal_from_selection_combobox = QtGui.QComboBox()
         self.pandda_analyse_crystal_from_selection_combobox.currentIndexChanged.connect(self.pandda_analyse_crystal_from_selection_combobox_changed)
-        self.update_pandda_crystal_from_combobox()
+#        self.update_pandda_crystal_from_combobox()
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_analyse_crystal_from_selection_combobox)
 
         self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('\n\n\nExpert Parameters (need rarely changing):\n'))
