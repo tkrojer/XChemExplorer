@@ -2455,9 +2455,21 @@ class XChemExplorer(QtGui.QApplication):
                             self.initial_model_table.setCellWidget(current_row, column, run_dimple)
                             run_dimple.setChecked(True)
                     elif header[0]=='Reference\nSpaceGroup':
-                        continue
+                        cell_text=QtGui.QTableWidgetItem()
+                        if reference_file != []:
+                            cell_text.setText(str( reference_file[0][1]  ))
+                        else:
+                            cell_text.setText('')
+                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                        self.initial_model_table.setItem(current_row, column, cell_text)
                     elif header[0]=='Difference\nUC Volume (%)':
-                        continue
+                        cell_text=QtGui.QTableWidgetItem()
+                        if reference_file != []:
+                            cell_text.setText(str( reference_file[1]  ))
+                        else:
+                            cell_text.setText('')
+                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                        self.initial_model_table.setItem(current_row, column, cell_text)
                     elif header[0]=='Reference File':
                         reference_file_selection_combobox = QtGui.QComboBox()
 #                    for reference_file in self.reference_file_list:
