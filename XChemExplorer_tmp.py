@@ -2472,8 +2472,6 @@ class XChemExplorer(QtGui.QApplication):
                         self.initial_model_table.setItem(current_row, column, cell_text)
                     elif header[0]=='Reference File':
                         reference_file_selection_combobox = QtGui.QComboBox()
-#                    for reference_file in self.reference_file_list:
-#                        reference_file_selection_combobox.addItem(reference_file[0])
                         self.populate_reference_combobox(reference_file_selection_combobox)
                         self.initial_model_table.setCellWidget(current_row, column, reference_file_selection_combobox)
                         index = reference_file_selection_combobox.findText(str(reference_file[0][0]), QtCore.Qt.MatchFixedString)
