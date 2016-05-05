@@ -1226,6 +1226,7 @@ class XChemExplorer(QtGui.QApplication):
         self.window.setLayout(vbox_main)
 
         if self.data_source_set:
+            self.get_reference_file_list(' ')
             self.update_all_tables()
 
         self.status_bar.showMessage('Ready')
@@ -1388,7 +1389,6 @@ class XChemExplorer(QtGui.QApplication):
                         self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
                         self.data_source_set=True
                         self.update_header_and_data_from_datasource()
-                        self.update_all_tables()
 #                        self.populate_and_update_data_source_table()
 #                        self.create_initial_model_table()
 #                else:
@@ -1416,6 +1416,9 @@ class XChemExplorer(QtGui.QApplication):
             self.adjust_allowed_unit_cell_difference.setText(str(self.allowed_unitcell_difference_percent))
             self.adjust_acceptable_low_resolution_limit.setText(str(self.acceptable_low_resolution_limit_for_data))
             self.reference_file_list=self.get_reference_file_list(' ')
+
+            if self.data_source_set:
+                self.update_all_tables()
 
 
         except KeyError:
@@ -1615,7 +1618,6 @@ class XChemExplorer(QtGui.QApplication):
                 self.data_source_set=True
                 self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
                 self.update_header_and_data_from_datasource()
-                self.update_all_tables()
 #                self.populate_and_update_data_source_table()
 #                self.create_initial_model_table()
         if self.sender().text()=='Select Data Collection Directory':
@@ -1665,6 +1667,9 @@ class XChemExplorer(QtGui.QApplication):
             self.pandda_initial_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_initial.html')
             self.pandda_analyse_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_analyse.html')
             self.pandda_inspect_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_inspect.html')
+
+        if self.data_source_set:
+            self.update_all_tables()
 
 
 
