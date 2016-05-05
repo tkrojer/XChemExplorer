@@ -22,6 +22,6 @@ if __name__=='__main__':
 #    db=XChemDB.data_source(db_file)
     if os.path.isfile(os.path.join(inital_model_directory,xtal,'dimple.pdb')):
         print os.path.join(inital_model_directory,xtal,'dimple.pdb')
-        pdb=parse().PDBheader(os.path.join(self.initial_model_directory,sample,'refine.pdb'))
+        pdb=parse().PDBheader(os.path.join(inital_model_directory,xtal,'dimple.pdb'))
         print pdb['Rcryst']
         print pdb['Rfree']
