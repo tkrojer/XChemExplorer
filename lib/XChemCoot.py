@@ -54,6 +54,14 @@ class GUI(object):
                                         'Show Confirmed Ligands':           "RefinementOutcome='Ligand Confirmed'",
                                         'SHow Final Structures':            "RefinementOutcome='Structure Finished'"   }
 
+        self.selection_criteria = [     '0 – All Datasets',
+                                        '1 - Analysis Pending',
+                                        '2 – PANDDA Model',
+                                        '3 – In Refinement',
+                                        '4 - Ligand Confirmed',
+                                        '5 – Ready for Proofreading',
+                                        '6 – Structure Finished'        ]
+
         self.ligand_confidence = [  'Ligand Confidence: Analysis Pending',
                                     'Ligand Confidence: 0 - no ligand present',
                                     'Ligand Confidence: 1 - low confidence',
@@ -512,10 +520,11 @@ class GUI(object):
         self.RefmacParams=self.Refine.RefinementParams(self.RefmacParams)
 
     def set_selection_mode(self,widget):
-        for criteria in self.selection_criteria:
-            if criteria==widget.get_active_text():
-                self.selection_mode=self.selection_criteria[criteria]
-                break
+        self.selection_mode=widget.get_active_text()
+#        for criteria in self.selection_criteria:
+#            if criteria==widget.get_active_text():
+#                self.selection_mode=self.selection_criteria[criteria]
+#                break
 
     def set_ligand_confidence(self,widget):
         self.ligand_confidence_of_sample=widget.get_active_text().replace('Ligand Confidence: ','')

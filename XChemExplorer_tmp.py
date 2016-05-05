@@ -132,6 +132,7 @@ class XChemExplorer(QtGui.QApplication):
         self.dataset_outcome_combobox_dict={}
         self.data_collection_dict={}
         self.xtal_db_dict={}
+        self.pandda_analyse_input_table_dict={}
         self.dewar_configuration_dict={}
         self.data_collection_statistics_dict={}
         self.initial_model_dimple_dict={}       # contains toggle button if dimple should be run
@@ -858,8 +859,8 @@ class XChemExplorer(QtGui.QApplication):
 
         # left hand side: table with information about available datasets
         self.pandda_column_name = [ 'Sample ID',
-                                    'Crystal Form\nName',
-                                    'Dimple\nResolution High',
+                                    'Refinement\nSpace Group',
+                                    'Resolution\n[Mn<I/sig(I)> = 1.5]',
                                     'Dimple\nRcryst',
                                     'Dimple\nRfree' ]
         self.pandda_analyse_data_table=QtGui.QTableWidget()
@@ -1563,6 +1564,7 @@ class XChemExplorer(QtGui.QApplication):
         self.reference_file_list=self.get_reference_file_list(' ')
         self.populate_and_update_data_source_table()
         self.create_initial_model_table()
+        self.populate_pandda_analyse_input_table()
 
 
     def settings_button_clicked(self):
@@ -1729,9 +1731,7 @@ class XChemExplorer(QtGui.QApplication):
             self.check_for_new_autoprocessing_or_rescore(True)
 
         elif instruction=="Read PKL file":
-            print '==> XCE: unpickling ',self.data_collection_summary_file,'...'
             summary = pickle.load( open( self.data_collection_summary_file, "rb") )
-            print '==> XCE: done!'
             self.create_widgets_for_autoprocessing_results_only(summary)
 
         elif instruction=='Run DIMPLE on All Autoprocessing MTZ files':
@@ -1746,6 +1746,8 @@ class XChemExplorer(QtGui.QApplication):
         elif instruction=='pandda.analyse':
             self.run_pandda_analyse()
 
+        elif instruction=='pandda.inspect':
+            self.run_pandda_inspect()
 
 #        elif instruction=="Check for inital Refinement" or \
 #             instruction=="Update\nDatasource":
@@ -2088,10 +2090,17 @@ class XChemExplorer(QtGui.QApplication):
                 'pdb_style':            str(self.pandda_pdb_style_entry.text()),
                 'mtz_style':            str(self.pandda_mtz_style_entry.text())
                         }
-        print pandda_params
         self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
+
+    def run_pandda_inspect(self):
+        self.settings['panddas_directory']=str(self.pandda_output_data_dir_entry.text())
+        print '==> XCE: starting pandda.inspect'
+        self.work_thread=XChemThread.start_pandda_inspect(self.settings)
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.work_thread.start()
+
 
 
     def create_cif_pdb_png_files(self):
@@ -2386,14 +2395,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def create_initial_model_table(self):
-#        all_samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not '';")
-#        dict_for_map_table={}
-#        for sample in all_samples_in_db:
-#            db_dict=self.db.get_db_dict_for_sample(str(sample[0]))
-#            dict_for_map_table[str(sample[0])]=db_dict
-
         self.update_header_and_data_from_datasource()
-#        self.header,self.data=self.db.load_samples_from_data_source()
         column_name=self.db.translate_xce_column_list_to_sqlite(self.inital_model_column_list)
 
         for xtal in sorted(self.xtal_db_dict):
@@ -2952,7 +2954,38 @@ class XChemExplorer(QtGui.QApplication):
         self.summary_table.setHorizontalHeaderLabels(self.summary_column_name)
 
 
-    def populate_pandda_analyse_input_table(self,crystal_form):
+    def populate_pandda_analyse_input_table(self):
+        self.update_header_and_data_from_datasource()
+        column_name=self.db.translate_xce_column_list_to_sqlite(self.pandda_column_name)
+        for xtal in sorted(self.xtal_db_dict):
+            new_xtal=False
+            db_dict=self.xtal_db_dict[xtal]
+            if os.path.isfile(db_dict['DimplePathToPDB']):
+                row=self.pandda_analyse_data_table.rowCount()
+                if xtal not in self.pandda_analyse_input_table_dict:
+                    self.pandda_analyse_data_table.insertRow()
+                    current_row=row
+                    new_xtal=True
+                else:
+                    for table_row in range(row):
+                        if self.pandda_analyse_data_table.item(table_row,0).text() == xtal:
+                            current_row=table_row
+                            break
+                for column,header in enumerate(column_name):
+                    if header[0]=='Sample ID':
+                        cell_text=QtGui.QTableWidgetItem()
+                        cell_text.setText(str(xtal))
+                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                        self.pandda_analyse_data_table.setItem(current_row, column, cell_text)
+                    else:
+                        cell_text=QtGui.QTableWidgetItem()
+                        cell_text.setText(str( db_dict[ header[1] ]  ))
+                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                        self.pandda_analyse_data_table.setItem(current_row, column, cell_text)
+            if new_xtal:
+                self.pandda_analyse_input_table_dict[xtal]=[]
+
+
         # load samples from datasource
         # show:
         # - sample ID

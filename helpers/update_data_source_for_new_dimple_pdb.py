@@ -18,6 +18,8 @@ if __name__=='__main__':
         pdb=parse().PDBheader(os.path.join(inital_model_directory,xtal,'dimple.pdb'))
         db_dict['DimpleRcryst']=pdb['Rcryst']
         db_dict['DimpleRfree']=pdb['Rfree']
+        db_dict['RefinementOutcome']='1 - Analysis Pending'
+        db_dict['RefinementSpaceGroup']=pdb['SpaceGroup']
         if os.path.isfile(os.path.join(inital_model_directory,xtal,'dimple','dimple_rerun_on_selected_file','dimple','prepared2.mtz')):
             os.chdir(os.path.join(inital_model_directory,xtal))
             if os.path.isfile(xtal+'.free.mtz'):

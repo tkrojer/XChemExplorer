@@ -148,6 +148,7 @@ class data_source:
 
             ['RefinementRcryst',                     'Refinement\nRcryst',                        'TEXT'],
             ['RefinementRfree',                      'Refinement\nRfree',                         'TEXT'],
+            ['RefinementSpaceGroup',                      'Refinement\nSpace Group',                         'TEXT'],
             ['RefinementLigandCC',                   'RefinementLigandCC',                      'TEXT'],
             ['RefinementRmsdBonds',                  'RefinementRmsdBonds',                     'TEXT'],
             ['RefinementRmsdAngles',                 'RefinementRmsdAngles',                    'TEXT'],
