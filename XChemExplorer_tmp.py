@@ -1502,10 +1502,15 @@ class XChemExplorer(QtGui.QApplication):
             self.check_before_running_dimple(job_list)
 
     def run_dimple_on_selected_autoprocessing_file(self):
+        job_list=[]
         for xtal in sorted(self.initial_model_dimple_dict):
             db_dict=self.xtal_db_dict[xtal]
             if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])):
                 print os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])
+                entry=['','dimple_rerun_on_selected_file','','','']
+                job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
+        if job_list != []:
+            self.check_before_running_dimple(job_list)
 
 
     def get_job_list_for_dimple_rerun(self,xtal,job_list,db_dict,entry):
