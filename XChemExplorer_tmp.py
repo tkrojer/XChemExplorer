@@ -1503,7 +1503,9 @@ class XChemExplorer(QtGui.QApplication):
 
     def run_dimple_on_selected_autoprocessing_file(self):
         for xtal in sorted(self.initial_model_dimple_dict):
-            print xtal,self.initial_model_dimple_dict[xtal][0].isChecked(),str(self.initial_model_dimple_dict[xtal][1].currentText())
+            db_dict=self.xtal_db_dict[xtal]
+            if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])):
+                print os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])
 
 
     def get_job_list_for_dimple_rerun(self,xtal,job_list,db_dict,entry):
