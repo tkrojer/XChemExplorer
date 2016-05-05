@@ -772,6 +772,10 @@ class XChemExplorer(QtGui.QApplication):
         self.initial_model_table.setHorizontalHeaderLabels(self.inital_model_column_list)
         self.initial_model_vbox_for_table.addWidget(self.initial_model_table)
         self.tab_dict[self.workflow_dict['Maps']][1].addLayout(self.initial_model_vbox_for_table)
+        if self.data_source_set:
+            self.create_initial_model_table()
+
+
 #        initial_model_button_hbox=QtGui.QHBoxLayout()
 #        get_initial_model_button=QtGui.QPushButton("Check for inital Refinement")
 #        get_initial_model_button.clicked.connect(self.button_clicked)
@@ -1745,12 +1749,7 @@ class XChemExplorer(QtGui.QApplication):
             self.rerun_dimple_on_all_autoprocessing_files()
 
         elif instruction=='Run DIMPLE on selected MTZ files':
-            all_samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not '';")
-            dict_for_map_table={}
-            for sample in all_samples_in_db:
-                db_dict=self.db.get_db_dict_for_sample(str(sample[0]))
-                dict_for_map_table[str(sample[0])]=db_dict
-            self.create_initial_model_table(dict_for_map_table)
+            self.create_initial_model_table()
 
         elif instruction=='Create CIF/PDB/PNG file of soaked compound':
             self.create_cif_pdb_png_files()
@@ -2420,7 +2419,12 @@ class XChemExplorer(QtGui.QApplication):
         return reference_file
 
 
-    def create_initial_model_table(self,dict_for_map_table):
+    def create_initial_model_table(self):
+        all_samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not '';")
+        dict_for_map_table={}
+        for sample in all_samples_in_db:
+            db_dict=self.db.get_db_dict_for_sample(str(sample[0]))
+            dict_for_map_table[str(sample[0])]=db_dict
 
         self.header,self.data=self.db.load_samples_from_data_source()
         column_name=self.db.translate_xce_column_list_to_sqlite(self.inital_model_column_list)
@@ -2485,39 +2489,6 @@ class XChemExplorer(QtGui.QApplication):
 
 
 
-
-#                    self.initial_model_dimple_dict[line[0]]=run_dimple
-
-
-#        for n,line in enumerate(initial_model_list):
-#            for column,item in enumerate(line[:-1]):
-#                if column==1:
-#                    run_dimple = QtGui.QCheckBox()
-#                    run_dimple.toggle()
-#                    self.initial_model_table.setCellWidget(n, column, run_dimple)
-#                    run_dimple.setChecked(line[1])
-##                    self.initial_model_dimple_dict[line[0]]=run_dimple
-#                elif column==8:
-#                    # don't need to connect, because only the displayed text will be read out
-#                    reference_file_selection_combobox = QtGui.QComboBox()
-##                    for reference_file in self.reference_file_list:
-##                        reference_file_selection_combobox.addItem(reference_file[0])
-#                    self.populate_reference_combobox(reference_file_selection_combobox)
-#                    self.initial_model_table.setCellWidget(n, column, reference_file_selection_combobox)
-#                    index = reference_file_selection_combobox.findText(str(line[8]), QtCore.Qt.MatchFixedString)
-#                    reference_file_selection_combobox.setCurrentIndex(index)
-#                else:
-#                    cell_text=QtGui.QTableWidgetItem()
-#                    cell_text.setText(str(item))
-#                    cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-#                    self.initial_model_table.setItem(n, column, cell_text)
-#            self.initial_model_dimple_dict[line[0]]=[run_dimple,reference_file_selection_combobox]
-##                r=item
-##                g=item
-##                b=item
-##                initial_model_table.item(n,column).setBackground(QtGui.QColor(r,g,b))
-#        self.initial_model_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-#        self.initial_model_table.resizeColumnsToContents()
 
     def pandda_analyse_crystal_from_selection_combobox_changed(self,i):
         crystal_form = self.pandda_analyse_crystal_from_selection_combobox.currentText()
