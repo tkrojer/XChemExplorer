@@ -181,11 +181,13 @@ class crystal_from(QtCore.QThread):
 
 
 class create_png_and_cif_of_compound(QtCore.QThread):
-    def __init__(self,external_software,initial_model_directory,compound_list):
+    def __init__(self,external_software,initial_model_directory,compound_list,database_directory,data_source_file):
         QtCore.QThread.__init__(self)
         self.external_software=external_software
         self.initial_model_directory=initial_model_directory
         self.compound_list=compound_list
+        self.database_directory=database_directory
+        self.data_source_file=data_source_file
 
     def run(self):
         progress_step=100/float(len(self.compound_list))
@@ -197,7 +199,7 @@ class create_png_and_cif_of_compound(QtCore.QThread):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'creating cif/png -> '+sampleID)
             if compoundID=='' or compoundID==None:
                 compoundID='compound'
-            helpers().make_png(self.initial_model_directory,sampleID,compoundID,smiles,self.external_software['qsub'])
+            helpers().make_png(self.initial_model_directory,sampleID,compoundID,smiles,self.external_software['qsub'],self.database_directory,self.data_source_file)
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
         self.emit(QtCore.SIGNAL("finished()"))

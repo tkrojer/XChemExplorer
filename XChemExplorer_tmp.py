@@ -996,43 +996,6 @@ class XChemExplorer(QtGui.QApplication):
         ######################################################################################
 
 
-#        ######################################################################################
-#        # Crystal Form Tab
-#        self.vbox_for_crystal_form_table=QtGui.QVBoxLayout()
-##        self.vbox_for_crystal_form_table.addStretch(1)
-#        self.crystal_form_column_name=[ 'Crystal Form\nName',
-#                                        'Space\nGroup',
-#                                        'Point\nGroup',
-#                                        'a',
-#                                        'b',
-#                                        'c',
-#                                        'alpha',
-#                                        'beta',
-#                                        'gamma',
-#                                        'Crystal Form\nVolume'  ]
-#        self.crystal_form_table=QtGui.QTableWidget()
-#        self.crystal_form_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-#        self.crystal_form_table.setSortingEnabled(True)
-#        self.crystal_form_table.setHorizontalHeaderLabels(self.crystal_form_column_name)
-#        self.vbox_for_crystal_form_table.addWidget(self.crystal_form_table)
-#        self.tab_dict['Crystal Form'][1].addLayout(self.vbox_for_crystal_form_table)
-#
-##        self.vbox_for_crystal_form_table.addStretch(1)
-#
-#        crystal_form_button_hbox=QtGui.QHBoxLayout()
-#        load_all_crystal_form_button=QtGui.QPushButton("Load Crystal Forms From Datasource")
-#        load_all_crystal_form_button.clicked.connect(self.button_clicked)
-#        crystal_form_button_hbox.addWidget(load_all_crystal_form_button)
-#        suggest_crystal_form_button=QtGui.QPushButton("Suggest Additional Crystal Forms")
-#        suggest_crystal_form_button.clicked.connect(self.button_clicked)
-#        crystal_form_button_hbox.addWidget(suggest_crystal_form_button)
-#        assign_crystal_form_button=QtGui.QPushButton("Assign Crystal Forms To Samples")
-#        assign_crystal_form_button.clicked.connect(self.button_clicked)
-#        crystal_form_button_hbox.addWidget(assign_crystal_form_button)
-#        self.tab_dict['Crystal Form'][1].addLayout(crystal_form_button_hbox)
-
-
-        ######################################################################################
 
 
         #
@@ -2126,60 +2089,19 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 print '==> XCE: apparently no cluster available, so will run',len(compound_list),' sequential jobs on one core of your local machine.'
                 print '==> XCE: this could take a while...'
-#            self.explorer_active=1
-#            self.work_thread=XChemThread.create_png_and_cif_of_compound(self.external_software,
-#                                                                        self.initial_model_directory,
-#                                                                        compound_list)
-#            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-#            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-#            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-#            self.work_thread.start()
+            self.explorer_active=1
+            self.work_thread=XChemThread.create_png_and_cif_of_compound(self.external_software,
+                                                                        self.initial_model_directory,
+                                                                        compound_list,
+                                                                        self.database_directory,
+                                                                        self.data_source_file)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.work_thread.start()
 
 
 
-
-
-#    def load_crystal_form_from_datasource(self):
-#        columns = ( 'CrystalFormName,'
-#                    'CrystalFormPointGroup,'
-#                    'CrystalFormVolume,'
-#                    'CrystalFormA,'
-#                    'CrystalFormB,'
-#                    'CrystalFormC,'
-#                    'CrystalFormAlpha,'
-#                    'CrystalFormBeta,'
-#                    'CrystalFormGamma,'
-#                    'CrystalFormSpaceGroup' )
-#        self.xtalform_dict={}
-#        all_xtalforms=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).execute_statement("SELECT "+columns+" FROM mainTable;")
-#        for item in all_xtalforms:
-#            name=item[0]
-#            pg=item[1]
-#            vol=item[2]
-#            a=item[3]
-#            b=item[4]
-#            c=item[5]
-#            alpha=item[6]
-#            beta=item[7]
-#            gamma=item[8]
-#            spg=item[9]
-#            add_crystalform=True
-#            for xf in self.xtalform_dict:
-#                if self.xtalform_dict[xf][0]==pg:      # same pointgroup as reference
-#                    try:
-#                        unitcell_difference=round((math.fabs(float(vol)-float(self.xtalform_dict[xf][1]))/float(vol))*100,1)
-#                    except (ValueError,TypeError):
-#                        unitcell_difference=100
-#                    if unitcell_difference < self.allowed_unitcell_difference_percent:      # suggest new crystal form
-#                        add_crystalform=False
-#                        break
-#            if add_crystalform:
-#                if str(name)=='None':
-#                    pass
-#                elif str(name)=='':
-#                    pass
-#                else:
-#                    self.xtalform_dict[name]=[pg,vol,[a,b,c,alpha,beta,gamma],spg]
 
 
     def show_html_summary_and_diffraction_image(self):

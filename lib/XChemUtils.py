@@ -195,7 +195,7 @@ class helpers:
     def pil_rdkit_exist(self):
         return self.pil_rdkit_present
 
-    def make_png(self,initial_model_directory,sample,compoundID,smiles,queueing_system_available):
+    def make_png(self,initial_model_directory,sample,compoundID,smiles,queueing_system_available,database_directory,data_source_file):
 
         if not os.path.isdir(os.path.join(initial_model_directory,sample)):
             os.mkdir(os.path.join(initial_model_directory,sample))
@@ -232,6 +232,8 @@ class helpers:
                 Cmds = (
                     '#!'+os.getenv('SHELL')+'\n'
                     '\n'
+                    'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
+                    '\n'
                     'cd '+os.path.join(initial_model_directory,sample,'compound')+'\n'
                     '\n'
                     'acedrg --res LIG -i "%s" -o %s\n' %(smiles,compoundID.replace(' ',''))+
@@ -241,6 +243,10 @@ class helpers:
                     'ln -s compound/%s.cif .\n' %compoundID.replace(' ','')+
                     'ln -s compound/%s.pdb .\n' %compoundID.replace(' ','')+
                     'ln -s compound/%s.png .\n' %compoundID.replace(' ','')+
+                    '\n'
+                    '$CCP4/libexec/python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_for_new_cif_files.py')+
+                    ' %s %s %s %s\n' %(os.path.join(self.database_directory,self.data_source_file),xtal,self.initial_model_directory),compoundID.replace(' ','')  )+
+                    '\n'
                     '/bin/rm compound/ACEDRG_IN_PROGRESS\n'
                 )
                 f = open('acedrg.sh','w')

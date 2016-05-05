@@ -25,5 +25,4 @@ if __name__=='__main__':
             os.symlink(os.path.join('dimple','dimple_rerun_on_selected_file','dimple','prepared2.mtz'),xtal+'.free.mtz')
             db_dict['RefinementMTZfree']=xtal+'.free.mtz'
         print '==> xce: updating data source after DIMPLE run'
-        print db_dict
         db.update_data_source(xtal,db_dict)
