@@ -2486,7 +2486,7 @@ class XChemExplorer(QtGui.QApplication):
                     elif header[0]=='Reference File':
                         if new_xtal:
                             reference_file_selection_combobox = QtGui.QComboBox()
-                            if reference_file != []
+                            if reference_file != []:
                                 self.populate_reference_combobox(reference_file_selection_combobox)
                                 index = reference_file_selection_combobox.findText(str(reference_file[0][0]), QtCore.Qt.MatchFixedString)
                                 reference_file_selection_combobox.setCurrentIndex(index)
