@@ -522,6 +522,7 @@ class XChemExplorer(QtGui.QApplication):
         self.mounted_crystal_table.resizeColumnsToContents()
         self.overview_tab_dict['Data Source'][1].addWidget(self.mounted_crystal_table)
         if self.data_source_set:
+            print 'here'
             self.populate_and_update_data_source_table()
 
 #        self.mounted_crystals_vbox_for_table.addWidget(self.mounted_crystal_table)
