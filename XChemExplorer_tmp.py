@@ -2426,16 +2426,14 @@ class XChemExplorer(QtGui.QApplication):
         column_name=self.db.translate_xce_column_list_to_sqlite(self.inital_model_column_list)
 
         for xtal in sorted(dict_for_map_table):
+            new_xtal=False
             db_dict=dict_for_map_table[xtal]
             if str(db_dict['DataCollectionOutcome']).lower().startswith('success'):
                 reference_file=self.find_suitable_reference_file(db_dict)
-                print reference_file
-                new_xtal=False
                 row=self.initial_model_table.rowCount()
                 if xtal not in self.initial_model_dimple_dict:
                     self.initial_model_table.insertRow(row)
                     current_row=row
-                    self.initial_model_dimple_dict[xtal]=[]
                     new_xtal=True
                 else:
                     for table_row in range(row):
@@ -2444,7 +2442,8 @@ class XChemExplorer(QtGui.QApplication):
                             break
                 for column,header in enumerate(column_name):
                     if header[0]=='Sample ID':
-                        cell_text=QtGui.QTableWidgetItem()
+                        if new_xtal:
+                            cell_text=QtGui.QTableWidgetItem()
                         cell_text.setText(str(xtal))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.initial_model_table.setItem(current_row, column, cell_text)
@@ -2455,7 +2454,8 @@ class XChemExplorer(QtGui.QApplication):
                             self.initial_model_table.setCellWidget(current_row, column, run_dimple)
                             run_dimple.setChecked(True)
                     elif header[0]=='Reference\nSpaceGroup':
-                        cell_text=QtGui.QTableWidgetItem()
+                        if new_xtal:
+                            cell_text=QtGui.QTableWidgetItem()
                         if reference_file != []:
                             cell_text.setText(str( reference_file[0][1]  ))
                         else:
@@ -2463,7 +2463,8 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.initial_model_table.setItem(current_row, column, cell_text)
                     elif header[0]=='Difference\nUC Volume (%)':
-                        cell_text=QtGui.QTableWidgetItem()
+                        if new_xtal:
+                            cell_text=QtGui.QTableWidgetItem()
                         if reference_file != []:
                             cell_text.setText(str( round(float(reference_file[1]),1)  ))
                         else:
@@ -2471,17 +2472,20 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.initial_model_table.setItem(current_row, column, cell_text)
                     elif header[0]=='Reference File':
-                        reference_file_selection_combobox = QtGui.QComboBox()
+                        if new_xtal:
+                            reference_file_selection_combobox = QtGui.QComboBox()
                         self.populate_reference_combobox(reference_file_selection_combobox)
                         self.initial_model_table.setCellWidget(current_row, column, reference_file_selection_combobox)
                         index = reference_file_selection_combobox.findText(str(reference_file[0][0]), QtCore.Qt.MatchFixedString)
                         reference_file_selection_combobox.setCurrentIndex(index)
                     else:
-                        cell_text=QtGui.QTableWidgetItem()
+                        if new_xtal:
+                            cell_text=QtGui.QTableWidgetItem()
                         cell_text.setText(str( db_dict[ header[1] ]  ))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.initial_model_table.setItem(current_row, column, cell_text)
-
+            if new_xtal:
+                self.initial_model_dimple_dict[xtal]=[run_dimple,reference_file_selection_combobox]
 
 
 
