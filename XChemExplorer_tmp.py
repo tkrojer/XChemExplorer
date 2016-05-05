@@ -1584,7 +1584,7 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_mtz_style_entry.setText(mtzin)
 
     def update_all_tables(self):
-        self.update_reference_files(' ')
+        self.reference_file_list=self.get_reference_file_list(' ')
         self.populate_and_update_data_source_table()
         self.create_initial_model_table()
 
