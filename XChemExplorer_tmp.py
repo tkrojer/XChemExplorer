@@ -1539,7 +1539,9 @@ class XChemExplorer(QtGui.QApplication):
             self.work_thread=XChemThread.run_dimple_on_all_autoprocessing_files(    job_list,
                                                                                     self.initial_model_directory,
                                                                                     self.external_software,
-                                                                                    self.ccp4_scratch_directory )
+                                                                                    self.ccp4_scratch_directory,
+                                                                                    self.database_directory,
+                                                                                    self.data_source_file)
             self.explorer_active=1
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)

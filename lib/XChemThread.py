@@ -204,12 +204,14 @@ class create_png_and_cif_of_compound(QtCore.QThread):
 
 
 class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
-    def __init__(self,sample_list,initial_model_directory,external_software,ccp4_scratch_directory):
+    def __init__(self,sample_list,initial_model_directory,external_software,ccp4_scratch_directory,database_directory,data_source_file):
         QtCore.QThread.__init__(self)
         self.sample_list=sample_list
         self.initial_model_directory=initial_model_directory
         self.queueing_system_available=external_software['qsub']
         self.ccp4_scratch_directory=ccp4_scratch_directory
+        self.database_directory=database_directory
+        self.data_source_file=data_source_file
     def run(self):
         progress_step=1
         if len(self.sample_list) != 0:
