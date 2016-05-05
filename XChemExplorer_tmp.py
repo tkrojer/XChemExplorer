@@ -2962,7 +2962,7 @@ class XChemExplorer(QtGui.QApplication):
             if os.path.isfile(db_dict['DimplePathToPDB']):
                 row=self.pandda_analyse_data_table.rowCount()
                 if xtal not in self.pandda_analyse_input_table_dict:
-                    self.pandda_analyse_data_table.insertRow()
+                    self.pandda_analyse_data_table.insertRow(row)
                     current_row=row
                     new_xtal=True
                 else:
