@@ -1433,21 +1433,21 @@ class XChemExplorer(QtGui.QApplication):
     def update_reference_files(self,reference_root):
         self.reference_file_list=self.get_reference_file_list(reference_root)
         self.populate_reference_combobox(self.reference_file_selection_combobox)
-        if self.initial_model_dimple_dict != {}:
-            self.explorer_active=1
-            update_datasource_only=False
-            self.work_thread=XChemThread.read_intial_refinement_results(self.initial_model_directory,
-                                                                        self.reference_file_list,
-                                                                        os.path.join(self.database_directory,
-                                                                                     self.data_source_file),
-                                                                        self.allowed_unitcell_difference_percent,
-                                                                        self.filename_root,
-                                                                        update_datasource_only  )
-            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-            self.connect(self.work_thread, QtCore.SIGNAL("create_initial_model_table"),self.create_initial_model_table)
-            self.work_thread.start()
+#        if self.initial_model_dimple_dict != {}:
+#            self.explorer_active=1
+#            update_datasource_only=False
+#            self.work_thread=XChemThread.read_intial_refinement_results(self.initial_model_directory,
+#                                                                        self.reference_file_list,
+#                                                                        os.path.join(self.database_directory,
+#                                                                                     self.data_source_file),
+#                                                                        self.allowed_unitcell_difference_percent,
+#                                                                        self.filename_root,
+#                                                                        update_datasource_only  )
+#            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+#            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+#            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#            self.connect(self.work_thread, QtCore.SIGNAL("create_initial_model_table"),self.create_initial_model_table)
+#            self.work_thread.start()
 
     def target_selection_combobox_activated(self,text):
         self.target=str(text)
