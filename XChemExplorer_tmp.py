@@ -2414,7 +2414,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def find_suitable_reference_file(self,db_dict):
-        reference_file=''
+        reference_file=[]
         self.status_bar.showMessage('checking: '+str(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])))
         suitable_reference=[]
         for reference in self.reference_file_list:
@@ -2468,7 +2468,6 @@ class XChemExplorer(QtGui.QApplication):
                             self.initial_model_table.setCellWidget(current_row, column, run_dimple)
                             run_dimple.setChecked(True)
                     elif header[0]=='Reference\nSpaceGroup':
-                        print 'ref',reference_file
                         cell_text=QtGui.QTableWidgetItem()
                         if reference_file != []:
                             cell_text.setText(str( reference_file[0][1]  ))
