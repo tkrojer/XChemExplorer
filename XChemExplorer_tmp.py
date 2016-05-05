@@ -55,7 +55,8 @@ class XChemExplorer(QtGui.QApplication):
                 self.data_source_set=True
                 self.db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
                 self.db.create_missing_columns()
-                self.header,self.data=self.db.load_samples_from_data_source()
+                self.update_header_and_data_from_datasource()
+#                self.header,self.data=self.db.load_samples_from_data_source()
 #                XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).create_missing_columns()
             self.ccp4_scratch_directory=os.path.join(self.labxchem_directory,'processing','tmp')
 
@@ -130,6 +131,7 @@ class XChemExplorer(QtGui.QApplication):
         self.target=''
         self.dataset_outcome_combobox_dict={}
         self.data_collection_dict={}
+        self.xtal_db_dict={}
         self.dewar_configuration_dict={}
         self.data_collection_statistics_dict={}
         self.initial_model_dimple_dict={}       # contains toggle button if dimple should be run
@@ -1284,6 +1286,13 @@ class XChemExplorer(QtGui.QApplication):
         self.db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
         self.db.create_missing_columns()
         self.header,self.data=self.db.load_samples_from_data_source()
+        all_samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not '';")
+        self.xtal_db_dict={}
+        for sample in all_samples_in_db:
+            db_dict=self.db.get_db_dict_for_sample(str(sample[0]))
+            self.xtal_db_dict[str(sample[0])]=db_dict
+
+        
 
 
     def datasource_menu_reload_samples(self):
@@ -1493,8 +1502,9 @@ class XChemExplorer(QtGui.QApplication):
             self.check_before_running_dimple(job_list)
 
     def run_dimple_on_selected_autoprocessing_file(self):
-        for xtal in self.initial_model_dimple_dict:
+        for xtal in sorted(self.initial_model_dimple_dict):
             print xtal,self.initial_model_dimple_dict[xtal][0].isChecked(),str(self.initial_model_dimple_dict[xtal][1].currentText())
+
 
     def get_job_list_for_dimple_rerun(self,xtal,job_list,db_dict,entry):
         self.status_bar.showMessage('checking: '+str(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])))
@@ -2439,18 +2449,19 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def create_initial_model_table(self):
-        all_samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not '';")
-        dict_for_map_table={}
-        for sample in all_samples_in_db:
-            db_dict=self.db.get_db_dict_for_sample(str(sample[0]))
-            dict_for_map_table[str(sample[0])]=db_dict
+#        all_samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not '';")
+#        dict_for_map_table={}
+#        for sample in all_samples_in_db:
+#            db_dict=self.db.get_db_dict_for_sample(str(sample[0]))
+#            dict_for_map_table[str(sample[0])]=db_dict
 
-        self.header,self.data=self.db.load_samples_from_data_source()
+        self.update_header_and_data_from_datasource()
+#        self.header,self.data=self.db.load_samples_from_data_source()
         column_name=self.db.translate_xce_column_list_to_sqlite(self.inital_model_column_list)
 
-        for xtal in sorted(dict_for_map_table):
+        for xtal in sorted(self.xtal_db_dict):
             new_xtal=False
-            db_dict=dict_for_map_table[xtal]
+            db_dict=self.xtal_db_dict[xtal]
             if str(db_dict['DataCollectionOutcome']).lower().startswith('success'):
                 reference_file=self.find_suitable_reference_file(db_dict)
                 row=self.initial_model_table.rowCount()
