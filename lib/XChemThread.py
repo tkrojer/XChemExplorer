@@ -641,6 +641,7 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
                         db_dict['DataCollectionOutcome']=self.dataset_outcome_dict[sample]
                         db_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
                         db_dict['RefinementMTZfree'],db_dict['DimpleRcryst'],db_dict['DimpleRfree'] =self.link_mtz_log_files_to_sample_directory(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename,dimple_destination)
+                        print db_dict['RefinementMTZfree'],db_dict['DimpleRcryst'],db_dict['DimpleRfree']
                         data_source.update_insert_data_source(sample,db_dict)
 
 

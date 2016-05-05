@@ -2442,8 +2442,7 @@ class XChemExplorer(QtGui.QApplication):
                             break
                 for column,header in enumerate(column_name):
                     if header[0]=='Sample ID':
-                        if new_xtal:
-                            cell_text=QtGui.QTableWidgetItem()
+                        cell_text=QtGui.QTableWidgetItem()
                         cell_text.setText(str(xtal))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.initial_model_table.setItem(current_row, column, cell_text)
@@ -2454,8 +2453,7 @@ class XChemExplorer(QtGui.QApplication):
                             self.initial_model_table.setCellWidget(current_row, column, run_dimple)
                             run_dimple.setChecked(True)
                     elif header[0]=='Reference\nSpaceGroup':
-                        if new_xtal:
-                            cell_text=QtGui.QTableWidgetItem()
+                        cell_text=QtGui.QTableWidgetItem()
                         if reference_file != []:
                             cell_text.setText(str( reference_file[0][1]  ))
                         else:
@@ -2463,8 +2461,7 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.initial_model_table.setItem(current_row, column, cell_text)
                     elif header[0]=='Difference\nUC Volume (%)':
-                        if new_xtal:
-                            cell_text=QtGui.QTableWidgetItem()
+                        cell_text=QtGui.QTableWidgetItem()
                         if reference_file != []:
                             cell_text.setText(str( round(float(reference_file[1]),1)  ))
                         else:
@@ -2479,8 +2476,7 @@ class XChemExplorer(QtGui.QApplication):
                         index = reference_file_selection_combobox.findText(str(reference_file[0][0]), QtCore.Qt.MatchFixedString)
                         reference_file_selection_combobox.setCurrentIndex(index)
                     else:
-                        if new_xtal:
-                            cell_text=QtGui.QTableWidgetItem()
+                        cell_text=QtGui.QTableWidgetItem()
                         cell_text.setText(str( db_dict[ header[1] ]  ))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.initial_model_table.setItem(current_row, column, cell_text)
