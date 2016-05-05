@@ -866,7 +866,7 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_data_table=QtGui.QTableWidget()
         self.pandda_analyse_data_table.setSortingEnabled(True)
         self.pandda_analyse_data_table.resizeColumnsToContents()
-        self.populate_pandda_analyse_input_table('use all datasets')
+        self.populate_pandda_analyse_input_table()
         self.pandda_analyse_hbox.addWidget(self.pandda_analyse_data_table)
 
         # right hand side: input parameters for PANDDAs run
