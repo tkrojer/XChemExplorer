@@ -1442,24 +1442,11 @@ class XChemExplorer(QtGui.QApplication):
             file_name=file_name+'.conf'
         pickle.dump(self.settings,open(file_name,'wb'))
 
+
     def update_reference_files(self,reference_root):
         self.reference_file_list=self.get_reference_file_list(reference_root)
         self.populate_reference_combobox(self.reference_file_selection_combobox)
-#        if self.initial_model_dimple_dict != {}:
-#            self.explorer_active=1
-#            update_datasource_only=False
-#            self.work_thread=XChemThread.read_intial_refinement_results(self.initial_model_directory,
-#                                                                        self.reference_file_list,
-#                                                                        os.path.join(self.database_directory,
-#                                                                                     self.data_source_file),
-#                                                                        self.allowed_unitcell_difference_percent,
-#                                                                        self.filename_root,
-#                                                                        update_datasource_only  )
-#            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-#            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-#            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-#            self.connect(self.work_thread, QtCore.SIGNAL("create_initial_model_table"),self.create_initial_model_table)
-#            self.work_thread.start()
+
 
     def target_selection_combobox_activated(self,text):
         self.target=str(text)
@@ -1480,10 +1467,33 @@ class XChemExplorer(QtGui.QApplication):
     def run_dimple_on_selected_autoprocessing_file(self):
         job_list=[]
         for xtal in sorted(self.initial_model_dimple_dict):
-            db_dict=self.xtal_db_dict[xtal]
-            if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])):
-                entry=['','dimple_rerun_on_selected_file','','','']
-                job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
+            if self.initial_model_dimple_dict[xtal][0].isChecked():
+                db_dict=self.xtal_db_dict[xtal]
+                if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])):
+                    reference_file=str(self.initial_model_dimple_dict[xtal][1].currentText())
+
+                    reference_file_pdb=os.path.join(self.reference_directory,reference_file+'.pdb')
+
+                    if os.path.isfile(os.path.join(self.reference_directory,reference_file+'.mtz')):
+                        reference_file_mtz=' -R '+os.path.join(self.reference_directory,reference_file+'.mtz')
+                    else:
+                        reference_file_mtz=''
+
+                    if os.path.isfile(os.path.join(self.reference_directory,reference_file+'.cif')):
+                        reference_file_cif=' --libin '+os.path.join(self.reference_directory,reference_file+'.cif')
+                    else:
+                        reference_file_cif=''
+
+                    job_list.append([   xtal,
+                                        'dimple_rerun_on_selected_file',
+                                        os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName']),
+                                        reference_file_pdb,
+                                        reference_file_mtz,
+                                        reference_file_cif  ])
+
+
+
+
         if job_list != []:
             self.check_before_running_dimple(job_list)
 

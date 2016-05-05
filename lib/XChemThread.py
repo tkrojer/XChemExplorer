@@ -223,8 +223,6 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
 
             xtal =                  item[0]
             visit_run_autoproc =    item[1]
-            if 'dimple_rerun_on_selected_file' in visit_run_autoproc:
-                visit_run_autoproc='dimple_rerun_on_selected_file'
             mtzin =                 item[2]
             ref_pdb =               item[3]
             ref_mtz =               item[4]
