@@ -773,6 +773,7 @@ class XChemExplorer(QtGui.QApplication):
         self.initial_model_vbox_for_table.addWidget(self.initial_model_table)
         self.tab_dict[self.workflow_dict['Maps']][1].addLayout(self.initial_model_vbox_for_table)
         if self.data_source_set:
+            print 'hallo'
             self.create_initial_model_table()
 
 
