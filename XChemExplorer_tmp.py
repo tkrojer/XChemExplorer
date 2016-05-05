@@ -2085,7 +2085,8 @@ class XChemExplorer(QtGui.QApplication):
                 'submit_mode':          str(self.pandda_submission_mode_selection_combobox.currentText()),
                 'nproc':                str(self.pandda_nproc_entry.text()),
                 'min_build_datasets':   str(self.pandda_min_build_dataset_entry.text()),
-                'pdb_style':            str(self.pandda_pdb_style_entry.text())
+                'pdb_style':            str(self.pandda_pdb_style_entry.text()),
+                'mtz_style':            str(self.pandda_mtz_style_entry.text())
                         }
         print pandda_params
         self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params)
