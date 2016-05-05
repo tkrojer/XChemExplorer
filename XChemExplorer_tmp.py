@@ -866,6 +866,7 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_data_table=QtGui.QTableWidget()
         self.pandda_analyse_data_table.setSortingEnabled(True)
         self.pandda_analyse_data_table.resizeColumnsToContents()
+        self.pandda_analyse_data_table.setHorizontalHeaderLabels(self.pandda_column_name)
         self.pandda_analyse_hbox.addWidget(self.pandda_analyse_data_table)
 
         # right hand side: input parameters for PANDDAs run
@@ -2985,56 +2986,6 @@ class XChemExplorer(QtGui.QApplication):
                 self.pandda_analyse_input_table_dict[xtal]=[]
 
 
-        # load samples from datasource
-        # show:
-        # - sample ID
-        # - crystal form name
-        # - Dimple: resolution
-        # - Dimple: Rcryst
-        # - Dimple: Rfree
-        #self.pandda_analyse_data_table
-        self.pandda_analyse_data_table.setColumnCount(len(self.pandda_column_name))
-        self.pandda_analyse_data_table.setRowCount(0)
-        if os.path.isfile(os.path.join(self.database_directory,self.data_source_file)):
-            columns_to_show=self.get_columns_to_show(self.pandda_column_name)
-            sample_id_column=self.get_columns_to_show(['Sample ID'])
-            n_rows=0
-            for x,row in enumerate(self.data):
-                if str(row[sample_id_column[0]]).lower() == 'none' or str(row[sample_id_column[0]]).replace(' ','') == '':
-                    continue        # do not show rows where sampleID is null
-                for y,item in enumerate(columns_to_show):
-                    if y==1:
-                        if crystal_form=='use all datasets':
-                            n_rows+=1
-                        elif str(row[item]) == crystal_form:
-                            n_rows+=1
-            self.pandda_analyse_data_table.setRowCount(n_rows)
-
-            x=0
-            for row in self.data:
-                if str(row[sample_id_column[0]]).lower() == 'none' or str(row[sample_id_column[0]]).replace(' ','') == '':
-                    continue        # do not show rows where sampleID is null
-                sample_id_exists=False
-                crystal_from_of_interest=False
-                # first run through every line and check if conditions above are fulfilled
-                for y,item in enumerate(columns_to_show):
-                    # y=0 is sample ID
-                    if y==0:
-                        if str(row[item]) != 'None' or str(row[item]).replace(' ','') != '':
-                            sample_id_exists=True
-                    if y==1:
-                        if crystal_form=='use all datasets':
-                            crystal_from_of_interest=True
-                        elif str(row[item]) == crystal_form:
-                            crystal_from_of_interest=True
-                if sample_id_exists and crystal_from_of_interest:
-                    for y,item in enumerate(columns_to_show):
-                            cell_text=QtGui.QTableWidgetItem()
-                            cell_text.setText(str(row[item]))
-                            cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                            self.pandda_analyse_data_table.setItem(x, y, cell_text)
-                    x+=1
-        self.pandda_analyse_data_table.setHorizontalHeaderLabels(self.pandda_column_name)
 
     def get_columns_to_show(self,column_list):
         # maybe I coded some garbage before, but I need to find out which column name in the
