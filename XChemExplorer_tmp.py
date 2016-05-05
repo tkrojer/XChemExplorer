@@ -1486,8 +1486,9 @@ class XChemExplorer(QtGui.QApplication):
 #                job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
 #        if job_list != []:
 #            self.check_before_running_dimple(job_list)
+        xtal='PHIPA-x1968'
         os.system('$CCP4/libexec/python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_for_new_dimple_pdb.py')+' %s %s %s'
-                  %(os.path.join(self.database_directory,self.data_source_file),'xtal',self.initial_model_directory)  )
+                  %(os.path.join(self.database_directory,self.data_source_file),xtal,self.initial_model_directory)  )
 
 
     def get_job_list_for_dimple_rerun(self,xtal,job_list,db_dict,entry):

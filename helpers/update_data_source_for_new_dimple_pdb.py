@@ -1,7 +1,7 @@
 import os,sys
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 
-#from XChemUtils import parse
+from XChemUtils import parse
 #from XChemUtils import external_software
 #from XChemUtils import helpers
 #import XChemThread
@@ -22,3 +22,6 @@ if __name__=='__main__':
 #    db=XChemDB.data_source(db_file)
     if os.path.isfile(os.path.join(inital_model_directory,xtal,'dimple.pdb')):
         print os.path.join(inital_model_directory,xtal,'dimple.pdb')
+        pdb=parse().PDBheader(os.path.join(self.initial_model_directory,sample,'refine.pdb'))
+        print pdb['Rcryst']
+        print pdb['Rfree']
