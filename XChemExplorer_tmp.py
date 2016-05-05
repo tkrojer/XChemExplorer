@@ -1492,6 +1492,9 @@ class XChemExplorer(QtGui.QApplication):
         if job_list != []:
             self.check_before_running_dimple(job_list)
 
+    def run_dimple_on_selected_autoprocessing_file(self):
+        for xtal in self.initial_model_dimple_dict:
+            print xtal,self.initial_model_dimple_dict[xtal][0].isChecked(),str(self.initial_model_dimple_dict[xtal][1].currentText())
 
     def get_job_list_for_dimple_rerun(self,xtal,job_list,db_dict,entry):
         self.status_bar.showMessage('checking: '+str(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])))
@@ -1765,7 +1768,7 @@ class XChemExplorer(QtGui.QApplication):
             self.rerun_dimple_on_all_autoprocessing_files()
 
         elif instruction=='Run DIMPLE on selected MTZ files':
-            self.create_initial_model_table()
+            self.run_dimple_on_selected_autoprocessing_file()
 
         elif instruction=='Create CIF/PDB/PNG file of soaked compound':
             self.create_cif_pdb_png_files()
@@ -2436,8 +2439,6 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def create_initial_model_table(self):
-        print 'creating table'
-        print 'ref',self.reference_file_list
         all_samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not '';")
         dict_for_map_table={}
         for sample in all_samples_in_db:
