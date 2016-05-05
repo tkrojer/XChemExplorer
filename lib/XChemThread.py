@@ -276,7 +276,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             Cmds = (
                     '%s\n' %top_line+
                     '\n'
-                    'export XChemExplorer_DIR="os.getenv('+XChemExplorer_DIR+')"\n'
+                    'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
                     '\n'
                     'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc) +
                     '\n'
