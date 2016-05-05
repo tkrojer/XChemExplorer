@@ -19,5 +19,10 @@ if __name__=='__main__':
         pdb=parse().PDBheader(os.path.join(inital_model_directory,xtal,'dimple.pdb'))
         db_dict['DimpleRcryst']=pdb['Rcryst']
         db_dict['DimpleRfree']=pdb['Rfree']
-        print db_dict
+        if os.path.isfile(os.path.join(inital_model_directory,xtal,'dimple','dimple_rerun_on_selected_file','dimple','prepared2.mtz')):
+            os.chdir(os.path.join(inital_model_directory,xtal))
+            if os.path.isfile(xtal+'.free.mtz')):
+                os.system('/bin/rm '+xtal+'.free.mtz')
+            os.symlink(os.path.join('dimple','dimple_rerun_on_selected_file','dimple','prepared2.mtz'),xtal+'.free.mtz')
+            db_dict['RefinementMTZfree']=xtal+'.free.mtz'
         db.update_data_source(xtal,db_dict)
