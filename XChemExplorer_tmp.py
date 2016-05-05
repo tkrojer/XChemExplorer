@@ -1465,30 +1465,6 @@ class XChemExplorer(QtGui.QApplication):
         self.target=str(text)
 
 
-    def rerun_dimple_on_autoprocessing_files(self):
-        text = str(self.rerun_dimple_combobox.currentText())
-        if self.explorer_active==0 and self.data_source_set==True and self.data_collection_summary_file != '':
-            job_list=[]
-            for xtal in self.data_collection_dict:
-                for entry in self.data_collection_dict[xtal]:
-                    if entry[0]=='logfile':
-                        db_dict=entry[6]
-                        try:
-                            if os.path.isfile(db_dict['DataProcessingPathToMTZfile']):
-                                if text=='Run Dimple if final.pdb cannot be found ' \
-                                 and not os.path.isfile(db_dict['DataProcessingPathToDimplePDBfile']):
-                                    job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
-                                elif text=='Rerun Dimple on Everything':
-                                    job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
-                        # thought this is not necessary, because 'logfile' entry in dict is only made if logfile is present
-                        # however, came across case where autoPROC generated logile and aimless.mtz, but not truncate.mtz
-                        except KeyError:
-                            pass
-
-            if job_list != []:
-                self.check_before_running_dimple(job_list)
-
-
     def rerun_dimple_on_all_autoprocessing_files(self):
         print '==> XCE: running DIMPLE on ALL auto-processing files'
         job_list=[]
@@ -1506,7 +1482,6 @@ class XChemExplorer(QtGui.QApplication):
         for xtal in sorted(self.initial_model_dimple_dict):
             db_dict=self.xtal_db_dict[xtal]
             if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])):
-                print os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])
                 entry=['','dimple_rerun_on_selected_file','','','']
                 job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
         if job_list != []:

@@ -408,63 +408,6 @@ class data_source:
 
 
 
-    def get_data_dict_to_save_autoprocessing_results_to_data_source(self,sample,outcome,logfile):
-        if logfile != None:
-            aimless_results=parse().GetAimlessLog(logfile)
-            data_dict =  {
-                'DataCollectionBeamline':               'n/a',
-                'DataCollectionDate':                   'n/a',
-                'DataCollectionOutcome':                outcome,
-                'DataCollectionRun':                    aimless_results['Run'],
-                'DataCollectionComment':                'n/a',
-                'DataProcessingProgram':                aimless_results['AutoProc'],
-                'DataProcessingSpaceGroup':             aimless_results['SpaceGroup'],
-                'DataProcessingUnitCell':               aimless_results['UnitCell'],
-                'DataProcessingResolutionOverall':      aimless_results['ResolutionLow']+'-'+aimless_results['ResolutionHigh'],
-                'DataProcessingResolutionLow':          aimless_results['ResolutionLow'],
-                'DataProcessingResolutionHigh':         aimless_results['ResolutionHigh'],
-                'DataProcessingRmergeOverall':          aimless_results['RmergeOverall'],
-                'DataProcessingRmergeLow':              aimless_results['RmergeLow'],
-                'DataProcessingRmergeHigh':             aimless_results['RmergeHigh'],
-                'DataProcessingIsigOverall':            aimless_results['IsigOverall'],
-                'DataProcessingIsigLow':                aimless_results['IsigLow'],
-                'DataProcessingIsigHigh':               aimless_results['IsigHigh'],
-                'DataProcessingCompletenessOverall':    aimless_results['CompletenessOverall'],
-                'DataProcessingCompletenessLow':        aimless_results['CompletenessLow'],
-                'DataProcessingCompletenessHigh':       aimless_results['CompletenessHigh'],
-                'DataProcessingMultiplicityOverall':    aimless_results['MultiplicityOverall'],
-                'DataProcessingMultiplicityLow':        aimless_results['MultiplicityLow'],
-                'DataProcessingMultiplicityHigh':       aimless_results['MultiplicityHigh'],
-                'DataProcessingPathToLogfile':          logfile    }
-        else:
-            data_dict=  {
-                'DataCollectionBeamline':              'n/a',
-                'DataCollectionDate':                  'n/a',
-                'DataCollectionOutcome':               outcome,
-                'DataCollectionRun':                   'n/a',
-                'DataCollectionComment':               'n/a',
-                'DataProcessingProgram':               'n/a',
-                'DataProcessingSpaceGroup':            'n/a',
-                'DataProcessingUnitCell':              'n/a',
-                'DataProcessingResolutionOverall':     'n/a',
-                'DataProcessingResolutionLow':         'n/a',
-                'DataProcessingResolutionHigh':        'n/a',
-                'DataProcessingRmergeOverall':         'n/a',
-                'DataProcessingRmergeLow':             'n/a',
-                'DataProcessingRmergeHigh':            'n/a',
-                'DataProcessingIsigOverall':           'n/a',
-                'DataProcessingIsigLow':               'n/a',
-                'DataProcessingIsigHigh':              'n/a',
-                'DataProcessingCompletenessOverall':   'n/a',
-                'DataProcessingCompletenessLow':       'n/a',
-                'DataProcessingCompletenessHigh':      'n/a',
-                'DataProcessingMultiplicityOverall':   'n/a',
-                'DataProcessingMultiplicityLow':       'n/a',
-                'DataProcessingMultiplicityHigh':      'n/a',
-                'DataProcessingPathToLogfile':         'n/a'    }
-
-        return data_dict
-
 
 
     def get_samples_for_coot(self,RefinementOutcome):

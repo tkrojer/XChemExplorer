@@ -249,10 +249,25 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             else:
                 ccp4_scratch=''
 
+            if 'dimple_rerun_on_selected_file' in visit_run_autoproc:
+                additional_cmds = (
+                            'cd %s\n' %os.path.join(self.initial_model_directory,xtal) +
+                            '/bin/rm dimple.pdb\n'
+                            'ln -s dimple/dimple_rerun_on_selected_file/dimple/final.pdb dimple.pdb\n'
+                            '/bin/rm dimple.mtz\n'
+                            'ln -s dimple/dimple_rerun_on_selected_file/dimple/final.mtz dimple.mtz\n'
+                            '/bin/rm 2fofc.map\n'
+                            'ln -s dimple/dimple_rerun_on_selected_file/dimple/2fofc.map .\n'
+                            '/bin/rm fofc.map\n'
+                            'ln -s dimple/dimple_rerun_on_selected_file/dimple/fofc.map .\n'
+                            )
+            else:
+                additional_cmds=''
+
             Cmds = (
                     '%s\n' %top_line+
                     '\n'
-                    'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit_run_autoproc) +
+                    'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc) +
                     '\n'
                     +ccp4_scratch+
                     '\n'
@@ -268,13 +283,9 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     ' labin F1=FOFCWT PHI=PHFOFCWT\n'
                     'EOF\n'
                     '\n'
-                    'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc) +
-                    'ln -s dimple/final.pdb .\n'
-                    'ln -s dimple/final.mtz .\n'
-                    'ln -s dimple/2fofc.map .\n'
-                    'ln -s dimple/fofc.map .\n'
+                    +additional_cmds+
                     '\n'
-                    'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'autoprocessing_dimple',visit_run_autoproc) +
+                    'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc) +
                     '\n'
                     '/bin/rm dimple_run_in_progress\n'
                     )
