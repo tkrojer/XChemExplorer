@@ -2468,6 +2468,7 @@ class XChemExplorer(QtGui.QApplication):
                             self.initial_model_table.setCellWidget(current_row, column, run_dimple)
                             run_dimple.setChecked(True)
                     elif header[0]=='Reference\nSpaceGroup':
+                        print 'ref',reference_file
                         cell_text=QtGui.QTableWidgetItem()
                         if reference_file != []:
                             cell_text.setText(str( reference_file[0][1]  ))
