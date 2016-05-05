@@ -866,6 +866,7 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_data_table=QtGui.QTableWidget()
         self.pandda_analyse_data_table.setSortingEnabled(True)
         self.pandda_analyse_data_table.resizeColumnsToContents()
+        self.pandda_analyse_data_table.setColumnCount(len(self.pandda_column_name))
         self.pandda_analyse_data_table.setHorizontalHeaderLabels(self.pandda_column_name)
         self.pandda_analyse_hbox.addWidget(self.pandda_analyse_data_table)
 
