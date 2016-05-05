@@ -1225,7 +1225,8 @@ class XChemExplorer(QtGui.QApplication):
 
         self.window.setLayout(vbox_main)
 
-        self.update_all_tables()
+        if self.data_source_set:
+            self.update_all_tables()
 
         self.status_bar.showMessage('Ready')
 #        self.timer = QtCore.QBasicTimer()
