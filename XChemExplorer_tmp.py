@@ -1498,6 +1498,7 @@ class XChemExplorer(QtGui.QApplication):
                                 reference_file_pdb,
                                 reference_file_mtz,
                                 reference_file_cif  ])
+        self.status_bar.showMessage('idle')
         return job_list
 
 
@@ -1741,6 +1742,9 @@ class XChemExplorer(QtGui.QApplication):
 
         elif instruction=='Create CIF/PDB/PNG file of soaked compound':
             self.create_cif_pdb_png_files()
+
+        elif instruction=='pandda.analyse':
+            self.run_pandda_analyse()
 
 
 #        elif instruction=="Check for inital Refinement" or \
@@ -2071,6 +2075,20 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.work_thread.start()
+
+    def run_pandda_analyse(self):
+        pandda_params = {
+                'data_dir':             str(self.pandda_input_data_dir_entry.text()),
+                'out_dir':              str(self.pandda_output_data_dir_entry.text()),
+                'submit_mode':          str(self.pandda_submission_mode_selection_combobox.currentText()),
+                'nproc':                str(self.pandda_nproc_entry.text()),
+                'min_build_datasets':   str(self.pandda_min_build_dataset_entry.text()),
+                'pdb_style':            str(self.pandda_pdb_style_entry.text())
+                        }
+        print pandda_params
+        self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
