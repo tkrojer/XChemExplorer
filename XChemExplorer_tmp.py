@@ -522,7 +522,6 @@ class XChemExplorer(QtGui.QApplication):
         self.mounted_crystal_table.resizeColumnsToContents()
         self.overview_tab_dict['Data Source'][1].addWidget(self.mounted_crystal_table)
         if self.data_source_set:
-            print 'here'
             self.populate_and_update_data_source_table()
 
 #        self.mounted_crystals_vbox_for_table.addWidget(self.mounted_crystal_table)
@@ -774,7 +773,6 @@ class XChemExplorer(QtGui.QApplication):
         self.initial_model_vbox_for_table.addWidget(self.initial_model_table)
         self.tab_dict[self.workflow_dict['Maps']][1].addLayout(self.initial_model_vbox_for_table)
         if self.data_source_set:
-            print 'hallo'
             self.create_initial_model_table()
 
 
@@ -1292,6 +1290,7 @@ class XChemExplorer(QtGui.QApplication):
         print '==> reading samples from data source: ',os.path.join(self.database_directory,self.data_source_file)
         self.update_header_and_data_from_datasource()
         self.populate_and_update_data_source_table()
+        self.create_initial_model_table()
 
     def datasource_menu_save_samples(self):
         print 'hallo'
@@ -1390,6 +1389,7 @@ class XChemExplorer(QtGui.QApplication):
                         self.data_source_set=True
                         self.update_header_and_data_from_datasource()
                         self.populate_and_update_data_source_table()
+                        self.create_initial_model_table()
 #                else:
 #                    XChemDB.data_source(self.settings['data_source']).create_empty_data_source_file()
 #                self.data_source_set=True
@@ -1609,6 +1609,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
                 self.update_header_and_data_from_datasource()
                 self.populate_and_update_data_source_table()
+                self.create_initial_model_table()
         if self.sender().text()=='Select Data Collection Directory':
             dir_name = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             if dir_name != self.beamline_directory:
