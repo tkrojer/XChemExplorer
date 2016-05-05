@@ -2431,6 +2431,8 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def create_initial_model_table(self):
+        print 'creating table'
+        print 'ref',self.reference_file_list
         all_samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not '';")
         dict_for_map_table={}
         for sample in all_samples_in_db:
