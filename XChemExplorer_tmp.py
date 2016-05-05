@@ -1441,6 +1441,9 @@ class XChemExplorer(QtGui.QApplication):
 
                     reference_file_pdb=os.path.join(self.reference_directory,reference_file+'.pdb')
 
+                    if not os.path.isfile(reference_file_pdb):
+                        continue
+
                     if os.path.isfile(os.path.join(self.reference_directory,reference_file+'.mtz')):
                         reference_file_mtz=' -R '+os.path.join(self.reference_directory,reference_file+'.mtz')
                     else:
