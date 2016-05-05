@@ -16,7 +16,7 @@ if __name__=='__main__':
     xtal=sys.argv[2]
     inital_model_directory=sys.argv[3]
 
-    print db,xtal,inital_model_directory
+    print db_file,xtal,inital_model_directory
 
     print 'XCE path',os.path.join(os.getenv('XChemExplorer_DIR'),'lib')
 
