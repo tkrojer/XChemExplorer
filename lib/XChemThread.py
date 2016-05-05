@@ -262,9 +262,15 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                             'ln -s dimple/dimple_rerun_on_selected_file/dimple/2fofc.map .\n'
                             '/bin/rm fofc.map\n'
                             'ln -s dimple/dimple_rerun_on_selected_file/dimple/fofc.map .\n'
-                            )
+                            '\n'
+                            '$CCP4/libexec/python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_for_new_dimple_pdb.py')+
+                            ' %s %s %s\n' %(os.path.join(self.database_directory,self.data_source_file),xtal,self.initial_model_directory)  )
+
             else:
                 additional_cmds=''
+
+
+
 
             Cmds = (
                     '%s\n' %top_line+
@@ -273,7 +279,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     '\n'
                     +ccp4_scratch+
                     '\n'
-                    'dimple %s %s %s %s dimple\n' %(mtzin,ref_pdb,ref_mtz,ref_cif) +
+                    'dimple --no-cleanup %s %s %s %s dimple\n' %(mtzin,ref_pdb,ref_mtz,ref_cif) +
                     '\n'
                     'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc,'dimple') +
                     '\n'
