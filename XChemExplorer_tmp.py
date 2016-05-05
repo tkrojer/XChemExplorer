@@ -840,12 +840,12 @@ class XChemExplorer(QtGui.QApplication):
         self.panddas_results_vbox=QtGui.QVBoxLayout()
         self.tab_dict[self.workflow_dict['PANDDAs']][1].addLayout(self.panddas_results_vbox)
 
-
         pandda_tab_widget = QtGui.QTabWidget()
         pandda_tab_list = [ 'pandda.analyse',
                             'Dataset Summary',
                             'Results Summary',
                             'Inspect Summary'  ]
+
         self.pandda_tab_dict={}
         for page in pandda_tab_list:
             tab=QtGui.QWidget()
@@ -855,6 +855,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.pandda_analyse_hbox=QtGui.QHBoxLayout()
         self.pandda_tab_dict['pandda.analyse'][1].addLayout(self.pandda_analyse_hbox)
+
         # left hand side: table with information about available datasets
         self.pandda_column_name = [ 'Sample ID',
                                     'Crystal Form\nName',
@@ -866,13 +867,14 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_data_table.resizeColumnsToContents()
         self.populate_pandda_analyse_input_table('use all datasets')
         self.pandda_analyse_hbox.addWidget(self.pandda_analyse_data_table)
+
         # right hand side: input parameters for PANDDAs run
         self.pandda_analyse_input_params_vbox=QtGui.QVBoxLayout()
 
         pandda_input_dir_hbox=QtGui.QHBoxLayout()
         self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('data directory'))
         self.pandda_input_data_dir_entry = QtGui.QLineEdit()
-        self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory,'*','Dimple','dimple'))
+        self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory,'*'))
         self.pandda_input_data_dir_entry.setFixedWidth(400)
         pandda_input_dir_hbox.addWidget(self.pandda_input_data_dir_entry)
         self.select_pandda_input_dir_button=QtGui.QPushButton("Select Input Template")
@@ -883,7 +885,7 @@ class XChemExplorer(QtGui.QApplication):
         pandda_pdb_style_hbox=QtGui.QHBoxLayout()
         pandda_pdb_style_hbox.addWidget(QtGui.QLabel('pdb style'))
         self.pandda_pdb_style_entry=QtGui.QLineEdit()
-        self.pandda_pdb_style_entry.setText('final.pdb')
+        self.pandda_pdb_style_entry.setText('dimple.pdb')
         self.pandda_pdb_style_entry.setFixedWidth(200)
         pandda_pdb_style_hbox.addWidget(self.pandda_pdb_style_entry)
         self.pandda_analyse_input_params_vbox.addLayout(pandda_pdb_style_hbox)
@@ -891,7 +893,7 @@ class XChemExplorer(QtGui.QApplication):
         pandda_mtz_style_hbox=QtGui.QHBoxLayout()
         pandda_mtz_style_hbox.addWidget(QtGui.QLabel('mtz style'))
         self.pandda_mtz_style_entry=QtGui.QLineEdit()
-        self.pandda_mtz_style_entry.setText('final.mtz')
+        self.pandda_mtz_style_entry.setText('dimple.mtz')
         self.pandda_mtz_style_entry.setFixedWidth(200)
         pandda_mtz_style_hbox.addWidget(self.pandda_mtz_style_entry)
         self.pandda_analyse_input_params_vbox.addLayout(pandda_mtz_style_hbox)
@@ -922,11 +924,11 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_nproc_entry)
 
         # run pandda on specific crystalform only
-        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('Use Specific Crystal Form Only'))
-        self.pandda_analyse_crystal_from_selection_combobox = QtGui.QComboBox()
-        self.pandda_analyse_crystal_from_selection_combobox.currentIndexChanged.connect(self.pandda_analyse_crystal_from_selection_combobox_changed)
-#        self.update_pandda_crystal_from_combobox()
-        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_analyse_crystal_from_selection_combobox)
+#        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('Use Specific Crystal Form Only'))
+#        self.pandda_analyse_crystal_from_selection_combobox = QtGui.QComboBox()
+#        self.pandda_analyse_crystal_from_selection_combobox.currentIndexChanged.connect(self.pandda_analyse_crystal_from_selection_combobox_changed)
+##        self.update_pandda_crystal_from_combobox()
+#        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_analyse_crystal_from_selection_combobox)
 
         self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('\n\n\nExpert Parameters (need rarely changing):\n'))
 
@@ -978,20 +980,20 @@ class XChemExplorer(QtGui.QApplication):
         self.panddas_results_vbox.addWidget(pandda_tab_widget)
 
 
-        panddas_button_hbox=QtGui.QHBoxLayout()
-        show_panddas_results=QtGui.QPushButton("Show PANDDAs Results")
-        show_panddas_results.clicked.connect(self.button_clicked)
-        panddas_button_hbox.addWidget(show_panddas_results)
-#        reload_panddas_results=QtGui.QPushButton("Reload PANDDAs Results")
-#        reload_panddas_results.clicked.connect(self.button_clicked)
-#        panddas_button_hbox.addWidget(reload_panddas_results)
-        launch_panddas_inspect=QtGui.QPushButton("Launch pandda.inspect")
-        launch_panddas_inspect.clicked.connect(self.button_clicked)
-        panddas_button_hbox.addWidget(launch_panddas_inspect)
-        export_panddas_inspect=QtGui.QPushButton("Export PANDDA Models")
-        export_panddas_inspect.clicked.connect(self.button_clicked)
-        panddas_button_hbox.addWidget(export_panddas_inspect)
-        self.tab_dict[self.workflow_dict['PANDDAs']][1].addLayout(panddas_button_hbox)
+#        panddas_button_hbox=QtGui.QHBoxLayout()
+#        show_panddas_results=QtGui.QPushButton("Show PANDDAs Results")
+#        show_panddas_results.clicked.connect(self.button_clicked)
+#        panddas_button_hbox.addWidget(show_panddas_results)
+##        reload_panddas_results=QtGui.QPushButton("Reload PANDDAs Results")
+##        reload_panddas_results.clicked.connect(self.button_clicked)
+##        panddas_button_hbox.addWidget(reload_panddas_results)
+#        launch_panddas_inspect=QtGui.QPushButton("Launch pandda.inspect")
+#        launch_panddas_inspect.clicked.connect(self.button_clicked)
+#        panddas_button_hbox.addWidget(launch_panddas_inspect)
+#        export_panddas_inspect=QtGui.QPushButton("Export PANDDA Models")
+#        export_panddas_inspect.clicked.connect(self.button_clicked)
+#        panddas_button_hbox.addWidget(export_panddas_inspect)
+#        self.tab_dict[self.workflow_dict['PANDDAs']][1].addLayout(panddas_button_hbox)
 
         ######################################################################################
 
