@@ -21,7 +21,7 @@ if __name__=='__main__':
     print 'XCE path',os.path.join(os.getenv('XChemExplorer_DIR'),'lib')
 
 
-#    db=XChemDB.data_source(db_file)
+    db=XChemDB.data_source(db_file)
     if os.path.isfile(os.path.join(inital_model_directory,xtal,'dimple.pdb')):
         db_dict={}
         db_dict['DimplePathToPDB']=os.path.join(inital_model_directory,xtal,'dimple.pdb')
@@ -32,3 +32,4 @@ if __name__=='__main__':
         db_dict['DimpleRcryst']=pdb['Rcryst']
         db_dict['DimpleRfree']=pdb['Rfree']
         print db_dict
+        db.update_data_source(xtal,db_dict)
