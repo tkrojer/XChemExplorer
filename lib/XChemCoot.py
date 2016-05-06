@@ -59,8 +59,9 @@ class GUI(object):
                                         '2 – PANDDA Model',
                                         '3 – In Refinement',
                                         '4 - Ligand Confirmed',
-                                        '5 – Ready for Proofreading',
-                                        '6 – Structure Finished'        ]
+                                        '5 - ComChem ready',
+                                        '6 – Ready for Proofreading',
+                                        '7 – Structure Finished'        ]
 
         self.ligand_confidence = [  'Ligand Confidence: Analysis Pending',
                                     'Ligand Confidence: 0 - no ligand present',
