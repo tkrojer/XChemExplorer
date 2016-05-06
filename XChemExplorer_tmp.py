@@ -1132,7 +1132,6 @@ class XChemExplorer(QtGui.QApplication):
         hboxTaskFrames.addWidget(frame_map_cif_file_task)
         hboxTaskFrames.addWidget(frame_panddas_file_task)
         hboxTaskFrames.addWidget(frame_refine_file_task)
-        hboxTaskFrames.addWidget(frame_validation_file_task)
         vbox_main.addLayout(hboxTaskFrames)
 
         vbox_main.addLayout(hbox_status)
