@@ -1370,6 +1370,7 @@ class XChemExplorer(QtGui.QApplication):
         job_list=[]
         for xtal in self.data_collection_dict:
             for entry in self.data_collection_dict[xtal]:
+                print entry
                 if entry[0]=='logfile':
                     db_dict=entry[6]
                     if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])):
