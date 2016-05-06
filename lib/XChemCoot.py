@@ -54,14 +54,14 @@ class GUI(object):
                                         'Show Confirmed Ligands':           "RefinementOutcome='Ligand Confirmed'",
                                         'SHow Final Structures':            "RefinementOutcome='Structure Finished'"   }
 
-        self.selection_criteria = [     '0 – All Datasets',
+        self.selection_criteria = [     '0 - All Datasets',
                                         '1 - Analysis Pending',
-                                        '2 – PANDDA Model',
-                                        '3 – In Refinement',
+                                        '2 - PANDDA Model',
+                                        '3 - In Refinement',
                                         '4 - Ligand Confirmed',
                                         '5 - ComChem ready',
-                                        '6 – Ready for Proofreading',
-                                        '7 – Structure Finished'        ]
+                                        '6 - Ready for Proofreading',
+                                        '7 - Deposit!'       ]
 
         self.ligand_confidence = [  'Ligand Confidence: Analysis Pending',
                                     'Ligand Confidence: 0 - no ligand present',
