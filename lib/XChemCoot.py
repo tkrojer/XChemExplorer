@@ -542,7 +542,7 @@ class GUI(object):
                 self.cb.remove_text(0)
         self.Todo=[]
 #        self.Todo=self.db.get_samples_for_coot(self.selection_mode)
-        tmp=self.db.get_samples_for_coot('RefinementOutcome is '+self.selection_mode)
+        tmp=self.db.get_samples_for_coot('RefinementOutcome is "'+self.selection_mode+'"')
         print self.selection_mode
         for item in tmp:
             self.Todo.append(list(item))

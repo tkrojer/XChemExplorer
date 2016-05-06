@@ -426,6 +426,7 @@ class data_source:
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
 
+        print "SELECT CrystalName,CompoundCode,RefinementLigandConfidence,RefinementPathToRefinementFolder FROM mainTable WHERE %s;" % RefinementOutcome
         cursor.execute("SELECT CrystalName,CompoundCode,RefinementLigandConfidence,RefinementPathToRefinementFolder FROM mainTable WHERE %s;" % RefinementOutcome )
 
         sample_list_for_coot= cursor.fetchall()
