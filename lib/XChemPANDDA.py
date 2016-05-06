@@ -52,9 +52,11 @@ class run_pandda_analyse(QtCore.QThread):
             f.write(Cmds)
             f.close()
             if self.submit_mode=='local machine':
+                print '==> running PANDDA on local machine'
                 os.system('chmod +x pandda.sh')
                 os.system('./pandda.sh &')
             else:
+                print '==> running PANDDA on cluster, using qsub...'
                 os.system('qsub pandda.sh')
 
 class check_if_pandda_can_run:
