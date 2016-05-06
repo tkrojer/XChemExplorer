@@ -50,14 +50,14 @@ class create_png_and_cif_of_compound(QtCore.QThread):
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
             counter += 1
-            if counter==100:
-                while counter > 90:
-                    print '==> submitted 100 jobs to cluster, will pause for 10 seconds...'
-                    time.sleep(10)
-                    jobs_in_queue=self.check_jobs_in_queue()
-                    print '==> number of jobs in queue: ',jobs_in_queue
-                    if jobs_in_queue < 90:
-                        counter=jobs_in_queue
+#            if counter==100:
+#                while counter > 90:
+#                    print '==> submitted 100 jobs to cluster, will pause for 10 seconds...'
+#                    time.sleep(10)
+#                    jobs_in_queue=self.check_jobs_in_queue()
+#                    print '==> number of jobs in queue: ',jobs_in_queue
+#                    if jobs_in_queue < 90:
+#                        counter=jobs_in_queue
         self.emit(QtCore.SIGNAL("finished()"))
 
     def check_jobs_in_queue(self):
@@ -799,7 +799,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
                 # this step is only relevant when several samples are reviewed in one session
-                if 'tmp' in collected_xtals or 'results' in collected_xtals:
+                if 'tmp' in collected_xtals or 'results' in collected_xtals or 'scre' in collected_xtals:
                     continue
 
                 xtal=collected_xtals[collected_xtals.rfind('/')+1:]
