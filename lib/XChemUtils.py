@@ -245,7 +245,7 @@ class helpers:
                     'ln -s compound/%s.png .\n' %compoundID.replace(' ','')+
                     '\n'
                     '$CCP4/libexec/python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_for_new_cif_files.py')+
-                    ' %s %s %s %s\n' %(os.path.join(database_directory,data_source_file),sample,self.initial_model_directory,compoundID.replace(' ','') )+
+                    ' %s %s %s %s\n' %(os.path.join(database_directory,data_source_file),sample,initial_model_directory,compoundID.replace(' ','') )+
                     '\n'
                     '/bin/rm compound/ACEDRG_IN_PROGRESS\n'
                 )
