@@ -12,6 +12,7 @@ import base64
 import math
 import subprocess
 from datetime import datetime
+import time
 
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 from XChemUtils import process
@@ -37,6 +38,7 @@ class create_png_and_cif_of_compound(QtCore.QThread):
     def run(self):
         progress_step=100/float(len(self.compound_list))
         progress=0
+        counter=0
         for item in self.compound_list:
             sampleID=item[0]
             compoundID=item[1]
@@ -47,8 +49,23 @@ class create_png_and_cif_of_compound(QtCore.QThread):
             helpers().make_png(self.initial_model_directory,sampleID,compoundID,smiles,self.external_software['qsub'],self.database_directory,self.data_source_file)
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+            counter += 1
+            if counter==100:
+                while counter > 90:
+                    print '==> submitted 100 jobs to cluster, will pause for 10 seconds...'
+                    time.sleep(10)
+                    jobs_in_queue=self.check_jobs_in_queue()
+                    print '==> number of jobs in queue: ',jobs_in_queue
+                    if jobs_in_queue < 90:
+                        counter=jobs_in_queue
         self.emit(QtCore.SIGNAL("finished()"))
 
+    def check_jobs_in_queue(self):
+        tmp=out = subprocess.check_output(['qstat'])
+        n=0
+        for i in tmp:
+            if i=='\n': n+=1
+        return n
 
 class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
     def __init__(self,sample_list,initial_model_directory,external_software,ccp4_scratch_directory,database_directory,data_source_file):

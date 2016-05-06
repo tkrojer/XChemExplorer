@@ -11,7 +11,7 @@ if __name__=='__main__':
     compoundID=sys.argv[4]
 
     db=XChemDB.data_source(db_file)
-    if os.path.isfile(os.path.join(inital_model_directory,xtal,compound,compoundID+'.cif')):
+    if os.path.isfile(os.path.join(inital_model_directory,xtal,'compound',compoundID+'.cif')):
         db_dict={}
-        db_dict['RefinementCIF']=os.path.join(inital_model_directory,xtal,compound,compoundID+'.cif')
+        db_dict['RefinementCIF']=os.path.join(inital_model_directory,xtal,'compound',compoundID+'.cif')
         db.update_data_source(xtal,db_dict)
