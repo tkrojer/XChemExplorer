@@ -1370,13 +1370,11 @@ class XChemExplorer(QtGui.QApplication):
         job_list=[]
         for xtal in self.data_collection_dict:
             for entry in self.data_collection_dict[xtal]:
-                print entry
                 if entry[0]=='logfile':
                     db_dict=entry[6]
                     if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])) or \
                        os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
                         job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
-        print job_list
         if job_list != []:
             self.check_before_running_dimple(job_list)
 
@@ -1446,9 +1444,14 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 reference_file_cif=''
 
+            if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])):
+                mtzin=os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])
+            elif os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
+                mtzin=os.path.join(db_dict['DataProcessingPathToMTZfile'])
+
             job_list.append([   xtal,
                                 visit+'-'+run+autoproc,
-                                os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName']),
+                                mtzin,
                                 reference_file_pdb,
                                 reference_file_mtz,
                                 reference_file_cif  ])
