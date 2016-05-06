@@ -55,7 +55,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.data_source_set=True
                 self.db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
                 self.db.create_missing_columns()
-                self.update_header_and_data_from_datasource()
+#                self.update_header_and_data_from_datasource()
 #                self.header,self.data=self.db.load_samples_from_data_source()
 #                XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).create_missing_columns()
             self.ccp4_scratch_directory=os.path.join(self.labxchem_directory,'processing','tmp')
@@ -1195,8 +1195,9 @@ class XChemExplorer(QtGui.QApplication):
         self.window.setLayout(vbox_main)
 
         if self.data_source_set:
-            self.get_reference_file_list(' ')
-            self.update_all_tables()
+            self.datasource_menu_reload_samples()
+#            self.get_reference_file_list(' ')
+#            self.update_all_tables()
 
         self.status_bar.showMessage('Ready')
 #        self.timer = QtCore.QBasicTimer()
@@ -1250,6 +1251,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def update_header_and_data_from_datasource(self):
+        print '==> getting information for all samples from data source...'
         self.db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
         self.db.create_missing_columns()
         self.header,self.data=self.db.load_samples_from_data_source()
@@ -1364,7 +1366,7 @@ class XChemExplorer(QtGui.QApplication):
                     else:
                         self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
                         self.data_source_set=True
-                        self.update_header_and_data_from_datasource()
+#                        self.update_header_and_data_from_datasource()
 #                        self.populate_and_update_data_source_table()
 #                        self.create_initial_model_table()
 #                else:
@@ -1393,8 +1395,8 @@ class XChemExplorer(QtGui.QApplication):
             self.adjust_acceptable_low_resolution_limit.setText(str(self.acceptable_low_resolution_limit_for_data))
             self.reference_file_list=self.get_reference_file_list(' ')
 
-            if self.data_source_set:
-                self.update_all_tables()
+#            if self.data_source_set:
+#                self.update_all_tables()
 
 
         except KeyError:
@@ -1565,9 +1567,13 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_mtz_style_entry.setText(mtzin)
 
     def update_all_tables(self):
+        print '==> checking for new reference files'
         self.reference_file_list=self.get_reference_file_list(' ')
+        print '==> updating Overview table'
         self.populate_and_update_data_source_table()
+        print '==> updating Maps table'
         self.create_initial_model_table()
+        print '==> updating PANDDA table'
         self.populate_pandda_analyse_input_table()
 
 
@@ -1596,7 +1602,7 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 self.data_source_set=True
                 self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
-                self.update_header_and_data_from_datasource()
+#                self.update_header_and_data_from_datasource()
 #                self.populate_and_update_data_source_table()
 #                self.create_initial_model_table()
         if self.sender().text()=='Select Data Collection Directory':
@@ -1647,8 +1653,8 @@ class XChemExplorer(QtGui.QApplication):
             self.pandda_analyse_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_analyse.html')
             self.pandda_inspect_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_inspect.html')
 
-        if self.data_source_set:
-            self.update_all_tables()
+#        if self.data_source_set:
+#            self.update_all_tables()
 
 
 
@@ -1752,6 +1758,9 @@ class XChemExplorer(QtGui.QApplication):
 
         elif instruction=='pandda.inspect':
             self.run_pandda_inspect()
+
+        elif instruction=='Show HTML summary':
+            self.show_pandda_html_summary()
 
 #        elif instruction=="Check for inital Refinement" or \
 #             instruction=="Update\nDatasource":
@@ -1932,71 +1941,8 @@ class XChemExplorer(QtGui.QApplication):
         elif str(self.sender().text()).startswith("Show Overview"):
             self.update_overview()
 
-        elif self.sender().text()=='Run':
-            self.rerun_dimple_on_autoprocessing_files()
-
-        elif str(self.sender().text()).startswith("Run PANDDAs"):
-
-            if str(self.pandda_analyse_crystal_from_selection_combobox.currentText())=='use all datasets':
-                data_dir=str(self.pandda_input_data_dir_entry.text())
-            else:
-                # read table
-                allRows = self.pandda_analyse_data_table.rowCount()
-                tmp_dir=os.path.join(self.panddas_directory[:self.panddas_directory.rfind('/')],'tmp_pandda_'+str(self.pandda_analyse_crystal_from_selection_combobox.currentText()))
-                if not os.path.isdir(tmp_dir):
-                    os.mkdir(tmp_dir)
-                data_dir=os.path.join(tmp_dir,'*')
-                for row in range(allRows):
-                    sample=str(self.pandda_analyse_data_table.item(row,0).text())
-                    if os.path.isfile(os.path.join(str(self.pandda_input_data_dir_entry.text()).replace('*',sample),'final.pdb')    ):
-                        if not os.path.isdir(os.path.join(tmp_dir,sample)):
-                            os.mkdir(os.path.join(tmp_dir,sample))
-                        os.chdir(os.path.join(tmp_dir,sample))
-                        if not os.path.isfile('final.pdb'):
-                            os.symlink(os.path.join(str(self.pandda_input_data_dir_entry.text()).replace('*',sample),'final.pdb'),'final.pdb')
-                        if not os.path.isfile('final.mtz'):
-                            os.symlink(os.path.join(str(self.pandda_input_data_dir_entry.text()).replace('*',sample),'final.mtz'),'final.mtz')
-                # create softlinks to pseudo datadir
-                # set new data_dir path
-
-            pandda_params = {
-                    'data_dir':             data_dir,
-                    'out_dir':              str(self.pandda_output_data_dir_entry.text()),
-                    'submit_mode':          str(self.pandda_submission_mode_selection_combobox.currentText()),
-                    'nproc':                str(self.pandda_nproc_entry.text()),
-                    'xtalform':             str(self.pandda_analyse_crystal_from_selection_combobox.currentText()),
-                    'min_build_datasets':   str(self.pandda_min_build_dataset_entry.text()),
-                    'pdb_style':            str(self.pandda_pdb_style_entry.text())
-                        }
-            print pandda_params
-            self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params)
-            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-            self.work_thread.start()
-
-        elif str(self.sender().text()).startswith("Launch pandda.inspect"):
-            pandda_params = {
-                    'data_dir':         str(self.pandda_input_data_dir_entry.text()),
-                    'out_dir':          str(self.pandda_output_data_dir_entry.text()),
-                    'submit_mode':      str(self.pandda_submission_mode_selection_combobox.currentText()),
-                    'nproc':            str(self.pandda_nproc_entry.text()),
-                    'xtalform':         str(self.pandda_analyse_crystal_from_selection_combobox.currentText())
-                        }
-#            XChemPANDDA.PANDDAs(pandda_params).launch_pandda_inspect()
-            print '==> XCE: starting pandda.inspect'
-            self.work_thread=XChemThread.start_pandda_inspect(self.settings)
-            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-            self.work_thread.start()
 
 
-
-        elif str(self.sender().text()).startswith("Show PANDDAs Results"):
-            print 'hallo', self.pandda_initial_html_file
-            self.pandda_initial_html.load(QtCore.QUrl(self.pandda_initial_html_file))
-            self.pandda_initial_html.show()
-            self.pandda_analyse_html.load(QtCore.QUrl(self.pandda_analyse_html_file))
-            self.pandda_analyse_html.show()
-            self.pandda_inspect_html.load(QtCore.QUrl(self.pandda_inspect_html_file))
-            self.pandda_inspect_html.show()
 
         elif str(self.sender().text()).startswith("Export PANDDA Models"):
             print '==> XCE: exporting pandda models with pandda.export'
@@ -2104,6 +2050,15 @@ class XChemExplorer(QtGui.QApplication):
         self.work_thread=XChemThread.start_pandda_inspect(self.settings)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
+
+
+    def show_pandda_html_summary(self):
+        self.pandda_initial_html.load(QtCore.QUrl(self.pandda_initial_html_file))
+        self.pandda_initial_html.show()
+        self.pandda_analyse_html.load(QtCore.QUrl(self.pandda_analyse_html_file))
+        self.pandda_analyse_html.show()
+        self.pandda_inspect_html.load(QtCore.QUrl(self.pandda_inspect_html_file))
+        self.pandda_inspect_html.show()
 
 
 
@@ -2399,7 +2354,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def create_initial_model_table(self):
-        self.update_header_and_data_from_datasource()
+#        self.update_header_and_data_from_datasource()
         column_name=self.db.translate_xce_column_list_to_sqlite(self.inital_model_column_list)
 
         for xtal in sorted(self.xtal_db_dict):
@@ -2750,7 +2705,7 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_summary_table.resizeColumnsToContents()
 
         self.status_bar.showMessage('updating Overview table')
-        self.update_header_and_data_from_datasource()
+#        self.update_header_and_data_from_datasource()
 #        self.populate_and_update_data_source_table()
 
         self.status_bar.showMessage('idle')
@@ -2965,7 +2920,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def populate_pandda_analyse_input_table(self):
-        self.update_header_and_data_from_datasource()
+#        self.update_header_and_data_from_datasource()
         column_name=self.db.translate_xce_column_list_to_sqlite(self.pandda_column_name)
         for xtal in sorted(self.xtal_db_dict):
             new_xtal=False
