@@ -247,37 +247,19 @@ class XChemExplorer(QtGui.QApplication):
         # Workflow @ Task Containers
         #
 
-#        self.workflow =     [   'Settings',         # 0
-#                                'Dataset',          # 1
-#                                'MAP_CIF_files',    # 2
-#                                'PANDDAs',          # 3
-#                                'Refine',           # 4
-#                                'Valdiation',       # 5
-#                                'Preferences'   ]   # 6
-#
-#        self.workflow_dict = {  self.workflow[0]:       'Settings',
-#                                self.workflow[1]:       'Dataset',
-#                                self.workflow[2]:       'MAP_CIF_files',
-#                                self.workflow[3]:       'PANDDAs',
-#                                self.workflow[4]:       'Refine',
-#                                self.workflow[5]:       'Validation',
-#                                self.workflow[6]:       'Preferences'   }
-
         self.workflow =     [   'Overview',         # 0
                                 'Datasets',         # 1
                                 'Maps',             # 2
                                 'PANDDAs',          # 3
                                 'Refinement',       # 4
-                                'Valdiation',       # 5
-                                'Settings'   ]      # 6
+                                'Settings'   ]      # 5
 
         self.workflow_dict = {  self.workflow[0]:       'Overview',
                                 self.workflow[1]:       'Datasets',
                                 self.workflow[2]:       'Maps',
                                 self.workflow[3]:       'PANDDAs',
                                 self.workflow[4]:       'Refinement',
-                                self.workflow[5]:       'Validation',
-                                self.workflow[6]:       'Settings'   }
+                                self.workflow[5]:       'Settings'   }
 
         self.workflow_widget_dict = {}
 
@@ -435,43 +417,6 @@ class XChemExplorer(QtGui.QApplication):
         self.workflow_widget_dict['Refinement']=[self.refine_file_tasks_combobox,refine_file_task_run_button,refine_file_task_status_button]
 
         #####################################################################################
-
-        #
-        # @ Valdiation ######################################################################
-        #
-
-        self.validation_file_tasks = [ 'Open COOT'     ]
-
-        frame_validation_file_task=QtGui.QFrame()
-        frame_validation_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
-        vboxTask=QtGui.QVBoxLayout()
-        label=QtGui.QLabel(self.workflow_dict['Valdiation'])
-        label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
-        vboxTask.addWidget(label)
-        hboxAction=QtGui.QHBoxLayout()
-        self.validation_file_tasks_combobox = QtGui.QComboBox()
-        for task in self.validation_file_tasks:
-            self.validation_file_tasks_combobox.addItem(task)
-        self.validation_file_tasks_combobox.setToolTip(XChemToolTips.validation_file_task_tip())
-        hboxAction.addWidget(self.validation_file_tasks_combobox)
-        vboxButton=QtGui.QVBoxLayout()
-        validation_file_task_run_button=QtGui.QPushButton("Run")
-        validation_file_task_run_button.setToolTip(XChemToolTips.validation_file_task_run_button_tip())
-        validation_file_task_run_button.clicked.connect(self.button_clicked)
-        vboxButton.addWidget(validation_file_task_run_button)
-        validation_file_task_status_button=QtGui.QPushButton("Status")
-        validation_file_task_status_button.setToolTip(XChemToolTips.validation_file_task_status_button_tip())
-        validation_file_task_status_button.clicked.connect(self.button_clicked)
-        vboxButton.addWidget(validation_file_task_status_button)
-        hboxAction.addLayout(vboxButton)
-        vboxTask.addLayout(hboxAction)
-        frame_validation_file_task.setLayout(vboxTask)
-
-        self.workflow_widget_dict['Valdiation']=[self.validation_file_tasks_combobox,validation_file_task_run_button,validation_file_task_status_button]
-
-        #####################################################################################
-
-
 
 
 
@@ -1430,6 +1375,7 @@ class XChemExplorer(QtGui.QApplication):
                     db_dict=entry[6]
                     if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])):
                         job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
+        print job_list
         if job_list != []:
             self.check_before_running_dimple(job_list)
 
