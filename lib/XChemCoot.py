@@ -345,7 +345,8 @@ class GUI(object):
                     self.cb_ligand_confidence.append_text(citeria)
                 self.hbox_refinemnt_outcome.add(self.cb_ligand_confidence)
             else:
-                new_button=gtk.Button(label=button[0])
+#                label=gtk.Label(button[0])
+                new_button=gtk.Button(label=button[0],size=10)
                 new_button.connect("clicked",self.experiment_stage_button_clicked)
                 new_button.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(button[2],button[3],button[4]))
                 self.hbox_refinemnt_outcome.add(new_button)
