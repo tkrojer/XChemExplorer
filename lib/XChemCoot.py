@@ -70,8 +70,12 @@ class GUI(object):
                                     'Ligand Confidence: 2 - pose/identity uncertain',
                                     'Ligand Confidence: 3 - high confidence'   ]
 
+        self.ligand_site_information =  [   'all sites','1','2','3','4','5','6','7','8','9','10'    ]
+    
+
         # this decides which samples will be looked at
         self.selection_mode = ''
+        self.selected_site=''
 
         # the Folder is kind of a legacy thing because my inital idea was to have separate folders
         # for Data Processing and Refinement
@@ -152,17 +156,27 @@ class GUI(object):
 
         frame = gtk.Frame(label='Select Samples')
         self.hbox_select_samples=gtk.HBox()
+        vbox=gtk.VBox()
         self.cb_select_samples = gtk.combo_box_new_text()
         self.cb_select_samples.connect("changed", self.set_selection_mode)
         for citeria in self.selection_criteria:
             self.cb_select_samples.append_text(citeria)
-        self.hbox_select_samples.add(self.cb_select_samples)
+        vbox.add(self.cb_select_samples)
+        self.cb_select_sites = gtk.combo_box_new_text()
+        self.cb_select_sites.connect("changed", self.set_site)
+        for site in self.ligand_site_information:
+            self.cb_select_sites.append_text(site)
+        vbox.add(self.cb_select_sites)
+        self.hbox_select_samples.add(vbox)
         self.select_samples_button = gtk.Button(label="GO")
         self.select_samples_button.connect("clicked",self.get_samples_to_look_at)
         self.hbox_select_samples.add(self.select_samples_button)
 #        self.vbox.pack_start(self.hbox_select_samples)
         frame.add(self.hbox_select_samples)
         self.vbox.pack_start(frame)
+
+
+
 
         # SPACER
         self.vbox.add(gtk.Label(' '))
@@ -527,6 +541,9 @@ class GUI(object):
 #            if criteria==widget.get_active_text():
 #                self.selection_mode=self.selection_criteria[criteria]
 #                break
+
+    def set_site(self,widget):
+        self.selected_site=widget.get_active_text()
 
     def set_ligand_confidence(self,widget):
         self.ligand_confidence_of_sample=widget.get_active_text().replace('Ligand Confidence: ','')
