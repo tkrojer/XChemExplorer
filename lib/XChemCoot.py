@@ -156,27 +156,20 @@ class GUI(object):
 
         frame = gtk.Frame(label='Select Samples')
         self.hbox_select_samples=gtk.HBox()
-        vbox=gtk.VBox()
+#        vbox=gtk.VBox()
 
-        label=gtk.Label('State')
-        fontdesc = pango.FontDescription("Purisa 10")
-        label.modify_font(fontdesc)
-        frame_cb_select_samples=gtk.Frame(label)
-        vbox_cb=gtk.VBox()
         self.cb_select_samples = gtk.combo_box_new_text()
         self.cb_select_samples.connect("changed", self.set_selection_mode)
         for citeria in self.selection_criteria:
             self.cb_select_samples.append_text(citeria)
-        vbox_cb.add(self.cb_select_samples)
-        frame_cb_select_samples.add(vbox_cb)
-        vbox.add(frame_cb_select_samples)
+        self.hbox_select_samples.add(self.cb_select_samples)
 
 
         self.cb_select_sites = gtk.combo_box_new_text()
         self.cb_select_sites.connect("changed", self.set_site)
         for site in self.ligand_site_information:
             self.cb_select_sites.append_text(site)
-        vbox.add(self.cb_select_sites)
+        self.hbox_select_samples.add(self.cb_select_sites)
         self.hbox_select_samples.add(vbox)
         self.select_samples_button = gtk.Button(label="GO")
         self.select_samples_button.connect("clicked",self.get_samples_to_look_at)
