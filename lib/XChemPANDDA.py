@@ -4,32 +4,32 @@ from PyQt4 import QtGui, QtCore
 from XChemUtils import mtztools
 import csv
 
-class run_pandda_export:
-
-    sample=[]
-
-    db_dict={	'PANDDA_site_1_index':			'',
-			'PANDDA_site_1_name':			'',
-			'PANDDA_site_1_comment':		'',
-			'PANNDA_site_1_viewed':			'',
-			'PANDDA_site_1_confidence':		'',
-			'PANDDA_site_1_ligand_placed':	'',
-			'PANDDA_site_2_index':			'',
-			'PANDDA_site_2_name':			'',
-			'PANDDA_site_2_comment':		'',
-			'PANNDA_site_2_viewed':			'',
-			'PANDDA_site_2_confidence':		'',
-			'PANDDA_site_2_ligand_placed':	''	}
-
-    with open('pandda_inspect.csv','rb') as csv_import:
-        csv_dict = csv.DictReader(csv_import)
-        for line in csv_dict:
-            sampleID=line['dtag']
-            site_index=line['site_idx']
-            site_comment=line['Comment']
-            #print sampleID,site_index,site_comment
-	    	for item in db_dict:
-                print item
+#class run_pandda_export:
+#
+#    sample=[]
+#
+#    db_dict={	'PANDDA_site_1_index':			'',
+#			'PANDDA_site_1_name':			'',
+#			'PANDDA_site_1_comment':		'',
+#			'PANNDA_site_1_viewed':			'',
+#			'PANDDA_site_1_confidence':		'',
+#			'PANDDA_site_1_ligand_placed':	'',
+#			'PANDDA_site_2_index':			'',
+#			'PANDDA_site_2_name':			'',
+#			'PANDDA_site_2_comment':		'',
+#			'PANNDA_site_2_viewed':			'',
+#			'PANDDA_site_2_confidence':		'',
+#			'PANDDA_site_2_ligand_placed':	''	}
+#
+#    with open('pandda_inspect.csv','rb') as csv_import:
+#        csv_dict = csv.DictReader(csv_import)
+#        for line in csv_dict:
+#            sampleID=line['dtag']
+#            site_index=line['site_idx']
+#            site_comment=line['Comment']
+#            #print sampleID,site_index,site_comment
+#	    	for item in db_dict:
+#                print item
 
 
 
