@@ -157,10 +157,17 @@ class GUI(object):
         frame = gtk.Frame(label='Select Samples')
         self.hbox_select_samples=gtk.HBox()
         vbox=gtk.VBox()
+
+        frame_cb_select_samples=gtk.Frame(label='State')
+        vbox_cb=gtk.VBox()
         self.cb_select_samples = gtk.combo_box_new_text()
         self.cb_select_samples.connect("changed", self.set_selection_mode)
         for citeria in self.selection_criteria:
             self.cb_select_samples.append_text(citeria)
+        vbox_cb.add(self.cb_select_samples)
+        frame_cb_select_samples.add(vbox_cb)
+
+
         vbox.add(self.cb_select_samples)
         self.cb_select_sites = gtk.combo_box_new_text()
         self.cb_select_sites.connect("changed", self.set_site)
