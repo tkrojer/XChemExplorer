@@ -353,19 +353,21 @@ class GUI(object):
         frame.add(self.hbox_refinemnt_outcome)
         self.vbox.pack_start(frame)
 
+        # SPACER
+        self.vbox.add(gtk.Label(' '))
 
         # --- ligand modeling ---
+        frame = gtk.Frame(label='Ligand Modeling')
+        self.hbox_for_modeling=gtk.HBox()
         self.merge_ligand_button=gtk.Button(label="Merge Ligand")
         self.place_ligand_here_button=gtk.Button(label="Place Ligand here")
-#        self.fit_ligand_to_density_button=gtk.Button(label='Fit Ligand to Density')
-        self.hbox_for_modeling=gtk.HBox()
         self.hbox_for_modeling.add(self.place_ligand_here_button)
         self.place_ligand_here_button.connect("clicked",self.place_ligand_here)
         self.hbox_for_modeling.add(self.merge_ligand_button)
         self.merge_ligand_button.connect("clicked",self.merge_ligand_into_protein)
-#        self.hbox_for_modeling.add(self.fit_ligand_to_density_button)
-#        self.fit_ligand_to_density_button.connect("clicked",self.fit_ligand)
-        self.vbox.add(self.hbox_for_modeling)
+        frame.add(self.hbox_for_modeling)
+        self.vbox.pack_start(frame)
+
 
 #        # --- ligand confidence ---
 #        self.cb_ligand_confidence = gtk.combo_box_new_text()
