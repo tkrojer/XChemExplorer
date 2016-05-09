@@ -2,34 +2,52 @@ import os, sys, glob
 from datetime import datetime
 from PyQt4 import QtGui, QtCore
 from XChemUtils import mtztools
+import XChemDB
 import csv
 
-#class run_pandda_export:
-#
-#    sample=[]
-#
-#    db_dict={	'PANDDA_site_1_index':			'',
-#			'PANDDA_site_1_name':			'',
-#			'PANDDA_site_1_comment':		'',
-#			'PANNDA_site_1_viewed':			'',
-#			'PANDDA_site_1_confidence':		'',
-#			'PANDDA_site_1_ligand_placed':	'',
-#			'PANDDA_site_2_index':			'',
-#			'PANDDA_site_2_name':			'',
-#			'PANDDA_site_2_comment':		'',
-#			'PANNDA_site_2_viewed':			'',
-#			'PANDDA_site_2_confidence':		'',
-#			'PANDDA_site_2_ligand_placed':	''	}
-#
-#    with open('pandda_inspect.csv','rb') as csv_import:
-#        csv_dict = csv.DictReader(csv_import)
-#        for line in csv_dict:
-#            sampleID=line['dtag']
-#            site_index=line['site_idx']
-#            site_comment=line['Comment']
-#            #print sampleID,site_index,site_comment
-#	    	for item in db_dict:
-#                print item
+class run_pandda_export(QtCore.QThread):
+
+    def __init__(self,panddas_directory,datasource):
+        self.panddas_directory=panddas_directory
+        self.datasource=datasource
+        self.db=XChemDB.data_source(self.datasource)
+        self.db.create_missing_columns()
+
+    def run(self):
+        self.import_samples_into_datasouce()
+
+    def get_db_dict(self):
+
+        sample_dict={}
+
+        with open(os.path.join(self.panddas_directory,'pandda_inspect.csv'),'rb') as csv_import:
+            csv_dict = csv.DictReader(csv_import)
+            for i,line in enumerate(csv_dict):
+                sampleID=line['dtag']
+                site_index=line['site_idx']
+                if int(site_index) > 15:        # currently data source does not support more than 15 sites
+                    continue
+                if sampleID not in sample_dict:
+                    sample_dict[sampleID]={}
+
+                db_dict=sample_dict[sampleID]
+
+                db_dict['PANDDA_site_'+str(site_index)+'_index']=line['site_idx']
+                db_dict['PANDDA_site_'+str(site_index)+'_comment']=line['Comment']
+                db_dict['PANDDA_site_'+str(site_index)+'_confidence']=line['Ligand Confidence']
+                db_dict['PANDDA_site_'+str(site_index)+'_ligand_placed']=line['Ligand Placed']
+                db_dict['PANDDA_site_'+str(site_index)+'_viewed']=line['Viewed']
+                db_dict['PANDDA_site_'+str(site_index)+'_interesting']=line['Interesting']
+                db_dict['PANDDA_site_'+str(site_index)+'_z_peak']=line['z_peak']
+
+                sample_dict[sampleID]=db_dict
+
+    def import_samples_into_datasouce(self):
+
+        db_dict=self.get_db_dict()
+        for xtal in db_dict:
+            self.db.update_data_source(xtal,db_dict[xtal])
+
 
 
 
