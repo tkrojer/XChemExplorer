@@ -64,6 +64,14 @@ class GUI(object):
                                         '6 - Ready for Proofreading',
                                         '7 - Deposit!'       ]
 
+        self.experiment_stage =     [   ['Refinement\nFailed',       '-3 - Refinement Failed',   65000,  0,  0],
+                                        ['Ligand\nabsent',           '-4 - No ligand bound',     65000,  0,  0],
+                                        ['Ligand\nconfirmed',        '4 - Ligand Confirmed',     0,      65000,  0],
+                                        ['CompChem\nready',          '5 - CompChem ready',            0,  65000,  0],
+                                        ['Ready for\nProofreading',  '6 - Ready for Proofreading',   0,      0,  65000],
+                                        ['Deposit',                  '7 - Ready for Deposition',      0,      0,  65000]   ]
+
+
         self.ligand_confidence = [  'Ligand Confidence: Analysis Pending',
                                     'Ligand Confidence: 0 - no ligand present',
                                     'Ligand Confidence: 1 - low confidence',
@@ -314,24 +322,32 @@ class GUI(object):
         # --- current refinement stage ---
         frame = gtk.Frame(label='Experiment Outcome')
         self.hbox_refinemnt_outcome=gtk.HBox()
-        self.refinement_failed_buttoon = gtk.Button(label="Refinement\nFailed")
-        self.refinement_failed_buttoon.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(65535,0,0))
-        self.refinement_failed_buttoon.modify_bg(gtk.STATE_ACTIVE, gtk.gdk.Color(0,65535,0))
-        self.refinement_failed_buttoon.modify_bg(gtk.STATE_PRELIGHT, gtk.gdk.Color(0,0,65535))
-#        self.refinement_failed_buttoon.modify_bg(gtk.STATE_SELECTED, gtk.gdk.Color(65535,0,0))
-#        self.refinement_failed_buttoon.modify_bg(gtk.STATE_INSENSITIVE, gtk.gdk.Color(65535,0,0))
-        self.refinement_failed_buttoon.connect("clicked",self.update_data_source,"Refinement Failed")
-        self.hbox_refinemnt_outcome.add(self.refinement_failed_buttoon)
+#        self.refinement_failed_buttoon = gtk.Button(label="Refinement\nFailed")
+#        self.refinement_failed_buttoon.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(65535,0,0))
+#        self.refinement_failed_buttoon.modify_bg(gtk.STATE_ACTIVE, gtk.gdk.Color(0,65535,0))
+#        self.refinement_failed_buttoon.modify_bg(gtk.STATE_PRELIGHT, gtk.gdk.Color(0,0,65535))
+##        self.refinement_failed_buttoon.modify_bg(gtk.STATE_SELECTED, gtk.gdk.Color(65535,0,0))
+##        self.refinement_failed_buttoon.modify_bg(gtk.STATE_INSENSITIVE, gtk.gdk.Color(65535,0,0))
+#        self.refinement_failed_buttoon.connect("clicked",self.update_data_source,"Refinement Failed")
+#        self.hbox_refinemnt_outcome.add(self.refinement_failed_buttoon)
+#
+#        self.no_ligand_present_button = gtk.Button(label="No Ligand")
+#        self.no_ligand_present_button.connect("clicked",self.update_data_source,"No Ligand Bound")
+#        self.hbox_refinemnt_outcome.add(self.no_ligand_present_button)
+#        self.structure_finished_button = gtk.Button(label="Structure\nFinished")
+#
+#        self.structure_finished_button.connect("clicked",self.update_data_source,"Structure Finished")
+#        self.hbox_refinemnt_outcome.add(self.structure_finished_button)
 
-        self.no_ligand_present_button = gtk.Button(label="No Ligand")
-        self.no_ligand_present_button.connect("clicked",self.update_data_source,"No Ligand Bound")
-        self.hbox_refinemnt_outcome.add(self.no_ligand_present_button)
-        self.structure_finished_button = gtk.Button(label="Structure\nFinished")
 
-        self.structure_finished_button.connect("clicked",self.update_data_source,"Structure Finished")
-        self.hbox_refinemnt_outcome.add(self.structure_finished_button)
+        for button in self.experiment_stage:
+            new_button=gtk.Button(label=button[0])
+            new_button.connect("clicked",self.experiment_stage_button_clicked)
+            self.hbox_refinemnt_outcome.add(new_button)
+
         frame.add(self.hbox_refinemnt_outcome)
         self.vbox.pack_start(frame)
+
 
         # --- ligand modeling ---
         self.merge_ligand_button=gtk.Button(label="Merge Ligand")
@@ -413,6 +429,9 @@ class GUI(object):
         if self.index >= len(self.Todo):
             self.index = len(self.Todo)
         self.cb.set_active(self.index)
+
+    def experiment_stage_button_clicked(self,widget):
+        print 'here',widget.get_label()
 
     def RefreshData(self):
         # initialize Refinement library
