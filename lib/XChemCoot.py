@@ -65,18 +65,15 @@ class GUI(object):
                                         '7 - Deposit!'       ]
 
         self.experiment_stage =     [   ['Refinement\nFailed',       '-3 - Refinement Failed',   65000,  0,  0],
-                                        ['Ligand\nabsent',           '-4 - No ligand bound',     65000,  0,  0],
-                                        ['Ligand\nconfirmed',        '4 - Ligand Confirmed',     0,      65000,  0],
+                                        ['Ligand\nConfidence'],
                                         ['CompChem\nready',          '5 - CompChem ready',            0,  65000,  0],
                                         ['Ready for\nProofreading',  '6 - Ready for Proofreading',   0,      0,  65000],
                                         ['Deposit',                  '7 - Ready for Deposition',      0,      0,  65000]   ]
 
-
-        self.ligand_confidence = [  'Ligand Confidence: Analysis Pending',
-                                    'Ligand Confidence: 0 - no ligand present',
-                                    'Ligand Confidence: 1 - low confidence',
-                                    'Ligand Confidence: 2 - pose/identity uncertain',
-                                    'Ligand Confidence: 3 - high confidence'   ]
+        self.ligand_confidence = [  '0 - no ligand present',
+                                    '1 - low confidence',
+                                    '2 - pose/identity uncertain',
+                                    '3 - high confidence'   ]
 
         self.ligand_site_information =  [   'all sites','1','2','3','4','5','6','7','8','9','10'    ]
     
@@ -341,10 +338,17 @@ class GUI(object):
 
 
         for button in self.experiment_stage:
-            new_button=gtk.Button(label=button[0])
-            new_button.connect("clicked",self.experiment_stage_button_clicked)
-            new_button.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(button[2],button[3],button[4]))
-            self.hbox_refinemnt_outcome.add(new_button)
+            if str(button[0]).startswith('Ligand'):
+                self.cb_ligand_confidence = gtk.combo_box_new_text()
+                self.cb_ligand_confidence.connect("changed", self.set_ligand_confidence)
+                for citeria in self.ligand_confidence:
+                    self.cb_ligand_confidence.append_text(citeria)
+                self.hbox_refinemnt_outcome.add(self.cb_ligand_confidence)
+            else:
+                new_button=gtk.Button(label=button[0])
+                new_button.connect("clicked",self.experiment_stage_button_clicked)
+                new_button.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(button[2],button[3],button[4]))
+                self.hbox_refinemnt_outcome.add(new_button)
 
         frame.add(self.hbox_refinemnt_outcome)
         self.vbox.pack_start(frame)
@@ -363,12 +367,12 @@ class GUI(object):
 #        self.fit_ligand_to_density_button.connect("clicked",self.fit_ligand)
         self.vbox.add(self.hbox_for_modeling)
 
-        # --- ligand confidence ---
-        self.cb_ligand_confidence = gtk.combo_box_new_text()
-        self.cb_ligand_confidence.connect("changed", self.set_ligand_confidence)
-        for citeria in self.ligand_confidence:
-            self.cb_ligand_confidence.append_text(citeria)
-        self.vbox.add(self.cb_ligand_confidence)
+#        # --- ligand confidence ---
+#        self.cb_ligand_confidence = gtk.combo_box_new_text()
+#        self.cb_ligand_confidence.connect("changed", self.set_ligand_confidence)
+#        for citeria in self.ligand_confidence:
+#            self.cb_ligand_confidence.append_text(citeria)
+#        self.vbox.add(self.cb_ligand_confidence)
 
 
         # --- refinement & options ---
