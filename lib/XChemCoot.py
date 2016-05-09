@@ -170,7 +170,7 @@ class GUI(object):
         for site in self.ligand_site_information:
             self.cb_select_sites.append_text(site)
         self.hbox_select_samples.add(self.cb_select_sites)
-        self.hbox_select_samples.add(vbox)
+ #       self.hbox_select_samples.add(vbox)
         self.select_samples_button = gtk.Button(label="GO")
         self.select_samples_button.connect("clicked",self.get_samples_to_look_at)
         self.hbox_select_samples.add(self.select_samples_button)
