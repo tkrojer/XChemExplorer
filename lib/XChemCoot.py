@@ -343,6 +343,7 @@ class GUI(object):
         for button in self.experiment_stage:
             new_button=gtk.Button(label=button[0])
             new_button.connect("clicked",self.experiment_stage_button_clicked)
+            new_button.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(button[2],button[3],button[4]))
             self.hbox_refinemnt_outcome.add(new_button)
 
         frame.add(self.hbox_refinemnt_outcome)
