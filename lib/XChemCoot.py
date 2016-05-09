@@ -39,7 +39,7 @@ class GUI(object):
         ###########################################################################################
         # read in settings file from XChemExplorer to set the relevant paths
         print 'current dir',os.getcwd()
-        self.settings = pickle.load(open("XChemExplorer_settings.pkl","rb"))
+        self.settings = pickle.load(open(".xce_settings.pkl","rb"))
         print 'setting',self.settings
         self.refine_model_directory=self.settings['refine_model_directory']
         self.database_directory=self.settings['database_directory']
