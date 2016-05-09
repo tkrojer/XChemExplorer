@@ -41,7 +41,7 @@ class GUI(object):
         print 'current dir',os.getcwd()
         self.settings = pickle.load(open(".xce_settings.pkl","rb"))
         print 'setting',self.settings
-        self.refine_model_directory=self.settings['refine_model_directory']
+#        self.refine_model_directory=self.settings['refine_model_directory']
         self.database_directory=self.settings['database_directory']
         self.data_source=self.settings['data_source']
         self.db=XChemDB.data_source(self.data_source)
