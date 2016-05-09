@@ -168,7 +168,7 @@ class GUI(object):
         frame_cb_select_samples.add(vbox_cb)
 
 
-        vbox.add(self.cb_select_samples)
+        vbox.add(frame_cb_select_samples)
         self.cb_select_sites = gtk.combo_box_new_text()
         self.cb_select_sites.connect("changed", self.set_site)
         for site in self.ligand_site_information:
