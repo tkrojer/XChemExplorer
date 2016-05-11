@@ -99,7 +99,7 @@ class run_pandda_export(QtCore.QThread):
 
 
     def export_models(self):
-        source_file=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-csh')
+        source_file=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')
         Cmds = (
                 'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-csh')+'\n'
                 '\n'
