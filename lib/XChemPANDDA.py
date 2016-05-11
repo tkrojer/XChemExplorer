@@ -81,22 +81,15 @@ class run_pandda_export(QtCore.QThread):
                                     line['Interesting'],
                                     line['z_peak']              ])
 
-#            ['PANDDA_site_L_index',                 'PANDDA_site_L_index',                      'TEXT'],
-#            ['PANDDA_site_L_name',                  'PANDDA_site_L_name',                       'TEXT'],
-#            ['PANDDA_site_L_comment',               'PANDDA_site_L_comment',                    'TEXT'],
-#            ['PANDDA_site_L_confidence',            'PANDDA_site_L_confidence',                 'TEXT'],
-#            ['PANDDA_site_L_ligand_placed',         'PANDDA_site_L_ligand_placed',              'TEXT'],
-#            ['PANDDA_site_L_viewed',                'PANDDA_site_L_viewed',                     'TEXT'],
-#            ['PANDDA_site_L_interesting',           'PANDDA_site_L_interesting',                'TEXT'],
-#            ['PANDDA_site_L_z_peak',                'PANDDA_site_L_z_peak',                     'TEXT'],
-
         site=['_A_','_B_','_C_','_D_','_E_','_F_','_G_','_H_','_I_','_J_','_K_','_L_']
 
+        print self.db_list
         for xtal in sample_dict:
             db_dict={}
             # sort by site index
             sample_dict[xtal].sort()
             for n,entry in enumerate(sample_dict[xtal]):
+                print entry
                 for item in self.db_list:
                     if item[0].startswith('PANDDA_site') and site[n] in item[0]:
                         if item[0].endswith('_index'):          db_dict[item[0]]=entry[0]
