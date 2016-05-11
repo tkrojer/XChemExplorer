@@ -14,10 +14,11 @@ class run_pandda_export(QtCore.QThread):
         self.initial_model_directory=initial_model_directory
         self.db=XChemDB.data_source(self.datasource)
         self.db.create_missing_columns()
+        self.db_list=self.db.get_empty_db_dict()
 
     def run(self):
         self.import_samples_into_datasouce()
-        self.export_models()
+#        self.export_models()
 
 #    def get_db_dict(self):
 #
@@ -55,14 +56,6 @@ class run_pandda_export(QtCore.QThread):
     def get_db_dict(self):
 
 
-#        db_dict['PANDDA_site_A_index']
-#        db_dict['PANDDA_site_A_name']=line['site_idx']
-#        db_dict['PANDDA_site_A_comment']=line['Comment']
-#        db_dict['PANDDA_site_A_confidence']=line['Ligand Confidence']
-#        db_dict['PANDDA_site_A_ligand_placed']=line['Ligand Placed']
-#        db_dict['PANDDA_site_A_viewed']=line['Viewed']
-#        db_dict['PANDDA_site_A_interesting']=line['Interesting']
-#        db_dict['PANDDA_site_A_z_peak']=line['z_peak']
 
 
         sample_dict={}
@@ -72,7 +65,7 @@ class run_pandda_export(QtCore.QThread):
             for i,line in enumerate(csv_dict):
                 sampleID=line['dtag']
                 site_index=line['site_idx']
-                if int(site_index) > 15:        # currently data source does not support more than 15 sites
+                if int(site_index) > 12:        # currently data source does not support more than 12 sites
                     continue
                 if sampleID not in sample_dict:
                     sample_dict[sampleID]=[]
@@ -88,12 +81,33 @@ class run_pandda_export(QtCore.QThread):
                                     line['Interesting'],
                                     line['z_peak']              ])
 
+#            ['PANDDA_site_L_index',                 'PANDDA_site_L_index',                      'TEXT'],
+#            ['PANDDA_site_L_name',                  'PANDDA_site_L_name',                       'TEXT'],
+#            ['PANDDA_site_L_comment',               'PANDDA_site_L_comment',                    'TEXT'],
+#            ['PANDDA_site_L_confidence',            'PANDDA_site_L_confidence',                 'TEXT'],
+#            ['PANDDA_site_L_ligand_placed',         'PANDDA_site_L_ligand_placed',              'TEXT'],
+#            ['PANDDA_site_L_viewed',                'PANDDA_site_L_viewed',                     'TEXT'],
+#            ['PANDDA_site_L_interesting',           'PANDDA_site_L_interesting',                'TEXT'],
+#            ['PANDDA_site_L_z_peak',                'PANDDA_site_L_z_peak',                     'TEXT'],
+
+        site=['_A_','_B_','_C_','_D_','_E_','_F_','_G_','_H_','_I_','_J_','_K_','_L_']
 
         for xtal in sample_dict:
+            db_dict={}
             # sort by site index
             sample_dict[xtal].sort()
-            for entry in sample_dict[xtal]:
-                print xtal,entry
+            for n,entry in enumerate(sample_dict[xtal]):
+                for item in self.db_list:
+                    if item[0].startswith('PANDDA_site') and site[n] in item[0]:
+                        if item[0].endswith('_index'):          db_dict[item[0]]=entry[0]
+                        if item[0].endswith('_name'):           db_dict[item[0]]=entry[1]
+                        if item[0].endswith('_comment'):        db_dict[item[0]]=entry[2]
+                        if item[0].endswith('_confidence'):     db_dict[item[0]]=entry[3]
+                        if item[0].endswith('_ligand_placed'):  db_dict[item[0]]=entry[4]
+                        if item[0].endswith('_viewed'):         db_dict[item[0]]=entry[5]
+                        if item[0].endswith('_interesting'):    db_dict[item[0]]=entry[6]
+                        if item[0].endswith('_z_peak'):         db_dict[item[0]]=entry[7]
+            print xtal,db_dict
 
         return sample_dict
 
