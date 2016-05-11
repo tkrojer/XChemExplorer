@@ -49,14 +49,27 @@ class run_pandda_export(QtCore.QThread):
     def import_samples_into_datasouce(self):
 
         db_dict=self.get_db_dict()
-#        for xtal in db_dict:
+
+        progress_step=1
+        if len(db_dict) != 0:
+            progress_step=100/float(len(db_dict))
+        else:
+            progress_step=0
+        progress=0
+
+        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+        for xtal in db_dict:
+            print '==> XCE: updating data source with PANDDA site information for',xtal
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating data source with PANDDA site information for '+xtal)
+            print xtal,db_dict[xtal]
 #            self.db.update_data_source(xtal,db_dict[xtal])
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
 
 
     def get_db_dict(self):
-
-
-
 
         sample_dict={}
 
@@ -72,16 +85,25 @@ class run_pandda_export(QtCore.QThread):
 
                 db_list=sample_dict[sampleID]
 
+                # MISSING
+                # x,y,z of event
+                # event map
+
                 db_list.append([    line['site_idx'],
                                     'site name',
+                                    line['event_idx'],
                                     line['Comment'],
                                     line['Ligand Confidence'],
                                     line['Ligand Placed'],
                                     line['Viewed'],
                                     line['Interesting'],
-                                    line['z_peak']              ])
+                                    line['z_peak'],
+                                    line['x'],
+                                    line['y'],
+                                    line['z']   ])
 
         site=['_A_','_B_','_C_','_D_','_E_','_F_','_G_','_H_','_I_','_J_','_K_','_L_']
+        return_dict={}
 
         for xtal in sample_dict:
             db_dict={}
@@ -91,17 +113,22 @@ class run_pandda_export(QtCore.QThread):
                 print site[n]
                 for item in self.db_list:
                     if item.startswith('PANDDA_site') and site[n] in item:
-                        if item.endswith('_index'):          db_dict[item]=entry[0]
-                        if item.endswith('_name'):           db_dict[item]=entry[1]
-                        if item.endswith('_comment'):        db_dict[item]=entry[2]
-                        if item.endswith('_confidence'):     db_dict[item]=entry[3]
-                        if item.endswith('_ligand_placed'):  db_dict[item]=entry[4]
-                        if item.endswith('_viewed'):         db_dict[item]=entry[5]
-                        if item.endswith('_interesting'):    db_dict[item]=entry[6]
-                        if item.endswith('_z_peak'):         db_dict[item]=entry[7]
-            print xtal,db_dict
+                        if item.endswith('_index'):             db_dict[item]=entry[0]
+                        if item.endswith('_name'):              db_dict[item]=entry[1]
 
-        return sample_dict
+
+                        if item.endswith('_comment'):           db_dict[item]=entry[2]
+                        if item.endswith('_confidence'):        db_dict[item]=entry[3]
+                        if item.endswith('_ligand_placed'):     db_dict[item]=entry[4]
+                        if item.endswith('_viewed'):            db_dict[item]=entry[5]
+                        if item.endswith('_interesting'):       db_dict[item]=entry[6]
+                        if item.endswith('_z_peak'):            db_dict[item]=entry[7]
+                        if item.endswith('_x'):                 db_dict[item]=entry[8]
+                        if item.endswith('_y'):                 db_dict[item]=entry[9]
+                        if item.endswith('_z'):                 db_dict[item]=entry[10]
+            return_dict[xtal]=db_dict
+
+        return return_dict
 
 
     def export_models(self):
