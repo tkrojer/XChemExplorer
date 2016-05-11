@@ -90,17 +90,15 @@ class run_pandda_export(QtCore.QThread):
             for n,entry in enumerate(sample_dict[xtal]):
                 print site[n]
                 for item in self.db_list:
-                    print item
-                    if item[0].startswith('PANDDA_site') and site[n] in item[0]:
-                        print 'hallo'
-                        if item[0].endswith('_index'):          db_dict[item[0]]=entry[0]
-                        if item[0].endswith('_name'):           db_dict[item[0]]=entry[1]
-                        if item[0].endswith('_comment'):        db_dict[item[0]]=entry[2]
-                        if item[0].endswith('_confidence'):     db_dict[item[0]]=entry[3]
-                        if item[0].endswith('_ligand_placed'):  db_dict[item[0]]=entry[4]
-                        if item[0].endswith('_viewed'):         db_dict[item[0]]=entry[5]
-                        if item[0].endswith('_interesting'):    db_dict[item[0]]=entry[6]
-                        if item[0].endswith('_z_peak'):         db_dict[item[0]]=entry[7]
+                    if item.startswith('PANDDA_site') and site[n] in item:
+                        if item.endswith('_index'):          db_dict[item]=entry[0]
+                        if item.endswith('_name'):           db_dict[item]=entry[1]
+                        if item.endswith('_comment'):        db_dict[item]=entry[2]
+                        if item.endswith('_confidence'):     db_dict[item]=entry[3]
+                        if item.endswith('_ligand_placed'):  db_dict[item]=entry[4]
+                        if item.endswith('_viewed'):         db_dict[item]=entry[5]
+                        if item.endswith('_interesting'):    db_dict[item]=entry[6]
+                        if item.endswith('_z_peak'):         db_dict[item]=entry[7]
             print xtal,db_dict
 
         return sample_dict
