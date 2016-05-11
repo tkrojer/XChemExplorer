@@ -14,6 +14,7 @@ class run_pandda_export(QtCore.QThread):
         self.db.create_missing_columns()
 
     def run(self):
+        print 'fuirguir'
         self.import_samples_into_datasouce()
 
 #    def get_db_dict(self):
@@ -92,8 +93,9 @@ class run_pandda_export(QtCore.QThread):
             print xtal
             print sample_dict[xtal]
 
+#pandda.export pandda_dir=/dls/labxchem/data/2015/lb13385-2/processing/test/pandda export_dir=./testx export_ligands=False generate_occupancy_groupings=True
 
-
+        return sample_dict
 
 class run_pandda_analyse(QtCore.QThread):
 
