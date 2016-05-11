@@ -91,8 +91,8 @@ class run_pandda_export(QtCore.QThread):
         for xtal in sample_dict:
             # sort by site index
             sample_dict[xtal].sort()
-            print xtal
-            print sample_dict[xtal]
+            for entry in sample_dict[xtal]:
+                print xtal,entry
 
 #pandda.export pandda_dir=/dls/labxchem/data/2015/lb13385-2/processing/test/pandda export_dir=./testx export_ligands=False generate_occupancy_groupings=True
 
