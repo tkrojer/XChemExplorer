@@ -90,7 +90,7 @@ class run_pandda_export(QtCore.QThread):
             for n,entry in enumerate(sample_dict[xtal]):
                 print site[n]
                 for item in self.db_list:
-                    print item[0]
+                    print item
                     if item[0].startswith('PANDDA_site') and site[n] in item[0]:
                         print 'hallo'
                         if item[0].endswith('_index'):          db_dict[item[0]]=entry[0]
