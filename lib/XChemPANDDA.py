@@ -8,6 +8,7 @@ import csv
 class run_pandda_export(QtCore.QThread):
 
     def __init__(self,panddas_directory,datasource):
+        QtCore.QThread.__init__(self)
         self.panddas_directory=panddas_directory
         self.datasource=datasource
         self.db=XChemDB.data_source(self.datasource)
