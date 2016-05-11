@@ -1331,6 +1331,7 @@ class XChemExplorer(QtGui.QApplication):
 
             self.initial_model_directory_label.setText(self.initial_model_directory)
             self.panddas_directory_label.setText(self.panddas_directory)
+            self.pandda_output_data_dir_entry.setText(self.panddas_directory)
             self.reference_directory_label.setText(self.reference_directory)
 #            self.database_directory_label.setText(self.database_directory)
             self.beamline_directory_label.setText(self.beamline_directory)
@@ -1713,6 +1714,9 @@ class XChemExplorer(QtGui.QApplication):
         elif instruction=='pandda.inspect':
             self.run_pandda_inspect()
 
+        elif instruction=='Export PANDDA models':
+            self.run_pandda_export()
+
         elif instruction=='Show HTML summary':
             self.show_pandda_html_summary()
 
@@ -2002,6 +2006,13 @@ class XChemExplorer(QtGui.QApplication):
         self.settings['panddas_directory']=str(self.pandda_output_data_dir_entry.text())
         print '==> XCE: starting pandda.inspect'
         self.work_thread=XChemThread.start_pandda_inspect(self.settings)
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.work_thread.start()
+
+    def run_pandda_export(self):
+        self.settings['panddas_directory']=str(self.pandda_output_data_dir_entry.text())
+        print '==> XCE: exporting models from pandda.inspect'
+        self.work_thread=XChemPANDDA.run_pandda_export(self.panddas_directory,os.path.join(self.database_directory,self.data_source_file))
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 

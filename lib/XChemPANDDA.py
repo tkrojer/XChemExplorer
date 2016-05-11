@@ -16,11 +16,56 @@ class run_pandda_export(QtCore.QThread):
     def run(self):
         self.import_samples_into_datasouce()
 
+#    def get_db_dict(self):
+#
+#        sample_dict={}
+#
+#        with open(os.path.join(self.panddas_directory,'pandda_inspect.csv'),'rb') as csv_import:
+#            csv_dict = csv.DictReader(csv_import)
+#            for i,line in enumerate(csv_dict):
+#                sampleID=line['dtag']
+#                site_index=line['site_idx']
+#                if int(site_index) > 15:        # currently data source does not support more than 15 sites
+#                    continue
+#                if sampleID not in sample_dict:
+#                    sample_dict[sampleID]={}
+#
+#                db_dict=sample_dict[sampleID]
+#
+#                db_dict['PANDDA_site_'+str(site_index)+'_index']=line['site_idx']
+#                db_dict['PANDDA_site_'+str(site_index)+'_comment']=line['Comment']
+#                db_dict['PANDDA_site_'+str(site_index)+'_confidence']=line['Ligand Confidence']
+#                db_dict['PANDDA_site_'+str(site_index)+'_ligand_placed']=line['Ligand Placed']
+#                db_dict['PANDDA_site_'+str(site_index)+'_viewed']=line['Viewed']
+#                db_dict['PANDDA_site_'+str(site_index)+'_interesting']=line['Interesting']
+#                db_dict['PANDDA_site_'+str(site_index)+'_z_peak']=line['z_peak']
+#
+#                sample_dict[sampleID]=db_dict
+
+    def import_samples_into_datasouce(self):
+
+        db_dict=self.get_db_dict()
+        print 'hallo'
+#        for xtal in db_dict:
+#            self.db.update_data_source(xtal,db_dict[xtal])
+
+
     def get_db_dict(self):
+
+
+#        db_dict['PANDDA_site_A_index']
+#        db_dict['PANDDA_site_A_name']=line['site_idx']
+#        db_dict['PANDDA_site_A_comment']=line['Comment']
+#        db_dict['PANDDA_site_A_confidence']=line['Ligand Confidence']
+#        db_dict['PANDDA_site_A_ligand_placed']=line['Ligand Placed']
+#        db_dict['PANDDA_site_A_viewed']=line['Viewed']
+#        db_dict['PANDDA_site_A_interesting']=line['Interesting']
+#        db_dict['PANDDA_site_A_z_peak']=line['z_peak']
+
 
         sample_dict={}
 
-        with open(os.path.join(self.panddas_directory,'pandda_inspect.csv'),'rb') as csv_import:
+        with open(os.path.join(self.panddas_directory,'analyses','pandda_inspect.csv'),'rb') as csv_import:
             csv_dict = csv.DictReader(csv_import)
             for i,line in enumerate(csv_dict):
                 sampleID=line['dtag']
@@ -28,25 +73,24 @@ class run_pandda_export(QtCore.QThread):
                 if int(site_index) > 15:        # currently data source does not support more than 15 sites
                     continue
                 if sampleID not in sample_dict:
-                    sample_dict[sampleID]={}
+                    sample_dict[sampleID]=[]
 
-                db_dict=sample_dict[sampleID]
+                db_list=sample_dict[sampleID]
 
-                db_dict['PANDDA_site_'+str(site_index)+'_index']=line['site_idx']
-                db_dict['PANDDA_site_'+str(site_index)+'_comment']=line['Comment']
-                db_dict['PANDDA_site_'+str(site_index)+'_confidence']=line['Ligand Confidence']
-                db_dict['PANDDA_site_'+str(site_index)+'_ligand_placed']=line['Ligand Placed']
-                db_dict['PANDDA_site_'+str(site_index)+'_viewed']=line['Viewed']
-                db_dict['PANDDA_site_'+str(site_index)+'_interesting']=line['Interesting']
-                db_dict['PANDDA_site_'+str(site_index)+'_z_peak']=line['z_peak']
+                db_list.append([    line['site_idx'],
+                                    line['Comment'],
+                                    line['Ligand Confidence'],
+                                    line['Ligand Placed'],
+                                    line['Viewed'],
+                                    line['Interesting'],
+                                    line['z_peak']              ])
 
-                sample_dict[sampleID]=db_dict
 
-    def import_samples_into_datasouce(self):
-
-        db_dict=self.get_db_dict()
-        for xtal in db_dict:
-            self.db.update_data_source(xtal,db_dict[xtal])
+        for xtal in sample_dict:
+            # sort by site index
+            sample_dict[xtal].sort()
+            print xtal
+            print sample_dict[xtal]
 
 
 
