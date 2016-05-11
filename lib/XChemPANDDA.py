@@ -7,17 +7,18 @@ import csv
 
 class run_pandda_export(QtCore.QThread):
 
-    def __init__(self,panddas_directory,datasource):
+    def __init__(self,panddas_directory,datasource,initial_model_directory):
         QtCore.QThread.__init__(self)
         self.panddas_directory=panddas_directory
         self.datasource=datasource
+        self.initial_model_directory=initial_model_directory
         self.db=XChemDB.data_source(self.datasource)
         self.db.create_missing_columns()
 
     def run(self):
-        print 'fuirguir'
         self.import_samples_into_datasouce()
-
+        self.export_models()
+        
 #    def get_db_dict(self):
 #
 #        sample_dict={}
@@ -47,7 +48,6 @@ class run_pandda_export(QtCore.QThread):
     def import_samples_into_datasouce(self):
 
         db_dict=self.get_db_dict()
-        print 'hallo'
 #        for xtal in db_dict:
 #            self.db.update_data_source(xtal,db_dict[xtal])
 
@@ -80,6 +80,7 @@ class run_pandda_export(QtCore.QThread):
                 db_list=sample_dict[sampleID]
 
                 db_list.append([    line['site_idx'],
+                                    'site name',
                                     line['Comment'],
                                     line['Ligand Confidence'],
                                     line['Ligand Placed'],
@@ -94,9 +95,27 @@ class run_pandda_export(QtCore.QThread):
             for entry in sample_dict[xtal]:
                 print xtal,entry
 
-#pandda.export pandda_dir=/dls/labxchem/data/2015/lb13385-2/processing/test/pandda export_dir=./testx export_ligands=False generate_occupancy_groupings=True
-
         return sample_dict
+
+
+    def export_models(self):
+        source_file=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-csh')
+        Cmds = (
+                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-csh')+'\n'
+                '\n'
+                'pandda.export '
+                ' pandda_dir=%s' %self.panddas_directory+
+                ' export_dir=%s' %self.initial_model_directory+
+                ' export_ligands=False'
+                ' generate_occupancy_groupings=True'
+                '\n'
+                )
+            print Cmds
+
+#        os.system(Cmds)
+
+
+
 
 class run_pandda_analyse(QtCore.QThread):
 
