@@ -18,7 +18,7 @@ class run_pandda_export(QtCore.QThread):
     def run(self):
         self.import_samples_into_datasouce()
         self.export_models()
-        
+
 #    def get_db_dict(self):
 #
 #        sample_dict={}
@@ -110,7 +110,7 @@ class run_pandda_export(QtCore.QThread):
                 ' generate_occupancy_groupings=True'
                 '\n'
                 )
-            print Cmds
+        print Cmds
 
 #        os.system(Cmds)
 
