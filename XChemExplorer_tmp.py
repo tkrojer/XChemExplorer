@@ -1211,6 +1211,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def datasource_menu_reload_samples(self):
         print '==> reading samples from data source: ',os.path.join(self.database_directory,self.data_source_file)
+        self.update_status_bar('reading samples from data source: '+os.path.join(self.database_directory,self.data_source_file))
         self.update_header_and_data_from_datasource()
         self.update_all_tables()
 #        self.populate_and_update_data_source_table()
@@ -1540,13 +1541,18 @@ class XChemExplorer(QtGui.QApplication):
 
     def update_all_tables(self):
         print '==> checking for new reference files'
+        self.update_status_bar('checking for new reference files')
         self.reference_file_list=self.get_reference_file_list(' ')
         print '==> updating Overview table'
+        self.update_status_bar('updating Overview table')
         self.populate_and_update_data_source_table()
         print '==> updating Maps table'
+        self.update_status_bar('updating Maps table')
         self.create_initial_model_table()
         print '==> updating PANDDA table'
+        self.update_status_bar('updating PANDDA table')
         self.populate_pandda_analyse_input_table()
+        self.update_status_bar('idle')
 
 
     def settings_button_clicked(self):
@@ -2321,7 +2327,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def find_suitable_reference_file(self,db_dict):
         reference_file=[]
-        self.status_bar.showMessage('checking: '+str(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])))
+#        self.status_bar.showMessage('checking: '+str(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])))
         suitable_reference=[]
         for reference in self.reference_file_list:
             # first we need one in the same pointgroup
