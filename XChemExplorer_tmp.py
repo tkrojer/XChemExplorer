@@ -1917,7 +1917,7 @@ class XChemExplorer(QtGui.QApplication):
         self.populate_and_update_data_source_table()
 
     def datasource_menu_update_datasource(self):
-        self.work_thread=XChemThread.update_datasource_from_file_system(self.initial_model_directory)
+        self.work_thread=XChemThread.update_datasource_from_file_system(self.initial_model_directory,os.path.join(self.database_directory,self.data_source_file))
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)

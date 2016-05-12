@@ -25,7 +25,7 @@ import XChemDB
 
 
 class update_datasource_from_file_system(QtCore.QThread):
-    def __init__(self,initial_model_directory,data_source):
+    def __init__(self,initial_model_directory,datasource):
         QtCore.QThread.__init__(self)
         self.initial_model_directory=initial_model_directory
         self.datasource=datasource
