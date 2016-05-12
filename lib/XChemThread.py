@@ -77,8 +77,10 @@ class update_datasource_from_file_system(QtCore.QThread):
                     db_dict['RefinementMTZ_latest']=os.path.realpath(os.path.join(directory,'refine.mtz'))
                 # check if EVENT map exists
                     if file.startswith(xtal+'-event_') and filename.endswith('map.native.ccp4'):
+                        print file
                         tmp=file[file.find('event_')+6:]
                         event_id=tmp[:tmp.find('_')]
+                        print event_id
                         for entry in sample_dict:
                             if entry.endswith('_event_index'):
                                 if sample_dict[entry]==event_id:
