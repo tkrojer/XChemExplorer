@@ -148,7 +148,7 @@ class data_source:
 
             ['PANDDA_site_A_site_index',                 'PANDDA_site_A_site_index',                      'TEXT'],
             ['PANDDA_site_A_name',                  'PANDDA_site_A_name',                       'TEXT'],
-            ['PANDDA_site_A_site_index',                 'PANDDA_site_A_site_index',                      'TEXT'],
+            ['PANDDA_site_A_event_index',                 'PANDDA_site_A_event_index',                      'TEXT'],
             ['PANDDA_site_A_comment',               'PANDDA_site_A_comment',                    'TEXT'],
             ['PANDDA_site_A_confidence',            'PANDDA_site_A_confidence',                 'TEXT'],
             ['PANDDA_site_A_ligand_placed',         'PANDDA_site_A_ligand_placed',              'TEXT'],
@@ -163,7 +163,7 @@ class data_source:
 
             ['PANDDA_site_B_site_index',                 'PANDDA_site_B_site_index',                      'TEXT'],
             ['PANDDA_site_B_name',                  'PANDDA_site_B_name',                       'TEXT'],
-            ['PANDDA_event_B_event_index',                 'PANDDA_event_B_event_index',                      'TEXT'],
+            ['PANDDA_site_B_event_index',                 'PANDDA_site_B_event_index',                      'TEXT'],
             ['PANDDA_site_B_comment',               'PANDDA_site_B_comment',                    'TEXT'],
             ['PANDDA_site_B_confidence',            'PANDDA_site_B_confidence',                 'TEXT'],
             ['PANDDA_site_B_ligand_placed',         'PANDDA_site_B_ligand_placed',              'TEXT'],
@@ -178,7 +178,7 @@ class data_source:
 
             ['PANDDA_site_C_site_index',                 'PANDDA_site_C_site_index',                      'TEXT'],
             ['PANDDA_site_C_name',                  'PANDDA_site_C_name',                       'TEXT'],
-            ['PANDDA_event_C_event_index',                 'PANDDA_event_C_event_index',                      'TEXT'],
+            ['PANDDA_site_C_event_index',                 'PANDDA_site_C_event_index',                      'TEXT'],
             ['PANDDA_site_C_comment',               'PANDDA_site_C_comment',                    'TEXT'],
             ['PANDDA_site_C_confidence',            'PANDDA_site_C_confidence',                 'TEXT'],
             ['PANDDA_site_C_ligand_placed',         'PANDDA_site_C_ligand_placed',              'TEXT'],
@@ -193,7 +193,7 @@ class data_source:
 
             ['PANDDA_site_D_site_index',                 'PANDDA_site_D_site_index',                      'TEXT'],
             ['PANDDA_site_D_name',                  'PANDDA_site_D_name',                       'TEXT'],
-            ['PANDDA_event_D_event_index',                 'PANDDA_event_D_event_index',                      'TEXT'],
+            ['PANDDA_site_D_event_index',                 'PANDDA_site_D_event_index',                      'TEXT'],
             ['PANDDA_site_D_comment',               'PANDDA_site_D_comment',                    'TEXT'],
             ['PANDDA_site_D_confidence',            'PANDDA_site_D_confidence',                 'TEXT'],
             ['PANDDA_site_D_ligand_placed',         'PANDDA_site_D_ligand_placed',              'TEXT'],
@@ -208,7 +208,7 @@ class data_source:
 
             ['PANDDA_site_E_site_index',                 'PANDDA_site_E_site_index',                      'TEXT'],
             ['PANDDA_site_E_name',                  'PANDDA_site_E_name',                       'TEXT'],
-            ['PANDDA_event_E_event_index',                 'PANDDA_event_E_event_index',                      'TEXT'],
+            ['PANDDA_site_E_event_index',                 'PANDDA_site_E_event_index',                      'TEXT'],
             ['PANDDA_site_E_comment',               'PANDDA_site_E_comment',                    'TEXT'],
             ['PANDDA_site_E_confidence',            'PANDDA_site_E_confidence',                 'TEXT'],
             ['PANDDA_site_E_ligand_placed',         'PANDDA_site_E_ligand_placed',              'TEXT'],
@@ -223,7 +223,7 @@ class data_source:
 
             ['PANDDA_site_F_site_index',                 'PANDDA_site_F_site_index',                      'TEXT'],
             ['PANDDA_site_F_name',                  'PANDDA_site_F_name',                       'TEXT'],
-            ['PANDDA_event_F_event_index',                 'PANDDA_event_F_event_index',                      'TEXT'],
+            ['PANDDA_site_F_event_index',                 'PANDDA_site_F_event_index',                      'TEXT'],
             ['PANDDA_site_F_comment',               'PANDDA_site_F_comment',                    'TEXT'],
             ['PANDDA_site_F_confidence',            'PANDDA_site_F_confidence',                 'TEXT'],
             ['PANDDA_site_F_ligand_placed',         'PANDDA_site_F_ligand_placed',              'TEXT'],
@@ -238,7 +238,7 @@ class data_source:
 
             ['PANDDA_site_G_site_index',                 'PANDDA_site_G_site_index',                      'TEXT'],
             ['PANDDA_site_G_name',                  'PANDDA_site_G_name',                       'TEXT'],
-            ['PANDDA_event_G_event_index',                 'PANDDA_event_G_event_index',                      'TEXT'],
+            ['PANDDA_site_G_event_index',                 'PANDDA_site_G_event_index',                      'TEXT'],
             ['PANDDA_site_G_comment',               'PANDDA_site_G_comment',                    'TEXT'],
             ['PANDDA_site_G_confidence',            'PANDDA_site_G_confidence',                 'TEXT'],
             ['PANDDA_site_G_ligand_placed',         'PANDDA_site_G_ligand_placed',              'TEXT'],
@@ -253,7 +253,7 @@ class data_source:
 
             ['PANDDA_site_H_site_index',                 'PANDDA_site_H_site_index',                      'TEXT'],
             ['PANDDA_site_H_name',                  'PANDDA_site_H_name',                       'TEXT'],
-            ['PANDDA_event_H_event_index',                 'PANDDA_event_H_event_index',                      'TEXT'],
+            ['PANDDA_site_H_event_index',                 'PANDDA_site_H_event_index',                      'TEXT'],
             ['PANDDA_site_H_comment',               'PANDDA_site_H_comment',                    'TEXT'],
             ['PANDDA_site_H_confidence',            'PANDDA_site_H_confidence',                 'TEXT'],
             ['PANDDA_site_H_ligand_placed',         'PANDDA_site_H_ligand_placed',              'TEXT'],
@@ -268,7 +268,7 @@ class data_source:
 
             ['PANDDA_site_I_site_index',                 'PANDDA_site_I_site_index',                      'TEXT'],
             ['PANDDA_site_I_name',                  'PANDDA_site_I_name',                       'TEXT'],
-            ['PANDDA_event_I_event_index',                 'PANDDA_event_I_event_index',                      'TEXT'],
+            ['PANDDA_site_I_event_index',                 'PANDDA_site_I_event_index',                      'TEXT'],
             ['PANDDA_site_I_comment',               'PANDDA_site_I_comment',                    'TEXT'],
             ['PANDDA_site_I_confidence',            'PANDDA_site_I_confidence',                 'TEXT'],
             ['PANDDA_site_I_ligand_placed',         'PANDDA_site_I_ligand_placed',              'TEXT'],
@@ -283,7 +283,7 @@ class data_source:
 
             ['PANDDA_site_J_site_index',                 'PANDDA_site_J_site_index',                      'TEXT'],
             ['PANDDA_site_J_name',                  'PANDDA_site_J_name',                       'TEXT'],
-            ['PANDDA_event_J_event_index',                 'PANDDA_event_J_event_index',                      'TEXT'],
+            ['PANDDA_site_J_event_index',                 'PANDDA_site_J_event_index',                      'TEXT'],
             ['PANDDA_site_J_comment',               'PANDDA_site_J_comment',                    'TEXT'],
             ['PANDDA_site_J_confidence',            'PANDDA_site_J_confidence',                 'TEXT'],
             ['PANDDA_site_J_ligand_placed',         'PANDDA_site_J_ligand_placed',              'TEXT'],
@@ -298,7 +298,7 @@ class data_source:
 
             ['PANDDA_site_K_site_index',                 'PANDDA_site_K_site_index',                      'TEXT'],
             ['PANDDA_site_K_name',                  'PANDDA_site_K_name',                       'TEXT'],
-            ['PANDDA_event_K_event_index',                 'PANDDA_event_K_event_index',                      'TEXT'],
+            ['PANDDA_site_K_event_index',                 'PANDDA_site_K_event_index',                      'TEXT'],
             ['PANDDA_site_K_comment',               'PANDDA_site_K_comment',                    'TEXT'],
             ['PANDDA_site_K_confidence',            'PANDDA_site_K_confidence',                 'TEXT'],
             ['PANDDA_site_K_ligand_placed',         'PANDDA_site_K_ligand_placed',              'TEXT'],
@@ -313,7 +313,7 @@ class data_source:
 
             ['PANDDA_site_L_site_index',                 'PANDDA_site_L_site_index',                      'TEXT'],
             ['PANDDA_site_L_name',                  'PANDDA_site_L_name',                       'TEXT'],
-            ['PANDDA_event_L_event_index',                 'PANDDA_event_L_event_index',                      'TEXT'],
+            ['PANDDA_site_L_event_index',                 'PANDDA_site_L_event_index',                      'TEXT'],
             ['PANDDA_site_L_comment',               'PANDDA_site_L_comment',                    'TEXT'],
             ['PANDDA_site_L_confidence',            'PANDDA_site_L_confidence',                 'TEXT'],
             ['PANDDA_site_L_ligand_placed',         'PANDDA_site_L_ligand_placed',              'TEXT'],

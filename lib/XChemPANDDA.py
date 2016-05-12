@@ -85,10 +85,6 @@ class run_pandda_export(QtCore.QThread):
 
                 db_list=sample_dict[sampleID]
 
-                # MISSING
-                # x,y,z of event
-                # event map
-
                 db_list.append([    line['site_idx'],
                                     'site name',
                                     line['event_idx'],
@@ -100,7 +96,9 @@ class run_pandda_export(QtCore.QThread):
                                     line['z_peak'],
                                     line['x'],
                                     line['y'],
-                                    line['z']   ])
+                                    line['z'],
+                                    'Ligand ID',
+                                    'event map'     ])
 
         site=['_A_','_B_','_C_','_D_','_E_','_F_','_G_','_H_','_I_','_J_','_K_','_L_']
         return_dict={}
@@ -113,19 +111,20 @@ class run_pandda_export(QtCore.QThread):
                 print site[n]
                 for item in self.db_list:
                     if item.startswith('PANDDA_site') and site[n] in item:
-                        if item.endswith('_index'):             db_dict[item]=entry[0]
+                        if item.endswith('_site_index'):        db_dict[item]=entry[0]
                         if item.endswith('_name'):              db_dict[item]=entry[1]
-
-
-                        if item.endswith('_comment'):           db_dict[item]=entry[2]
-                        if item.endswith('_confidence'):        db_dict[item]=entry[3]
-                        if item.endswith('_ligand_placed'):     db_dict[item]=entry[4]
-                        if item.endswith('_viewed'):            db_dict[item]=entry[5]
-                        if item.endswith('_interesting'):       db_dict[item]=entry[6]
-                        if item.endswith('_z_peak'):            db_dict[item]=entry[7]
-                        if item.endswith('_x'):                 db_dict[item]=entry[8]
-                        if item.endswith('_y'):                 db_dict[item]=entry[9]
-                        if item.endswith('_z'):                 db_dict[item]=entry[10]
+                        if item.endswith('_event_index'):       db_dict[item]=entry[2]
+                        if item.endswith('_comment'):           db_dict[item]=entry[3]
+                        if item.endswith('_confidence'):        db_dict[item]=entry[4]
+                        if item.endswith('_ligand_placed'):     db_dict[item]=entry[5]
+                        if item.endswith('_viewed'):            db_dict[item]=entry[6]
+                        if item.endswith('_interesting'):       db_dict[item]=entry[7]
+                        if item.endswith('_z_peak'):            db_dict[item]=entry[8]
+                        if item.endswith('_x'):                 db_dict[item]=entry[9]
+                        if item.endswith('_y'):                 db_dict[item]=entry[10]
+                        if item.endswith('_z'):                 db_dict[item]=entry[11]
+                        if item.endswith('_ligand_id'):         db_dict[item]=entry[12]
+                        if item.endswith('_event_map'):         db_dict[item]=entry[13]
             return_dict[xtal]=db_dict
 
         return return_dict
