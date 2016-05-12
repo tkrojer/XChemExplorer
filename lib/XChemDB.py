@@ -72,7 +72,6 @@ class data_source:
             ['CrystalFormGamma',                     'gamma',                        'TEXT'],
             ['CrystalFormVolume',                     'Crystal Form\nVolume',                        'TEXT'],
 
-
             ['DataCollectionBeamline',               'Beamline',                  'TEXT'],
             ['DataCollectionDate',                   'Data Collection\nDate',                      'TEXT'],
             ['DataCollectionOutcome',                'DataCollection\nOutcome',                   'TEXT'],
@@ -90,8 +89,6 @@ class data_source:
             ['DataProcessingAlpha',               'DataProcessing\nAlpha',                  'TEXT'],
             ['DataProcessingBeta',               'DataProcessing\nBeta',                  'TEXT'],
             ['DataProcessingGamma',               'DataProcessing\nGamma',                  'TEXT'],
-
-
 
             ['DataProcessingResolutionOverall',             'Resolution\nOverall',                          'TEXT'],
             ['DataProcessingResolutionLow',                 'Resolution\nLow',                              'TEXT'],
@@ -140,7 +137,7 @@ class data_source:
             ['DimplePathToPDB',                             'Dimple\nPath to PDB file',                     'TEXT'],
             ['DimplePathToMTZ',                             'Dimple\nPath to MTZ file',                     'TEXT'],
 
-            ['PANDDApath',                           'PANDDApath',                             'TEXT'],
+            ['PANDDApath',                                  'PANDDApath',                                   'TEXT'],
 
             ['PANDDA_site_A_site_index',                 'PANDDA_site_A_site_index',                      'TEXT'],
             ['PANDDA_site_A_name',                  'PANDDA_site_A_name',                       'TEXT'],

@@ -25,13 +25,31 @@ import XChemDB
 
 
 class update_datasource_from_file_system(QtCore.QThread):
-    def __init__(self,initial_model_directory):
+    def __init__(self,initial_model_directory,data_source):
         QtCore.QThread.__init__(self)
         self.initial_model_directory=initial_model_directory
+        self.datasource=datasource
+        self.db=XChemDB.data_source(self.datasource)
 
     def run(self):
         for directory in glob.glob(os.path.join(self.initial_model_directory,'*')):
             xtal=directory[directory.rfind('/')+1:]
+            compoundID=self.db.get_value_from_field(xtal,'CompoundCode')
+            print compoundID
+            db_dict={}
+            os.chdir(directory)
+            for file in glob.glob('*'):
+                if file==xtal+'.log' and os.path.isfile(file):
+                    db_dict['DataProcessingPathToLogfile']=os.path.join(directory,xtal+'.log')
+                    db_dict['DataProcessingLOGfileName']=xtal+'.log'
+                if file==xtal+'.mtz' and os.path.isfile(file):
+                    db_dict['DataProcessingPathToMTZfile']=os.path.join(directory,xtal+'.mtz')
+                    db_dict['DataProcessingMTZfileName']=xtal+'.mtz'
+                if file==xtal+'.free.mtz' and os.path.isfile(file):
+                    db_dict['RefinementMTZfree']=os.path.join(directory,xtal+'.free.mtz')
+#RefinementCIF
+
+
             print xtal
 
 class create_png_and_cif_of_compound(QtCore.QThread):
