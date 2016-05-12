@@ -81,7 +81,7 @@ class update_datasource_from_file_system(QtCore.QThread):
                         event_id=tmp[:tmp.find('_')]
                         for entry in sample_dict:
                             if entry.endswith('_event_index'):
-                                if sample_dict[entry]==event_id
+                                if sample_dict[entry]==event_id:
                                     print 'event id',event_id
 
             if db_dict != {}:
