@@ -20,32 +20,6 @@ class run_pandda_export(QtCore.QThread):
         self.import_samples_into_datasouce()
 #        self.export_models()
 
-#    def get_db_dict(self):
-#
-#        sample_dict={}
-#
-#        with open(os.path.join(self.panddas_directory,'pandda_inspect.csv'),'rb') as csv_import:
-#            csv_dict = csv.DictReader(csv_import)
-#            for i,line in enumerate(csv_dict):
-#                sampleID=line['dtag']
-#                site_index=line['site_idx']
-#                if int(site_index) > 15:        # currently data source does not support more than 15 sites
-#                    continue
-#                if sampleID not in sample_dict:
-#                    sample_dict[sampleID]={}
-#
-#                db_dict=sample_dict[sampleID]
-#
-#                db_dict['PANDDA_site_'+str(site_index)+'_index']=line['site_idx']
-#                db_dict['PANDDA_site_'+str(site_index)+'_comment']=line['Comment']
-#                db_dict['PANDDA_site_'+str(site_index)+'_confidence']=line['Ligand Confidence']
-#                db_dict['PANDDA_site_'+str(site_index)+'_ligand_placed']=line['Ligand Placed']
-#                db_dict['PANDDA_site_'+str(site_index)+'_viewed']=line['Viewed']
-#                db_dict['PANDDA_site_'+str(site_index)+'_interesting']=line['Interesting']
-#                db_dict['PANDDA_site_'+str(site_index)+'_z_peak']=line['z_peak']
-#
-#                sample_dict[sampleID]=db_dict
-
     def import_samples_into_datasouce(self):
 
         db_dict=self.get_db_dict()
@@ -62,7 +36,6 @@ class run_pandda_export(QtCore.QThread):
         for xtal in db_dict:
             print '==> XCE: updating data source with PANDDA site information for',xtal
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating data source with PANDDA site information for '+xtal)
-            print xtal,db_dict[xtal]
 #            self.db.update_data_source(xtal,db_dict[xtal])
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
@@ -128,9 +101,13 @@ class run_pandda_export(QtCore.QThread):
             sample_dict[xtal].sort()
             for n,entry in enumerate(sample_dict[xtal]):
 
-                # check if EVENT map exists
-                for file in glob.glob(os.path.join(self.panddas_directory,'interesting_datasets',xtal,'*ccp4')):
-                    print file
+                # check if EVENT map exists in project directory
+                for file in glob.glob(os.path.join(self.initial_model_directory,xtal,'*ccp4')):
+                    filename=file[file.rfind('/')+1:]
+                    print filename
+                    # ATAD2A-x905-event_1_1-BDC_0.24_map.native.ccp4
+                    if filename.startswith(xtal+'-event_'+entry[3]) and filename.endswith('map.native.ccp4'):
+                        print 'found',filename
 
                 for item in self.db_list:
                     if item.startswith('PANDDA_site') and site[n] in item:
