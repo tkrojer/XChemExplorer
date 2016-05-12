@@ -40,6 +40,8 @@ class update_datasource_from_file_system(QtCore.QThread):
         progress=0
         self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
+        site=['_A_','_B_','_C_','_D_','_E_','_F_','_G_','_H_','_I_','_J_','_K_','_L_']
+
         for directory in glob.glob(os.path.join(self.initial_model_directory,'*')):
             xtal=directory[directory.rfind('/')+1:]
             compoundID=str(self.db.get_value_from_field(xtal,'CompoundCode')[0])
@@ -84,7 +86,12 @@ class update_datasource_from_file_system(QtCore.QThread):
                     for entry in sample_dict:
                         if entry.endswith('_event_index'):
                             if sample_dict[entry]==event_id:
-                                print 'event id',event_id
+                                for n,index in enumerate(site):
+                                    if index in entry:
+                                        db_dict['PANDDA_site'+site[n]+'event_map']=os.path.join(directory,file)
+
+            if xtal=='ATAD2A-x905'
+                print xtal,db_dict
 
             if db_dict != {}:
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating datasource for '+xtal)
