@@ -79,10 +79,8 @@ class update_datasource_from_file_system(QtCore.QThread):
                     db_dict['RefinementMTZ_latest']=os.path.realpath(os.path.join(directory,'refine.mtz'))
                 # check if EVENT map exists
                 if file.startswith(xtal+'-event_') and file.endswith('map.native.ccp4'):
-                    print file
                     tmp=file[file.find('event_')+6:]
                     event_id=tmp[:tmp.find('_')]
-                    print event_id
                     for entry in sample_dict:
                         if entry.endswith('_event_index'):
                             if sample_dict[entry]==event_id:
@@ -90,12 +88,9 @@ class update_datasource_from_file_system(QtCore.QThread):
                                     if index in entry:
                                         db_dict['PANDDA_site'+site[n]+'event_map']=os.path.join(directory,file)
 
-            if xtal=='ATAD2A-x905':
-                print xtal,db_dict
-
             if db_dict != {}:
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating datasource for '+xtal)
-#                self.db.update_data_source(xtal,db_dict)
+                self.db.update_data_source(xtal,db_dict)
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
