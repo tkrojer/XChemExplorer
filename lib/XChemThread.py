@@ -45,6 +45,7 @@ class update_datasource_from_file_system(QtCore.QThread):
             compoundID=str(self.db.get_value_from_field(xtal,'CompoundCode')[0])
             db_dict={}
             os.chdir(directory)
+            sample_dict=self.db.get_db_dict_for_sample(xtal)
             for file in glob.glob('*'):
                 if file==xtal+'.log' and os.path.isfile(file):
                     db_dict['DataProcessingPathToLogfile']=os.path.join(directory,xtal+'.log')
@@ -74,9 +75,18 @@ class update_datasource_from_file_system(QtCore.QThread):
                     db_dict['RefinementRmsdAngles']=pdb_info['rmsdAngles']
                 if file=='refine.mtz' and os.path.isfile(file):
                     db_dict['RefinementMTZ_latest']=os.path.realpath(os.path.join(directory,'refine.mtz'))
+                # check if EVENT map exists
+                    if file.startswith(xtal+'-event_') and filename.endswith('map.native.ccp4'):
+                        tmp=file[file.find('event_')+6:]
+                        event_id=tmp[:tmp.find('_')]
+                        for entry in sample_dict:
+                            if entry.endswith('_event_index'):
+                                if sample_dict[entry]==event_id
+                                    print 'event id',event_id
+
             if db_dict != {}:
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating datasource for '+xtal)
-                self.db.update_data_source(xtal,db_dict)
+#                self.db.update_data_source(xtal,db_dict)
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
