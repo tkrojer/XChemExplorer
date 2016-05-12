@@ -198,6 +198,7 @@ class run_dimple_on_selected_samples(QtCore.QThread):
             progress_step=100/float(todo)
         progress=0
 
+        counter=0
         for sample in sorted(self.initial_model_dimple_dict):
             if self.initial_model_dimple_dict[sample][0].isChecked():
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running dimple -> '+sample)
@@ -212,9 +213,28 @@ class run_dimple_on_selected_samples(QtCore.QThread):
                                     'ccp4_scratch': self.ccp4_scratch_directory,
                                     'fileroot_in':  self.filename_root.replace('${samplename}',sample)  }
                 process(dimple_commands).dimple()
+                counter += 1
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+            if counter==100:
+                while counter > 90:
+                    print '==> submitted 100 jobs to cluster, will pause for 10 seconds...'
+                    self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'too many jobs in queue, pausing...')
+                    time.sleep(10)
+                    jobs_in_queue=self.check_jobs_in_queue()
+                    print '==> number of jobs in queue: ',jobs_in_queue
+                    if jobs_in_queue < 90:
+                        counter=jobs_in_queue
         self.emit(QtCore.SIGNAL("finished()"))
+
+        self.emit(QtCore.SIGNAL("finished()"))
+
+    def check_jobs_in_queue(self):
+        tmp=out = subprocess.check_output(['qstat'])
+        n=0
+        for i in tmp:
+            if i=='\n': n+=1
+        return n
 
 
 class start_COOT(QtCore.QThread):

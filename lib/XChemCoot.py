@@ -8,20 +8,16 @@ import subprocess
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 
-# last commit: 05/12/2015
-
 # XCE libraries
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
-#sys.path.append(os.getenv('CCP4')+'/lib/python2.7/site-packages')
-
 import XChemDB
 import XChemRefine
-
 import XChemUtils
 
 # libraries from COOT
 import pygtk, gtk, pango
 import coot
+
 # had to adapt the original coot_utils.py file
 # otherwise unable to import the original file without complaints about missing modules etc.
 # modified file is now in $XChemExplorer_DIR/lib
