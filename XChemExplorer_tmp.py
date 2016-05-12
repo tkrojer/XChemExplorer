@@ -1650,7 +1650,10 @@ class XChemExplorer(QtGui.QApplication):
                     file_name=file_name[:file_name.rfind('.')]+'.sqlite'
                 else:
                     file_name=file_name+'.sqlite'
-                XChemDB.data_source(os.path.join(file_name)).create_empty_data_source_file()
+                self.db=XChemDB.data_source(file_name)
+                print '==> XCE: creating new data source'
+                self.db.create_empty_data_source_file()
+                self.db.create_missing_columns()
                 if self.data_source_file=='':
                     self.database_directory=file_name[:file_name.rfind('/')]
                     self.data_source_file=file_name[file_name.rfind('/')+1:]
