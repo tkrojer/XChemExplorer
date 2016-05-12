@@ -17,8 +17,8 @@ class run_pandda_export(QtCore.QThread):
         self.db_list=self.db.get_empty_db_dict()
 
     def run(self):
+        self.export_models()
         self.import_samples_into_datasouce()
-#        self.export_models()
 
     def import_samples_into_datasouce(self):
 
@@ -36,7 +36,7 @@ class run_pandda_export(QtCore.QThread):
         for xtal in db_dict:
             print '==> XCE: updating data source with PANDDA site information for',xtal
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating data source with PANDDA site information for '+xtal)
-#            self.db.update_data_source(xtal,db_dict[xtal])
+            self.db.update_data_source(xtal,db_dict[xtal])
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
@@ -89,25 +89,24 @@ class run_pandda_export(QtCore.QThread):
                                     line['x'],
                                     line['y'],
                                     line['z'],
-                                    'Ligand ID',
-                                    'event map'     ])
+                                    'Ligand ID'     ])
 
         site=['_A_','_B_','_C_','_D_','_E_','_F_','_G_','_H_','_I_','_J_','_K_','_L_']
         return_dict={}
 
         for xtal in sample_dict:
             db_dict={}
+            db_dict['PANDDApath']=self.panddas_directory
             # sort by site index
             sample_dict[xtal].sort()
             for n,entry in enumerate(sample_dict[xtal]):
 
                 # check if EVENT map exists in project directory
+                event_map='event_map'
                 for file in glob.glob(os.path.join(self.initial_model_directory,xtal,'*ccp4')):
                     filename=file[file.rfind('/')+1:]
-                    print filename
-                    # ATAD2A-x905-event_1_1-BDC_0.24_map.native.ccp4
                     if filename.startswith(xtal+'-event_'+entry[3]) and filename.endswith('map.native.ccp4'):
-                        print 'found',filename
+                        event_map=file
 
                 for item in self.db_list:
                     if item.startswith('PANDDA_site') and site[n] in item:
@@ -125,7 +124,7 @@ class run_pandda_export(QtCore.QThread):
                         if item.endswith('_y'):                 db_dict[item]=entry[11]
                         if item.endswith('_z'):                 db_dict[item]=entry[12]
                         if item.endswith('_ligand_id'):         db_dict[item]=entry[13]
-                        if item.endswith('_event_map'):         db_dict[item]=entry[14]
+                        if item.endswith('_event_map'):         event_map
             return_dict[xtal]=db_dict
 
         return return_dict
