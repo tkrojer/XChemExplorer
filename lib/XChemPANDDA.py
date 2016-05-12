@@ -129,10 +129,9 @@ class run_pandda_export(QtCore.QThread):
             for n,entry in enumerate(sample_dict[xtal]):
 
                 # check if EVENT map exists
-                for file in glob.glob(os.path.join(self.panddas_directory,xtal,'interesting_datasets','*ccp4')):
+                for file in glob.glob(os.path.join(self.panddas_directory,'interesting_datasets',xtal,'*ccp4')):
                     print file
 
-                print site[n]
                 for item in self.db_list:
                     if item.startswith('PANDDA_site') and site[n] in item:
                         if item.endswith('_site_index'):        db_dict[item]=entry[0]
