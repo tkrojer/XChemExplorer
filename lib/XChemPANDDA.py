@@ -36,7 +36,6 @@ class run_pandda_export(QtCore.QThread):
         for xtal in db_dict:
             print '==> XCE: updating data source with PANDDA site information for',xtal
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating data source with PANDDA site information for '+xtal)
-            print xtal,db_dict[xtal]
             self.db.update_data_source(xtal,db_dict[xtal])
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
@@ -125,7 +124,7 @@ class run_pandda_export(QtCore.QThread):
                         if item.endswith('_y'):                 db_dict[item]=entry[11]
                         if item.endswith('_z'):                 db_dict[item]=entry[12]
                         if item.endswith('_ligand_id'):         db_dict[item]=entry[13]
-                        if item.endswith('_event_map'):         event_map
+                        if item.endswith('_event_map'):         db_dict[item]=event_map
             return_dict[xtal]=db_dict
 
         return return_dict
