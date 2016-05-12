@@ -32,6 +32,14 @@ class update_datasource_from_file_system(QtCore.QThread):
         self.db=XChemDB.data_source(self.datasource)
 
     def run(self):
+        progress_step=1
+        if len(glob.glob(os.path.join(self.initial_model_directory,'*'))) != 0:
+            progress_step=100/float(len(glob.glob(os.path.join(self.initial_model_directory,'*'))))
+        else:
+            progress_step=1
+        progress=0
+        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
         for directory in glob.glob(os.path.join(self.initial_model_directory,'*')):
             xtal=directory[directory.rfind('/')+1:]
             compoundID=str(self.db.get_value_from_field(xtal,'CompoundCode')[0])
@@ -47,10 +55,19 @@ class update_datasource_from_file_system(QtCore.QThread):
                     db_dict['DataProcessingMTZfileName']=xtal+'.mtz'
                 if file==xtal+'.free.mtz' and os.path.isfile(file):
                     db_dict['RefinementMTZfree']=os.path.join(directory,xtal+'.free.mtz')
-#RefinementCIF
+                if file==compoundID+'.cif' and os.path.isfile(file):
+                    db_dict['RefinementCIF']=os.path.join(directory,compoundID+'.cif')
+                if file=='refine.pdb' and os.path.isfile(file):
+                    db_dict['RefinementPDB_latest']=os.path.realpath(os.path.join(directory,'refine.pdb'))
+                if file=='refine.mtz' and os.path.isfile(file):
+                    db_dict['RefinementMTZ_latest']=os.path.realpath(os.path.join(directory,'refine.mtz'))
+            if db_dict != {}:
+                self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating datasource for '+xtal)
+                self.db.update_data_source(xtal,db_dict)
 
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
-            print xtal
 
 class create_png_and_cif_of_compound(QtCore.QThread):
     def __init__(self,external_software,initial_model_directory,compound_list,database_directory,data_source_file):
