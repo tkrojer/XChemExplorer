@@ -43,7 +43,6 @@ class update_datasource_from_file_system(QtCore.QThread):
         for directory in glob.glob(os.path.join(self.initial_model_directory,'*')):
             xtal=directory[directory.rfind('/')+1:]
             compoundID=str(self.db.get_value_from_field(xtal,'CompoundCode')[0])
-            print compoundID
             db_dict={}
             os.chdir(directory)
             for file in glob.glob('*'):
@@ -57,8 +56,22 @@ class update_datasource_from_file_system(QtCore.QThread):
                     db_dict['RefinementMTZfree']=os.path.join(directory,xtal+'.free.mtz')
                 if file==compoundID+'.cif' and os.path.isfile(file):
                     db_dict['RefinementCIF']=os.path.join(directory,compoundID+'.cif')
+                if file=='dimple.pdb' and os.path.isfile(file):
+                    db_dict['DimplePathToPDB']=os.path.realpath(os.path.join(directory,'dimple.pdb'))
+                    pdb_info=parse().PDBheader(file)
+                    db_dict['DimpleRcryst']=pdb_info['Rcryst']
+                    db_dict['DimpleRfree']=pdb_info['Rfree']
+                    db_dict['DimpleResolutionHigh']=pdb_info['ResolutionHigh']
+                if file=='dimple.mtz' and os.path.isfile(file):
+                    db_dict['DimplePathToMTZ']=os.path.realpath(os.path.join(directory,'dimple.mtz'))
                 if file=='refine.pdb' and os.path.isfile(file):
                     db_dict['RefinementPDB_latest']=os.path.realpath(os.path.join(directory,'refine.pdb'))
+                    pdb_info=parse().PDBheader(file)
+                    db_dict['RefinementRcryst']=pdb_info['Rcryst']
+                    db_dict['RefinementRfree']=pdb_info['Rfree']
+                    db_dict['RefinementSpaceGroup']=pdb_info['SpaceGroup']
+                    db_dict['RefinementRmsdBonds']=pdb_info['rmsdBonds']
+                    db_dict['RefinementRmsdAngles']=pdb_info['rmsdAngles']
                 if file=='refine.mtz' and os.path.isfile(file):
                     db_dict['RefinementMTZ_latest']=os.path.realpath(os.path.join(directory,'refine.mtz'))
             if db_dict != {}:
