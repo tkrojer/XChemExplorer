@@ -17,7 +17,7 @@ class run_pandda_export(QtCore.QThread):
         self.db_list=self.db.get_empty_db_dict()
 
     def run(self):
-        self.export_models()
+#        self.export_models()
         self.import_samples_into_datasouce()
 
     def import_samples_into_datasouce(self):
@@ -36,6 +36,7 @@ class run_pandda_export(QtCore.QThread):
         for xtal in db_dict:
             print '==> XCE: updating data source with PANDDA site information for',xtal
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating data source with PANDDA site information for '+xtal)
+            print xtal,db_dict[xtal]
             self.db.update_data_source(xtal,db_dict[xtal])
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
@@ -140,7 +141,7 @@ class run_pandda_export(QtCore.QThread):
                 ' export_ligands=False'
                 ' generate_occupancy_groupings=True\n'
                 )
-        print Cmds
+        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running pandda.export: check terminal for details')
         os.system(Cmds)
 
 
