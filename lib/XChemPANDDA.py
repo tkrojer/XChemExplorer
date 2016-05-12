@@ -71,22 +71,41 @@ class run_pandda_export(QtCore.QThread):
 
     def get_db_dict(self):
 
+
+        site_list = []
+
+        with open(os.path.join(self.panddas_directory,'analyses','pandda_inspect_sites.csv'),'rb') as csv_import:
+            csv_dict = csv.DictReader(csv_import)
+            for i,line in enumerate(csv_dict):
+                site_index=line['site_idx']
+                name=line['Name']
+                comment=line['Comment']
+                site_list.append([site_index,name,comment])
+
         sample_dict={}
 
-        with open(os.path.join(self.panddas_directory,'analyses','pandda_inspect.csv'),'rb') as csv_import:
+        with open(os.path.join(self.panddas_directory,'analyses','pandda_inspect_events.csv'),'rb') as csv_import:
             csv_dict = csv.DictReader(csv_import)
             for i,line in enumerate(csv_dict):
                 sampleID=line['dtag']
                 site_index=line['site_idx']
                 if int(site_index) > 12:        # currently data source does not support more than 12 sites
                     continue
+                for entry in site_list:
+                    if entry[0]==site_index:
+                        site_name=entry[1]
+                        site_comment=entry[2]
+                        break
+
+
                 if sampleID not in sample_dict:
                     sample_dict[sampleID]=[]
 
                 db_list=sample_dict[sampleID]
 
                 db_list.append([    line['site_idx'],
-                                    'site name',
+                                    site_name,
+                                    site_comment,
                                     line['event_idx'],
                                     line['Comment'],
                                     line['Ligand Confidence'],
@@ -108,23 +127,29 @@ class run_pandda_export(QtCore.QThread):
             # sort by site index
             sample_dict[xtal].sort()
             for n,entry in enumerate(sample_dict[xtal]):
+
+                # check if EVENT map exists
+                for file in glob.glob(os.path.join(self.panddas_directory,xtal,'interesting_datasets','*ccp4'))
+                    print file
+
                 print site[n]
                 for item in self.db_list:
                     if item.startswith('PANDDA_site') and site[n] in item:
                         if item.endswith('_site_index'):        db_dict[item]=entry[0]
                         if item.endswith('_name'):              db_dict[item]=entry[1]
-                        if item.endswith('_event_index'):       db_dict[item]=entry[2]
-                        if item.endswith('_comment'):           db_dict[item]=entry[3]
-                        if item.endswith('_confidence'):        db_dict[item]=entry[4]
-                        if item.endswith('_ligand_placed'):     db_dict[item]=entry[5]
-                        if item.endswith('_viewed'):            db_dict[item]=entry[6]
-                        if item.endswith('_interesting'):       db_dict[item]=entry[7]
-                        if item.endswith('_z_peak'):            db_dict[item]=entry[8]
-                        if item.endswith('_x'):                 db_dict[item]=entry[9]
-                        if item.endswith('_y'):                 db_dict[item]=entry[10]
-                        if item.endswith('_z'):                 db_dict[item]=entry[11]
-                        if item.endswith('_ligand_id'):         db_dict[item]=entry[12]
-                        if item.endswith('_event_map'):         db_dict[item]=entry[13]
+                        if item.endswith('_comment'):           db_dict[item]=entry[2]
+                        if item.endswith('_event_index'):       db_dict[item]=entry[3]
+                        if item.endswith('_event_comment'):     db_dict[item]=entry[4]
+                        if item.endswith('_confidence'):        db_dict[item]=entry[5]
+                        if item.endswith('_ligand_placed'):     db_dict[item]=entry[6]
+                        if item.endswith('_viewed'):            db_dict[item]=entry[7]
+                        if item.endswith('_interesting'):       db_dict[item]=entry[8]
+                        if item.endswith('_z_peak'):            db_dict[item]=entry[9]
+                        if item.endswith('_x'):                 db_dict[item]=entry[10]
+                        if item.endswith('_y'):                 db_dict[item]=entry[11]
+                        if item.endswith('_z'):                 db_dict[item]=entry[12]
+                        if item.endswith('_ligand_id'):         db_dict[item]=entry[13]
+                        if item.endswith('_event_map'):         db_dict[item]=entry[14]
             return_dict[xtal]=db_dict
 
         return return_dict
