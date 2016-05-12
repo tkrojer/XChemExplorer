@@ -24,7 +24,15 @@ from XChemUtils import reference
 import XChemDB
 
 
+class update_datasource_from_file_system(QtCore.QThread):
+    def __init__(self,initial_model_directory):
+        QtCore.QThread.__init__(self)
+        self.initial_model_directory=initial_model_directory
 
+    def run(self):
+        for directory in glob.glob(os.path.join(self.initial_model_directory,'*')):
+            xtal=directory[directory.rfind('/')+1:]
+            print xtal
 
 class create_png_and_cif_of_compound(QtCore.QThread):
     def __init__(self,external_software,initial_model_directory,compound_list,database_directory,data_source_file):

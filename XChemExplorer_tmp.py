@@ -227,7 +227,7 @@ class XChemExplorer(QtGui.QApplication):
         import_csv_file_into_datasource.triggered.connect(self.datasource_menu_import_csv_file)
         export_csv_file_into_datasource=QtGui.QAction('Export CSV file into Datasource',self.window)
         export_csv_file_into_datasource.triggered.connect(self.datasource_menu_export_csv_file)
-        update_datasource=QtGui.QAction('Update Datasource',self.window)
+        update_datasource=QtGui.QAction('Update Datasource from file system',self.window)
         update_datasource.triggered.connect(self.datasource_menu_update_datasource)
         select_columns_to_show=QtGui.QAction('Select columns to show',self.window)
         select_columns_to_show.triggered.connect(self.select_datasource_columns_to_display)
@@ -1914,10 +1914,15 @@ class XChemExplorer(QtGui.QApplication):
     def select_datasource_columns_to_display(self):
         self.data_source_columns_to_display, ok = XChemDialogs.select_columns_to_show(
             os.path.join(self.database_directory,self.data_source_file)).return_selected_columns()
-#        content=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
-#        header=content[0]
-#        data=content[1]
         self.populate_and_update_data_source_table()
+
+    def datasource_menu_update_datasource(self):
+        self.work_thread=XChemThread.update_datasource_from_file_system(self.initial_model_directory)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.connect(self.work_thread, QtCore.SIGNAL("create_initial_model_table"),self.create_initial_model_table)
+        self.work_thread.start()
 
     def check_status_create_png_of_soaked_compound(self):
         number_of_samples=0
