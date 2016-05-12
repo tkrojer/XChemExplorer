@@ -34,7 +34,7 @@ class update_datasource_from_file_system(QtCore.QThread):
     def run(self):
         for directory in glob.glob(os.path.join(self.initial_model_directory,'*')):
             xtal=directory[directory.rfind('/')+1:]
-            compoundID=self.db.get_value_from_field(xtal,'CompoundCode')
+            compoundID=str(self.db.get_value_from_field(xtal,'CompoundCode')[0])
             print compoundID
             db_dict={}
             os.chdir(directory)
