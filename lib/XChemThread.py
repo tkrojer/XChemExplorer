@@ -90,7 +90,7 @@ class update_datasource_from_file_system(QtCore.QThread):
                                     if index in entry:
                                         db_dict['PANDDA_site'+site[n]+'event_map']=os.path.join(directory,file)
 
-            if xtal=='ATAD2A-x905'
+            if xtal=='ATAD2A-x905':
                 print xtal,db_dict
 
             if db_dict != {}:
