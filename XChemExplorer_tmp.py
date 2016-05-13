@@ -1408,6 +1408,13 @@ class XChemExplorer(QtGui.QApplication):
                 db_dict=self.xtal_db_dict[xtal]
                 if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])) or \
                     os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
+
+                    if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])):
+                        mtzin=os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])
+                    elif os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
+                        mtzin=os.path.join(db_dict['DataProcessingPathToMTZfile'])
+
+
                     reference_file=str(self.initial_model_dimple_dict[xtal][1].currentText())
 
                     reference_file_pdb=os.path.join(self.reference_directory,reference_file+'.pdb')
@@ -1427,7 +1434,7 @@ class XChemExplorer(QtGui.QApplication):
 
                     job_list.append([   xtal,
                                         'dimple_rerun_on_selected_file',
-                                        os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName']),
+                                        mtzin,
                                         reference_file_pdb,
                                         reference_file_mtz,
                                         reference_file_cif  ])
