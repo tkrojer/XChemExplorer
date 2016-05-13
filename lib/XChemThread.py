@@ -173,7 +173,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             ref_mtz =               item[4]
             ref_cif =               item[5]
 
-            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running dimple -> '+xtal+'+'+visit_run_autoproc)
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'creating input script for '+xtal+'+'+visit_run_autoproc)
 
             if not os.path.isdir(os.path.join(self.initial_model_directory,xtal)):
                 os.mkdir(os.path.join(self.initial_model_directory,xtal))
@@ -265,7 +265,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
         os.chdir(self.ccp4_scratch_directory)
         Cmds = (
                 '#PBS -joe -N xce_dimple_master\n'
-                'xce_dimple_$SGE_TASK_ID.sh\n'
+                './xce_dimple_$SGE_TASK_ID.sh\n'
                 )
         f = open('dimple_master.sh','w')
         f.write(Cmds)
