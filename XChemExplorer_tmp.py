@@ -1384,6 +1384,10 @@ class XChemExplorer(QtGui.QApplication):
         self.target=str(text)
 
 
+    def check_status_rerun_dimple_on_all_autoprocessing_files(self):
+
+
+
     def rerun_dimple_on_all_autoprocessing_files(self):
         print '==> XCE: running DIMPLE on ALL auto-processing files'
         job_list=[]
@@ -1711,12 +1715,13 @@ class XChemExplorer(QtGui.QApplication):
                             if action=='Run':
                                 self.prepare_and_run_task(instruction)
                             elif action=='Status':
-                                self.get_status_of_workflow_milestone(item)
+                                self.get_status_of_workflow_milestone(instruction)
                     else:
                         self.need_to_switch_main_tab(task_index)
 
-    def get_status_of_workflow_milestone(self,item):
-        print item
+    def get_status_of_workflow_milestone(self,instruction):
+        if instruction=='Run DIMPLE on All Autoprocessing MTZ files':
+            self.check_status_rerun_dimple_on_all_autoprocessing_files()
 
     def prepare_and_run_task(self,instruction):
 
