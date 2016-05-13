@@ -128,22 +128,9 @@ class create_png_and_cif_of_compound(QtCore.QThread):
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
             counter += 1
-#            if counter==100:
-#                while counter > 90:
-#                    print '==> submitted 100 jobs to cluster, will pause for 10 seconds...'
-#                    time.sleep(10)
-#                    jobs_in_queue=self.check_jobs_in_queue()
-#                    print '==> number of jobs in queue: ',jobs_in_queue
-#                    if jobs_in_queue < 90:
-#                        counter=jobs_in_queue
+
         self.emit(QtCore.SIGNAL("finished()"))
 
-    def check_jobs_in_queue(self):
-        tmp=out = subprocess.check_output(['qstat'])
-        n=0
-        for i in tmp:
-            if i=='\n': n+=1
-        return n
 
 class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
     def __init__(self,sample_list,initial_model_directory,external_software,ccp4_scratch_directory,database_directory,data_source_file):
@@ -173,7 +160,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             ref_mtz =               item[4]
             ref_cif =               item[5]
 
-            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'creating input script for '+xtal+'+'+visit_run_autoproc)
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'creating input script for '+xtal+' in '+visit_run_autoproc)
 
             if not os.path.isdir(os.path.join(self.initial_model_directory,xtal)):
                 os.mkdir(os.path.join(self.initial_model_directory,xtal))
@@ -230,11 +217,11 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc,'dimple') +
                     '\n'
                     'fft hklin final.mtz mapout 2fofc.map << EOF\n'
-                    ' labin F1=2FOFCWT PHI=PH2FOFCWT\n'
+                    ' labin F1=FWT PHI=PHWT\n'
                     'EOF\n'
                     '\n'
                     'fft hklin final.mtz mapout fofc.map << EOF\n'
-                    ' labin F1=FOFCWT PHI=PHFOFCWT\n'
+                    ' labin F1=DELFWT PHI=PHDELWT\n'
                     'EOF\n'
                     '\n'
                     +additional_cmds+
@@ -270,68 +257,11 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
         f = open('dimple_master.sh','w')
         f.write(Cmds)
         f.close()
-        print '==> XCE: submitting array job with maximal 100 jobs running on cluster'
-        print 'qsub -t 1:%s -tc 100 dimple_master.sh' %(str(n+1))
-#        os.system('qsub -t 1:%s -tc 100 dimple_master.sh' %(str(n+1)))
+        print '==> XCE: submitting array job with maximal 200 jobs running on cluster'
+        print '==> XCE: using the following command:'
+        print '         qsub -t 1:%s -tc 100 dimple_master.sh' %(str(n+1))
+        os.system('qsub -t 1:%s -tc 200 dimple_master.sh' %(str(n+1)))
 
-class run_dimple_on_selected_samples(QtCore.QThread):
-    def __init__(self,settings,initial_model_dimple_dict,external_software,ccp4_scratch,filename_root):
-        QtCore.QThread.__init__(self)
-        self.initial_model_directory=settings['initial_model_directory']
-        self.reference_directory=settings['reference_directory']
-        self.initial_model_dimple_dict=initial_model_dimple_dict
-        self.queueing_system_available=external_software['qsub']
-        self.ccp4_scratch_directory=ccp4_scratch
-        self.filename_root=filename_root
-
-    def run(self):
-        todo=0
-        if len(self.initial_model_dimple_dict) != 0:
-#            progress_step=100/float(len(self.initial_model_dimple_dict))
-            for sample in sorted(self.initial_model_dimple_dict):
-                if self.initial_model_dimple_dict[sample][0].isChecked(): todo+=1
-            if todo==0:
-                todo=1
-            progress_step=100/float(todo)
-        progress=0
-
-        counter=0
-        for sample in sorted(self.initial_model_dimple_dict):
-            if self.initial_model_dimple_dict[sample][0].isChecked():
-                self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running dimple -> '+sample)
-                dimple_commands={   'project_directory': self.initial_model_directory,
-                                    'delete_old': self.initial_model_dimple_dict[sample][0].isChecked(),
-                                    'xtalID': sample,
-                                    'compoundID': '',
-                                    'smiles': '',
-                                    'reference': self.reference_directory+'/'+
-                                                 str(self.initial_model_dimple_dict[sample][1].currentText()),
-                                    'queueing_system_available': self.queueing_system_available,
-                                    'ccp4_scratch': self.ccp4_scratch_directory,
-                                    'fileroot_in':  self.filename_root.replace('${samplename}',sample)  }
-                process(dimple_commands).dimple()
-                counter += 1
-            progress += progress_step
-            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-            if counter==100:
-                while counter > 90:
-                    print '==> submitted 100 jobs to cluster, will pause for 10 seconds...'
-                    self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'too many jobs in queue, pausing...')
-                    time.sleep(10)
-                    jobs_in_queue=self.check_jobs_in_queue()
-                    print '==> number of jobs in queue: ',jobs_in_queue
-                    if jobs_in_queue < 90:
-                        counter=jobs_in_queue
-        self.emit(QtCore.SIGNAL("finished()"))
-
-        self.emit(QtCore.SIGNAL("finished()"))
-
-    def check_jobs_in_queue(self):
-        tmp=out = subprocess.check_output(['qstat'])
-        n=0
-        for i in tmp:
-            if i=='\n': n+=1
-        return n
 
 
 class start_COOT(QtCore.QThread):

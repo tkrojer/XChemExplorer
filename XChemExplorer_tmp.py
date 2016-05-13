@@ -1493,7 +1493,7 @@ class XChemExplorer(QtGui.QApplication):
     def check_before_running_dimple(self,job_list):
 
         msgBox = QtGui.QMessageBox()
-        msgBox.setText("Do you really want to run %s Dimple jobs?" %len(job_list))
+        msgBox.setText("Do you really want to run %s Dimple jobs?\nNote: we will not run more than 200 at once on the cluster!" %len(job_list))
         msgBox.addButton(QtGui.QPushButton('Go'), QtGui.QMessageBox.YesRole)
         msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
         reply = msgBox.exec_();
@@ -1828,18 +1828,6 @@ class XChemExplorer(QtGui.QApplication):
                 self.work_thread=XChemThread.start_COOT(self.settings)
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                 self.work_thread.start()
-
-        elif self.sender().text()=="Run Dimple":
-            self.explorer_active=1
-            self.work_thread=XChemThread.run_dimple_on_selected_samples(self.settings,
-                                                            self.initial_model_dimple_dict,
-                                                            self.external_software,
-                                                            self.ccp4_scratch_directory,
-                                                            self.filename_root  )
-            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-            self.work_thread.start()
 
         elif self.sender().text()=='Set New Reference (if applicable)':
             reference_root=str(self.reference_file_selection_combobox.currentText())
