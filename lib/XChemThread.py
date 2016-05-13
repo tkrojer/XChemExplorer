@@ -161,7 +161,10 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
         progress=0
         self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
-        for item in self.sample_list:
+        os.chdir(self.ccp4_scratch_directory)
+        os.system('/bin/rm -f xce_dimple*sh')
+
+        for n,item in enumerate(self.sample_list):
 
             xtal =                  item[0]
             visit_run_autoproc =    item[1]
@@ -241,19 +244,34 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     '/bin/rm dimple_run_in_progress\n'
                     )
 
-            f = open('xce_dimple.sh','w')
+            os.chdir(self.ccp4_scratch_directory)
+            f = open('xce_dimple_%s.sh' %str(n),'w')
             f.write(Cmds)
             f.close()
-            if self.queueing_system_available:
-                os.system('qsub xce_dimple.sh')
-            else:
-                os.system('chmod +x xce_dimple.sh')
-                os.system('./xce_dimple.sh')
+            os.system('chmod +x xce_dimple_%s.sh' %str(n))
+#            if self.queueing_system_available:
+#                os.system('qsub xce_dimple.sh')
+#            else:
+#                os.system('chmod +x xce_dimple.sh')
+#                os.system('./xce_dimple.sh')
+            if not self.queueing_system_available:
+                os.system('./xce_dimple_%s.sh' %str(n))
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
-
+        # submit array job at Diamond
+        print '==> XCE: created input scripts for '+str(n+1)+' in '+self.ccp4_scratch_directory
+        os.chdir(self.ccp4_scratch_directory)
+        Cmds = (
+                '#PBS -joe -N xce_dimple_master\n'
+                'xce_dimple_$SGE_TASK_ID.sh\n'
+                )
+        f = open('dimple_master.sh','w')
+        f.write(Cmds)
+        f.close()
+        print '==> XCE: submitting array job with maximal 100 jobs running on cluster'
+#        os.system('qsub -t 1:%s -tc 100 dimple_master.sh' %(str(n+1)))
 
 class run_dimple_on_selected_samples(QtCore.QThread):
     def __init__(self,settings,initial_model_dimple_dict,external_software,ccp4_scratch,filename_root):
