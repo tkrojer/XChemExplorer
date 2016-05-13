@@ -400,6 +400,7 @@ class data_source:
         cursor = connect.cursor()
         cursor.execute(cmd)
         output=cursor.fetchall()
+        connect.commit()
         return output
 
     def get_db_dict_for_sample(self,sampleID):

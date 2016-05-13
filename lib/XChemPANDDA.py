@@ -17,7 +17,7 @@ class run_pandda_export(QtCore.QThread):
         self.db_list=self.db.get_empty_db_dict()
 
     def run(self):
-        self.export_models()
+#        self.export_models()
         self.import_samples_into_datasouce()
 
     def import_samples_into_datasouce(self):

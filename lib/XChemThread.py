@@ -42,8 +42,14 @@ class update_datasource_from_file_system(QtCore.QThread):
 
         site=['_A_','_B_','_C_','_D_','_E_','_F_','_G_','_H_','_I_','_J_','_K_','_L_']
 
-        for directory in glob.glob(os.path.join(self.initial_model_directory,'*')):
+        all_samples_in_datasource=self.db.get_all_samples_in_data_source_as_list()
+
+        for directory in sorted(glob.glob(os.path.join(self.initial_model_directory,'*'))):
             xtal=directory[directory.rfind('/')+1:]
+            if xtal not in all_samples_in_datasource:
+                print '==> XCE inserting '+xtal+' into data source'
+                self.db.execute_statement("insert into mainTable (CrystalName) values ('%s');" %xtal)
+                all_samples_in_datasource.append(xtal)
             compoundID=str(self.db.get_value_from_field(xtal,'CompoundCode')[0])
             db_dict={}
             os.chdir(directory)
@@ -52,6 +58,8 @@ class update_datasource_from_file_system(QtCore.QThread):
                 if file==xtal+'.log' and os.path.isfile(file):
                     db_dict['DataProcessingPathToLogfile']=os.path.join(directory,xtal+'.log')
                     db_dict['DataProcessingLOGfileName']=xtal+'.log'
+                    aimless_results=parse().read_aimless_logfile(file)
+                    db_dict.update(aimless_results)
                 if file==xtal+'.mtz' and os.path.isfile(file):
                     db_dict['DataProcessingPathToMTZfile']=os.path.join(directory,xtal+'.mtz')
                     db_dict['DataProcessingMTZfileName']=xtal+'.mtz'
