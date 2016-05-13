@@ -245,17 +245,17 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     )
 
             os.chdir(self.ccp4_scratch_directory)
-            f = open('xce_dimple_%s.sh' %str(n),'w')
+            f = open('xce_dimple_%s.sh' %str(n+1),'w')
             f.write(Cmds)
             f.close()
-            os.system('chmod +x xce_dimple_%s.sh' %str(n))
+            os.system('chmod +x xce_dimple_%s.sh' %str(n+1))
 #            if self.queueing_system_available:
 #                os.system('qsub xce_dimple.sh')
 #            else:
 #                os.system('chmod +x xce_dimple.sh')
 #                os.system('./xce_dimple.sh')
             if not self.queueing_system_available:
-                os.system('./xce_dimple_%s.sh' %str(n))
+                os.system('./xce_dimple_%s.sh' %str(n+1))
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
@@ -271,6 +271,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
         f.write(Cmds)
         f.close()
         print '==> XCE: submitting array job with maximal 100 jobs running on cluster'
+        print 'qsub -t 1:%s -tc 100 dimple_master.sh' %(str(n+1))
 #        os.system('qsub -t 1:%s -tc 100 dimple_master.sh' %(str(n+1)))
 
 class run_dimple_on_selected_samples(QtCore.QThread):
