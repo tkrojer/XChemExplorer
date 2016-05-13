@@ -1406,7 +1406,8 @@ class XChemExplorer(QtGui.QApplication):
         for xtal in sorted(self.initial_model_dimple_dict):
             if self.initial_model_dimple_dict[xtal][0].isChecked():
                 db_dict=self.xtal_db_dict[xtal]
-                if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])):
+                if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])) or \
+                    os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
                     reference_file=str(self.initial_model_dimple_dict[xtal][1].currentText())
 
                     reference_file_pdb=os.path.join(self.reference_directory,reference_file+'.pdb')
