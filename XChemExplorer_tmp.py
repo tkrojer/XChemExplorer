@@ -1493,7 +1493,7 @@ class XChemExplorer(QtGui.QApplication):
     def check_before_running_dimple(self,job_list):
 
         msgBox = QtGui.QMessageBox()
-        msgBox.setText("Do you really want to run %s Dimple jobs?\nNote: we will not run more than 200 at once on the cluster!" %len(job_list))
+        msgBox.setText("Do you really want to run %s Dimple jobs?\nNote: we will not run more than 100 at once on the cluster!" %len(job_list))
         msgBox.addButton(QtGui.QPushButton('Go'), QtGui.QMessageBox.YesRole)
         msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
         reply = msgBox.exec_();

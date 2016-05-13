@@ -257,10 +257,10 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
         f = open('dimple_master.sh','w')
         f.write(Cmds)
         f.close()
-        print '==> XCE: submitting array job with maximal 200 jobs running on cluster'
+        print '==> XCE: submitting array job with maximal 100 jobs running on cluster'
         print '==> XCE: using the following command:'
         print '         qsub -t 1:%s -tc 100 dimple_master.sh' %(str(n+1))
-        os.system('qsub -t 1:%s -tc 200 dimple_master.sh' %(str(n+1)))
+        os.system('qsub -t 1:%s -tc 100 dimple_master.sh' %(str(n+1)))
 
 
 
