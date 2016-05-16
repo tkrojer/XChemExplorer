@@ -1027,7 +1027,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             db_dict['DataProcessingMTZfileName']='fast_dp.mtz'
                         autoproc=file_name.split('/')[len(file_name.split('/'))-2]
                         found_autoproc=False
-                        for entry in self.data_collection_dict[xtal]:
+                        for n,entry in enumerate(self.data_collection_dict[xtal]):
+#                        for entry in self.data_collection_dict[xtal]:
                             if len(entry)>=9:
                                 if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[4]==autoproc:
                                     found_autoproc=True
@@ -1084,7 +1085,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             db_dict['DataProcessingMTZfileName']='truncate-unique.mtz'
                         autoproc=file_name.split('/')[len(file_name.split('/'))-3]
                         found_autoproc=False
-                        for entry in self.data_collection_dict[xtal]:
+                        for n,entry in enumerate(self.data_collection_dict[xtal]):
+#                        for entry in self.data_collection_dict[xtal]:
                             if len(entry)>=9:
                                 if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[4]==autoproc:
                                     found_autoproc=True

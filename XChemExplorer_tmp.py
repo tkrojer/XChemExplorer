@@ -314,7 +314,8 @@ class XChemExplorer(QtGui.QApplication):
 
         self.map_cif_file_tasks = [ 'Run DIMPLE on All Autoprocessing MTZ files',
                                     'Run DIMPLE on selected MTZ files',
-                                    'Create CIF/PDB/PNG file of soaked compound'             ]
+                                    'Create CIF/PDB/PNG file of ALL soaked compound',
+                                    'Create CIF/PDB/PNG file of NEW soaked compound'    ]
 
         frame_map_cif_file_task=QtGui.QFrame()
         frame_map_cif_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -1744,7 +1745,7 @@ class XChemExplorer(QtGui.QApplication):
         elif instruction=='Run DIMPLE on selected MTZ files':
             self.run_dimple_on_selected_autoprocessing_file()
 
-        elif instruction=='Create CIF/PDB/PNG file of soaked compound':
+        elif instruction=='Create CIF/PDB/PNG file of ALL soaked compound':
             self.create_cif_pdb_png_files()
 
         elif instruction=='pandda.analyse':
