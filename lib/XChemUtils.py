@@ -195,7 +195,7 @@ class helpers:
     def pil_rdkit_exist(self):
         return self.pil_rdkit_present
 
-    def make_png(self,initial_model_directory,sample,compoundID,smiles,queueing_system_available,database_directory,data_source_file,ccp4_scratch_directory,todo,counter):
+    def make_png(self,initial_model_directory,sample,compoundID,smiles,queueing_system_available,database_directory,data_source_file,ccp4_scratch_directory,counter):
 
         if not os.path.isfile(os.path.join(initial_model_directory,sample,'compound','ACEDRG_IN_PROGRESS')):
             os.system('touch ACEDRG_IN_PROGRESS')

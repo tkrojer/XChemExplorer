@@ -154,7 +154,8 @@ class create_png_and_cif_of_compound(QtCore.QThread):
                 os.chdir(os.path.join(self.initial_model_directory,sampleID,'compound'))
 
                 helpers().make_png( self.initial_model_directory,
-                                    sampleID,compoundID,
+                                    sampleID,
+                                    compoundID,
                                     smiles,
                                     self.external_software['qsub'],
                                     self.database_directory,
