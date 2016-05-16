@@ -1385,7 +1385,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def check_status_rerun_dimple_on_all_autoprocessing_files(self):
-
+        print 'hallo'
 
 
     def rerun_dimple_on_all_autoprocessing_files(self):
