@@ -432,7 +432,11 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
                     self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'writing all files from data processing to project folder -> '+sample+', visit: '+visit+', run: '+run+', program: '+autoproc)
                     path_to_procdir=db_dict['DataProcessingDirectoryOriginal']
                     path_to_logfile=db_dict['DataProcessingPathToLogfile']
-                    path_to_mtzfile=db_dict['DataProcessingPathToMTZfile']
+                    try:
+                        path_to_mtzfile=db_dict['DataProcessingPathToMTZfile']
+                    except KeyError:
+                        print db_dict
+                        continue
                     if path_to_mtzfile=='':     # in case a log file exists, but the job did not produce an mtz file
                         continue
                     mtz_filename=db_dict['DataProcessingMTZfileName']

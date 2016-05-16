@@ -2095,12 +2095,25 @@ class XChemExplorer(QtGui.QApplication):
         smiles_for_sample=self.db.execute_statement("select CrystalName,compoundSMILES from mainTable where compoundSMILES is not NULL or compoundSMILES is not '';")
         samples_with_data=self.db.execute_statement("select CrystalName from mainTable where DataCollectionOutcome is 'success';")
         cif_files=self.db.execute_statement("select CrystalName,RefinementCIF from mainTable where RefinementCIF is not Null or RefinementCIF is not '';")
-        print '==> XCE: suammary for compounds:'
+        print '==> XCE: summary for compounds:'
         print '    * nr samples in datasource:',len(samples_in_db)
         print '    * nr SMILES for samples:   ',len(smiles_for_sample)
         print '    * nr samples with data:    ',len(samples_with_data)
         print '    * nr CIF files created:    ',len(cif_files)
+        out_bytes = subprocess.check_output(['qstat'])
+        out_text = out_bytes.decode('utf-8')
+        jobs_on_cluster = subprocess.check_output(['qstat'])
+        jobs_running=0
+        for n,line in enumerate(jobs_on_cluster):
 
+        jobs_running=n
+        print '==> XCE: job info'
+        print '    * nr jobs currently running on cluster:',jobs_running
+        print '    * nr ACEDRG jobs submitted'
+        print '    * nr ACEDRG jobs waiting'
+        print '    * nr ACEDRG jobs finished'
+        print '    * time ACEDRG queue started'
+        print '    * expected time to finish'
 
     def show_html_summary_and_diffraction_image(self):
         for key in self.albula_button_dict:
