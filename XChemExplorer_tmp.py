@@ -2093,7 +2093,7 @@ class XChemExplorer(QtGui.QApplication):
         self.update_status_bar('Please check terminal window for details!')
         samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not NULL;")
         smiles_for_sample=self.db.execute_statement("select CrystalName,compoundSMILES from mainTable where compoundSMILES is not NULL or compoundSMILES is not '';")
-        samples_with_data=self.db.execute_statement("select CrystalName from mainTable where DataCollectionOutcome is 'success'';")
+        samples_with_data=self.db.execute_statement("select CrystalName from mainTable where DataCollectionOutcome is 'success';")
         cif_files=self.db.execute_statement("select CrystalName,RefinementCIF from mainTable where RefinementCIF is not Null or RefinementCIF is not '';")
         print '==> XCE: suammary for compounds:'
         print '    * nr samples in datasource:',len(samples_in_db)
