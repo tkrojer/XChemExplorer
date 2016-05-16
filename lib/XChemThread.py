@@ -1035,6 +1035,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')):
                                         dimple_file=os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')
                                         pdb_info=parse().PDBheader(dimple_file)
+                                        print xtal,n,entry[1],entry[2],entry[4]
                                         db_dict_old=self.data_collection_dict[xtal][n][6]
                                         db_dict_old['DataProcessingPathToDimplePDBfile']=dimple_file
                                         db_dict_old['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
