@@ -135,7 +135,7 @@ class create_png_and_cif_of_compound(QtCore.QThread):
             if not os.path.isdir(os.path.join(initial_model_directory,sample)):
                 os.mkdir(os.path.join(initial_model_directory,sample))
 
-            if self.todo=='ALL:'
+            if self.todo=='ALL':
                 # remove symbolic links if present
                 if os.path.isfile(os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.pdb')):
                     os.system('/bin/rm '+os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.pdb'))
