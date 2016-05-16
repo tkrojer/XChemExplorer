@@ -1724,7 +1724,7 @@ class XChemExplorer(QtGui.QApplication):
         if instruction=='Run DIMPLE on All Autoprocessing MTZ files':
             self.check_status_rerun_dimple_on_all_autoprocessing_files()
 
-        elif instruction=='Create CIF/PDB/PNG file of ALL soaked compound' or
+        elif instruction=='Create CIF/PDB/PNG file of ALL soaked compound' or \
              instruction=='Create CIF/PDB/PNG file of NEW soaked compounds':
             self.check_status_create_cif_pdb_png_files()
 
