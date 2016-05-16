@@ -2091,7 +2091,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def check_status_create_cif_pdb_png_files(self):
-        self.status_bar('Please check terminal window for details!')
+        self.update_status_bar('Please check terminal window for details!')
         samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not NULL;")
         smiles_for_sample=self.db.execute_statement("select CrystalName,compoundSMILES from mainTable where compoundSMILES is not NULL or compoundSMILES is no '';")
         samples_with_data=self.db.execute_statement("select CrystalName from mainTable where DataCollectionOutcome is 'success'';")
