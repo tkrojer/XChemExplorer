@@ -1139,10 +1139,9 @@ class XChemExplorer(QtGui.QApplication):
 
         self.window.setLayout(vbox_main)
 
-        if self.data_source_set:
-            self.datasource_menu_reload_samples()
-#            self.get_reference_file_list(' ')
-#            self.update_all_tables()
+        # this can be excrutiatingly slow...
+#        if self.data_source_set:
+#            self.datasource_menu_reload_samples()
 
         self.status_bar.showMessage('Ready')
 #        self.timer = QtCore.QBasicTimer()
@@ -2093,7 +2092,7 @@ class XChemExplorer(QtGui.QApplication):
     def check_status_create_cif_pdb_png_files(self):
         self.update_status_bar('Please check terminal window for details!')
         samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not NULL;")
-        smiles_for_sample=self.db.execute_statement("select CrystalName,compoundSMILES from mainTable where compoundSMILES is not NULL or compoundSMILES is no '';")
+        smiles_for_sample=self.db.execute_statement("select CrystalName,compoundSMILES from mainTable where compoundSMILES is not NULL or compoundSMILES is not '';")
         samples_with_data=self.db.execute_statement("select CrystalName from mainTable where DataCollectionOutcome is 'success'';")
         cif_files=self.db.execute_statement("select CrystalName,RefinementCIF from mainTable where RefinementCIF is not Null or RefinementCIF is not '';")
         print '==> XCE: suammary for compounds:'
