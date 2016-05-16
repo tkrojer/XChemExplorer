@@ -159,7 +159,7 @@ class create_png_and_cif_of_compound(QtCore.QThread):
                                     self.external_software['qsub'],
                                     self.database_directory,
                                     self.data_source_file,
-                                    self.ccp4_scratch_directory
+                                    self.ccp4_scratch_directory,
                                     counter )
                 counter += 1
 
