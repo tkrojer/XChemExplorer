@@ -132,26 +132,26 @@ class create_png_and_cif_of_compound(QtCore.QThread):
             if compoundID=='' or compoundID==None:
                 compoundID='compound'
 
-            if not os.path.isdir(os.path.join(initial_model_directory,sample)):
-                os.mkdir(os.path.join(initial_model_directory,sample))
+            if not os.path.isdir(os.path.join(self.initial_model_directory,sampleID)):
+                os.mkdir(os.path.join(self.initial_model_directory,sampleID))
 
             if self.todo=='ALL':
                 # remove symbolic links if present
-                if os.path.isfile(os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.pdb')):
-                    os.system('/bin/rm '+os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.pdb'))
-                if os.path.isfile(os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.cif')):
-                    os.system('/bin/rm '+os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.cif'))
-                if os.path.isfile(os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.png')):
-                    os.system('/bin/rm '+os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.png'))
-                if os.path.isdir(os.path.join(initial_model_directory,sample,'compound')):
-                    os.system('/bin/rm -fr '+os.path.join(initial_model_directory,sample,'compound'))
+                if os.path.isfile(os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.pdb')):
+                    os.system('/bin/rm '+os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.pdb'))
+                if os.path.isfile(os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.cif')):
+                    os.system('/bin/rm '+os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.cif'))
+                if os.path.isfile(os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.png')):
+                    os.system('/bin/rm '+os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.png'))
+                if os.path.isdir(os.path.join(self.initial_model_directory,sampleID,'compound')):
+                    os.system('/bin/rm -fr '+os.path.join(self.initial_model_directory,sampleID,'compound'))
 
             # create 'compound' directory if not present
-            if not os.path.isdir(os.path.join(initial_model_directory,sample,'compound')):
-                os.mkdir(os.path.join(initial_model_directory,sample,'compound'))
+            if not os.path.isdir(os.path.join(self.initial_model_directory,sampleID,'compound')):
+                os.mkdir(os.path.join(self.initial_model_directory,sampleID,'compound'))
 
-            if not os.path.isfile(os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.cif')):
-                os.chdir(os.path.join(initial_model_directory,sample,'compound'))
+            if not os.path.isfile(os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.cif')):
+                os.chdir(os.path.join(self.initial_model_directory,sampleID,'compound'))
 
                 helpers().make_png( self.initial_model_directory,
                                     sampleID,compoundID,
