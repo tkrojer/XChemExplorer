@@ -315,7 +315,7 @@ class XChemExplorer(QtGui.QApplication):
         self.map_cif_file_tasks = [ 'Run DIMPLE on All Autoprocessing MTZ files',
                                     'Run DIMPLE on selected MTZ files',
                                     'Create CIF/PDB/PNG file of ALL soaked compound',
-                                    'Create CIF/PDB/PNG file of NEW soaked compound'    ]
+                                    'Create CIF/PDB/PNG file of NEW soaked compounds'    ]
 
         frame_map_cif_file_task=QtGui.QFrame()
         frame_map_cif_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -1724,6 +1724,10 @@ class XChemExplorer(QtGui.QApplication):
         if instruction=='Run DIMPLE on All Autoprocessing MTZ files':
             self.check_status_rerun_dimple_on_all_autoprocessing_files()
 
+        elif instruction=='Create CIF/PDB/PNG file of ALL soaked compound' or
+             instruction=='Create CIF/PDB/PNG file of NEW soaked compounds':
+            self.check_status_create_cif_pdb_png_files()
+
     def prepare_and_run_task(self,instruction):
 
         if instruction=='Get New Results from Autoprocessing':
@@ -1746,7 +1750,10 @@ class XChemExplorer(QtGui.QApplication):
             self.run_dimple_on_selected_autoprocessing_file()
 
         elif instruction=='Create CIF/PDB/PNG file of ALL soaked compound':
-            self.create_cif_pdb_png_files()
+            self.create_cif_pdb_png_files('ALL')
+
+        elif instruction=='Create CIF/PDB/PNG file of NEW soaked compounds':
+            self.create_cif_pdb_png_files('NEW')
 
         elif instruction=='pandda.analyse':
             self.run_pandda_analyse()
@@ -2053,7 +2060,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
 
-    def create_cif_pdb_png_files(self):
+    def create_cif_pdb_png_files(self,todo):
         tmp=self.db.execute_statement("select CrystalName,CompoundCode,CompoundSmiles from mainTable where CrystalName is not '' and CompoundSmiles is not '' and CompoundSmiles is not NULL;")
         compound_list=[]
         for item in tmp:
@@ -2074,14 +2081,26 @@ class XChemExplorer(QtGui.QApplication):
                                                                         self.initial_model_directory,
                                                                         compound_list,
                                                                         self.database_directory,
-                                                                        self.data_source_file)
+                                                                        self.data_source_file,
+                                                                        todo,
+                                                                        self.ccp4_scratch_directory )
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.work_thread.start()
 
 
-
+    def check_status_create_cif_pdb_png_files(self):
+        self.status_bar('Please check terminal window for details!')
+        samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not NULL;")
+        smiles_for_sample=self.db.execute_statement("select CrystalName,compoundSMILES from mainTable where compoundSMILES is not NULL or compoundSMILES is no '';")
+        samples_with_data=self.db.execute_statement("select CrystalName from mainTable where DataCollectionOutcome is 'success'';")
+        cif_files=self.db.execute_statement("select CrystalName,RefinementCIF from mainTable where RefinementCIF is not Null or RefinementCIF is not '';")
+        print '==> XCE: suammary for compounds:'
+        print '    * nr samples in datasource:',len(samples_in_db)
+        print '    * nr SMILES for samples:   ',len(smiles_for_sample)
+        print '    * nr samples with data:    ',len(samples_with_data)
+        print '    * nr CIF files created:    ',len(cif_files)
 
 
     def show_html_summary_and_diffraction_image(self):

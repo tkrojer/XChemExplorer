@@ -195,44 +195,17 @@ class helpers:
     def pil_rdkit_exist(self):
         return self.pil_rdkit_present
 
-    def make_png(self,initial_model_directory,sample,compoundID,smiles,queueing_system_available,database_directory,data_source_file):
+    def make_png(self,initial_model_directory,sample,compoundID,smiles,queueing_system_available,database_directory,data_source_file,ccp4_scratch_directory,todo,counter):
 
-        if not os.path.isdir(os.path.join(initial_model_directory,sample)):
-            os.mkdir(os.path.join(initial_model_directory,sample))
-
-        # remove symbolic links if present
-#        if os.path.isfile(os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.pdb')):
-#            os.system('/bin/rm '+os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.pdb'))
-#        if os.path.isfile(os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.cif')):
-#            os.system('/bin/rm '+os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.cif'))
-#        if os.path.isfile(os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.png')):
-#            os.system('/bin/rm '+os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.png'))
-
-        # remove compound directory if present
-#        if os.path.isdir(os.path.join(initial_model_directory,sample,'compound')):
-#            os.system('/bin/rm -fr '+os.path.join(initial_model_directory,sample,'compound'))
-
-        if not os.path.isdir(os.path.join(initial_model_directory,sample,'compound')):
-            os.mkdir(os.path.join(initial_model_directory,sample,'compound'))
-
-        os.chdir(os.path.join(initial_model_directory,sample,'compound'))
-
-        if not os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID.replace(' ','')+'.png')):
-            mol = Chem.MolFromSmiles(smiles)
-            AllChem.Compute2DCoords(mol)
-            # Draw to a file
-            Draw.MolToFile(mol, "%s.png" %compoundID.replace(' ',''))
-
-        if not os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID.replace(' ','')+'.cif')):
-#            os.system('acedrg --res LIG -i "%s" -o %s' %(smiles,compoundID.replace(' ','')))
-#            os.system("grade '%s' -resname LIG -ocif %s.cif -opdb %s.pdb" %(smiles,compoundID.replace(' ',''),compoundID.replace(' ','')))
-            os.chdir(os.path.join(initial_model_directory,sample,'compound'))
-            if not os.path.isfile(os.path.join(initial_model_directory,sample,'compound','ACEDRG_IN_PROGRESS')):
-                os.system('touch ACEDRG_IN_PROGRESS')
-                Cmds = (
+        if not os.path.isfile(os.path.join(initial_model_directory,sample,'compound','ACEDRG_IN_PROGRESS')):
+            os.system('touch ACEDRG_IN_PROGRESS')
+            Cmds = (
                     '#!'+os.getenv('SHELL')+'\n'
                     '\n'
                     'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
+                    '\n'
+                    '$CCP4/libexec/python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','create_png_of_compound.py')+
+                    ' %s %s %s %s\n' %(smiles,compoundID.replace(' ',''),sample,initial_model_directory)+
                     '\n'
                     'cd '+os.path.join(initial_model_directory,sample,'compound')+'\n'
                     '\n'
@@ -249,14 +222,15 @@ class helpers:
                     '\n'
                     '/bin/rm compound/ACEDRG_IN_PROGRESS\n'
                 )
-                f = open('acedrg.sh','w')
-                f.write(Cmds)
-                f.close()
-                if queueing_system_available:
-                    os.system('qsub acedrg.sh')
-                else:
-                    os.system('chmod +x acedrg.sh')
-                    os.system('./acedrg.sh')
+            f = open(os.path.join(ccp4_scratch_directory,'xce_acedrg_%s.sh' %counter),'w')
+            f.write(Cmds)
+            f.close()
+
+#                if queueing_system_available:
+#                    os.system('qsub acedrg.sh')
+#                else:
+#                    os.system('chmod +x acedrg.sh')
+#                    os.system('./acedrg.sh')
 
 #        os.chdir(os.path.join(initial_model_directory,sample))
 #        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound',compoundID.replace(' ','')+'.pdb'))\

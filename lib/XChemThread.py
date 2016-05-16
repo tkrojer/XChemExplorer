@@ -105,29 +105,81 @@ class update_datasource_from_file_system(QtCore.QThread):
 
 
 class create_png_and_cif_of_compound(QtCore.QThread):
-    def __init__(self,external_software,initial_model_directory,compound_list,database_directory,data_source_file):
+    def __init__(self,external_software,initial_model_directory,compound_list,database_directory,data_source_file,todo,ccp4_scratch_directory):
         QtCore.QThread.__init__(self)
         self.external_software=external_software
         self.initial_model_directory=initial_model_directory
         self.compound_list=compound_list
         self.database_directory=database_directory
         self.data_source_file=data_source_file
+        self.todo=todo
+        self.ccp4_scratch_directory=ccp4_scratch_directory
 
     def run(self):
+        # first remove all ACEDRG input scripts in ccp4_scratch directory
+        print '==> XCE: removing all xce_acedrg scripts from',self.ccp4_scratch_directory
+        os.chdir(self.ccp4_scratch_directory)
+        os.system('/bin/rm -f xce_acedrg*')
+
         progress_step=100/float(len(self.compound_list))
         progress=0
-        counter=0
+        counter=1
         for item in self.compound_list:
             sampleID=item[0]
             compoundID=item[1]
             smiles=item[2]
-            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'creating cif/png -> '+sampleID)
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'creating ACEDRG shell script for '+sampleID)
             if compoundID=='' or compoundID==None:
                 compoundID='compound'
-            helpers().make_png(self.initial_model_directory,sampleID,compoundID,smiles,self.external_software['qsub'],self.database_directory,self.data_source_file)
+
+            if not os.path.isdir(os.path.join(initial_model_directory,sample)):
+                os.mkdir(os.path.join(initial_model_directory,sample))
+
+            if self.todo=='ALL:'
+                # remove symbolic links if present
+                if os.path.isfile(os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.pdb')):
+                    os.system('/bin/rm '+os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.pdb'))
+                if os.path.isfile(os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.cif')):
+                    os.system('/bin/rm '+os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.cif'))
+                if os.path.isfile(os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.png')):
+                    os.system('/bin/rm '+os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.png'))
+                if os.path.isdir(os.path.join(initial_model_directory,sample,'compound')):
+                    os.system('/bin/rm -fr '+os.path.join(initial_model_directory,sample,'compound'))
+
+            # create 'compound' directory if not present
+            if not os.path.isdir(os.path.join(initial_model_directory,sample,'compound')):
+                os.mkdir(os.path.join(initial_model_directory,sample,'compound'))
+
+            if not os.path.isfile(os.path.join(initial_model_directory,sample,compoundID.replace(' ','')+'.cif')):
+                os.chdir(os.path.join(initial_model_directory,sample,'compound'))
+
+                helpers().make_png( self.initial_model_directory,
+                                    sampleID,compoundID,
+                                    smiles,
+                                    self.external_software['qsub'],
+                                    self.database_directory,
+                                    self.data_source_file,
+                                    self.ccp4_scratch_directory
+                                    counter )
+                counter += 1
+
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-            counter += 1
+
+        # submit array job at Diamond
+        print '==> XCE: created input scripts for '+str(counter)+' ACEDRG jobs in '+self.ccp4_scratch_directory
+        os.chdir(self.ccp4_scratch_directory)
+        Cmds = (
+                '#PBS -joe -N xce_acedrg_master\n'
+                './xce_acedrg_$SGE_TASK_ID.sh\n'
+                )
+        f = open('acedrg_master.sh','w')
+        f.write(Cmds)
+        f.close()
+        print '==> XCE: submitting array job with maximal 100 jobs running on cluster'
+        print '==> XCE: using the following command:'
+        print '         qsub -t 1:%s -tc 100 acedrg_master.sh' %(str(counter))
+        os.system('qsub -t 1:%s -tc 100 acedrg_master.sh' %(str(counter)))
 
         self.emit(QtCore.SIGNAL("finished()"))
 
@@ -1036,7 +1088,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')):
                                         dimple_file=os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')
                                         pdb_info=parse().PDBheader(dimple_file)
-                                        print xtal,n,entry[1],entry[2],entry[4]
                                         db_dict_old=self.data_collection_dict[xtal][n][6]
                                         db_dict_old['DataProcessingPathToDimplePDBfile']=dimple_file
                                         db_dict_old['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
