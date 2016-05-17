@@ -197,7 +197,8 @@ class helpers:
 
     def make_png(self,initial_model_directory,sample,compoundID,smiles,queueing_system_available,database_directory,data_source_file,ccp4_scratch_directory,counter):
 
-        if not os.path.isfile(os.path.join(initial_model_directory,sample,'compound','ACEDRG_IN_PROGRESS')):
+#        if not os.path.isfile(os.path.join(initial_model_directory,sample,'compound','ACEDRG_IN_PROGRESS')):
+        if os.path.isfile(os.path.join(initial_model_directory,sample,'compound','ACEDRG_IN_PROGRESS')):
             os.system('touch ACEDRG_IN_PROGRESS')
             Cmds = (
                     '#!'+os.getenv('SHELL')+'\n'
@@ -222,9 +223,10 @@ class helpers:
                     '\n'
                     '/bin/rm compound/ACEDRG_IN_PROGRESS\n'
                 )
-            f = open(os.path.join(ccp4_scratch_directory,'xce_acedrg_%s.sh' %counter),'w')
+            f = open(os.path.join(ccp4_scratch_directory,'xce_acedrg_%s.sh' %str(counter)),'w')
             f.write(Cmds)
             f.close()
+            os.system('chmod +x xce_acedrg_%s.sh' %str(counter))
 
 #                if queueing_system_available:
 #                    os.system('qsub acedrg.sh')
