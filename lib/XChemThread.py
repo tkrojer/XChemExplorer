@@ -436,7 +436,6 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
                     try:
                         path_to_mtzfile=db_dict['DataProcessingPathToMTZfile']
                     except KeyError:
-                        print db_dict
                         continue
                     if path_to_mtzfile=='':     # in case a log file exists, but the job did not produce an mtz file
                         continue
@@ -855,7 +854,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                 db_dict={   'DataCollectionVisit':              latest_run[1],
                             'DataCollectionBeamline':           latest_run[3],
                             'DataCollectionDate':               latest_run[0],
-                            'DataCollectionOutcome':            'Failed - unknown'    }
+                            'DataCollectionOutcome':            'Failed - unknown',
+                            'RefinementOutcome'+                '-1 - Data Collection Failed'}
 
             if self.rescore_only:
                 self.data_source.update_insert_data_source(sample,db_dict)
