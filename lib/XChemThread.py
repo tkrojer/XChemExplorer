@@ -484,7 +484,6 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
                         db_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
                         db_dict['RefinementMTZfree'],db_dict['DimpleRcryst'],db_dict['DimpleRfree'],db_dict['RefinementOutcome'],db_dict['RefinementSpaceGroup'] =self.link_mtz_log_files_to_sample_directory(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename,dimple_destination)
                         current_refinement_outcome=data_source.get_value_from_field(sample,'RefinementOutcome')
-                        print str(current_refinement_outcome[0]).split()[0].lower()
                         if str(current_refinement_outcome[0]).split()[0].lower().startswith('none'):
                             db_dict['RefinementOutcome']='1 - Analysis Pending'
                         data_source.update_insert_data_source(sample,db_dict)
