@@ -1417,8 +1417,11 @@ class XChemExplorer(QtGui.QApplication):
                             os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
                             job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
                     except KeyError:
-                        if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
-                            job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
+                        try:
+                            if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
+                                job_list=self.get_job_list_for_dimple_rerun(xtal,job_list,db_dict,entry)
+                        except KeyError:
+                            continue
         if job_list != []:
             self.check_before_running_dimple(job_list)
 
