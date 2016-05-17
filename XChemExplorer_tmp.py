@@ -1203,6 +1203,7 @@ class XChemExplorer(QtGui.QApplication):
         self.header,self.data=self.db.load_samples_from_data_source()
         print '==> XCE: get all samples in data source'
         all_samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not '';")
+        print '==> XCE: ok, this is now really slow...'
         self.xtal_db_dict={}
         for sample in all_samples_in_db:
             db_dict=self.db.get_db_dict_for_sample(str(sample[0]))
