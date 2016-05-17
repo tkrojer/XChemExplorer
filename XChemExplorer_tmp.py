@@ -1207,7 +1207,6 @@ class XChemExplorer(QtGui.QApplication):
         self.xtal_db_dict={}
         for sample in all_samples_in_db:
             db_dict=self.db.get_db_dict_for_sample(str(sample[0]))
-            sys.stdout.write(sample)
             self.xtal_db_dict[str(sample[0])]=db_dict
         print '==> XCE: found '+str(len(self.xtal_db_dict))+' samples'
 
