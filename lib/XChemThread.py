@@ -170,17 +170,18 @@ class create_png_and_cif_of_compound(QtCore.QThread):
         # submit array job at Diamond
         print '==> XCE: created input scripts for '+str(counter)+' ACEDRG jobs in '+self.ccp4_scratch_directory
         os.chdir(self.ccp4_scratch_directory)
-        Cmds = (
-                '#PBS -joe -N xce_acedrg_master\n'
-                './xce_acedrg_$SGE_TASK_ID.sh\n'
-                )
-        f = open('acedrg_master.sh','w')
-        f.write(Cmds)
-        f.close()
-        print '==> XCE: submitting array job with maximal 100 jobs running on cluster'
-        print '==> XCE: using the following command:'
-        print '         qsub -t 1:%s -tc 100 acedrg_master.sh' %(str(counter))
-        os.system('qsub -t 1:%s -tc 100 acedrg_master.sh' %(str(counter)))
+        if counter > 1:
+            Cmds = (
+                    '#PBS -joe -N xce_acedrg_master\n'
+                    './xce_acedrg_$SGE_TASK_ID.sh\n'
+                    )
+            f = open('acedrg_master.sh','w')
+            f.write(Cmds)
+            f.close()
+            print '==> XCE: submitting array job with maximal 100 jobs running on cluster'
+            print '==> XCE: using the following command:'
+            print '         qsub -t 1:%s -tc 100 acedrg_master.sh' %(str(counter))
+            os.system('qsub -t 1:%s -tc 100 acedrg_master.sh' %(str(counter)))
 
         self.emit(QtCore.SIGNAL("finished()"))
 

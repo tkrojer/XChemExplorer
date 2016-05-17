@@ -223,7 +223,8 @@ class helpers:
                     '\n'
                     '/bin/rm compound/ACEDRG_IN_PROGRESS\n'
                 )
-            f = open(os.path.join(ccp4_scratch_directory,'xce_acedrg_%s.sh' %str(counter)),'w')
+            os.chdir(ccp4_scratch_directory)
+            f = open('xce_acedrg_%s.sh' %str(counter),'w')
             f.write(Cmds)
             f.close()
             os.system('chmod +x xce_acedrg_%s.sh' %str(counter))

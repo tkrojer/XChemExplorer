@@ -1195,10 +1195,13 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def update_header_and_data_from_datasource(self):
-        print '==> getting information for all samples from data source...'
+        print '==> XCE: getting information for all samples from data source...'
         self.db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
+        print '==> XCE: creating missing columns in data source'
         self.db.create_missing_columns()
+        print '==> XCE: load header and data from data source'
         self.header,self.data=self.db.load_samples_from_data_source()
+        print '==> XCE: get all samples in data source'
         all_samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not '';")
         self.xtal_db_dict={}
         for sample in all_samples_in_db:
