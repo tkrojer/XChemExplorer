@@ -204,7 +204,7 @@ class helpers:
                     '\n'
                     'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
                     '\n'
-                    '$CCP4/libexec/python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','create_png_of_compound.py')+
+                    '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','create_png_of_compound.py')+
                     ' %s %s %s %s\n' %(smiles,compoundID.replace(' ',''),sample,initial_model_directory)+
                     '\n'
                     'cd '+os.path.join(initial_model_directory,sample,'compound')+'\n'

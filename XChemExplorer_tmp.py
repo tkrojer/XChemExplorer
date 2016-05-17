@@ -1203,15 +1203,28 @@ class XChemExplorer(QtGui.QApplication):
         self.header,self.data=self.db.load_samples_from_data_source()
         print '==> XCE: get all samples in data source'
         all_samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not '';")
-        print '==> XCE: ok, this is now really slow...'
+
+#        print '==> XCE: ok, this is now really slow...'
+#        self.xtal_db_dict={}
+#        for sample in all_samples_in_db:
+#            db_dict=self.db.get_db_dict_for_sample(str(sample[0]))
+#            self.xtal_db_dict[str(sample[0])]=db_dict
+
         self.xtal_db_dict={}
-        for sample in all_samples_in_db:
-            db_dict=self.db.get_db_dict_for_sample(str(sample[0]))
-            self.xtal_db_dict[str(sample[0])]=db_dict
+        sampleID_column=0
+        for n,entry in enumerate(self.header):
+            if entry=='CrystalName':
+                sampleID_column=n
+                break
+        for line in self.data:
+            if str(line[sampleID_column]) != '':
+                db_dict={}
+                for n,entry in enumerate(line):
+                    if n != sampleID_column:
+                        db_dict[str(header[n])]=str(entry)
+                self.xtal_db_dict[str(line[sampleID_column])]=db_dict
+
         print '==> XCE: found '+str(len(self.xtal_db_dict))+' samples'
-
-        
-
 
     def datasource_menu_reload_samples(self):
         print '==> reading samples from data source: ',os.path.join(self.database_directory,self.data_source_file)
