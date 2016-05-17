@@ -17,5 +17,8 @@ if __name__=='__main__':
     AllChem.Compute2DCoords(mol)
     # Draw to a file
 
+    print 'path',os.path.join(inital_model_directory,xtal,'compound')
     os.chdir(os.path.join(inital_model_directory,xtal,'compound'))
+    print 'compoundID',compoundID
+    print 'mol',mol
     Draw.MolToFile(mol, "%s.png" %compoundID.replace(' ',''))
