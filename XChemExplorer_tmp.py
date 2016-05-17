@@ -1221,7 +1221,7 @@ class XChemExplorer(QtGui.QApplication):
                 db_dict={}
                 for n,entry in enumerate(line):
                     if n != sampleID_column:
-                        db_dict[str(header[n])]=str(entry)
+                        db_dict[str(self.header[n])]=str(entry)
                 self.xtal_db_dict[str(line[sampleID_column])]=db_dict
 
         print '==> XCE: found '+str(len(self.xtal_db_dict))+' samples'
