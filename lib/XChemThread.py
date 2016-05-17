@@ -855,7 +855,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             'DataCollectionBeamline':           latest_run[3],
                             'DataCollectionDate':               latest_run[0],
                             'DataCollectionOutcome':            'Failed - unknown',
-                            'RefinementOutcome'+                '-1 - Data Collection Failed'}
+                            'RefinementOutcome':                '-1 - Data Collection Failed'}
 
             if self.rescore_only:
                 self.data_source.update_insert_data_source(sample,db_dict)
