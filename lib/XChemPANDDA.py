@@ -60,36 +60,41 @@ class run_pandda_export(QtCore.QThread):
         with open(os.path.join(self.panddas_directory,'analyses','pandda_inspect_events.csv'),'rb') as csv_import:
             csv_dict = csv.DictReader(csv_import)
             for i,line in enumerate(csv_dict):
+                db_dict=[]
                 sampleID=line['dtag']
                 site_index=line['site_idx']
-                if int(site_index) > 12:        # currently data source does not support more than 12 sites
-                    continue
+
                 for entry in site_list:
                     if entry[0]==site_index:
                         site_name=entry[1]
                         site_comment=entry[2]
                         break
 
+                db_dict['CrystalName']                  =   sampleID
+                db_dict['PANDDApath']                   =   self.panddas_directory
+                db_dict['PANDDA_site_index']            =   site_index
+                db_dict['PANDDA_site_name']             =   site_name
+                db_dict['PANDDA_site_comment']          =   site_comment
+                db_dict['PANDDA_site_event_index']      =   line['event_idx']
+                db_dict['PANDDA_site_event_comment']    =   line['Comment']
+                db_dict['PANDDA_site_confidence']       =   line['Ligand Confidence']
+                db_dict['PANDDA_site_ligand_placed']    =   line['Ligand Placed']
+                db_dict['PANDDA_site_viewed']           =   line['Viewed']
+                db_dict['PANDDA_site_interesting']      =   line['Interesting']
+                db_dict['PANDDA_site_z_peak']           =   line['z_peak']
+                db_dict['PANDDA_site_x']                =   line['x']
+                db_dict['PANDDA_site_y']                =   line['y']
+                db_dict['PANDDA_site_z']                =   line['z']
+                db_dict['PANDDA_site_ligand_id']        =   'LIG'
+                db_dict['PANDDA_site_event_map']        =   ''
+                db_dict['PANDDA_site_initial_model']    =   ''
+                db_dict['PANDDA_site_initial_mtz']      =   ''
+                db_dict['PANDDA_site_spider_plot']      =   ''
 
-                if sampleID not in sample_dict:
-                    sample_dict[sampleID]=[]
 
-                db_list=sample_dict[sampleID]
 
-                db_list.append([    line['site_idx'],
-                                    site_name,
-                                    site_comment,
-                                    line['event_idx'],
-                                    line['Comment'],
-                                    line['Ligand Confidence'],
-                                    line['Ligand Placed'],
-                                    line['Viewed'],
-                                    line['Interesting'],
-                                    line['z_peak'],
-                                    line['x'],
-                                    line['y'],
-                                    line['z'],
-                                    'Ligand ID'     ])
+
+
 
         site=['_A_','_B_','_C_','_D_','_E_','_F_','_G_','_H_','_I_','_J_','_K_','_L_']
         return_dict={}
@@ -125,6 +130,10 @@ class run_pandda_export(QtCore.QThread):
                         if item.endswith('_z'):                 db_dict[item]=entry[12]
                         if item.endswith('_ligand_id'):         db_dict[item]=entry[13]
                         if item.endswith('_event_map'):         db_dict[item]=event_map
+                        if item.endswith('_initial_model'):     db_dict[item]=''
+                        if item.endswith('_spider_plot'):       db_dict[item]=''
+                        if item.endswith('_column_identifier'): db_dict[item]=site[n]
+
             return_dict[xtal]=db_dict
 
         return return_dict
@@ -142,6 +151,190 @@ class run_pandda_export(QtCore.QThread):
                 )
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running pandda.export: check terminal for details')
         os.system(Cmds)
+
+
+
+#class TEST_run_pandda_export(QtCore.QThread):
+#
+#    def __init__(self,panddas_directory,datasource,initial_model_directory):
+#        QtCore.QThread.__init__(self)
+#        self.panddas_directory=panddas_directory
+#        self.datasource=datasource
+#        self.initial_model_directory=initial_model_directory
+#        self.db=XChemDB.data_source(self.datasource)
+#        self.db.create_missing_columns()
+#        self.db_list=self.db.get_empty_db_dict()
+#
+#    def run(self):
+#        self.export_models()
+#        self.import_samples_into_datasouce()
+#
+#    def import_samples_into_datasouce(self):
+#
+#        db_dict=self.get_db_dict()
+#
+#        progress_step=1
+#        if len(db_dict) != 0:
+#            progress_step=100/float(len(db_dict))
+#        else:
+#            progress_step=0
+#        progress=0
+#
+#        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+#
+#        for xtal in db_dict:
+#            print '==> XCE: updating data source with PANDDA site information for',xtal
+#            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating data source with PANDDA site information for '+xtal)
+#            self.db.update_data_source(xtal,db_dict[xtal])
+#            progress += progress_step
+#            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+#
+#
+#
+#    def get_db_dict(self):
+#
+#
+#        site_list = []
+#
+#        with open(os.path.join(self.panddas_directory,'analyses','pandda_inspect_sites.csv'),'rb') as csv_import:
+#            csv_dict = csv.DictReader(csv_import)
+#            for i,line in enumerate(csv_dict):
+#                site_index=line['site_idx']
+#                name=line['Name']
+#                comment=line['Comment']
+#                site_list.append([site_index,name,comment])
+#
+#        sample_dict={}
+#
+#        with open(os.path.join(self.panddas_directory,'analyses','pandda_inspect_events.csv'),'rb') as csv_import:
+#            csv_dict = csv.DictReader(csv_import)
+#            for i,line in enumerate(csv_dict):
+#                sampleID=line['dtag']
+#                site_index=line['site_idx']
+#                if int(site_index) > 12:        # currently data source does not support more than 12 sites
+#                    continue
+#                for entry in site_list:
+#                    if entry[0]==site_index:
+#                        site_name=entry[1]
+#                        site_comment=entry[2]
+#                        break
+#
+#
+#                if sampleID not in sample_dict:
+#                    sample_dict[sampleID]=[]
+#
+#                db_list=sample_dict[sampleID]
+#
+#                db_list.append([    line['site_idx'],
+#                                    site_name,
+#                                    site_comment,
+#                                    line['event_idx'],
+#                                    line['Comment'],
+#                                    line['Ligand Confidence'],
+#                                    line['Ligand Placed'],
+#                                    line['Viewed'],
+#                                    line['Interesting'],
+#                                    line['z_peak'],
+#                                    line['x'],
+#                                    line['y'],
+#                                    line['z'],
+#                                    'Ligand ID'     ])
+#
+#                db_dict['PANDDA_site_'+str(site_index)+'_site_index']       =   site_index
+#                db_dict['PANDDA_site_'+str(site_index)+'_name']             =
+#                db_dict['PANDDA_site_'+str(site_index)+'_comment']          =
+#                db_dict['PANDDA_site_'+str(site_index)+'_event_index']      =
+#                db_dict['PANDDA_site_'+str(site_index)+'_event_comment']    =
+#                db_dict['PANDDA_site_'+str(site_index)+'_confidence']       =
+#                db_dict['PANDDA_site_'+str(site_index)+'_ligand_placed']    =
+#                db_dict['PANDDA_site_'+str(site_index)+'_viewed']           =
+#                db_dict['PANDDA_site_'+str(site_index)+'_interesting']      =
+#                db_dict['PANDDA_site_'+str(site_index)+'_z_peak']           =
+#                db_dict['PANDDA_site_'+str(site_index)+'_x']                =
+#                db_dict['PANDDA_site_'+str(site_index)+'_y']                =
+#                db_dict['PANDDA_site_'+str(site_index)+'_z']                =
+#                db_dict['PANDDA_site_'+str(site_index)+'_ligand_id']        =
+#                db_dict['PANDDA_site_'+str(site_index)+'_event_map']        =
+#                db_dict['PANDDA_site_'+str(site_index)+'_initial_model']    =
+#                db_dict['PANDDA_site_'+str(site_index)+'_spider_plot']      =
+#
+#
+#
+#                    if item.startswith('PANDDA_site') and site[n] in item:
+#                        if item.endswith('_site_index'):        db_dict[item]=entry[0]
+#                        if item.endswith('_name'):              db_dict[item]=entry[1]
+#                        if item.endswith('_comment'):           db_dict[item]=entry[2]
+#                        if item.endswith('_event_index'):       db_dict[item]=entry[3]
+#                        if item.endswith('_event_comment'):     db_dict[item]=entry[4]
+#                        if item.endswith('_confidence'):        db_dict[item]=entry[5]
+#                        if item.endswith('_ligand_placed'):     db_dict[item]=entry[6]
+#                        if item.endswith('_viewed'):            db_dict[item]=entry[7]
+#                        if item.endswith('_interesting'):       db_dict[item]=entry[8]
+#                        if item.endswith('_z_peak'):            db_dict[item]=entry[9]
+#                        if item.endswith('_x'):                 db_dict[item]=entry[10]
+#                        if item.endswith('_y'):                 db_dict[item]=entry[11]
+#                        if item.endswith('_z'):                 db_dict[item]=entry[12]
+#                        if item.endswith('_ligand_id'):         db_dict[item]=entry[13]
+#                        if item.endswith('_event_map'):         db_dict[item]=event_map
+#                        if item.endswith('_initial_model'):     db_dict[item]=''
+#                        if item.endswith('_spider_plot'):       db_dict[item]=''
+#
+#
+#        site=['_1_','_2_','_3_','_4_','_5_','_6_','_7_','_8_','_9_','_10_','_11_','_12_']
+#        return_dict={}
+#
+#        for xtal in sample_dict:
+#            db_dict={}
+#            db_dict['PANDDApath']=self.panddas_directory
+#            # sort by site index
+#            sample_dict[xtal].sort()
+#            for n,entry in enumerate(sample_dict[xtal]):
+#
+#                # check if EVENT map exists in project directory
+#                event_map='event_map'
+#                for file in glob.glob(os.path.join(self.initial_model_directory,xtal,'*ccp4')):
+#                    filename=file[file.rfind('/')+1:]
+#                    if filename.startswith(xtal+'-event_'+entry[3]) and filename.endswith('map.native.ccp4'):
+#                        event_map=file
+#
+#                for item in self.db_list:
+#                    if item.startswith('PANDDA_site') and site[n] in item:
+#                        if item.endswith('_site_index'):        db_dict[item]=entry[0]
+#                        if item.endswith('_name'):              db_dict[item]=entry[1]
+#                        if item.endswith('_comment'):           db_dict[item]=entry[2]
+#                        if item.endswith('_event_index'):       db_dict[item]=entry[3]
+#                        if item.endswith('_event_comment'):     db_dict[item]=entry[4]
+#                        if item.endswith('_confidence'):        db_dict[item]=entry[5]
+#                        if item.endswith('_ligand_placed'):     db_dict[item]=entry[6]
+#                        if item.endswith('_viewed'):            db_dict[item]=entry[7]
+#                        if item.endswith('_interesting'):       db_dict[item]=entry[8]
+#                        if item.endswith('_z_peak'):            db_dict[item]=entry[9]
+#                        if item.endswith('_x'):                 db_dict[item]=entry[10]
+#                        if item.endswith('_y'):                 db_dict[item]=entry[11]
+#                        if item.endswith('_z'):                 db_dict[item]=entry[12]
+#                        if item.endswith('_ligand_id'):         db_dict[item]=entry[13]
+#                        if item.endswith('_event_map'):         db_dict[item]=event_map
+#                        if item.endswith('_initial_model'):     db_dict[item]=''
+#                        if item.endswith('_spider_plot'):       db_dict[item]=''
+#
+#            return_dict[xtal]=db_dict
+#
+#        return return_dict
+#
+#
+#    def export_models(self):
+#        Cmds = (
+#                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
+#                '\n'
+#                'pandda.export'
+#                ' pandda_dir=%s' %self.panddas_directory+
+#                ' export_dir=%s' %self.initial_model_directory+
+#                ' export_ligands=False'
+#                ' generate_occupancy_groupings=True\n'
+#                )
+#        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running pandda.export: check terminal for details')
+#        os.system(Cmds)
+
 
 
 

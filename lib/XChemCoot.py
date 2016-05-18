@@ -71,12 +71,12 @@ class GUI(object):
                                     '2 - pose/identity uncertain',
                                     '3 - high confidence'   ]
 
-        self.ligand_site_information =  [   'all sites','1','2','3','4','5','6','7','8','9','10'    ]
+        self.ligand_site_information =  self.db.get_list_of_pandda_sites_for_coot()
     
 
         # this decides which samples will be looked at
         self.selection_mode = ''
-        self.selected_site=''
+        self.selected_site=self.ligand_site_information[0]
 
         # the Folder is kind of a legacy thing because my inital idea was to have separate folders
         # for Data Processing and Refinement
@@ -169,7 +169,7 @@ class GUI(object):
         self.cb_select_sites = gtk.combo_box_new_text()
         self.cb_select_sites.connect("changed", self.set_site)
         for site in self.ligand_site_information:
-            self.cb_select_sites.append_text(site)
+            self.cb_select_sites.append_text(str(site[0])+' - '+str(site[1]))
         self.hbox_select_samples.add(self.cb_select_sites)
  #       self.hbox_select_samples.add(vbox)
         self.select_samples_button = gtk.Button(label="GO")
@@ -568,7 +568,11 @@ class GUI(object):
 #                break
 
     def set_site(self,widget):
-        self.selected_site=widget.get_active_text()
+        for site in self.ligand_site_information:
+            print site[0]
+            if str(site[0])==str(widget.get_active_text()).split()[0]:
+                self.selected_site=site
+                break
 
     def set_ligand_confidence(self,widget):
         self.ligand_confidence_of_sample=widget.get_active_text().replace('Ligand Confidence: ','')
@@ -579,16 +583,16 @@ class GUI(object):
 
 
     def get_samples_to_look_at(self,widget):
+        x=float(self.selected_site[2])
+        y=float(self.selected_site[3])
+        z=float(self.selected_site[4])
+        coot.set_rotation_centre(x,y,z)
         # first remove old samples if present
         if len(self.Todo) != 0:
             for n,item in enumerate(self.Todo):
                 self.cb.remove_text(0)
         self.Todo=[]
-#        self.Todo=self.db.get_samples_for_coot(self.selection_mode)
-        tmp=self.db.get_samples_for_coot('RefinementOutcome is "'+self.selection_mode+'"')
-        print self.selection_mode
-        for item in tmp:
-            self.Todo.append(list(item))
+        self.Todo=self.db.get_samples_for_coot(self.selection_mode,self.selected_site[0])
         for item in self.Todo:
             print item
             self.cb.append_text('%s' %item[0])

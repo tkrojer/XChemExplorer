@@ -137,220 +137,51 @@ class data_source:
             ['DimplePathToPDB',                             'Dimple\nPath to PDB file',                     'TEXT'],
             ['DimplePathToMTZ',                             'Dimple\nPath to MTZ file',                     'TEXT'],
 
-            ['PANDDApath',                                  'PANDDApath',                                   'TEXT'],
 
-            ['PANDDA_site_A_site_index',                    'PANDDA_site_A_site_index',                     'TEXT'],
-            ['PANDDA_site_A_name',                          'PANDDA_site_A_name',                           'TEXT'],
-            ['PANDDA_site_A_comment',                       'PANDDA_site_A_comment',                        'TEXT'],
-            ['PANDDA_site_A_event_index',                   'PANDDA_site_A_event_index',                    'TEXT'],
-            ['PANDDA_site_A_event_comment',                 'PANDDA_site_A_event_comment',                  'TEXT'],
-            ['PANDDA_site_A_confidence',                    'PANDDA_site_A_confidence',                     'TEXT'],
-            ['PANDDA_site_A_ligand_placed',                 'PANDDA_site_A_ligand_placed',                  'TEXT'],
-            ['PANDDA_site_A_viewed',                        'PANDDA_site_A_viewed',                         'TEXT'],
-            ['PANDDA_site_A_interesting',                   'PANDDA_site_A_interesting',                    'TEXT'],
-            ['PANDDA_site_A_z_peak',                        'PANDDA_site_A_z_peak',                         'TEXT'],
-            ['PANDDA_site_A_x',                             'PANDDA_site_A_x',                              'TEXT'],
-            ['PANDDA_site_A_y',                             'PANDDA_site_A_y',                              'TEXT'],
-            ['PANDDA_site_A_z',                             'PANDDA_site_A_z',                              'TEXT'],
-            ['PANDDA_site_A_ligand_id',                     'PANDDA_site_A_ligand_id',                      'TEXT'],
-            ['PANDDA_site_A_event_map',                     'PANDDA_site_A_event_map',                      'TEXT'],
+            ['RefinementRcryst',                            'Refinement\nRcryst',                           'TEXT'],
+            ['RefinementRfree',                             'Refinement\nRfree',                            'TEXT'],
+            ['RefinementSpaceGroup',                        'Refinement\nSpace Group',                      'TEXT'],
+            ['RefinementLigandCC',                          'RefinementLigandCC',                           'TEXT'],
+            ['RefinementRmsdBonds',                         'RefinementRmsdBonds',                          'TEXT'],
+            ['RefinementRmsdAngles',                        'RefinementRmsdAngles',                         'TEXT'],
+            ['RefinementOutcome',                           'Refinement\nOutcome',                          'TEXT'],
+            ['RefinementMTZfree',                           'RefinementMTZfree',                            'TEXT'],
+            ['RefinementCIF',                               'RefinementCIF',                                'TEXT'],
+            ['RefinementPDB_latest',                        'RefinementPDB_latest',                         'TEXT'],
+            ['RefinementMTZ_latest',                        'RefinementMTZ_latest',                         'TEXT'],
+            ['RefinementComment',                           'RefinementComment',                            'TEXT'],
+            ['RefinementPathToRefinementFolder',            'RefinementPathToRefinementFolder',             'TEXT'],
+            ['RefinementLigandConfidence',                  'Ligand\nConfidence',                           'TEXT'],
 
-            ['PANDDA_site_B_site_index',                    'PANDDA_site_B_site_index',                     'TEXT'],
-            ['PANDDA_site_B_name',                          'PANDDA_site_B_name',                           'TEXT'],
-            ['PANDDA_site_B_comment',                       'PANDDA_site_B_comment',                        'TEXT'],
-            ['PANDDA_site_B_event_index',                   'PANDDA_site_B_event_index',                    'TEXT'],
-            ['PANDDA_site_B_event_comment',                 'PANDDA_site_B_event_comment',                  'TEXT'],
-            ['PANDDA_site_B_confidence',                    'PANDDA_site_B_confidence',                     'TEXT'],
-            ['PANDDA_site_B_ligand_placed',                 'PANDDA_site_B_ligand_placed',                  'TEXT'],
-            ['PANDDA_site_B_viewed',                        'PANDDA_site_B_viewed',                         'TEXT'],
-            ['PANDDA_site_B_interesting',                   'PANDDA_site_B_interesting',                    'TEXT'],
-            ['PANDDA_site_B_z_peak',                        'PANDDA_site_B_z_peak',                         'TEXT'],
-            ['PANDDA_site_B_x',                             'PANDDA_site_B_x',                              'TEXT'],
-            ['PANDDA_site_B_y',                             'PANDDA_site_B_y',                              'TEXT'],
-            ['PANDDA_site_B_z',                             'PANDDA_site_B_z',                              'TEXT'],
-            ['PANDDA_site_B_ligand_id',                     'PANDDA_site_B_ligand_id',                      'TEXT'],
-            ['PANDDA_site_B_event_map',                     'PANDDA_site_B_event_map',                      'TEXT'],
-
-            ['PANDDA_site_C_site_index',                    'PANDDA_site_C_site_index',                     'TEXT'],
-            ['PANDDA_site_C_name',                          'PANDDA_site_C_name',                           'TEXT'],
-            ['PANDDA_site_C_comment',                       'PANDDA_site_C_comment',                        'TEXT'],
-            ['PANDDA_site_C_event_index',                   'PANDDA_site_C_event_index',                    'TEXT'],
-            ['PANDDA_site_C_event_comment',                 'PANDDA_site_C_event_comment',                  'TEXT'],
-            ['PANDDA_site_C_confidence',                    'PANDDA_site_C_confidence',                     'TEXT'],
-            ['PANDDA_site_C_ligand_placed',                 'PANDDA_site_C_ligand_placed',                  'TEXT'],
-            ['PANDDA_site_C_viewed',                        'PANDDA_site_C_viewed',                         'TEXT'],
-            ['PANDDA_site_C_interesting',                   'PANDDA_site_C_interesting',                    'TEXT'],
-            ['PANDDA_site_C_z_peak',                        'PANDDA_site_C_z_peak',                         'TEXT'],
-            ['PANDDA_site_C_x',                             'PANDDA_site_C_x',                              'TEXT'],
-            ['PANDDA_site_C_y',                             'PANDDA_site_C_y',                              'TEXT'],
-            ['PANDDA_site_C_z',                             'PANDDA_site_C_z',                              'TEXT'],
-            ['PANDDA_site_C_ligand_id',                     'PANDDA_site_C_ligand_id',                      'TEXT'],
-            ['PANDDA_site_C_event_map',                     'PANDDA_site_C_event_map',                      'TEXT'],
-
-            ['PANDDA_site_D_site_index',                 'PANDDA_site_D_site_index',                      'TEXT'],
-            ['PANDDA_site_D_name',                  'PANDDA_site_D_name',                       'TEXT'],
-            ['PANDDA_site_D_comment',               'PANDDA_site_D_comment',                    'TEXT'],
-            ['PANDDA_site_D_event_index',                 'PANDDA_site_D_event_index',                      'TEXT'],
-            ['PANDDA_site_D_event_comment',               'PANDDA_site_D_event_comment',                    'TEXT'],
-            ['PANDDA_site_D_confidence',            'PANDDA_site_D_confidence',                 'TEXT'],
-            ['PANDDA_site_D_ligand_placed',         'PANDDA_site_D_ligand_placed',              'TEXT'],
-            ['PANDDA_site_D_viewed',                'PANDDA_site_D_viewed',                     'TEXT'],
-            ['PANDDA_site_D_interesting',           'PANDDA_site_D_interesting',                'TEXT'],
-            ['PANDDA_site_D_z_peak',                'PANDDA_site_D_z_peak',                     'TEXT'],
-            ['PANDDA_site_D_x',           'PANDDA_site_D_x',                'TEXT'],
-            ['PANDDA_site_D_y',           'PANDDA_site_D_y',                'TEXT'],
-            ['PANDDA_site_D_z',           'PANDDA_site_D_z',                'TEXT'],
-            ['PANDDA_site_D_ligand_id',           'PANDDA_site_D_ligand_id',                'TEXT'],
-            ['PANDDA_site_D_event_map',           'PANDDA_site_D_event_map',                'TEXT'],
-
-            ['PANDDA_site_E_site_index',                 'PANDDA_site_E_site_index',                      'TEXT'],
-            ['PANDDA_site_E_name',                  'PANDDA_site_E_name',                       'TEXT'],
-            ['PANDDA_site_E_comment',               'PANDDA_site_E_comment',                    'TEXT'],
-            ['PANDDA_site_E_event_index',                 'PANDDA_site_E_event_index',                      'TEXT'],
-            ['PANDDA_site_E_event_comment',               'PANDDA_site_E_event_comment',                    'TEXT'],
-            ['PANDDA_site_E_confidence',            'PANDDA_site_E_confidence',                 'TEXT'],
-            ['PANDDA_site_E_ligand_placed',         'PANDDA_site_E_ligand_placed',              'TEXT'],
-            ['PANDDA_site_E_viewed',                'PANDDA_site_E_viewed',                     'TEXT'],
-            ['PANDDA_site_E_interesting',           'PANDDA_site_E_interesting',                'TEXT'],
-            ['PANDDA_site_E_z_peak',                'PANDDA_site_E_z_peak',                     'TEXT'],
-            ['PANDDA_site_E_x',           'PANDDA_site_E_x',                'TEXT'],
-            ['PANDDA_site_E_y',           'PANDDA_site_E_y',                'TEXT'],
-            ['PANDDA_site_E_z',           'PANDDA_site_E_z',                'TEXT'],
-            ['PANDDA_site_E_ligand_id',           'PANDDA_site_E_ligand_id',                'TEXT'],
-            ['PANDDA_site_E_event_map',           'PANDDA_site_E_event_map',                'TEXT'],
-
-            ['PANDDA_site_F_site_index',                 'PANDDA_site_F_site_index',                      'TEXT'],
-            ['PANDDA_site_F_name',                  'PANDDA_site_F_name',                       'TEXT'],
-            ['PANDDA_site_F_comment',               'PANDDA_site_F_comment',                    'TEXT'],
-            ['PANDDA_site_F_event_index',                 'PANDDA_site_F_event_index',                      'TEXT'],
-            ['PANDDA_site_F_event_comment',               'PANDDA_site_F_event_comment',                    'TEXT'],
-            ['PANDDA_site_F_confidence',            'PANDDA_site_F_confidence',                 'TEXT'],
-            ['PANDDA_site_F_ligand_placed',         'PANDDA_site_F_ligand_placed',              'TEXT'],
-            ['PANDDA_site_F_viewed',                'PANDDA_site_F_viewed',                     'TEXT'],
-            ['PANDDA_site_F_interesting',           'PANDDA_site_F_interesting',                'TEXT'],
-            ['PANDDA_site_F_z_peak',                'PANDDA_site_F_z_peak',                     'TEXT'],
-            ['PANDDA_site_F_x',           'PANDDA_site_F_x',                'TEXT'],
-            ['PANDDA_site_F_y',           'PANDDA_site_F_y',                'TEXT'],
-            ['PANDDA_site_F_z',           'PANDDA_site_F_z',                'TEXT'],
-            ['PANDDA_site_F_ligand_id',           'PANDDA_site_F_ligand_id',                'TEXT'],
-            ['PANDDA_site_F_event_map',           'PANDDA_site_F_event_map',                'TEXT'],
-
-            ['PANDDA_site_G_site_index',                 'PANDDA_site_G_site_index',                      'TEXT'],
-            ['PANDDA_site_G_name',                  'PANDDA_site_G_name',                       'TEXT'],
-            ['PANDDA_site_G_comment',               'PANDDA_site_G_comment',                    'TEXT'],
-            ['PANDDA_site_G_event_index',                 'PANDDA_site_G_event_index',                      'TEXT'],
-            ['PANDDA_site_G_event_comment',               'PANDDA_site_G_event_comment',                    'TEXT'],
-            ['PANDDA_site_G_confidence',            'PANDDA_site_G_confidence',                 'TEXT'],
-            ['PANDDA_site_G_ligand_placed',         'PANDDA_site_G_ligand_placed',              'TEXT'],
-            ['PANDDA_site_G_viewed',                'PANDDA_site_G_viewed',                     'TEXT'],
-            ['PANDDA_site_G_interesting',           'PANDDA_site_G_interesting',                'TEXT'],
-            ['PANDDA_site_G_z_peak',                'PANDDA_site_G_z_peak',                     'TEXT'],
-            ['PANDDA_site_G_x',           'PANDDA_site_G_x',                'TEXT'],
-            ['PANDDA_site_G_y',           'PANDDA_site_G_y',                'TEXT'],
-            ['PANDDA_site_G_z',           'PANDDA_site_G_z',                'TEXT'],
-            ['PANDDA_site_G_ligand_id',           'PANDDA_site_G_ligand_id',                'TEXT'],
-            ['PANDDA_site_G_event_map',           'PANDDA_site_G_event_map',                'TEXT'],
-
-            ['PANDDA_site_H_site_index',                 'PANDDA_site_H_site_index',                      'TEXT'],
-            ['PANDDA_site_H_name',                  'PANDDA_site_H_name',                       'TEXT'],
-            ['PANDDA_site_H_comment',               'PANDDA_site_H_comment',                    'TEXT'],
-            ['PANDDA_site_H_event_index',                 'PANDDA_site_H_event_index',                      'TEXT'],
-            ['PANDDA_site_H_event_comment',               'PANDDA_site_H_event_comment',                    'TEXT'],
-            ['PANDDA_site_H_confidence',            'PANDDA_site_H_confidence',                 'TEXT'],
-            ['PANDDA_site_H_ligand_placed',         'PANDDA_site_H_ligand_placed',              'TEXT'],
-            ['PANDDA_site_H_viewed',                'PANDDA_site_H_viewed',                     'TEXT'],
-            ['PANDDA_site_H_interesting',           'PANDDA_site_H_interesting',                'TEXT'],
-            ['PANDDA_site_H_z_peak',                'PANDDA_site_H_z_peak',                     'TEXT'],
-            ['PANDDA_site_H_x',           'PANDDA_site_H_x',                'TEXT'],
-            ['PANDDA_site_H_y',           'PANDDA_site_H_y',                'TEXT'],
-            ['PANDDA_site_H_z',           'PANDDA_site_H_z',                'TEXT'],
-            ['PANDDA_site_H_ligand_id',           'PANDDA_site_H_ligand_id',                'TEXT'],
-            ['PANDDA_site_H_event_map',           'PANDDA_site_H_event_map',                'TEXT'],
-
-            ['PANDDA_site_I_site_index',                 'PANDDA_site_I_site_index',                      'TEXT'],
-            ['PANDDA_site_I_name',                  'PANDDA_site_I_name',                       'TEXT'],
-            ['PANDDA_site_I_comment',               'PANDDA_site_I_comment',                    'TEXT'],
-            ['PANDDA_site_I_event_index',                 'PANDDA_site_I_event_index',                      'TEXT'],
-            ['PANDDA_site_I_event_comment',               'PANDDA_site_I_event_comment',                    'TEXT'],
-            ['PANDDA_site_I_confidence',            'PANDDA_site_I_confidence',                 'TEXT'],
-            ['PANDDA_site_I_ligand_placed',         'PANDDA_site_I_ligand_placed',              'TEXT'],
-            ['PANDDA_site_I_viewed',                'PANDDA_site_I_viewed',                     'TEXT'],
-            ['PANDDA_site_I_interesting',           'PANDDA_site_I_interesting',                'TEXT'],
-            ['PANDDA_site_I_z_peak',                'PANDDA_site_I_z_peak',                     'TEXT'],
-            ['PANDDA_site_I_x',           'PANDDA_site_I_x',                'TEXT'],
-            ['PANDDA_site_I_y',           'PANDDA_site_I_y',                'TEXT'],
-            ['PANDDA_site_I_z',           'PANDDA_site_I_z',                'TEXT'],
-            ['PANDDA_site_I_ligand_id',           'PANDDA_site_I_ligand_id',                'TEXT'],
-            ['PANDDA_site_I_event_map',           'PANDDA_site_I_event_map',                'TEXT'],
-
-            ['PANDDA_site_J_site_index',                 'PANDDA_site_J_site_index',                      'TEXT'],
-            ['PANDDA_site_J_name',                  'PANDDA_site_J_name',                       'TEXT'],
-            ['PANDDA_site_J_comment',               'PANDDA_site_J_comment',                    'TEXT'],
-            ['PANDDA_site_J_event_index',                 'PANDDA_site_J_event_index',                      'TEXT'],
-            ['PANDDA_site_J_event_comment',               'PANDDA_site_J_event_comment',                    'TEXT'],
-            ['PANDDA_site_J_confidence',            'PANDDA_site_J_confidence',                 'TEXT'],
-            ['PANDDA_site_J_ligand_placed',         'PANDDA_site_J_ligand_placed',              'TEXT'],
-            ['PANDDA_site_J_viewed',                'PANDDA_site_J_viewed',                     'TEXT'],
-            ['PANDDA_site_J_interesting',           'PANDDA_site_J_interesting',                'TEXT'],
-            ['PANDDA_site_J_z_peak',                'PANDDA_site_J_z_peak',                     'TEXT'],
-            ['PANDDA_site_J_x',           'PANDDA_site_J_x',                'TEXT'],
-            ['PANDDA_site_J_y',           'PANDDA_site_J_y',                'TEXT'],
-            ['PANDDA_site_J_z',           'PANDDA_site_J_z',                'TEXT'],
-            ['PANDDA_site_J_ligand_id',           'PANDDA_site_J_ligand_id',                'TEXT'],
-            ['PANDDA_site_J_event_map',           'PANDDA_site_J_event_map',                'TEXT'],
-
-            ['PANDDA_site_K_site_index',                 'PANDDA_site_K_site_index',                      'TEXT'],
-            ['PANDDA_site_K_name',                  'PANDDA_site_K_name',                       'TEXT'],
-            ['PANDDA_site_K_comment',               'PANDDA_site_K_comment',                    'TEXT'],
-            ['PANDDA_site_K_event_index',                 'PANDDA_site_K_event_index',                      'TEXT'],
-            ['PANDDA_site_K_event_comment',               'PANDDA_site_K_event_comment',                    'TEXT'],
-            ['PANDDA_site_K_confidence',            'PANDDA_site_K_confidence',                 'TEXT'],
-            ['PANDDA_site_K_ligand_placed',         'PANDDA_site_K_ligand_placed',              'TEXT'],
-            ['PANDDA_site_K_viewed',                'PANDDA_site_K_viewed',                     'TEXT'],
-            ['PANDDA_site_K_interesting',           'PANDDA_site_K_interesting',                'TEXT'],
-            ['PANDDA_site_K_z_peak',                'PANDDA_site_K_z_peak',                     'TEXT'],
-            ['PANDDA_site_K_x',           'PANDDA_site_K_x',                'TEXT'],
-            ['PANDDA_site_K_y',           'PANDDA_site_K_y',                'TEXT'],
-            ['PANDDA_site_K_z',           'PANDDA_site_K_z',                'TEXT'],
-            ['PANDDA_site_K_ligand_id',           'PANDDA_site_K_ligand_id',                'TEXT'],
-            ['PANDDA_site_K_event_map',           'PANDDA_site_K_event_map',                'TEXT'],
-
-            ['PANDDA_site_L_site_index',                 'PANDDA_site_L_site_index',                      'TEXT'],
-            ['PANDDA_site_L_name',                  'PANDDA_site_L_name',                       'TEXT'],
-            ['PANDDA_site_L_comment',               'PANDDA_site_L_comment',                    'TEXT'],
-            ['PANDDA_site_L_event_index',                 'PANDDA_site_L_event_index',                      'TEXT'],
-            ['PANDDA_site_L_event_comment',               'PANDDA_site_L_event_comment',                    'TEXT'],
-            ['PANDDA_site_L_confidence',            'PANDDA_site_L_confidence',                 'TEXT'],
-            ['PANDDA_site_L_ligand_placed',         'PANDDA_site_L_ligand_placed',              'TEXT'],
-            ['PANDDA_site_L_viewed',                'PANDDA_site_L_viewed',                     'TEXT'],
-            ['PANDDA_site_L_interesting',           'PANDDA_site_L_interesting',                'TEXT'],
-            ['PANDDA_site_L_z_peak',                'PANDDA_site_L_z_peak',                     'TEXT'],
-            ['PANDDA_site_L_x',           'PANDDA_site_L_x',                'TEXT'],
-            ['PANDDA_site_L_y',           'PANDDA_site_L_y',                'TEXT'],
-            ['PANDDA_site_L_z',           'PANDDA_site_L_z',                'TEXT'],
-            ['PANDDA_site_L_ligand_id',           'PANDDA_site_L_ligand_id',                'TEXT'],
-            ['PANDDA_site_L_event_map',           'PANDDA_site_L_event_map',                'TEXT'],
-
-
-            ['RefinementRcryst',                     'Refinement\nRcryst',                        'TEXT'],
-            ['RefinementRfree',                      'Refinement\nRfree',                         'TEXT'],
-            ['RefinementSpaceGroup',                      'Refinement\nSpace Group',                         'TEXT'],
-            ['RefinementLigandCC',                   'RefinementLigandCC',                      'TEXT'],
-            ['RefinementRmsdBonds',                  'RefinementRmsdBonds',                     'TEXT'],
-            ['RefinementRmsdAngles',                 'RefinementRmsdAngles',                    'TEXT'],
-            ['RefinementOutcome',                    'Refinement\nOutcome',                       'TEXT'],
-            ['RefinementMTZfree',                    'RefinementMTZfree',                       'TEXT'],
-            ['RefinementCIF',                        'RefinementCIF',                           'TEXT'],
-            ['RefinementPDB_latest',                 'RefinementPDB_latest',                    'TEXT'],
-            ['RefinementMTZ_latest',                 'RefinementMTZ_latest',                    'TEXT'],
-            ['RefinementComment',                    'RefinementComment',                       'TEXT'],
-            ['RefinementPathToRefinementFolder',     'RefinementPathToRefinementFolder',        'TEXT'],
-            ['RefinementLigandConfidence',           'Ligand\nConfidence',                      'TEXT'],
-
-            ['AssayIC50',                            'AssayIC50',                               'TEXT'],
-            ['LastUpdated',                            'LastUpdated',                               'TEXT']
+            ['AssayIC50',                                   'AssayIC50',                                    'TEXT'],
+            ['LastUpdated',                                 'LastUpdated',                                  'TEXT']
         ]
 
+        self.pandda_table_columns = [
+            ['ID',                                      'ID',                                      'INTEGER PRIMARY KEY'],
+            ['CrystalName',                          'Sample ID',                               'TEXT'],
+            ['PANDDApath',                                'PANDDApath',                               'TEXT'],
+            ['PANDDA_site_index',                         'PANDDA_site_index',                     'TEXT'],
+            ['PANDDA_site_name',                          'PANDDA_site_name',                           'TEXT'],
+            ['PANDDA_site_comment',                       'PANDDA_site_comment',                        'TEXT'],
+            ['PANDDA_site_event_index',                   'PANDDA_site_event_index',                    'TEXT'],
+            ['PANDDA_site_event_comment',                 'PANDDA_site_event_comment',                  'TEXT'],
+            ['PANDDA_site_confidence',                    'PANDDA_site_confidence',                     'TEXT'],
+            ['PANDDA_site_ligand_placed',                 'PANDDA_site_ligand_placed',                  'TEXT'],
+            ['PANDDA_site_viewed',                        'PANDDA_site_viewed',                         'TEXT'],
+            ['PANDDA_site_interesting',                   'PANDDA_site_interesting',                    'TEXT'],
+            ['PANDDA_site_z_peak',                        'PANDDA_site_z_peak',                         'TEXT'],
+            ['PANDDA_site_x',                             'PANDDA_site_x',                              'TEXT'],
+            ['PANDDA_site_y',                             'PANDDA_site_y',                              'TEXT'],
+            ['PANDDA_site_z',                             'PANDDA_site_z',                              'TEXT'],
+            ['PANDDA_site_ligand_id',                     'PANDDA_site_ligand_id',                      'TEXT'],
+            ['PANDDA_site_event_map',                     'PANDDA_site_event_map',                      'TEXT'],
+            ['PANDDA_site_initial_model',                 'PANDDA_site_initial_model',                  'TEXT'],
+            ['PANDDA_site_initial_mtz',                 'PANDDA_site_initial_mtz',                  'TEXT'],
+            ['PANDDA_site_spider_plot',                   'PANDDA_site_spider_plot',                    'TEXT']
+            ]
+        
+        
     def get_empty_db_dict(self):
         db_dict={}
         for column in self.column_list:
@@ -370,6 +201,17 @@ class data_source:
             if column[0] not in existing_columns:
                 cursor.execute("alter table mainTable add column '"+column[0]+"' '"+column[2]+"'")
                 connect.commit()
+        # create PANDDA table if not exists
+        cursor.execute("create table if not exists panddaTable (ID INTEGER);")
+        existing_columns=[]
+        cursor.execute("SELECT * FROM panddaTable")
+        for column in cursor.description:
+            existing_columns.append(column[0])
+        for column in self.pandda_table_columns:
+            if column[0] not in existing_columns:
+                cursor.execute("alter table panddaTable add column '"+column[0]+"' '"+column[2]+"'")
+                connect.commit()
+
 
     def return_column_list(self):
         return self.column_list
@@ -488,6 +330,20 @@ class data_source:
             cursor.execute("UPDATE mainTable SET "+update_string[:-1]+" WHERE CrystalName="+"'"+sampleID+"'")
             connect.commit()
 
+    def update_specified_table(self,sampleID,data_dict,table):
+        connect=sqlite3.connect(self.data_source_file)
+        cursor = connect.cursor()
+        update_string=''
+        for key in data_dict:
+            value=data_dict[key]
+            if key=='ID' or key=='CrystalName':
+                continue
+            if not str(value).replace(' ','')=='':  # ignore empty fields
+                update_string+=str(key)+'='+"'"+str(value)+"'"+','
+        if update_string != '':
+            cursor.execute("UPDATE "+table+" SET "+update_string[:-1]+" WHERE CrystalName="+"'"+sampleID+"'")
+            connect.commit()
+
     def update_insert_data_source(self,sampleID,data_dict):
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
@@ -598,27 +454,60 @@ class data_source:
 
 
 
-    def get_samples_for_coot(self,RefinementOutcome):
-        # 0: sampleID
-        # 1: compoundID
-        # 2: dataset outcome
-        # 3: ligand confidence
-        # 4: path to refinement
+    def get_samples_for_coot(self,RefinementOutcome,pandda_site):
         sample_list_for_coot=[]
-        colums_for_coot=[['RefinementOutcome',                  None],
-                         ['CrystalName',                        None],
-                         ['CompoundCode',                       None],
-                         ['RefinementLigandConfidence',         None],
-                         ['RefinementPathToRefinementFolder',   None]]
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
 
-        print 'data source',self.data_source_file
-        print "SELECT CrystalName,CompoundCode,RefinementLigandConfidence,RefinementPathToRefinementFolder FROM mainTable WHERE %s;" % RefinementOutcome
-        cursor.execute("SELECT CrystalName,CompoundCode,RefinementLigandConfidence,RefinementPathToRefinementFolder FROM mainTable WHERE %s;" % RefinementOutcome )
+        if RefinementOutcome=='0 - All Datasets':
+            outcome = " RefinementOutcome is not null "
+        else:
+            outcome = " RefinementOutcome is '%s' " %RefinementOutcome
 
-        sample_list_for_coot= cursor.fetchall()
+        if int(pandda_site) > 0:
+            pandda_sqlite = (
+                " and "
+                " (PANDDA_site_A_site_index is '%s' or "    %pandda_site+
+                "  PANDDA_site_B_site_index is '%s' or "    %pandda_site+
+                "  PANDDA_site_C_site_index is '%s' or "    %pandda_site+
+                "  PANDDA_site_D_site_index is '%s' or "    %pandda_site+
+                "  PANDDA_site_E_site_index is '%s' or "    %pandda_site+
+                "  PANDDA_site_F_site_index is '%s' or "    %pandda_site+
+                "  PANDDA_site_G_site_index is '%s' or "    %pandda_site+
+                "  PANDDA_site_H_site_index is '%s' or "    %pandda_site+
+                "  PANDDA_site_I_site_index is '%s' or "    %pandda_site+
+                "  PANDDA_site_J_site_index is '%s' or "    %pandda_site+
+                "  PANDDA_site_K_site_index is '%s' or "    %pandda_site+
+                "  PANDDA_site_L_site_index is '%s')"       %pandda_site
+                )
+        else:
+            pandda_sqlite = ''
+
+        sqlite = (
+                "select"
+                " CrystalName,"
+                " CompoundCode,"
+                " RefinementLigandConfidence,"
+                " RefinementCIF,"
+                " RefinementMTZfree,"
+                " RefinementPathToRefinementFolder,"
+                " RefinementOutcome, "
+                "from "
+                " mainTable "
+                "where "
+                +outcome
+                +pandda_sqlite+';'
+                )
+
+        cursor.execute(sqlite)
+
+        tmp = cursor.fetchall()
+        for item in tmp:
+            line=[x.encode('UTF8') for x in list(item)]
+            sample_list_for_coot.append(line)
+
         return sample_list_for_coot
+
 
     def translate_xce_column_list_to_sqlite(self,column_list):
         out_list=[]
@@ -646,3 +535,32 @@ class data_source:
                     out_list.append([item,entry[0]])
                     break
         return out_list
+
+    def get_list_of_pandda_sites_for_coot(self):
+        site_list=[]
+        site_list.append(['0','All Sites','0','0','0'])
+        site=['_A_','_B_','_C_','_D_','_E_','_F_','_G_','_H_','_I_','_J_','_K_','_L_']
+        for site_idx in range(1,13):
+            site_name=''
+            for id in site:
+                sqlite = (
+                        "select PANDDA_site%sname," %id+
+                        "       PANDDA_site%sx," %id+
+                        "       PANDDA_site%sy," %id+
+                        "       PANDDA_site%sz" %id+
+                        " from mainTable where "
+                        " PANDDA_site%ssite_index is '%s'" %(id,site_idx)
+                        )
+                name=self.execute_statement(sqlite)
+                if name !=[] and name[0][0] != '':
+                    site_name=str(name[0][0])		#and name not in site_name:
+                    # note: all sites have "slightly" different xyz coordinates,
+                    #       but we simply take the first one
+                    x=str(name[0][1])
+                    y=str(name[0][2])
+                    z=str(name[0][3])
+                    site_list.append([site_idx,site_name,x,y,z])
+                    break
+        return site_list
+
+
