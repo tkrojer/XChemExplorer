@@ -510,48 +510,37 @@ class data_source:
         cursor = connect.cursor()
 
         if RefinementOutcome=='0 - All Datasets':
-            outcome = " RefinementOutcome is not null "
+            outcome = " not null "
         else:
-            outcome = " RefinementOutcome is '%s' " %RefinementOutcome
+            outcome = " '%s' " %RefinementOutcome
 
         if int(pandda_site) > 0:
-            pandda_sqlite = (
-                " and "
-                " (PANDDA_site_A_site_index is '%s' or "    %pandda_site+
-                "  PANDDA_site_B_site_index is '%s' or "    %pandda_site+
-                "  PANDDA_site_C_site_index is '%s' or "    %pandda_site+
-                "  PANDDA_site_D_site_index is '%s' or "    %pandda_site+
-                "  PANDDA_site_E_site_index is '%s' or "    %pandda_site+
-                "  PANDDA_site_F_site_index is '%s' or "    %pandda_site+
-                "  PANDDA_site_G_site_index is '%s' or "    %pandda_site+
-                "  PANDDA_site_H_site_index is '%s' or "    %pandda_site+
-                "  PANDDA_site_I_site_index is '%s' or "    %pandda_site+
-                "  PANDDA_site_J_site_index is '%s' or "    %pandda_site+
-                "  PANDDA_site_K_site_index is '%s' or "    %pandda_site+
-                "  PANDDA_site_L_site_index is '%s')"       %pandda_site
+            sqlite = (
+                "select"
+                " mainTable.CrystalName,"
+                " mainTable.CompoundCode,"
+                " mainTable.RefinementCIF,"
+                " mainTable.RefinementMTZfree,"
+                " mainTable.RefinementPathToRefinementFolder,"
+                " mainTable.RefinementOutcome, "
+                " panddaTable.PANDDA_site_event_map,"
+                " panddaTable.PANDDA_site_confidence,"
+                " panddaTable.PANDDA_site_x,"
+                " panddaTable.PANDDA_site_y,"
+                " panddaTable.PANDDA_site_z,"
+                " panddaTable.PANDDA_site_initial_model,"
+                " panddaTable.PANDDA_site_initial_mtz,"
+                " panddaTable.PANDDA_site_spider_plot "
+                "from mainTable inner join panddaTable on mainTable.CrystalName = panddaTable.CrystalName "
+                "where panddaTable.PANDDA_site_index is '%s'" %pandda_site+
+                " and panddaTable.PANDDA_site_ligand_placed is 'True'"
+                " and mainTable.RefinementOutcome is '%s';" %outcome
                 )
+
         else:
             pandda_sqlite = ''
 
-        sqlite = (
-                "select"
-                " CrystalName,"
-                " CompoundCode,"
-                " RefinementLigandConfidence,"
-                " RefinementCIF,"
-                " RefinementMTZfree,"
-                " RefinementPathToRefinementFolder,"
-                " RefinementOutcome, "
-                "from "
-                " mainTable "
-                "where "
-                +outcome
-                +pandda_sqlite+';'
-                )
-
         cursor.execute(sqlite)
-
-#SELECT mainTable.CrystalName,mainTable.CompoundCode,panddaTable.PANDDA_site_index,panddaTable.PANDDA_site_event_map from mainTable inner join panddaTable on mainTable.CrystalName = panddaTable.CrystalName where panddaTable.PANDDA_site_index is '1';
 
         tmp = cursor.fetchall()
         for item in tmp:
