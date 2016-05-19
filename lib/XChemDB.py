@@ -530,7 +530,8 @@ class data_source:
                 " panddaTable.PANDDA_site_z,"
                 " panddaTable.PANDDA_site_initial_model,"
                 " panddaTable.PANDDA_site_initial_mtz,"
-                " panddaTable.PANDDA_site_spider_plot "
+                " panddaTable.PANDDA_site_spider_plot, "
+                " panddaTable.PANDDA_site_index "
                 "from mainTable inner join panddaTable on mainTable.CrystalName = panddaTable.CrystalName "
                 "where panddaTable.PANDDA_site_index is '%s'" %pandda_site+
                 " and panddaTable.PANDDA_site_ligand_placed is 'True'"

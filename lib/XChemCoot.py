@@ -433,6 +433,7 @@ class GUI(object):
             self.ligand_confidence_of_sample=str(self.Todo[self.index][7])
             self.refinement_folder=str(self.Todo[self.index][4])
             self.event_map=str(self.Todo[self.index][6])
+            coot.set_rotation_centre(float(self.Todo[self.index][8]),float(self.Todo[self.index][9]),float(self.Todo[self.index][10]))
         else:
             self.compoundID=''
             self.ligand_confidence_of_sample=''
@@ -448,11 +449,6 @@ class GUI(object):
             self.index = len(self.Todo)
         self.cb.set_active(self.index)
 
-#    def experiment_stage_button_clicked(self,widget):
-#        for button in self.experiment_stage_button_list:
-#            if button == widget:
-#                print 'fuefhuruir'
-#        print 'here',widget.get_label()
 
     def experiment_stage_button_clicked(self,widget, data=None):
         self.db_dict_mainTable['RefinementOutcome']=data
