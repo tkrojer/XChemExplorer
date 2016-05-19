@@ -341,10 +341,13 @@ class GUI(object):
                     self.cb_ligand_confidence.append_text(citeria)
                 self.hbox_refinemnt_outcome.add(self.cb_ligand_confidence)
             else:
-                new_button=gtk.Button(label=button[0])
-                new_button.connect("clicked",self.experiment_stage_button_clicked)
-                new_button.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(10000,10000,10000))
-                new_button.modify_bg(gtk.STATE_ACTIVE, gtk.gdk.Color(button[2],button[3],button[4]))
+                #new_button=gtk.Button(label=button[0])
+                #new_button.connect("clicked",self.experiment_stage_button_clicked)
+                new_button = gtk.ToggleButton(button[0])
+                new_button.connect("toggled",self.experiment_stage_button_clicked,button[1])
+                #new_button.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(10000,10000,10000))
+                #new_button.modify_bg(gtk.STATE_ACTIVE, gtk.gdk.Color(button[2],button[3],button[4]))
+
                 self.hbox_refinemnt_outcome.add(new_button)
                 self.experiment_stage_button_list.append(new_button)
 
@@ -435,11 +438,18 @@ class GUI(object):
             self.index = len(self.Todo)
         self.cb.set_active(self.index)
 
-    def experiment_stage_button_clicked(self,widget):
-        for button in self.experiment_stage_button_list:
-            if button == widget:
-                print 'fuefhuruir'
-        print 'here',widget.get_label()
+#    def experiment_stage_button_clicked(self,widget):
+#        for button in self.experiment_stage_button_list:
+#            if button == widget:
+#                print 'fuefhuruir'
+#        print 'here',widget.get_label()
+
+    def experiment_stage_button_clicked(self,widget, data=None):
+        print data
+#        for button in self.experiment_stage_button_list:
+#            if button == widget:
+#                print 'fuefhuruir'
+#        print 'here',widget.get_label()
 
     def RefreshData(self):
         # initialize Refinement library

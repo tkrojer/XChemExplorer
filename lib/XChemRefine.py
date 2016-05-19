@@ -253,17 +253,6 @@ class Refine(object):
             '\n'
             '/bin/rm %s/%s/REFINEMENT_IN_PROGRESS\n' %(self.ProjectPath,self.xtalID)+
             '\n'
-#            '#cd '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'\n'
-#            '#\n'
-#            '#phenix.refine in.pdb ../'+self.xtalID+'.free.mtz ../'+self.compoundID+'.cif '+TLSphenix+' '
-#            '# refinement.input.xray_data.labels=../'+self.xtalID+'.free.mtz:F,SIGF '
-#            '# optimize_xyz_weight=true '
-#            '# optimize_adp_weight=true ordered_solvent=False output.prefix=refine_phenix_'+Serial+'\n'
-#            '#\n'
-#            '#phenix.molprobity refine_phenix_%s.pdb refine_phenix_%s.mtz\n' %(Serial,Serial)+
-#            '#/bin/mv molprobity.out refine_phenix_molprobity.log\n'
-#            '#mmtbx.validate_ligands refine_phenix_%s.pdb refine_phenix_%s.mtz LIG > validate_ligands_phenix.txt\n' %(Serial,Serial)+
-#            '#\n'
            )
 
         cmd = open(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refmac.csh'),'w')
