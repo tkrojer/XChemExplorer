@@ -104,7 +104,7 @@ class run_pandda_export(QtCore.QThread):
                 db_dict['PANDDA_site_ligand_placed']    =   line['Ligand Placed']
                 db_dict['PANDDA_site_viewed']           =   line['Viewed']
                 db_dict['PANDDA_site_interesting']      =   line['Interesting']
-                db_dict['PANDDA_site_z_peak']           =   line['z_peak']
+#                db_dict['PANDDA_site_z_peak']           =   line['z_peak']
                 db_dict['PANDDA_site_x']                =   line['x']
                 db_dict['PANDDA_site_y']                =   line['y']
                 db_dict['PANDDA_site_z']                =   line['z']
