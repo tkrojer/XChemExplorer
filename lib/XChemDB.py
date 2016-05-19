@@ -545,8 +545,9 @@ class data_source:
 
         tmp = cursor.fetchall()
         for item in tmp:
-            line=[x.encode('UTF8') for x in list(item)]
-            sample_list_for_coot.append(line)
+            print item
+#            line=[x.encode('UTF8') for x in list(item)]
+#            sample_list_for_coot.append(line)
 
         return sample_list_for_coot
 
