@@ -156,11 +156,22 @@ class Refine(object):
         else:
             weight='weight matrix '+str(RefmacParams['MATRIX_WEIGHT'])+'\n'
 
+        #######################################################
+        # PANDDA validation @ spider plot
+        spider_plot=''
+        if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-ensemble-model.pdb')):
+            if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz')):
+                pdb_two=os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-ensemble-model.pdb')
+                mtz_two=os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz')
+                pdb_one=RefmacParams['XYZOUT']
+                mtz_one=RefmacParams['HKLOUT']
+                spider_plot='giant.score_model pdb1=%s mtz1=%s pdb2=%s mtz2=%s\n' %(pdb_one,mtz_one,pdb_two,mtz_two)
 
         refmacCmds = (
             '#!'+os.getenv('SHELL')+'\n'
             +pbs_line+
-            'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','xce.setup-csh')+'\n'
+            'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','xce.setup-sh')+'\n'
+            'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
             'cd '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'\n'
             +findTLS+
             'refmac5 '
@@ -217,6 +228,8 @@ class Refine(object):
             'END\n'
             'EOF\n'
             '\n'
+            +spider_plot+
+            '\n'
             'phenix.molprobity refine_%s.pdb refine_%s.mtz\n' %(Serial,Serial)+
             '/bin/mv molprobity.out refine_molprobity.log\n'
             'mmtbx.validate_ligands refine_%s.pdb refine_%s.mtz LIG > validate_ligands.txt\n' %(Serial,Serial)+
@@ -235,6 +248,9 @@ class Refine(object):
             'labin F1=DELFWT PHI=PHDELWT\n'
             'EOF\n'
              '\n'
+            '$CCP4/libexec/python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_after_refinement.py')+
+            ' %s %s %s %s\n' %(os.path.join(self.database_directory,self.data_source_file),xtal,self.ProjectPath,os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))+
+            '\n'
             '/bin/rm %s/%s/REFINEMENT_IN_PROGRESS\n' %(self.ProjectPath,self.xtalID)+
             '\n'
 #            '#cd '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'\n'

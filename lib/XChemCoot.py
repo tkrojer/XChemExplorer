@@ -385,10 +385,8 @@ class GUI(object):
         self.hbox_for_refinement.add(self.RefinementParamsButton)
         self.vbox.add(self.hbox_for_refinement)
 
-        self.VALIDATEbutton = gtk.Button(label="validate structure")
-        self.DEPOSITbutton = gtk.Button(label="prepare for deposition")
-#        self.LigandConfidenceButton = gtk.Button(label="ligand confidence")
-#        self.AdjustDataProcessingButton = gtk.Button(label="adjust data processing")
+#        self.VALIDATEbutton = gtk.Button(label="validate structure")
+#        self.DEPOSITbutton = gtk.Button(label="prepare for deposition")
 
 
         # --- CANCEL button ---
