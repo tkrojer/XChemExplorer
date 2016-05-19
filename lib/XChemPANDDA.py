@@ -17,7 +17,7 @@ class run_pandda_export(QtCore.QThread):
         self.db_list=self.db.get_empty_db_dict()
 
     def run(self):
-        self.export_models()
+#        self.export_models()
         self.import_samples_into_datasouce()
 
     def import_samples_into_datasouce(self):
@@ -75,7 +75,7 @@ class run_pandda_export(QtCore.QThread):
                 event_map='event_map'
                 for file in glob.glob(os.path.join(self.initial_model_directory,sampleID,'*ccp4')):
                     filename=file[file.rfind('/')+1:]
-                    if filename.startswith(xtal+'-event_'+event_index) and filename.endswith('map.native.ccp4'):
+                    if filename.startswith(sampleID+'-event_'+event_index) and filename.endswith('map.native.ccp4'):
                         event_map=file
                         break
 
