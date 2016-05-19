@@ -540,6 +540,7 @@ class data_source:
         else:
             pandda_sqlite = ''
 
+        print sqlite
         cursor.execute(sqlite)
 
         tmp = cursor.fetchall()
