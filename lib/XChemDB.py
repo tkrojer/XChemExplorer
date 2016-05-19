@@ -210,6 +210,7 @@ class data_source:
             existing_columns.append(column[0])
         for column in self.pandda_table_columns:
             if column[0] not in existing_columns:
+                print "alter table panddaTable add column '"+column[0]+"' '"+column[2]+"'"
                 cursor.execute("alter table panddaTable add column '"+column[0]+"' '"+column[2]+"'")
                 connect.commit()
 
