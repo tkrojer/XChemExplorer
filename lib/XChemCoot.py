@@ -53,7 +53,7 @@ class GUI(object):
 
         self.selection_criteria = [     '0 - All Datasets',
                                         '1 - Analysis Pending',
-                                        '2 - PANDDA Model',
+                                        '2 - PANDDA model',
                                         '3 - In Refinement',
                                         '4 - ComChem ready',
                                         '5 - Deposition ready',
