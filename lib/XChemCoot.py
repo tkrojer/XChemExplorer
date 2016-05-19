@@ -55,10 +55,9 @@ class GUI(object):
                                         '1 - Analysis Pending',
                                         '2 - PANDDA Model',
                                         '3 - In Refinement',
-                                        '4 - Ligand Confirmed',
-                                        '5 - ComChem ready',
-                                        '6 - Ready for Proofreading',
-                                        '7 - Deposit!'       ]
+                                        '4 - ComChem ready',
+                                        '5 - Deposition ready',
+                                        '6 - Deposited'         ]
 
         self.experiment_stage =     [   ['Refinement\nFailed',       '-3 - Refinement Failed',   65000,  0,  0],
                                         ['Ligand\nConfidence'],
