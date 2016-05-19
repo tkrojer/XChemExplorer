@@ -60,7 +60,6 @@ class GUI(object):
                                         '6 - Deposited'         ]
 
         self.experiment_stage =     [   ['Refinement\nFailed',      '-3 - Refinement Failed',   65000,  0,  0],
-                                        ['Ligand\nConfidence'],
                                         ['CompChem\nready',         '4 - ComChem ready',            0,  65000,  0],
                                         ['Ready for\nDeposition',   '5 - Deposition ready',     0,      0,  65000],
                                         ['Deposited!',              '6 - Deposited',      0,      0,  65000]   ]
@@ -337,24 +336,28 @@ class GUI(object):
 #        self.hbox_refinemnt_outcome.add(self.structure_finished_button)
 
 
+        # Ligand confidence
+        self.cb_ligand_confidence = gtk.combo_box_new_text()
+        self.cb_ligand_confidence.connect("changed", self.set_ligand_confidence)
+        for citeria in self.ligand_confidence:
+            self.cb_ligand_confidence.append_text(citeria)
+        self.hbox_refinemnt_outcome.add(self.cb_ligand_confidence)
+
         self.experiment_stage_button_list=[]
-        for button in self.experiment_stage:
-            if str(button[0]).startswith('Ligand'):
-                self.cb_ligand_confidence = gtk.combo_box_new_text()
-                self.cb_ligand_confidence.connect("changed", self.set_ligand_confidence)
-                for citeria in self.ligand_confidence:
-                    self.cb_ligand_confidence.append_text(citeria)
-                self.hbox_refinemnt_outcome.add(self.cb_ligand_confidence)
-            else:
+        for n,button in enumerate(self.experiment_stage):
                 #new_button=gtk.Button(label=button[0])
                 #new_button.connect("clicked",self.experiment_stage_button_clicked)
-                new_button = gtk.ToggleButton(button[0])
-                new_button.connect("toggled",self.experiment_stage_button_clicked,button[1])
+            if n == 0:
+                new_button = gtk.RadioButton(None, button[0])
+            else:
+                new_button = gtk.RadioButton(new_button, button[0])
+            new_button.connect("toggled",self.experiment_stage_button_clicked,button[1])
+
                 #new_button.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(10000,10000,10000))
                 #new_button.modify_bg(gtk.STATE_ACTIVE, gtk.gdk.Color(button[2],button[3],button[4]))
 
-                self.hbox_refinemnt_outcome.add(new_button)
-                self.experiment_stage_button_list.append(new_button)
+            self.hbox_refinemnt_outcome.add(new_button)
+            self.experiment_stage_button_list.append(new_button)
 
         frame.add(self.hbox_refinemnt_outcome)
         self.vbox.pack_start(frame)
@@ -452,12 +455,8 @@ class GUI(object):
 #        print 'here',widget.get_label()
 
     def experiment_stage_button_clicked(self,widget, data=None):
-        for button in self.experiment_stage_button_list:
-            if button == widget:
-                button.set_active(True)
-            else:
-                button.set_active(False)
         self.db_dict_mainTable['RefinementOutcome']=data
+        print self.db_dict_mainTable
 
     def RefreshData(self):
         # initialize Refinement library
