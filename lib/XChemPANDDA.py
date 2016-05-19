@@ -73,7 +73,7 @@ class run_pandda_export(QtCore.QThread):
 
                 # check if EVENT map exists in project directory
                 event_map='event_map'
-                for file in glob.glob(os.path.join(self.initial_model_directory,xtal,'*ccp4')):
+                for file in glob.glob(os.path.join(self.initial_model_directory,sampleID,'*ccp4')):
                     filename=file[file.rfind('/')+1:]
                     if filename.startswith(xtal+'-event_'+event_index) and filename.endswith('map.native.ccp4'):
                         event_map=file
@@ -81,13 +81,13 @@ class run_pandda_export(QtCore.QThread):
 
                 # initial pandda model and mtz file
                 pandda_model='pandda_model'
-                for file in glob.glob(os.path.join(self.initial_model_directory,xtal,'*pdb')):
+                for file in glob.glob(os.path.join(self.initial_model_directory,sampleID,'*pdb')):
                     filename=file[file.rfind('/')+1:]
                     if filename.endswith('pandda-model.pdb'):
                         pandda_model=file
                         break
                 inital_mtz='initial_mtz'
-                for file in glob.glob(os.path.join(self.initial_model_directory,xtal,'*mtz')):
+                for file in glob.glob(os.path.join(self.initial_model_directory,sampleID,'*mtz')):
                     filename=file[file.rfind('/')+1:]
                     if filename.endswith('pandda-input.mtz'):
                         inital_mtz=file
