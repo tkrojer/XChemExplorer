@@ -405,7 +405,7 @@ class data_source:
                     continue
                 if not str(value).replace(' ','')=='':  # ignore empty fields
                     update_string=str(key)+'='+"'"+str(value)+"'"
-                    print "UPDATE panddaTable SET "+update_string+" WHERE CrystalName="+"'"+sampleID+"' and PANDDA_site_index is '"+data_dict['PANDDA_site_index']+"';"
+#                    print "UPDATE panddaTable SET "+update_string+" WHERE CrystalName="+"'"+sampleID+"' and PANDDA_site_index is '"+data_dict['PANDDA_site_index']+"';"
                     cursor.execute("UPDATE panddaTable SET "+update_string+" WHERE CrystalName="+"'"+sampleID+"' and PANDDA_site_index is '"+data_dict['PANDDA_site_index']+"';")
         else:
             column_string=''
@@ -551,6 +551,8 @@ class data_source:
 
         cursor.execute(sqlite)
 
+#SELECT mainTable.CrystalName,mainTable.CompoundCode,panddaTable.PANDDA_site_index,panddaTable.PANDDA_site_event_map from mainTable inner join panddaTable on mainTable.CrystalName = panddaTable.CrystalName where panddaTable.PANDDA_site_index is '1';
+
         tmp = cursor.fetchall()
         for item in tmp:
             line=[x.encode('UTF8') for x in list(item)]
@@ -587,30 +589,23 @@ class data_source:
         return out_list
 
     def get_list_of_pandda_sites_for_coot(self):
-        site_list=[]
-        site_list.append(['0','All Sites','0','0','0'])
-        site=['_A_','_B_','_C_','_D_','_E_','_F_','_G_','_H_','_I_','_J_','_K_','_L_']
-        for site_idx in range(1,13):
-            site_name=''
-            for id in site:
-                sqlite = (
-                        "select PANDDA_site%sname," %id+
-                        "       PANDDA_site%sx," %id+
-                        "       PANDDA_site%sy," %id+
-                        "       PANDDA_site%sz" %id+
-                        " from mainTable where "
-                        " PANDDA_site%ssite_index is '%s'" %(id,site_idx)
-                        )
-                name=self.execute_statement(sqlite)
-                if name !=[] and name[0][0] != '':
-                    site_name=str(name[0][0])		#and name not in site_name:
-                    # note: all sites have "slightly" different xyz coordinates,
-                    #       but we simply take the first one
-                    x=str(name[0][1])
-                    y=str(name[0][2])
-                    z=str(name[0][3])
-                    site_list.append([site_idx,site_name,x,y,z])
-                    break
+        sqlite = (
+            'select distinct'
+            ' panddaTable.PANDDA_site_index,'
+            ' panddaTable.PANDDA_site_name '
+            'from panddaTable '
+            'order by panddaTable.PANDDA_site_index ASC;'
+                  )
+        site_list=[ ['0','any site'] ]
+
+        connect=sqlite3.connect(self.data_source_file)
+        cursor = connect.cursor()
+        cursor.execute(sqlite)
+        tmp=cursor.fetchall()
+        for item in tmp:
+            line=[x.encode('UTF8') for x in list(item)]
+            site_list.append(line)
+
         return site_list
 
 

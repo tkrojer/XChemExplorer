@@ -583,10 +583,10 @@ class GUI(object):
 
 
     def get_samples_to_look_at(self,widget):
-        x=float(self.selected_site[2])
-        y=float(self.selected_site[3])
-        z=float(self.selected_site[4])
-        coot.set_rotation_centre(x,y,z)
+#        x=float(self.selected_site[2])
+#        y=float(self.selected_site[3])
+#        z=float(self.selected_site[4])
+#        coot.set_rotation_centre(x,y,z)
         # first remove old samples if present
         if len(self.Todo) != 0:
             for n,item in enumerate(self.Todo):
