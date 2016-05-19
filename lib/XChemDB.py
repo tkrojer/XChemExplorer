@@ -545,7 +545,12 @@ class data_source:
 
         tmp = cursor.fetchall()
         for item in tmp:
-            tmpx=list(item)
+            tmpx=[]
+            for i in list(item):
+                if i==None:
+                    tmpx.append('None')
+                else:
+                    tmpx.append(i)
             line=[x.encode('UTF8') for x in tmpx]
             sample_list_for_coot.append(line)
 

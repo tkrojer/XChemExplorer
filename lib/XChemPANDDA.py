@@ -34,7 +34,7 @@ class run_pandda_export(QtCore.QThread):
         self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
         for xtal in db_dict:
-            print '==> XCE: updating panddaTable of data source with PANDDA site information for',xtal
+#            print '==> XCE: updating panddaTable of data source with PANDDA site information for',xtal
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating data source with PANDDA site information for '+xtal)
             self.db.update_insert_panddaTable(xtal,db_dict[xtal])
             self.db.execute_statement("update mainTable set RefinementOutcome = '2 - PANDDA model' where CrystalName is '%s' and RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending'" %xtal)
