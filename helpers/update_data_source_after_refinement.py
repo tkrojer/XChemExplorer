@@ -27,4 +27,9 @@ if __name__=='__main__':
         # finally, update data source
         print '==> xce: updating data source after DIMPLE run'
         db.update_data_source(xtal,db_dict)
-
+        # update refinement outcome if necessary
+        sqlite = (
+            "update mainTable set RefinementOutcome = '3 - In Refinement' where CrystalName is '%s' " %xtal+
+            "and RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending' or RefinementOutcome is '2 - PANDDA model'"
+                )
+        db.execute_statement(sqlite)

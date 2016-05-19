@@ -101,6 +101,11 @@ class GUI(object):
                             'fofc':     -1,
                             'event':    -1  }
 
+        # two dictionaries which are flushed when a new crystal is loaded
+        # and which contain information to update the data source if necessary
+        self.db_dict_mainTable={}
+        self.db_dict_panddaTable={}
+
         ###########################################################################################
         # some COOT settings
         coot.set_map_radius(15)
@@ -418,6 +423,8 @@ class GUI(object):
             if str(item[0]) == self.xtalID:
                 self.index = n
         self.xtalID=str(self.Todo[self.index][0])
+        self.db_dict_mainTable={}
+        self.db_dict_panddaTable={}
         if str(self.Todo[self.index][0]) != None:
             self.compoundID=str(self.Todo[self.index][1])
             self.ligand_confidence_of_sample=str(self.Todo[self.index][7])
@@ -445,11 +452,12 @@ class GUI(object):
 #        print 'here',widget.get_label()
 
     def experiment_stage_button_clicked(self,widget, data=None):
-        print data
-#        for button in self.experiment_stage_button_list:
-#            if button == widget:
-#                print 'fuefhuruir'
-#        print 'here',widget.get_label()
+        for button in self.experiment_stage_button_list:
+            if button == widget:
+                button.set_active(True)
+            else:
+                button.set_active(False)
+        self.db_dict_mainTable['RefinementOutcome']=data
 
     def RefreshData(self):
         # initialize Refinement library

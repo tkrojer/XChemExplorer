@@ -167,11 +167,18 @@ class Refine(object):
                 mtz_one=RefmacParams['HKLOUT']
                 spider_plot='giant.score_model pdb1=%s mtz1=%s pdb2=%s mtz2=%s\n' %(pdb_one,mtz_one,pdb_two,mtz_two)
 
+        #######################################################
+        # PHENIX stuff (if working at DLS)
+        module_load=''
+        if os.getcwd().startswith('/dls'):
+            module_load='module load phenix\n'
+
         refmacCmds = (
             '#!'+os.getenv('SHELL')+'\n'
             +pbs_line+
             'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','xce.setup-sh')+'\n'
             'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
+            +module_load+
             'cd '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'\n'
             +findTLS+
             'refmac5 '
