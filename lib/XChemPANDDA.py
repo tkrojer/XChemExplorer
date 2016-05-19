@@ -75,6 +75,7 @@ class run_pandda_export(QtCore.QThread):
                 # check if EVENT map exists in project directory
                 event_map='event_map'
                 for file in glob.glob(os.path.join(self.initial_model_directory,sampleID,'*ccp4')):
+                    print file
                     filename=file[file.rfind('/')+1:]
                     if filename.startswith(sampleID+'-event_'+event_index) and filename.endswith('map.native.ccp4'):
                         event_map=file
