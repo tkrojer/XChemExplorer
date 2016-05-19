@@ -383,23 +383,31 @@ class data_source:
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
         cursor.execute('Select CrystalName,PANDDA_site_index FROM panddaTable')
-        available_columns=[]
-        cursor.execute("SELECT * FROM panddaTable")
-        for column in cursor.description:           # only update existing columns in data source
-            available_columns.append(column[0])
-#        if self.check_if_sample_exists_in_data_source(sampleID):
-#            for key in data_dict:
-#                value=data_dict[key]
-#                if key=='ID' or key=='CrystalName':
-#                    continue
-#                if not str(value).replace(' ','')=='':  # ignore empty fields
-#                    update_string=str(key)+'='+"'"+str(value)+"'"
-#                    cursor.execute("UPDATE mainTable SET "+update_string+" WHERE CrystalName="+"'"+sampleID+"';")
-#        else:
-        hallo=True
-        if hallo:
-#            column_string='CrystalName'+','
-#            value_string="'"+sampleID+"'"+','
+#        available_columns=[]
+#        cursor.execute("SELECT * FROM panddaTable")
+#        for column in cursor.description:           # only update existing columns in data source
+#            available_columns.append(column[0])
+        samples_sites_in_table=[]
+        tmp=cursor.fetchall()
+        for item in tmp:
+            line=[x.encode('UTF8') for x in list(item)]
+            samples_sites_in_table.append(line)
+
+        found_sample_site=False
+        for entry in samples_sites_in_table:
+            if entry[0]==sampleID and entry[1]==data_dict['PANDDA_site_index']:
+                found_sample_site=True
+
+        if found_sample_site:
+            for key in data_dict:
+                value=data_dict[key]
+                if key=='ID' or key=='CrystalName' or key=='PANDDA_site_index':
+                    continue
+                if not str(value).replace(' ','')=='':  # ignore empty fields
+                    update_string=str(key)+'='+"'"+str(value)+"'"
+                    print "UPDATE panddaTable SET "+update_string+" WHERE CrystalName="+"'"+sampleID+"' and PANDDA_site_index is '"+data_dict['PANDDA_site_index']+"';"
+                    cursor.execute("UPDATE panddaTable SET "+update_string+" WHERE CrystalName="+"'"+sampleID+"' and PANDDA_site_index is '"+data_dict['PANDDA_site_index']+"';")
+        else:
             column_string=''
             value_string=''
             for key in data_dict:
