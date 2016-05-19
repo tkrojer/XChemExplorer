@@ -59,11 +59,11 @@ class GUI(object):
                                         '5 - Deposition ready',
                                         '6 - Deposited'         ]
 
-        self.experiment_stage =     [   ['Refinement\nFailed',       '-3 - Refinement Failed',   65000,  0,  0],
+        self.experiment_stage =     [   ['Refinement\nFailed',      '-3 - Refinement Failed',   65000,  0,  0],
                                         ['Ligand\nConfidence'],
-                                        ['CompChem\nready',          '5 - CompChem ready',            0,  65000,  0],
-                                        ['Ready for\nProofreading',  '6 - Ready for Proofreading',   0,      0,  65000],
-                                        ['Deposit',                  '7 - Ready for Deposition',      0,      0,  65000]   ]
+                                        ['CompChem\nready',         '4 - ComChem ready',            0,  65000,  0],
+                                        ['Ready for\nDeposition',   '5 - Deposition ready',     0,      0,  65000],
+                                        ['Deposited!',              '6 - Deposited',      0,      0,  65000]   ]
 
         self.ligand_confidence = [  '0 - no ligand present',
                                     '1 - low confidence',
@@ -332,6 +332,7 @@ class GUI(object):
 #        self.hbox_refinemnt_outcome.add(self.structure_finished_button)
 
 
+        self.experiment_stage_button_list=[]
         for button in self.experiment_stage:
             if str(button[0]).startswith('Ligand'):
                 self.cb_ligand_confidence = gtk.combo_box_new_text()
@@ -342,8 +343,10 @@ class GUI(object):
             else:
                 new_button=gtk.Button(label=button[0])
                 new_button.connect("clicked",self.experiment_stage_button_clicked)
-                new_button.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(button[2],button[3],button[4]))
+                new_button.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(10000,10000,10000))
+                new_button.modify_bg(gtk.STATE_ACTIVE, gtk.gdk.Color(button[2],button[3],button[4]))
                 self.hbox_refinemnt_outcome.add(new_button)
+                self.experiment_stage_button_list.append(new_button)
 
         frame.add(self.hbox_refinemnt_outcome)
         self.vbox.pack_start(frame)
@@ -416,12 +419,14 @@ class GUI(object):
         self.xtalID=str(self.Todo[self.index][0])
         if str(self.Todo[self.index][0]) != None:
             self.compoundID=str(self.Todo[self.index][1])
-            self.ligand_confidence_of_sample=str(self.Todo[self.index][2])
-            self.refinement_folder=str(self.Todo[self.index][3])
+            self.ligand_confidence_of_sample=str(self.Todo[self.index][7])
+            self.refinement_folder=str(self.Todo[self.index][4])
+            self.event_map=str(self.Todo[self.index][6])
         else:
             self.compoundID=''
             self.ligand_confidence_of_sample=''
             self.refinement_folder=''
+            self.event_map=''
         self.RefreshData()
 
     def update_data_source(self,widget,data=None):              # update and move to next xtal
@@ -433,6 +438,9 @@ class GUI(object):
         self.cb.set_active(self.index)
 
     def experiment_stage_button_clicked(self,widget):
+        for button in self.experiment_stage_button_list:
+            if button == widget:
+                print 'fuefhuruir'
         print 'here',widget.get_label()
 
     def RefreshData(self):
@@ -474,6 +482,14 @@ class GUI(object):
             imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.pdb'),0)
             self.mol_dict['ligand']=imol
             coot.read_cif_dictionary(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.cif'))
+        if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style)):
+            os.chdir(os.path.join(self.project_directory,self.xtalID))
+            if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.xtalID+'-pandda-model.pdb')):
+                os.symlink(self.xtalID+'-pandda-model.pdb',self.pdb_style)
+            elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.pdb')):
+                os.symlink('dimple.pdb',self.pdb_style)
+            else:
+                self.go_to_next_xtal()
         imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style),0)
         self.mol_dict['protein']=imol
         for item in coot_utils_XChem.molecule_number_list():
@@ -483,14 +499,21 @@ class GUI(object):
 
         #########################################################################################
         # check for PANDDAs EVENT maps
-        for map in glob.glob(os.path.join(self.project_directory,self.xtalID,'*')):
-            if 'event' in str(map) and '.ccp4' in str(map):
-                occupancy=map[map.find('occupancy')+10:map.rfind('_')]
-                coot.handle_read_ccp4_map((map),0)
-                for imol in coot_utils_XChem.molecule_number_list():
-                    if map in coot.molecule_name(imol):
-                        coot.set_contour_level_absolute(imol,float(occupancy))
-                        coot.set_last_map_colour(0.4,0,0.4)
+#        for map in glob.glob(os.path.join(self.project_directory,self.xtalID,'*')):
+#            if 'event' in str(map) and '.ccp4' in str(map):
+#                occupancy=map[map.find('occupancy')+10:map.rfind('_')]
+#                coot.handle_read_ccp4_map((map),0)
+#                for imol in coot_utils_XChem.molecule_number_list():
+#                    if map in coot.molecule_name(imol):
+#                        coot.set_contour_level_absolute(imol,float(occupancy))
+#                        coot.set_last_map_colour(0.4,0,0.4)
+        if os.path.isfile(self.event_map):
+            coot.handle_read_ccp4_map((self.event_map),0)
+            for imol in coot_utils_XChem.molecule_number_list():
+                if map in coot.molecule_name(imol):
+                    coot.set_contour_level_absolute(imol,0.5)
+                    coot.set_last_map_colour(0.4,0,0.4)
+
 
         #########################################################################################
         # read fofo maps
@@ -505,6 +528,12 @@ class GUI(object):
         else:
             # try to open mtz file with same name as pdb file
             coot.set_default_initial_contour_level_for_map(1)
+            if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.mtz_style)):
+                os.chdir(os.path.join(self.project_directory,self.xtalID,self.mtz_style))
+                if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.xtalID+'-pandda-input.mtz')):
+                    os.symlink(self.xtalID+'-pandda-input.mtz',self.mtz_style)
+                elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.mtz')):
+                    os.symlink('dimple.mtz',self.mtz_style)
             coot.auto_read_make_and_draw_maps(os.path.join(self.project_directory,self.xtalID,self.mtz_style))
 
         #########################################################################################
@@ -543,6 +572,12 @@ class GUI(object):
             pic = gtk.gdk.pixbuf_new_from_file(os.path.join(os.getenv('XChemExplorer_DIR'),'image','NO_COMPOUND_IMAGE_AVAILABLE.png'))
         self.pic = pic.scale_simple(200, 200, gtk.gdk.INTERP_BILINEAR)
         self.image.set_from_pixbuf(self.pic)
+
+    def go_to_next_xtal(self):
+        self.index+=1
+        if self.index >= len(self.Todo):
+            self.index = len(self.Todo)
+        self.cb.set_active(self.index)
 
 
     def REFINE(self,widget):

@@ -38,9 +38,17 @@ class run_pandda_export(QtCore.QThread):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating data source with PANDDA site information for '+xtal)
             self.db.update_insert_panddaTable(xtal,db_dict[xtal])
             self.db.execute_statement("update mainTable set RefinementOutcome = '2 - PANDDA model' where CrystalName is '%s' and RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending'" %xtal)
+            os.chdir(os.path.join(self.initial_model_directory,xtal))
+            if os.path.isfile(xtal+'-ensemble-model.pdb'):
+                if os.path.isfile('refine.pdb'):
+                    os.system('/bin/rm refine.pdb')
+                os.symlink(xtal+'-ensemble-model.pdb','refine.pdb')
+            if os.path.isfile(xtal+'-pandda-input.mtz'):
+                if os.path.isfile('refine.mtz'):
+                    os.system('/bin/rm refine.mtz')
+                os.symlink(xtal+'-pandda-input.mtz','refine.mtz')
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-
 
 
     def get_db_dict(self):
@@ -86,7 +94,7 @@ class run_pandda_export(QtCore.QThread):
                 pandda_model='pandda_model'
                 for file in glob.glob(os.path.join(self.initial_model_directory,sampleID,'*pdb')):
                     filename=file[file.rfind('/')+1:]
-                    if filename.endswith('pandda-model.pdb'):
+                    if filename.endswith('-ensemble-model.pdb'):
                         pandda_model=file
                         break
                 inital_mtz='initial_mtz'
