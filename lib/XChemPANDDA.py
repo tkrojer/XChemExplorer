@@ -17,6 +17,18 @@ class run_pandda_export(QtCore.QThread):
         self.db.create_missing_columns()
         self.db_list=self.db.get_empty_db_dict()
 
+        self.RefmacParams={ 'HKLIN':            '',                 'HKLOUT': '',
+                            'XYZIN':            '',                 'XYZOUT': '',
+                            'LIBIN':            '',                 'LIBOUT': '',
+                            'TLSIN':            '',                 'TLSOUT': '',
+                            'TLSADD':           '',
+                            'NCYCLES':          '10',
+                            'MATRIX_WEIGHT':    'AUTO',
+                            'BREF':             '    bref ISOT\n',
+                            'TLS':              '',
+                            'NCS':              '',
+                            'TWIN':             ''    }
+
     def run(self):
 #        self.export_models()
 #        self.import_samples_into_datasouce()
@@ -32,14 +44,14 @@ class run_pandda_export(QtCore.QThread):
         for item in sample_list:
             xtal=str(item[0])
             compoundID=str(item[1])
-#            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.free.mtz')):
-#                if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb')):
-#                    Refine=XChemRefine.Refine(self.initial_model_directory,xtal,compoundID,self.datasource)
-#                    Serial=Refine.GetSerial()
-#                    os.mkdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+Serial))
-#                    os.chdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+Serial))
-#                    os.symlink(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb'),'in.pdb')
-#                    Refine.RunRefmac(self.Serial,self.RefmacParams,self.external_software)
+            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.free.mtz')):
+                if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb')):
+                    Refine=XChemRefine.Refine(self.initial_model_directory,xtal,compoundID,self.datasource)
+                    Serial=Refine.GetSerial()
+                    os.mkdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+Serial))
+                    os.chdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+Serial))
+                    os.symlink(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb'),'in.pdb')
+                    Refine.RunRefmac(Serial,self.RefmacParams,self.external_software)
 
 
 

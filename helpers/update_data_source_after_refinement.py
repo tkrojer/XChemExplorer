@@ -34,4 +34,4 @@ if __name__=='__main__':
                 )
         db.execute_statement(sqlite)
 
-    site=db.execute_statement()
+#    site=db.execute_statement()

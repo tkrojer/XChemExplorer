@@ -125,13 +125,10 @@ class Refine(object):
         #######################################################
         # PANDDAs stuff
         # only use occupancy refinement if EVENT map is present
-        occupancy_refinement='\n'
-        for map in glob.glob(os.path.join(self.ProjectPath,self.xtalID,'*')):
-            if 'event' in map and map.endswith('.ccp4'):
-                if external_software['giant.create_occupancy_params']:
-                    os.chdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
-                    os.system('giant.create_occupancy_params in.pdb')
-                    break       # doesn't matter if 2nd event map is there
+        occupancy_refinement=''
+        if external_software['giant.create_occupancy_params']:
+            os.chdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
+            os.system("giant.create_occupancy_params pdb=in.pdb refmac_occ_out='refmac_refine.params'")
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refmac_refine.params')):
             occupancy_refinement='@refmac_refine.params\n'
 
@@ -165,8 +162,8 @@ class Refine(object):
             if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz')):
                 pdb_two=os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-ensemble-model.pdb')
                 mtz_two=os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz')
-                pdb_one=RefmacParams['XYZOUT']
-                mtz_one=RefmacParams['HKLOUT']
+                pdb_one=os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refine_'+Serial+'.pdb'
+                mtz_one=os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refine_'+Serial+'.mtz'
                 spider_plot='giant.score_model pdb1=%s mtz1=%s pdb2=%s mtz2=%s\n' %(pdb_one,mtz_one,pdb_two,mtz_two)
 
         #######################################################
