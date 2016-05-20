@@ -521,7 +521,7 @@ class GUI(object):
         if os.path.isfile(self.event_map):
             coot.handle_read_ccp4_map((self.event_map),0)
             for imol in coot_utils_XChem.molecule_number_list():
-                if map in coot.molecule_name(imol):
+                if self.event_map in coot.molecule_name(imol):
                     coot.set_contour_level_absolute(imol,0.5)
                     coot.set_last_map_colour(0.4,0,0.4)
 

@@ -33,3 +33,5 @@ if __name__=='__main__':
             "and RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending' or RefinementOutcome is '2 - PANDDA model'"
                 )
         db.execute_statement(sqlite)
+
+    site=db.execute_statement()

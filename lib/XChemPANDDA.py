@@ -3,6 +3,7 @@ from datetime import datetime
 from PyQt4 import QtGui, QtCore
 from XChemUtils import mtztools
 import XChemDB
+import XChemRefine
 import csv
 
 class run_pandda_export(QtCore.QThread):
@@ -17,42 +18,50 @@ class run_pandda_export(QtCore.QThread):
         self.db_list=self.db.get_empty_db_dict()
 
     def run(self):
-        self.export_models()
-        self.import_samples_into_datasouce()
+#        self.export_models()
+#        self.import_samples_into_datasouce()
+        self.refine_exported_models()
+
+    def refine_exported_models(self):
+
+#        self.Refine=XChemRefine.Refine(self.project_directory,self.xtalID,self.compoundID,self.data_source)
+#        self.Serial=self.Refine.GetSerial()
+#        self.Refine.RunRefmac(self.Serial,self.RefmacParams,self.external_software)
+
+        sample_list=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome='2 - PANDDA model';")
+        for xtal in sample_list:
+            print str(xtal)[0]
+
+
+
+ #       progress_step=1
+ #       if len(db_dict) != 0:
+ #           progress_step=100/float(len(db_dict))
+ #       else:
+ #           progress_step=0
+ #       progress=0
+#
+#        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+#
+#        for xtal in db_dict:
+##            print '==> XCE: updating panddaTable of data source with PANDDA site information for',xtal
+#            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating data source with PANDDA site information for '+xtal)
+#            self.db.update_insert_panddaTable(xtal,db_dict[xtal])
+#            self.db.execute_statement("update mainTable set RefinementOutcome = '2 - PANDDA model' where CrystalName is '%s' and RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending'" %xtal)
+#            os.chdir(os.path.join(self.initial_model_directory,xtal))
+#            if os.path.isfile(xtal+'-ensemble-model.pdb'):
+#                if os.path.isfile('refine.pdb'):
+#                    os.system('/bin/rm refine.pdb')
+#                os.symlink(xtal+'-ensemble-model.pdb','refine.pdb')
+#            if os.path.isfile(xtal+'-pandda-input.mtz'):
+#                if os.path.isfile('refine.mtz'):
+#                    os.system('/bin/rm refine.mtz')
+#                os.symlink(xtal+'-pandda-input.mtz','refine.mtz')
+#            progress += progress_step
+#            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
 
     def import_samples_into_datasouce(self):
-
-        db_dict=self.get_db_dict()
-
-        progress_step=1
-        if len(db_dict) != 0:
-            progress_step=100/float(len(db_dict))
-        else:
-            progress_step=0
-        progress=0
-
-        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-
-        for xtal in db_dict:
-#            print '==> XCE: updating panddaTable of data source with PANDDA site information for',xtal
-            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating data source with PANDDA site information for '+xtal)
-            self.db.update_insert_panddaTable(xtal,db_dict[xtal])
-            self.db.execute_statement("update mainTable set RefinementOutcome = '2 - PANDDA model' where CrystalName is '%s' and RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending'" %xtal)
-            os.chdir(os.path.join(self.initial_model_directory,xtal))
-            if os.path.isfile(xtal+'-ensemble-model.pdb'):
-                if os.path.isfile('refine.pdb'):
-                    os.system('/bin/rm refine.pdb')
-                os.symlink(xtal+'-ensemble-model.pdb','refine.pdb')
-            if os.path.isfile(xtal+'-pandda-input.mtz'):
-                if os.path.isfile('refine.mtz'):
-                    os.system('/bin/rm refine.mtz')
-                os.symlink(xtal+'-pandda-input.mtz','refine.mtz')
-            progress += progress_step
-            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-
-
-    def get_db_dict(self):
-
 
         site_list = []
 
@@ -64,10 +73,19 @@ class run_pandda_export(QtCore.QThread):
                 comment=line['Comment']
                 site_list.append([site_index,name,comment])
 
-        sample_dict={}
 
         with open(os.path.join(self.panddas_directory,'analyses','pandda_inspect_events.csv'),'rb') as csv_import:
             csv_dict = csv.DictReader(csv_import)
+            progress_step=1
+            if len(csv_dict) != 0:
+                progress_step=100/float(len(csv_dict))
+            else:
+                progress_step=0
+            progress=0
+
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+
             for i,line in enumerate(csv_dict):
                 db_dict={}
                 sampleID=line['dtag']
@@ -124,9 +142,10 @@ class run_pandda_export(QtCore.QThread):
                 db_dict['PANDDA_site_initial_mtz']      =   inital_mtz
                 db_dict['PANDDA_site_spider_plot']      =   ''
 
-                sample_dict[sampleID]=db_dict
-
-        return sample_dict
+                self.db.update_insert_panddaTable(sampleID,db_dict)
+                self.db.execute_statement("update mainTable set RefinementOutcome = '2 - PANDDA model' where CrystalName is '%s' and RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending'" %sampleID)
+                progress += progress_step
+                self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
 
     def export_models(self):

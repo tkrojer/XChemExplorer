@@ -1300,3 +1300,8 @@ class reference:
         return (spg_reference,unitcell_reference,reference,found_suitable_reference,
                 resolution_high,spg_autoproc,unitcell_autoproc,unitcell_difference)
 
+
+class misc:
+
+    def calculate_distance_between_coordinates(self,x1,y1,z1,x2,y2,z2):
+        print 'hallo'
