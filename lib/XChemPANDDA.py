@@ -30,7 +30,7 @@ class run_pandda_export(QtCore.QThread):
 
         sample_list=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome='2 - PANDDA model';")
         for xtal in sample_list:
-            print str(xtal)[0]
+            print str(xtal)
 
 
 
