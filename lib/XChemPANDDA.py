@@ -3,7 +3,7 @@ from datetime import datetime
 from PyQt4 import QtGui, QtCore
 from XChemUtils import mtztools
 import XChemDB
-import XChemRefine
+#import XChemRefine
 import csv
 
 class run_pandda_export(QtCore.QThread):
