@@ -36,16 +36,13 @@ class run_pandda_export(QtCore.QThread):
 
     def refine_exported_models(self):
 
-#        self.Refine=XChemRefine.Refine(self.project_directory,self.xtalID,self.compoundID,self.data_source)
-#        self.Serial=self.Refine.GetSerial()
-#        self.Refine.RunRefmac(self.Serial,self.RefmacParams,self.external_software)
-
         sample_list=self.db.execute_statement("select CrystalName,CompoundCode from mainTable where RefinementOutcome='2 - PANDDA model';")
         for item in sample_list:
             xtal=str(item[0])
             compoundID=str(item[1])
             if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.free.mtz')):
                 if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb')):
+                    print '==> XCE: running inital refinement on PANDDA model of',xtal
                     Refine=XChemRefine.Refine(self.initial_model_directory,xtal,compoundID,self.datasource)
                     Serial=Refine.GetSerial()
                     os.mkdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+Serial))
