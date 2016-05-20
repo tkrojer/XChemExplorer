@@ -33,7 +33,8 @@ class run_pandda_export(QtCore.QThread):
             xtal=str(item[0])
             if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb')):
                 print os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb')
-
+            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'free.mtz')):
+                print os.path.join(self.initial_model_directory,xtal,xtal+'free.mtz')
 
  #       progress_step=1
  #       if len(db_dict) != 0:
