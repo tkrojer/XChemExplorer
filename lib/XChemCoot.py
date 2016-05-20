@@ -45,11 +45,11 @@ class GUI(object):
         # checking for external software packages
         self.external_software=XChemUtils.external_software().check()
 
-        self.selection_criteria =   {   'Show All Datasets':                'RefinementPDB_latest is not null',
-                                        'Show Analysis Pending Only':       "RefinementOutcome='Analysis Pending'",
-                                        'Show Datasets Under Refinement':   "RefinementOutcome='Refinement Ongoing'",
-                                        'Show Confirmed Ligands':           "RefinementOutcome='Ligand Confirmed'",
-                                        'SHow Final Structures':            "RefinementOutcome='Structure Finished'"   }
+#        self.selection_criteria =   {   'Show All Datasets':                'RefinementPDB_latest is not null',
+#                                        'Show Analysis Pending Only':       "RefinementOutcome='Analysis Pending'",
+#                                        'Show Datasets Under Refinement':   "RefinementOutcome='Refinement Ongoing'",
+#                                        'Show Confirmed Ligands':           "RefinementOutcome='Ligand Confirmed'",
+#                                        'SHow Final Structures':            "RefinementOutcome='Structure Finished'"   }
 
         self.selection_criteria = [     '0 - All Datasets',
                                         '1 - Analysis Pending',
@@ -442,8 +442,8 @@ class GUI(object):
         self.RefreshData()
 
     def update_data_source(self,widget,data=None):              # update and move to next xtal
-        outcome_dict={'RefinementOutcome': data}
-        self.db.update_data_source(self.xtalID,outcome_dict)
+#        outcome_dict={'RefinementOutcome': data}
+#        self.db.update_data_source(self.xtalID,outcome_dict)
         self.index+=1
         if self.index >= len(self.Todo):
             self.index = len(self.Todo)
@@ -552,7 +552,7 @@ class GUI(object):
         if str(self.ligand_confidence_of_sample)=='None':
             self.ligand_confidence_of_sample='Analysis Pending'
             db_dict={'RefinementLigandConfidence': self.ligand_confidence_of_sample}
-            self.db.update_data_source(self.xtalID,db_dict)
+#            self.db.update_data_source(self.xtalID,db_dict)
         for n,criteria in enumerate(self.ligand_confidence):
             if criteria.replace('Ligand Confidence: ','')==self.ligand_confidence_of_sample:
                 self.cb_ligand_confidence.set_active(n)
@@ -593,7 +593,7 @@ class GUI(object):
 
     def REFINE(self,widget):
         outcome_dict={'RefinementOutcome': 'Refinement Ongoing'}
-        self.db.update_data_source(self.xtalID,outcome_dict)
+#        self.db.update_data_source(self.xtalID,outcome_dict)
         self.Refine.RunRefmac(self.Serial,self.RefmacParams,self.external_software,self.data_source)
         self.index+=1
         if self.index >= len(self.Todo):
@@ -623,7 +623,7 @@ class GUI(object):
         self.ligand_confidence_of_sample=widget.get_active_text().replace('Ligand Confidence: ','')
         print '===> XCE: updating data source with new ligand confidence ',self.ligand_confidence_of_sample
         db_dict={'RefinementLigandConfidence': self.ligand_confidence_of_sample}
-        self.db.update_data_source(self.xtalID,db_dict)
+#        self.db.update_data_source(self.xtalID,db_dict)
         self.Todo[self.index][2]=self.ligand_confidence_of_sample
 
 
