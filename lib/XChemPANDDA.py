@@ -3,7 +3,7 @@ from datetime import datetime
 from PyQt4 import QtGui, QtCore
 from XChemUtils import mtztools
 import XChemDB
-#import XChemRefine
+import XChemRefine
 import csv
 
 class run_pandda_export(QtCore.QThread):
@@ -29,9 +29,10 @@ class run_pandda_export(QtCore.QThread):
 #        self.Refine.RunRefmac(self.Serial,self.RefmacParams,self.external_software)
 
         sample_list=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome='2 - PANDDA model';")
-        for xtal in sample_list:
-            print str(xtal[0])
-
+        for item in sample_list:
+            xtal=str(item[0])
+            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb')):
+                print os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb')
 
 
  #       progress_step=1

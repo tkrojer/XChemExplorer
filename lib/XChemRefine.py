@@ -3,7 +3,7 @@ import os
 import glob
 import sys
 import getpass
-#sys.path.append('/usr/local/coot/current/lib/python2.7/site-packages')
+sys.path.append(os.path.join(os.getenv('CCP4'),'lib/python2.7/site-packages'))
 import coot
 #sys.path.append('/usr/local/coot/SoakProc/lib')
 #sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
