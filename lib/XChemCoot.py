@@ -456,7 +456,7 @@ class GUI(object):
 
     def RefreshData(self):
         # initialize Refinement library
-        self.Refine=XChemRefine.Refine(self.project_directory,self.xtalID,self.compoundID)
+        self.Refine=XChemRefine.Refine(self.project_directory,self.xtalID,self.compoundID,self.data_source)
         self.Serial=self.Refine.GetSerial()
 
         self.QualityIndicators=XChemUtils.ParseFiles(self.project_directory,self.xtalID).UpdateQualityIndicators()
