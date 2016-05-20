@@ -28,13 +28,22 @@ class run_pandda_export(QtCore.QThread):
 #        self.Serial=self.Refine.GetSerial()
 #        self.Refine.RunRefmac(self.Serial,self.RefmacParams,self.external_software)
 
-        sample_list=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome='2 - PANDDA model';")
+        sample_list=self.db.execute_statement("select CrystalName,CompoundCode from mainTable where RefinementOutcome='2 - PANDDA model';")
         for item in sample_list:
             xtal=str(item[0])
-            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb')):
-                print os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb')
-            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'free.mtz')):
-                print os.path.join(self.initial_model_directory,xtal,xtal+'free.mtz')
+            compoundID=str(item[1])
+#            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.free.mtz')):
+#                if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb')):
+#                    Refine=XChemRefine.Refine(self.initial_model_directory,xtal,compoundID,self.datasource)
+#                    Serial=Refine.GetSerial()
+#                    os.mkdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+Serial))
+#                    os.chdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+Serial))
+#                    os.symlink(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb'),'in.pdb')
+#                    Refine.RunRefmac(self.Serial,self.RefmacParams,self.external_software)
+
+
+
+
 
  #       progress_step=1
  #       if len(db_dict) != 0:

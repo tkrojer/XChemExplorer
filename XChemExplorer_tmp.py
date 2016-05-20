@@ -694,6 +694,11 @@ class XChemExplorer(QtGui.QApplication):
         select_sample_for_dimple.stateChanged.connect(self.set_run_dimple_flag)
         initial_model_checkbutton_hbox.addWidget(select_sample_for_dimple)
 
+        set_new_reference_button=QtGui.QPushButton("Set New Reference (if applicable)")
+        set_new_reference_button.clicked.connect(self.set_new_reference_if_applicable)
+        initial_model_checkbutton_hbox.addWidget(set_new_reference_button)
+
+
         self.reference_file_list=self.get_reference_file_list(' ')
         self.reference_file_selection_combobox = QtGui.QComboBox()
         self.populate_reference_combobox(self.reference_file_selection_combobox)
@@ -1960,6 +1965,10 @@ class XChemExplorer(QtGui.QApplication):
             print '==> XCE: exporting pandda models with pandda.export'
             os.system('pandda.export pandda_dir="'+self.panddas_directory+'" out_dir="'+self.initial_model_directory+'"')
 
+
+    def set_new_reference_if_applicable(self):
+        reference_root=str(self.reference_file_selection_combobox.currentText())
+        self.update_reference_files(reference_root)
 
 
     def select_datasource_columns_to_display(self):
