@@ -40,8 +40,6 @@ class update_datasource_from_file_system(QtCore.QThread):
         progress=0
         self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
-        site=['_A_','_B_','_C_','_D_','_E_','_F_','_G_','_H_','_I_','_J_','_K_','_L_']
-
         all_samples_in_datasource=self.db.get_all_samples_in_data_source_as_list()
 
         for directory in sorted(glob.glob(os.path.join(self.initial_model_directory,'*'))):
@@ -63,8 +61,10 @@ class update_datasource_from_file_system(QtCore.QThread):
                 if file==xtal+'.mtz' and os.path.isfile(file):
                     db_dict['DataProcessingPathToMTZfile']=os.path.join(directory,xtal+'.mtz')
                     db_dict['DataProcessingMTZfileName']=xtal+'.mtz'
+                found_mtz_free=False
                 if file==xtal+'.free.mtz' and os.path.isfile(file):
                     db_dict['RefinementMTZfree']=os.path.join(directory,xtal+'.free.mtz')
+                    found_mtz_free=True
                 if file==compoundID+'.cif' and os.path.isfile(file):
                     db_dict['RefinementCIF']=os.path.join(directory,compoundID+'.cif')
                 if file=='dimple.pdb' and os.path.isfile(file):
@@ -75,6 +75,12 @@ class update_datasource_from_file_system(QtCore.QThread):
                     db_dict['DimpleResolutionHigh']=pdb_info['ResolutionHigh']
                 if file=='dimple.mtz' and os.path.isfile(file):
                     db_dict['DimplePathToMTZ']=os.path.realpath(os.path.join(directory,'dimple.mtz'))
+                    if not found_mtz_free:
+                        dimple_mtz=db_dict['DimplePathToMTZ']
+                        dimple_path=dimple_mtz[:dimple_mtz.rfind('/')]
+                        if os.path.isfile(os.path.join(dimple_path,'prepared2.mtz')):
+                            os.symlink(os.path.join(dimple_path,'prepared2.mtz'),xtal+'.free.mtz')
+                            db_dict['RefinementMTZfree']=os.path.join(os.path.join(dimple_path,'prepared2.mtz'))
                 if file=='refine.pdb' and os.path.isfile(file):
                     db_dict['RefinementPDB_latest']=os.path.realpath(os.path.join(directory,'refine.pdb'))
                     pdb_info=parse().PDBheader(file)
@@ -85,16 +91,6 @@ class update_datasource_from_file_system(QtCore.QThread):
                     db_dict['RefinementRmsdAngles']=pdb_info['rmsdAngles']
                 if file=='refine.mtz' and os.path.isfile(file):
                     db_dict['RefinementMTZ_latest']=os.path.realpath(os.path.join(directory,'refine.mtz'))
-                # check if EVENT map exists
-                if file.startswith(xtal+'-event_') and file.endswith('map.native.ccp4'):
-                    tmp=file[file.find('event_')+6:]
-                    event_id=tmp[:tmp.find('_')]
-                    for entry in sample_dict:
-                        if entry.endswith('_event_index'):
-                            if sample_dict[entry]==event_id:
-                                for n,index in enumerate(site):
-                                    if index in entry:
-                                        db_dict['PANDDA_site'+site[n]+'event_map']=os.path.join(directory,file)
 
             if db_dict != {}:
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating datasource for '+xtal)
