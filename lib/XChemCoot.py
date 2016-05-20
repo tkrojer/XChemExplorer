@@ -592,9 +592,23 @@ class GUI(object):
 
 
     def REFINE(self,widget):
-        outcome_dict={'RefinementOutcome': 'Refinement Ongoing'}
-#        self.db.update_data_source(self.xtalID,outcome_dict)
+
+        #######################################################
+        # create folder for new refinement cycle
+        os.mkdir(os.path.join(self.project_directory,self.xtalID,'Refine_'+self.Serial))
+
+        #######################################################
+        # write PDB file
+        # now take protein pdb file and write it to newly create Refine_<serial> folder
+        # note: the user has to make sure that the ligand file was merged into main file
+        for item in coot_utils_XChem.molecule_number_list():
+            if coot.molecule_name(item).endswith(self.pdb_style):
+                coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'Refine_'+self.Serial,'in.pdb'))
+
+        #######################################################
+        # run REFMAC
         self.Refine.RunRefmac(self.Serial,self.RefmacParams,self.external_software)
+
         self.index+=1
         if self.index >= len(self.Todo):
             self.index = len(self.Todo)

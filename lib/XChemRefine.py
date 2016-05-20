@@ -3,11 +3,11 @@ import os
 import glob
 import sys
 import getpass
-sys.path.append(os.path.join(os.getenv('CCP4'),'lib/python2.7/site-packages'))
-import coot
+#sys.path.append(os.path.join(os.getenv('CCP4'),'lib/python2.7/site-packages'))
+#import coot
 #sys.path.append('/usr/local/coot/SoakProc/lib')
 #sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
-import coot_utils_XChem
+#import coot_utils_XChem
 
 
 class Refine(object):
@@ -43,7 +43,8 @@ class Refine(object):
 
         # first check if refinement is ongoing and exit if yes
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'REFINEMENT_IN_PROGRESS')):
-            coot.info_dialog('*** REFINEMENT IN PROGRESS ***')
+#            coot.info_dialog('*** REFINEMENT IN PROGRESS ***')
+            print '==> XCE: cannot start new refinement - *** REFINEMENT IN PROGRESS ***'
             return None
 
         #######################################################
@@ -109,17 +110,17 @@ class Refine(object):
                 RefmacParams['TLS']='\n'
 
 
-        #######################################################
-        # create folder for new refinement cycle
-        os.mkdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
-
-        #######################################################
-        # write PDB file
-        # now take protein pdb file and write it to newly create Refine_<serial> folder
-        # note: the user has to make sure that the ligand file was merged into main file
-        for item in coot_utils_XChem.molecule_number_list():
-            if coot.molecule_name(item).endswith(self.prefix+'.pdb'):
-                coot.write_pdb_file(item,os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'in.pdb'))
+#        #######################################################
+#        # create folder for new refinement cycle
+#        os.mkdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
+#
+#        #######################################################
+#        # write PDB file
+#        # now take protein pdb file and write it to newly create Refine_<serial> folder
+#        # note: the user has to make sure that the ligand file was merged into main file
+#        for item in coot_utils_XChem.molecule_number_list():
+#            if coot.molecule_name(item).endswith(self.prefix+'.pdb'):
+#                coot.write_pdb_file(item,os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'in.pdb'))
 
         #######################################################
         # PANDDAs stuff
