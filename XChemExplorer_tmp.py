@@ -1969,6 +1969,12 @@ class XChemExplorer(QtGui.QApplication):
     def set_new_reference_if_applicable(self):
         reference_root=str(self.reference_file_selection_combobox.currentText())
         self.update_reference_files(reference_root)
+        for xtal in self.initial_model_dimple_dict:
+            db_dict=self.xtal_db_dict[xtal]
+            reference_file=self.find_suitable_reference_file(db_dict)
+            reference_file_selection_combobox=self.initial_model_dimple_dict[xtal][1]
+            index = reference_file_selection_combobox.findText(str(reference_file[0][0]), QtCore.Qt.MatchFixedString)
+            reference_file_selection_combobox.setCurrentIndex(index)
 
 
     def select_datasource_columns_to_display(self):
