@@ -594,7 +594,7 @@ class GUI(object):
     def REFINE(self,widget):
         outcome_dict={'RefinementOutcome': 'Refinement Ongoing'}
 #        self.db.update_data_source(self.xtalID,outcome_dict)
-        self.Refine.RunRefmac(self.Serial,self.RefmacParams,self.external_software,self.data_source)
+        self.Refine.RunRefmac(self.Serial,self.RefmacParams,self.external_software)
         self.index+=1
         if self.index >= len(self.Todo):
             self.index = len(self.Todo)
