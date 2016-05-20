@@ -45,8 +45,8 @@ class run_pandda_export(QtCore.QThread):
                     print '==> XCE: running inital refinement on PANDDA model of',xtal
                     Refine=XChemRefine.Refine(self.initial_model_directory,xtal,compoundID,self.datasource)
                     Serial=Refine.GetSerial()
-                    os.mkdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+Serial))
-                    os.chdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+Serial))
+                    os.mkdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+str(Serial)))
+                    os.chdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+str(Serial)))
                     os.symlink(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb'),'in.pdb')
                     Refine.RunRefmac(Serial,self.RefmacParams,self.external_software)
 
