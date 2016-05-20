@@ -4,6 +4,7 @@ from PyQt4 import QtGui, QtCore
 from XChemUtils import mtztools
 import XChemDB
 import XChemRefine
+import XChemUtils
 import csv
 
 class run_pandda_export(QtCore.QThread):
@@ -16,6 +17,7 @@ class run_pandda_export(QtCore.QThread):
         self.db=XChemDB.data_source(self.datasource)
         self.db.create_missing_columns()
         self.db_list=self.db.get_empty_db_dict()
+        self.external_software=XChemUtils.external_software().check()
 
         self.RefmacParams={ 'HKLIN':            '',                 'HKLOUT': '',
                             'XYZIN':            '',                 'XYZOUT': '',
