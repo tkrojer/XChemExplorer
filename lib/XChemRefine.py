@@ -12,11 +12,12 @@ import coot_utils_XChem
 
 class Refine(object):
 
-    def __init__(self,ProjectPath,xtalID,compoundID):
+    def __init__(self,ProjectPath,xtalID,compoundID,datasource):
         self.ProjectPath = ProjectPath
         self.xtalID = xtalID
         self.compoundID = compoundID
         self.prefix = 'refine'
+        self.datasource=datasource
 
     def GetSerial(self):
         # check if there were already previous refinements
