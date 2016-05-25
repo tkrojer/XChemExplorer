@@ -669,7 +669,7 @@ class parse:
                     PDBinfo['UnitCell']=line.split()[1]+' '+line.split()[2]+' '+line.split()[3]+' '+ \
                                         line.split()[4]+' '+line.split()[5]+' '+line.split()[6]
 #                    PDBinfo['SpaceGroup']=line[55:len(line)-1].replace(' ','').rstrip('\r')
-                    PDBinfo['SpaceGroup']=line[55:65]
+                    PDBinfo['SpaceGroup']=str(line[55:65]).rstrip()
 
                     PDBinfo['Lattice']=self.get_lattice_from_space_group(PDBinfo['SpaceGroup'])
                     PDBinfo['PointGroup']=self.get_pointgroup_from_space_group(PDBinfo['SpaceGroup'])

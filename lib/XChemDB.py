@@ -541,7 +541,6 @@ class data_source:
         else:
             pandda_sqlite = ''
 
-        print sqlite
         cursor.execute(sqlite)
 
         tmp = cursor.fetchall()
@@ -586,14 +585,14 @@ class data_source:
         return out_list
 
     def get_list_of_pandda_sites_for_coot(self):
+        site_list=[ ['0','any site'] ]
         sqlite = (
             'select distinct'
             ' panddaTable.PANDDA_site_index,'
             ' panddaTable.PANDDA_site_name '
             'from panddaTable '
-            'order by panddaTable.PANDDA_site_index ASC;'
+            'order by cast (panddaTable.PANDDA_site_index as integer) ASC;'
                   )
-        site_list=[ ['0','any site'] ]
 
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()

@@ -59,10 +59,10 @@ class GUI(object):
                                         '5 - Deposition ready',
                                         '6 - Deposited'         ]
 
-        self.experiment_stage =     [   ['Refinement\nFailed',      '-3 - Refinement Failed',   65000,  0,  0],
-                                        ['CompChem\nready',         '4 - ComChem ready',            0,  65000,  0],
-                                        ['Ready for\nDeposition',   '5 - Deposition ready',     0,      0,  65000],
-                                        ['Deposited!',              '6 - Deposited',      0,      0,  65000]   ]
+        self.experiment_stage =     [   ['Review PANDDA export',    '2 - PANDDA model',     65000,  0,  0],
+                                        ['In Refinement',           '3 - In Refinement',    65000,  0,  0],
+                                        ['Comp Chem Ready!',        '4 - ComChem ready',    65000,  0,  0],
+                                        ['Ready for Deposition!',   '5 - Deposition ready', 65000,  0,  0]   ]
 
         self.ligand_confidence = [  '0 - no ligand present',
                                     '1 - low confidence',
@@ -168,7 +168,6 @@ class GUI(object):
             self.cb_select_samples.append_text(citeria)
         self.hbox_select_samples.add(self.cb_select_samples)
 
-
         self.cb_select_sites = gtk.combo_box_new_text()
         self.cb_select_sites.connect("changed", self.set_site)
         for site in self.ligand_site_information:
@@ -182,7 +181,12 @@ class GUI(object):
         frame.add(self.hbox_select_samples)
         self.vbox.pack_start(frame)
 
-
+        #################################################################################
+        # --- status window ---
+        frame=gtk.Frame()
+        self.status_label=gtk.Label()
+        frame.add(self.status_label)
+        self.vbox.pack_start(frame)
 
 
         # SPACER
@@ -316,33 +320,19 @@ class GUI(object):
 
         #################################################################################
         # --- current refinement stage ---
-        frame = gtk.Frame(label='Experiment Outcome')
-        self.hbox_refinemnt_outcome=gtk.HBox()
-#        self.refinement_failed_buttoon = gtk.Button(label="Refinement\nFailed")
-#        self.refinement_failed_buttoon.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(65535,0,0))
-#        self.refinement_failed_buttoon.modify_bg(gtk.STATE_ACTIVE, gtk.gdk.Color(0,65535,0))
-#        self.refinement_failed_buttoon.modify_bg(gtk.STATE_PRELIGHT, gtk.gdk.Color(0,0,65535))
-##        self.refinement_failed_buttoon.modify_bg(gtk.STATE_SELECTED, gtk.gdk.Color(65535,0,0))
-##        self.refinement_failed_buttoon.modify_bg(gtk.STATE_INSENSITIVE, gtk.gdk.Color(65535,0,0))
-#        self.refinement_failed_buttoon.connect("clicked",self.update_data_source,"Refinement Failed")
-#        self.hbox_refinemnt_outcome.add(self.refinement_failed_buttoon)
-#
-#        self.no_ligand_present_button = gtk.Button(label="No Ligand")
-#        self.no_ligand_present_button.connect("clicked",self.update_data_source,"No Ligand Bound")
-#        self.hbox_refinemnt_outcome.add(self.no_ligand_present_button)
-#        self.structure_finished_button = gtk.Button(label="Structure\nFinished")
-#
-#        self.structure_finished_button.connect("clicked",self.update_data_source,"Structure Finished")
-#        self.hbox_refinemnt_outcome.add(self.structure_finished_button)
-
-
-        # Ligand confidence
+        frame = gtk.Frame(label='Ligand Confidence')
+        hbox=gtk.HBox()
         self.cb_ligand_confidence = gtk.combo_box_new_text()
         self.cb_ligand_confidence.connect("changed", self.set_ligand_confidence)
         for citeria in self.ligand_confidence:
             self.cb_ligand_confidence.append_text(citeria)
-        self.hbox_refinemnt_outcome.add(self.cb_ligand_confidence)
+        hbox.add(self.cb_ligand_confidence)
+        frame.add(hbox)
+        self.vbox.pack_start(frame)
 
+
+        frame = gtk.Frame(label='Analysis Status')
+        vbox=gtk.VBox()
         self.experiment_stage_button_list=[]
         for n,button in enumerate(self.experiment_stage):
                 #new_button=gtk.Button(label=button[0])
@@ -352,14 +342,13 @@ class GUI(object):
             else:
                 new_button = gtk.RadioButton(new_button, button[0])
             new_button.connect("toggled",self.experiment_stage_button_clicked,button[1])
-
                 #new_button.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(10000,10000,10000))
                 #new_button.modify_bg(gtk.STATE_ACTIVE, gtk.gdk.Color(button[2],button[3],button[4]))
 
-            self.hbox_refinemnt_outcome.add(new_button)
+            vbox.add(new_button)
             self.experiment_stage_button_list.append(new_button)
 
-        frame.add(self.hbox_refinemnt_outcome)
+        frame.add(vbox)
         self.vbox.pack_start(frame)
 
         # SPACER
@@ -642,6 +631,7 @@ class GUI(object):
 
 
     def get_samples_to_look_at(self,widget):
+        self.status_label.set_text('checking datasource for samples... ')
 #        x=float(self.selected_site[2])
 #        y=float(self.selected_site[3])
 #        z=float(self.selected_site[4])
@@ -652,6 +642,7 @@ class GUI(object):
                 self.cb.remove_text(0)
         self.Todo=[]
         self.Todo=self.db.get_samples_for_coot(self.selection_mode,self.selected_site[0])
+        self.status_label.set_text('found %s samples' %len(self.Todo))
         for item in self.Todo:
             print item
             self.cb.append_text('%s' %item[0])
