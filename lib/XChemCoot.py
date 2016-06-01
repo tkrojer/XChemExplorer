@@ -265,6 +265,12 @@ class GUI(object):
         frame.add(self.table)
         self.vbox.add(frame)
 
+        button = gtk.Button(label="Show MolProbity to-do list")
+        button.connect("clicked",self.show_molprobity_to_do)
+        self.vbox.add(button)
+        self.vbox.pack_start(frame)
+
+
         # SPACER
         self.vbox.add(gtk.Label(' '))
 
