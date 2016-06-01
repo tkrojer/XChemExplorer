@@ -1,6 +1,7 @@
 import sqlite3
 import os,sys
 import csv
+from datetime import datetime
 
 # committed on: 05/12/2015
 
@@ -319,6 +320,7 @@ class data_source:
         connect.commit()
 
     def update_data_source(self,sampleID,data_dict):
+        data_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
         update_string=''
@@ -333,6 +335,7 @@ class data_source:
             connect.commit()
 
     def update_specified_table(self,sampleID,data_dict,table):
+        data_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
         update_string=''
@@ -347,6 +350,7 @@ class data_source:
             connect.commit()
 
     def update_insert_data_source(self,sampleID,data_dict):
+        data_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
         cursor.execute('Select CrystalName FROM mainTable')
@@ -428,6 +432,7 @@ class data_source:
 
 
     def update_insert_not_null_fields_only(self,sampleID,data_dict):
+        data_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
         cursor.execute('Select CrystalName FROM mainTable')
