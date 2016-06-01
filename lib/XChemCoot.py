@@ -584,7 +584,7 @@ class GUI(object):
 
         #######################################################
         # create folder for new refinement cycle
-        os.mkdir(os.path.join(self.project_directory,self.xtalID,'Refine_'+self.Serial))
+        os.mkdir(os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial)))
 
         #######################################################
         # write PDB file
@@ -592,7 +592,7 @@ class GUI(object):
         # note: the user has to make sure that the ligand file was merged into main file
         for item in coot_utils_XChem.molecule_number_list():
             if coot.molecule_name(item).endswith(self.pdb_style):
-                coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'Refine_'+self.Serial,'in.pdb'))
+                coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial),'in.pdb'))
 
         #######################################################
         # run REFMAC
