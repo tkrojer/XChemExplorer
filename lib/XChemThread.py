@@ -646,6 +646,10 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         # - but images can only be found of XCE is started in the respective labchem directory
 
     def run(self):
+        if self.target=='=== SELECT TARGET ===':
+            print '==> XCE: please select a target first'
+            return
+
         if self.rescore_only:
             self.rescore_and_reset_pkl_file()
         else:

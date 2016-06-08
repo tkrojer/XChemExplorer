@@ -1,7 +1,8 @@
 import os,glob
 
 def get_target_and_visit_list(beamline_directory):
-    target_list=['*']      # always give the option to read in all targets
+#    target_list=['*']      # always give the option to read in all targets
+    target_list=['=== SELECT TARGET ===']      # always give the option to read in all targets
     visit_list=[]
     # the beamline directory could be a the real directory or
     # a directory where the visits are linked into
