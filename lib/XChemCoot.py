@@ -679,7 +679,7 @@ class GUI(object):
         print '===> XCE: deleting ligand molecule'
         coot.close_molecule(self.mol_dict['ligand'])
 
-    def show_molprobity_to_do(self):
+    def show_molprobity_to_do(self,widget):
         if os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial-1),'molprobity_coot.py'):
             print '==> XCE: running MolProbity Summary for',self.xtalID
             coot.run_script(os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial-1),'molprobity_coot.py'))
