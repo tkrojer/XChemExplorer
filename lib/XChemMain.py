@@ -10,6 +10,8 @@ def get_target_and_visit_list(beamline_directory):
         beamline_directory.split('/')[1]=='dls' and beamline_directory.split('/')[3]=='data' \
         and not 'labxchem' in beamline_directory:
         visit_list.append(beamline_directory)
+    elif os.path.islink(beamline_directory):
+        visit_list.append(os.path.realpath(beamline_directory))
     else:
         for dir in glob.glob(beamline_directory+'/*'):
             visit_list.append(os.path.realpath(dir))
