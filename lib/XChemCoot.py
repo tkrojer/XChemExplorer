@@ -86,6 +86,7 @@ class GUI(object):
 
         self.xtalID=''
         self.compoundID=''
+        self.spider_plot=''
         self.ligand_confidence_of_sample=''
         self.refinement_folder=''
 #        self.datasetOutcome=''
@@ -455,19 +456,27 @@ class GUI(object):
         self.Serial=self.Refine.GetSerial()
 
         self.QualityIndicators=XChemUtils.ParseFiles(self.project_directory,self.xtalID).UpdateQualityIndicators()
+
+        #########################################################################################
+        # history
         # if the structure was previously refined, try to read the parameters
-#        self.vbox_for_refinement_history.remove(self.canvas)
         self.hbox_for_info_graphics.remove(self.canvas)
         if self.Serial > 1:
             self.RefmacParams=self.Refine.ParamsFromPreviousCycle(self.Serial-1)
             refinement_cycle,Rfree,Rcryst=self.Refine.GetRefinementHistory()
-            self.canvas = FigureCanvas(self.update_plot(refinement_cycle,Rfree,Rcryst))
-        else:
-            self.canvas = FigureCanvas(self.update_plot([0],[0],[0]))  # a gtk.DrawingArea
-        self.canvas.set_size_request(190, 190)
-#        self.vbox_for_refinement_history.add(self.canvas)
-        self.hbox_for_info_graphics.add(self.canvas)
-        self.canvas.show()
+#            self.canvas = FigureCanvas(self.update_plot(refinement_cycle,Rfree,Rcryst))
+#        else:
+#            self.canvas = FigureCanvas(self.update_plot([0],[0],[0]))  # a gtk.DrawingArea
+#        self.canvas.set_size_request(190, 190)
+#        self.hbox_for_info_graphics.add(self.canvas)
+#        self.canvas.show()
+
+        #########################################################################################
+        # Spider plot
+        # Note: refinement history was shown instead previously
+        self.spider_plot=self.db.execute_statement("select PANDDA_site_spider_plot from panddaTable where CrystalName='%s' and PANDDA_site_index='%s';" %(self.xtalID,self.selected_site))
+        print 'HHHHHH',self.spider_plot
+
 
         #########################################################################################
         # update pdb & maps
@@ -623,7 +632,6 @@ class GUI(object):
 
     def set_site(self,widget):
         for site in self.ligand_site_information:
-            print site[0]
             if str(site[0])==str(widget.get_active_text()).split()[0]:
                 self.selected_site=site
                 break
