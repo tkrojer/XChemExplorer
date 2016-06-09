@@ -483,8 +483,8 @@ class GUI(object):
         query=self.db.execute_statement("select PANDDA_site_spider_plot from panddaTable where CrystalName='%s' and PANDDA_site_index='%s';" %(self.xtalID,self.selected_site[0]))
         if os.path.isfile(str(query[0][0])):
             self.spider_plot=str(query[0][0])
-
-            self.spider_plot_pic = pic.scale_simple(190, 190, gtk.gdk.INTERP_BILINEAR)
+            spider_plot_pic = gtk.gdk.pixbuf_new_from_file(self.spider_plot)
+            self.spider_plot_pic = spider_plot_pic.scale_simple(190, 190, gtk.gdk.INTERP_BILINEAR)
             self.spider_plot_image.set_from_pixbuf(self.spider_plot_pic)
 
         #########################################################################################
