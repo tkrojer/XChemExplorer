@@ -96,17 +96,18 @@ class run_pandda_export(QtCore.QThread):
                 site_list.append([site_index,name,comment])
 
 
+        progress_step=1
+        for i,line in enumerate(open(os.path.join(self.panddas_directory,'analyses','pandda_inspect_events.csv'))):
+            n_lines=i
+        if n_lines != 0:
+            progress_step=100/float(n_lines)
+        else:
+            progress_step=0
+        progress=0
+        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
         with open(os.path.join(self.panddas_directory,'analyses','pandda_inspect_events.csv'),'rb') as csv_import:
             csv_dict = csv.DictReader(csv_import)
-            progress_step=1
-            if len(csv_dict) != 0:
-                progress_step=100/float(len(csv_dict))
-            else:
-                progress_step=0
-            progress=0
-
-            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-
 
             for i,line in enumerate(csv_dict):
                 db_dict={}
