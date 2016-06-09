@@ -679,6 +679,9 @@ class GUI(object):
         print '===> XCE: deleting ligand molecule'
         coot.close_molecule(self.mol_dict['ligand'])
 
+    def show_molprobity_to_do(self):
+        print 'hallo'
+
 #    def fit_ligand(self,widget):
 #        print 'fit'
 
