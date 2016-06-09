@@ -770,17 +770,6 @@ class XChemExplorer(QtGui.QApplication):
         self.summary_table.setHorizontalHeaderLabels(self.summary_column_name)
         self.summary_vbox_for_table.addWidget(self.summary_table)
         self.tab_dict[self.workflow_dict['Refinement']][1].addLayout(self.summary_vbox_for_table)
-#        summary_button_hbox=QtGui.QHBoxLayout()
-#        load_all_samples_button=QtGui.QPushButton("Load All Samples")
-#        load_all_samples_button.clicked.connect(self.button_clicked)
-#        summary_button_hbox.addWidget(load_all_samples_button)
-#        refresh_all_samples_button=QtGui.QPushButton("Refresh All Samples")
-#        refresh_all_samples_button.clicked.connect(self.button_clicked)
-#        summary_button_hbox.addWidget(refresh_all_samples_button)
-#        open_cootl_button=QtGui.QPushButton("Open COOT")
-#        open_cootl_button.clicked.connect(self.button_clicked)
-#        summary_button_hbox.addWidget(open_cootl_button)
-#        self.tab_dict[self.workflow['Refine']][1].addLayout(summary_button_hbox)
 
         ######################################################################################
 
@@ -875,6 +864,12 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_nproc_entry = QtGui.QLineEdit()
         self.pandda_nproc_entry.setText(str(self.pandda_nproc).replace(' ',''))
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_nproc_entry)
+
+        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('order event by:'))
+        self.pandda_sort_event_combobox = QtGui.QComboBox()
+        self.pandda_sort_event_combobox.addItem('z_peak')
+        self.pandda_sort_event_combobox.addItem('cluster_size')
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_sort_event_combobox)
 
         # run pandda on specific crystalform only
 #        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('Use Specific Crystal Form Only'))
@@ -2063,7 +2058,8 @@ class XChemExplorer(QtGui.QApplication):
                 'nproc':                str(self.pandda_nproc_entry.text()),
                 'min_build_datasets':   str(self.pandda_min_build_dataset_entry.text()),
                 'pdb_style':            str(self.pandda_pdb_style_entry.text()),
-                'mtz_style':            str(self.pandda_mtz_style_entry.text())
+                'mtz_style':            str(self.pandda_mtz_style_entry.text()),
+                'sort_event':           str(self.pandda_sort_event_combobox.currentText())
                         }
         self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)

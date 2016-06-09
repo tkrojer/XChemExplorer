@@ -201,6 +201,7 @@ class run_pandda_analyse(QtCore.QThread):
         self.min_build_datasets=pandda_params['min_build_datasets']
         self.pdb_style=pandda_params['pdb_style']
         self.mtz_style=pandda_params['mtz_style']
+        self.sort_event=pandda_params['sort_event']
 
     def run(self):
         if os.path.isfile(os.path.join(self.panddas_directory,'pandda.running')):
@@ -227,6 +228,7 @@ class run_pandda_analyse(QtCore.QThread):
                 ' min_build_datasets='+self.min_build_datasets+
                 ' maps.ampl_label=FWT maps.phas_label=PHWT'
                 ' cpus='+self.nproc+
+                ' events.order_by='+self.sort_event+
                 ' pdb_style='+self.pdb_style+
                 ' mtz_style='+self.mtz_style+'\n'
                 )

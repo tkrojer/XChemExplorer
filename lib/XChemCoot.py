@@ -484,8 +484,10 @@ class GUI(object):
         if os.path.isfile(str(query[0][0])):
             self.spider_plot=str(query[0][0])
             spider_plot_pic = gtk.gdk.pixbuf_new_from_file(self.spider_plot)
-            self.spider_plot_pic = spider_plot_pic.scale_simple(190, 190, gtk.gdk.INTERP_BILINEAR)
-            self.spider_plot_image.set_from_pixbuf(self.spider_plot_pic)
+        else:
+            spider_plot_pic = gtk.gdk.pixbuf_new_from_file(os.path.join(os.getenv('XChemExplorer_DIR'),'image','NO_SPIDER_PLOT_AVAILABLE.png'))
+        self.spider_plot_pic = spider_plot_pic.scale_simple(190, 190, gtk.gdk.INTERP_BILINEAR)
+        self.spider_plot_image.set_from_pixbuf(self.spider_plot_pic)
 
         #########################################################################################
         # update pdb & maps
