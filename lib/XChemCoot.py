@@ -535,7 +535,7 @@ class GUI(object):
             # try to open mtz file with same name as pdb file
             coot.set_default_initial_contour_level_for_map(1)
             if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.mtz_style)):
-                os.chdir(os.path.join(self.project_directory,self.xtalID,self.mtz_style))
+                os.chdir(os.path.join(self.project_directory,self.xtalID))
                 if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.xtalID+'-pandda-input.mtz')):
                     os.symlink(self.xtalID+'-pandda-input.mtz',self.mtz_style)
                 elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.mtz')):
