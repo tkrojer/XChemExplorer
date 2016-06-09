@@ -401,10 +401,10 @@ class data_source:
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
         cursor.execute('Select CrystalName,PANDDA_site_index FROM panddaTable')
-        available_columns=[]
-        cursor.execute("SELECT * FROM panddaTable")
-        for column in cursor.description:           # only update existing columns in data source
-            available_columns.append(column[0])
+#        available_columns=[]
+#        cursor.execute("SELECT * FROM panddaTable")
+#        for column in cursor.description:           # only update existing columns in data source
+#            available_columns.append(column[0])
         samples_sites_in_table=[]
         tmp=cursor.fetchall()
         for item in tmp:
@@ -432,8 +432,8 @@ class data_source:
                 value=data_dict[key]
                 if key=='ID':
                     continue
-                if key not in available_columns:
-                    continue
+#                if key not in available_columns:
+#                    continue
                 if not str(value).replace(' ','')=='':  # ignore if nothing in csv field
                     value_string+="'"+str(value)+"'"+','
                     column_string+=key+','
