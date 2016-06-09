@@ -466,7 +466,7 @@ class GUI(object):
         #########################################################################################
         # history
         # if the structure was previously refined, try to read the parameters
-        self.hbox_for_info_graphics.remove(self.canvas)
+#        self.hbox_for_info_graphics.remove(self.canvas)
         if self.Serial > 1:
             self.RefmacParams=self.Refine.ParamsFromPreviousCycle(self.Serial-1)
             refinement_cycle,Rfree,Rcryst=self.Refine.GetRefinementHistory()
@@ -483,6 +483,9 @@ class GUI(object):
         query=self.db.execute_statement("select PANDDA_site_spider_plot from panddaTable where CrystalName='%s' and PANDDA_site_index='%s';" %(self.xtalID,self.selected_site[0]))
         if os.path.isfile(str(query[0][0])):
             self.spider_plot=str(query[0][0])
+
+            self.spider_plot_pic = pic.scale_simple(190, 190, gtk.gdk.INTERP_BILINEAR)
+            self.spider_plot_image.set_from_pixbuf(self.spider_plot_pic)
 
         #########################################################################################
         # update pdb & maps
@@ -591,7 +594,7 @@ class GUI(object):
             pic = gtk.gdk.pixbuf_new_from_file(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.png'))
         except gobject.GError:
             pic = gtk.gdk.pixbuf_new_from_file(os.path.join(os.getenv('XChemExplorer_DIR'),'image','NO_COMPOUND_IMAGE_AVAILABLE.png'))
-        self.pic = pic.scale_simple(200, 200, gtk.gdk.INTERP_BILINEAR)
+        self.pic = pic.scale_simple(190, 190, gtk.gdk.INTERP_BILINEAR)
         self.image.set_from_pixbuf(self.pic)
 
     def go_to_next_xtal(self):
