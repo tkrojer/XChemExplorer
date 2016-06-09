@@ -475,8 +475,8 @@ class GUI(object):
         # Spider plot
         # Note: refinement history was shown instead previously
         print "select PANDDA_site_spider_plot from panddaTable where CrystalName='%s' and PANDDA_site_index='%s';" %(self.xtalID,self.selected_site[0])
-        self.spider_plot=self.db.execute_statement("select PANDDA_site_spider_plot from panddaTable where CrystalName='%s' and PANDDA_site_index='%s';" %(self.xtalID,self.selected_site[0]))
-        print 'HHHHHH',self.spider_plot
+        query=self.db.execute_statement("select PANDDA_site_spider_plot from panddaTable where CrystalName='%s' and PANDDA_site_index='%s';" %(self.xtalID,self.selected_site[0]))
+        print 'HHHHHH',str(query[0])
 
 
         #########################################################################################
