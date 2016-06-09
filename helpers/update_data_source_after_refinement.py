@@ -34,7 +34,6 @@ if __name__=='__main__':
                         residue_chain=residue.split('-')[1]
                         residue_number=residue.split('-')[2]
                         residue_xyz=pdbtools(os.path.join(inital_model_directory,xtal,'refine.pdb')).get_center_of_gravity_of_residue_ish(residue_chain,residue_number)
-
                         event=db.execute_statement("select PANDDA_site_x,PANDDA_site_y,PANDDA_site_z,PANDDA_site_index from panddaTable where CrystalName='%s'" %xtal)
                         for coord in event:
                             db_pandda_dict={}
@@ -45,7 +44,11 @@ if __name__=='__main__':
                             distance=misc().calculate_distance_between_coordinates(residue_xyz[0],residue_xyz[1],residue_xyz[2],event_x,event_y,event_z)
                             # if coordinate of ligand and event are closer than 5A, then we assume they belong together
                             if distance < 5:
-                                db_pandda_dict['PANDDA_site_ligand_id']=residue
+                                db_pandda_dict['PANDDA_site_ligand_id'] =                       residue
+                                db_pandda_dict['PANDDA_site_occupancy'] =                       line['Occupancy']
+                                db_pandda_dict['PANDDA_site_B_average'] =                       line['Average B-factor (Residue)']
+                                db_pandda_dict['PANDDA_site_B_ratio_residue_surroundings'] =    line['Surroundings B-factor Ratio']
+                                db_pandda_dict['PANDDA_site_RSCC'] =                            line['RSCC']
                                 if os.path.isfile(os.path.join(refinement_directory,'residue_plots',residue+'.png')):
                                     db_pandda_dict['PANDDA_site_spider_plot']=os.path.join(refinement_directory,'residue_plots',residue+'.png')
                             if db_pandda_dict != {}:

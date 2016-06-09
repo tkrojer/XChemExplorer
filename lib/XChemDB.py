@@ -180,7 +180,11 @@ class data_source:
             ['PANDDA_site_event_map',                     'PANDDA_site_event_map',                      'TEXT'],
             ['PANDDA_site_initial_model',                 'PANDDA_site_initial_model',                  'TEXT'],
             ['PANDDA_site_initial_mtz',                 'PANDDA_site_initial_mtz',                  'TEXT'],
-            ['PANDDA_site_spider_plot',                   'PANDDA_site_spider_plot',                    'TEXT']
+            ['PANDDA_site_spider_plot',                   'PANDDA_site_spider_plot',                    'TEXT'],
+            ['PANDDA_site_occupancy',                   'PANDDA_site_occupancy',                    'TEXT'],
+            ['PANDDA_site_B_average',                   'PANDDA_site_B_average',                    'TEXT'],
+            ['PANDDA_site_B_ratio_residue_surroundings',                   'PANDDA_site_B_ratio_residue_surroundings',                    'TEXT'],
+            ['PANDDA_site_RSCC',                   'PANDDA_site_RSCC',                    'TEXT']
             ]
         
         

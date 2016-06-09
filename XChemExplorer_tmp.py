@@ -865,7 +865,7 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_nproc_entry.setText(str(self.pandda_nproc).replace(' ',''))
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_nproc_entry)
 
-        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('order event by:'))
+        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('order events by:'))
         self.pandda_sort_event_combobox = QtGui.QComboBox()
         self.pandda_sort_event_combobox.addItem('z_peak')
         self.pandda_sort_event_combobox.addItem('cluster_size')
