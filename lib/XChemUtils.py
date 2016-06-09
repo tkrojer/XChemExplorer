@@ -7,6 +7,7 @@ import math
 import subprocess
 import getpass
 import shutil
+import math
 import platform
 
 from rdkit import Chem
@@ -1257,6 +1258,29 @@ class pdbtools(object):
                 break
         return X,Y,Z
 
+    def get_center_of_gravity_of_residue_ish(self,chain,number):
+        X=0.0
+        Y=0.0
+        Z=0.0
+        x_list=[]
+        y_list=[]
+        z_list=[]
+        # pdb definition see: http://www.wwpdb.org/documentation/file-format-content/format33/sect9.html#ATOM
+        for line in open(self.pdb):
+            if (line.startswith('ATOM') or line.startswith('HETATM')) and line[21:22]==chain and line[22:26].replace(' ','')==str(number):
+                X=float(line[30:38])
+                x_list.append(X)
+                Y=float(line[38:46])
+                y_list.append(Y)
+                Z=float(line[46:54])
+                z_list.append(Z)
+        # 'ish' because it's not really the centre of gravity, but the the middle of the min/max of each x,y,z
+        X=((max(x_list)-min(x_list))/2)+min(x_list)
+        Y=((max(y_list)-min(y_list))/2)+min(y_list)
+        Z=((max(z_list)-min(z_list))/2)+min(z_list)
+        return X,Y,Z
+
+
 
 class reference:
 
@@ -1304,4 +1328,7 @@ class reference:
 class misc:
 
     def calculate_distance_between_coordinates(self,x1,y1,z1,x2,y2,z2):
-        print 'hallo'
+        print '==> XCE: calculating distance between two coordinates'
+        distance=0.0
+        distance=math.sqrt(math.pow(x1-x2,2)+math.pow(y1-y2,2)+math.pow(z1-z2,2))
+        return distance

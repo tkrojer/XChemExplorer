@@ -175,6 +175,9 @@ class Refine(object):
         refmacCmds = (
             '#!'+os.getenv('SHELL')+'\n'
             +pbs_line+
+            '\n'
+            'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
+            '\n'
             'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','xce.setup-sh')+'\n'
             'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
             +module_load+

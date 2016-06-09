@@ -680,7 +680,9 @@ class GUI(object):
         coot.close_molecule(self.mol_dict['ligand'])
 
     def show_molprobity_to_do(self):
-        print 'hallo'
+        if os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial-1),'molprobity_coot.py'):
+            print '==> XCE: running MolProbity Summary for',self.xtalID
+            coot.run_script(os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial-1),'molprobity_coot.py'))
 
 #    def fit_ligand(self,widget):
 #        print 'fit'

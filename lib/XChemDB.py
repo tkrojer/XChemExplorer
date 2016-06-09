@@ -334,6 +334,20 @@ class data_source:
             cursor.execute("UPDATE mainTable SET "+update_string[:-1]+" WHERE CrystalName="+"'"+sampleID+"'")
             connect.commit()
 
+    def update_panddaTable(self,sampleID,site_index,data_dict):
+        connect=sqlite3.connect(self.data_source_file)
+        cursor = connect.cursor()
+        update_string=''
+        for key in data_dict:
+            value=data_dict[key]
+            if key=='ID' or key=='CrystalName' or key=='PANDDA_site_index':
+                continue
+            if not str(value).replace(' ','')=='':  # ignore empty fields
+                update_string+=str(key)+'='+"'"+str(value)+"'"+','
+        if update_string != '':
+            cursor.execute("UPDATE panddaTable SET "+update_string[:-1]+" WHERE CrystalName='%s' and PANDDA_site_index='%s'" %(sampleID,site_index))
+            connect.commit()
+
     def update_specified_table(self,sampleID,data_dict,table):
         data_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
         connect=sqlite3.connect(self.data_source_file)
