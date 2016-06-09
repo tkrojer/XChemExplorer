@@ -276,7 +276,7 @@ class GUI(object):
         self.vbox.add(gtk.Label(' '))
 
         #################################################################################
-        # --- hbox for compound picture & refinement history ---
+        # --- hbox for compound picture & spider_plot (formerly: refinement history) ---
         frame=gtk.Frame()
         self.hbox_for_info_graphics=gtk.HBox()
 
@@ -290,13 +290,19 @@ class GUI(object):
         self.hbox_for_info_graphics.add(compound_frame)
 
         # --- Refinement History ---
-        self.canvas = FigureCanvas(self.update_plot([0],[0],[0]))
-        self.canvas.set_size_request(190, 190)
-#        self.vbox_for_refinement_history=gtk.VBox()
-#        self.vbox_for_refinement_history.add(self.canvas)
-#        self.vbox.add(self.vbox_for_refinement_history)
-        self.hbox_for_info_graphics.add(self.canvas)
-#        self.vbox.pack_start(self.hbox_for_info_graphics)
+#        self.canvas = FigureCanvas(self.update_plot([0],[0],[0]))
+#        self.canvas.set_size_request(190, 190)
+#        self.hbox_for_info_graphics.add(self.canvas)
+
+        # --- Spider Plot ---
+        spider_plot_frame=gtk.Frame()
+        spider_plot_pic = gtk.gdk.pixbuf_new_from_file(os.path.join(os.getenv('XChemExplorer_DIR'),'image','NO_SPIDER_PLOT_AVAILABLE.png'))
+        self.spider_plot_pic = pic.scale_simple(190, 190, gtk.gdk.INTERP_BILINEAR)
+        self.spider_plot_image = gtk.Image()
+        self.spider_plot_image.set_from_pixbuf(self.spider_plot_pic)
+        spider_plot_frame.add(self.spider_plot_image)
+        self.hbox_for_info_graphics.add(spider_plot_frame)
+
         frame.add(self.hbox_for_info_graphics)
         self.vbox.add(frame)
 
@@ -474,10 +480,9 @@ class GUI(object):
         #########################################################################################
         # Spider plot
         # Note: refinement history was shown instead previously
-        print "select PANDDA_site_spider_plot from panddaTable where CrystalName='%s' and PANDDA_site_index='%s';" %(self.xtalID,self.selected_site[0])
         query=self.db.execute_statement("select PANDDA_site_spider_plot from panddaTable where CrystalName='%s' and PANDDA_site_index='%s';" %(self.xtalID,self.selected_site[0]))
-        print 'HHHHHH',str(query[0][0])
-
+        if os.path.isfile(str(query[0][0])):
+            self.spider_plot=str(query[0][0])
 
         #########################################################################################
         # update pdb & maps
