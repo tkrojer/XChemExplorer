@@ -133,7 +133,7 @@ if __name__=='__main__':
     db_dict=parse_pdb(inital_model_directory,xtal,db_dict)
     db_dict=parse_mtz(inital_model_directory,xtal,db_dict)
     db_dict=check_refmac_matrix_weight(refinement_directory,db_dict)
-    db_dict=parse_ligand_validation(inital_model_directory,xtal,db_dict)
+    db_dict=parse_molprobity_output(inital_model_directory,xtal,db_dict)
 
     db_pandda_dict=parse_ligand_validation(refinement_directory,db_pandda_dict)
 
