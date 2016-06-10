@@ -52,10 +52,20 @@ class update_datasource_from_file_system(QtCore.QThread):
             db_dict={}
             os.chdir(directory)
             sample_dict=self.db.get_db_dict_for_sample(xtal)
+
+            if os.path.isfile('dimple.pdb'):
+                if not os.path.isfile('refine.pdb'):
+                    os.symlink('dimple.pdb', 'refine.pdb')
+            if os.path.isfile('dimple.mtz'):
+                if not os.path.isfile('refine.mtz'):
+                    os.symlink('dimple.mtz', 'refine.mtz')
+
             for file in glob.glob('*'):
                 if file==xtal+'.log' and os.path.isfile(file):
                     db_dict['DataProcessingPathToLogfile']=os.path.join(directory,xtal+'.log')
                     db_dict['DataProcessingLOGfileName']=xtal+'.log'
+                    if sample_dict['DataCollectionOutcome']=='None' or sample_dict['DataCollectionOutcome']=='':
+                        db_dict['DataCollectionOutcome']='success'
                     aimless_results=parse().read_aimless_logfile(file)
                     db_dict.update(aimless_results)
                 if file==xtal+'.mtz' and os.path.isfile(file):
@@ -82,6 +92,8 @@ class update_datasource_from_file_system(QtCore.QThread):
                             os.symlink(os.path.join(dimple_path,'prepared2.mtz'),xtal+'.free.mtz')
                             db_dict['RefinementMTZfree']=os.path.join(os.path.join(dimple_path,'prepared2.mtz'))
                 if file=='refine.pdb' and os.path.isfile(file):
+                    if sample_dict['RefinementOutcome']=='None' or sample_dict['RefinementOutcome']=='':
+                        db_dict['RefinementOutcome']='3 - In Refinement'
                     db_dict['RefinementPDB_latest']=os.path.realpath(os.path.join(directory,'refine.pdb'))
                     pdb_info=parse().PDBheader(file)
                     db_dict['RefinementRcryst']=pdb_info['Rcryst']

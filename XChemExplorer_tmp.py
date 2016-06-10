@@ -2051,6 +2051,11 @@ class XChemExplorer(QtGui.QApplication):
         self.work_thread.start()
 
     def run_pandda_analyse(self):
+        counter=self.check_data_for_pandda_analyse()
+        if counter < 10:
+            self.status_bar.showMessage('pandda.analyse: not enough datasets found')
+            print '==> XCE: pandda.analyse: not enough datasets found'
+            return
         pandda_params = {
                 'data_dir':             str(self.pandda_input_data_dir_entry.text()),
                 'out_dir':              str(self.pandda_output_data_dir_entry.text()),
@@ -2064,6 +2069,15 @@ class XChemExplorer(QtGui.QApplication):
         self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
+
+    def check_data_for_pandda_analyse(self):
+        counter=0
+        for file in glob.glob(os.path.join(str(self.pandda_input_data_dir_entry.text()),str(self.pandda_pdb_style_entry.text()))):
+            if os.path.isfile(file):
+                counter+=1
+        self.status_bar.showMessage('pandda.analyse: found %s useable datasets' %counter)
+        print '==> XCE: pandda.analyse: found %s useable datasets' %counter
+        return counter
 
     def run_pandda_inspect(self):
         self.settings['panddas_directory']=str(self.pandda_output_data_dir_entry.text())

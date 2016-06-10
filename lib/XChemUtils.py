@@ -612,7 +612,9 @@ class parse:
 
     def PDBheader(self,pdbfile):
         PDBinfo = { 'Rcryst':           'n/a',
+                    'RcrystTL':         'gray',
                     'Rfree':            'n/a',
+                    'RfreeTL':          'gray',
                     'SpaceGroup':       'n/a',
                     'PointGroup':       'n/a',
                     'UnitCell':         'n/a',
@@ -621,7 +623,9 @@ class parse:
                     'UnitCellVolume':       0,
                     'Alert':            '#E0E0E0',
                     'rmsdBonds':        'n/a',
-                    'rmsdAngles':       'n/a'   }
+                    'rmsdBondsTL':      'gray',
+                    'rmsdAngles':       'n/a',
+                    'rmsdAnglesTL':     'gray'}
 
         a='n/a'
         b='n/a'
@@ -637,27 +641,40 @@ class parse:
                         PDBinfo['Rcryst']=line.split()[9]
                         if float(PDBinfo['Rcryst']) > 0.4:
                             PDBinfo['Alert']='#FF0000'
+                            PDBinfo['RcrystTL'] = 'red'
                         if float(PDBinfo['Rcryst']) <= 0.4 and float(PDBinfo['Rcryst']) >= 0.3:
                             PDBinfo['Alert']='#FF9900'
+                            PDBinfo['RcrystTL'] = 'orange'
                         if float(PDBinfo['Rcryst']) < 0.3:
                             PDBinfo['Alert']='#00FF00'
+                            PDBinfo['RcrystTL'] = 'green'
                     if line.startswith('REMARK   3   FREE R VALUE                     :'):
                         PDBinfo['Rfree']=line.split()[6]
                         if float(PDBinfo['Rfree']) > 0.4:
                             PDBinfo['Alert']='#FF0000'
+                            PDBinfo['RfreeTL'] = 'red'
                         if float(PDBinfo['Rfree']) <= 0.4 and float(PDBinfo['Rfree']) >= 0.3:
                             PDBinfo['Alert']='#FF9900'
+                            PDBinfo['RfreeTL'] = 'orange'
                         if float(PDBinfo['Rfree']) < 0.3:
                             PDBinfo['Alert']='#00FF00'
+                            PDBinfo['RfreeTL'] = 'green'
                 except ValueError:
                     pass
+
                 if line.startswith('REMARK   3   RESOLUTION RANGE HIGH (ANGSTROMS) :'):
                     PDBinfo['ResolutionHigh']=line.split()[7]
+
                 if line.startswith('REMARK   3   BOND LENGTHS REFINED ATOMS        (A):'):
                     PDBinfo['rmsdBonds'] = line.split()[9]
+                    if float(line.split()[9]) < 0.02:                                       PDBinfo['rmsdBondsTL'] = 'green'
+                    if float(line.split()[9]) >= 0.02 and float(line.split()[9]) < 0.03:    PDBinfo['rmsdBondsTL'] = 'orange'
+                    if float(line.split()[9]) >= 0.03:                                      PDBinfo['rmsdBondsTL'] = 'red'
                 if line.startswith('REMARK   3   BOND ANGLES REFINED ATOMS   (DEGREES):'):
                     PDBinfo['rmsdAngles'] = line.split()[9]
-
+                    if float(line.split()[9]) < 2.0:                                        PDBinfo['rmsdAnglesTL'] = 'green'
+                    if float(line.split()[9]) >= 2.0 and float(line.split()[9]) < 3.0:      PDBinfo['rmsdAnglesTL'] = 'orange'
+                    if float(line.split()[9]) >= 3.0:                                       PDBinfo['rmsdAnglesTL'] = 'red'
 
                 if line.startswith('CRYST1'):
                     a=int(float(line.split()[1]))

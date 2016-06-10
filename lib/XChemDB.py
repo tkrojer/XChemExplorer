@@ -140,23 +140,35 @@ class data_source:
 
 
             ['RefinementRcryst',                            'Refinement\nRcryst',                           'TEXT'],
+            ['RefinementRcrystTraficLight',                 'RefinementRcrystTraficLight',                           'TEXT'],
             ['RefinementRfree',                             'Refinement\nRfree',                            'TEXT'],
+            ['RefinementRfreeTraficLight',                  'RefinementRfreeTraficLight',                            'TEXT'],
             ['RefinementSpaceGroup',                        'Refinement\nSpace Group',                      'TEXT'],
             ['RefinementLigandCC',                          'RefinementLigandCC',                           'TEXT'],
             ['RefinementRmsdBonds',                         'RefinementRmsdBonds',                          'TEXT'],
+            ['RefinementRmsdBondsTL',                         'RefinementRmsdBondsTL',                          'TEXT'],
             ['RefinementRmsdAngles',                        'RefinementRmsdAngles',                         'TEXT'],
+            ['RefinementRmsdAnglesTL',                        'RefinementRmsdAnglesTL',                         'TEXT'],
             ['RefinementOutcome',                           'Refinement\nOutcome',                          'TEXT'],
             ['RefinementMTZfree',                           'RefinementMTZfree',                            'TEXT'],
             ['RefinementCIF',                               'RefinementCIF',                                'TEXT'],
             ['RefinementPDB_latest',                        'RefinementPDB_latest',                         'TEXT'],
             ['RefinementMTZ_latest',                        'RefinementMTZ_latest',                         'TEXT'],
+            ['RefinementMatrixWeight',                      'RefinementMatrixWeight',                       'TEXT'],
             ['RefinementComment',                           'RefinementComment',                            'TEXT'],
             ['RefinementPathToRefinementFolder',            'RefinementPathToRefinementFolder',             'TEXT'],
             ['RefinementLigandConfidence',                  'Ligand\nConfidence',                           'TEXT'],
             ['RefinementLigandBoundConformation',           'RefinementLigandBoundConformation',            'TEXT'],
+            ['RefinementMolProbityScore',                   'RefinementMolProbityScore',                    'TEXT'],
+            ['RefinementMolProbityScoreTL',                 'RefinementMolProbityScoreTL',                  'TEXT'],
+            ['RefinementRamachandranOutliers',              'RefinementRamachandranOutliers',               'TEXT'],
+            ['RefinementRamachandranOutliersTL',            'RefinementRamachandranOutliersTL',             'TEXT'],
+            ['RefinementRamachandranFavored',               'RefinementRamachandranFavored',                'TEXT'],
+            ['RefinementRamachandranFavoredTL',             'RefinementRamachandranFavoredTL',              'TEXT'],
 
             ['AssayIC50',                                   'AssayIC50',                                    'TEXT'],
-            ['LastUpdated',                                 'LastUpdated',                                  'TEXT']
+            ['LastUpdated',                                 'LastUpdated',                                  'TEXT'],
+            ['LastUpdated_by',                              'LastUpdated_by',                               'TEXT']
         ]
 
         self.pandda_table_columns = [
@@ -562,7 +574,17 @@ class data_source:
                 )
 
         else:
-            pandda_sqlite = ''
+            sqlite = (
+                "select"
+                " CrystalName,"
+                " CompoundCode,"
+                " RefinementCIF,"
+                " RefinementMTZfree,"
+                " RefinementPathToRefinementFolder,"
+                " RefinementOutcome "
+                "from mainTable "
+                "where RefinementOutcome is %s;" %outcome
+                )
 
         cursor.execute(sqlite)
 

@@ -1,12 +1,10 @@
 import gobject
 import sys
 import os
-import glob
 import pickle
-import subprocess
 
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
+#from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 
 # XCE libraries
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
@@ -243,26 +241,75 @@ class GUI(object):
         self.MatrixWeightBox = gtk.EventBox()
         self.MatrixWeightBox.add(self.MatrixWeightValue)
 
+
+#        self.ligandIDLabel = gtk.Label('Ligand ID')
+#        self.ligandIDValue = gtk.Label(self.QualityIndicators['ligandID'])
+#        self.ligandIDBox = gtk.EventBox()
+#        self.ligandIDBox.add(self.ligandIDValue)
+
+#        self.ligand_occupancyLabel = gtk.Label('occupancy')
+#        self.ligand_occupancyValue = gtk.Label(self.QualityIndicators['ligand_occupancy'])
+#        self.ligand_occupancyBox = gtk.EventBox()
+#        self.ligand_occupancyBox.add(self.ligand_occupancyValue)
+
+#        self.ligand_BaverageLabel = gtk.Label('B average')
+#        self.ligand_BaverageValue = gtk.Label(self.QualityIndicators['ligand_Baverage'])
+#        self.ligand_BaverageBox = gtk.EventBox()
+#        self.ligand_BaverageBox.add(self.ligand_BaverageValue)
+
+#        self.ligand_BratioSurroundingsLabel = gtk.Label('B ratio')
+#        self.ligand_BratioSurroundingsValue = gtk.Label(self.QualityIndicators['ligand_BratioSurroundings'])
+#        self.ligand_BratioSurroundingsBox = gtk.EventBox()
+#        self.ligand_BratioSurroundingsBox.add(self.ligand_BratioSurroundingsValue)
+
+#        self.ligand_RSCCLabel = gtk.Label('RSCC')
+#        self.ligand_RSCCValue = gtk.Label(self.QualityIndicators['ligand_RSCC'])
+#        self.ligand_RSCCBox = gtk.EventBox()
+#        self.ligand_RSCCBox.add(self.ligand_RSCCValue)
+
         frame = gtk.Frame()
         self.table = gtk.Table(4, 2, False)
+
+#        self.table.attach(self.RRfreeLabel,                 0, 1, 0, 1)
+#        self.table.attach(self.RRfreeBox,                   1, 2, 0, 1)
+#        self.table.attach(self.ResolutionLabel,             0, 1, 1, 2)
+#        self.table.attach(self.ResolutionBox,               1, 2, 1, 2)
+#        self.table.attach(self.MolprobityScoreLabel,        0, 1, 2, 3)
+#        self.table.attach(self.MolprobityScoreBox,          1, 2, 2, 3)
+#        self.table.attach(self.RamachandranOutliersLabel,   0, 1, 3, 4)
+#        self.table.attach(self.RamachandranOutliersBox,     1, 2, 3, 4)
+#        self.table.attach(self.RamachandranFavoredLabel,    0, 1, 4, 5)
+#        self.table.attach(self.RamachandranFavoredBox,      1, 2, 4, 5)
+#        self.table.attach(self.LigandCCLabel,               0, 1, 5, 6)
+#        self.table.attach(self.LigandCCBox,                 1, 2, 5, 6)
+#        self.table.attach(self.rmsdBondsLabel,              0, 1, 7, 8)
+#        self.table.attach(self.rmsdBondsBox,                1, 2, 7, 8)
+#        self.table.attach(self.rmsdAnglesLabel,             0, 1, 9,10)
+#        self.table.attach(self.rmsdAnglesBox,               1, 2, 9,10)
+#        self.table.attach(self.MatrixWeightLabel,           0, 1,11,12)
+#        self.table.attach(self.MatrixWeightBox,             1, 2,11,12)
+
         self.table.attach(self.RRfreeLabel,                 0, 1, 0, 1)
-        self.table.attach(self.RRfreeBox,                   1, 2, 0, 1)
         self.table.attach(self.ResolutionLabel,             0, 1, 1, 2)
-        self.table.attach(self.ResolutionBox,               1, 2, 1, 2)
         self.table.attach(self.MolprobityScoreLabel,        0, 1, 2, 3)
-        self.table.attach(self.MolprobityScoreBox,          1, 2, 2, 3)
         self.table.attach(self.RamachandranOutliersLabel,   0, 1, 3, 4)
-        self.table.attach(self.RamachandranOutliersBox,     1, 2, 3, 4)
         self.table.attach(self.RamachandranFavoredLabel,    0, 1, 4, 5)
-        self.table.attach(self.RamachandranFavoredBox,      1, 2, 4, 5)
         self.table.attach(self.LigandCCLabel,               0, 1, 5, 6)
-        self.table.attach(self.LigandCCBox,                 1, 2, 5, 6)
         self.table.attach(self.rmsdBondsLabel,              0, 1, 7, 8)
-        self.table.attach(self.rmsdBondsBox,                1, 2, 7, 8)
         self.table.attach(self.rmsdAnglesLabel,             0, 1, 9,10)
-        self.table.attach(self.rmsdAnglesBox,               1, 2, 9,10)
         self.table.attach(self.MatrixWeightLabel,           0, 1,11,12)
+
+        self.table.attach(self.RRfreeBox,                   1, 2, 0, 1)
+        self.table.attach(self.ResolutionBox,               1, 2, 1, 2)
+        self.table.attach(self.MolprobityScoreBox,          1, 2, 2, 3)
+        self.table.attach(self.RamachandranOutliersBox,     1, 2, 3, 4)
+        self.table.attach(self.RamachandranFavoredBox,      1, 2, 4, 5)
+        self.table.attach(self.LigandCCBox,                 1, 2, 5, 6)
+        self.table.attach(self.rmsdBondsBox,                1, 2, 7, 8)
+        self.table.attach(self.rmsdAnglesBox,               1, 2, 9,10)
         self.table.attach(self.MatrixWeightBox,             1, 2,11,12)
+
+
         frame.add(self.table)
         self.vbox.add(frame)
 
@@ -430,13 +477,16 @@ class GUI(object):
         self.xtalID=str(self.Todo[self.index][0])
         self.db_dict_mainTable={}
         self.db_dict_panddaTable={}
+        looking_at_pandda_models=False
         if str(self.Todo[self.index][0]) != None:
             self.compoundID=str(self.Todo[self.index][1])
-            self.ligand_confidence_of_sample=str(self.Todo[self.index][7])
             self.refinement_folder=str(self.Todo[self.index][4])
-            self.event_map=str(self.Todo[self.index][6])
-            coot.set_rotation_centre(float(self.Todo[self.index][8]),float(self.Todo[self.index][9]),float(self.Todo[self.index][10]))
-        else:
+            if len(self.Todo[self.index]) > 6:
+                self.ligand_confidence_of_sample=str(self.Todo[self.index][7])
+                self.event_map=str(self.Todo[self.index][6])
+                coot.set_rotation_centre(float(self.Todo[self.index][8]),float(self.Todo[self.index][9]),float(self.Todo[self.index][10]))
+                looking_at_pandda_models=True
+        if not looking_at_pandda_models:
             self.compoundID=''
             self.ligand_confidence_of_sample=''
             self.refinement_folder=''
@@ -481,13 +531,14 @@ class GUI(object):
         # Spider plot
         # Note: refinement history was shown instead previously
         query=self.db.execute_statement("select PANDDA_site_spider_plot from panddaTable where CrystalName='%s' and PANDDA_site_index='%s';" %(self.xtalID,self.selected_site[0]))
-        if os.path.isfile(str(query[0][0])):
-            self.spider_plot=str(query[0][0])
-            spider_plot_pic = gtk.gdk.pixbuf_new_from_file(self.spider_plot)
-        else:
-            spider_plot_pic = gtk.gdk.pixbuf_new_from_file(os.path.join(os.getenv('XChemExplorer_DIR'),'image','NO_SPIDER_PLOT_AVAILABLE.png'))
-        self.spider_plot_pic = spider_plot_pic.scale_simple(190, 190, gtk.gdk.INTERP_BILINEAR)
-        self.spider_plot_image.set_from_pixbuf(self.spider_plot_pic)
+        if query != []:
+            if os.path.isfile(str(query[0][0])):
+                self.spider_plot=str(query[0][0])
+                spider_plot_pic = gtk.gdk.pixbuf_new_from_file(self.spider_plot)
+            else:
+                spider_plot_pic = gtk.gdk.pixbuf_new_from_file(os.path.join(os.getenv('XChemExplorer_DIR'),'image','NO_SPIDER_PLOT_AVAILABLE.png'))
+            self.spider_plot_pic = spider_plot_pic.scale_simple(190, 190, gtk.gdk.INTERP_BILINEAR)
+            self.spider_plot_image.set_from_pixbuf(self.spider_plot_pic)
 
         #########################################################################################
         # update pdb & maps
@@ -666,7 +717,9 @@ class GUI(object):
             for n,item in enumerate(self.Todo):
                 self.cb.remove_text(0)
         self.Todo=[]
+        print self.Todo
         self.Todo=self.db.get_samples_for_coot(self.selection_mode,self.selected_site[0])
+        print self.Todo
         self.status_label.set_text('found %s samples' %len(self.Todo))
         for item in self.Todo:
             print item
@@ -699,9 +752,11 @@ class GUI(object):
         coot.close_molecule(self.mol_dict['ligand'])
 
     def show_molprobity_to_do(self,widget):
-        if os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial-1),'molprobity_coot.py'):
+        if os.path.isfile(os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial-1),'molprobity_coot.py')):
             print '==> XCE: running MolProbity Summary for',self.xtalID
             coot.run_script(os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial-1),'molprobity_coot.py'))
+        else:
+            print '==> XCE: cannot find '+os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial-1),'molprobity_coot.py')
 
 #    def fit_ligand(self,widget):
 #        print 'fit'
