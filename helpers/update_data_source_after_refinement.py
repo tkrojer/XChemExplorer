@@ -30,7 +30,7 @@ def parse_mtz(inital_model_directory,xtal,db_dict):
 
 def check_refmac_matrix_weight(refinement_directory,db_dict):
     if os.path.isfile(os.path.join(refinement_directory,'refmac.log')):
-        for line in open(os.path.join(self.DataPath, self.xtalID, 'Refine_' + str(Serial), 'refmac.log')):
+        for line in open(os.path.join(refinement_directory,'refmac.log')):
             if line.startswith(' Weight matrix') and len(line.split()) == 3:
                 db_dict['RefinementMatrixWeight'] = line.split()[2]
     return db_dict
