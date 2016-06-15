@@ -380,36 +380,56 @@ class GUI(object):
 
         #################################################################################
         # --- current refinement stage ---
-        frame = gtk.Frame(label='Ligand Confidence')
+        outer_frame=gtk.Frame()
         hbox=gtk.HBox()
-        self.cb_ligand_confidence = gtk.combo_box_new_text()
-        self.cb_ligand_confidence.connect("changed", self.set_ligand_confidence)
-        for citeria in self.ligand_confidence:
-            self.cb_ligand_confidence.append_text(citeria)
-        hbox.add(self.cb_ligand_confidence)
-        frame.add(hbox)
-        self.vbox.pack_start(frame)
-
 
         frame = gtk.Frame(label='Analysis Status')
         vbox=gtk.VBox()
         self.experiment_stage_button_list=[]
         for n,button in enumerate(self.experiment_stage):
-                #new_button=gtk.Button(label=button[0])
-                #new_button.connect("clicked",self.experiment_stage_button_clicked)
             if n == 0:
                 new_button = gtk.RadioButton(None, button[0])
             else:
                 new_button = gtk.RadioButton(new_button, button[0])
             new_button.connect("toggled",self.experiment_stage_button_clicked,button[1])
-                #new_button.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(10000,10000,10000))
-                #new_button.modify_bg(gtk.STATE_ACTIVE, gtk.gdk.Color(button[2],button[3],button[4]))
-
             vbox.add(new_button)
             self.experiment_stage_button_list.append(new_button)
-
         frame.add(vbox)
-        self.vbox.pack_start(frame)
+        hbox.pack_start(frame)
+
+
+        #
+        #
+        #
+        #
+        #
+        #
+        ### note this needs more work:
+        # if site > 0: refinementoutcome and ligand confidence is in pandda table
+        # otherwise it is in maintable!!!
+        #
+        #
+        #
+        #
+        #
+        #
+        #
+        frame = gtk.Frame(label='Ligand Confidence')
+        vbox=gtk.VBox()
+        self.ligand_confidence_button_list=[]
+        for n,criteria in enumerate(self.ligand_confidence):
+            if n == 0:
+                new_button = gtk.RadioButton(None, criteria)
+            else:
+                new_button = gtk.RadioButton(new_button, criteria)
+            new_button.connect("toggled",self.experiment_stage_button_clicked,citeria)
+            vbox.add(new_button)
+            self.ligand_confidence_button_list.append(new_button)
+        frame.add(vbox)
+        hbox.pack_start(frame)
+
+        outer_frame.add(hbox)
+        self.vbox.pack_start(outer_frame)
 
         # SPACER
         self.vbox.add(gtk.Label(' '))
@@ -481,6 +501,16 @@ class GUI(object):
         if str(self.Todo[self.index][0]) != None:
             self.compoundID=str(self.Todo[self.index][1])
             self.refinement_folder=str(self.Todo[self.index][4])
+            self.refinement_outcome=str(self.Todo[self.index][5])
+            current_stage=0
+            for i,entry in enumerate(self.experiment_stage):
+                if entry[1]==self.refinement_outcome:
+                    current_stage=i
+                    break
+            for i,button in enumerate(self.experiment_stage_button_list):
+                if i==current_stage:
+                    button.set_active(True)
+                    break
             if len(self.Todo[self.index]) > 6:
                 self.ligand_confidence_of_sample=str(self.Todo[self.index][7])
                 self.event_map=str(self.Todo[self.index][6])
@@ -504,7 +534,8 @@ class GUI(object):
 
     def experiment_stage_button_clicked(self,widget, data=None):
         self.db_dict_mainTable['RefinementOutcome']=data
-        print self.db_dict_mainTable
+        print '==> XCE: setting Refinement Outcome to '+str(data)+' in datasource'
+        self.db.update_data_source(self.xtalID,self.db_dict_mainTable)
 
     def RefreshData(self):
         # initialize Refinement library
@@ -717,12 +748,9 @@ class GUI(object):
             for n,item in enumerate(self.Todo):
                 self.cb.remove_text(0)
         self.Todo=[]
-        print self.Todo
         self.Todo=self.db.get_samples_for_coot(self.selection_mode,self.selected_site[0])
-        print self.Todo
         self.status_label.set_text('found %s samples' %len(self.Todo))
         for item in self.Todo:
-            print item
             self.cb.append_text('%s' %item[0])
 
 
