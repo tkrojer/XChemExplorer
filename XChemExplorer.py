@@ -231,14 +231,22 @@ class XChemExplorer(QtGui.QApplication):
         update_datasource.triggered.connect(self.datasource_menu_update_datasource)
         select_columns_to_show=QtGui.QAction('Select columns to show',self.window)
         select_columns_to_show.triggered.connect(self.select_datasource_columns_to_display)
+        create_new_data_source=QtGui.QAction('Create New Data Source (SQLite)',self.window)
+        create_new_data_source.triggered.connect(self.create_new_data_source)
+
         datasource_menu.addAction(reload_samples_from_datasource)
         datasource_menu.addAction(save_samples_to_datasource)
         datasource_menu.addAction(import_csv_file_into_datasource)
         datasource_menu.addAction(export_csv_file_into_datasource)
         datasource_menu.addAction(update_datasource)
         datasource_menu.addAction(select_columns_to_show)
+        datasource_menu.addAction(create_new_data_source)
 
         preferences_menu = menu_bar.addMenu("&Preferences")
+        show_preferences=QtGui.QAction('Edit Preferences',self.window)
+        show_preferences.triggered.connect(self.show_preferences)
+        preferences_menu.addAction(show_preferences)
+
         help = menu_bar.addMenu("&Help")
 
 
@@ -471,50 +479,6 @@ class XChemExplorer(QtGui.QApplication):
         self.mounted_crystal_table.resizeColumnsToContents()
         self.overview_tab_dict['Data Source'][1].addWidget(self.mounted_crystal_table)
 
-#        self.mounted_crystals_vbox_for_table.addWidget(self.mounted_crystal_table)
-#        mounted_crystals_button_hbox=QtGui.QHBoxLayout()
-#        get_mounted_crystals_button=QtGui.QPushButton("Load Samples\nFrom Datasource")
-#        get_mounted_crystals_button.setToolTip(XChemToolTips.load_samples_from_datasource())
-#        get_mounted_crystals_button.clicked.connect(self.button_clicked)
-#        mounted_crystals_button_hbox.addWidget(get_mounted_crystals_button)
-#        save_mounted_crystals_button=QtGui.QPushButton("Save Samples\nTo Datasource")
-#        save_mounted_crystals_button.setToolTip(XChemToolTips.save_samples_to_datasource())
-#        save_mounted_crystals_button.clicked.connect(self.button_clicked)
-#        mounted_crystals_button_hbox.addWidget(save_mounted_crystals_button)
-#        frame=QtGui.QFrame()
-#        frame.setFrameShape(QtGui.QFrame.StyledPanel)
-#        hbox=QtGui.QHBoxLayout()
-#        create_png_of_soaked_compound_button=QtGui.QPushButton("Create PDB/CIF/PNG\nfiles of Compound")
-#        create_png_of_soaked_compound_button.clicked.connect(self.button_clicked)
-#        hbox.addWidget(create_png_of_soaked_compound_button)
-#        check_status_create_png_of_soaked_compound_button=QtGui.QPushButton("Check\nStatus")
-#        check_status_create_png_of_soaked_compound_button.clicked.connect(self.button_clicked)
-#        hbox.addWidget(check_status_create_png_of_soaked_compound_button)
-#        frame.setLayout(hbox)
-#        mounted_crystals_button_hbox.addWidget(frame)
-##        create_new_data_source_button=QtGui.QPushButton("Create New Data\nSource (SQLite)")
-##        create_new_data_source_button.clicked.connect(self.button_clicked)
-##        mounted_crystals_button_hbox.addWidget(create_new_data_source_button)
-#        import_csv_into_data_source_button=QtGui.QPushButton("Import CSV file\ninto Data Source")
-#        import_csv_into_data_source_button.clicked.connect(self.button_clicked)
-#        mounted_crystals_button_hbox.addWidget(import_csv_into_data_source_button)
-#        export_csv_from_data_source_button=QtGui.QPushButton("Export CSV file\nfrom Data Source")
-#        export_csv_from_data_source_button.clicked.connect(self.button_clicked)
-#        mounted_crystals_button_hbox.addWidget(export_csv_from_data_source_button)
-#        mounted_crystals_button_hbox.addWidget(frame_dataset_task)
-#        mounted_crystals_button_hbox.addWidget(frame_cif_file_task)
-##        select_data_source_columns_to_display_button=QtGui.QPushButton("Select Columns")
-##        select_data_source_columns_to_display_button.clicked.connect(self.button_clicked)
-##        mounted_crystals_button_hbox.addWidget(select_data_source_columns_to_display_button)
-##        datasource_menu = menu_bar.addMenu("&Data Source")
-#        select_datasource_columns_to_display_menu_item=QtGui.QAction("Select Columns", self.window)
-#        select_datasource_columns_to_display_menu_item.triggered.connect(self.select_datasource_columns_to_display)
-#        datasource_menu.addAction(select_datasource_columns_to_display_menu_item)
-#        update_data_source_button=QtGui.QPushButton("Update\nDatasource")
-#        update_data_source_button.clicked.connect(self.button_clicked)
-#        mounted_crystals_button_hbox.addWidget(update_data_source_button)
-#        self.tab_dict['Data Source'][1].addLayout(mounted_crystals_button_hbox)
-
         ######################################################################################
 
 
@@ -726,30 +690,6 @@ class XChemExplorer(QtGui.QApplication):
         self.tab_dict[self.workflow_dict['Maps']][1].addLayout(self.initial_model_vbox_for_table)
 
 
-#        initial_model_button_hbox=QtGui.QHBoxLayout()
-#        get_initial_model_button=QtGui.QPushButton("Check for inital Refinement")
-#        get_initial_model_button.clicked.connect(self.button_clicked)
-#        initial_model_button_hbox.addWidget(get_initial_model_button)
-#        run_dimple_button=QtGui.QPushButton("Run Dimple")
-#        run_dimple_button.clicked.connect(self.button_clicked)
-#        initial_model_button_hbox.addWidget(run_dimple_button)
-#        refresh_inital_model_button=QtGui.QPushButton("Refresh")
-#        refresh_inital_model_button.clicked.connect(self.button_clicked)
-#        initial_model_button_hbox.addWidget(refresh_inital_model_button)
-
-#        self.reference_file_list=self.get_reference_file_list(' ')
-#        self.reference_file_selection_combobox = QtGui.QComboBox()
-#        self.populate_reference_combobox(self.reference_file_selection_combobox)
-#        initial_model_button_hbox.addWidget(self.reference_file_selection_combobox)
-
-#        set_new_reference_button=QtGui.QPushButton("Set New Reference (if applicable)")
-#        set_new_reference_button.clicked.connect(self.button_clicked)
-#        initial_model_button_hbox.addWidget(set_new_reference_button)
-##        run_panddas_button=QtGui.QPushButton("Run PANDDAs")
-##        run_panddas_button.clicked.connect(self.button_clicked)
-##        initial_model_button_hbox.addWidget(run_panddas_button)
-#        self.tab_dict['Initial Refinement'][1].addLayout(initial_model_button_hbox)
-
         #
         # @ Refine Tab #######################################################################
         #
@@ -811,6 +751,10 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_hbox.addWidget(self.pandda_analyse_data_table)
 
         # right hand side: input parameters for PANDDAs run
+
+        frame=QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+
         self.pandda_analyse_input_params_vbox=QtGui.QVBoxLayout()
 
         pandda_input_dir_hbox=QtGui.QHBoxLayout()
@@ -889,6 +833,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.pandda_analyse_input_params_vbox.addStretch(1)
 
+        frame.setLayout(self.pandda_analyse_input_params_vbox)
 
 #        # green 'Run Pandda' button (which is red when pandda run in progress
 #        self.run_panddas_button=QtGui.QPushButton("Run PANDDAs")
@@ -898,7 +843,8 @@ class XChemExplorer(QtGui.QApplication):
 #        self.color_run_panddas_button()
 #        self.pandda_analyse_input_params_vbox.addWidget(self.run_panddas_button)
 
-        self.pandda_analyse_hbox.addLayout(self.pandda_analyse_input_params_vbox)
+#        self.pandda_analyse_hbox.addLayout(self.pandda_analyse_input_params_vbox)
+        self.pandda_analyse_hbox.addWidget(frame)
 
         #######################################################
         # next three blocks display html documents created by pandda.analyse
@@ -966,38 +912,6 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_initial_model_directory.addWidget(settings_buttoon_initial_model_directory)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_initial_model_directory)
 
-        settings_hbox_filename_root=QtGui.QHBoxLayout()
-        self.filename_root_label=QtGui.QLabel('filename root:')
-        settings_hbox_filename_root.addWidget(self.filename_root_label)
-        settings_hbox_filename_root.addStretch(1)
-        self.filename_root_input = QtGui.QLineEdit()
-        self.filename_root_input.setFixedWidth(400)
-        self.filename_root_input.setText(str(self.filename_root))
-        self.filename_root_input.textChanged[str].connect(self.change_filename_root)
-        settings_hbox_filename_root.addWidget(self.filename_root_input)
-        self.data_collection_vbox_for_settings.addLayout(settings_hbox_filename_root)
-
-        settings_hbox_adjust_allowed_unit_cell_difference=QtGui.QHBoxLayout()
-        self.adjust_allowed_unit_cell_difference_label=QtGui.QLabel('Max. Allowed Unit Cell Difference between Reference and Target (%):')
-        settings_hbox_adjust_allowed_unit_cell_difference.addWidget(self.adjust_allowed_unit_cell_difference_label)
-        settings_hbox_adjust_allowed_unit_cell_difference.addStretch(1)
-        self.adjust_allowed_unit_cell_difference = QtGui.QLineEdit()
-        self.adjust_allowed_unit_cell_difference.setFixedWidth(200)
-        self.adjust_allowed_unit_cell_difference.setText(str(self.allowed_unitcell_difference_percent))
-        self.adjust_allowed_unit_cell_difference.textChanged[str].connect(self.change_allowed_unitcell_difference_percent)
-        settings_hbox_adjust_allowed_unit_cell_difference.addWidget(self.adjust_allowed_unit_cell_difference)
-        self.data_collection_vbox_for_settings.addLayout(settings_hbox_adjust_allowed_unit_cell_difference)
-
-        settings_hbox_acceptable_low_resolution_limit=QtGui.QHBoxLayout()
-        self.adjust_acceptable_low_resolution_limit_label=QtGui.QLabel('Acceptable low resolution limit for datasets (in Angstrom):')
-        settings_hbox_acceptable_low_resolution_limit.addWidget(self.adjust_acceptable_low_resolution_limit_label)
-        settings_hbox_acceptable_low_resolution_limit.addStretch(1)
-        self.adjust_acceptable_low_resolution_limit = QtGui.QLineEdit()
-        self.adjust_acceptable_low_resolution_limit.setFixedWidth(200)
-        self.adjust_acceptable_low_resolution_limit.setText(str(self.acceptable_low_resolution_limit_for_data))
-        self.adjust_acceptable_low_resolution_limit.textChanged[str].connect(self.change_acceptable_low_resolution_limit)
-        settings_hbox_acceptable_low_resolution_limit.addWidget(self.adjust_acceptable_low_resolution_limit)
-        self.data_collection_vbox_for_settings.addLayout(settings_hbox_acceptable_low_resolution_limit)
 
         self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nReference Structure Directory:'))
         settings_hbox_reference_directory=QtGui.QHBoxLayout()
@@ -1025,9 +939,9 @@ class XChemExplorer(QtGui.QApplication):
         settings_buttoon_data_source_file=QtGui.QPushButton('Select Data Source File')
         settings_buttoon_data_source_file.clicked.connect(self.settings_button_clicked)
         settings_hbox_data_source_file.addWidget(settings_buttoon_data_source_file)
-        create_new_data_source_button=QtGui.QPushButton("Create New Data\nSource (SQLite)")
-        create_new_data_source_button.clicked.connect(self.button_clicked)
-        settings_hbox_data_source_file.addWidget(create_new_data_source_button)
+#        create_new_data_source_button=QtGui.QPushButton("Create New Data\nSource (SQLite)")
+#        create_new_data_source_button.clicked.connect(self.button_clicked)
+#        settings_hbox_data_source_file.addWidget(create_new_data_source_button)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_data_source_file)
 
         #################
@@ -1193,6 +1107,93 @@ class XChemExplorer(QtGui.QApplication):
         if reply == 0:
             print 'here'
 
+    def show_preferences(self):
+        preferences = QtGui.QMessageBox()
+        preferencesLayout = preferences.layout()
+
+        vbox = QtGui.QVBoxLayout()
+        settings_hbox_filename_root=QtGui.QHBoxLayout()
+        filename_root_label=QtGui.QLabel('filename root:')
+        settings_hbox_filename_root.addWidget(filename_root_label)
+        filename_root_input = QtGui.QLineEdit()
+        filename_root_input.setFixedWidth(400)
+        filename_root_input.setText(str(self.filename_root))
+        filename_root_input.textChanged[str].connect(self.change_filename_root)
+        settings_hbox_filename_root.addWidget(filename_root_input)
+        vbox.addLayout(settings_hbox_filename_root)
+
+        settings_hbox_adjust_allowed_unit_cell_difference=QtGui.QHBoxLayout()
+        adjust_allowed_unit_cell_difference_label=QtGui.QLabel('Max. Allowed Unit Cell Difference between Reference and Target (%):')
+        settings_hbox_adjust_allowed_unit_cell_difference.addWidget(adjust_allowed_unit_cell_difference_label)
+        adjust_allowed_unit_cell_difference = QtGui.QLineEdit()
+        adjust_allowed_unit_cell_difference.setFixedWidth(200)
+        adjust_allowed_unit_cell_difference.setText(str(self.allowed_unitcell_difference_percent))
+        adjust_allowed_unit_cell_difference.textChanged[str].connect(self.change_allowed_unitcell_difference_percent)
+        settings_hbox_adjust_allowed_unit_cell_difference.addWidget(adjust_allowed_unit_cell_difference)
+        vbox.addLayout(settings_hbox_adjust_allowed_unit_cell_difference)
+
+        settings_hbox_acceptable_low_resolution_limit=QtGui.QHBoxLayout()
+        adjust_acceptable_low_resolution_limit_label=QtGui.QLabel('Acceptable low resolution limit for datasets (in Angstrom):')
+        settings_hbox_acceptable_low_resolution_limit.addWidget(adjust_acceptable_low_resolution_limit_label)
+        adjust_acceptable_low_resolution_limit = QtGui.QLineEdit()
+        adjust_acceptable_low_resolution_limit.setFixedWidth(200)
+        adjust_acceptable_low_resolution_limit.setText(str(self.acceptable_low_resolution_limit_for_data))
+        adjust_acceptable_low_resolution_limit.textChanged[str].connect(self.change_acceptable_low_resolution_limit)
+        settings_hbox_acceptable_low_resolution_limit.addWidget(adjust_acceptable_low_resolution_limit)
+        vbox.addLayout(settings_hbox_acceptable_low_resolution_limit)
+
+        preferencesLayout.addLayout(vbox,0,0)
+
+        preferences.exec_();
+
+
+    def select_datasource_columns_to_display(self):
+#        self.data_source_columns_to_display, ok = XChemDialogs.select_columns_to_show(
+#            os.path.join(self.database_directory,self.data_source_file)).return_selected_columns()
+#        self.populate_and_update_data_source_table()
+        columns_to_show = QtGui.QMessageBox()
+        columns_to_showLayout = columns_to_show.layout()
+        columns_in_data_source=self.db.return_column_list()
+        try:
+            columns_in_data_source=self.db.return_column_list()
+        except AttributeError:
+            print '==> XCE: please select a datasource file'
+            self.status_bar.showMessage('please select a datasource file')
+            return
+
+        column_dict={}
+        vbox = QtGui.QVBoxLayout()
+        number_of_entries=len(columns_in_data_source)
+        columns_shown_in_dialog_column=15
+        grid = QtGui.QGridLayout()
+        x=0
+        y=0
+#        columns_to_ignore=['Sample ID','ID']
+        columns_to_ignore=self.db.columns_not_to_display()
+        for entries_added in range(number_of_entries):
+            if not columns_in_data_source[entries_added][1] in columns_to_ignore:
+                data_source_column = QtGui.QCheckBox(columns_in_data_source[entries_added][1])
+                column_dict[entries_added]=data_source_column
+                if columns_in_data_source[entries_added][1] in self.data_source_columns_to_display:
+                    data_source_column.setChecked(True)
+                grid.addWidget(data_source_column, y,x)
+                y+=1
+            if y==columns_shown_in_dialog_column:
+                y=0
+                x+=1
+        vbox.addLayout(grid)
+        columns_to_showLayout.addLayout(vbox,0,0)
+
+        columns_to_show.addButton(QtGui.QPushButton('OK'), QtGui.QMessageBox.YesRole)
+        columns_to_show.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
+        reply=columns_to_show.exec_();
+        if reply == 0:
+            columns_to_show_list=['Sample ID']
+            for key in column_dict:
+                if column_dict[key].isChecked():
+                    columns_to_show_list.append(columns_in_data_source[key][1])
+            self.data_source_columns_to_display=columns_to_show_list
+            self.populate_and_update_data_source_table()
 
     def update_header_and_data_from_datasource(self):
         print '==> XCE: getting information for all samples from data source...'
@@ -1203,12 +1204,6 @@ class XChemExplorer(QtGui.QApplication):
         self.header,self.data=self.db.load_samples_from_data_source()
         print '==> XCE: get all samples in data source'
         all_samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not '';")
-
-#        print '==> XCE: ok, this is now really slow...'
-#        self.xtal_db_dict={}
-#        for sample in all_samples_in_db:
-#            db_dict=self.db.get_db_dict_for_sample(str(sample[0]))
-#            self.xtal_db_dict[str(sample[0])]=db_dict
 
         self.xtal_db_dict={}
         sampleID_column=0
@@ -1612,6 +1607,9 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 self.data_source_set=True
                 self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
+                self.db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
+                self.db.create_missing_columns()
+                self.datasource_menu_reload_samples()
 #                self.update_header_and_data_from_datasource()
 #                self.populate_and_update_data_source_table()
 #                self.create_initial_model_table()
@@ -1692,6 +1690,26 @@ class XChemExplorer(QtGui.QApplication):
     def change_filename_root(self,text):
         self.filename_root=str(text)
         self.settings['filename_root']=self.filename_root
+
+
+    def create_new_data_source(self):
+        file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
+        #make sure that the file always has .sqlite extension
+        if file_name.rfind('.') != -1:
+            file_name=file_name[:file_name.rfind('.')]+'.sqlite'
+        else:
+            file_name=file_name+'.sqlite'
+        self.db=XChemDB.data_source(file_name)
+        print '==> XCE: creating new data source'
+        self.db.create_empty_data_source_file()
+        self.db.create_missing_columns()
+        self.database_directory=file_name[:file_name.rfind('/')]
+        self.data_source_file=file_name[file_name.rfind('/')+1:]
+        self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
+        self.settings['database_directory']=self.database_directory
+        self.settings['data_source']=self.data_source_file
+        self.data_source_set=True
+        self.datasource_menu_reload_samples()
 
 
 
@@ -1786,25 +1804,12 @@ class XChemExplorer(QtGui.QApplication):
         elif instruction=='Show HTML summary':
             self.show_pandda_html_summary()
 
-#        elif instruction=="Check for inital Refinement" or \
-#             instruction=="Update\nDatasource":
-#            if self.sender().text()=="Update\nDatasource":
-#                update_datasource_only=True
-#            else:
-#                update_datasource_only=False
-#            self.explorer_active=1
-#            self.work_thread=XChemThread.read_intial_refinement_results(self.initial_model_directory,
-#                                                                        self.reference_file_list,
-#                                                                        os.path.join(self.database_directory,
-#                                                                                     self.data_source_file),
-#                                                                        self.allowed_unitcell_difference_percent,
-#                                                                        self.filename_root,
-#                                                                        update_datasource_only)
-#            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-#            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-#            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-#            self.connect(self.work_thread, QtCore.SIGNAL("create_initial_model_table"),self.create_initial_model_table)
-#            self.work_thread.start()
+        elif instruction=="Open COOT":
+            if not self.coot_running:
+                print 'starting coot'
+                self.work_thread=XChemThread.start_COOT(self.settings)
+                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+                self.work_thread.start()
 
 
 #        elif self.sender().text()=="Load Crystal Forms From Datasource":
@@ -1854,111 +1859,105 @@ class XChemExplorer(QtGui.QApplication):
 #            self.connect(self.work_thread, QtCore.SIGNAL("update_xtalfrom_table"),self.update_xtalfrom_table)
 #            self.work_thread.start()
 
-        elif instruction=="Open COOT":
-            if not self.coot_running:
-                print 'starting coot'
-                self.work_thread=XChemThread.start_COOT(self.settings)
-                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-                self.work_thread.start()
 
-        elif self.sender().text()=='Set New Reference (if applicable)':
-            reference_root=str(self.reference_file_selection_combobox.currentText())
-            self.update_reference_files(reference_root)
+#        elif self.sender().text()=='Set New Reference (if applicable)':
+#            reference_root=str(self.reference_file_selection_combobox.currentText())
+#            self.update_reference_files(reference_root)
 
 
-        elif self.sender().text()=="Load Samples\nFrom Datasource":
-            content=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
-            header=content[0]
-            data=content[1]
-            self.populate_data_source_table(header,data)
+#        elif self.sender().text()=="Load Samples\nFrom Datasource":
+#            content=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
+#            header=content[0]
+#            data=content[1]
+#            self.populate_data_source_table(header,data)
 
 
-        elif self.sender().text()=="Import CSV file\ninto Data Source":
-            if self.data_source_file=='':
-                self.update_status_bar('Please load a data source file first')
-            else:
-                file_name = QtGui.QFileDialog.getOpenFileName(self.window,'Open file', self.database_directory)
-                XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).import_csv_file(file_name)
+#        elif self.sender().text()=="Import CSV file\ninto Data Source":
+#            if self.data_source_file=='':
+#                self.update_status_bar('Please load a data source file first')
+#            else:
+#                file_name = QtGui.QFileDialog.getOpenFileName(self.window,'Open file', self.database_directory)
+#                XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).import_csv_file(file_name)
 
-        elif self.sender().text()=="Export CSV file\nfrom Data Source":
-            file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
-            if file_name.rfind('.') != -1:
-                file_name=file_name[:file_name.rfind('.')]+'.csv'
-            else:
-                file_name=file_name+'.csv'
-            XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).export_to_csv_file(file_name)
+#        elif self.sender().text()=="Export CSV file\nfrom Data Source":
+#            file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
+#            if file_name.rfind('.') != -1:
+#                file_name=file_name[:file_name.rfind('.')]+'.csv'
+#            else:
+#                file_name=file_name+'.csv'
+#            XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).export_to_csv_file(file_name)
 
-        elif self.sender().text()=="Save Samples\nTo Datasource":
-            # first translate all columns in table in SQLite tablenames
-            columns_in_data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).return_column_list()
-            column_dict={}
-            for item in self.data_source_columns_to_display:
-                for column_name in columns_in_data_source:
-                    if column_name[1]==item:
-                        column_dict[item]=column_name[0]
-
-            allRows = self.mounted_crystal_table.rowCount()
-            for row in range(allRows):
-                data_dict={}
-                sampleID=str(self.mounted_crystal_table.item(row,0).text())      # this must be the case
-                for i in range(1,len(self.data_source_columns_to_display)):
-                    if self.mounted_crystal_table.item(row,i).text() != '':
-                        headertext = str(self.mounted_crystal_table.horizontalHeaderItem(i).text())
-                        column_to_update=column_dict[headertext]
-                        data_dict[column_to_update]=str(self.mounted_crystal_table.item(row,i).text())
-#                print sampleID,data_dict
-                XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).update_data_source(sampleID,data_dict)
-
-
-        elif self.sender().text()=="Create PDB/CIF/PNG\nfiles of Compound":
-            if helpers().pil_rdkit_exist()==False:
-                QtGui.QMessageBox.warning(self.window, "Library Problem",
-                                                       ('Cannot find PIL and RDKIT'),
-                        QtGui.QMessageBox.Cancel, QtGui.QMessageBox.NoButton,
-                        QtGui.QMessageBox.NoButton)
-            else:
-                columns_to_read=['Sample ID',
-                                 'Compound ID',
-                                 'Smiles']
-                # it's a bit pointless now to search for the position of the columns,
-                # but later I may want to give the user the option to change the column order
-                headercount = self.mounted_crystal_table.columnCount()
-                column_positions=[]
-                for item in columns_to_read:
-                    for x in range(headercount):
-                        headertext = self.mounted_crystal_table.horizontalHeaderItem(x).text()
-                        if headertext==item:
-                            column_positions.append(x)
-                            break
-                allRows = self.mounted_crystal_table.rowCount()
-                compound_list=[]
-                for row in range(allRows):
-                    if self.mounted_crystal_table.item(row,column_positions[2]).text() != '':
-                        compound_list.append([str(self.mounted_crystal_table.item(row,column_positions[0]).text()),
-                                              str(self.mounted_crystal_table.item(row,column_positions[1]).text()),
-                                              str(self.mounted_crystal_table.item(row,column_positions[2]).text())] )
-                if compound_list != []:
-                    self.explorer_active=1
-                    self.work_thread=XChemThread.create_png_and_cif_of_compound(self.external_software,
-                                                                                self.initial_model_directory,
-                                                                                compound_list)
-                    self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-                    self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-                    self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-                    self.work_thread.start()
-
-        elif self.sender().text()=="Check\nStatus":
-            self.check_status_create_png_of_soaked_compound()
-
-        elif str(self.sender().text()).startswith("Show Overview"):
-            self.update_overview()
+#        elif self.sender().text()=="Save Samples\nTo Datasource":
+#            # first translate all columns in table in SQLite tablenames
+#            columns_in_data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).return_column_list()
+#            column_dict={}
+#            for item in self.data_source_columns_to_display:
+#                for column_name in columns_in_data_source:
+#                    if column_name[1]==item:
+#                        column_dict[item]=column_name[0]
+#
+#            allRows = self.mounted_crystal_table.rowCount()
+#            for row in range(allRows):
+#                data_dict={}
+#                sampleID=str(self.mounted_crystal_table.item(row,0).text())      # this must be the case
+#                for i in range(1,len(self.data_source_columns_to_display)):
+#                    if self.mounted_crystal_table.item(row,i).text() != '':
+#                        headertext = str(self.mounted_crystal_table.horizontalHeaderItem(i).text())
+#                        column_to_update=column_dict[headertext]
+#                        data_dict[column_to_update]=str(self.mounted_crystal_table.item(row,i).text())
+##                print sampleID,data_dict
+#                XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).update_data_source(sampleID,data_dict)
 
 
-
-
-        elif str(self.sender().text()).startswith("Export PANDDA Models"):
-            print '==> XCE: exporting pandda models with pandda.export'
-            os.system('pandda.export pandda_dir="'+self.panddas_directory+'" out_dir="'+self.initial_model_directory+'"')
+#        elif self.sender().text()=="Create PDB/CIF/PNG\nfiles of Compound":
+#            if helpers().pil_rdkit_exist()==False:
+#                QtGui.QMessageBox.warning(self.window, "Library Problem",
+#                                                       ('Cannot find PIL and RDKIT'),
+#                        QtGui.QMessageBox.Cancel, QtGui.QMessageBox.NoButton,
+#                        QtGui.QMessageBox.NoButton)
+#            else:
+#                columns_to_read=['Sample ID',
+#                                 'Compound ID',
+#                                 'Smiles']
+#                # it's a bit pointless now to search for the position of the columns,
+#                # but later I may want to give the user the option to change the column order
+#                headercount = self.mounted_crystal_table.columnCount()
+#                column_positions=[]
+#                for item in columns_to_read:
+#                    for x in range(headercount):
+#                        headertext = self.mounted_crystal_table.horizontalHeaderItem(x).text()
+#                        if headertext==item:
+#                            column_positions.append(x)
+#                            break
+#                allRows = self.mounted_crystal_table.rowCount()
+#                compound_list=[]
+#                for row in range(allRows):
+#                    if self.mounted_crystal_table.item(row,column_positions[2]).text() != '':
+#                        compound_list.append([str(self.mounted_crystal_table.item(row,column_positions[0]).text()),
+#                                              str(self.mounted_crystal_table.item(row,column_positions[1]).text()),
+#                                              str(self.mounted_crystal_table.item(row,column_positions[2]).text())] )
+#                if compound_list != []:
+#                    self.explorer_active=1
+#                    self.work_thread=XChemThread.create_png_and_cif_of_compound(self.external_software,
+#                                                                                self.initial_model_directory,
+#                                                                                compound_list)
+#                    self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+#                    self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+#                    self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#                    self.work_thread.start()
+#
+#        elif self.sender().text()=="Check\nStatus":
+#            self.check_status_create_png_of_soaked_compound()
+#
+#        elif str(self.sender().text()).startswith("Show Overview"):
+#            self.update_overview()
+#
+#
+#
+#
+#        elif str(self.sender().text()).startswith("Export PANDDA Models"):
+#            print '==> XCE: exporting pandda models with pandda.export'
+#            os.system('pandda.export pandda_dir="'+self.panddas_directory+'" out_dir="'+self.initial_model_directory+'"')
 
 
     def set_new_reference_if_applicable(self):
@@ -1970,12 +1969,6 @@ class XChemExplorer(QtGui.QApplication):
             reference_file_selection_combobox=self.initial_model_dimple_dict[xtal][1]
             index = reference_file_selection_combobox.findText(str(reference_file[0][0]), QtCore.Qt.MatchFixedString)
             reference_file_selection_combobox.setCurrentIndex(index)
-
-
-    def select_datasource_columns_to_display(self):
-        self.data_source_columns_to_display, ok = XChemDialogs.select_columns_to_show(
-            os.path.join(self.database_directory,self.data_source_file)).return_selected_columns()
-        self.populate_and_update_data_source_table()
 
 
     def check_status_create_png_of_soaked_compound(self):

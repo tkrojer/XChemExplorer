@@ -72,7 +72,7 @@ class GUI(object):
 
         # this decides which samples will be looked at
         self.selection_mode = ''
-        self.selected_site=self.ligand_site_information[0]
+        self.selected_site=''
 
         # the Folder is kind of a legacy thing because my inital idea was to have separate folders
         # for Data Processing and Refinement
@@ -693,7 +693,7 @@ class GUI(object):
 #        self.hbox_for_info_graphics.remove(self.canvas)
         if self.Serial > 1:
             self.RefmacParams=self.Refine.ParamsFromPreviousCycle(self.Serial-1)
-            refinement_cycle,Rfree,Rcryst=self.Refine.GetRefinementHistory()
+#            refinement_cycle,Rfree,Rcryst=self.Refine.GetRefinementHistory()
 #            self.canvas = FigureCanvas(self.update_plot(refinement_cycle,Rfree,Rcryst))
 #        else:
 #            self.canvas = FigureCanvas(self.update_plot([0],[0],[0]))  # a gtk.DrawingArea
@@ -876,11 +876,16 @@ class GUI(object):
 
 
     def get_samples_to_look_at(self,widget):
+        if self.selection_mode=='' and self.selected_site=='':
+            self.status_label.set_text('select model stage and site')
+            return
+        if self.selection_mode=='':
+            self.status_label.set_text('select model stage (left field)')
+            return
+        if self.selected_site=='':
+            self.status_label.set_text('select site (right field)')
+            return
         self.status_label.set_text('checking datasource for samples... ')
-#        x=float(self.selected_site[2])
-#        y=float(self.selected_site[3])
-#        z=float(self.selected_site[4])
-#        coot.set_rotation_centre(x,y,z)
         # first remove old samples if present
         if len(self.Todo) != 0:
             for n,item in enumerate(self.Todo):
