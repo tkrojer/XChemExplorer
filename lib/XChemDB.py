@@ -2,6 +2,7 @@ import sqlite3
 import os,sys
 import csv
 from datetime import datetime
+import getpass
 
 # committed on: 05/12/2015
 
@@ -138,7 +139,8 @@ class data_source:
             ['DimplePathToPDB',                             'Dimple\nPath to PDB file',                     'TEXT'],
             ['DimplePathToMTZ',                             'Dimple\nPath to MTZ file',                     'TEXT'],
 
-
+            ['RefinementResolution',                        'RefinementResolution',                           'TEXT'],
+            ['RefinementResolutionTL',                      'RefinementResolutionTL',                           'TEXT'],
             ['RefinementRcryst',                            'Refinement\nRcryst',                           'TEXT'],
             ['RefinementRcrystTraficLight',                 'RefinementRcrystTraficLight',                           'TEXT'],
             ['RefinementRfree',                             'Refinement\nRfree',                            'TEXT'],
@@ -172,31 +174,37 @@ class data_source:
         ]
 
         self.pandda_table_columns = [
-            ['ID',                                      'ID',                                      'INTEGER PRIMARY KEY'],
-            ['CrystalName',                          'Sample ID',                               'TEXT'],
-            ['PANDDApath',                                'PANDDApath',                               'TEXT'],
-            ['PANDDA_site_index',                         'PANDDA_site_index',                     'TEXT'],
-            ['PANDDA_site_name',                          'PANDDA_site_name',                           'TEXT'],
-            ['PANDDA_site_comment',                       'PANDDA_site_comment',                        'TEXT'],
-            ['PANDDA_site_event_index',                   'PANDDA_site_event_index',                    'TEXT'],
-            ['PANDDA_site_event_comment',                 'PANDDA_site_event_comment',                  'TEXT'],
-            ['PANDDA_site_confidence',                    'PANDDA_site_confidence',                     'TEXT'],
-            ['PANDDA_site_ligand_placed',                 'PANDDA_site_ligand_placed',                  'TEXT'],
-            ['PANDDA_site_viewed',                        'PANDDA_site_viewed',                         'TEXT'],
-            ['PANDDA_site_interesting',                   'PANDDA_site_interesting',                    'TEXT'],
-            ['PANDDA_site_z_peak',                        'PANDDA_site_z_peak',                         'TEXT'],
-            ['PANDDA_site_x',                             'PANDDA_site_x',                              'TEXT'],
-            ['PANDDA_site_y',                             'PANDDA_site_y',                              'TEXT'],
-            ['PANDDA_site_z',                             'PANDDA_site_z',                              'TEXT'],
-            ['PANDDA_site_ligand_id',                     'PANDDA_site_ligand_id',                      'TEXT'],
-            ['PANDDA_site_event_map',                     'PANDDA_site_event_map',                      'TEXT'],
-            ['PANDDA_site_initial_model',                 'PANDDA_site_initial_model',                  'TEXT'],
-            ['PANDDA_site_initial_mtz',                 'PANDDA_site_initial_mtz',                  'TEXT'],
-            ['PANDDA_site_spider_plot',                   'PANDDA_site_spider_plot',                    'TEXT'],
-            ['PANDDA_site_occupancy',                   'PANDDA_site_occupancy',                    'TEXT'],
-            ['PANDDA_site_B_average',                   'PANDDA_site_B_average',                    'TEXT'],
-            ['PANDDA_site_B_ratio_residue_surroundings',                   'PANDDA_site_B_ratio_residue_surroundings',                    'TEXT'],
-            ['PANDDA_site_RSCC',                   'PANDDA_site_RSCC',                    'TEXT']
+            ['ID',                                          'ID',                                       'INTEGER PRIMARY KEY'],
+            ['CrystalName',                                 'Sample ID',                                'TEXT'],
+            ['PANDDApath',                                  'PANDDApath',                               'TEXT'],
+            ['PANDDA_site_index',                           'PANDDA_site_index',                        'TEXT'],
+            ['PANDDA_site_name',                            'PANDDA_site_name',                         'TEXT'],
+            ['PANDDA_site_comment',                         'PANDDA_site_comment',                      'TEXT'],
+            ['PANDDA_site_event_index',                     'PANDDA_site_event_index',                  'TEXT'],
+            ['PANDDA_site_event_comment',                   'PANDDA_site_event_comment',                'TEXT'],
+            ['PANDDA_site_confidence',                      'PANDDA_site_confidence',                   'TEXT'],
+            ['PANDDA_site_ligand_placed',                   'PANDDA_site_ligand_placed',                'TEXT'],
+            ['PANDDA_site_viewed',                          'PANDDA_site_viewed',                       'TEXT'],
+            ['PANDDA_site_interesting',                     'PANDDA_site_interesting',                  'TEXT'],
+            ['PANDDA_site_z_peak',                          'PANDDA_site_z_peak',                       'TEXT'],
+            ['PANDDA_site_x',                               'PANDDA_site_x',                            'TEXT'],
+            ['PANDDA_site_y',                               'PANDDA_site_y',                            'TEXT'],
+            ['PANDDA_site_z',                               'PANDDA_site_z',                            'TEXT'],
+            ['PANDDA_site_ligand_id',                       'PANDDA_site_ligand_id',                    'TEXT'],
+            ['PANDDA_site_event_map',                       'PANDDA_site_event_map',                    'TEXT'],
+            ['PANDDA_site_initial_model',                   'PANDDA_site_initial_model',                'TEXT'],
+            ['PANDDA_site_initial_mtz',                     'PANDDA_site_initial_mtz',                  'TEXT'],
+            ['PANDDA_site_spider_plot',                     'PANDDA_site_spider_plot',                  'TEXT'],
+            ['PANDDA_site_occupancy',                       'PANDDA_site_occupancy',                    'TEXT'],
+            ['PANDDA_site_B_average',                       'PANDDA_site_B_average',                    'TEXT'],
+            ['PANDDA_site_B_ratio_residue_surroundings',    'PANDDA_site_B_ratio_residue_surroundings', 'TEXT'],
+            ['PANDDA_site_RSCC',                            'PANDDA_site_RSCC',                         'TEXT'],
+            ['PANDDA_site_RSR',                             'PANDDA_site_RSR',                          'TEXT'],
+            ['PANDDA_site_RSZD',                            'PANDDA_site_RSZD',                         'TEXT'],
+            ['PANDDA_site_rmsd',                            'PANDDA_site_rmsd',                         'TEXT'],
+            ['RefinementOutcome',                           'RefinementOutcome',                        'TEXT'],
+            ['LastUpdated',                                 'LastUpdated',                              'TEXT'],
+            ['LastUpdated_by',                              'LastUpdated_by',                           'TEXT']
             ]
         
         
@@ -278,6 +286,19 @@ class data_source:
             db_dict[header[n]]=str(item)
         return db_dict
 
+    def get_db_pandda_dict_for_sample_and_site(self,sampleID,site_index):
+        db_dict={}
+        header=[]
+        data=[]
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+        cursor.execute("select * from panddaTable where CrystalName='%s' and PANDDA_site_index='%s';" %(sampleID,site_index))
+        for column in cursor.description:
+            header.append(column[0])
+        data = cursor.fetchall()
+        for n,item in enumerate(data[0]):
+            db_dict[header[n]]=str(item)
+        return db_dict
 
     def check_if_sample_exists_in_data_source(self,sampleID):
         sample_exists=False
@@ -337,6 +358,7 @@ class data_source:
 
     def update_data_source(self,sampleID,data_dict):
         data_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
+        data_dict['LastUpdated_by']=getpass.getuser()
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
         update_string=''
@@ -351,6 +373,8 @@ class data_source:
             connect.commit()
 
     def update_panddaTable(self,sampleID,site_index,data_dict):
+        data_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
+        data_dict['LastUpdated_by']=getpass.getuser()
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
         update_string=''
@@ -366,6 +390,7 @@ class data_source:
 
     def update_specified_table(self,sampleID,data_dict,table):
         data_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
+        data_dict['LastUpdated_by']=getpass.getuser()
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
         update_string=''
@@ -381,6 +406,7 @@ class data_source:
 
     def update_insert_data_source(self,sampleID,data_dict):
         data_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
+        data_dict['LastUpdated_by']=getpass.getuser()
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
         cursor.execute('Select CrystalName FROM mainTable')
@@ -414,6 +440,8 @@ class data_source:
 
 
     def update_insert_panddaTable(self,sampleID,data_dict):
+        data_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
+        data_dict['LastUpdated_by']=getpass.getuser()
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
         cursor.execute('Select CrystalName,PANDDA_site_index FROM panddaTable')
@@ -463,6 +491,7 @@ class data_source:
 
     def update_insert_not_null_fields_only(self,sampleID,data_dict):
         data_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
+        data_dict['LastUpdated_by']=getpass.getuser()
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
         cursor.execute('Select CrystalName FROM mainTable')
@@ -557,7 +586,7 @@ class data_source:
                 " mainTable.RefinementCIF,"
                 " mainTable.RefinementMTZfree,"
                 " mainTable.RefinementPathToRefinementFolder,"
-                " mainTable.RefinementOutcome, "
+                " panddaTable.RefinementOutcome, "
                 " panddaTable.PANDDA_site_event_map,"
                 " panddaTable.PANDDA_site_confidence,"
                 " panddaTable.PANDDA_site_x,"
@@ -570,7 +599,7 @@ class data_source:
                 "from mainTable inner join panddaTable on mainTable.CrystalName = panddaTable.CrystalName "
                 "where panddaTable.PANDDA_site_index is '%s'" %pandda_site+
                 " and panddaTable.PANDDA_site_ligand_placed is 'True'"
-                " and mainTable.RefinementOutcome is %s;" %outcome
+                " and panddaTable.RefinementOutcome is %s;" %outcome
                 )
 
         else:
@@ -601,6 +630,95 @@ class data_source:
 
         return sample_list_for_coot
 
+    def get_pandda_info_for_coot(self,xtalID,pandda_site):
+        pandda_info_for_coot=[]
+        connect=sqlite3.connect(self.data_source_file)
+        cursor = connect.cursor()
+
+        sqlite = (
+            "select"
+            " PANDDA_site_event_map,"
+            " PANDDA_site_x,"
+            " PANDDA_site_y,"
+            " PANDDA_site_z,"
+            " PANDDA_site_spider_plot "
+            "from panddaTable  "
+            "where "
+            " CrystalName is '%s'" %xtalID+
+            " and PANDDA_site_index is '%s';" %pandda_site
+            )
+
+        cursor.execute(sqlite)
+
+        tmp = cursor.fetchall()
+        for item in tmp:
+            tmpx=[]
+            for i in list(item):
+                if i==None:
+                    tmpx.append('None')
+                else:
+                    tmpx.append(i)
+            line=[x.encode('UTF8') for x in tmpx]
+            pandda_info_for_coot.append(line)
+
+        return pandda_info_for_coot
+
+
+
+    def get_todo_list_for_coot(self,RefinementOutcome,pandda_site):
+        sample_list_for_coot=[]
+        connect=sqlite3.connect(self.data_source_file)
+        cursor = connect.cursor()
+
+        if RefinementOutcome=='0 - All Datasets':
+            outcome = " not null "
+        else:
+            outcome = " '%s' " %RefinementOutcome
+
+        if int(pandda_site) > 0:
+            sqlite = (
+                "select"
+                " mainTable.CrystalName"
+                " mainTable.CompoundCode,"
+                " mainTable.RefinementCIF,"
+                " mainTable.RefinementMTZfree,"
+                " mainTable.RefinementPathToRefinementFolder,"
+                " panddaTable.RefinementOutcome, "
+                " panddaTable.PANDDA_site_confidence "
+                "from mainTable inner join panddaTable on mainTable.CrystalName = panddaTable.CrystalName "
+                "where panddaTable.PANDDA_site_index is '%s'" %pandda_site+
+                " and panddaTable.PANDDA_site_ligand_placed is 'True'"
+                " and panddaTable.RefinementOutcome is %s;" %outcome
+                )
+
+        else:
+            sqlite = (
+                "select"
+                " CrystalName,"
+                " CompoundCode,"
+                " RefinementCIF,"
+                " RefinementMTZfree,"
+                " RefinementPathToRefinementFolder,"
+                " RefinementOutcome,"
+                " RefinementLigandConfidence "
+                "from mainTable "
+                "where RefinementOutcome is %s;" %outcome
+                )
+
+        cursor.execute(sqlite)
+
+        tmp = cursor.fetchall()
+        for item in tmp:
+            tmpx=[]
+            for i in list(item):
+                if i==None:
+                    tmpx.append('None')
+                else:
+                    tmpx.append(i)
+            line=[x.encode('UTF8') for x in tmpx]
+            sample_list_for_coot.append(line)
+
+        return sample_list_for_coot
 
     def translate_xce_column_list_to_sqlite(self,column_list):
         out_list=[]

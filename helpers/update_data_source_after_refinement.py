@@ -21,6 +21,9 @@ def parse_pdb(inital_model_directory,xtal,db_dict):
         db_dict['RefinementRmsdAngles'] =           pdb['rmsdAngles']
         db_dict['RefinementRmsdAnglesTL'] =         pdb['rmsdAnglesTL']
         db_dict['RefinementSpaceGroup'] =           pdb['SpaceGroup']
+        db_dict['ResolutionHigh'] =                 pdb['RefinementResolution']
+        db_dict['ResolutionColor'] =                pdb['RefinementResolutionTL']
+
     return db_dict
 
 def parse_mtz(inital_model_directory,xtal,db_dict):
@@ -97,9 +100,11 @@ def parse_ligand_validation(refinement_directory,db_pandda_dict):
                             db_pandda_dict['PANDDA_site_ligand_id'] = residue
                             db_pandda_dict['PANDDA_site_occupancy'] = line['Occupancy']
                             db_pandda_dict['PANDDA_site_B_average'] = line['Average B-factor (Residue)']
-                            db_pandda_dict['PANDDA_site_B_ratio_residue_surroundings'] = line[
-                                'Surroundings B-factor Ratio']
+                            db_pandda_dict['PANDDA_site_B_ratio_residue_surroundings'] = line['Surroundings B-factor Ratio']
+                            db_pandda_dict['PANDDA_site_rmsd'] = line['Model RMSD']
                             db_pandda_dict['PANDDA_site_RSCC'] = line['RSCC']
+                            db_pandda_dict['PANDDA_site_RSR'] = line['RSR']
+                            db_pandda_dict['PANDDA_site_RSZD'] = line['RSZD']
                             if os.path.isfile(os.path.join(refinement_directory, 'residue_plots', residue + '.png')):
                                 db_pandda_dict['PANDDA_site_spider_plot'] = os.path.join(refinement_directory,
                                                                                          'residue_plots',
@@ -116,7 +121,12 @@ def update_data_source(db_dict,db_pandda_dict):
             "and RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending' or RefinementOutcome is '2 - PANDDA model'"
                 )
         db.execute_statement(sqlite)
-
+        # now do the same for each site in the pandda table
+        sqlite = (
+            "update panddaTable set RefinementOutcome = '3 - In Refinement' where CrystalName is '%s' " %xtal+
+            "and RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending' or RefinementOutcome is '2 - PANDDA model'"
+                )
+        db.execute_statement(sqlite)
     if db_pandda_dict != {}:
         db.update_panddaTable(xtal, site_index, db_pandda_dict)
 

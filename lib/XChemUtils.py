@@ -619,6 +619,7 @@ class parse:
                     'PointGroup':       'n/a',
                     'UnitCell':         'n/a',
                     'ResolutionHigh':   'n/a',
+                    'ResolutionColor':  'gray',
                     'Lattice':          'n/a',
                     'UnitCellVolume':       0,
                     'Alert':            '#E0E0E0',
@@ -664,7 +665,9 @@ class parse:
 
                 if line.startswith('REMARK   3   RESOLUTION RANGE HIGH (ANGSTROMS) :'):
                     PDBinfo['ResolutionHigh']=line.split()[7]
-
+                    if float(line.split()[7]) < 2.4:                                   PDBinfo['ResolutionColor'] = 'green'
+                    if float(line.split()[7]) >= 2.4 and float(line.split()[7]) < 2.8: PDBinfo['ResolutionColor'] = 'orange'
+                    if float(line.split()[7]) >= 2.8:                                  PDBinfo['ResolutionColor'] = 'red'
                 if line.startswith('REMARK   3   BOND LENGTHS REFINED ATOMS        (A):'):
                     PDBinfo['rmsdBonds'] = line.split()[9]
                     if float(line.split()[9]) < 0.02:                                       PDBinfo['rmsdBondsTL'] = 'green'

@@ -62,10 +62,10 @@ class GUI(object):
                                         ['Comp Chem Ready!',        '4 - ComChem ready',    65000,  0,  0],
                                         ['Ready for Deposition!',   '5 - Deposition ready', 65000,  0,  0]   ]
 
-        self.ligand_confidence = [  '0 - no ligand present',
-                                    '1 - low confidence',
-                                    '2 - pose/identity uncertain',
-                                    '3 - high confidence'   ]
+        self.ligand_confidence_category = [     '0 - no ligand present',
+                                                '1 - low confidence',
+                                                '2 - pose/identity uncertain',
+                                                '3 - high confidence'   ]
 
         self.ligand_site_information =  self.db.get_list_of_pandda_sites_for_coot()
     
@@ -85,7 +85,7 @@ class GUI(object):
         self.xtalID=''
         self.compoundID=''
         self.spider_plot=''
-        self.ligand_confidence_of_sample=''
+        self.ligand_confidence=''
         self.refinement_folder=''
 #        self.datasetOutcome=''
 
@@ -110,24 +110,32 @@ class GUI(object):
         coot.set_colour_map_rotation_for_map(0)
         coot.set_colour_map_rotation_on_read_pdb_flag(0)
 
-        self.QualityIndicators = {  'R':                            '-',
-                                    'RRfree':                       '-',
-                                    'RRfreeColor':                  'gray',
-                                    'Resolution':                   'n/a',
-                                    'ResolutionColor':              'gray',
-                                    'MolprobityScore':              'n/a',
-                                    'MolprobityScoreColor':         'gray',
-                                    'RamachandranOutliers':         'n/a',
-                                    'RamachandranOutliersColor':    'gray',
-                                    'RamachandranFavored':          'n/a',
-                                    'RamachandranFavoredColor':     'gray',
-                                    'LigandCCcolor':                'gray',
-                                    'LigandCC':                     'n/a',
-                                    'rmsdBonds':                    'n/a',
-                                    'rmsdBondsColor':               'gray',
-                                    'rmsdAngles':                   'n/a',
-                                    'rmsdAnglesColor':              'gray',
-                                    'MatrixWeight':                 'n/a'   }
+        self.QualityIndicators = {  'RefinementRcryst':                         '-',
+                                    'RefinementRfree':                          '-',
+                                    'RefinementRfreeTraficLight':               'gray',
+                                    'RefinementResolution':                     '-',
+                                    'RefinementResolutionTL':                   'gray',
+                                    'RefinementMolProbityScore':                '-',
+                                    'RefinementMolProbityScoreTL':              'gray',
+                                    'RefinementRamachandranOutliers':           '-',
+                                    'RefinementRamachandranOutliersTL':         'gray',
+                                    'RefinementRamachandranFavored':            '-',
+                                    'RefinementRamachandranFavoredTL':          'gray',
+                                    'RefinementRmsdBonds':                      '-',
+                                    'RefinementRmsdBondsTL':                    'gray',
+                                    'RefinementRmsdAngles':                     '-',
+                                    'RefinementRmsdAnglesTL':                   'gray',
+                                    'RefinementMatrixWeight':                   '-'   }
+
+        self.spider_plot_data = {   'PANDDA_site_ligand_id':                    '-',
+                                    'PANDDA_site_occupancy':                    '-',
+                                    'PANDDA_site_B_average':                    '-',
+                                    'PANDDA_site_B_ratio_residue_surroundings': '-',
+                                    'PANDDA_site_RSCC':                         '-',
+                                    'PANDDA_site_rmsd':                         '-',
+                                    'PANDDA_site_RSR':                          '-',
+                                    'PANDDA_site_RSZD':                         '-'     }
+
 
         # default refmac parameters
         self.RefmacParams={ 'HKLIN':            '',                 'HKLOUT': '',
@@ -196,122 +204,197 @@ class GUI(object):
         # next comes a section which displays some global quality indicators
         # a combination of labels and textview widgets, arranged in a table
 
+        RRfreeLabel_frame=gtk.Frame()
         self.RRfreeLabel = gtk.Label('R/Rfree')
-        self.RRfreeValue = gtk.Label(self.QualityIndicators['RRfree'])
+        RRfreeLabel_frame.add(self.RRfreeLabel)
+        self.RRfreeValue = gtk.Label(self.QualityIndicators['RefinementRcryst']+'/'+self.QualityIndicators['RefinementRfree'])
+        RRfreeBox_frame=gtk.Frame()
         self.RRfreeBox = gtk.EventBox()
         self.RRfreeBox.add(self.RRfreeValue)
+        RRfreeBox_frame.add(self.RRfreeBox)
 
+        ResolutionLabel_frame=gtk.Frame()
         self.ResolutionLabel = gtk.Label('Resolution')
-        self.ResolutionValue = gtk.Label(self.QualityIndicators['Resolution'])
+        ResolutionLabel_frame.add(self.ResolutionLabel)
+        self.ResolutionValue = gtk.Label(self.QualityIndicators['RefinementResolution'])
+        ResolutionBox_frame=gtk.Frame()
         self.ResolutionBox = gtk.EventBox()
         self.ResolutionBox.add(self.ResolutionValue)
+        ResolutionBox_frame.add(self.ResolutionBox)
 
+        MolprobityScoreLabel_frame=gtk.Frame()
         self.MolprobityScoreLabel = gtk.Label('MolprobityScore')
-        self.MolprobityScoreValue = gtk.Label(self.QualityIndicators['MolprobityScore'])
+        MolprobityScoreLabel_frame.add(self.MolprobityScoreLabel)
+        self.MolprobityScoreValue = gtk.Label(self.QualityIndicators['RefinementMolProbityScore'])
+        MolprobityScoreBox_frame=gtk.Frame()
         self.MolprobityScoreBox = gtk.EventBox()
         self.MolprobityScoreBox.add(self.MolprobityScoreValue)
+        MolprobityScoreBox_frame.add(self.MolprobityScoreBox)
 
+        RamachandranOutliersLabel_frame=gtk.Frame()
         self.RamachandranOutliersLabel = gtk.Label('Ramachandran Outliers')
-        self.RamachandranOutliersValue = gtk.Label(self.QualityIndicators['RamachandranOutliers'])
+        RamachandranOutliersLabel_frame.add(self.RamachandranOutliersLabel)
+        self.RamachandranOutliersValue = gtk.Label(self.QualityIndicators['RefinementRamachandranOutliers'])
+        RamachandranOutliersBox_frame=gtk.Frame()
         self.RamachandranOutliersBox = gtk.EventBox()
         self.RamachandranOutliersBox.add(self.RamachandranOutliersValue)
+        RamachandranOutliersBox_frame.add(self.RamachandranOutliersBox)
 
+        RamachandranFavoredLabel_frame=gtk.Frame()
         self.RamachandranFavoredLabel = gtk.Label('Ramachandran Favored')
-        self.RamachandranFavoredValue = gtk.Label(self.QualityIndicators['RamachandranFavored'])
+        RamachandranFavoredLabel_frame.add(self.RamachandranFavoredLabel)
+        self.RamachandranFavoredValue = gtk.Label(self.QualityIndicators['RefinementRamachandranFavored'])
+        RamachandranFavoredBox_frame=gtk.Frame()
         self.RamachandranFavoredBox = gtk.EventBox()
         self.RamachandranFavoredBox.add(self.RamachandranFavoredValue)
+        RamachandranFavoredBox_frame.add(self.RamachandranFavoredBox)
 
-        self.LigandCCLabel = gtk.Label('Ligand CC')
-        self.LigandCCValue = gtk.Label(self.QualityIndicators['LigandCC'])
-        self.LigandCCBox = gtk.EventBox()
-        self.LigandCCBox.add(self.LigandCCValue)
-
+        rmsdBondsLabel_frame=gtk.Frame()
         self.rmsdBondsLabel = gtk.Label('rmsd(Bonds)')
-        self.rmsdBondsValue = gtk.Label(self.QualityIndicators['rmsdBonds'])
+        rmsdBondsLabel_frame.add(self.rmsdBondsLabel)
+        self.rmsdBondsValue = gtk.Label(self.QualityIndicators['RefinementRmsdBonds'])
+        rmsdBondsBox_frame=gtk.Frame()
         self.rmsdBondsBox = gtk.EventBox()
         self.rmsdBondsBox.add(self.rmsdBondsValue)
+        rmsdBondsBox_frame.add(self.rmsdBondsBox)
 
+        rmsdAnglesLabel_frame=gtk.Frame()
         self.rmsdAnglesLabel = gtk.Label('rmsd(Angles)')
-        self.rmsdAnglesValue = gtk.Label(self.QualityIndicators['rmsdAngles'])
+        rmsdAnglesLabel_frame.add(self.rmsdAnglesLabel)
+        self.rmsdAnglesValue = gtk.Label(self.QualityIndicators['RefinementRmsdAngles'])
+        rmsdAnglesBox_frame=gtk.Frame()
         self.rmsdAnglesBox = gtk.EventBox()
         self.rmsdAnglesBox.add(self.rmsdAnglesValue)
+        rmsdAnglesBox_frame.add(self.rmsdAnglesBox)
 
+        MatrixWeightLabel_frame=gtk.Frame()
         self.MatrixWeightLabel = gtk.Label('Matrix Weight')
-        self.MatrixWeightValue = gtk.Label(self.QualityIndicators['MatrixWeight'])
+        MatrixWeightLabel_frame.add(self.MatrixWeightLabel)
+        self.MatrixWeightValue = gtk.Label(self.QualityIndicators['RefinementMatrixWeight'])
+        MatrixWeightBox_frame=gtk.Frame()
         self.MatrixWeightBox = gtk.EventBox()
         self.MatrixWeightBox.add(self.MatrixWeightValue)
+        MatrixWeightBox_frame.add(self.MatrixWeightBox)
 
+        ligandIDLabel_frame=gtk.Frame()
+        self.ligandIDLabel = gtk.Label('Ligand ID')
+        ligandIDLabel_frame.add(self.ligandIDLabel)
+        self.ligandIDValue = gtk.Label(self.spider_plot_data['PANDDA_site_ligand_id'])
+        ligandIDBox_frame=gtk.Frame()
+        self.ligandIDBox = gtk.EventBox()
+        self.ligandIDBox.add(self.ligandIDValue)
+        ligandIDBox_frame.add(self.ligandIDBox)
 
-#        self.ligandIDLabel = gtk.Label('Ligand ID')
-#        self.ligandIDValue = gtk.Label(self.QualityIndicators['ligandID'])
-#        self.ligandIDBox = gtk.EventBox()
-#        self.ligandIDBox.add(self.ligandIDValue)
+        ligand_occupancyLabel_frame=gtk.Frame()
+        self.ligand_occupancyLabel = gtk.Label('occupancy')
+        ligand_occupancyLabel_frame.add(self.ligand_occupancyLabel)
+        self.ligand_occupancyValue = gtk.Label(self.spider_plot_data['PANDDA_site_occupancy'])
+        ligand_occupancyBox_frame=gtk.Frame()
+        self.ligand_occupancyBox = gtk.EventBox()
+        self.ligand_occupancyBox.add(self.ligand_occupancyValue)
+        ligand_occupancyBox_frame.add(self.ligand_occupancyBox)
 
-#        self.ligand_occupancyLabel = gtk.Label('occupancy')
-#        self.ligand_occupancyValue = gtk.Label(self.QualityIndicators['ligand_occupancy'])
-#        self.ligand_occupancyBox = gtk.EventBox()
-#        self.ligand_occupancyBox.add(self.ligand_occupancyValue)
+        ligand_BaverageLabel_frame=gtk.Frame()
+        self.ligand_BaverageLabel = gtk.Label('B average')
+        ligand_BaverageLabel_frame.add(self.ligand_BaverageLabel)
+        self.ligand_BaverageValue = gtk.Label(self.spider_plot_data['PANDDA_site_B_average'])
+        ligand_BaverageBox_frame=gtk.Frame()
+        self.ligand_BaverageBox = gtk.EventBox()
+        self.ligand_BaverageBox.add(self.ligand_BaverageValue)
+        ligand_BaverageBox_frame.add(self.ligand_BaverageBox)
 
-#        self.ligand_BaverageLabel = gtk.Label('B average')
-#        self.ligand_BaverageValue = gtk.Label(self.QualityIndicators['ligand_Baverage'])
-#        self.ligand_BaverageBox = gtk.EventBox()
-#        self.ligand_BaverageBox.add(self.ligand_BaverageValue)
+        ligand_BratioSurroundingsLabel_frame=gtk.Frame()
+        self.ligand_BratioSurroundingsLabel = gtk.Label('B ratio')
+        ligand_BratioSurroundingsLabel_frame.add(self.ligand_BratioSurroundingsLabel)
+        self.ligand_BratioSurroundingsValue = gtk.Label(self.spider_plot_data['PANDDA_site_B_ratio_residue_surroundings'])
+        ligand_BratioSurroundingsBox_frame=gtk.Frame()
+        self.ligand_BratioSurroundingsBox = gtk.EventBox()
+        self.ligand_BratioSurroundingsBox.add(self.ligand_BratioSurroundingsValue)
+        ligand_BratioSurroundingsBox_frame.add(self.ligand_BratioSurroundingsBox)
 
-#        self.ligand_BratioSurroundingsLabel = gtk.Label('B ratio')
-#        self.ligand_BratioSurroundingsValue = gtk.Label(self.QualityIndicators['ligand_BratioSurroundings'])
-#        self.ligand_BratioSurroundingsBox = gtk.EventBox()
-#        self.ligand_BratioSurroundingsBox.add(self.ligand_BratioSurroundingsValue)
+        ligand_RSCCLabel_frame=gtk.Frame()
+        self.ligand_RSCCLabel = gtk.Label('RSCC')
+        ligand_RSCCLabel_frame.add(self.ligand_RSCCLabel)
+        self.ligand_RSCCValue = gtk.Label(self.spider_plot_data['PANDDA_site_RSCC'])
+        ligand_RSCCBox_frame=gtk.Frame()
+        self.ligand_RSCCBox = gtk.EventBox()
+        self.ligand_RSCCBox.add(self.ligand_RSCCValue)
+        ligand_RSCCBox_frame.add(self.ligand_RSCCBox)
 
-#        self.ligand_RSCCLabel = gtk.Label('RSCC')
-#        self.ligand_RSCCValue = gtk.Label(self.QualityIndicators['ligand_RSCC'])
-#        self.ligand_RSCCBox = gtk.EventBox()
-#        self.ligand_RSCCBox.add(self.ligand_RSCCValue)
+        ligand_rmsdLabel_frame=gtk.Frame()
+        self.ligand_rmsdLabel = gtk.Label('rmsd')
+        ligand_rmsdLabel_frame.add(self.ligand_rmsdLabel)
+        self.ligand_rmsdValue = gtk.Label(self.spider_plot_data['PANDDA_site_rmsd'])
+        ligand_rmsdBox_frame=gtk.Frame()
+        self.ligand_rmsdBox = gtk.EventBox()
+        self.ligand_rmsdBox.add(self.ligand_rmsdValue)
+        ligand_rmsdBox_frame.add(self.ligand_rmsdBox)
+
+        ligand_RSRLabel_frame=gtk.Frame()
+        self.ligand_RSRLabel = gtk.Label('RSR')
+        ligand_RSRLabel_frame.add(self.ligand_RSRLabel)
+        self.ligand_RSRValue = gtk.Label(self.spider_plot_data['PANDDA_site_RSR'])
+        ligand_RSRBox_frame=gtk.Frame()
+        self.ligand_RSRBox = gtk.EventBox()
+        self.ligand_RSRBox.add(self.ligand_RSRValue)
+        ligand_RSRBox_frame.add(self.ligand_RSRBox)
+
+        ligand_RSZDLabel_frame=gtk.Frame()
+        self.ligand_RSZDLabel = gtk.Label('RSZD')
+        ligand_RSZDLabel_frame.add(self.ligand_RSZDLabel)
+        self.ligand_RSZDValue = gtk.Label(self.spider_plot_data['PANDDA_site_RSZD'])
+        ligand_RSZDBox_frame=gtk.Frame()
+        self.ligand_RSZDBox = gtk.EventBox()
+        self.ligand_RSZDBox.add(self.ligand_RSZDValue)
+        ligand_RSZDBox_frame.add(self.ligand_RSZDBox)
+
+        outer_frame = gtk.Frame()
+        hbox = gtk.HBox()
 
         frame = gtk.Frame()
-        self.table = gtk.Table(4, 2, False)
+        self.table_left  = gtk.Table(8, 2, False)
+        self.table_left.attach(RRfreeLabel_frame,                 0, 1, 0, 1)
+        self.table_left.attach(ResolutionLabel_frame,             0, 1, 1, 2)
+        self.table_left.attach(MolprobityScoreLabel_frame,        0, 1, 2, 3)
+        self.table_left.attach(RamachandranOutliersLabel_frame,   0, 1, 3, 4)
+        self.table_left.attach(RamachandranFavoredLabel_frame,    0, 1, 4, 5)
+        self.table_left.attach(rmsdBondsLabel_frame,              0, 1, 5, 6)
+        self.table_left.attach(rmsdAnglesLabel_frame,             0, 1, 6, 7)
+        self.table_left.attach(MatrixWeightLabel_frame,           0, 1, 7, 8)
+        self.table_left.attach(RRfreeBox_frame,                   1, 2, 0, 1)
+        self.table_left.attach(ResolutionBox_frame,               1, 2, 1, 2)
+        self.table_left.attach(MolprobityScoreBox_frame,          1, 2, 2, 3)
+        self.table_left.attach(RamachandranOutliersBox_frame,     1, 2, 3, 4)
+        self.table_left.attach(RamachandranFavoredBox_frame,      1, 2, 4, 5)
+        self.table_left.attach(rmsdBondsBox_frame,                1, 2, 5, 6)
+        self.table_left.attach(rmsdAnglesBox_frame,               1, 2, 6, 7)
+        self.table_left.attach(MatrixWeightBox_frame,             1, 2, 7, 8)
+        frame.add(self.table_left)
+        hbox.add(frame)
 
-#        self.table.attach(self.RRfreeLabel,                 0, 1, 0, 1)
-#        self.table.attach(self.RRfreeBox,                   1, 2, 0, 1)
-#        self.table.attach(self.ResolutionLabel,             0, 1, 1, 2)
-#        self.table.attach(self.ResolutionBox,               1, 2, 1, 2)
-#        self.table.attach(self.MolprobityScoreLabel,        0, 1, 2, 3)
-#        self.table.attach(self.MolprobityScoreBox,          1, 2, 2, 3)
-#        self.table.attach(self.RamachandranOutliersLabel,   0, 1, 3, 4)
-#        self.table.attach(self.RamachandranOutliersBox,     1, 2, 3, 4)
-#        self.table.attach(self.RamachandranFavoredLabel,    0, 1, 4, 5)
-#        self.table.attach(self.RamachandranFavoredBox,      1, 2, 4, 5)
-#        self.table.attach(self.LigandCCLabel,               0, 1, 5, 6)
-#        self.table.attach(self.LigandCCBox,                 1, 2, 5, 6)
-#        self.table.attach(self.rmsdBondsLabel,              0, 1, 7, 8)
-#        self.table.attach(self.rmsdBondsBox,                1, 2, 7, 8)
-#        self.table.attach(self.rmsdAnglesLabel,             0, 1, 9,10)
-#        self.table.attach(self.rmsdAnglesBox,               1, 2, 9,10)
-#        self.table.attach(self.MatrixWeightLabel,           0, 1,11,12)
-#        self.table.attach(self.MatrixWeightBox,             1, 2,11,12)
+        frame=gtk.Frame()
+        self.table_right = gtk.Table(8, 2, False)
+        self.table_right.attach(ligandIDLabel_frame,                   0, 1, 0, 1)
+        self.table_right.attach(ligand_occupancyLabel_frame,           0, 1, 1, 2)
+        self.table_right.attach(ligand_BaverageLabel_frame,            0, 1, 2, 3)
+        self.table_right.attach(ligand_BratioSurroundingsLabel_frame,  0, 1, 3, 4)
+        self.table_right.attach(ligand_RSCCLabel_frame,                0, 1, 4, 5)
+        self.table_right.attach(ligand_rmsdLabel_frame,                0, 1, 5, 6)
+        self.table_right.attach(ligand_RSRLabel_frame,                 0, 1, 6, 7)
+        self.table_right.attach(ligand_RSZDLabel_frame,                0, 1, 7, 8)
+        self.table_right.attach(ligandIDBox_frame,                     1, 2, 0, 1)
+        self.table_right.attach(ligand_occupancyBox_frame,             1, 2, 1, 2)
+        self.table_right.attach(ligand_BaverageBox_frame,              1, 2, 2, 3)
+        self.table_right.attach(ligand_BratioSurroundingsBox_frame,    1, 2, 3, 4)
+        self.table_right.attach(ligand_RSCCBox_frame,                  1, 2, 4, 5)
+        self.table_right.attach(ligand_rmsdBox_frame,                  1, 2, 5, 6)
+        self.table_right.attach(ligand_RSRBox_frame,                   1, 2, 6, 7)
+        self.table_right.attach(ligand_RSZDBox_frame,                  1, 2, 7, 8)
+        frame.add(self.table_right)
+        hbox.add(frame)
 
-        self.table.attach(self.RRfreeLabel,                 0, 1, 0, 1)
-        self.table.attach(self.ResolutionLabel,             0, 1, 1, 2)
-        self.table.attach(self.MolprobityScoreLabel,        0, 1, 2, 3)
-        self.table.attach(self.RamachandranOutliersLabel,   0, 1, 3, 4)
-        self.table.attach(self.RamachandranFavoredLabel,    0, 1, 4, 5)
-        self.table.attach(self.LigandCCLabel,               0, 1, 5, 6)
-        self.table.attach(self.rmsdBondsLabel,              0, 1, 7, 8)
-        self.table.attach(self.rmsdAnglesLabel,             0, 1, 9,10)
-        self.table.attach(self.MatrixWeightLabel,           0, 1,11,12)
-
-        self.table.attach(self.RRfreeBox,                   1, 2, 0, 1)
-        self.table.attach(self.ResolutionBox,               1, 2, 1, 2)
-        self.table.attach(self.MolprobityScoreBox,          1, 2, 2, 3)
-        self.table.attach(self.RamachandranOutliersBox,     1, 2, 3, 4)
-        self.table.attach(self.RamachandranFavoredBox,      1, 2, 4, 5)
-        self.table.attach(self.LigandCCBox,                 1, 2, 5, 6)
-        self.table.attach(self.rmsdBondsBox,                1, 2, 7, 8)
-        self.table.attach(self.rmsdAnglesBox,               1, 2, 9,10)
-        self.table.attach(self.MatrixWeightBox,             1, 2,11,12)
-
-
-        frame.add(self.table)
-        self.vbox.add(frame)
+        outer_frame.add(hbox)
+        self.vbox.add(outer_frame)
 
         button = gtk.Button(label="Show MolProbity to-do list")
         button.connect("clicked",self.show_molprobity_to_do)
@@ -397,32 +480,16 @@ class GUI(object):
         frame.add(vbox)
         hbox.pack_start(frame)
 
-
-        #
-        #
-        #
-        #
-        #
-        #
-        ### note this needs more work:
-        # if site > 0: refinementoutcome and ligand confidence is in pandda table
-        # otherwise it is in maintable!!!
-        #
-        #
-        #
-        #
-        #
-        #
-        #
+        # --- ligand confidence ---
         frame = gtk.Frame(label='Ligand Confidence')
         vbox=gtk.VBox()
         self.ligand_confidence_button_list=[]
-        for n,criteria in enumerate(self.ligand_confidence):
+        for n,criteria in enumerate(self.ligand_confidence_category):
             if n == 0:
                 new_button = gtk.RadioButton(None, criteria)
             else:
                 new_button = gtk.RadioButton(new_button, criteria)
-            new_button.connect("toggled",self.experiment_stage_button_clicked,citeria)
+            new_button.connect("toggled",self.ligand_confidence_button_clicked,citeria)
             vbox.add(new_button)
             self.ligand_confidence_button_list.append(new_button)
         frame.add(vbox)
@@ -494,14 +561,15 @@ class GUI(object):
         for n,item in enumerate(self.Todo):
             if str(item[0]) == self.xtalID:
                 self.index = n
-        self.xtalID=str(self.Todo[self.index][0])
+
         self.db_dict_mainTable={}
         self.db_dict_panddaTable={}
-        looking_at_pandda_models=False
         if str(self.Todo[self.index][0]) != None:
             self.compoundID=str(self.Todo[self.index][1])
             self.refinement_folder=str(self.Todo[self.index][4])
             self.refinement_outcome=str(self.Todo[self.index][5])
+            self.ligand_confidence=str(self.Todo[self.index][6])
+            # updating dataset outcome radiobuttons
             current_stage=0
             for i,entry in enumerate(self.experiment_stage):
                 if entry[1]==self.refinement_outcome:
@@ -511,17 +579,63 @@ class GUI(object):
                 if i==current_stage:
                     button.set_active(True)
                     break
-            if len(self.Todo[self.index]) > 6:
-                self.ligand_confidence_of_sample=str(self.Todo[self.index][7])
-                self.event_map=str(self.Todo[self.index][6])
-                coot.set_rotation_centre(float(self.Todo[self.index][8]),float(self.Todo[self.index][9]),float(self.Todo[self.index][10]))
-                looking_at_pandda_models=True
-        if not looking_at_pandda_models:
-            self.compoundID=''
-            self.ligand_confidence_of_sample=''
-            self.refinement_folder=''
-            self.event_map=''
+            # updating ligand confidence radiobuttons
+            current_stage=0
+            for i,entry in enumerate(self.ligand_confidence_category):
+                if entry==self.ligand_confidence:
+                    current_stage=i
+                    break
+            for i,button in enumerate(self.ligand_confidence_button_list):
+                if i==current_stage:
+                    button.set_active(True)
+                    break
+            if self.selected_site[0] > 0:
+                pandda_info=self.db.get_pandda_info_for_coot(self.xtalID,self.selected_site[0])
+                self.event_map=str(self.Todo[self.index][0])
+                coot.set_rotation_centre(float(self.Todo[self.index][1]),float(self.Todo[self.index][2]),float(self.Todo[self.index][3]))
+                self.spider_plot=pandda_info[4]
+            else:
+                self.event_map=''
+                self.spider_plot=''
         self.RefreshData()
+
+
+# this works, but will try something else
+#    def ChooseXtal(self, widget):
+#        self.xtalID = str(widget.get_active_text())
+#        for n,item in enumerate(self.Todo):
+#            if str(item[0]) == self.xtalID:
+#                self.index = n
+#        self.xtalID=str(self.Todo[self.index][0])
+#        self.db_dict_mainTable={}
+#        self.db_dict_panddaTable={}
+#        looking_at_pandda_models=False
+#        if str(self.Todo[self.index][0]) != None:
+#            self.compoundID=str(self.Todo[self.index][1])
+#            self.refinement_folder=str(self.Todo[self.index][4])
+#            self.refinement_outcome=str(self.Todo[self.index][5])
+#            current_stage=0
+#            for i,entry in enumerate(self.experiment_stage):
+#                if entry[1]==self.refinement_outcome:
+#                    current_stage=i
+#                    break
+#            for i,button in enumerate(self.experiment_stage_button_list):
+#                if i==current_stage:
+#                    button.set_active(True)
+#                    break
+#            if len(self.Todo[self.index]) > 6:
+#                self.ligand_confidence_of_sample=str(self.Todo[self.index][7])
+#                self.event_map=str(self.Todo[self.index][6])
+#                coot.set_rotation_centre(float(self.Todo[self.index][8]),float(self.Todo[self.index][9]),float(self.Todo[self.index][10]))
+#                looking_at_pandda_models=True
+#        if not looking_at_pandda_models:
+#            self.compoundID=''
+#            self.ligand_confidence_of_sample=''
+#            self.refinement_folder=''
+#            self.event_map=''
+#        self.RefreshData()
+
+
 
     def update_data_source(self,widget,data=None):              # update and move to next xtal
 #        outcome_dict={'RefinementOutcome': data}
@@ -533,16 +647,45 @@ class GUI(object):
 
 
     def experiment_stage_button_clicked(self,widget, data=None):
-        self.db_dict_mainTable['RefinementOutcome']=data
-        print '==> XCE: setting Refinement Outcome to '+str(data)+' in datasource'
-        self.db.update_data_source(self.xtalID,self.db_dict_mainTable)
+        if self.selected_site[0] == 0:
+            self.db_dict_mainTable['RefinementOutcome']=data
+            print '==> XCE: setting Refinement Outcome for '+self.xtalID+' to '+str(data)+' in mainTable of datasource'
+            self.db.update_data_source(self.xtalID,self.db_dict_mainTable)
+        else:
+            self.db_dict_panddaTable['RefinementOutcome']=data
+            print '==> XCE: setting Refinement Outcome for '+self.xtalID+' (site='+str(self.selected_site)+') to '+str(data)+' in panddaTable of datasource'
+            self.db.update_panddaTable(self.xtalID,self.selected_site[0],self.db_dict_panddaTable)
+
+    def ligand_confidence_button_clicked(self,widget, data=None):
+        if self.selected_site[0] == 0:
+            self.db_dict_mainTable['RefinementLigandConfidence']=data
+            print '==> XCE: setting Ligand Confidence for '+self.xtalID+' to '+str(data)+' in mainTable of datasource'
+            self.db.update_data_source(self.xtalID,self.db_dict_mainTable)
+        else:
+            self.db_dict_panddaTable['PANDDA_site_confidence']=data
+            print '==> XCE: setting Ligand Confidence for '+self.xtalID+' (site='+str(self.selected_site)+') to '+str(data)+' in panddaTable of datasource'
+            self.db.update_panddaTable(self.xtalID,self.selected_site[0],self.db_dict_panddaTable)
+
 
     def RefreshData(self):
         # initialize Refinement library
         self.Refine=XChemRefine.Refine(self.project_directory,self.xtalID,self.compoundID,self.data_source)
         self.Serial=self.Refine.GetSerial()
 
-        self.QualityIndicators=XChemUtils.ParseFiles(self.project_directory,self.xtalID).UpdateQualityIndicators()
+#        self.QualityIndicators=XChemUtils.ParseFiles(self.project_directory,self.xtalID).UpdateQualityIndicators()
+        # all this information is now updated in the datasource after each refinement cycle
+        self.QualityIndicators=self.db.get_db_dict_for_sample(self.xtalID)
+        if self.selected_site[0] > 0:
+            self.spider_plot_data=self.db.get_db_pandda_dict_for_sample_and_site(self.xtalID,self.selected_site[0])
+            self.ligandIDValue.set_label(self.spider_plot_data['PANDDA_site_ligand_id'])
+            self.ligand_occupancyValue.set_label(self.spider_plot_data['PANDDA_site_occupancy'])
+            self.ligand_BaverageValue.set_label(self.spider_plot_data['PANDDA_site_B_average'])
+            self.ligand_BratioSurroundingsValue.set_label(self.spider_plot_data['PANDDA_site_B_ratio_residue_surroundings'])
+            self.ligand_RSCCValue.set_label(self.spider_plot_data['PANDDA_site_RSCC'])
+            self.ligand_rmsdValue.set_label(self.spider_plot_data['PANDDA_site_rmsd'])
+            self.ligand_RSRValue.set_label(self.spider_plot_data['PANDDA_site_RSR'])
+            self.ligand_RSZDValue.set_label(self.spider_plot_data['PANDDA_site_RSZD'])
+
 
         #########################################################################################
         # history
@@ -561,15 +704,12 @@ class GUI(object):
         #########################################################################################
         # Spider plot
         # Note: refinement history was shown instead previously
-        query=self.db.execute_statement("select PANDDA_site_spider_plot from panddaTable where CrystalName='%s' and PANDDA_site_index='%s';" %(self.xtalID,self.selected_site[0]))
-        if query != []:
-            if os.path.isfile(str(query[0][0])):
-                self.spider_plot=str(query[0][0])
-                spider_plot_pic = gtk.gdk.pixbuf_new_from_file(self.spider_plot)
-            else:
-                spider_plot_pic = gtk.gdk.pixbuf_new_from_file(os.path.join(os.getenv('XChemExplorer_DIR'),'image','NO_SPIDER_PLOT_AVAILABLE.png'))
-            self.spider_plot_pic = spider_plot_pic.scale_simple(190, 190, gtk.gdk.INTERP_BILINEAR)
-            self.spider_plot_image.set_from_pixbuf(self.spider_plot_pic)
+        if os.path.isfile(self.spider_plot):
+            spider_plot_pic = gtk.gdk.pixbuf_new_from_file(self.spider_plot)
+        else:
+            spider_plot_pic = gtk.gdk.pixbuf_new_from_file(os.path.join(os.getenv('XChemExplorer_DIR'),'image','NO_SPIDER_PLOT_AVAILABLE.png'))
+        self.spider_plot_pic = spider_plot_pic.scale_simple(190, 190, gtk.gdk.INTERP_BILINEAR)
+        self.spider_plot_image.set_from_pixbuf(self.spider_plot_pic)
 
         #########################################################################################
         # update pdb & maps
@@ -656,23 +796,21 @@ class GUI(object):
 
         #########################################################################################
         # update Quality Indicator table
-        self.RRfreeValue.set_label(self.QualityIndicators['R']+' / '+self.QualityIndicators['RRfree'])
-        self.RRfreeBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RRfreeColor']))
-        self.ResolutionValue.set_label(self.QualityIndicators['Resolution'])
-        self.ResolutionBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['ResolutionColor']))
-        self.MolprobityScoreValue.set_label(self.QualityIndicators['MolprobityScore'])
-        self.MolprobityScoreBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['MolprobityScoreColor']))
-        self.RamachandranOutliersValue.set_label(self.QualityIndicators['RamachandranOutliers'])
-        self.RamachandranOutliersBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RamachandranOutliersColor']))
-        self.RamachandranFavoredValue.set_label(self.QualityIndicators['RamachandranFavored'])
-        self.RamachandranFavoredBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RamachandranFavoredColor']))
-        self.LigandCCValue.set_label(self.QualityIndicators['LigandCC'])
-        self.LigandCCBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['LigandCCcolor']))
-        self.rmsdBondsValue.set_label(self.QualityIndicators['rmsdBonds'])
-        self.rmsdBondsBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['rmsdBondsColor']))
-        self.rmsdAnglesValue.set_label(self.QualityIndicators['rmsdAngles'])
-        self.rmsdAnglesBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['rmsdAnglesColor']))
-        self.MatrixWeightValue.set_label(self.QualityIndicators['MatrixWeight'])
+        self.RRfreeValue.set_label(self.QualityIndicators['RefinementRcryst']+' / '+self.QualityIndicators['RefinementRfree'])
+        self.RRfreeBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementRfreeTraficLight']))
+        self.ResolutionValue.set_label(self.QualityIndicators['RefinementResolution'])
+        self.ResolutionBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementResolutionTL']))
+        self.MolprobityScoreValue.set_label(self.QualityIndicators['RefinementMolProbityScore'])
+        self.MolprobityScoreBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementMolProbityScoreTL']))
+        self.RamachandranOutliersValue.set_label(self.QualityIndicators['RefinementRamachandranOutliers'])
+        self.RamachandranOutliersBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementRamachandranOutliersTL']))
+        self.RamachandranFavoredValue.set_label(self.QualityIndicators['RefinementRamachandranFavored'])
+        self.RamachandranFavoredBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementRamachandranFavoredTL']))
+        self.rmsdBondsValue.set_label(self.QualityIndicators['RefinementRmsdBonds'])
+        self.rmsdBondsBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementRmsdBondsTL']))
+        self.rmsdAnglesValue.set_label(self.QualityIndicators['RefinementRmsdAngles'])
+        self.rmsdAnglesBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementRmsdAnglesTL']))
+        self.MatrixWeightValue.set_label(self.QualityIndicators['RefinementMatrixWeight'])
 
         try:
             pic = gtk.gdk.pixbuf_new_from_file(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.png'))
@@ -748,7 +886,7 @@ class GUI(object):
             for n,item in enumerate(self.Todo):
                 self.cb.remove_text(0)
         self.Todo=[]
-        self.Todo=self.db.get_samples_for_coot(self.selection_mode,self.selected_site[0])
+        self.Todo=self.db.get_todo_list_for_coot(self.selection_mode,self.selected_site[0])
         self.status_label.set_text('found %s samples' %len(self.Todo))
         for item in self.Todo:
             self.cb.append_text('%s' %item[0])
