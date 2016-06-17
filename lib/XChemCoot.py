@@ -800,7 +800,6 @@ class GUI(object):
 
         #########################################################################################
         # update Quality Indicator table
-        print self.QualityIndicators
         self.RRfreeValue.set_label(self.QualityIndicators['RefinementRcryst']+' / '+self.QualityIndicators['RefinementRfree'])
         self.RRfreeBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementRfreeTraficLight']))
         self.ResolutionValue.set_label(self.QualityIndicators['RefinementResolution'])
