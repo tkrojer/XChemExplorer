@@ -78,6 +78,15 @@ class update_datasource_from_file_system(QtCore.QThread):
                             break
                     if not refinement_in_progress:
                         db_dict['RefinementOutcome']='1 - Analysis Pending'
+            if os.path.isdir('compound'):
+                if sample_dict['CompoundCode']=='None' or sample_dict['CompoundCode']=='':
+                    for smiles in glob.glob('compound/*'):
+                        if smiles.endwith('smiles'):
+                            for line in open(smiles):
+                                if len(line.split()) >= 1:
+                                    db_dict['CompoundSMILES']=line.split()[0]
+                                    db_dict['CompoundCode']=smiles[smiles.rfind('/')+1:smiles.rfind('.')]
+                                    break
 
             for file in glob.glob('*'):
                 if file==xtal+'.log' and os.path.isfile(file):
@@ -166,6 +175,13 @@ class create_png_and_cif_of_compound(QtCore.QThread):
             # create 'compound' directory if not present
             if not os.path.isdir(os.path.join(self.initial_model_directory,sampleID,'compound')):
                 os.mkdir(os.path.join(self.initial_model_directory,sampleID,'compound'))
+
+            # create text file which contains the smiles string
+            if not os.path.isfile(os.path.join(self.initial_model_directory,sampleID,'compound',compoundID+'.smiles')):
+                os.chdir(os.path.join(self.initial_model_directory,sampleID,'compound'))
+                f=open(compoundID+'.smiles','w')
+                f.write(smiles)
+                f.close()
 
             if not os.path.isfile(os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.cif')):
                 os.chdir(os.path.join(self.initial_model_directory,sampleID,'compound'))
