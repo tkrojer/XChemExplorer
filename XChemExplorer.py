@@ -1366,8 +1366,8 @@ class XChemExplorer(QtGui.QApplication):
 #            self.database_directory_label.setText(self.database_directory)
             self.beamline_directory_label.setText(self.beamline_directory)
             self.ccp4_scratch_directory_label.setText(self.ccp4_scratch_directory)
-            self.adjust_allowed_unit_cell_difference.setText(str(self.allowed_unitcell_difference_percent))
-            self.adjust_acceptable_low_resolution_limit.setText(str(self.acceptable_low_resolution_limit_for_data))
+#            self.adjust_allowed_unit_cell_difference.setText(str(self.allowed_unitcell_difference_percent))
+#            self.adjust_acceptable_low_resolution_limit.setText(str(self.acceptable_low_resolution_limit_for_data))
             self.reference_file_list=self.get_reference_file_list(' ')
 
 #            if self.data_source_set:
