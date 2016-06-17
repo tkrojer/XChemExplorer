@@ -672,7 +672,11 @@ class GUI(object):
         self.Refine=XChemRefine.Refine(self.project_directory,self.xtalID,self.compoundID,self.data_source)
         self.Serial=self.Refine.GetSerial()
         print '\n\n\n\n\n\nSerial',self.Serial
-#        self.QualityIndicators=XChemUtils.ParseFiles(self.project_directory,self.xtalID).UpdateQualityIndicators()
+        if self.Serial==1:
+            # i.e. no refinement has been done; data is probably straight out of dimple
+            if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style)):
+                print '==> XCE: updating quality indicators in data source for '+self.xtalID
+                XChemUtils.parse().update_datasource_with_PDBheader(self.xtalID,self.data_source,os.path.join(self.project_directory,self.xtalID,self.pdb_style))
         # all this information is now updated in the datasource after each refinement cycle
         self.QualityIndicators=self.db.get_db_dict_for_sample(self.xtalID)
         if int(self.selected_site[0]) > 0:
