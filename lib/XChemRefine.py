@@ -102,11 +102,11 @@ class Refine(object):
         # if a new data source is created from a file system, but smiles and compoundID where not updated;
         # so the ligand may still be in the structure, but since the compoundID is unknown to the datasource,
         # its restraints won't be read in and refmac will fail
-        for file in glob.glob(os.path.join(self.ProjectPath,self.xtalID,'*')):
-            if file.endswith('.cif'):
-                RefmacParams['LIBIN']='LIBIN '+file+' \\\n'
-                RefmacParams['LIBOUT']='LIBOUT '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'/refine_'+Serial+'.cif \\\n'
-                break
+            for file in glob.glob(os.path.join(self.ProjectPath,self.xtalID,'*')):
+                if file.endswith('.cif'):
+                    RefmacParams['LIBIN']='LIBIN '+file+' \\\n'
+                    RefmacParams['LIBOUT']='LIBOUT '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'/refine_'+Serial+'.cif \\\n'
+                    break
 
         #######################################################
         # TLSIN & TLSOUT
