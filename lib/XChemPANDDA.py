@@ -182,7 +182,7 @@ class run_pandda_export(QtCore.QThread):
                 ' export_ligands=False'
                 ' generate_occupancy_groupings=True\n'
                 )
-        print Cmds
+        print '==> XCE: running pandda.export with the following command:\n',Cmds
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running pandda.export: check terminal for details')
         os.system(Cmds)
 

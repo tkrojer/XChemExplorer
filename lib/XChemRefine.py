@@ -65,7 +65,9 @@ class Refine(object):
 
         #######################################################
         # LIBIN & LIBOUT
+        found_cif=False
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.compoundID+'.cif')):
+            found_cif=True
             # in cases where multiple liagnds are present (e.g. NOG, ATP) the user for now needs to put
             # the respective dictionary into the xtalID folder
             # need to think of a better mechanism in the future
@@ -95,6 +97,16 @@ class Refine(object):
             else:
                 RefmacParams['LIBIN']='LIBIN '+self.ProjectPath+'/'+self.xtalID+'/'+self.compoundID+'.cif \\\n'
             RefmacParams['LIBOUT']='LIBOUT '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'/refine_'+Serial+'.cif \\\n'
+        if not found_cif:
+        # this should actually not be necessary, but the following scenario can happen:
+        # if a new data source is created from a file system, but smiles and compoundID where not updated;
+        # so the ligand may still be in the structure, but since the compoundID is unknown to the datasource,
+        # its restraints won't be read in and refmac will fail
+        for file in glob.glob(os.path.join(self.ProjectPath,self.xtalID,'*')):
+            if file.endswith('.cif'):
+                RefmacParams['LIBIN']='LIBIN '+file+' \\\n'
+                RefmacParams['LIBOUT']='LIBOUT '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'/refine_'+Serial+'.cif \\\n'
+                break
 
         #######################################################
         # TLSIN & TLSOUT
