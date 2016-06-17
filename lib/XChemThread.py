@@ -81,7 +81,7 @@ class update_datasource_from_file_system(QtCore.QThread):
             if os.path.isdir('compound'):
                 if sample_dict['CompoundCode']=='None' or sample_dict['CompoundCode']=='':
                     for smiles in glob.glob('compound/*'):
-                        if smiles.endwith('smiles'):
+                        if smiles.endswith('smiles'):
                             for line in open(smiles):
                                 if len(line.split()) >= 1:
                                     db_dict['CompoundSMILES']=line.split()[0]
