@@ -724,6 +724,7 @@ class parse:
         db_dict['RefinementSpaceGroup'] =           pdb['SpaceGroup']
         db_dict['RefinementResolution'] =           pdb['ResolutionHigh']
         db_dict['RefinementResolutionTL'] =         pdb['ResolutionColor']
+        print db_dict
         db=XChemDB.data_source(datasource)
         db.update_data_source(xtal,db_dict)
 
@@ -767,7 +768,7 @@ class parse:
             db_dict['RefinementRamachandranOutliersTL'] = 'gray'
             db_dict['RefinementRamachandranFavored']    = '-'
             db_dict['RefinementRamachandranFavoredTL']  = 'gray'
-
+        print db_dict
         db=XChemDB.data_source(datasource)
         db.update_data_source(xtal,db_dict)
 
