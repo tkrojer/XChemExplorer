@@ -55,6 +55,7 @@ class update_datasource_from_file_system(QtCore.QThread):
 
             if os.path.isfile('dimple.pdb'):
                 if not os.path.isfile('refine.pdb'):
+                    print xtal
                     os.symlink('dimple.pdb', 'refine.pdb')
             if os.path.isfile('dimple.mtz'):
                 db_dict['DimplePathToMTZ']=os.path.realpath(os.path.join(directory,'dimple.mtz'))
