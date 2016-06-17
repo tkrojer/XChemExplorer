@@ -72,7 +72,9 @@ class update_datasource_from_file_system(QtCore.QThread):
                     db_dict['DataProcessingPathToMTZfile']=os.path.join(directory,xtal+'.mtz')
                     db_dict['DataProcessingMTZfileName']=xtal+'.mtz'
                 found_mtz_free=False
+                print file
                 if file==xtal+'.free.mtz' and os.path.isfile(file):
+                    print 'here'
                     db_dict['RefinementMTZfree']=os.path.join(directory,xtal+'.free.mtz')
                     found_mtz_free=True
                 if file==compoundID+'.cif' and os.path.isfile(file):
