@@ -57,8 +57,14 @@ class update_datasource_from_file_system(QtCore.QThread):
                 if not os.path.isfile('refine.pdb'):
                     os.symlink('dimple.pdb', 'refine.pdb')
             if os.path.isfile('dimple.mtz'):
+                db_dict['DimplePathToMTZ']=os.path.realpath(os.path.join(directory,'dimple.mtz'))
+                dimple_mtz=db_dict['DimplePathToMTZ']
+                dimple_path=dimple_mtz[:dimple_mtz.rfind('/')]
                 if not os.path.isfile('refine.mtz'):
                     os.symlink('dimple.mtz', 'refine.mtz')
+            if not os.path.isfile(xtal+'.free.mtz'):
+                if os.path.isfile(os.path.join(dimple_path,'prepared2.mtz')):
+                    os.symlink(os.path.join(dimple_path,'prepared2.mtz'),xtal+'.free.mtz')
 
             for file in glob.glob('*'):
                 if file==xtal+'.log' and os.path.isfile(file):
@@ -71,12 +77,8 @@ class update_datasource_from_file_system(QtCore.QThread):
                 if file==xtal+'.mtz' and os.path.isfile(file):
                     db_dict['DataProcessingPathToMTZfile']=os.path.join(directory,xtal+'.mtz')
                     db_dict['DataProcessingMTZfileName']=xtal+'.mtz'
-                found_mtz_free=False
-                print file
                 if file==xtal+'.free.mtz' and os.path.isfile(file):
-                    print 'here'
                     db_dict['RefinementMTZfree']=os.path.join(directory,xtal+'.free.mtz')
-                    found_mtz_free=True
                 if file==compoundID+'.cif' and os.path.isfile(file):
                     db_dict['RefinementCIF']=os.path.join(directory,compoundID+'.cif')
                 if file=='dimple.pdb' and os.path.isfile(file):
@@ -85,14 +87,6 @@ class update_datasource_from_file_system(QtCore.QThread):
                     db_dict['DimpleRcryst']=pdb_info['Rcryst']
                     db_dict['DimpleRfree']=pdb_info['Rfree']
                     db_dict['DimpleResolutionHigh']=pdb_info['ResolutionHigh']
-                if file=='dimple.mtz' and os.path.isfile(file):
-                    db_dict['DimplePathToMTZ']=os.path.realpath(os.path.join(directory,'dimple.mtz'))
-                    if not found_mtz_free:
-                        dimple_mtz=db_dict['DimplePathToMTZ']
-                        dimple_path=dimple_mtz[:dimple_mtz.rfind('/')]
-                        if os.path.isfile(os.path.join(dimple_path,'prepared2.mtz')):
-                            os.symlink(os.path.join(dimple_path,'prepared2.mtz'),xtal+'.free.mtz')
-                            db_dict['RefinementMTZfree']=os.path.join(os.path.join(dimple_path,'prepared2.mtz'))
                 if file=='refine.pdb' and os.path.isfile(file):
                     if sample_dict['RefinementOutcome']=='None' or sample_dict['RefinementOutcome']=='':
                         db_dict['RefinementOutcome']='3 - In Refinement'
