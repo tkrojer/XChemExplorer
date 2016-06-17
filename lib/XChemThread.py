@@ -55,15 +55,17 @@ class update_datasource_from_file_system(QtCore.QThread):
 
             if os.path.isfile('dimple.pdb'):
                 if not os.path.isfile('refine.pdb'):
-                    print xtal
+                    os.system('/bin/rm refine.pdb')         # this removes broken links that could trip the symlink
                     os.symlink('dimple.pdb', 'refine.pdb')
             if os.path.isfile('dimple.mtz'):
                 db_dict['DimplePathToMTZ']=os.path.realpath(os.path.join(directory,'dimple.mtz'))
                 dimple_mtz=db_dict['DimplePathToMTZ']
                 dimple_path=dimple_mtz[:dimple_mtz.rfind('/')]
                 if not os.path.isfile('refine.mtz'):
+                    os.system('/bin/rm refine.mtz')
                     os.symlink('dimple.mtz', 'refine.mtz')
             if not os.path.isfile(xtal+'.free.mtz'):
+                os.system('/bin/rm '+xtal+'.free.mtz')
                 if os.path.isfile(os.path.join(dimple_path,'prepared2.mtz')):
                     os.symlink(os.path.join(dimple_path,'prepared2.mtz'),xtal+'.free.mtz')
             if os.path.isfile('refine.mtz'):
