@@ -709,6 +709,8 @@ class data_source:
                 "where RefinementOutcome is %s;" %outcome
                 )
 
+        print sqlite
+
         cursor.execute(sqlite)
 
         tmp = cursor.fetchall()
