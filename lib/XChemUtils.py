@@ -722,8 +722,8 @@ class parse:
         db_dict['RefinementRmsdAngles'] =           pdb['rmsdAngles']
         db_dict['RefinementRmsdAnglesTL'] =         pdb['rmsdAnglesTL']
         db_dict['RefinementSpaceGroup'] =           pdb['SpaceGroup']
-        db_dict['ResolutionHigh'] =                 pdb['RefinementResolution']
-        db_dict['ResolutionColor'] =                pdb['RefinementResolutionTL']
+        db_dict['RefinementResolution'] =           pdb['ResolutionHigh']
+        db_dict['RefinementResolutionTL'] =         pdb['ResolutionColor']
         db=XChemDB.data_source(datasource)
         db.update_data_source(xtal,db_dict)
 

@@ -21,8 +21,8 @@ def parse_pdb(inital_model_directory,xtal,db_dict):
         db_dict['RefinementRmsdAngles'] =           pdb['rmsdAngles']
         db_dict['RefinementRmsdAnglesTL'] =         pdb['rmsdAnglesTL']
         db_dict['RefinementSpaceGroup'] =           pdb['SpaceGroup']
-        db_dict['ResolutionHigh'] =                 pdb['RefinementResolution']
-        db_dict['ResolutionColor'] =                pdb['RefinementResolutionTL']
+        db_dict['RefinementResolution'] =           pdb['ResolutionHigh']
+        db_dict['RefinementResolutionTL'] =         pdb['ResolutionColor']
 
     return db_dict
 

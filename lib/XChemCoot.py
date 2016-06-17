@@ -671,7 +671,6 @@ class GUI(object):
         # initialize Refinement library
         self.Refine=XChemRefine.Refine(self.project_directory,self.xtalID,self.compoundID,self.data_source)
         self.Serial=self.Refine.GetSerial()
-        print '\n\n\n\n\n\nSerial',self.Serial
         if self.Serial==1:
             # i.e. no refinement has been done; data is probably straight out of dimple
             if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style)):
