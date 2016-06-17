@@ -784,15 +784,15 @@ class GUI(object):
                     os.symlink('dimple.mtz',self.mtz_style)
             coot.auto_read_make_and_draw_maps(os.path.join(self.project_directory,self.xtalID,self.mtz_style))
 
-        #########################################################################################
-        # update Ligand Confidence combobox
-        if str(self.ligand_confidence_of_sample)=='None':
-            self.ligand_confidence_of_sample='Analysis Pending'
-            db_dict={'RefinementLigandConfidence': self.ligand_confidence_of_sample}
-#            self.db.update_data_source(self.xtalID,db_dict)
-        for n,criteria in enumerate(self.ligand_confidence):
-            if criteria.replace('Ligand Confidence: ','')==self.ligand_confidence_of_sample:
-                self.cb_ligand_confidence.set_active(n)
+#        #########################################################################################
+#        # update Ligand Confidence combobox
+#        if str(self.ligand_confidence_of_sample)=='None':
+#            self.ligand_confidence_of_sample='Analysis Pending'
+#            db_dict={'RefinementLigandConfidence': self.ligand_confidence_of_sample}
+##            self.db.update_data_source(self.xtalID,db_dict)
+#        for n,criteria in enumerate(self.ligand_confidence):
+#            if criteria.replace('Ligand Confidence: ','')==self.ligand_confidence_of_sample:
+#                self.cb_ligand_confidence.set_active(n)
 
         #########################################################################################
         # update Quality Indicator table
@@ -867,12 +867,12 @@ class GUI(object):
                 self.selected_site=site
                 break
 
-    def set_ligand_confidence(self,widget):
-        self.ligand_confidence_of_sample=widget.get_active_text().replace('Ligand Confidence: ','')
-        print '===> XCE: updating data source with new ligand confidence ',self.ligand_confidence_of_sample
-        db_dict={'RefinementLigandConfidence': self.ligand_confidence_of_sample}
-#        self.db.update_data_source(self.xtalID,db_dict)
-        self.Todo[self.index][2]=self.ligand_confidence_of_sample
+#    def set_ligand_confidence(self,widget):
+#        self.ligand_confidence_of_sample=widget.get_active_text().replace('Ligand Confidence: ','')
+#        print '===> XCE: updating data source with new ligand confidence ',self.ligand_confidence_of_sample
+#        db_dict={'RefinementLigandConfidence': self.ligand_confidence_of_sample}
+##        self.db.update_data_source(self.xtalID,db_dict)
+#        self.Todo[self.index][2]=self.ligand_confidence_of_sample
 
 
     def get_samples_to_look_at(self,widget):
