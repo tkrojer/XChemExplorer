@@ -65,6 +65,16 @@ class update_datasource_from_file_system(QtCore.QThread):
             if not os.path.isfile(xtal+'.free.mtz'):
                 if os.path.isfile(os.path.join(dimple_path,'prepared2.mtz')):
                     os.symlink(os.path.join(dimple_path,'prepared2.mtz'),xtal+'.free.mtz')
+            if os.path.isfile('refine.mtz'):
+                if sample_dict['RefinementOutcome']=='None' or sample_dict['RefinementOutcome']=='':
+                    refinement_in_progress=False
+                    for dirs in glob.glob('*'):
+                        if dirs.startswith('Refine_') and os.path.isdir(dirs):
+                            db_dict['RefinementOutcome']='3 - In Refinement'
+                            refinement_in_progress=True
+                            break
+                    if not refinement_in_progress:
+                        db_dict['RefinementOutcome']='1 - Analysis Pending'
 
             for file in glob.glob('*'):
                 if file==xtal+'.log' and os.path.isfile(file):
@@ -88,8 +98,8 @@ class update_datasource_from_file_system(QtCore.QThread):
                     db_dict['DimpleRfree']=pdb_info['Rfree']
                     db_dict['DimpleResolutionHigh']=pdb_info['ResolutionHigh']
                 if file=='refine.pdb' and os.path.isfile(file):
-                    if sample_dict['RefinementOutcome']=='None' or sample_dict['RefinementOutcome']=='':
-                        db_dict['RefinementOutcome']='3 - In Refinement'
+#                    if sample_dict['RefinementOutcome']=='None' or sample_dict['RefinementOutcome']=='':
+#                        db_dict['RefinementOutcome']='3 - In Refinement'
                     db_dict['RefinementPDB_latest']=os.path.realpath(os.path.join(directory,'refine.pdb'))
                     pdb_info=parse().PDBheader(file)
                     db_dict['RefinementRcryst']=pdb_info['Rcryst']
