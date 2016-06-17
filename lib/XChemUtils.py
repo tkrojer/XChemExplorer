@@ -727,6 +727,49 @@ class parse:
         db=XChemDB.data_source(datasource)
         db.update_data_source(xtal,db_dict)
 
+    def update_datasource_with_phenix_validation_summary(self,xtal,datasource,validation_summary):
+        db_dict={}
+        if os.path.isfile(validation_summary):
+            for line in open(validation_summary):
+                if 'molprobity score' in line.lower():
+                    if len(line.split()) >= 4:
+                        db_dict['RefinementMolProbityScore'] = line.split()[3]
+                        if float(line.split()[3]) < 2:
+                            db_dict['RefinementMolProbityScoreTL'] = 'green'
+                        if float(line.split()[3]) >= 2 and float(line.split()[3]) < 3:
+                            db_dict['RefinementMolProbityScoreTL'] = 'orange'
+                        if float(line.split()[3]) >= 3:
+                            db_dict['RefinementMolProbityScoreTL'] = 'red'
+
+                if 'ramachandran outliers' in line.lower():
+                    if len(line.split()) >= 4:
+                        db_dict['RefinementRamachandranOutliers'] = line.split()[3]
+                        if float(line.split()[3]) < 0.3:
+                            db_dict['RefinementRamachandranOutliersTL'] = 'green'
+                        if float(line.split()[3]) >= 0.3 and float(line.split()[3]) < 1:
+                            db_dict['RefinementRamachandranOutliersTL'] = 'orange'
+                        if float(line.split()[3]) >= 1:
+                            db_dict['RefinementRamachandranOutliersTL'] = 'red'
+
+                if 'favored' in line.lower():
+                    if len(line.split()) >= 3:
+                        db_dict['RefinementRamachandranFavored'] = line.split()[2]
+                        if float(line.split()[2]) < 90:
+                            db_dict['RefinementRamachandranFavoredTL'] = 'red'
+                        if float(line.split()[2]) >= 90 and float(line.split()[2]) < 98:
+                            db_dict['RefinementRamachandranFavoredTL'] = 'orange'
+                        if float(line.split()[2]) >= 98:
+                            db_dict['RefinementRamachandranFavoredTL'] = 'green'
+        else:
+            db_dict['RefinementMolProbityScore']        = '-'
+            db_dict['RefinementMolProbityScoreTL']      = 'gray'
+            db_dict['RefinementRamachandranOutliers']   = '-'
+            db_dict['RefinementRamachandranOutliersTL'] = 'gray'
+            db_dict['RefinementRamachandranFavored']    = '-'
+            db_dict['RefinementRamachandranFavoredTL']  = 'gray'
+
+        db=XChemDB.data_source(datasource)
+        db.update_data_source(xtal,db_dict)
 
 class mtztools:
     

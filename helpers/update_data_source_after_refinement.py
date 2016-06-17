@@ -43,7 +43,7 @@ def parse_molprobity_output(inital_model_directory,xtal,db_dict):
         for line in open(os.path.join(inital_model_directory,xtal,'validation_summary.txt')):
             if 'molprobity score' in line.lower():
                 if len(line.split()) >= 4:
-                    db_dict['RefinementMolProbityScoreTL'] = line.split()[3]
+                    db_dict['RefinementMolProbityScore'] = line.split()[3]
                     if float(line.split()[3]) < 2:
                         db_dict['RefinementMolProbityScoreTL'] = 'green'
                     if float(line.split()[3]) >= 2 and float(line.split()[3]) < 3:

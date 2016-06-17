@@ -676,6 +676,7 @@ class GUI(object):
             if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style)):
                 print '==> XCE: updating quality indicators in data source for '+self.xtalID
                 XChemUtils.parse().update_datasource_with_PDBheader(self.xtalID,self.data_source,os.path.join(self.project_directory,self.xtalID,self.pdb_style))
+                XChemUtils.parse().update_datasource_with_phenix_validation_summary(self,self.xtalID,self.data_source,'')   # '' because file does not exist
         # all this information is now updated in the datasource after each refinement cycle
         self.QualityIndicators=self.db.get_db_dict_for_sample(self.xtalID)
         if int(self.selected_site[0]) > 0:
