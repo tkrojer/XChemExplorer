@@ -682,7 +682,7 @@ class data_source:
         if int(pandda_site) > 0:
             sqlite = (
                 "select"
-                " mainTable.CrystalName"
+                " mainTable.CrystalName,"
                 " mainTable.CompoundCode,"
                 " mainTable.RefinementCIF,"
                 " mainTable.RefinementMTZfree,"
@@ -694,7 +694,6 @@ class data_source:
                 " and panddaTable.PANDDA_site_ligand_placed is 'True'"
                 " and panddaTable.RefinementOutcome is %s;" %outcome
                 )
-
         else:
             sqlite = (
                 "select"
@@ -708,8 +707,6 @@ class data_source:
                 "from mainTable "
                 "where RefinementOutcome is %s;" %outcome
                 )
-
-        print sqlite
 
         cursor.execute(sqlite)
 
