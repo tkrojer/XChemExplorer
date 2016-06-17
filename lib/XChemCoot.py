@@ -590,7 +590,7 @@ class GUI(object):
                     button.set_active(True)
                     break
             print 'selected site',self.selected_site
-            if self.selected_site[0] > 0:
+            if int(self.selected_site)[0] > 0:
                 pandda_info=self.db.get_pandda_info_for_coot(self.xtalID,self.selected_site[0])
                 print 'pandda_info',pandda_info
                 self.event_map=pandda_info[0]
