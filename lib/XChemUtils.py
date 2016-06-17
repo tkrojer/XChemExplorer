@@ -14,6 +14,9 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit.Chem import Draw
 
+sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
+import XChemDB
+
 
 class process:
 
@@ -705,6 +708,25 @@ class parse:
                     
                     
         return PDBinfo
+
+    def update_datasource_with_PDBheader(self,xtal,datasource,pdbfile):
+        db_dict={}
+        db_dict['RefinementPDB_latest']=os.path.realpath(pdbfile)
+        pdb=self.PDBheader(pdbfile)
+        db_dict['RefinementRcryst'] =               pdb['Rcryst']
+        db_dict['RefinementRcrystTraficLight'] =    pdb['RcrystTL']
+        db_dict['RefinementRfree']=                 pdb['Rfree']
+        db_dict['RefinementRfreeTraficLight'] =     pdb['RfreeTL']
+        db_dict['RefinementRmsdBonds']  =           pdb['rmsdBonds']
+        db_dict['RefinementRmsdBondsTL'] =          pdb['rmsdBondsTL']
+        db_dict['RefinementRmsdAngles'] =           pdb['rmsdAngles']
+        db_dict['RefinementRmsdAnglesTL'] =         pdb['rmsdAnglesTL']
+        db_dict['RefinementSpaceGroup'] =           pdb['SpaceGroup']
+        db_dict['ResolutionHigh'] =                 pdb['RefinementResolution']
+        db_dict['ResolutionColor'] =                pdb['RefinementResolutionTL']
+        db=XChemDB.data_source(datasource)
+        db.update_data_source(xtal,db_dict)
+
 
 class mtztools:
     

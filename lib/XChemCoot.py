@@ -671,7 +671,7 @@ class GUI(object):
         # initialize Refinement library
         self.Refine=XChemRefine.Refine(self.project_directory,self.xtalID,self.compoundID,self.data_source)
         self.Serial=self.Refine.GetSerial()
-
+        print '\n\n\n\n\n\nSerial',self.Serial
 #        self.QualityIndicators=XChemUtils.ParseFiles(self.project_directory,self.xtalID).UpdateQualityIndicators()
         # all this information is now updated in the datasource after each refinement cycle
         self.QualityIndicators=self.db.get_db_dict_for_sample(self.xtalID)
@@ -796,6 +796,7 @@ class GUI(object):
 
         #########################################################################################
         # update Quality Indicator table
+        print self.QualityIndicators
         self.RRfreeValue.set_label(self.QualityIndicators['RefinementRcryst']+' / '+self.QualityIndicators['RefinementRfree'])
         self.RRfreeBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementRfreeTraficLight']))
         self.ResolutionValue.set_label(self.QualityIndicators['RefinementResolution'])
