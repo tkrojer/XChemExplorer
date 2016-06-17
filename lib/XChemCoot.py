@@ -675,7 +675,7 @@ class GUI(object):
 #        self.QualityIndicators=XChemUtils.ParseFiles(self.project_directory,self.xtalID).UpdateQualityIndicators()
         # all this information is now updated in the datasource after each refinement cycle
         self.QualityIndicators=self.db.get_db_dict_for_sample(self.xtalID)
-        if self.selected_site[0] > 0:
+        if int(self.selected_site[0]) > 0:
             self.spider_plot_data=self.db.get_db_pandda_dict_for_sample_and_site(self.xtalID,self.selected_site[0])
             self.ligandIDValue.set_label(self.spider_plot_data['PANDDA_site_ligand_id'])
             self.ligand_occupancyValue.set_label(self.spider_plot_data['PANDDA_site_occupancy'])
