@@ -4,10 +4,8 @@ import csv
 from datetime import datetime
 import getpass
 
-# committed on: 05/12/2015
-
-sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
-from XChemUtils import parse
+#sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
+#from XChemUtils import parse
 
 class data_source:
 
