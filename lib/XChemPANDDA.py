@@ -125,7 +125,6 @@ class run_pandda_export(QtCore.QThread):
                 # check if EVENT map exists in project directory
                 event_map='event_map'
                 for file in glob.glob(os.path.join(self.initial_model_directory,sampleID,'*ccp4')):
-                    print file
                     filename=file[file.rfind('/')+1:]
                     if filename.startswith(sampleID+'-event_'+event_index) and filename.endswith('map.native.ccp4'):
                         event_map=file
@@ -169,6 +168,9 @@ class run_pandda_export(QtCore.QThread):
 
                 self.db.update_insert_panddaTable(sampleID,db_dict)
                 self.db.execute_statement("update mainTable set RefinementOutcome = '2 - PANDDA model' where CrystalName is '%s' and RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending'" %sampleID)
+                print '\n\n\n\n\n'
+                print sampleID
+                print "update mainTable set RefinementOutcome = '2 - PANDDA model' where CrystalName is '%s' and RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending'" %sampleID
                 progress += progress_step
                 self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
