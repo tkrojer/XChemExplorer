@@ -590,10 +590,14 @@ class GUI(object):
                     button.set_active(True)
                     break
             if int(self.selected_site[0]) > 0:
-                pandda_info=self.db.get_pandda_info_for_coot(self.xtalID,self.selected_site[0])
-                self.event_map=pandda_info[0]
-                coot.set_rotation_centre(float(pandda_info[1]),float(pandda_info[2]),float(pandda_info[3]))
-                self.spider_plot=pandda_info[4]
+                try:
+                    pandda_info=self.db.get_pandda_info_for_coot(self.xtalID,self.selected_site[0])
+                    self.event_map=pandda_info[0]
+                    coot.set_rotation_centre(float(pandda_info[1]),float(pandda_info[2]),float(pandda_info[3]))
+                    self.spider_plot=pandda_info[4]
+                except IndexError:
+                    self.event_map=''
+                    self.spider_plot=''
             else:
                 self.event_map=''
                 self.spider_plot=''
