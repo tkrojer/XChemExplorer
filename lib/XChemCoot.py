@@ -687,13 +687,14 @@ class GUI(object):
         if int(self.selected_site[0]) > 0:
             self.spider_plot_data=self.db.get_db_pandda_dict_for_sample_and_site(self.xtalID,self.selected_site[0])
             self.ligandIDValue.set_label(self.spider_plot_data['PANDDA_site_ligand_id'])
-            self.ligand_occupancyValue.set_label(self.spider_plot_data['PANDDA_site_occupancy'])
-            self.ligand_BaverageValue.set_label(self.spider_plot_data['PANDDA_site_B_average'])
-            self.ligand_BratioSurroundingsValue.set_label(self.spider_plot_data['PANDDA_site_B_ratio_residue_surroundings'])
-            self.ligand_RSCCValue.set_label(self.spider_plot_data['PANDDA_site_RSCC'])
-            self.ligand_rmsdValue.set_label(self.spider_plot_data['PANDDA_site_rmsd'])
-            self.ligand_RSRValue.set_label(self.spider_plot_data['PANDDA_site_RSR'])
-            self.ligand_RSZDValue.set_label(self.spider_plot_data['PANDDA_site_RSZD'])
+            try:
+                self.ligand_occupancyValue.set_label(           str(round(float(self.spider_plot_data['PANDDA_site_occupancy']),2)) )
+                self.ligand_BaverageValue.set_label(            str(round(float(self.spider_plot_data['PANDDA_site_B_average']),2)) )
+                self.ligand_BratioSurroundingsValue.set_label(  str(round(float(self.spider_plot_data['PANDDA_site_B_ratio_residue_surroundings']),2)) )
+                self.ligand_RSCCValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_RSCC']),2)) )
+                self.ligand_rmsdValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_rmsd']),2)) )
+                self.ligand_RSRValue.set_label(                 str(round(float(self.spider_plot_data['PANDDA_site_RSR']),2)) )
+                self.ligand_RSZDValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_RSZD']),2)) )
 
 
         #########################################################################################
