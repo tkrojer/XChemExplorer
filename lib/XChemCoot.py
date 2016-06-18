@@ -592,6 +592,7 @@ class GUI(object):
             if int(self.selected_site[0]) > 0:
                 try:
                     pandda_info=self.db.get_pandda_info_for_coot(self.xtalID,self.selected_site[0])
+                    print 'PANDDA INDO', pandda_info
                     self.event_map=pandda_info[0]
                     coot.set_rotation_centre(float(pandda_info[1]),float(pandda_info[2]),float(pandda_info[3]))
                     self.spider_plot=pandda_info[4]
@@ -712,7 +713,6 @@ class GUI(object):
         #########################################################################################
         # Spider plot
         # Note: refinement history was shown instead previously
-        print 'spider plit:',self.spider_plot
         if os.path.isfile(self.spider_plot):
             spider_plot_pic = gtk.gdk.pixbuf_new_from_file(self.spider_plot)
         else:
