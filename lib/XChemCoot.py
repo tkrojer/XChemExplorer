@@ -232,7 +232,7 @@ class GUI(object):
         MolprobityScoreBox_frame.add(self.MolprobityScoreBox)
 
         RamachandranOutliersLabel_frame=gtk.Frame()
-        self.RamachandranOutliersLabel = gtk.Label('Ramachandran Outliers')
+        self.RamachandranOutliersLabel = gtk.Label('Rama Outliers')
         RamachandranOutliersLabel_frame.add(self.RamachandranOutliersLabel)
         self.RamachandranOutliersValue = gtk.Label(self.QualityIndicators['RefinementRamachandranOutliers'])
         RamachandranOutliersBox_frame=gtk.Frame()
@@ -241,7 +241,7 @@ class GUI(object):
         RamachandranOutliersBox_frame.add(self.RamachandranOutliersBox)
 
         RamachandranFavoredLabel_frame=gtk.Frame()
-        self.RamachandranFavoredLabel = gtk.Label('Ramachandran Favored')
+        self.RamachandranFavoredLabel = gtk.Label('Rama Favored')
         RamachandranFavoredLabel_frame.add(self.RamachandranFavoredLabel)
         self.RamachandranFavoredValue = gtk.Label(self.QualityIndicators['RefinementRamachandranFavored'])
         RamachandranFavoredBox_frame=gtk.Frame()
