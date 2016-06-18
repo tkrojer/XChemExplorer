@@ -118,13 +118,13 @@ def update_data_source(db_dict,db_pandda_dict):
         # update refinement outcome if necessary
         sqlite = (
             "update mainTable set RefinementOutcome = '3 - In Refinement' where CrystalName is '%s' " %xtal+
-            "and RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending' or RefinementOutcome is '2 - PANDDA model'"
+            "and (RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending' or RefinementOutcome is '2 - PANDDA model')"
                 )
         db.execute_statement(sqlite)
         # now do the same for each site in the pandda table
         sqlite = (
             "update panddaTable set RefinementOutcome = '3 - In Refinement' where CrystalName is '%s' " %xtal+
-            "and RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending' or RefinementOutcome is '2 - PANDDA model'"
+            "and (RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending' or RefinementOutcome is '2 - PANDDA model')"
                 )
         db.execute_statement(sqlite)
     if db_pandda_dict != {}:

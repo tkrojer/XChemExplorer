@@ -1142,6 +1142,24 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_acceptable_low_resolution_limit.addWidget(adjust_acceptable_low_resolution_limit)
         vbox.addLayout(settings_hbox_acceptable_low_resolution_limit)
 
+        vbox_data=QtGui.QVBoxLayout()
+        vbox_data.addWidget(QtGui.QLabel('Select amount of processed data you wish to copy to initial_model directory:'))
+        self.preferences_data_to_copy_combobox = QtGui.QComboBox()
+        for item in self.preferences_data_to_copy:
+            self.preferences_data_to_copy_combobox.addItem(item[0])
+        self.preferences_data_to_copy_combobox.currentIndexChanged.connect(self.preferences_data_to_copy_combobox_changed)
+        vbox_data.addWidget(self.preferences_data_to_copy_combobox)
+        vbox.addLayout(vbox_data)
+
+        vbox_select=QtGui.QVBoxLayout()
+        vbox_select.addWidget(QtGui.QLabel('Dataset Selection Mechanism:'))
+        self.preferences_selection_mechanism_combobox = QtGui.QComboBox()
+        for item in self.preferences_selection_mechanism:
+            self.preferences_selection_mechanism_combobox.addItem(item)
+        self.preferences_selection_mechanism_combobox.currentIndexChanged.connect(self.preferences_selection_mechanism_combobox_changed)
+        vbox_select.addWidget(self.preferences_selection_mechanism_combobox)
+        vbox.addLayout(vbox_select)
+
         preferencesLayout.addLayout(vbox,0,0)
 
         preferences.exec_();
