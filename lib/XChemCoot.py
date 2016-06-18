@@ -703,7 +703,7 @@ class GUI(object):
                 self.ligand_rmsdValue.set_label('-')
                 self.ligand_RSRValue.set_label('-')
                 self.ligand_RSZDValue.set_label('-')
-                
+
 
         #########################################################################################
         # history
@@ -814,7 +814,10 @@ class GUI(object):
 
         #########################################################################################
         # update Quality Indicator table
-        self.RRfreeValue.set_label(self.QualityIndicators['RefinementRcryst']+' / '+self.QualityIndicators['RefinementRfree'])
+        try:
+            self.RRfreeValue.set_label(  str(round(float(self.QualityIndicators['RefinementRcryst']),3)) +' / '+str(round(float(self.QualityIndicators['RefinementRfree']),3)))
+        except TypeError:
+            self.RRfreeValue.set_label('-')
         self.RRfreeBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementRfreeTraficLight']))
         self.ResolutionValue.set_label(self.QualityIndicators['RefinementResolution'])
         self.ResolutionBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementResolutionTL']))
