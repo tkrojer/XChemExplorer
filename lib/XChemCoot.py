@@ -695,7 +695,7 @@ class GUI(object):
                 self.ligand_rmsdValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_rmsd']),2)) )
                 self.ligand_RSRValue.set_label(                 str(round(float(self.spider_plot_data['PANDDA_site_RSR']),2)) )
                 self.ligand_RSZDValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_RSZD']),2)) )
-            except TypeError:
+            except ValueError:
                 self.ligand_occupancyValue.set_label('-')
                 self.ligand_BaverageValue.set_label('-')
                 self.ligand_BratioSurroundingsValue.set_label('-')
@@ -816,7 +816,7 @@ class GUI(object):
         # update Quality Indicator table
         try:
             self.RRfreeValue.set_label(  str(round(float(self.QualityIndicators['RefinementRcryst']),3)) +' / '+str(round(float(self.QualityIndicators['RefinementRfree']),3)))
-        except TypeError:
+        except ValueError:
             self.RRfreeValue.set_label('-')
         self.RRfreeBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementRfreeTraficLight']))
         self.ResolutionValue.set_label(self.QualityIndicators['RefinementResolution'])
