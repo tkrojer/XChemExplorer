@@ -88,20 +88,16 @@ def parse_ligand_validation(refinement_directory,xtal):
                     residue_number = residue.split('-')[2]
                     residue_xyz = pdbtools(os.path.join(inital_model_directory, xtal, 'refine.pdb')).get_center_of_gravity_of_residue_ish(residue_chain, residue_number)
                     event = db.execute_statement("select PANDDA_site_x,PANDDA_site_y,PANDDA_site_z,PANDDA_site_index from panddaTable where CrystalName='%s'" % xtal)
-                    print event
                     for coord in event:
                         db_pandda_dict = {}
                         event_x = float(str(coord[0]))
                         event_y = float(str(coord[1]))
                         event_z = float(str(coord[2]))
                         site_index = str(coord[3])
-                        print event_x,event_y,event_z,site_index
                         distance = misc().calculate_distance_between_coordinates(residue_xyz[0], residue_xyz[1],residue_xyz[2],
                                                                                  event_x, event_y,event_z)
-                        print 'distance',distance
                         # if coordinate of ligand and event are closer than 5A, then we assume they belong together
                         if distance < 5:
-                            print 'hallo'
                             db_pandda_dict['PANDDA_site_ligand_id'] = residue
                             db_pandda_dict['PANDDA_site_occupancy'] = line['Occupancy']
                             db_pandda_dict['PANDDA_site_B_average'] = line['Average B-factor (Residue)']
@@ -114,7 +110,6 @@ def parse_ligand_validation(refinement_directory,xtal):
                                 db_pandda_dict['PANDDA_site_spider_plot'] = os.path.join(refinement_directory,
                                                                                          'residue_plots',
                                                                                          residue + '.png')
-                        print db_pandda_dict
                         if db_pandda_dict != {}:
                             print '==> XCE: updating pandda Table of data source'
                             db.update_panddaTable(xtal, site_index, db_pandda_dict)
