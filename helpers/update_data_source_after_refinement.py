@@ -101,6 +101,7 @@ def parse_ligand_validation(refinement_directory,xtal):
                         print 'distance',distance
                         # if coordinate of ligand and event are closer than 5A, then we assume they belong together
                         if distance < 5:
+                            print 'hallo'
                             db_pandda_dict['PANDDA_site_ligand_id'] = residue
                             db_pandda_dict['PANDDA_site_occupancy'] = line['Occupancy']
                             db_pandda_dict['PANDDA_site_B_average'] = line['Average B-factor (Residue)']
@@ -113,10 +114,10 @@ def parse_ligand_validation(refinement_directory,xtal):
                                 db_pandda_dict['PANDDA_site_spider_plot'] = os.path.join(refinement_directory,
                                                                                          'residue_plots',
                                                                                          residue + '.png')
-                print db_pandda_dict
-                if db_pandda_dict != {}:
-                    print '==> XCE: updating pandda Table of data source'
-                    db.update_panddaTable(xtal, site_index, db_pandda_dict)
+                        print db_pandda_dict
+                        if db_pandda_dict != {}:
+                            print '==> XCE: updating pandda Table of data source'
+                            db.update_panddaTable(xtal, site_index, db_pandda_dict)
 
 def update_data_source(db_dict):
     if db_dict != {}:
