@@ -75,11 +75,12 @@ def parse_molprobity_output(inital_model_directory,xtal,db_dict):
     return db_dict
 
 
-def parse_ligand_validation(refinement_directory,db_pandda_dict):
+def parse_ligand_validation(refinement_directory,xtal):
     if os.path.isfile(os.path.join(refinement_directory, 'residue_scores.csv')):
         with open(os.path.join(refinement_directory, 'residue_scores.csv'), 'rb') as csv_import:
             csv_dict = csv.DictReader(csv_import)
             for i, line in enumerate(csv_dict):
+                db_pandda_dict = {}
                 residue = line['']
                 if len(residue.split('-')) == 3:
                     residue_name = residue.split('-')[0]
@@ -109,9 +110,10 @@ def parse_ligand_validation(refinement_directory,db_pandda_dict):
                                 db_pandda_dict['PANDDA_site_spider_plot'] = os.path.join(refinement_directory,
                                                                                          'residue_plots',
                                                                                          residue + '.png')
-    return db_pandda_dict
+                if db_pandda_dict != {}:
+                    db.update_panddaTable(xtal, site_index, db_pandda_dict)
 
-def update_data_source(db_dict,db_pandda_dict):
+def update_data_source(db_dict):
     if db_dict != {}:
         print '==> xce: updating mainTable of data source'
         db.update_data_source(xtal,db_dict)
@@ -127,8 +129,6 @@ def update_data_source(db_dict,db_pandda_dict):
             "and (RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending' or RefinementOutcome is '2 - PANDDA model')"
                 )
         db.execute_statement(sqlite)
-    if db_pandda_dict != {}:
-        db.update_panddaTable(xtal, site_index, db_pandda_dict)
 
 if __name__=='__main__':
     db_file=sys.argv[1]
@@ -138,13 +138,12 @@ if __name__=='__main__':
 
     db=XChemDB.data_source(db_file)
     db_dict={}
-    db_pandda_dict = {}
 
     db_dict=parse_pdb(inital_model_directory,xtal,db_dict)
     db_dict=parse_mtz(inital_model_directory,xtal,db_dict)
     db_dict=check_refmac_matrix_weight(refinement_directory,db_dict)
     db_dict=parse_molprobity_output(inital_model_directory,xtal,db_dict)
 
-    db_pandda_dict=parse_ligand_validation(refinement_directory,db_pandda_dict)
+    parse_ligand_validation(refinement_directory,xtal)
 
-    update_data_source(db_dict, db_pandda_dict)
+    update_data_source(db_dict)
