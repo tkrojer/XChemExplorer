@@ -712,6 +712,7 @@ class GUI(object):
         #########################################################################################
         # Spider plot
         # Note: refinement history was shown instead previously
+        print 'spider plit:',self.spider_plot
         if os.path.isfile(self.spider_plot):
             spider_plot_pic = gtk.gdk.pixbuf_new_from_file(self.spider_plot)
         else:
