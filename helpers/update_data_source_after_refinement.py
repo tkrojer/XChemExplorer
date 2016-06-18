@@ -110,7 +110,9 @@ def parse_ligand_validation(refinement_directory,xtal):
                                 db_pandda_dict['PANDDA_site_spider_plot'] = os.path.join(refinement_directory,
                                                                                          'residue_plots',
                                                                                          residue + '.png')
+                print db_pandda_dict
                 if db_pandda_dict != {}:
+                    print '==> XCE: updating pandda Table of data source'
                     db.update_panddaTable(xtal, site_index, db_pandda_dict)
 
 def update_data_source(db_dict):
