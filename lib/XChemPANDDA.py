@@ -39,19 +39,18 @@ class run_pandda_export(QtCore.QThread):
     def refine_exported_models(self):
 
         sample_list=self.db.execute_statement("select CrystalName,CompoundCode from mainTable where RefinementOutcome='2 - PANDDA model';")
-        print sample_list
-#        for item in sample_list:
-#            xtal=str(item[0])
-#            compoundID=str(item[1])
-#            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.free.mtz')):
-#                if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb')):
-#                    print '==> XCE: running inital refinement on PANDDA model of',xtal
-#                    Refine=XChemRefine.Refine(self.initial_model_directory,xtal,compoundID,self.datasource)
-#                    Serial=Refine.GetSerial()
-#                    os.mkdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+str(Serial)))
-#                    os.chdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+str(Serial)))
-#                    os.symlink(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb'),'in.pdb')
-#                    Refine.RunRefmac(Serial,self.RefmacParams,self.external_software)
+        for item in sample_list:
+            xtal=str(item[0])
+            compoundID=str(item[1])
+            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.free.mtz')):
+                if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb')):
+                    print '==> XCE: running inital refinement on PANDDA model of',xtal
+                    Refine=XChemRefine.Refine(self.initial_model_directory,xtal,compoundID,self.datasource)
+                    Serial=Refine.GetSerial()
+                    os.mkdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+str(Serial)))
+                    os.chdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+str(Serial)))
+                    os.symlink(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb'),'in.pdb')
+                    Refine.RunRefmac(Serial,self.RefmacParams,self.external_software)
 
 
 
@@ -167,10 +166,7 @@ class run_pandda_export(QtCore.QThread):
                 db_dict['RefinementOutcome']            =   '2 - PANDDA model'
 
                 self.db.update_insert_panddaTable(sampleID,db_dict)
-                self.db.execute_statement("update mainTable set RefinementOutcome = '2 - PANDDA model' where CrystalName is '%s' and RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending'" %sampleID)
-                print '\n\n\n\n\n'
-                print sampleID
-                print "update mainTable set RefinementOutcome = '2 - PANDDA model' where CrystalName is '%s' and RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending'" %sampleID
+                self.db.execute_statement("update mainTable set RefinementOutcome = '2 - PANDDA model' where CrystalName is '%s' and (RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending')" %sampleID)
                 progress += progress_step
                 self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
