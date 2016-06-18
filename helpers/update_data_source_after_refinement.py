@@ -95,6 +95,7 @@ def parse_ligand_validation(refinement_directory,xtal):
                         event_y = float(str(coord[1]))
                         event_z = float(str(coord[2]))
                         site_index = str(coord[3])
+                        print event_x,event_y,event_z,site_index
                         distance = misc().calculate_distance_between_coordinates(residue_xyz[0], residue_xyz[1],residue_xyz[2],
                                                                                  event_x, event_y,event_z)
                         # if coordinate of ligand and event are closer than 5A, then we assume they belong together
