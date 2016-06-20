@@ -1,4 +1,6 @@
 import os,glob
+import subprocess
+import getpass
 
 def get_target_and_visit_list(beamline_directory):
 #    target_list=['*']      # always give the option to read in all targets
@@ -40,3 +42,38 @@ def get_dewar_configuration(beamline_directory):
         dewar_sample_configuration_dict[str(container_reference)+'-'+str(sample_location)]=prefix
     return dewar_sample_configuration_dict
 
+def get_jobs_running_on_cluster():
+    out_dict={}
+
+    dimple_jobs=0
+    dimple_job_ID=[]
+    pandda_jobs=0
+    pandda_job_ID=[]
+    refmac_jobs=0
+    refmac_job_ID=[]
+    others_jobs=0
+    others_job_ID=[]
+
+    out=subprocess.Popen(['qstat'],stdout=subprocess.PIPE)
+    for n,line in enumerate(iter(out.stdout.readline,'')):
+        if len(line.split()) >= 4:
+            if line.split()[3] == getpass.getuser():
+                if 'dimple' in line.split()[2]:
+                    dimple_jobs+=1
+                    dimple_job_ID.append(line.split()[0])
+                elif 'pandda' in line.split()[2]:
+                    pandda_jobs+=1
+                    pandda_job_ID.append(line.split()[0])
+                elif 'refmac' in line.split()[2]:
+                    refmac_jobs+=1
+                    refmac_job_ID.append(line.split()[0])
+                else:
+                    others_jobs+=1
+                    others_job_ID.append(line.split()[0])
+
+    out_dict['dimple']=[dimple_jobs,dimple_job_ID]
+    out_dict['pandda']=[pandda_jobs,pandda_job_ID]
+    out_dict['refmac']=[refmac_jobs,refmac_job_ID]
+    out_dict['others']=[others_jobs,others_job_ID]
+
+    return out_dict
