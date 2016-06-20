@@ -67,7 +67,7 @@ def get_jobs_running_on_cluster():
     for n,line in enumerate(iter(out.stdout.readline,'')):
         print len(line.split()),line.split()
         if len(line.split()) >= 3:
-            if line.split()[5] == getpass.getuser():
+            if line.split()[3] == getpass.getuser():
                 print 'hererrrrre'
                 start_date=''
                 start_time=''
