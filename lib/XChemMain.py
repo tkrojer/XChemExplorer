@@ -83,7 +83,7 @@ def get_jobs_running_on_cluster():
 
     return out_dict
 
-def get_datasource_summary(db_file)
+def get_datasource_summary(db_file):
     db=XChemDB.data_source(db_file)
     out_dict={}
 
