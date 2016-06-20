@@ -65,6 +65,7 @@ def get_jobs_running_on_cluster():
     # [job_ID, status, run_time]
     out=subprocess.Popen(['qstat'],stdout=subprocess.PIPE)
     for n,line in enumerate(iter(out.stdout.readline,'')):
+        print len(line.split()),line.split()
         if len(line.split()) >= 3:
             if line.split()[5] == getpass.getuser():
                 print 'hererrrrre'
