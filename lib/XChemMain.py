@@ -72,6 +72,7 @@ def get_jobs_running_on_cluster():
                 start_time=''
                 start_date=line.split()[5]
                 print start_date
+                print len(start_date.split('/'))
                 if len(start_date.split('/')) == 3:
                     month_start=start_date.split('/')[0]
                     day_start=start_date.split('/')[1]
@@ -79,6 +80,7 @@ def get_jobs_running_on_cluster():
                     
                 start_time=line.split()[6]
                 print start_time
+                print len(start_time.split('/'))
                 if len(start_time.split('/')) == 3:
                     hour_start=start_time.split('/')[0]
                     minute_start=start_time.split('/')[1]
