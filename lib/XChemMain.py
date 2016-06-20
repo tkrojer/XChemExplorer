@@ -89,18 +89,18 @@ def get_datasource_summary(db_file):
     db=XChemDB.data_source(db_file)
     out_dict={}
 
-    out_dict['no_samples']=db.execute_statement("select CrystalName from mainTable where CrystalName is not NULL;")
-    out_dict['no_smiles_for_samples']=db.execute_statement("select compoundSMILES from mainTable where compoundSMILES is not (NULL or '')")
-    out_dict['no_data_collection_success']=db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'success';")
+    out_dict['no_samples']=len(db.execute_statement("select CrystalName from mainTable where CrystalName is not NULL;"))
+    out_dict['no_smiles_for_samples']=len(db.execute_statement("select compoundSMILES from mainTable where compoundSMILES is not (NULL or '')"))
+    out_dict['no_data_collection_success']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'success';"))
 
-    out_dict['no_data_collection_success']=db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - centring failed';")
-    out_dict['no_data_collection_fail-no-diffraction']=db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - no diffraction';")
-    out_dict['no_data_collection_fail-processing']=db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - processing';")
-    out_dict['no_data_collection_fail-loop-empty']=db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - loop empty';")
-    out_dict['no_data_collection_fail-loop-broken']=db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - loop broken';")
-    out_dict['no_data_collection_fail-low-resolution']=db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - low resolution';")
-    out_dict['no_data_collection_fail-no-X-rays']=db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - no X-rays';")
-    out_dict['no_data_collection_fail-unknown']=db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - unknown';")
+    out_dict['no_data_collection_success']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - centring failed';"))
+    out_dict['no_data_collection_fail-no-diffraction']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - no diffraction';"))
+    out_dict['no_data_collection_fail-processing']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - processing';"))
+    out_dict['no_data_collection_fail-loop-empty']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - loop empty';"))
+    out_dict['no_data_collection_fail-loop-broken']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - loop broken';"))
+    out_dict['no_data_collection_fail-low-resolution']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - low resolution';"))
+    out_dict['no_data_collection_fail-no-X-rays']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - no X-rays';"))
+    out_dict['no_data_collection_fail-unknown']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - unknown';"))
 
 
     return out_dict
