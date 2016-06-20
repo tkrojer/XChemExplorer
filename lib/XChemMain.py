@@ -2,6 +2,7 @@ import os,glob
 import sys
 import subprocess
 import getpass
+import datetime
 
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 
@@ -52,35 +53,58 @@ def get_jobs_running_on_cluster():
     out_dict={}
 
     dimple_jobs=0
-    dimple_job_ID=[]
+    dimple_job_details=[]
     pandda_jobs=0
-    pandda_job_ID=[]
+    pandda_job_details=[]
     refmac_jobs=0
-    refmac_job_ID=[]
+    refmac_job_details=[]
     others_jobs=0
-    others_job_ID=[]
+    others_job_details=[]
+
+    # note: each job_details list contains a list with
+    # [job_ID, status, run_time]
 
     out=subprocess.Popen(['qstat'],stdout=subprocess.PIPE)
     for n,line in enumerate(iter(out.stdout.readline,'')):
-        if len(line.split()) >= 4:
-            if line.split()[3] == getpass.getuser():
+        if len(line.split()) >= 7:
+            if line.split()[5] == getpass.getuser():
+                start_date=''
+                start_time=''
+                start_date=line.split()[5]
+                if len(start_date.split('/')) == 3:
+                    month_start=start_date.split('/')[0]
+                    day_start=start_date.split('/')[1]
+                    year_start=start_date.split('/')[2]
+                    
+                start_time==line.split()[6]
+                if len(start_time.split('/')) == 3:
+                    hour_start=start_time.split('/')[0]
+                    minute_start=start_time.split('/')[1]
+                    second_start=start_time.split('/')[2]
+
+                if start_time != '' and start_date != '':
+                    print start
+                    start='%s-%s-%s %s:%s:%s' %(year_start,month_start,day_start,hour_start,minute_start,second_start)
+#                datetime.strptime(,"%Y-%m-%d %H:%M:%S")
+                if start_date=
+
                 if 'dimple' in line.split()[2]:
                     dimple_jobs+=1
-                    dimple_job_ID.append(line.split()[0])
+                    dimple_job_details.append(line.split()[0])
                 elif 'pandda' in line.split()[2]:
                     pandda_jobs+=1
-                    pandda_job_ID.append(line.split()[0])
+                    pandda_job_details.append([line.split()[0]],line.split(4)  )
                 elif 'refmac' in line.split()[2]:
                     refmac_jobs+=1
-                    refmac_job_ID.append(line.split()[0])
+                    refmac_job_details.append(line.split()[0])
                 else:
                     others_jobs+=1
-                    others_job_ID.append(line.split()[0])
+                    others_job_details.append(line.split()[0])
 
-    out_dict['dimple']=[dimple_jobs,dimple_job_ID]
-    out_dict['pandda']=[pandda_jobs,pandda_job_ID]
-    out_dict['refmac']=[refmac_jobs,refmac_job_ID]
-    out_dict['others']=[others_jobs,others_job_ID]
+    out_dict['dimple']=[dimple_jobs,dimple_job_details]
+    out_dict['pandda']=[pandda_jobs,pandda_job_details]
+    out_dict['refmac']=[refmac_jobs,refmac_job_details]
+    out_dict['others']=[others_jobs,others_job_details]
 
     return out_dict
 
@@ -102,6 +126,13 @@ def get_datasource_summary(db_file):
     out_dict['no_data_collection_fail-no-X-rays']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - no X-rays';"))
     out_dict['no_data_collection_fail-unknown']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - unknown';"))
 
+    out_dict['no_cif_files']=len(db.execute_statement("select RefinementCIF from mainTable where RefinementCIF is not (Null or '');"))
+
+    out_dict['no_analysis-pending']=len(db.execute_statement("select RefinementOutcome from mainTable where RefinementOutcome is '1 - Analysis Pending';"))
+    out_dict['no_pandda-models']=len(db.execute_statement("select RefinementOutcome from mainTable where RefinementOutcome is '2 - PANDDA model';"))
+    out_dict['no_in-refinement']=len(db.execute_statement("select RefinementOutcome from mainTable where RefinementOutcome is '3 - In Refinement';"))
+    out_dict['no_comp-chem-ready']=len(db.execute_statement("select RefinementOutcome from mainTable where RefinementOutcome is '4 - ComChem ready';"))
+    out_dict['no_deposition-ready']=len(db.execute_statement("select RefinementOutcome from mainTable where RefinementOutcome is '5 - Deposition ready';"))
 
     return out_dict
 
