@@ -63,7 +63,7 @@ def get_jobs_running_on_cluster():
 
     # note: each job_details list contains a list with
     # [job_ID, status, run_time]
-
+    print 'fefigwfyegyrfg'
     out=subprocess.Popen(['qstat'],stdout=subprocess.PIPE)
     for n,line in enumerate(iter(out.stdout.readline,'')):
         if len(line.split()) >= 7:
