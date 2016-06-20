@@ -103,6 +103,6 @@ def get_datasource_summary(db_file):
 
     return out_dict
 
-def remove_all_refmac_jobs_from_cluster_and_reinstate_last_stable_state()
+def remove_all_refmac_jobs_from_cluster_and_reinstate_last_stable_state():
     print 'hallo'
 
