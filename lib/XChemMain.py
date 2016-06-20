@@ -66,6 +66,8 @@ def get_jobs_running_on_cluster():
     print 'fefigwfyegyrfg'
     out=subprocess.Popen(['qstat'],stdout=subprocess.PIPE)
     for n,line in enumerate(iter(out.stdout.readline,'')):
+        print line
+        print len(line.split())
         if len(line.split()) >= 7:
             if line.split()[5] == getpass.getuser():
                 start_date=''
