@@ -66,9 +66,8 @@ def get_jobs_running_on_cluster():
     out=subprocess.Popen(['qstat'],stdout=subprocess.PIPE)
     for n,line in enumerate(iter(out.stdout.readline,'')):
         print len(line.split()),line.split()
-        if len(line.split()) >= 3:
+        if len(line.split()) >= 7:
             if line.split()[3] == getpass.getuser():
-                print 'hererrrrre'
                 start_date=''
                 start_time=''
                 start_date=line.split()[5]
@@ -78,7 +77,7 @@ def get_jobs_running_on_cluster():
                     day_start=start_date.split('/')[1]
                     year_start=start_date.split('/')[2]
                     
-                start_time==line.split()[6]
+                start_time=line.split()[6]
                 print start_time
                 if len(start_time.split('/')) == 3:
                     hour_start=start_time.split('/')[0]
@@ -86,7 +85,6 @@ def get_jobs_running_on_cluster():
                     second_start=start_time.split('/')[2]
 
                 if start_time != '' and start_date != '':
-                    print start
                     start='%s-%s-%s %s:%s:%s' %(year_start,month_start,day_start,hour_start,minute_start,second_start)
                     print start
 #                datetime.strptime(,"%Y-%m-%d %H:%M:%S")
