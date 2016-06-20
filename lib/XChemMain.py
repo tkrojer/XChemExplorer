@@ -63,13 +63,11 @@ def get_jobs_running_on_cluster():
 
     # note: each job_details list contains a list with
     # [job_ID, status, run_time]
-    print 'fefigwfyegyrfg'
     out=subprocess.Popen(['qstat'],stdout=subprocess.PIPE)
     for n,line in enumerate(iter(out.stdout.readline,'')):
-        print line
-        print len(line.split())
         if len(line.split()) >= 7:
             if line.split()[5] == getpass.getuser():
+                print 'hererrrrre'
                 start_date=''
                 start_time=''
                 start_date=line.split()[5]
