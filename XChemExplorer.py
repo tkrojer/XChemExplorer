@@ -2158,6 +2158,7 @@ class XChemExplorer(QtGui.QApplication):
 #        print '    * nr CIF files created:    ',len(cif_files)
         print 'here:'
         print XChemMain.get_jobs_running_on_cluster()
+        print XChemMain.get_datasource_summary(self.data_source_file)
 #        out_bytes = subprocess.check_output(['qstat'])
 #        out_text = out_bytes.decode('utf-8')
 #        jobs_on_cluster = subprocess.check_output(['qstat'])

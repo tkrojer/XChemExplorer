@@ -2,6 +2,11 @@ import os,glob
 import subprocess
 import getpass
 
+sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
+
+import XChemDB
+
+
 def get_target_and_visit_list(beamline_directory):
 #    target_list=['*']      # always give the option to read in all targets
     target_list=['=== SELECT TARGET ===']      # always give the option to read in all targets
@@ -77,3 +82,27 @@ def get_jobs_running_on_cluster():
     out_dict['others']=[others_jobs,others_job_ID]
 
     return out_dict
+
+def get_datasource_summary(db_file)
+    db=XChemDB.data_source(db_file)
+    out_dict={}
+
+    out_dict['no_samples']=db.execute_statement("select CrystalName from mainTable where CrystalName is not NULL;")
+    out_dict['no_smiles_for_samples']=db.execute_statement("select compoundSMILES from mainTable where compoundSMILES is not (NULL or '')")
+    out_dict['no_data_collection_success']=db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'success';")
+
+    out_dict['no_data_collection_success']=db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - centring failed';")
+    out_dict['no_data_collection_fail-no-diffraction']=db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - no diffraction';")
+    out_dict['no_data_collection_fail-processing']=db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - processing';")
+    out_dict['no_data_collection_fail-loop-empty']=db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - loop empty';")
+    out_dict['no_data_collection_fail-loop-broken']=db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - loop broken';")
+    out_dict['no_data_collection_fail-low-resolution']=db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - low resolution';")
+    out_dict['no_data_collection_fail-no-X-rays']=db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - no X-rays';")
+    out_dict['no_data_collection_fail-unknown']=db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - unknown';")
+
+
+    return out_dict
+
+def remove_all_refmac_jobs_from_cluster_and_reinstate_last_stable_state()
+    print 'hallo'
+
