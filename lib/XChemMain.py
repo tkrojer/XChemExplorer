@@ -83,9 +83,10 @@ def get_jobs_running_on_cluster():
 
                 if start_time != '' and start_date != '':
                     start='%s-%s-%s %s:%s:%s' %(year_start,month_start,day_start,hour_start,minute_start,second_start)
-                    run_time_seconds=datetime.now()-datetime.strptime(start,"%Y-%m-%d %H:%M:%S")
-                    run_time_minutes=int(run_time_seconds.total_seconds() / 60)
-                    run_time_hours=int(run_time_seconds.total_seconds() / 3600)
+                    run_time=datetime.now()-datetime.strptime(start,"%Y-%m-%d %H:%M:%S")
+                    run_time_seconds=int(run_time.total_seconds())
+                    run_time_minutes=int(run_time.total_seconds() / 60)
+                    run_time_hours=int(run_time.total_seconds() / 3600)
                     print 'run time:',run_time_hours,run_time_minutes,run_time_seconds
 
 #                    print  datetime.strptime(start,"%Y-%m-%d %H:%M:%S")-datetime.now().strftime("%Y-%m-%d %H:%M:%S")
