@@ -255,6 +255,14 @@ class data_source:
             for i in range(1,len(self.column_list)):
                 cursor.execute("alter table mainTable add column '"+self.column_list[i][0]+"' '"+self.column_list[i][2]+"'")
             connect.commit()
+        # Don't need to create panddaTable at this point, because table will be created by create_missing_columns
+        # which is called the first time a data source in specified in XCE
+#        with connect:
+#            cursor = connect.cursor()
+#            cursor.execute("CREATE TABLE panddaTable("+self.pandda_table_columns[0][0]+' '+self.pandda_table_columns[0][2]+")")
+#            for i in range(1,len(self.pandda_table_columns)):
+#                cursor.execute("alter table mainTable add column '"+self.pandda_table_columns[i][0]+"' '"+self.pandda_table_columns[i][2]+"'")
+#            connect.commit()
 
     def get_all_samples_in_data_source_as_list(self):
         connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
