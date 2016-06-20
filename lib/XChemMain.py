@@ -65,22 +65,17 @@ def get_jobs_running_on_cluster():
     # [job_ID, status, run_time]
     out=subprocess.Popen(['qstat'],stdout=subprocess.PIPE)
     for n,line in enumerate(iter(out.stdout.readline,'')):
-        print len(line.split()),line.split()
         if len(line.split()) >= 7:
             if line.split()[3] == getpass.getuser():
                 start_date=''
                 start_time=''
                 start_date=line.split()[5]
-                print start_date
-                print len(start_date.split('/'))
                 if len(start_date.split('/')) == 3:
                     month_start=start_date.split('/')[0]
                     day_start=start_date.split('/')[1]
                     year_start=start_date.split('/')[2]
                     
                 start_time=line.split()[6]
-                print start_time
-                print len(start_time.split(':'))
                 if len(start_time.split(':')) == 3:
                     hour_start=start_time.split(':')[0]
                     minute_start=start_time.split(':')[1]
@@ -88,10 +83,10 @@ def get_jobs_running_on_cluster():
 
                 if start_time != '' and start_date != '':
                     start='%s-%s-%s %s:%s:%s' %(year_start,month_start,day_start,hour_start,minute_start,second_start)
-                    print start
-                    delta_time=datetime.now()-datetime.strptime(start,"%Y-%m-%d %H:%M:%S")
-                    print delta_time
-                    print int(delta_time.total_seconds() / 60)
+                    run_time_seconds=datetime.now()-datetime.strptime(start,"%Y-%m-%d %H:%M:%S")
+                    run_time_minutes=int(delta_time.total_seconds() / 60)
+                    run_time_hours=int(delta_time.total_seconds() / 3600)
+                    print 'run time:',run_time_hours,run_time_minutes,run_time_seconds
 
 #                    print  datetime.strptime(start,"%Y-%m-%d %H:%M:%S")-datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 #                    now =  datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
