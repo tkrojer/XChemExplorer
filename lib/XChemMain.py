@@ -80,17 +80,17 @@ def get_jobs_running_on_cluster():
                     
                 start_time=line.split()[6]
                 print start_time
-                print len(start_time.split('/'))
-                if len(start_time.split('/')) == 3:
-                    hour_start=start_time.split('/')[0]
-                    minute_start=start_time.split('/')[1]
-                    second_start=start_time.split('/')[2]
+                print len(start_time.split(':'))
+                if len(start_time.split(':')) == 3:
+                    hour_start=start_time.split(':')[0]
+                    minute_start=start_time.split(':')[1]
+                    second_start=start_time.split(':')[2]
 
                 if start_time != '' and start_date != '':
                     start='%s-%s-%s %s:%s:%s' %(year_start,month_start,day_start,hour_start,minute_start,second_start)
                     print start
-#                datetime.strptime(,"%Y-%m-%d %H:%M:%S")
-
+                    print datetime.strptime(start,"%Y-%m-%d %H:%M:%S")
+                    print 'llllllllll'
                 if 'dimple' in line.split()[2]:
                     dimple_jobs+=1
                     dimple_job_details.append(line.split()[0])
