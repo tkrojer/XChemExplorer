@@ -84,7 +84,8 @@ class summary_plot(object):
             pass
         ax0.set_xticks(np.arange(len(outcome)) + 0.15/2)
         ax0.set_xticklabels(outcome, rotation=0)
-
+        print 'outcome',outcome
+        print 'frequency',frequency
 #            ax1.set_title('Data Collection - Resolution')
 #            try:
 #                ax1.hist((Resolution_missing, Resolution_present), bins=20, color=("red", "green"), label=("missing","analysed"))
