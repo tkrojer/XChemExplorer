@@ -99,7 +99,7 @@ def parse_ligand_validation(refinement_directory,xtal):
                                                                                  event_x, event_y,event_z)
                         print 'distance',distance
                         # if coordinate of ligand and event are closer than 5A, then we assume they belong together
-                        if distance < 5:
+                        if distance < 7:
                             db_pandda_dict['PANDDA_site_ligand_id'] = residue
                             db_pandda_dict['PANDDA_site_occupancy'] = line['Occupancy']
                             db_pandda_dict['PANDDA_site_B_average'] = line['Average B-factor (Residue)']
