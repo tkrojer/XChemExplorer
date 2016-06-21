@@ -653,6 +653,7 @@ class GUI(object):
 
 
     def experiment_stage_button_clicked(self,widget, data=None):
+        print 'data-------------',data
         if self.selected_site[0] == 0:
             self.db_dict_mainTable['RefinementOutcome']=data
             print '==> XCE: setting Refinement Outcome for '+self.xtalID+' to '+str(data)+' in mainTable of datasource'
