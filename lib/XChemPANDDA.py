@@ -33,8 +33,8 @@ class run_pandda_export(QtCore.QThread):
 
     def run(self):
         self.export_models()
-        self.import_samples_into_datasouce()
-        self.refine_exported_models()
+#        self.import_samples_into_datasouce()
+#        self.refine_exported_models()
 
     def refine_exported_models(self):
 
@@ -183,7 +183,7 @@ class run_pandda_export(QtCore.QThread):
                 )
         print '==> XCE: running pandda.export with the following command:\n',Cmds
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running pandda.export: check terminal for details')
-        os.system(Cmds)
+#        os.system(Cmds)
 
 
 
@@ -203,6 +203,7 @@ class run_pandda_analyse(QtCore.QThread):
         self.pdb_style=pandda_params['pdb_style']
         self.mtz_style=pandda_params['mtz_style']
         self.sort_event=pandda_params['sort_event']
+        self.number_of_datasets=pandda_params['nr_datasets']
 
     def run(self):
 
@@ -243,6 +244,7 @@ class run_pandda_analyse(QtCore.QThread):
                 ' out_dir='+self.panddas_directory+
                 ' min_build_datasets='+self.min_build_datasets+
                 ' maps.ampl_label=FWT maps.phas_label=PHWT'
+                ' max_new_datasets=300'
                 ' cpus='+self.nproc+
                 ' events.order_by='+self.sort_event+
                 ' pdb_style='+self.pdb_style+
