@@ -2064,6 +2064,7 @@ class XChemExplorer(QtGui.QApplication):
         counter=0
         for file in glob.glob(os.path.join(str(self.pandda_input_data_dir_entry.text()),str(self.pandda_pdb_style_entry.text()))):
             if os.path.isfile(file):
+                print file
                 counter+=1
         self.status_bar.showMessage('pandda.analyse: found %s useable datasets' %counter)
         print '==> XCE: pandda.analyse: found %s useable datasets' %counter
