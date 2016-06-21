@@ -485,6 +485,7 @@ class GUI(object):
         vbox=gtk.VBox()
         self.ligand_confidence_button_list=[]
         for n,criteria in enumerate(self.ligand_confidence_category):
+            print 'criteria',criteria
             if n == 0:
                 new_button = gtk.RadioButton(None, criteria)
             else:
