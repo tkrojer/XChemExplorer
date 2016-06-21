@@ -662,7 +662,7 @@ class GUI(object):
             print '==> XCE: setting Refinement Outcome for '+self.xtalID+' (site='+str(self.selected_site)+') to '+str(data)+' in panddaTable of datasource'
             self.db.update_panddaTable(self.xtalID,self.selected_site[0],self.db_dict_panddaTable)
 
-    def ligand_confidence_button_clicked(self,widget):
+    def ligand_confidence_button_clicked(self,widget,data):
         print 'data!!!!!!!!!!!!!',data
         if self.selected_site[0] == 0:
             self.db_dict_mainTable['RefinementLigandConfidence']=data
