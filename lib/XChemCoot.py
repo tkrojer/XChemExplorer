@@ -750,12 +750,14 @@ class GUI(object):
             coot.read_cif_dictionary(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.cif'))
         if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style)):
             os.chdir(os.path.join(self.project_directory,self.xtalID))
-            if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.xtalID+'-pandda-model.pdb')):
-                os.symlink(self.xtalID+'-pandda-model.pdb',self.pdb_style)
-            elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.pdb')):
-                os.symlink('dimple.pdb',self.pdb_style)
-            else:
-                self.go_to_next_xtal()
+            # we want to be able to check dimple results immediately, but don't want to interfere with refinement
+            if not os.path.isfile('REFINEMENT_IN_PROGRESS'):
+                if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.xtalID+'-pandda-model.pdb')):
+                    os.symlink(self.xtalID+'-pandda-model.pdb',self.pdb_style)
+                elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.pdb')):
+                    os.symlink('dimple.pdb',self.pdb_style)
+                else:
+                    self.go_to_next_xtal()
         imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style),0)
         self.mol_dict['protein']=imol
         for item in coot_utils_XChem.molecule_number_list():
