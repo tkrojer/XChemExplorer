@@ -84,6 +84,7 @@ def parse_ligand_validation(refinement_directory,xtal):
                 residue = line['']
                 if len(residue.split('-')) == 3:
                     residue_name = residue.split('-')[0]
+                    print residue_name
                     residue_chain = residue.split('-')[1]
                     residue_number = residue.split('-')[2]
                     residue_xyz = pdbtools(os.path.join(inital_model_directory, xtal, 'refine.pdb')).get_center_of_gravity_of_residue_ish(residue_chain, residue_number)
@@ -96,6 +97,7 @@ def parse_ligand_validation(refinement_directory,xtal):
                         site_index = str(coord[3])
                         distance = misc().calculate_distance_between_coordinates(residue_xyz[0], residue_xyz[1],residue_xyz[2],
                                                                                  event_x, event_y,event_z)
+                        print 'distance',distance
                         # if coordinate of ligand and event are closer than 5A, then we assume they belong together
                         if distance < 5:
                             db_pandda_dict['PANDDA_site_ligand_id'] = residue
