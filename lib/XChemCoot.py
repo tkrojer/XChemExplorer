@@ -485,7 +485,6 @@ class GUI(object):
         vbox=gtk.VBox()
         self.ligand_confidence_button_list=[]
         for n,criteria in enumerate(self.ligand_confidence_category):
-            print 'criteria',n,criteria
             if n == 0:
                 new_button = gtk.RadioButton(None, criteria)
             else:
@@ -663,13 +662,13 @@ class GUI(object):
             print '==> XCE: setting Refinement Outcome for '+self.xtalID+' (site='+str(self.selected_site)+') to '+str(data)+' in panddaTable of datasource'
             self.db.update_panddaTable(self.xtalID,self.selected_site[0],self.db_dict_panddaTable)
 
-    def ligand_confidence_button_clicked(self,widget, data=None):
+    def ligand_confidence_button_clicked(self,widget):
+        print 'data!!!!!!!!!!!!!',data
         if self.selected_site[0] == 0:
             self.db_dict_mainTable['RefinementLigandConfidence']=data
             print '==> XCE: setting Ligand Confidence for '+self.xtalID+' to '+str(data)+' in mainTable of datasource'
             self.db.update_data_source(self.xtalID,self.db_dict_mainTable)
         else:
-            print 'data!!!!!!!!!!!!!',data
             self.db_dict_panddaTable['PANDDA_site_confidence']=data
             print '==> XCE: setting Ligand Confidence for '+self.xtalID+' (site='+str(self.selected_site)+') to '+str(data)+' in panddaTable of datasource'
             self.db.update_panddaTable(self.xtalID,self.selected_site[0],self.db_dict_panddaTable)
