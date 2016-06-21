@@ -582,6 +582,7 @@ class GUI(object):
             # updating ligand confidence radiobuttons
             current_stage=0
             for i,entry in enumerate(self.ligand_confidence_category):
+                print '--->',entry,self.ligand_confidence
                 if entry==self.ligand_confidence:
                     current_stage=i
                     break
@@ -652,7 +653,6 @@ class GUI(object):
 
 
     def experiment_stage_button_clicked(self,widget, data=None):
-        print 'data-------------',data
         if self.selected_site[0] == 0:
             self.db_dict_mainTable['RefinementOutcome']=data
             print '==> XCE: setting Refinement Outcome for '+self.xtalID+' to '+str(data)+' in mainTable of datasource'
@@ -663,7 +663,6 @@ class GUI(object):
             self.db.update_panddaTable(self.xtalID,self.selected_site[0],self.db_dict_panddaTable)
 
     def ligand_confidence_button_clicked(self,widget,data=None):
-        print 'data!!!!!!!!!!!!!',data
         if self.selected_site[0] == 0:
             self.db_dict_mainTable['RefinementLigandConfidence']=data
             print '==> XCE: setting Ligand Confidence for '+self.xtalID+' to '+str(data)+' in mainTable of datasource'
