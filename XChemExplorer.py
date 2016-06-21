@@ -804,6 +804,10 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_min_build_dataset_entry.setText('40')
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_min_build_dataset_entry)
 
+        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('max_new_datasets'))
+        self.pandda_max_new_datasets_entry = QtGui.QLineEdit()
+        self.pandda_max_new_datasets_entry.setText('300')
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_max_new_datasets_entry)
 
         self.pandda_analyse_input_params_vbox.addStretch(1)
 
@@ -2055,7 +2059,8 @@ class XChemExplorer(QtGui.QApplication):
                 'pdb_style':            str(self.pandda_pdb_style_entry.text()),
                 'mtz_style':            str(self.pandda_mtz_style_entry.text()),
                 'sort_event':           str(self.pandda_sort_event_combobox.currentText()),
-                'nr_datasets':          counter
+                'N_datasets':           counter,
+                'max_new_datasets':     str(self.pandda_max_new_datasets_entry.text())
                         }
         self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)

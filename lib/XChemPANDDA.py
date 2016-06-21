@@ -33,8 +33,8 @@ class run_pandda_export(QtCore.QThread):
 
     def run(self):
         self.export_models()
-#        self.import_samples_into_datasouce()
-#        self.refine_exported_models()
+        self.import_samples_into_datasouce()
+        self.refine_exported_models()
 
     def refine_exported_models(self):
 
@@ -183,7 +183,7 @@ class run_pandda_export(QtCore.QThread):
                 )
         print '==> XCE: running pandda.export with the following command:\n',Cmds
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running pandda.export: check terminal for details')
-#        os.system(Cmds)
+        os.system(Cmds)
 
 
 
@@ -203,23 +203,27 @@ class run_pandda_analyse(QtCore.QThread):
         self.pdb_style=pandda_params['pdb_style']
         self.mtz_style=pandda_params['mtz_style']
         self.sort_event=pandda_params['sort_event']
-        self.number_of_datasets=pandda_params['nr_datasets']
+        self.number_of_datasets=pandda_params['N_datasets']
+        self.max_new_datasets=pandda_params['max_new_datasets']
 
     def run(self):
 
+        # how to run pandda.analyse on large datasets
+        #
+        # 1) Run the normal pandda command, with the new setting, e.g.
+        # pandda.analyse data_dirs=... max_new_datasets=500
+        # This will do the analysis on the first 500 datasets and build the statistical maps - just as normal.
+        #
+        # 2) Run pandda with the same command:
+        # pandda.analyse data_dirs=... max_new_datasets=500
+        # This will add 500 new datasets, and process them using the existing statistical maps
+        # (this will be quicker than the original analysis). It will then merge the results of the two analyses.
+        #
+        # 3) Repeat 2) until you don't add any "new" datasets. Then you can build the models as normal.
 
-# For 2000 datasets:
-#
-# 1) Run the normal pandda command, with the new setting, e.g.
-# pandda.analyse data_dirs=... max_new_datasets=500
-# This will do the analysis on the first 500 datasets and build the statistical maps - just as normal.
-#
-# 2) Run pandda with the same command:
-# pandda.analyse data_dirs=... max_new_datasets=500
-# This will add 500 new datasets, and process them using the existing statistical maps (this will be quicker than the original analysis). It will then merge the results of the two analyses.
-#
-# 3) Repeat 2) twice more until you don't add any "new" datasets. Then you can build the models as normal.
-
+        number_of_cyles=int(self.number_of_datasets)/int(self.max_new_datasets)
+        if int(self.number_of_datasets) % int(self.max_new_datasets) != 0:  # modulo gives remainder after integer division
+            number_of_cyles+=1
 
         if os.path.isfile(os.path.join(self.panddas_directory,'pandda.running')):
             return None
@@ -238,19 +242,25 @@ class run_pandda_analyse(QtCore.QThread):
                 'source '+source_file+'\n'
                 '\n'
                 'cd '+self.panddas_directory+'\n'
-                '\n'
-                'pandda.analyse '
-                ' data_dirs="'+self.data_directory+'"'
-                ' out_dir='+self.panddas_directory+
-                ' min_build_datasets='+self.min_build_datasets+
-                ' maps.ampl_label=FWT maps.phas_label=PHWT'
-                ' max_new_datasets=300'
-                ' cpus='+self.nproc+
-                ' events.order_by='+self.sort_event+
-                ' pdb_style='+self.pdb_style+
-                ' mtz_style='+self.mtz_style+'\n'
                 )
-            print Cmds
+
+            for i in range(number_of_cyles):
+                Cmds += (
+                    '\n'
+                    'pandda.analyse '
+                    ' data_dirs="'+self.data_directory+'"'
+                    ' out_dir='+self.panddas_directory+
+                    ' min_build_datasets='+self.min_build_datasets+
+                    ' maps.ampl_label=FWT maps.phas_label=PHWT'
+                    ' max_new_datasets='+self.max_new_datasets+
+                    ' cpus='+self.nproc+
+                    ' events.order_by='+self.sort_event+
+                    ' pdb_style='+self.pdb_style+
+                    ' mtz_style='+self.mtz_style+'\n'
+                    '\n'
+                    )
+
+            print '==> XCE: running pandda.analyse with the following command:\n\n',Cmds
 
             f = open('pandda.sh','w')
             f.write(Cmds)
