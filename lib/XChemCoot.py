@@ -485,7 +485,7 @@ class GUI(object):
         vbox=gtk.VBox()
         self.ligand_confidence_button_list=[]
         for n,criteria in enumerate(self.ligand_confidence_category):
-            print 'criteria',criteria
+            print 'criteria',n,criteria
             if n == 0:
                 new_button = gtk.RadioButton(None, criteria)
             else:
@@ -800,10 +800,11 @@ class GUI(object):
             coot.set_default_initial_contour_level_for_map(1)
             if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.mtz_style)):
                 os.chdir(os.path.join(self.project_directory,self.xtalID))
-                if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.xtalID+'-pandda-input.mtz')):
-                    os.symlink(self.xtalID+'-pandda-input.mtz',self.mtz_style)
-                elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.mtz')):
-                    os.symlink('dimple.mtz',self.mtz_style)
+                if not os.path.isfile('REFINEMENT_IN_PROGRESS'):
+                    if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.xtalID+'-pandda-input.mtz')):
+                        os.symlink(self.xtalID+'-pandda-input.mtz',self.mtz_style)
+                    elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.mtz')):
+                        os.symlink('dimple.mtz',self.mtz_style)
             coot.auto_read_make_and_draw_maps(os.path.join(self.project_directory,self.xtalID,self.mtz_style))
 
 #        #########################################################################################
@@ -881,24 +882,12 @@ class GUI(object):
 
     def set_selection_mode(self,widget):
         self.selection_mode=widget.get_active_text()
-#        for criteria in self.selection_criteria:
-#            if criteria==widget.get_active_text():
-#                self.selection_mode=self.selection_criteria[criteria]
-#                break
 
     def set_site(self,widget):
         for site in self.ligand_site_information:
             if str(site[0])==str(widget.get_active_text()).split()[0]:
                 self.selected_site=site
                 break
-
-#    def set_ligand_confidence(self,widget):
-#        self.ligand_confidence_of_sample=widget.get_active_text().replace('Ligand Confidence: ','')
-#        print '===> XCE: updating data source with new ligand confidence ',self.ligand_confidence_of_sample
-#        db_dict={'RefinementLigandConfidence': self.ligand_confidence_of_sample}
-##        self.db.update_data_source(self.xtalID,db_dict)
-#        self.Todo[self.index][2]=self.ligand_confidence_of_sample
-
 
     def get_samples_to_look_at(self,widget):
         if self.selection_mode=='' and self.selected_site=='':
