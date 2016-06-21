@@ -77,13 +77,13 @@ class summary_plot(object):
             if key.startswith('no_data_collection'):
                 outcome.append(key.replace('no_data_collection_',''))
                 frequency.append(db_dict[key])
-            y_pos = np.arange(len(outcome))
-            try:
-                ax0.bar(y_pos, frequency, width=0.15)
-            except ValueError:
-                pass
-            ax0.set_xticks(np.arange(len(outcome)) + 0.15/2)
-            ax0.set_xticklabels(outcome, rotation=0)
+        y_pos = np.arange(len(outcome))
+        try:
+            ax0.bar(y_pos, frequency, width=0.15)
+        except ValueError:
+            pass
+        ax0.set_xticks(np.arange(len(outcome)) + 0.15/2)
+        ax0.set_xticklabels(outcome, rotation=0)
 
 #            ax1.set_title('Data Collection - Resolution')
 #            try:

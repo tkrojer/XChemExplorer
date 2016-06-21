@@ -147,7 +147,7 @@ def get_datasource_summary(db_file):
     out_dict['no_in-refinement']=len(db.execute_statement("select RefinementOutcome from mainTable where RefinementOutcome is '3 - In Refinement';"))
     out_dict['no_comp-chem-ready']=len(db.execute_statement("select RefinementOutcome from mainTable where RefinementOutcome is '4 - ComChem ready';"))
     out_dict['no_deposition-ready']=len(db.execute_statement("select RefinementOutcome from mainTable where RefinementOutcome is '5 - Deposition ready';"))
-
+    print out_dict
     return out_dict
 
 def remove_all_refmac_jobs_from_cluster_and_reinstate_last_stable_state():
