@@ -52,14 +52,11 @@ def get_dewar_configuration(beamline_directory):
 def get_jobs_running_on_cluster():
     out_dict={}
 
-    dimple_jobs=0
-    dimple_job_details=[]
-    pandda_jobs=0
-    pandda_job_details=[]
-    refmac_jobs=0
-    refmac_job_details=[]
-    others_jobs=0
-    others_job_details=[]
+    dimple_jobs=[]
+    acedrg_jobs=[]
+    pandda_jobs=[]
+    refmac_jobs=[]
+    others_jobs=[]
 
     # note: each job_details list contains a list with
     # [job_ID, status, run_time]
@@ -67,8 +64,16 @@ def get_jobs_running_on_cluster():
     for n,line in enumerate(iter(out.stdout.readline,'')):
         if len(line.split()) >= 7:
             if line.split()[3] == getpass.getuser():
+
+                job_id = line.split()[0]
+                job_name = line.split()[2]
+                job_status = line.split()[4]
+
+                ##########################################################
+                # determine run time of each job in minutes
                 start_date=''
                 start_time=''
+                run_time_minutes=''
                 start_date=line.split()[5]
                 if len(start_date.split('/')) == 3:
                     month_start=start_date.split('/')[0]
@@ -87,31 +92,35 @@ def get_jobs_running_on_cluster():
                     run_time_seconds=int(run_time.total_seconds())
                     run_time_minutes=int(run_time.total_seconds() / 60)
                     run_time_hours=int(run_time.total_seconds() / 3600)
-                    print 'run time:',run_time_hours,run_time_minutes,run_time_seconds
 
-#                    print  datetime.strptime(start,"%Y-%m-%d %H:%M:%S")-datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-#                    now =  datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-#                    delta_time = now - then
-#                    print delta_time
-                if 'dimple' in line.split()[2]:
-                    dimple_jobs+=1
-                    dimple_job_details.append(line.split()[0])
-                elif 'pandda' in line.split()[2]:
-                    pandda_jobs+=1
-                    pandda_job_details.append([line.split()[0]],line.split(4)  )
-                elif 'refmac' in line.split()[2]:
-                    refmac_jobs+=1
-                    refmac_job_details.append(line.split()[0])
+                ##########################################################
+                # determine run time of each job in minutes
+                if 'dimple' in job_name:
+                    dimple_jobs.append([job_id,job_status,run_time_minutes])
+                elif 'acedrg' in job_name:
+                    acedrg_jobs.append([job_id,job_status,run_time_minutes])
+                elif 'pandda' in job_name:
+                    pandda_jobs.append([job_id,job_status,run_time_minutes])
+                elif 'refmac' in job_name:
+                    refmac_jobs.append([job_id,job_status,run_time_minutes])
                 else:
-                    others_jobs+=1
-                    others_job_details.append(line.split()[0])
+                    others_jobs.append([job_id,job_status,run_time_minutes])
 
-    out_dict['dimple']=[dimple_jobs,dimple_job_details]
-    out_dict['pandda']=[pandda_jobs,pandda_job_details]
-    out_dict['refmac']=[refmac_jobs,refmac_job_details]
-    out_dict['others']=[others_jobs,others_job_details]
+    out_dict['dimple']=dimple_jobs
+    out_dict['pandda']=pandda_jobs
+    out_dict['refmac']=refmac_jobs
+    out_dict['others']=others_jobs
 
     return out_dict
+
+def display_queue_status_in_terminal(in_dict):
+    # latest_run=max(tmp,key=lambda x: x[1])[0]
+    max_dimple_runtime=max(in_dict['dimple'],key=lambda  x:x[2])[2]
+    print '----------------------------------------------------------------------------'
+    print '| Task                   | Nr. Jobs               | Max. Runtime (minutes) |'
+    print '----------------------------------------------------------------------------'
+    print '{0:24} {1:24} {2:24} {3:1}'.format('| DIMPLE', '| %s' %len(in_dict['dimple']),'| %s' &max_dimple_runtime,'|')
+    print '----------------------------------------------------------------------------'
 
 def get_datasource_summary(db_file):
     print 'db file', db_file
@@ -123,13 +132,13 @@ def get_datasource_summary(db_file):
     out_dict['no_data_collection_success']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'success';"))
 
     out_dict['no_data_collection_success']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - centring failed';"))
-    out_dict['no_data_collection_fail-no-diffraction']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - no diffraction';"))
-    out_dict['no_data_collection_fail-processing']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - processing';"))
-    out_dict['no_data_collection_fail-loop-empty']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - loop empty';"))
-    out_dict['no_data_collection_fail-loop-broken']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - loop broken';"))
-    out_dict['no_data_collection_fail-low-resolution']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - low resolution';"))
-    out_dict['no_data_collection_fail-no-X-rays']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - no X-rays';"))
-    out_dict['no_data_collection_fail-unknown']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - unknown';"))
+    out_dict['no_data_collection_no-diffraction']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - no diffraction';"))
+    out_dict['no_data_collection_processing_fail']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - processing';"))
+    out_dict['no_data_collection_loop-empty']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - loop empty';"))
+    out_dict['no_data_collection_loop-broken']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - loop broken';"))
+    out_dict['no_data_collection_low-resolution']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - low resolution';"))
+    out_dict['no_data_collection_no-X-rays']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - no X-rays';"))
+    out_dict['no_data_collection_unknown']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'Failed - unknown';"))
 
     out_dict['no_cif_files']=len(db.execute_statement("select RefinementCIF from mainTable where RefinementCIF is not (Null or '');"))
 

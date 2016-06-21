@@ -19,7 +19,7 @@ import XChemDialogs
 import XChemPANDDA
 import XChemToolTips
 import XChemMain
-
+import XChemPlots
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -479,6 +479,18 @@ class XChemExplorer(QtGui.QApplication):
         self.mounted_crystal_table.resizeColumnsToContents()
         self.overview_tab_dict['Data Source'][1].addWidget(self.mounted_crystal_table)
 
+        # - Overview Graph ####################################################################
+
+#        self.data_collection_vbox_for_summary_plot=QtGui.QVBoxLayout()
+        self.overview_figure, self.overview_axes = plt.subplots(nrows=2, ncols=2)
+        self.overview_canvas = FigureCanvas(self.overview_figure)
+        self.update_summary_plot()
+#        self.data_collection_vbox_for_summary_plot.addWidget(self.overview_canvas)
+        self.overview_tab_dict['Summary'][1].addWidget(self.overview_canvas)
+#        self.tab_dict['Plot'][1].addLayout(self.data_collection_vbox_for_overview)
+
+
+        ######################################################################################
         ######################################################################################
 
 
@@ -551,30 +563,6 @@ class XChemExplorer(QtGui.QApplication):
 
         self.data_collection_summarys_vbox_for_table.addWidget(self.data_collection_summary_table)
 
-#        # @ Buttons
-#        data_collection_button_hbox=QtGui.QHBoxLayout()
-#        get_data_collection_button=QtGui.QPushButton("Get New Results from Autoprocessing")
-#        get_data_collection_button.clicked.connect(self.button_clicked)
-#        data_collection_button_hbox.addWidget(get_data_collection_button)
-#        write_files_button=QtGui.QPushButton("Save Files from Autoprocessing in 'inital_model' Folder")
-#        write_files_button.clicked.connect(self.button_clicked)
-#        data_collection_button_hbox.addWidget(write_files_button)
-#        frame=QtGui.QFrame()
-#        frame.setFrameShape(QtGui.QFrame.StyledPanel)
-#        hbox=QtGui.QHBoxLayout()
-#        self.rerun_dimple_combobox=QtGui.QComboBox()
-#        cmd_list = [    'Run Dimple if final.pdb cannot be found ',
-#                        'Rerun Dimple on Everything'    ]
-#        for cmd in cmd_list:
-#            self.rerun_dimple_combobox.addItem(cmd)
-#        hbox.addWidget(self.rerun_dimple_combobox)
-#        rerun_dimple_button=QtGui.QPushButton("Run")
-#        rerun_dimple_button.clicked.connect(self.button_clicked)
-#        hbox.addWidget(rerun_dimple_button)
-#        frame.setLayout(hbox)
-#        data_collection_button_hbox.addWidget(frame)
-
-
         self.dls_data_collection_vbox.addWidget(dls_tab_widget)
 #        self.dls_data_collection_vbox.addLayout(data_collection_button_hbox)
 
@@ -631,20 +619,6 @@ class XChemExplorer(QtGui.QApplication):
         self.dls_tab_dict['Dewar'][1].addLayout(self.dewar_configuration_layout)
 
 
-#        ######################################################################################
-#        # Overview Tab
-#        self.data_collection_vbox_for_overview=QtGui.QVBoxLayout()
-#        self.overview_figure, self.overview_axes = plt.subplots(nrows=2, ncols=2)
-#        self.overview_canvas = FigureCanvas(self.overview_figure)
-#        self.update_overview()
-#        self.data_collection_vbox_for_overview.addWidget(self.overview_canvas)
-#        show_overview_button=QtGui.QPushButton("Show Overview")
-#        show_overview_button.clicked.connect(self.button_clicked)
-#        self.data_collection_vbox_for_overview.addWidget(show_overview_button)
-#        self.tab_dict['Overview'][1].addLayout(self.data_collection_vbox_for_overview)
-
-
-        ######################################################################################
 
 
         #
@@ -1069,6 +1043,11 @@ class XChemExplorer(QtGui.QApplication):
             if not write_enabled:
                 self.data_source_set=False
 
+
+    def update_summary_plot(self):
+        if self.data_source_set:
+            XChemPlots.summary_plot(os.path.join(self.database_directory,self.data_source_file),self.overview_axes).update_overview()
+            self.overview_canvas.draw()
 
     def find_entry_point(self):
         if os.getcwd().startswith('/dls/labxchem'):
@@ -1598,7 +1577,7 @@ class XChemExplorer(QtGui.QApplication):
         self.update_status_bar('updating PANDDA table')
         self.populate_pandda_analyse_input_table()
         self.update_status_bar('idle')
-
+        self.update_summary_plot()
 
     def settings_button_clicked(self):
         if self.sender().text()=='Select Project Directory':
