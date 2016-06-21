@@ -489,7 +489,7 @@ class GUI(object):
                 new_button = gtk.RadioButton(None, criteria)
             else:
                 new_button = gtk.RadioButton(new_button, criteria)
-            new_button.connect("toggled",self.ligand_confidence_button_clicked,citeria)
+            new_button.connect("toggled",self.ligand_confidence_button_clicked,criteria)
             vbox.add(new_button)
             self.ligand_confidence_button_list.append(new_button)
         frame.add(vbox)
@@ -662,7 +662,7 @@ class GUI(object):
             print '==> XCE: setting Refinement Outcome for '+self.xtalID+' (site='+str(self.selected_site)+') to '+str(data)+' in panddaTable of datasource'
             self.db.update_panddaTable(self.xtalID,self.selected_site[0],self.db_dict_panddaTable)
 
-    def ligand_confidence_button_clicked(self,widget,data):
+    def ligand_confidence_button_clicked(self,widget,data=None):
         print 'data!!!!!!!!!!!!!',data
         if self.selected_site[0] == 0:
             self.db_dict_mainTable['RefinementLigandConfidence']=data
