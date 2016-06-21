@@ -205,6 +205,21 @@ class run_pandda_analyse(QtCore.QThread):
         self.sort_event=pandda_params['sort_event']
 
     def run(self):
+
+
+# For 2000 datasets:
+#
+# 1) Run the normal pandda command, with the new setting, e.g.
+# pandda.analyse data_dirs=... max_new_datasets=500
+# This will do the analysis on the first 500 datasets and build the statistical maps - just as normal.
+#
+# 2) Run pandda with the same command:
+# pandda.analyse data_dirs=... max_new_datasets=500
+# This will add 500 new datasets, and process them using the existing statistical maps (this will be quicker than the original analysis). It will then merge the results of the two analyses.
+#
+# 3) Repeat 2) twice more until you don't add any "new" datasets. Then you can build the models as normal.
+
+
         if os.path.isfile(os.path.join(self.panddas_directory,'pandda.running')):
             return None
         else:

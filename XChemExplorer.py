@@ -2046,19 +2046,19 @@ class XChemExplorer(QtGui.QApplication):
             self.status_bar.showMessage('pandda.analyse: not enough datasets found')
             print '==> XCE: pandda.analyse: not enough datasets found'
             return
-        pandda_params = {
-                'data_dir':             str(self.pandda_input_data_dir_entry.text()),
-                'out_dir':              str(self.pandda_output_data_dir_entry.text()),
-                'submit_mode':          str(self.pandda_submission_mode_selection_combobox.currentText()),
-                'nproc':                str(self.pandda_nproc_entry.text()),
-                'min_build_datasets':   str(self.pandda_min_build_dataset_entry.text()),
-                'pdb_style':            str(self.pandda_pdb_style_entry.text()),
-                'mtz_style':            str(self.pandda_mtz_style_entry.text()),
-                'sort_event':           str(self.pandda_sort_event_combobox.currentText())
-                        }
-        self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params)
-        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-        self.work_thread.start()
+#        pandda_params = {
+#                'data_dir':             str(self.pandda_input_data_dir_entry.text()),
+#                'out_dir':              str(self.pandda_output_data_dir_entry.text()),
+#                'submit_mode':          str(self.pandda_submission_mode_selection_combobox.currentText()),
+#                'nproc':                str(self.pandda_nproc_entry.text()),
+#                'min_build_datasets':   str(self.pandda_min_build_dataset_entry.text()),
+#                'pdb_style':            str(self.pandda_pdb_style_entry.text()),
+#                'mtz_style':            str(self.pandda_mtz_style_entry.text()),
+#                'sort_event':           str(self.pandda_sort_event_combobox.currentText())
+#                        }
+#        self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params)
+#        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#        self.work_thread.start()
 
     def check_data_for_pandda_analyse(self):
         counter=0
