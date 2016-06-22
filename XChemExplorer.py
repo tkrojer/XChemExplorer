@@ -2631,8 +2631,9 @@ class XChemExplorer(QtGui.QApplication):
         row = self.data_collection_summary_table.rowCount()
         print 'rows in table:',row
         column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
-        new_xtal=False
+#        new_xtal=False
         for xtal in sorted(self.data_collection_dict):
+            new_xtal=False
             if xtal not in self.data_collection_summary_dict:
                 print 'found new samples:',xtal
                 print 'current rows',self.data_collection_summary_table.rowCount()
