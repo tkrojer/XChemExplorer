@@ -2635,8 +2635,9 @@ class XChemExplorer(QtGui.QApplication):
         for xtal in sorted(self.data_collection_dict):
             if xtal not in self.data_collection_summary_dict:
                 print 'found new samples:',xtal
-                self.data_collection_summary_table.insertRow(row)
                 print 'current rows',self.data_collection_summary_table.rowCount()
+                self.data_collection_summary_table.insertRow(row)
+                print 'rows after inserting',self.data_collection_summary_table.rowCount()
                 self.data_collection_summary_dict[xtal]=[]
                 # self.data_collection_summary_dict[xtal]=[outcome,db_dict,image,diffraction_image]
                 new_xtal=True
