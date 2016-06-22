@@ -2256,7 +2256,6 @@ class XChemExplorer(QtGui.QApplication):
 
             # first check if it does already exist
             if xtal not in self.data_collection_column_three_dict:
-                print 'found new samples!!!'
                 # geneerate all the widgets which can later be appended and add them to the dictionary
                 data_collection_table=QtGui.QTableWidget()      # table with data processing results for each pipeline
                 selection_changed_by_user=False
@@ -2630,10 +2629,12 @@ class XChemExplorer(QtGui.QApplication):
     def populate_data_collection_summary_table(self):
         self.status_bar.showMessage('Building summary table for data processing results; be patient this may take a while')
         row = self.data_collection_summary_table.rowCount()
+        print 'rows in table:',row
         column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
         new_xtal=False
         for xtal in sorted(self.data_collection_dict):
             if xtal not in self.data_collection_summary_dict:
+                print 'found new samples:',xtal
                 self.data_collection_summary_table.insertRow(row)
                 self.data_collection_summary_dict[xtal]=[]
                 # self.data_collection_summary_dict[xtal]=[outcome,db_dict,image,diffraction_image]
