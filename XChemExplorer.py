@@ -2617,7 +2617,7 @@ class XChemExplorer(QtGui.QApplication):
 #                self.main_data_collection_table.item(current_row, 1).setBackground(QtGui.QColor(100,100,150))
 
     def continously_check_for_new_data_collection(self,state):
-        self.timer_to_check_for_new_data_collection.timeout.connect(self.check_for_new_autoprocessing_or_rescore(False))
+        self.timer_to_check_for_new_data_collection.timeout.connect(lambda: self.check_for_new_autoprocessing_or_rescore(False))
         if state == QtCore.Qt.Checked:
             print '==> checking automatically every 120s for new data collection'
             self.timer_to_check_for_new_data_collection.start(120000)
