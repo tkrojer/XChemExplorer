@@ -2256,6 +2256,7 @@ class XChemExplorer(QtGui.QApplication):
 
             # first check if it does already exist
             if xtal not in self.data_collection_column_three_dict:
+                print 'found new samples!!!'
                 # geneerate all the widgets which can later be appended and add them to the dictionary
                 data_collection_table=QtGui.QTableWidget()      # table with data processing results for each pipeline
                 selection_changed_by_user=False
@@ -2620,10 +2621,10 @@ class XChemExplorer(QtGui.QApplication):
     def continously_check_for_new_data_collection(self,state):
         self.timer_to_check_for_new_data_collection.timeout.connect(lambda: self.check_for_new_autoprocessing_or_rescore(False))
         if state == QtCore.Qt.Checked:
-            print '==> checking automatically every 120s for new data collection'
+            print '==> XCE: checking automatically every 120s for new data collection'
             self.timer_to_check_for_new_data_collection.start(120000)
         else:
-            print 'timer stop'
+            print '==> XCE: stopped checking for new data collections'
             self.timer_to_check_for_new_data_collection.stop()
 
     def populate_data_collection_summary_table(self):
