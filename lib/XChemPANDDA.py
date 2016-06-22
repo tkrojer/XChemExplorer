@@ -205,6 +205,7 @@ class run_pandda_analyse(QtCore.QThread):
         self.sort_event=pandda_params['sort_event']
         self.number_of_datasets=pandda_params['N_datasets']
         self.max_new_datasets=pandda_params['max_new_datasets']
+        self.grid_spacing=pandda_params['grid_spacing']
 
     def run(self):
 
@@ -253,6 +254,7 @@ class run_pandda_analyse(QtCore.QThread):
                     ' min_build_datasets='+self.min_build_datasets+
                     ' maps.ampl_label=FWT maps.phas_label=PHWT'
                     ' max_new_datasets='+self.max_new_datasets+
+                    ' grid_spacing'+self.grid_spacing+
                     ' cpus='+self.nproc+
                     ' events.order_by='+self.sort_event+
                     ' pdb_style='+self.pdb_style+

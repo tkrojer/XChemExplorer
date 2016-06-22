@@ -809,6 +809,11 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_max_new_datasets_entry.setText('300')
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_max_new_datasets_entry)
 
+        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('grid_spacing (default=0.6; higher values speed up calculations, but maps might be less pretty)'))
+        self.pandda_grid_spacing_entry = QtGui.QLineEdit()
+        self.pandda_grid_spacing_entry.setText('0.6')
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_grid_spacing_entry)
+
         self.pandda_analyse_input_params_vbox.addStretch(1)
 
         frame.setLayout(self.pandda_analyse_input_params_vbox)
@@ -2060,7 +2065,8 @@ class XChemExplorer(QtGui.QApplication):
                 'mtz_style':            str(self.pandda_mtz_style_entry.text()),
                 'sort_event':           str(self.pandda_sort_event_combobox.currentText()),
                 'N_datasets':           counter,
-                'max_new_datasets':     str(self.pandda_max_new_datasets_entry.text())
+                'max_new_datasets':     str(self.pandda_max_new_datasets_entry.text()),
+                'grid_spacing':         str(self.pandda_grid_spacing_entry.text())
                         }
         self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
