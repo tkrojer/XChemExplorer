@@ -1999,6 +1999,7 @@ class XChemExplorer(QtGui.QApplication):
         self.status_bar.showMessage(message)
 
     def check_for_new_autoprocessing_or_rescore(self,rescore_only):
+        print '==> XCE: checking for new data collection:',datetime.now()-datetime.strptime(start,"%Y-%m-%d %H:%M:%S")
         start_thread=False
         if rescore_only:
             # first pop up a warning message as this will overwrite all user selections
