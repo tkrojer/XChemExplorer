@@ -2632,17 +2632,13 @@ class XChemExplorer(QtGui.QApplication):
     def populate_data_collection_summary_table(self):
         self.status_bar.showMessage('Building summary table for data processing results; be patient this may take a while')
         row = self.data_collection_summary_table.rowCount()
-        print 'rows in table:',row
         column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
 #        new_xtal=False
         for xtal in sorted(self.data_collection_dict):
             new_xtal=False
             if xtal not in self.data_collection_summary_dict:
-                print 'found new samples:',xtal
-                print 'current rows',self.data_collection_summary_table.rowCount()
                 row = self.data_collection_summary_table.rowCount()
                 self.data_collection_summary_table.insertRow(row)
-                print 'rows after inserting',self.data_collection_summary_table.rowCount()
                 self.data_collection_summary_dict[xtal]=[]
                 # self.data_collection_summary_dict[xtal]=[outcome,db_dict,image,diffraction_image]
                 new_xtal=True
