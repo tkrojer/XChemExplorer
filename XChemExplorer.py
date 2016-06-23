@@ -2169,11 +2169,12 @@ class XChemExplorer(QtGui.QApplication):
     def show_html_summary_and_diffraction_image(self):
         for key in self.albula_button_dict:
             if self.albula_button_dict[key][0]==self.sender():
+                print '==> XCE: showing html summary in firefox'
                 self.show_html_summary_in_firefox(key)
-                print '==> XCE: starting dials.image_viewer'
-                self.work_thread=XChemThread.start_dials_image_viewer(self.albula_button_dict[key][1])
-                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-                self.work_thread.start()
+#                print '==> XCE: starting dials.image_viewer'
+#                self.work_thread=XChemThread.start_dials_image_viewer(self.albula_button_dict[key][1])
+#                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#                self.work_thread.start()
 
 
 
@@ -2637,6 +2638,7 @@ class XChemExplorer(QtGui.QApplication):
             if xtal not in self.data_collection_summary_dict:
                 print 'found new samples:',xtal
                 print 'current rows',self.data_collection_summary_table.rowCount()
+                row = self.data_collection_summary_table.rowCount()
                 self.data_collection_summary_table.insertRow(row)
                 print 'rows after inserting',self.data_collection_summary_table.rowCount()
                 self.data_collection_summary_dict[xtal]=[]
