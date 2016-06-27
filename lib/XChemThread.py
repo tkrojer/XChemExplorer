@@ -127,6 +127,9 @@ class update_datasource_from_file_system(QtCore.QThread):
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating datasource for '+xtal)
                 self.db.update_data_source(xtal,db_dict)
 
+            # also need to update PANDDA table...
+
+
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 

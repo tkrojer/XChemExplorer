@@ -832,6 +832,7 @@ class XChemExplorer(QtGui.QApplication):
         # next three blocks display html documents created by pandda.analyse
         self.pandda_initial_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_initial.html')
         self.pandda_analyse_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_analyse.html')
+#        self.pandda_inspect_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_inspect.html')
         self.pandda_inspect_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_inspect.html')
 
         self.pandda_initial_html = QtWebKit.QWebView()
@@ -2238,6 +2239,8 @@ class XChemExplorer(QtGui.QApplication):
                         'DataProcessing\nSpaceGroup',
                         'Mn<I/sig(I)>\nHigh',
                         'Rmerge\nLow',
+                        'Completeness\nOverall',
+                        'DataProcessing\nUnitCell',
                         'DataProcessing\nRfree' ]
 
         # need to do this because db_dict keys are SQLite column names
