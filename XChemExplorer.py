@@ -2165,6 +2165,7 @@ class XChemExplorer(QtGui.QApplication):
                 if not entry_already_in_table:
                     data_collection_table.insertRow(row_position)
                     db_dict=entry[6]
+                    print db_dict
                     for column,header in enumerate(diffraction_data_column_name):
                         cell_text=QtGui.QTableWidgetItem()
                         cell_text.setText(str( db_dict[ header[1] ]  ))

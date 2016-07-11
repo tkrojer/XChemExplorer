@@ -886,7 +886,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                 if entry[0]=='logfile':
                     if entry[8]:        # the best auto-selected or user selected output
                         db_dict=entry[6]
-                        print db_dict
                         logfile_found=True
                         try:
                             if float(db_dict['DataProcessingResolutionHigh']) <= float(self.acceptable_low_resolution_limit_for_data):
