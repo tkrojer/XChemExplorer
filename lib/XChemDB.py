@@ -123,6 +123,7 @@ class data_source:
             ['DataProcessingPointGroup',                    'DataProcessing\nPointGroup',                   'TEXT',                 0],
             ['DataProcessingUnitCellVolume',                'DataProcessing\nUnit Cell Volume',             'TEXT',                 0],
             ['DataProcessingAlert',                         'DataProcessing\nAlert',                        'TEXT',                 0],
+            ['DataProcessingScore',                         'DataProcessing\nScore',                        'TEXT',                 0],
 
             ['DataProcessingRcryst',                        'DataProcessing\nRcryst',                       'TEXT',                 0],
             ['DataProcessingRfree',                         'DataProcessing\nRfree',                        'TEXT',                 0],
