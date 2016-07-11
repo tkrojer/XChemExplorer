@@ -783,7 +783,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                      float(entry[6]['DataProcessingCompletenessOverall'])*\
                                      float(entry[6]['DataProcessingIsigOverall']))/float(entry[6]['DataProcessingUnitCellVolume'])
                             entry[6]['DataProcessingScore']=ranking
-                            self.data_collection_dict[xtal][n][6]=entry[6]
+                            print entry[6]
+#                            self.data_collection_dict[xtal][n][6]=entry[6]
                             select_stage_three_list.append([index,ranking])
                         except ValueError:
                             pass
