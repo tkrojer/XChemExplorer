@@ -1257,6 +1257,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         # save everything so that it's quicker to reload and is available outside DLS
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'pickling results')
 #        pickle.dump(self.data_collection_dict,open(self.data_collection_summary_file,'wb'))
+        for fff in self.data_collection_dict:
+            print fff
         cPickle.dump(self.data_collection_dict,open(self.data_collection_summary_file,'wb'))
 
         self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results_only'), self.data_collection_dict)
