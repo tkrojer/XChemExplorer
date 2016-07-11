@@ -1045,8 +1045,6 @@ class XChemExplorer(QtGui.QApplication):
 #        self.window.showMaximized()
         self.window.show()
 
-#        self.find_entry_point()
-
         if self.data_source_file != '':
             write_enabled=self.check_write_permissions_of_data_source()
             if not write_enabled:
@@ -1058,42 +1056,6 @@ class XChemExplorer(QtGui.QApplication):
             XChemPlots.summary_plot(os.path.join(self.database_directory,self.data_source_file),self.overview_axes).update_overview()
             self.overview_canvas.draw()
 
-    def find_entry_point(self):
-        if os.getcwd().startswith('/dls/labxchem'):
-            print 'o'
-        test = [    ['mx10619-1','2016/04/05'],
-                    ['mx10610-2','2016/04/18']]
-
-## Hide the default button
-# l.itemAtPosition( l.rowCount() - 1, 0 ).widget().hide()
-#
-# progress = QProgressBar()
-#
-## Add the progress bar at the bottom (last row + 1) and first column with column span
-# l.addWidget(progress,l.rowCount(), 0, 1, l.columnCount(), Qt.AlignCenter )
-
-        visit_table_columns=['visit','date']
-
-
-
-
-        msgBox = QtGui.QMessageBox()
-        msgBoxLayout = msgBox.layout()              # get the layout
-        print msgBoxLayout.columnCount()
-        print msgBoxLayout.rowCount()
-
-        visit_table=QtGui.QTableWidget()      # table with data processing results for each pipeline
-        visit_table.setHorizontalHeaderLabels(visit_table_columns)
-
-
-        test=QtGui.QCheckBox('test')
-        msgBoxLayout.addWidget(visit_table,0,0)
-        msgBox.setText("Hallo")
-        msgBox.addButton(QtGui.QPushButton('Go'), QtGui.QMessageBox.YesRole)
-        msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
-        reply = msgBox.exec_();
-        if reply == 0:
-            print 'here'
 
     def show_preferences(self):
         preferences = QtGui.QMessageBox()
@@ -1818,152 +1780,6 @@ class XChemExplorer(QtGui.QApplication):
                 self.work_thread.start()
 
 
-#        elif self.sender().text()=="Load Crystal Forms From Datasource":
-#            self.load_crystal_form_from_datasource()
-#            self.pandda_analyse_crystal_from_selection_combobox.clear()
-#            self.pandda_analyse_crystal_from_selection_combobox.addItem('all datasets')
-#            if self.xtalform_dict != {}:
-#                for key in self.xtalform_dict:
-#                    self.pandda_analyse_crystal_from_selection_combobox.addItem(key)
-#            self.update_xtalfrom_table(self.xtalform_dict)
-#            self.update_pandda_crystal_from_combobox()
-
-#        elif self.sender().text()=="Suggest Additional Crystal Forms" or \
-#             self.sender().text()=="Assign Crystal Forms To Samples":
-#            self.explorer_active=1
-#            if self.sender().text()=="Suggest Additional Crystal Forms":
-#                mode='suggest'
-#            if self.sender().text()=="Assign Crystal Forms To Samples":
-#                mode='assign'
-#                # allows user to change crystal from names
-#                allRows = self.crystal_form_table.rowCount()
-#                self.xtalform_dict={}
-#                for row in range(allRows):
-#                    crystal_form_name=str(self.crystal_form_table.item(row,0).text())      # this must be the case
-#                    self.xtalform_dict[crystal_form_name] = [
-#                            str(self.crystal_form_table.item(row,2).text()),
-#                            str(self.crystal_form_table.item(row,9).text()),
-#                            [   str(self.crystal_form_table.item(row,3).text()),
-#                                str(self.crystal_form_table.item(row,4).text()),
-#                                str(self.crystal_form_table.item(row,5).text()),
-#                                str(self.crystal_form_table.item(row,6).text()),
-#                                str(self.crystal_form_table.item(row,7).text()),
-#                                str(self.crystal_form_table.item(row,8).text()) ],
-#                            str(self.crystal_form_table.item(row,1).text())         ]
-
-
-#            self.work_thread=XChemThread.crystal_from(self.initial_model_directory,
-#                                                                        self.reference_file_list,
-#                                                                        os.path.join(self.database_directory,
-#                                                                                     self.data_source_file),
-#                                                                        self.filename_root,
-#                                                                        self.xtalform_dict,
-#                                                                        mode)
-#            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-#            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-#            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-#            self.connect(self.work_thread, QtCore.SIGNAL("update_xtalfrom_table"),self.update_xtalfrom_table)
-#            self.work_thread.start()
-
-
-#        elif self.sender().text()=='Set New Reference (if applicable)':
-#            reference_root=str(self.reference_file_selection_combobox.currentText())
-#            self.update_reference_files(reference_root)
-
-
-#        elif self.sender().text()=="Load Samples\nFrom Datasource":
-#            content=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).load_samples_from_data_source()
-#            header=content[0]
-#            data=content[1]
-#            self.populate_data_source_table(header,data)
-
-
-#        elif self.sender().text()=="Import CSV file\ninto Data Source":
-#            if self.data_source_file=='':
-#                self.update_status_bar('Please load a data source file first')
-#            else:
-#                file_name = QtGui.QFileDialog.getOpenFileName(self.window,'Open file', self.database_directory)
-#                XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).import_csv_file(file_name)
-
-#        elif self.sender().text()=="Export CSV file\nfrom Data Source":
-#            file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
-#            if file_name.rfind('.') != -1:
-#                file_name=file_name[:file_name.rfind('.')]+'.csv'
-#            else:
-#                file_name=file_name+'.csv'
-#            XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).export_to_csv_file(file_name)
-
-#        elif self.sender().text()=="Save Samples\nTo Datasource":
-#            # first translate all columns in table in SQLite tablenames
-#            columns_in_data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).return_column_list()
-#            column_dict={}
-#            for item in self.data_source_columns_to_display:
-#                for column_name in columns_in_data_source:
-#                    if column_name[1]==item:
-#                        column_dict[item]=column_name[0]
-#
-#            allRows = self.mounted_crystal_table.rowCount()
-#            for row in range(allRows):
-#                data_dict={}
-#                sampleID=str(self.mounted_crystal_table.item(row,0).text())      # this must be the case
-#                for i in range(1,len(self.data_source_columns_to_display)):
-#                    if self.mounted_crystal_table.item(row,i).text() != '':
-#                        headertext = str(self.mounted_crystal_table.horizontalHeaderItem(i).text())
-#                        column_to_update=column_dict[headertext]
-#                        data_dict[column_to_update]=str(self.mounted_crystal_table.item(row,i).text())
-##                print sampleID,data_dict
-#                XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).update_data_source(sampleID,data_dict)
-
-
-#        elif self.sender().text()=="Create PDB/CIF/PNG\nfiles of Compound":
-#            if helpers().pil_rdkit_exist()==False:
-#                QtGui.QMessageBox.warning(self.window, "Library Problem",
-#                                                       ('Cannot find PIL and RDKIT'),
-#                        QtGui.QMessageBox.Cancel, QtGui.QMessageBox.NoButton,
-#                        QtGui.QMessageBox.NoButton)
-#            else:
-#                columns_to_read=['Sample ID',
-#                                 'Compound ID',
-#                                 'Smiles']
-#                # it's a bit pointless now to search for the position of the columns,
-#                # but later I may want to give the user the option to change the column order
-#                headercount = self.mounted_crystal_table.columnCount()
-#                column_positions=[]
-#                for item in columns_to_read:
-#                    for x in range(headercount):
-#                        headertext = self.mounted_crystal_table.horizontalHeaderItem(x).text()
-#                        if headertext==item:
-#                            column_positions.append(x)
-#                            break
-#                allRows = self.mounted_crystal_table.rowCount()
-#                compound_list=[]
-#                for row in range(allRows):
-#                    if self.mounted_crystal_table.item(row,column_positions[2]).text() != '':
-#                        compound_list.append([str(self.mounted_crystal_table.item(row,column_positions[0]).text()),
-#                                              str(self.mounted_crystal_table.item(row,column_positions[1]).text()),
-#                                              str(self.mounted_crystal_table.item(row,column_positions[2]).text())] )
-#                if compound_list != []:
-#                    self.explorer_active=1
-#                    self.work_thread=XChemThread.create_png_and_cif_of_compound(self.external_software,
-#                                                                                self.initial_model_directory,
-#                                                                                compound_list)
-#                    self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-#                    self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-#                    self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-#                    self.work_thread.start()
-#
-#        elif self.sender().text()=="Check\nStatus":
-#            self.check_status_create_png_of_soaked_compound()
-#
-#        elif str(self.sender().text()).startswith("Show Overview"):
-#            self.update_overview()
-#
-#
-#
-#
-#        elif str(self.sender().text()).startswith("Export PANDDA Models"):
-#            print '==> XCE: exporting pandda models with pandda.export'
-#            os.system('pandda.export pandda_dir="'+self.panddas_directory+'" out_dir="'+self.initial_model_directory+'"')
 
 
     def set_new_reference_if_applicable(self):
@@ -2383,36 +2199,6 @@ class XChemExplorer(QtGui.QApplication):
 
         #-----------------------------------------------------------------------------------------------
 
-    def update_xtalfrom_table(self,xtalform_dict):
-        self.xtalform_dict=xtalform_dict
-        self.crystal_form_table.setRowCount(0)
-        self.crystal_form_table.setRowCount(len(self.xtalform_dict))
-        self.crystal_form_table.setColumnCount(len(self.crystal_form_column_name))
-        all_columns_in_datasource=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).return_column_list()
-        for y,key in enumerate(sorted(self.xtalform_dict)):
-            db_dict = {
-                'CrystalFormName':          key,
-                'CrystalFormSpaceGroup':    xtalform_dict[key][3],
-                'CrystalFormPointGroup':    xtalform_dict[key][0],
-                'CrystalFormA':             xtalform_dict[key][2][0],
-                'CrystalFormB':             xtalform_dict[key][2][1],
-                'CrystalFormC':             xtalform_dict[key][2][2],
-                'CrystalFormAlpha':         xtalform_dict[key][2][3],
-                'CrystalFormBeta':          xtalform_dict[key][2][4],
-                'CrystalFormGamma':         xtalform_dict[key][2][5],
-                'CrystalFormVolume':        xtalform_dict[key][1]       }
-            for x,column_name in enumerate(self.crystal_form_column_name):
-                cell_text=QtGui.QTableWidgetItem()
-                for column in all_columns_in_datasource:
-                    if column[1]==column_name:
-                        cell_text.setText(str(db_dict[column[0]]))
-                        break
-                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                self.crystal_form_table.setItem(y, x, cell_text)
-        self.crystal_form_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        self.crystal_form_table.resizeColumnsToContents()
-        self.crystal_form_table.setHorizontalHeaderLabels(self.crystal_form_column_name)
-
 
     def find_suitable_reference_file(self,db_dict):
         reference_file=[]
@@ -2422,12 +2208,13 @@ class XChemExplorer(QtGui.QApplication):
             # first we need one in the same pointgroup
             if reference[5]==db_dict['DataProcessingPointGroup']:
                 try:
-                    difference=math.fabs(1-(float(db_dict['DataProcessingUnitCellVolume'])/float(reference[4])))
+                    difference=math.fabs(1-(float(db_dict['DataProcessingUnitCellVolume'])/float(reference[4])))*100
                     suitable_reference.append([reference,difference])
                 except ValueError:
                     continue
         if suitable_reference != []:
             reference_file=min(suitable_reference,key=lambda x: x[1])
+        print 'reference file:',reference_file
         return reference_file
 
 
