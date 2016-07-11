@@ -779,6 +779,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                         select_stage_three_list.append([index,ranking])
         if not select_stage_three_list==[]:
             self.set_best_file_to_true(xtal,'max',select_stage_three_list)
+            if xtal=='JMJD2AA-x0066':
+                print select_stage_three_list
 
 
 
@@ -791,9 +793,10 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
             if entry[0]=='logfile':
                 if entry[7]==best_file_index:
                     self.data_collection_dict[xtal][n][8]=True
+                    if xtal=='JMJD2AA-x0066:':
+                        print self.data_collection_dict[xtal][n][6]
                 else:
                     self.data_collection_dict[xtal][n][8]=False
-
 
 
     def min_Rfree(self,xtal):
