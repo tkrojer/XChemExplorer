@@ -730,10 +730,10 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     if unitcell_difference < 5 and reference_file[3]==entry[6]['DataProcessingLattice']:
                                         select_stage_one_list.append(index)
                                         found=True
-                                    if xtal=='JMJD2AA-x0066':
-                                        print entry[6]['DataProcessingProgram']
-                                        print entry[6]['DataProcessingUnitCellVolume']
-                                        print entry[6]['DataProcessingLattice']
+                                        if xtal=='JMJD2AA-x0066':
+                                            print entry[6]['DataProcessingProgram']
+                                            print entry[6]['DataProcessingUnitCellVolume']
+                                            print entry[6]['DataProcessingLattice']
                     except ValueError:
                         pass
                 if not found:
