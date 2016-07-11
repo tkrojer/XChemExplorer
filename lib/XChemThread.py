@@ -771,7 +771,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         # max(unique_reflections*completeness*Mn(I/sig<I>)
         select_stage_three_list=[]
         for index in select_stage_two_list:
-            for entry in self.data_collection_dict[xtal]:
+            for n,entry in enumerate(self.data_collection_dict[xtal]):
                 if entry[0]=='logfile':
                     if isinstance(entry[6],dict) and entry[7]==index:
                         try:
@@ -783,8 +783,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                      float(entry[6]['DataProcessingCompletenessOverall'])*\
                                      float(entry[6]['DataProcessingIsigOverall']))/float(entry[6]['DataProcessingUnitCellVolume'])
                             entry[6]['DataProcessingScore']=ranking
-                            print entry[6]
-#                            self.data_collection_dict[xtal][n][6]=entry[6]
+                            self.data_collection_dict[xtal][n][6]=entry[6]
                             select_stage_three_list.append([index,ranking])
                         except ValueError:
                             pass
