@@ -773,7 +773,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         for index in select_stage_two_list:
             for n,entry in enumerate(self.data_collection_dict[xtal]):
                 if entry[0]=='logfile':
-                    print entry[6]
                     if isinstance(entry[6],dict) and entry[7]==index:
                         ranking=entry[6]['DataProcessingScore']
                         select_stage_three_list.append([index,ranking])
