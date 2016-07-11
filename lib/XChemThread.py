@@ -564,7 +564,10 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
             # check if dimple files exist
             if os.path.isfile(os.path.join(dimple_destination,'final.pdb')):
                 # remove old symbolic links if necessary
-                if os.path.isfile('dimple.pdb'): os.system('/bin/rm dimple.pdb')
+                #if os.path.isfile('dimple.pdb'):
+                # forget about the if statement; it won't catch broken links,
+                # but broken links will still trip os.symlink
+                os.system('/bin/rm dimple.pdb')
                 os.symlink(os.path.join(dimple_destination,'final.pdb'),'dimple.pdb')
                 pdb_info=parse().PDBheader(os.path.join(dimple_destination,'final.pdb'))
                 Rcryst=pdb_info['Rcryst']
@@ -574,7 +577,8 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
 
             if os.path.isfile(os.path.join(dimple_destination,'final.mtz')):
                 # remove old symbolic links if necessary
-                if os.path.isfile('dimple.mtz'): os.system('/bin/rm dimple.mtz')
+                #if os.path.isfile('dimple.mtz'):
+                os.system('/bin/rm dimple.mtz')
                 os.symlink(os.path.join(dimple_destination,'final.mtz'),'dimple.mtz')
             # if no refinement was carried out yet, then we also want to link the dimple files to refine.pdb/refine.log
             # so that we can look at them with the COOT plugin
@@ -585,14 +589,17 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
                     break
             if not found_previous_refinement:
                 # first delete possible old symbolic links
-                if os.path.isfile('refine.pdb'): os.system('/bin/rm refine.pdb')
+                #if os.path.isfile('refine.pdb'):
+                os.system('/bin/rm refine.pdb')
                 os.symlink('dimple.pdb','refine.pdb')
-                if os.path.isfile('refine.mtz'): os.system('/bin/rm refine.mtz')
+                #if os.path.isfile('refine.mtz'):
+                os.system('/bin/rm refine.mtz')
                 os.symlink('dimple.mtz','refine.mtz')
             # remove any previous <sample>.free.mtz file, and link new dimple.mtz
             # so if we continue refining, then we do so against the correct file
             # think that REFMAC does not tinker with F,SIGF as long as there is no twinning
-            if os.path.isfile(sample+'.free.mtz'): os.system('/bin/rm '+sample+'.free.mtz')
+            #if os.path.isfile(sample+'.free.mtz'):
+            os.system('/bin/rm '+sample+'.free.mtz')
             os.symlink(os.path.join(dimple_destination,'final.mtz'),sample+'.free.mtz')
             mtzfree=os.path.join(dimple_destination,'final.mtz')
         return mtzfree,Rcryst,Rfree,refinement_stage,spg
