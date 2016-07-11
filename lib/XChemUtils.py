@@ -325,6 +325,7 @@ class parse:
                             'DataCollectionWavelength':                     'n/a'   }
 
 
+
     def GetAimlessLog(self,Logfile):
         self.Logfile=Logfile
         Aimless = { 'AutoProc': 'n/a',
@@ -544,6 +545,12 @@ class parse:
                                                                                  math.radians(float(beta)),
                                                                                  math.radians(float(gamma)),
                                                                                  self.aimless['DataProcessingLattice']))
+                    try:
+                        self.aimless['DataProcessingScore'] = (float(self.aimless['DataProcessingUniqueReflectionsOverall'])*\
+                                                               float(self.aimless['DataProcessingCompletenessOverall'])*\
+                                                               float(self.aimless['DataProcessingIsigOverall']))/float(self.aimless['DataProcessingUnitCellVolume'])
+                    except ValueError:
+                        self.aimless['DataProcessingScore']=0.0
         self.aimless['DataProcessingUnitCell']=str(a)+' '+str(b)+' '+str(c)+' '+str(alpha)+' '+str(beta)+' '+str(gamma)
         self.aimless['DataProcessingResolutionOverall']=str(self.aimless['DataProcessingResolutionLow'])+' - '+str(self.aimless['DataProcessingResolutionHigh'])
 
