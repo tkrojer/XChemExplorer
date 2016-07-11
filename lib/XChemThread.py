@@ -730,10 +730,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                     if unitcell_difference < 5 and reference_file[3]==entry[6]['DataProcessingLattice']:
                                         select_stage_one_list.append(index)
                                         found=True
-                                        if xtal=='JMJD2AA-x0066':
-                                            print entry[6]['DataProcessingProgram']
-                                            print entry[6]['DataProcessingUnitCellVolume']
-                                            print entry[6]['DataProcessingLattice']
                     except ValueError:
                         pass
                 if not found:
@@ -782,9 +778,23 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                         select_stage_three_list.append([index,ranking])
         if not select_stage_three_list==[]:
             self.set_best_file_to_true(xtal,'max',select_stage_three_list)
-            if xtal=='JMJD2AA-x0066':
-                print select_stage_three_list
 
+
+    def max_IsigI_Completeness_Reflections_only(self,xtal):
+        # => select the dataset with
+        #    max(unique_reflections*completeness*Mn(I/sig<I>)
+
+        ############################################################################################
+        # select the file with the highest DataProcessingScore
+        select_stage_three_list=[]
+        for n,entry in enumerate(self.data_collection_dict[xtal]):
+            if entry[0]=='logfile':
+                index=self.data_collection_dict[xtal][n][7]
+                if isinstance(entry[6],dict):
+                    ranking=entry[6]['DataProcessingScore']
+                    select_stage_three_list.append([index,ranking])
+        if not select_stage_three_list==[]:
+            self.set_best_file_to_true(xtal,'max',select_stage_three_list)
 
 
     def set_best_file_to_true(self,xtal,min_max,input_list):
@@ -796,8 +806,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
             if entry[0]=='logfile':
                 if entry[7]==best_file_index:
                     self.data_collection_dict[xtal][n][8]=True
-                    if xtal=='JMJD2AA-x0066:':
-                        print self.data_collection_dict[xtal][n][6]
                 else:
                     self.data_collection_dict[xtal][n][8]=False
 
@@ -854,7 +862,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     if entry[0]=='logfile':
                         self.data_collection_dict[xtal][n][8]=False
             if self.selection_mechanism=='IsigI*Comp*UniqueRefl':
-                self.max_IsigI_Completeness_Reflections(xtal)
+                self.max_IsigI_Completeness_Reflections_only(xtal)
             elif self.selection_mechanism=='lowest_Rfree':
                 self.min_Rfree(xtal)
             elif self.selection_mechanism=='highest_resolution':
