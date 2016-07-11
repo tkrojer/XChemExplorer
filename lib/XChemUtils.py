@@ -322,7 +322,8 @@ class parse:
                             'DataProcessingPointGroup':                     'n/a',
                             'DataProcessingUnitCellVolume':                 0,
                             'DataProcessingAlert':                          '#FF0000',
-                            'DataCollectionWavelength':                     'n/a'   }
+                            'DataCollectionWavelength':                     'n/a',
+                            'DataProcessingScore':                          0.0             }
 
 
 
