@@ -2057,7 +2057,8 @@ class XChemExplorer(QtGui.QApplication):
                         'Rmerge\nLow',
                         'Completeness\nOverall',
                         'DataProcessing\nUnitCell',
-                        'DataProcessing\nRfree' ]
+                        'DataProcessing\nRfree',
+                        'DataProcessing\nScore'     ]
 
         # need to do this because db_dict keys are SQLite column names
         diffraction_data_column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(column_name)
