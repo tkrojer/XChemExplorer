@@ -2165,10 +2165,13 @@ class XChemExplorer(QtGui.QApplication):
                 if not entry_already_in_table:
                     data_collection_table.insertRow(row_position)
                     db_dict=entry[6]
-                    print db_dict
                     for column,header in enumerate(diffraction_data_column_name):
                         cell_text=QtGui.QTableWidgetItem()
-                        cell_text.setText(str( db_dict[ header[1] ]  ))
+                        try:
+                            cell_text.setText(str( db_dict[ header[1] ]  ))
+                        except KeyError:
+                            # this may happen if not score exists
+                            cell_text.setText('0')
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         data_collection_table.setItem(row_position, column, cell_text)
                     data_collection_table.setRowHeight(row_position,20)
