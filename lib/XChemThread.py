@@ -886,6 +886,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                 if entry[0]=='logfile':
                     if entry[8]:        # the best auto-selected or user selected output
                         db_dict=entry[6]
+                        print db_dict
                         logfile_found=True
                         try:
                             if float(db_dict['DataProcessingResolutionHigh']) <= float(self.acceptable_low_resolution_limit_for_data):
@@ -1257,8 +1258,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         # save everything so that it's quicker to reload and is available outside DLS
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'pickling results')
 #        pickle.dump(self.data_collection_dict,open(self.data_collection_summary_file,'wb'))
-        for fff in self.data_collection_dict:
-            print self.data_collection_dict[fff][6]
         cPickle.dump(self.data_collection_dict,open(self.data_collection_summary_file,'wb'))
 
         self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results_only'), self.data_collection_dict)
