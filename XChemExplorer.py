@@ -44,6 +44,7 @@ class XChemExplorer(QtGui.QApplication):
         self.xce_logfile=os.path.join(self.current_directory,'xce.log')
         XChemLog.startLog(self.xce_logfile).create_logfile()
         self.update_log=XChemLog.updateLog(self.xce_logfile)
+        self.update_log.insert('new session started')
 
         if 'labxchem' in self.current_directory:
             self.labxchem_directory='/'+os.path.join(*self.current_directory.split('/')[1:6])    # need splat operator: *
@@ -1841,7 +1842,7 @@ class XChemExplorer(QtGui.QApplication):
         self.status_bar.showMessage(message)
 
     def check_for_new_autoprocessing_or_rescore(self,rescore_only):
-        print '==> XCE: checking for new data collection:',datetime.now()
+        self.update_log.insert('checking for new data collection')
         start_thread=False
         if rescore_only:
             # first pop up a warning message as this will overwrite all user selections
@@ -2670,7 +2671,7 @@ class XChemExplorer(QtGui.QApplication):
         for key in self.data_collection_column_three_dict:
             if self.data_collection_column_three_dict[key][0]==self.sender():
                 # the user changed the selection, i.e. no automated selection will update it
-                print '==> XCE: user changed selection'
+                self.update_log.insert('user changed selection')
                 self.data_collection_column_three_dict[key][1]=True
                 # need to also update if not yet done
                 user_already_changed_selection=False
@@ -2683,7 +2684,8 @@ class XChemExplorer(QtGui.QApplication):
                                                                            self.data_collection_column_three_dict,
                                                                            self.dataset_outcome_dict,
                                                                            self.initial_model_directory,
-                                                                           os.path.join(self.database_directory,self.data_source_file))
+                                                                           os.path.join(self.database_directory,self.data_source_file),
+                                                                           self.xce_logfile)
 
     def update_selected_autoproc_data_collection_summary_table(self):
         for key in self.data_collection_column_three_dict:

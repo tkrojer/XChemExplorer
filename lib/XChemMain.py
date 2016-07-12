@@ -7,7 +7,7 @@ from datetime import datetime
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 
 import XChemDB
-
+import XChemLog
 
 def get_target_and_visit_list(beamline_directory):
 #    target_list=['*']      # always give the option to read in all targets
@@ -154,7 +154,8 @@ def remove_all_refmac_jobs_from_cluster_and_reinstate_last_stable_state():
     print 'hallo'
 
 
-def change_links_to_selected_data_collection_outcome(sample,data_collection_dict,data_collection_column_three_dict,dataset_outcome_dict,initial_model_directory,data_source_file):
+def change_links_to_selected_data_collection_outcome(sample,data_collection_dict,data_collection_column_three_dict,dataset_outcome_dict,initial_model_directory,data_source_file,xce_logfile):
+    Logfile=XChemLog.updateLog(xce_logfile)
     # find out which row was selected in respective data collection table
     selected_processing_result='n/a'
     indexes=data_collection_column_three_dict[sample][0].selectionModel().selectedRows()
@@ -184,9 +185,9 @@ def change_links_to_selected_data_collection_outcome(sample,data_collection_dict
 #                    os.system('/bin/rm '+sample+'.mtz')
 #                    os.system('/bin/rm '+sample+'.log')
                     # make new links
-                    print '==> XCE: setting symlink: '+os.path.join(path_to_logfile,log_filename)+' -> '+sample+'.log'
+                    Logfile.insert('setting symlink: '+os.path.join(path_to_logfile,log_filename)+' -> '+sample+'.log')
 #                    os.symlink(os.path.join(path_to_logfile,log_filename),sample+'.log')
-                    print '==> XCE: setting symlink: '+os.path.join(path_to_mtzfile,mtz_filename)+' -> '+sample+'.mtz'
+                    Logfile.insert('setting symlink: '+os.path.join(path_to_mtzfile,mtz_filename)+' -> '+sample+'.mtz')
 #                    os.symlink(os.path.join(path_to_mtzfile,mtz_filename),sample+'.mtz')
 
                     # update data source
@@ -194,4 +195,4 @@ def change_links_to_selected_data_collection_outcome(sample,data_collection_dict
                     data_source.update_insert_data_source(sample,db_dict)
 
                 else:
-                    print '==> XCE: please copy data to PROJECT DIRECTORY first!'
+                    Logfile.insert('please copy data to PROJECT DIRECTORY first!')
