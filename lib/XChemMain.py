@@ -179,11 +179,11 @@ def change_links_to_selected_data_collection_outcome(sample,data_collection_dict
                 if os.path.isdir(os.path.join(initial_model_directory,sample,'autoprocessing',visit+'-'+run+autoproc)):
                     os.chdir(os.path.join(initial_model_directory,sample))
                     # first remove old links
-                    os.system('/bin/rm '+sample+'.mtz')
-                    os.system('/bin/rm '+sample+'.log')
+#                    os.system('/bin/rm '+sample+'.mtz')
+#                    os.system('/bin/rm '+sample+'.log')
                     # make new links
                     print '==> XCE: setting symlink: '+path_to_logfile+' -> '+sample+'.log'
-                    os.symlink(path_to_logfile,sample+'.log')
+#                    os.symlink(path_to_logfile,sample+'.log')
                     print '==> XCE: setting symlink: '+path_to_mtzfile+' -> '+sample+'.mtz'
-                    os.symlink(path_to_mtzfile,sample+'.mtz')
+#                    os.symlink(path_to_mtzfile,sample+'.mtz')
 

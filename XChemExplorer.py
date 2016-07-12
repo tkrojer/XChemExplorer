@@ -2653,6 +2653,7 @@ class XChemExplorer(QtGui.QApplication):
                         user_already_changed_selection=True
                 if not user_already_changed_selection:
                     self.data_collection_dict[key].append(['user_changed_selection'])
+                XChemMain.change_links_to_selected_data_collection_outcome(key,self.data_collection_dict,self.data_collection_column_three_dict,self.dataset_outcome_dict,self.initial_model_directory)
 
     def update_selected_autoproc_data_collection_summary_table(self):
         for key in self.data_collection_column_three_dict:
