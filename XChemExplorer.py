@@ -1112,19 +1112,14 @@ class XChemExplorer(QtGui.QApplication):
         vbox_select.addWidget(self.preferences_selection_mechanism_combobox)
         vbox.addLayout(vbox_select)
 
-        vbox_log=QtGui.QVBoxLayout()
         hbox=QtGui.QHBoxLayout()
         hbox.addWidget(QtGui.QLabel('XCE logfile:'))
-        button=QtGui.QPushButton("Select")
+        self.xce_logfile_label=QtGui.QLabel(self.xce_logfile)
+        hbox.addWidget(self.xce_logfile_label)
+        button=QtGui.QPushButton("Change")
         button.clicked.connect(self.set_xce_logfile)
         hbox.addWidget(button)
-        vbox_log.addLayout(hbox)
-        self.logfile_path_entry = QtGui.QLineEdit()
-        self.logfile_path_entry.setFixedWidth(800)
-        self.logfile_path_entry.setText(str(self.xce_logfile))
-        self.logfile_path_entry.textChanged[str].connect(self.change_xce_logfile)
-        vbox_log.addWidget(self.logfile_path_entry)
-        vbox.addLayout(vbox_log)
+        vbox.addLayout(hbox)
 
         preferencesLayout.addLayout(vbox,0,0)
 
@@ -1134,12 +1129,9 @@ class XChemExplorer(QtGui.QApplication):
     def set_xce_logfile(self):
         file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.current_directory))
         self.xce_logfile=str(file_name)
-        self.logfile_path_entry.setText(str(self.xce_logfile))
+        self.xce_logfile_label.setText(str(self.xce_logfile))
         if not os.path.isfile(self.xce_logfile):
             os.system('touch '+self.xce_logfile)
-
-    def change_xce_logfile(self):
-        print 'hallo'
 
 
     def select_datasource_columns_to_display(self):
