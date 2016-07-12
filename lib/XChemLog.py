@@ -24,5 +24,6 @@ class updateLog:
         self.logfile=open(logfile, "w")
 
     def insert(self,message):
-        print( str(datetime.now())+'  '+message, file = self.logfile)
+        present_time=datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
+        print( str(present_time)+'  ==> XCE: '+message, file = self.logfile)
         print(message)
