@@ -21,9 +21,9 @@ class startLog:
 class updateLog:
 
     def __init__(self,logfile):
-        self.logfile=open(logfile, "w")
+        self.logfile=open(logfile, "w+")
 
     def insert(self,message):
         present_time=datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
-        print( str(present_time)+'  ==> XCE: '+message, file = self.logfile)
+        print( str(present_time)+' ==> XCE: '+message, file = self.logfile)
         print(message)
