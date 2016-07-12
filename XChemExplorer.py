@@ -1069,8 +1069,9 @@ class XChemExplorer(QtGui.QApplication):
         print 'hallo'
         indexes = self.initial_model_table.selectionModel().selectedRows()
         for index in sorted(indexes):
-            print('Row %d is selected' % index.row())
-        print self.initial_model_table.itemAt(0, 0).text()
+            print self.initial_model_table.itemAt(index.row(), 0).text()
+#            print('Row %d is selected' % index.row())
+#        print self.initial_model_table.itemAt(0, 0).text()
 #    self.ID = item.text()
 #        for xtal in sorted(self.initial_model_dimple_dict):
 #            print xtal,self.initial_model_dimple_dict[xtal]
