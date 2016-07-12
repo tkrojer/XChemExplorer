@@ -1066,9 +1066,9 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def select_sample_for_dimple(self):
-        print 'hallo'
         indexes = self.initial_model_table.selectionModel().selectedRows()
         for index in sorted(indexes):
+            print 'row',index.row()
             print self.initial_model_table.itemAt(index.row(), 0).text()
 #            print('Row %d is selected' % index.row())
 #        print self.initial_model_table.itemAt(0, 0).text()
