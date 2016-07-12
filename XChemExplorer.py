@@ -669,6 +669,13 @@ class XChemExplorer(QtGui.QApplication):
         self.initial_model_vbox_for_table.addWidget(self.initial_model_table)
         self.tab_dict[self.workflow_dict['Maps']][1].addLayout(self.initial_model_vbox_for_table)
 
+        # create context menu
+        self.popMenu_for_initial_model_table = QtGui.QMenu()
+        run_dimple=QtGui.QAction("run dimple on selected", self.window)
+        run_dimple.triggered.connect(self.select_sample_for_dimple)
+        self.popMenu_for_initial_model_table.addAction(run_dimple)
+        self.initial_model_table.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.initial_model_table.customContextMenuRequested.connect(self.on_context_menu_initial_model)
 
         #
         # @ Refine Tab #######################################################################
@@ -1058,6 +1065,10 @@ class XChemExplorer(QtGui.QApplication):
                 self.data_source_set=False
 
 
+    def select_sample_for_dimple(self):
+        print 'hallo'
+
+
     def update_summary_plot(self):
         if self.data_source_set:
             XChemPlots.summary_plot(os.path.join(self.database_directory,self.data_source_file),self.overview_axes).update_overview()
@@ -1261,6 +1272,11 @@ class XChemExplorer(QtGui.QApplication):
             if self.dewar_configuration_dict[key]==self.sender():
                 self.dewar_label_active=key
         self.popMenu.exec_(self.sender().mapToGlobal(point))
+
+    def on_context_menu_initial_model(self, point):
+        # show context menu
+        self.popMenu.exec_(self.sender().mapToGlobal(point))
+
 
     def flag_sample_for_recollection(self):
         self.dewar_configuration_dict[self.dewar_label_active].setStyleSheet("background-color: yellow")
@@ -2079,6 +2095,7 @@ class XChemExplorer(QtGui.QApplication):
 
         column_name = [ 'Program',
                         'Resolution\nOverall',
+                        'Resolution\n[Mn<I/sig(I)> = 1.5]',
                         'DataProcessing\nSpaceGroup',
                         'Mn<I/sig(I)>\nHigh',
                         'Rmerge\nLow',
