@@ -1120,7 +1120,7 @@ class XChemExplorer(QtGui.QApplication):
         hbox.addWidget(button)
         vbox_log.addLayout(hbox)
         self.logfile_path_entry = QtGui.QLineEdit()
-        self.logfile_path_entry.setFixedWidth(200)
+        self.logfile_path_entry.setFixedWidth(800)
         self.logfile_path_entry.setText(str(self.xce_logfile))
         self.logfile_path_entry.textChanged[str].connect(self.change_xce_logfile)
         vbox_log.addWidget(self.logfile_path_entry)
@@ -1132,8 +1132,8 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def set_xce_logfile(self):
-        file_name_temp = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Open file', self.current_directory)
-        file_name=tuple(file_name_temp)[0]
+        file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.current_directory))
+#        file_name=tuple(file_name_temp)[0]
         print file_name
 
 
