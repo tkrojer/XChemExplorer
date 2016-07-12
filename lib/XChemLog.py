@@ -25,5 +25,4 @@ class updateLog:
 
     def insert(self,message):
         print( str(datetime.now())+'  '+message, file = self.logfile)
-        print(self.logfile)
         print(message)
