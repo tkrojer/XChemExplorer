@@ -1134,8 +1134,11 @@ class XChemExplorer(QtGui.QApplication):
         file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.current_directory))
         self.xce_logfile=str(file_name)
         self.xce_logfile_label.setText(str(self.xce_logfile))
-        if not os.path.isfile(self.xce_logfile):
-            os.system('touch '+self.xce_logfile)
+        if self.xce_logfile=='' or self.xce_logfile[self.xce_logfile.rfind('/')+1:]=='':
+           print '==> XCE: invalid file format'
+        else:
+            XChemLog.startLog(self.xce_logfile).create_logfile()
+            self.update_log=XChemLog.updateLog(self.xce_logfile)
 
 
     def select_datasource_columns_to_display(self):
@@ -1187,14 +1190,13 @@ class XChemExplorer(QtGui.QApplication):
             self.populate_and_update_data_source_table()
 
     def update_header_and_data_from_datasource(self):
-#        print '==> XCE: getting information for all samples from data source...'
         self.update_log.insert('getting information for all samples from data source...')
         self.db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
-        print '==> XCE: creating missing columns in data source'
+        self.update_log.insert('creating missing columns in data source')
         self.db.create_missing_columns()
-        print '==> XCE: load header and data from data source'
+        self.update_log.insert('load header and data from data source')
         self.header,self.data=self.db.load_samples_from_data_source()
-        print '==> XCE: get all samples in data source'
+        self.update_log.insert('get all samples in data source')
         all_samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not '';")
 
         self.xtal_db_dict={}
