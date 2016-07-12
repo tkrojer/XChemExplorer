@@ -16,6 +16,7 @@ class startLog:
             message='==> XCE: creating new logfile for the current XChemExplorer session: '+self.logfile
         else:
             message='==> XCE: writing into existing logfile for current XChemExplorer session: '+self.logfile
+        print message
         updateLog(self.logfile).insert(message)
 
 class updateLog:
