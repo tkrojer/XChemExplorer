@@ -1070,8 +1070,10 @@ class XChemExplorer(QtGui.QApplication):
         indexes = self.initial_model_table.selectionModel().selectedRows()
         for index in sorted(indexes):
             print('Row %d is selected' % index.row())
-        for xtal in sorted(self.initial_model_dimple_dict):
-            print xtal,self.initial_model_dimple_dict[xtal]
+        print self.initial_model_table.itemAt(0, 0).text()
+#    self.ID = item.text()
+#        for xtal in sorted(self.initial_model_dimple_dict):
+#            print xtal,self.initial_model_dimple_dict[xtal]
 
     def update_summary_plot(self):
         if self.data_source_set:
