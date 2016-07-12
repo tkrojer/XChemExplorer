@@ -671,7 +671,7 @@ class XChemExplorer(QtGui.QApplication):
 
         # create context menu
         self.popMenu_for_initial_model_table = QtGui.QMenu()
-        run_dimple=QtGui.QAction("run dimple on selected", self.window)
+        run_dimple=QtGui.QAction("mark selected for dimple run", self.window)
         run_dimple.triggered.connect(self.select_sample_for_dimple)
         self.popMenu_for_initial_model_table.addAction(run_dimple)
         self.initial_model_table.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -1070,7 +1070,8 @@ class XChemExplorer(QtGui.QApplication):
         indexes = self.initial_model_table.selectionModel().selectedRows()
         for index in sorted(indexes):
             print('Row %d is selected' % index.row())
-
+        for xtal in sorted(self.initial_model_dimple_dict):
+            print xtal,self.initial_model_dimple_dict[xtal]
 
     def update_summary_plot(self):
         if self.data_source_set:
