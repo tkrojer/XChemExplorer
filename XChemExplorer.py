@@ -1275,7 +1275,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def on_context_menu_initial_model(self, point):
         # show context menu
-        self.popMenu.exec_(self.sender().mapToGlobal(point))
+        self.popMenu_for_initial_model_table.exec_(self.sender().mapToGlobal(point))
 
 
     def flag_sample_for_recollection(self):
