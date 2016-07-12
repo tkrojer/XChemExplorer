@@ -1134,8 +1134,7 @@ class XChemExplorer(QtGui.QApplication):
     def set_xce_logfile(self):
         file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.current_directory))
 #        file_name=tuple(file_name_temp)[0]
-        print file_name
-
+        self.logfile_path_entry.setText(str(self.xce_logfile))
 
     def change_xce_logfile(self):
         print 'hallo'
