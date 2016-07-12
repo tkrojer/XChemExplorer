@@ -1123,7 +1123,7 @@ class XChemExplorer(QtGui.QApplication):
         self.logfile_path_entry.setFixedWidth(200)
         self.logfile_path_entry.setText(str(self.xce_logfile))
         self.logfile_path_entry.textChanged[str].connect(self.change_xce_logfile)
-        vbox_log.addWiget(self.logfile_path_entry)
+        vbox_log.addWidget(self.logfile_path_entry)
         vbox.addLayout(vbox_log)
 
         preferencesLayout.addLayout(vbox,0,0)
