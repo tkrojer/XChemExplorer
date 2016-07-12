@@ -153,3 +153,37 @@ def get_datasource_summary(db_file):
 def remove_all_refmac_jobs_from_cluster_and_reinstate_last_stable_state():
     print 'hallo'
 
+
+def change_links_to_selected_data_collection_outcome(sample,data_collection_dict,data_collection_column_three_dict,dataset_outcome_dict,initial_model_directory):
+    # find out which row was selected in respective data collection table
+    selected_processing_result='n/a'
+    indexes=data_collection_column_three_dict[sample][0].selectionModel().selectedRows()
+    if indexes != []:       # i.e. logfile exists
+        for index in sorted(indexes):
+            selected_processing_result=index.row()
+
+    for n,entry in enumerate(data_collection_dict[sample]):
+        if entry[0]=='logfile':
+            if entry[7]==selected_processing_result:
+                visit=entry[1]
+                run=entry[2]
+                autoproc=entry[4]
+                db_dict=entry[6]
+                outcome=dataset_outcome_dict[sample]
+                path_to_logfile=db_dict['DataProcessingPathToLogfile']
+                path_to_mtzfile=db_dict['DataProcessingPathToMTZfile']
+
+                # first check if folders and files exist
+                # since user might do this before data are actually copied over
+
+                if os.path.isdir(os.path.join(initial_model_directory,sample,'autoprocessing',visit+'-'+run+autoproc)):
+                    os.chdir(os.path.join(initial_model_directory,sample))
+                    # first remove old links
+                    os.system('/bin/rm '+sample+'.mtz')
+                    os.system('/bin/rm '+sample+'.log')
+                    # make new links
+                    print '==> XCE: setting symlink: '+path_to_logfile+' -> '+sample+'.log'
+                    os.symlink(path_to_logfile,sample+'.log')
+                    print '==> XCE: setting symlink: '+path_to_mtzfile+' -> '+sample+'.mtz'
+                    os.symlink(path_to_mtzfile,sample+'.mtz')
+

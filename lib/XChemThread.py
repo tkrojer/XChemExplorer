@@ -791,8 +791,14 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
             if entry[0]=='logfile':
                 index=self.data_collection_dict[xtal][n][7]
                 if isinstance(entry[6],dict):
-                    ranking=entry[6]['DataProcessingScore']
-                    select_stage_three_list.append([index,ranking])
+                    try:
+                        ranking=entry[6]['DataProcessingScore']
+                        select_stage_three_list.append([index,ranking])
+                    except KeyError:
+                        ranking = (float(entry[6]['DataProcessingUniqueReflectionsOverall'])*\
+                                   float(entry[6]['DataProcessingCompletenessOverall'])*\
+                                   float(entry[6]['DataProcessingIsigOverall']))/float(entry[6]['DataProcessingUnitCellVolume'])
+                        select_stage_three_list.append([index,ranking])
         if not select_stage_three_list==[]:
             self.set_best_file_to_true(xtal,'max',select_stage_three_list)
 
