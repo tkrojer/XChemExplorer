@@ -1069,6 +1069,7 @@ class XChemExplorer(QtGui.QApplication):
         indexes = self.initial_model_table.selectionModel().selectedRows()
         for index in sorted(indexes):
             xtal=str(self.initial_model_table.item(index.row(), 0).text())
+            self.update_log.insert('%s is marked for DIMPLE')
             self.initial_model_dimple_dict[xtal][0].setChecked(True)
 
 
@@ -2267,7 +2268,6 @@ class XChemExplorer(QtGui.QApplication):
                     continue
         if suitable_reference != []:
             reference_file=min(suitable_reference,key=lambda x: x[1])
-        print 'reference file:',reference_file
         return reference_file
 
 
@@ -2321,8 +2321,9 @@ class XChemExplorer(QtGui.QApplication):
                     elif header[0]=='Reference File':
                         if new_xtal:
                             reference_file_selection_combobox = QtGui.QComboBox()
+                            self.populate_reference_combobox(reference_file_selection_combobox)
                             if reference_file != []:
-                                self.populate_reference_combobox(reference_file_selection_combobox)
+#                                self.populate_reference_combobox(reference_file_selection_combobox)
                                 index = reference_file_selection_combobox.findText(str(reference_file[0][0]), QtCore.Qt.MatchFixedString)
                                 reference_file_selection_combobox.setCurrentIndex(index)
                             self.initial_model_table.setCellWidget(current_row, column, reference_file_selection_combobox)
