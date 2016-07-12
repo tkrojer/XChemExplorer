@@ -42,10 +42,8 @@ class XChemExplorer(QtGui.QApplication):
 
         self.current_directory=os.getcwd()
         self.xce_logfile=os.path.join(self.current_directory,'xce.log')
-        if not os.path.isfile(self.xce_logfile):
-            XChemLog.startLog(self.xce_logfile).create_logfile()
-            self.update_log=XChemLog.updateLog(self.xce_logfile)
-            self.update_log.insert('==> XCE: starting a new logfile')
+        XChemLog.startLog(self.xce_logfile).create_logfile()
+        self.update_log=XChemLog.updateLog(self.xce_logfile)
 
         if 'labxchem' in self.current_directory:
             self.labxchem_directory='/'+os.path.join(*self.current_directory.split('/')[1:6])    # need splat operator: *
