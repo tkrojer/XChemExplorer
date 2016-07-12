@@ -16,7 +16,7 @@ class startLog:
             message='==> XCE: creating new logfile for the current XChemExplorer session: '+self.logfile
         else:
             message='==> XCE: writing into existing logfile for current XChemExplorer session: '+self.logfile
-        print message
+        print(message)
         updateLog(self.logfile).insert(message)
 
 class updateLog:
@@ -27,4 +27,4 @@ class updateLog:
     def insert(self,message):
 #        print( str(datetime.now())+'  '+message, file = self.logfile)
         print(message, file = self.logfile)
-        print message
+        print(message)
