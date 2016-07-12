@@ -172,6 +172,8 @@ def change_links_to_selected_data_collection_outcome(sample,data_collection_dict
                 outcome=dataset_outcome_dict[sample]
                 path_to_logfile=db_dict['DataProcessingPathToLogfile']
                 path_to_mtzfile=db_dict['DataProcessingPathToMTZfile']
+                mtz_filename=db_dict['DataProcessingMTZfileName']
+                log_filename=db_dict['DataProcessingLOGfileName']
 
                 # first check if folders and files exist
                 # since user might do this before data are actually copied over
@@ -182,8 +184,8 @@ def change_links_to_selected_data_collection_outcome(sample,data_collection_dict
 #                    os.system('/bin/rm '+sample+'.mtz')
 #                    os.system('/bin/rm '+sample+'.log')
                     # make new links
-                    print '==> XCE: setting symlink: '+path_to_logfile+' -> '+sample+'.log'
-#                    os.symlink(path_to_logfile,sample+'.log')
-                    print '==> XCE: setting symlink: '+path_to_mtzfile+' -> '+sample+'.mtz'
-#                    os.symlink(path_to_mtzfile,sample+'.mtz')
+                    print '==> XCE: setting symlink: '+os.path.join(path_to_logfile,log_filename)+' -> '+sample+'.log'
+#                    os.symlink(os.path.join(path_to_logfile,log_filename),sample+'.log')
+                    print '==> XCE: setting symlink: '+os.path.join(path_to_mtzfile,mtz_filename)+' -> '+sample+'.mtz'
+#                    os.symlink(os.path.join(path_to_mtzfile,mtz_filename),sample+'.mtz')
 
