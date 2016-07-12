@@ -44,7 +44,6 @@ class XChemExplorer(QtGui.QApplication):
         self.xce_logfile=os.path.join(self.current_directory,'xce.log')
         XChemLog.startLog(self.xce_logfile).create_logfile()
         self.update_log=XChemLog.updateLog(self.xce_logfile)
-        self.update_log.insert('this is a test')
 
         if 'labxchem' in self.current_directory:
             self.labxchem_directory='/'+os.path.join(*self.current_directory.split('/')[1:6])    # need splat operator: *
@@ -1188,7 +1187,8 @@ class XChemExplorer(QtGui.QApplication):
             self.populate_and_update_data_source_table()
 
     def update_header_and_data_from_datasource(self):
-        print '==> XCE: getting information for all samples from data source...'
+#        print '==> XCE: getting information for all samples from data source...'
+        self.update_log.insert('getting information for all samples from data source...')
         self.db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
         print '==> XCE: creating missing columns in data source'
         self.db.create_missing_columns()
