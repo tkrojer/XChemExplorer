@@ -40,6 +40,7 @@ class XChemExplorer(QtGui.QApplication):
         #
 
         self.current_directory=os.getcwd()
+        self.xce_logfile=os.path.join(self.current_directory,'xce.log')
         if 'labxchem' in self.current_directory:
             self.labxchem_directory='/'+os.path.join(*self.current_directory.split('/')[1:6])    # need splat operator: *
             self.beamline_directory=os.path.join(self.labxchem_directory,'processing','beamline')
@@ -119,7 +120,8 @@ class XChemExplorer(QtGui.QApplication):
                              'unitcell_difference':     self.allowed_unitcell_difference_percent,
                              'too_low_resolution_data': self.acceptable_low_resolution_limit_for_data,
                              'filename_root':           self.filename_root,
-                             'preferences':             self.preferences        }
+                             'preferences':             self.preferences,
+                             'xce_logfile':             self.xce_logfile        }
 
 
         #
@@ -1110,9 +1112,33 @@ class XChemExplorer(QtGui.QApplication):
         vbox_select.addWidget(self.preferences_selection_mechanism_combobox)
         vbox.addLayout(vbox_select)
 
+        vbox_log=QtGui.QVBoxLayout()
+        hbox=QtGui.QHBoxLayout()
+        hbox.addWidget(QtGui.QLabel('XCE logfile:'))
+        button=QtGui.QPushButton("Select")
+        button.clicked.connect(self.set_xce_logfile)
+        hbox.addWidget(button)
+        vbox_log.addLayout(hbox)
+        self.logfile_path_entry = QtGui.QLineEdit()
+        self.logfile_path_entry.setFixedWidth(200)
+        self.logfile_path_entry.setText(str(self.xce_logfile))
+        self.logfile_path_entry.textChanged[str].connect(self.change_xce_logfile)
+        vbox_log.addWiget(self.logfile_path_entry)
+        vbox.addLayout(vbox_log)
+
         preferencesLayout.addLayout(vbox,0,0)
 
         preferences.exec_();
+
+
+    def set_xce_logfile(self):
+        file_name_temp = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Open file', self.current_directory)
+        file_name=tuple(file_name_temp)[0]
+        print file_name
+
+
+    def change_xce_logfile(self):
+        print 'hallo'
 
 
     def select_datasource_columns_to_display(self):
@@ -2653,7 +2679,11 @@ class XChemExplorer(QtGui.QApplication):
                         user_already_changed_selection=True
                 if not user_already_changed_selection:
                     self.data_collection_dict[key].append(['user_changed_selection'])
-                XChemMain.change_links_to_selected_data_collection_outcome(key,self.data_collection_dict,self.data_collection_column_three_dict,self.dataset_outcome_dict,self.initial_model_directory)
+                XChemMain.change_links_to_selected_data_collection_outcome(key,self.data_collection_dict,
+                                                                           self.data_collection_column_three_dict,
+                                                                           self.dataset_outcome_dict,
+                                                                           self.initial_model_directory,
+                                                                           os.path.join(self.database_directory,self.data_source_file))
 
     def update_selected_autoproc_data_collection_summary_table(self):
         for key in self.data_collection_column_three_dict:
