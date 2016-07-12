@@ -1068,7 +1068,7 @@ class XChemExplorer(QtGui.QApplication):
     def select_sample_for_dimple(self):
         indexes = self.initial_model_table.selectionModel().selectedRows()
         for index in sorted(indexes):
-            xtal=self.initial_model_table.item(index.row(), 0).text()
+            xtal=str(self.initial_model_table.item(index.row(), 0).text())
             self.initial_model_dimple_dict[xtal][0].setChecked(True)
 
 
