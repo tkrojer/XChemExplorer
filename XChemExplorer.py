@@ -1310,12 +1310,11 @@ class XChemExplorer(QtGui.QApplication):
 
     def populate_reference_combobox(self,combobox):
         combobox.clear()
-        combobox.addItem('...')
+#        combobox.addItem('...')
         for reference_file in self.reference_file_list:
             combobox.addItem(reference_file[0])
 
     def change_pandda_spg_label(self):
-        print 'hallo'
         combo_text=str(self.pandda_reference_file_selection_combobox.currentText())
         for file in self.reference_file_list:
             if file[0] == combo_text:
@@ -2386,6 +2385,8 @@ class XChemExplorer(QtGui.QApplication):
     def get_reference_file_list(self,reference_root):
         # check available reference files
         reference_file_list=[]
+        dummy=['...', '', '', '', 0, '0']
+        reference_file_list.append(dummy)
         if os.path.isfile(os.path.join(self.reference_directory,reference_root+'.pdb')):
             pdb_reference=parse().PDBheader(os.path.join(self.reference_directory,reference_root+'.pdb'))
             spg_reference=pdb_reference['SpaceGroup']
