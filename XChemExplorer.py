@@ -2289,6 +2289,8 @@ class XChemExplorer(QtGui.QApplication):
                 reference_file=self.find_suitable_reference_file(db_dict)
                 print 'here'
                 print reference_file
+                print reference_file[1]
+                print reference_file[1][0]
                 row=self.initial_model_table.rowCount()
                 if xtal not in self.initial_model_dimple_dict:
                     self.initial_model_table.insertRow(row)
@@ -2313,18 +2315,20 @@ class XChemExplorer(QtGui.QApplication):
                             run_dimple.setChecked(True)
                     elif header[0]=='Reference\nSpaceGroup':
                         cell_text=QtGui.QTableWidgetItem()
-                        if reference_file != []:
-                            cell_text.setText(str( reference_file[0][1]  ))
-                        else:
-                            cell_text.setText('')
+                        cell_text.setText(str( reference_file[0][1]  ))
+#                        if reference_file != []:
+#                            cell_text.setText(str( reference_file[0][1]  ))
+#                        else:
+#                            cell_text.setText('')
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.initial_model_table.setItem(current_row, column, cell_text)
                     elif header[0]=='Difference\nUC Volume (%)':
                         cell_text=QtGui.QTableWidgetItem()
-                        if reference_file != []:
-                            cell_text.setText(str( round(float(reference_file[1]),1)  ))
-                        else:
-                            cell_text.setText('')
+                        cell_text.setText(str( round(float(reference_file[1]),1)  ))
+#                        if reference_file != []:
+#                            cell_text.setText(str( round(float(reference_file[1]),1)  ))
+#                        else:
+#                            cell_text.setText('')
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.initial_model_table.setItem(current_row, column, cell_text)
                     elif header[0]=='Reference File':
