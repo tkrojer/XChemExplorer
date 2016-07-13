@@ -206,6 +206,7 @@ class run_pandda_analyse(QtCore.QThread):
         self.number_of_datasets=pandda_params['N_datasets']
         self.max_new_datasets=pandda_params['max_new_datasets']
         self.grid_spacing=pandda_params['grid_spacing']
+        self.filter_pdb=pandda_params['filter_pdb']
 
     def run(self):
 
@@ -236,6 +237,11 @@ class run_pandda_analyse(QtCore.QThread):
             else:
                 source_file=''
 
+            if os.path.isfile(self.filter_pdb):
+                filter_pdb=' filter.pdb='+self.filter_pdb
+            else:
+                filter_pdb=''
+
             os.chdir(self.panddas_directory)
             Cmds = (
                 '#!'+os.getenv('SHELL')+'\n'
@@ -257,6 +263,7 @@ class run_pandda_analyse(QtCore.QThread):
                     ' grid_spacing='+self.grid_spacing+
                     ' cpus='+self.nproc+
                     ' events.order_by='+self.sort_event+
+                    filter_pdb+
                     ' pdb_style='+self.pdb_style+
                     ' mtz_style='+self.mtz_style+'\n'
                     '\n'
@@ -264,16 +271,16 @@ class run_pandda_analyse(QtCore.QThread):
 
             print '==> XCE: running pandda.analyse with the following command:\n\n',Cmds
 
-            f = open('pandda.sh','w')
-            f.write(Cmds)
-            f.close()
-            if self.submit_mode=='local machine':
-                print '==> running PANDDA on local machine'
-                os.system('chmod +x pandda.sh')
-                os.system('./pandda.sh &')
-            else:
-                print '==> running PANDDA on cluster, using qsub...'
-                os.system('qsub pandda.sh')
+#            f = open('pandda.sh','w')
+#            f.write(Cmds)
+#            f.close()
+#            if self.submit_mode=='local machine':
+#                print '==> running PANDDA on local machine'
+#                os.system('chmod +x pandda.sh')
+#                os.system('./pandda.sh &')
+#            else:
+#                print '==> running PANDDA on cluster, using qsub...'
+#                os.system('qsub pandda.sh')
 
 class check_if_pandda_can_run:
 

@@ -1934,6 +1934,13 @@ class XChemExplorer(QtGui.QApplication):
             self.status_bar.showMessage('pandda.analyse: not enough datasets found')
             print '==> XCE: pandda.analyse: not enough datasets found'
             return
+
+        reference_file=str(self.pandda_reference_file_selection_combobox.currentText())
+        if os.path.isfile(os.path.join(self.reference_directory,reference_file+'.pdb')):
+            filter_pdb=os.path.join(self.reference_directory,reference_file+'.pdb')
+        else:
+            filter_pdb=''
+
         pandda_params = {
                 'data_dir':             str(self.pandda_input_data_dir_entry.text()),
                 'out_dir':              str(self.pandda_output_data_dir_entry.text()),
@@ -1945,7 +1952,8 @@ class XChemExplorer(QtGui.QApplication):
                 'sort_event':           str(self.pandda_sort_event_combobox.currentText()),
                 'N_datasets':           counter,
                 'max_new_datasets':     str(self.pandda_max_new_datasets_entry.text()),
-                'grid_spacing':         str(self.pandda_grid_spacing_entry.text())
+                'grid_spacing':         str(self.pandda_grid_spacing_entry.text()),
+                'filter_pdb':           filter_pdb
                         }
         self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
