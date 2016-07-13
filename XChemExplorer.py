@@ -805,10 +805,15 @@ class XChemExplorer(QtGui.QApplication):
         # crystal form option
         self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('Use specific space group:'))
         # reference file combobox, label with spg display
+        hbox=QtGui.QHBoxLayout()
         self.reference_file_list=self.get_reference_file_list(' ')
         self.pandda_reference_file_selection_combobox = QtGui.QComboBox()
         self.populate_reference_combobox(self.pandda_reference_file_selection_combobox)
-        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_reference_file_selection_combobox)
+        self.pandda_reference_file_selection_combobox.activated[str].connect(self.change_pandda_spg_label)
+        hbox.addWidget(self.pandda_reference_file_selection_combobox)
+        self.pandda_reference_file_spg_label=QtGui.QLabel()
+        hbox.addWidget(self.pandda_reference_file_spg_label)
+        self.pandda_analyse_input_params_vbox.addLayout(hbox)
 
         # run pandda on specific crystalform only
 #        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('Use Specific Crystal Form Only'))
@@ -1301,6 +1306,9 @@ class XChemExplorer(QtGui.QApplication):
         combobox.addItem('...')
         for reference_file in self.reference_file_list:
             combobox.addItem(reference_file[0])
+
+    def change_pandda_spg_label(self):
+        print 'hallo'
 
     def populate_target_selection_combobox(self,combobox):
         combobox.clear()
