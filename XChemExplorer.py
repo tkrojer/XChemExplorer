@@ -802,6 +802,9 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_sort_event_combobox.addItem('cluster_size')
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_sort_event_combobox)
 
+        # crystal form option
+
+
         # run pandda on specific crystalform only
 #        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('Use Specific Crystal Form Only'))
 #        self.pandda_analyse_crystal_from_selection_combobox = QtGui.QComboBox()
@@ -809,7 +812,7 @@ class XChemExplorer(QtGui.QApplication):
 ##        self.update_pandda_crystal_from_combobox()
 #        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_analyse_crystal_from_selection_combobox)
 
-        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('\n\n\nExpert Parameters (need rarely changing):\n'))
+        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('\n\n\nExpert Parameters (only change if you know what you are doing!):\n'))
 
         # minimum number of datasets
         self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('min_build_datasets'))
@@ -1836,6 +1839,7 @@ class XChemExplorer(QtGui.QApplication):
         for xtal in self.initial_model_dimple_dict:
             db_dict=self.xtal_db_dict[xtal]
             reference_file=self.find_suitable_reference_file(db_dict)
+            print reference_file
             smallest_uc_difference=min(reference_file,key=lambda x: x[1])
             reference_file_selection_combobox=self.initial_model_dimple_dict[xtal][1]
             if float(smallest_uc_difference[1]) < self.allowed_unitcell_difference_percent:
