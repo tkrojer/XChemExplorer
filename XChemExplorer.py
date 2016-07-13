@@ -2291,6 +2291,7 @@ class XChemExplorer(QtGui.QApplication):
                 print reference_file
                 print reference_file[1]
                 print reference_file[1][0]
+                smallest_uc_difference=min(reference_file,key=lambda x: x[1])
                 row=self.initial_model_table.rowCount()
                 if xtal not in self.initial_model_dimple_dict:
                     self.initial_model_table.insertRow(row)
@@ -2315,7 +2316,8 @@ class XChemExplorer(QtGui.QApplication):
                             run_dimple.setChecked(True)
                     elif header[0]=='Reference\nSpaceGroup':
                         cell_text=QtGui.QTableWidgetItem()
-                        cell_text.setText(str( reference_file[0][1]  ))
+                        cell_text.setText(str( smallest_uc_difference[0][1]  ))
+#                        cell_text.setText(str( reference_file[0][1]  ))
 #                        if reference_file != []:
 #                            cell_text.setText(str( reference_file[0][1]  ))
 #                        else:
@@ -2325,8 +2327,9 @@ class XChemExplorer(QtGui.QApplication):
                     elif header[0]=='Difference\nUC Volume (%)':
                         cell_text=QtGui.QTableWidgetItem()
                         smallest_uc_difference=min(reference_file,key=lambda x: x[1])
-                        print smallest_uc_difference
-                        cell_text.setText(str( round(float(reference_file[1]),1)  ))
+#                        print smallest_uc_difference
+                        cell_text.setText(str( round(float(smallest_uc_difference[1]),1)  ))
+#                        cell_text.setText(str( round(float(reference_file[1]),1)  ))
 #                        if reference_file != []:
 #                            cell_text.setText(str( round(float(reference_file[1]),1)  ))
 #                        else:
