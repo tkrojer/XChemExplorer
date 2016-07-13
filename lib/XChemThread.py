@@ -242,6 +242,8 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
         os.chdir(self.ccp4_scratch_directory)
         os.system('/bin/rm -f xce_dimple*sh')
 
+        db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
+
         for n,item in enumerate(self.sample_list):
 
             xtal =                  item[0]
@@ -250,6 +252,10 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             ref_pdb =               item[3]
             ref_mtz =               item[4]
             ref_cif =               item[5]
+
+            db_dict={}
+            db_dict['DimpleReferencePDB']=ref_pdb
+            db.update_data_source(xtal,db_dict)
 
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'creating input script for '+xtal+' in '+visit_run_autoproc)
 

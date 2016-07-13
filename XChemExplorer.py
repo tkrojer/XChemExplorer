@@ -803,7 +803,12 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_sort_event_combobox)
 
         # crystal form option
-
+        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('Use specific space group:'))
+        # reference file combobox, label with spg display
+        self.reference_file_list=self.get_reference_file_list(' ')
+        self.pandda_reference_file_selection_combobox = QtGui.QComboBox()
+        self.populate_reference_combobox(self.pandda_reference_file_selection_combobox)
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_reference_file_selection_combobox)
 
         # run pandda on specific crystalform only
 #        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('Use Specific Crystal Form Only'))
@@ -872,26 +877,9 @@ class XChemExplorer(QtGui.QApplication):
 #        self.pandda_inspect_html = QtWebKit.QWebView()
 
         self.panddas_results_vbox.addWidget(pandda_tab_widget)
-
-
-#        panddas_button_hbox=QtGui.QHBoxLayout()
-#        show_panddas_results=QtGui.QPushButton("Show PANDDAs Results")
-#        show_panddas_results.clicked.connect(self.button_clicked)
-#        panddas_button_hbox.addWidget(show_panddas_results)
-##        reload_panddas_results=QtGui.QPushButton("Reload PANDDAs Results")
-##        reload_panddas_results.clicked.connect(self.button_clicked)
-##        panddas_button_hbox.addWidget(reload_panddas_results)
-#        launch_panddas_inspect=QtGui.QPushButton("Launch pandda.inspect")
-#        launch_panddas_inspect.clicked.connect(self.button_clicked)
-#        panddas_button_hbox.addWidget(launch_panddas_inspect)
-#        export_panddas_inspect=QtGui.QPushButton("Export PANDDA Models")
-#        export_panddas_inspect.clicked.connect(self.button_clicked)
-#        panddas_button_hbox.addWidget(export_panddas_inspect)
-#        self.tab_dict[self.workflow_dict['PANDDAs']][1].addLayout(panddas_button_hbox)
+        self.show_pandda_html_summary()
 
         ######################################################################################
-
-
 
 
         #
@@ -1339,7 +1327,7 @@ class XChemExplorer(QtGui.QApplication):
             self.pandda_initial_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_initial.html')
             self.pandda_analyse_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_analyse.html')
             self.pandda_inspect_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_inspect.html')
-
+            self.show_pandda_html_summary()
 
             self.database_directory=pickled_settings['database_directory']
             self.settings['database_directory']=self.database_directory
