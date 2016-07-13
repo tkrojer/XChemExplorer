@@ -2289,8 +2289,6 @@ class XChemExplorer(QtGui.QApplication):
                 reference_file=self.find_suitable_reference_file(db_dict)
                 print 'here'
                 print reference_file
-                print reference_file[1]
-                print reference_file[1][0]
                 smallest_uc_difference=min(reference_file,key=lambda x: x[1])
                 row=self.initial_model_table.rowCount()
                 if xtal not in self.initial_model_dimple_dict:
@@ -2313,27 +2311,16 @@ class XChemExplorer(QtGui.QApplication):
                             run_dimple = QtGui.QCheckBox()
                             run_dimple.toggle()
                             self.initial_model_table.setCellWidget(current_row, column, run_dimple)
-                            run_dimple.setChecked(True)
+#                            run_dimple.setChecked(True)
                     elif header[0]=='Reference\nSpaceGroup':
                         cell_text=QtGui.QTableWidgetItem()
                         cell_text.setText(str( smallest_uc_difference[0][1]  ))
-#                        cell_text.setText(str( reference_file[0][1]  ))
-#                        if reference_file != []:
-#                            cell_text.setText(str( reference_file[0][1]  ))
-#                        else:
-#                            cell_text.setText('')
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.initial_model_table.setItem(current_row, column, cell_text)
                     elif header[0]=='Difference\nUC Volume (%)':
                         cell_text=QtGui.QTableWidgetItem()
                         smallest_uc_difference=min(reference_file,key=lambda x: x[1])
-#                        print smallest_uc_difference
                         cell_text.setText(str( round(float(smallest_uc_difference[1]),1)  ))
-#                        cell_text.setText(str( round(float(reference_file[1]),1)  ))
-#                        if reference_file != []:
-#                            cell_text.setText(str( round(float(reference_file[1]),1)  ))
-#                        else:
-#                            cell_text.setText('')
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.initial_model_table.setItem(current_row, column, cell_text)
                     elif header[0]=='Reference File':
