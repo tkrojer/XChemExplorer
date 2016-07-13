@@ -815,7 +815,8 @@ class XChemExplorer(QtGui.QApplication):
 #        frame=QtGui.QFrame()
 #        frame.setFrameShape(QtGui.QFrame.StyledPanel)
 #        tmp=QtGui.QVBoxLayout()
-#        self.pandda_reference_file_spg_label=QtGui.QLabel()
+        self.pandda_reference_file_spg_label=QtGui.QLabel()
+        hbox.addWidget(self.pandda_reference_file_spg_label)
 #        tmp.addWidget(self.pandda_reference_file_spg_label)
 #        frame.setLayout(tmp)
 #        hbox.addWidget(frame)
@@ -1315,6 +1316,11 @@ class XChemExplorer(QtGui.QApplication):
 
     def change_pandda_spg_label(self):
         print 'hallo'
+        combo_text=str(self.pandda_reference_file_selection_combobox.currentText())
+        for file in self.reference_file_list:
+            if file[0] == combo_text:
+                self.pandda_reference_file_spg_label.setText(file[1])
+                break
 
     def populate_target_selection_combobox(self,combobox):
         combobox.clear()
