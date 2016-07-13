@@ -2255,19 +2255,26 @@ class XChemExplorer(QtGui.QApplication):
 
     def find_suitable_reference_file(self,db_dict):
         reference_file=[]
+        dummy=['', '', '', '', 0, '0']
+        reference_file.append([dummy,999])
 #        self.status_bar.showMessage('checking: '+str(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])))
         suitable_reference=[]
         for reference in self.reference_file_list:
             # first we need one in the same pointgroup
             if reference[5]==db_dict['DataProcessingPointGroup']:
+#                try:
+#                    difference=math.fabs(1-(float(db_dict['DataProcessingUnitCellVolume'])/float(reference[4])))*100
+#                    if difference < self.allowed_unitcell_difference_percent:
+#                        suitable_reference.append([reference,difference])
+#                except ValueError:
+#                    continue
                 try:
                     difference=math.fabs(1-(float(db_dict['DataProcessingUnitCellVolume'])/float(reference[4])))*100
-                    if difference < self.allowed_unitcell_difference_percent:
-                        suitable_reference.append([reference,difference])
+                    reference_file.append([reference,difference])
                 except ValueError:
                     continue
-        if suitable_reference != []:
-            reference_file=min(suitable_reference,key=lambda x: x[1])
+#        if suitable_reference != []:
+#            reference_file=min(suitable_reference,key=lambda x: x[1])
         return reference_file
 
 
@@ -2319,16 +2326,21 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.initial_model_table.setItem(current_row, column, cell_text)
                     elif header[0]=='Reference File':
+                        self.populate_reference_combobox(reference_file_selection_combobox)
                         if new_xtal:
                             reference_file_selection_combobox = QtGui.QComboBox()
-                            self.populate_reference_combobox(reference_file_selection_combobox)
-                            if reference_file != []:
+                            smallest_uc_difference=min(reference_file,key=lambda x: x[1])
+                            print reference_file
+                            if smallest_uc_difference < self.allowed_unitcell_difference_percent:
+#                            if reference_file != []:
 #                                self.populate_reference_combobox(reference_file_selection_combobox)
                                 index = reference_file_selection_combobox.findText(str(reference_file[0][0]), QtCore.Qt.MatchFixedString)
                                 reference_file_selection_combobox.setCurrentIndex(index)
+                            else:
+                                reference_file_selection_combobox.setCurrentIndex(0)
                             self.initial_model_table.setCellWidget(current_row, column, reference_file_selection_combobox)
                         else:
-                            if reference_file != []:
+                            if smallest_uc_difference < self.allowed_unitcell_difference_percent:
                                 reference_file_selection_combobox=self.initial_model_dimple_dict[xtal][1]
                                 self.populate_reference_combobox(reference_file_selection_combobox)
                                 index = reference_file_selection_combobox.findText(str(reference_file[0][0]), QtCore.Qt.MatchFixedString)
