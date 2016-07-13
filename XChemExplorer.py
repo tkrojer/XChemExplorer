@@ -1069,7 +1069,7 @@ class XChemExplorer(QtGui.QApplication):
         indexes = self.initial_model_table.selectionModel().selectedRows()
         for index in sorted(indexes):
             xtal=str(self.initial_model_table.item(index.row(), 0).text())
-            self.update_log.insert('%s is marked for DIMPLE')
+            self.update_log.insert('%s is marked for DIMPLE' %index.row())
             self.initial_model_dimple_dict[xtal][0].setChecked(True)
 
 
@@ -1836,10 +1836,13 @@ class XChemExplorer(QtGui.QApplication):
         for xtal in self.initial_model_dimple_dict:
             db_dict=self.xtal_db_dict[xtal]
             reference_file=self.find_suitable_reference_file(db_dict)
+            smallest_uc_difference=min(reference_file,key=lambda x: x[1])
             reference_file_selection_combobox=self.initial_model_dimple_dict[xtal][1]
-            index = reference_file_selection_combobox.findText(str(reference_file[0][0]), QtCore.Qt.MatchFixedString)
-            reference_file_selection_combobox.setCurrentIndex(index)
-
+            if float(smallest_uc_difference[1]) < self.allowed_unitcell_difference_percent:
+                index = reference_file_selection_combobox.findText(str(reference_file[0][0]), QtCore.Qt.MatchFixedString)
+                reference_file_selection_combobox.setCurrentIndex(index)
+            else:
+                reference_file_selection_combobox.setCurrentIndex(0)
 
     def check_status_create_png_of_soaked_compound(self):
         number_of_samples=0
@@ -2330,17 +2333,18 @@ class XChemExplorer(QtGui.QApplication):
                             self.populate_reference_combobox(reference_file_selection_combobox)
                             if float(smallest_uc_difference[1]) < self.allowed_unitcell_difference_percent:
                                 index = reference_file_selection_combobox.findText(str(smallest_uc_difference[0][0]), QtCore.Qt.MatchFixedString)
-                                print 'index',index
                                 reference_file_selection_combobox.setCurrentIndex(index)
                             else:
                                 reference_file_selection_combobox.setCurrentIndex(0)
                             self.initial_model_table.setCellWidget(current_row, column, reference_file_selection_combobox)
                         else:
+                            reference_file_selection_combobox=self.initial_model_dimple_dict[xtal][1]
+                            self.populate_reference_combobox(reference_file_selection_combobox)
                             if float(smallest_uc_difference[1]) < self.allowed_unitcell_difference_percent:
-                                reference_file_selection_combobox=self.initial_model_dimple_dict[xtal][1]
-                                self.populate_reference_combobox(reference_file_selection_combobox)
                                 index = reference_file_selection_combobox.findText(str(smallest_uc_difference[0][0]), QtCore.Qt.MatchFixedString)
                                 reference_file_selection_combobox.setCurrentIndex(index)
+                            else:
+                                reference_file_selection_combobox.setCurrentIndex(0)
                     else:
                         cell_text=QtGui.QTableWidgetItem()
                         cell_text.setText(str( db_dict[ header[1] ]  ))
