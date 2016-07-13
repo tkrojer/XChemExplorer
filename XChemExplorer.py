@@ -2330,6 +2330,7 @@ class XChemExplorer(QtGui.QApplication):
 #                            smallest_uc_difference=min(reference_file,key=lambda x: x[1])
 #                            print reference_file
                             print smallest_uc_difference
+                            print smallest_uc_difference[1]
                             if float(smallest_uc_difference[1]) < self.allowed_unitcell_difference_percent:
 #                            if reference_file != []:
 #                                self.populate_reference_combobox(reference_file_selection_combobox)
