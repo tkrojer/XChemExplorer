@@ -811,8 +811,14 @@ class XChemExplorer(QtGui.QApplication):
         self.populate_reference_combobox(self.pandda_reference_file_selection_combobox)
         self.pandda_reference_file_selection_combobox.activated[str].connect(self.change_pandda_spg_label)
         hbox.addWidget(self.pandda_reference_file_selection_combobox)
+
+        frame=QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+        tmp=QtGui.QVBoxLayout()
         self.pandda_reference_file_spg_label=QtGui.QLabel()
-        hbox.addWidget(self.pandda_reference_file_spg_label)
+        tmp.addWidget(self.pandda_reference_file_spg_label)
+        frame.setLayout(tmp)
+        hbox.addWidget(frame)
         self.pandda_analyse_input_params_vbox.addLayout(hbox)
 
         # run pandda on specific crystalform only
