@@ -2311,7 +2311,7 @@ class XChemExplorer(QtGui.QApplication):
                             run_dimple = QtGui.QCheckBox()
                             run_dimple.toggle()
                             self.initial_model_table.setCellWidget(current_row, column, run_dimple)
-#                            run_dimple.setChecked(True)
+                            run_dimple.setChecked(False)
                     elif header[0]=='Reference\nSpaceGroup':
                         cell_text=QtGui.QTableWidgetItem()
                         cell_text.setText(str( smallest_uc_difference[0][1]  ))
@@ -2327,12 +2327,13 @@ class XChemExplorer(QtGui.QApplication):
                         if new_xtal:
                             reference_file_selection_combobox = QtGui.QComboBox()
                             self.populate_reference_combobox(reference_file_selection_combobox)
-                            smallest_uc_difference=min(reference_file,key=lambda x: x[1])
-                            print reference_file
+#                            smallest_uc_difference=min(reference_file,key=lambda x: x[1])
+#                            print reference_file
+                            print smallest_uc_difference
                             if float(smallest_uc_difference[1]) < self.allowed_unitcell_difference_percent:
 #                            if reference_file != []:
 #                                self.populate_reference_combobox(reference_file_selection_combobox)
-                                index = reference_file_selection_combobox.findText(str(reference_file[0][0]), QtCore.Qt.MatchFixedString)
+                                index = reference_file_selection_combobox.findText(str(smallest_uc_difference[0][0]), QtCore.Qt.MatchFixedString)
                                 reference_file_selection_combobox.setCurrentIndex(index)
                             else:
                                 reference_file_selection_combobox.setCurrentIndex(0)
