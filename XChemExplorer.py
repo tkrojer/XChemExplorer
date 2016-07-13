@@ -1307,6 +1307,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def populate_reference_combobox(self,combobox):
         combobox.clear()
+        combobox.addItem('...')
         for reference_file in self.reference_file_list:
             combobox.addItem(reference_file[0])
 
@@ -2255,7 +2256,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def find_suitable_reference_file(self,db_dict):
         reference_file=[]
-        dummy=['', '', '', '', 0, '0']
+        dummy=['...', '', '', '', 0, '0']
         reference_file.append([dummy,999])
 #        self.status_bar.showMessage('checking: '+str(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])))
         suitable_reference=[]
