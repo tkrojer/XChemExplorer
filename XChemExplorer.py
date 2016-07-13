@@ -2324,6 +2324,8 @@ class XChemExplorer(QtGui.QApplication):
                         self.initial_model_table.setItem(current_row, column, cell_text)
                     elif header[0]=='Difference\nUC Volume (%)':
                         cell_text=QtGui.QTableWidgetItem()
+                        smallest_uc_difference=min(reference_file,key=lambda x: x[1])
+                        print smallest_uc_difference
                         cell_text.setText(str( round(float(reference_file[1]),1)  ))
 #                        if reference_file != []:
 #                            cell_text.setText(str( round(float(reference_file[1]),1)  ))
