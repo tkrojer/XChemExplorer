@@ -2337,12 +2337,12 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.initial_model_table.setItem(current_row, column, cell_text)
                     elif header[0]=='Reference File':
-                        self.populate_reference_combobox(reference_file_selection_combobox)
                         if new_xtal:
                             reference_file_selection_combobox = QtGui.QComboBox()
+                            self.populate_reference_combobox(reference_file_selection_combobox)
                             smallest_uc_difference=min(reference_file,key=lambda x: x[1])
                             print reference_file
-                            if smallest_uc_difference < self.allowed_unitcell_difference_percent:
+                            if float(smallest_uc_difference[1]) < self.allowed_unitcell_difference_percent:
 #                            if reference_file != []:
 #                                self.populate_reference_combobox(reference_file_selection_combobox)
                                 index = reference_file_selection_combobox.findText(str(reference_file[0][0]), QtCore.Qt.MatchFixedString)
@@ -2351,7 +2351,7 @@ class XChemExplorer(QtGui.QApplication):
                                 reference_file_selection_combobox.setCurrentIndex(0)
                             self.initial_model_table.setCellWidget(current_row, column, reference_file_selection_combobox)
                         else:
-                            if smallest_uc_difference < self.allowed_unitcell_difference_percent:
+                            if float(smallest_uc_difference[1]) < self.allowed_unitcell_difference_percent:
                                 reference_file_selection_combobox=self.initial_model_dimple_dict[xtal][1]
                                 self.populate_reference_combobox(reference_file_selection_combobox)
                                 index = reference_file_selection_combobox.findText(str(reference_file[0][0]), QtCore.Qt.MatchFixedString)
