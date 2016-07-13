@@ -2287,6 +2287,8 @@ class XChemExplorer(QtGui.QApplication):
             db_dict=self.xtal_db_dict[xtal]
             if str(db_dict['DataCollectionOutcome']).lower().startswith('success'):
                 reference_file=self.find_suitable_reference_file(db_dict)
+                print 'here'
+                print reference_file
                 row=self.initial_model_table.rowCount()
                 if xtal not in self.initial_model_dimple_dict:
                     self.initial_model_table.insertRow(row)
