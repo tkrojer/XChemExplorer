@@ -2975,7 +2975,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def quit_xce(self):
         self.update_log.insert('quitting XCE... bye,bye!')
-        QtGui.qApp.quit
+        QtGui.qApp.quit()
 
 
 if __name__ == "__main__":
