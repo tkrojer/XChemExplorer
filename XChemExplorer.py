@@ -2770,15 +2770,12 @@ class XChemExplorer(QtGui.QApplication):
 #                                                                           self.xce_logfile)
 
     def user_update_selected_autoproc_data_collection_summary_table(self):
-        print 'herererer'
         for key in self.data_collection_column_three_dict:
             if self.data_collection_column_three_dict[key][0]==self.sender():
                 indexes=self.sender().selectionModel().selectedRows()
                 selected_processing_result=1000000
                 for index in sorted(indexes):
                     selected_processing_result=index.row()
-                print '-->',index.row(),selected_processing_result
-
                 # the user changed the selection, i.e. no automated selection will update it
                 self.update_log.insert('user changed selection')
                 self.data_collection_column_three_dict[key][1]=True

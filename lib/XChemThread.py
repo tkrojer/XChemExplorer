@@ -821,6 +821,28 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
             if entry[0]=='logfile':
                 if entry[7]==best_file_index:
                     self.data_collection_dict[xtal][n][8]=True
+                    # if this was just a rescoring excersise, the files are already in the project directory
+                    # hence we want all the links to be reset immediately
+                    visit=entry[1]
+                    run=entry[2]
+                    autoproc=entry[4]
+                    db_dict=entry[6]
+                    path_to_logfile=db_dict['DataProcessingPathToLogfile']
+                    path_to_mtzfile=db_dict['DataProcessingPathToMTZfile']
+                    mtz_filename=db_dict['DataProcessingMTZfileName']
+                    log_filename=db_dict['DataProcessingLOGfileName']
+                    # first check if folders and files exist
+                    # since user might do this before data are actually copied over
+                    if os.path.isdir(os.path.join(initial_model_directory,sample,'autoprocessing',visit+'-'+run+autoproc)):
+                        db_dict['DataProcessingAutoAssigned']='False'
+                        os.chdir(os.path.join(initial_model_directory,sample))
+                        # first remove old links
+                        os.system('/bin/rm '+sample+'.mtz')
+                        os.system('/bin/rm '+sample+'.log')
+                        # make new links
+                        Logfile.insert('setting symlink: '+os.path.join(path_to_logfile,log_filename)+' -> '+sample+'.log')
+                        os.symlink(os.path.join(path_to_logfile,log_filename),sample+'.log')
+                        os.symlink(os.path.join(path_to_mtzfile,mtz_filename),sample+'.mtz')
                 else:
                     self.data_collection_dict[xtal][n][8]=False
 
