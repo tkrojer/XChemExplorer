@@ -2794,11 +2794,11 @@ class XChemExplorer(QtGui.QApplication):
                             program=db_dict['DataProcessingProgram']
                             visit=db_dict['DataCollectionVisit']
                             run=db_dict['DataCollectionRun']
-                            self.update_log.insert('user changed data processing files for %s to visit=%s, run=%s, program=%s' %(sample,visit,run,program))
+                            self.update_log.insert('user changed data processing files for %s to visit=%s, run=%s, program=%s' %(key,visit,run,program))
                             # update datasource
         #                    print db_dict
                             self.update_log.insert('updating datasource...')
-                            self.update_data_source(sample,db_dict)
+                            self.update_data_source(key,db_dict)
                             entry[8]=True
                         else:
                             entry[8]=False
