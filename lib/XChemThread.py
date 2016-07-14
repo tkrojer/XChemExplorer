@@ -833,16 +833,16 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     log_filename=db_dict['DataProcessingLOGfileName']
                     # first check if folders and files exist
                     # since user might do this before data are actually copied over
-                    if os.path.isdir(os.path.join(initial_model_directory,sample,'autoprocessing',visit+'-'+run+autoproc)):
+                    if os.path.isdir(os.path.join(self.initial_model_directory,xtal,'autoprocessing',visit+'-'+run+autoproc)):
                         db_dict['DataProcessingAutoAssigned']='False'
-                        os.chdir(os.path.join(initial_model_directory,sample))
+                        os.chdir(os.path.join(self.initial_model_directory,xtal))
                         # first remove old links
-                        os.system('/bin/rm '+sample+'.mtz')
-                        os.system('/bin/rm '+sample+'.log')
+                        os.system('/bin/rm '+xtal+'.mtz')
+                        os.system('/bin/rm '+xtal+'.log')
                         # make new links
-                        Logfile.insert('setting symlink: '+os.path.join(path_to_logfile,log_filename)+' -> '+sample+'.log')
-                        os.symlink(os.path.join(path_to_logfile,log_filename),sample+'.log')
-                        os.symlink(os.path.join(path_to_mtzfile,mtz_filename),sample+'.mtz')
+                        Logfile.insert('setting symlink: '+os.path.join(path_to_logfile,log_filename)+' -> '+xtal+'.log')
+                        os.symlink(os.path.join(path_to_logfile,log_filename),xtal+'.log')
+                        os.symlink(os.path.join(path_to_mtzfile,mtz_filename),xtal+'.mtz')
                 else:
                     self.data_collection_dict[xtal][n][8]=False
 
