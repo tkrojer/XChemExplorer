@@ -2815,25 +2815,25 @@ class XChemExplorer(QtGui.QApplication):
                                                                            self.xce_logfile)
 
 
-        # update 'Datasets' table
-        column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
-        rows_in_table=self.data_collection_summary_table.rowCount()
-        for row in range(rows_in_table):
-            if self.data_collection_summary_table.item(row,0).text()==sample:
-                for column,header in enumerate(column_name):
-                    if header[0]=='Sample ID':
-                        continue
-                    elif header[0]=='DataCollection\nOutcome':
-                        continue
-                    elif header[0].startswith('img'):
-                        continue
-                    elif header[0].startswith('Show'):
-                        continue
-                    else:
-                        cell_text=QtGui.QTableWidgetItem()
-                        cell_text.setText(str( db_dict[ header[1] ]  ))
-                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                        self.data_collection_summary_table.setItem(row, column, cell_text)
+            # update 'Datasets' table
+            column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
+            rows_in_table=self.data_collection_summary_table.rowCount()
+            for row in range(rows_in_table):
+                if self.data_collection_summary_table.item(row,0).text()==key:
+                    for column,header in enumerate(column_name):
+                        if header[0]=='Sample ID':
+                            continue
+                        elif header[0]=='DataCollection\nOutcome':
+                            continue
+                        elif header[0].startswith('img'):
+                            continue
+                        elif header[0].startswith('Show'):
+                            continue
+                        else:
+                            cell_text=QtGui.QTableWidgetItem()
+                            cell_text.setText(str( db_dict[ header[1] ]  ))
+                            cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                            self.data_collection_summary_table.setItem(row, column, cell_text)
 
 
 
