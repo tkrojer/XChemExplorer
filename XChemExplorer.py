@@ -2776,7 +2776,7 @@ class XChemExplorer(QtGui.QApplication):
                 selected_processing_result=1000000
                 for index in sorted(indexes):
                     selected_processing_result=index.row()
-
+                print '-->',index.row(),selected_processing_result
 
                 # the user changed the selection, i.e. no automated selection will update it
                 self.update_log.insert('user changed selection')
