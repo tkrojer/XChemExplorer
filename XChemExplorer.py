@@ -2558,8 +2558,6 @@ class XChemExplorer(QtGui.QApplication):
                         except ValueError:
                             pass
 
-            if db_dict == {}:
-
 #            if not logfile_found:
 #                db_dict={}
             outTemp=self.db.get_value_from_field(xtal,'DataCollectionOutcome')
