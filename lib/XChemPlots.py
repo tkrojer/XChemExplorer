@@ -27,8 +27,8 @@ class summary_plot(object):
 
 
 
-        ax0, ax1, ax2, ax3 = self.overview_axes.flat
-#        ax0 = self.overview_axes.flat
+#        ax0, ax1, ax2, ax3 = self.overview_axes.flat
+        ax0 = self.overview_axes.flat
 
         ax0.set_title('Data Collection - Outcome')
         ax0.set_ylabel("n")

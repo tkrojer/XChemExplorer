@@ -653,7 +653,7 @@ class GUI(object):
 
 
     def experiment_stage_button_clicked(self,widget, data=None):
-        if self.selected_site[0] == 0:
+        if self.selected_site[0] == '0':
             self.db_dict_mainTable['RefinementOutcome']=data
             print '==> XCE: setting Refinement Outcome for '+self.xtalID+' to '+str(data)+' in mainTable of datasource'
             self.db.update_data_source(self.xtalID,self.db_dict_mainTable)
@@ -663,7 +663,7 @@ class GUI(object):
             self.db.update_panddaTable(self.xtalID,self.selected_site[0],self.db_dict_panddaTable)
 
     def ligand_confidence_button_clicked(self,widget,data=None):
-        if self.selected_site[0] == 0:
+        if self.selected_site[0] == '0':
             self.db_dict_mainTable['RefinementLigandConfidence']=data
             print '==> XCE: setting Ligand Confidence for '+self.xtalID+' to '+str(data)+' in mainTable of datasource'
             self.db.update_data_source(self.xtalID,self.db_dict_mainTable)

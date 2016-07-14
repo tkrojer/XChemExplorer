@@ -489,14 +489,13 @@ class XChemExplorer(QtGui.QApplication):
         # - Overview Graph ####################################################################
 
 #        self.overview_figure, self.overview_axes = plt.subplots(nrows=1, ncols=1)
-        self.overview_figure, self.overview_axes = plt.subplots(nrows=2, ncols=2)
+        self.overview_figure, self.overview_axes = plt.subplots(nrows=1, ncols=1)
         self.overview_canvas = FigureCanvas(self.overview_figure)
         self.update_summary_plot()
         self.overview_tab_dict['Summary'][1].addWidget(self.overview_canvas)
 
 
 
-        ######################################################################################
         ######################################################################################
 
 
