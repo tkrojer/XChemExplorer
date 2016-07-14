@@ -2267,9 +2267,9 @@ class XChemExplorer(QtGui.QApplication):
                     best_file=entry[8]
                     logfile_found=True
                     if best_file:
-                        # we change the selection only if the user did not touch it, assuming that he/she knows best
-                        if not selection_changed_by_user:
-                            data_collection_table.selectRow(index)
+#                        # we change the selection only if the user did not touch it, assuming that he/she knows best
+#                        if not selection_changed_by_user:
+                        data_collection_table.selectRow(index)
 
         self.populate_data_collection_summary_table()
 
