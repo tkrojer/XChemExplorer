@@ -2434,10 +2434,33 @@ class XChemExplorer(QtGui.QApplication):
 
     def dataset_outcome_combobox_change_outcome(self,text):
         outcome=str(text)
+        xtal=''
         for key in self.dataset_outcome_combobox_dict:
             if self.dataset_outcome_combobox_dict[key]==self.sender():
-                dataset=key
-        self.dataset_outcome_dict[key]=outcome
+                xtal=key
+                self.update_log.insert('user changed data collection outcome of %s to %s' %(xtal,outcome))
+                break
+        self.dataset_outcome_dict[xtal]=outcome
+        if xtal != '':
+            # need to also update if not yet done
+            user_already_changed_selection=False
+            for n,entry in enumerate(self.data_collection_dict[xtal]):
+                if entry[0]=='user_changed_selection':
+                    user_already_changed_selection=True
+                if entry[0]=='logfile':
+                    db_dict=entry[6]
+                    db_dict['DataCollectionOutcome']=outcome
+                    entry[6]=db_dict
+                    self.data_collection_dict[xtal][n]=entry
+            if not user_already_changed_selection:
+                self.data_collection_dict[xtal].append(['user_changed_selection'])
+            # finally need to update outcome field in data source accordingly
+            self.update_log.insert('updating dataset outcome in datasource for %s' %xtal)
+            update_dict={}
+            update_dict['DataCollectionOutcome']=outcome
+            self.db.update_insert_data_source(xtal,update_dict)
+
+
 
 #        for button in self.dataset_outcome_dict[dataset]:
 #            if str(button.text())==outcome:
@@ -2735,6 +2758,7 @@ class XChemExplorer(QtGui.QApplication):
                     if entry[0]=='logfile':
                         db_dict=entry[6]
                         db_dict['DataProcessingAutoAssigned']='False'
+                        entry[6]=db_dict
                         self.data_collection_dict[key][n]=entry
                 if not user_already_changed_selection:
                     self.data_collection_dict[key].append(['user_changed_selection'])
