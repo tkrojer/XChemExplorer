@@ -542,6 +542,7 @@ class XChemExplorer(QtGui.QApplication):
                                                         'DataProcessing\nSpaceGroup',
                                                         'DataProcessing\nRfree',
                                                         'Rmerge\nLow',
+                                                        'auto-assigned',
                                                         'DataCollection\nOutcome',
                                                         'img1',
                                                         'img2',
