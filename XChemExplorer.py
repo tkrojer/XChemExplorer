@@ -1366,6 +1366,8 @@ class XChemExplorer(QtGui.QApplication):
                     else:
                         self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
                         self.data_source_set=True
+                        self.db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
+                        self.datasource_menu_reload_samples()
 #                        self.update_header_and_data_from_datasource()
 #                        self.populate_and_update_data_source_table()
 #                        self.create_initial_model_table()
@@ -1396,10 +1398,11 @@ class XChemExplorer(QtGui.QApplication):
 #            self.adjust_acceptable_low_resolution_limit.setText(str(self.acceptable_low_resolution_limit_for_data))
             self.reference_file_list=self.get_reference_file_list(' ')
 
-            if self.data_source_set:
-                self.db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
-                self.db.create_missing_columns()
-                self.update_all_tables()
+#            if self.data_source_set:
+#                self.db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
+#                self.update_header_and_data_from_datasource()
+#                self.db.create_missing_columns()
+#                self.update_all_tables()
 
 
         except KeyError:
