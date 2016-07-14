@@ -2557,8 +2557,14 @@ class XChemExplorer(QtGui.QApplication):
                                 too_low_resolution=False
                         except ValueError:
                             pass
-            if not logfile_found:
-                db_dict={}
+
+            if db_dict == {}:
+
+#            if not logfile_found:
+#                db_dict={}
+            outTemp=self.db.get_value_from_field(xtal,'DataCollectionOutcome')
+            print outTemp
+
             if logfile_found and not too_low_resolution:
                 outcome="success"
             elif logfile_found and too_low_resolution:
