@@ -840,7 +840,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                         os.system('/bin/rm '+xtal+'.mtz')
                         os.system('/bin/rm '+xtal+'.log')
                         # make new links
-                        Logfile.insert('setting symlink: '+os.path.join(path_to_logfile,log_filename)+' -> '+xtal+'.log')
                         os.symlink(os.path.join(path_to_logfile,log_filename),xtal+'.log')
                         os.symlink(os.path.join(path_to_mtzfile,mtz_filename),xtal+'.mtz')
                 else:
