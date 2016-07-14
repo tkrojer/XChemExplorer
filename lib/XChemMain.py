@@ -184,13 +184,13 @@ def change_links_to_selected_data_collection_outcome(sample,data_collection_dict
                     db_dict['DataProcessingAutoAssigned']='False'
                     os.chdir(os.path.join(initial_model_directory,sample))
                     # first remove old links
-#                    os.system('/bin/rm '+sample+'.mtz')
-#                    os.system('/bin/rm '+sample+'.log')
+                    os.system('/bin/rm '+sample+'.mtz')
+                    os.system('/bin/rm '+sample+'.log')
                     # make new links
                     Logfile.insert('setting symlink: '+os.path.join(path_to_logfile,log_filename)+' -> '+sample+'.log')
-#                    os.symlink(os.path.join(path_to_logfile,log_filename),sample+'.log')
+                    os.symlink(os.path.join(path_to_logfile,log_filename),sample+'.log')
                     Logfile.insert('setting symlink: '+os.path.join(path_to_mtzfile,mtz_filename)+' -> '+sample+'.mtz')
-#                    os.symlink(os.path.join(path_to_mtzfile,mtz_filename),sample+'.mtz')
+                    os.symlink(os.path.join(path_to_mtzfile,mtz_filename),sample+'.mtz')
 
                     # update data source
                     data_source=XChemDB.data_source(data_source_file)
