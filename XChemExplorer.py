@@ -2253,7 +2253,7 @@ class XChemExplorer(QtGui.QApplication):
 #            data_collection_table.setFixedHeight(300)
 #            data_collection_table.horizontalHeader().setStretchLastSection(False)
 #            data_collection_table.verticalHeader().setStretchLastSection(False)
-            data_collection_table.itemSelectionChanged.connect(self.update_selected_autoproc_data_collection_summary_table)
+#            data_collection_table.itemSelectionChanged.connect(self.update_selected_autoproc_data_collection_summary_table)
             data_collection_table.cellClicked.connect(self.user_update_selected_autoproc_data_collection_summary_table)
             data_collection_table.setSizePolicy(QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Minimum)
 
@@ -2744,9 +2744,40 @@ class XChemExplorer(QtGui.QApplication):
 #            self.data_collection_summary_table.resizeRowsToContents()
 #            self.data_collection_summary_table.resizeColumnsToContents()
 
+#    def user_update_selected_autoproc_data_collection_summary_table(self):
+#        for key in self.data_collection_column_three_dict:
+#            if self.data_collection_column_three_dict[key][0]==self.sender():
+#                # the user changed the selection, i.e. no automated selection will update it
+#                self.update_log.insert('user changed selection')
+#                self.data_collection_column_three_dict[key][1]=True
+#                # need to also update if not yet done
+#                user_already_changed_selection=False
+#                for n,entry in enumerate(self.data_collection_dict[key]):
+#                    if entry[0]=='user_changed_selection':
+#                        user_already_changed_selection=True
+#                    if entry[0]=='logfile':
+#                        db_dict=entry[6]
+#                        db_dict['DataProcessingAutoAssigned']='False'
+#                        entry[6]=db_dict
+#                        self.data_collection_dict[key][n]=entry
+#                if not user_already_changed_selection:
+#                    self.data_collection_dict[key].append(['user_changed_selection'])
+#                XChemMain.change_links_to_selected_data_collection_outcome(key,self.data_collection_dict,
+                                                                           self.data_collection_column_three_dict,
+                                                                           self.dataset_outcome_dict,
+                                                                           self.initial_model_directory,
+                                                                           os.path.join(self.database_directory,self.data_source_file),
+                                                                           self.xce_logfile)
+
     def user_update_selected_autoproc_data_collection_summary_table(self):
         for key in self.data_collection_column_three_dict:
             if self.data_collection_column_three_dict[key][0]==self.sender():
+                indexes=self.sender().selectionModel().selectedRows()
+                selected_processing_result=1000000
+                for index in sorted(indexes):
+                    selected_processing_result=index.row()
+
+
                 # the user changed the selection, i.e. no automated selection will update it
                 self.update_log.insert('user changed selection')
                 self.data_collection_column_three_dict[key][1]=True
@@ -2758,6 +2789,20 @@ class XChemExplorer(QtGui.QApplication):
                     if entry[0]=='logfile':
                         db_dict=entry[6]
                         db_dict['DataProcessingAutoAssigned']='False'
+                        if entry[7]==selected_processing_result:
+                            db_dict=entry[6]
+                            program=db_dict['DataProcessingProgram']
+                            visit=db_dict['DataCollectionVisit']
+                            run=db_dict['DataCollectionRun']
+                            self.update_log.insert('user changed data processing files for %s to visit=%s, run=%s, program=%s' %(sample,visit,run,program))
+                            # update datasource
+        #                    print db_dict
+                            self.update_log.insert('updating datasource...')
+                            self.update_data_source(sample,db_dict)
+                            entry[8]=True
+                        else:
+                            entry[8]=False
+
                         entry[6]=db_dict
                         self.data_collection_dict[key][n]=entry
                 if not user_already_changed_selection:
@@ -2768,6 +2813,7 @@ class XChemExplorer(QtGui.QApplication):
                                                                            self.initial_model_directory,
                                                                            os.path.join(self.database_directory,self.data_source_file),
                                                                            self.xce_logfile)
+
 
     def update_selected_autoproc_data_collection_summary_table(self):
         for key in self.data_collection_column_three_dict:
@@ -2785,7 +2831,7 @@ class XChemExplorer(QtGui.QApplication):
                     program=db_dict['DataProcessingProgram']
                     visit=db_dict['DataCollectionVisit']
                     run=db_dict['DataCollectionRun']
-                    self.update_log.insert('user changed data processing files to visit=%s, run=%s, program=%s' %(visit,run,program))
+                    self.update_log.insert('user changed data processing files for %s to visit=%s, run=%s, program=%s' %(sample,visit,run,program))
                     # update datasource
 #                    print db_dict
                     self.update_log.insert('updating datasource...')
