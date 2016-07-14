@@ -932,7 +932,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             'RefinementOutcome':                '-1 - Data Collection Failed'}
             else:
                 for n,entry in enumerate(self.data_collection_dict[sample]):
-                    if entry[0]==logfile:
+                    if entry[0]=='logfile':
                         db_data_collection_dict=entry[6]
                         if user_changed_selection:
                             db_dict['DataProcessingAutoAssigned']='False'
