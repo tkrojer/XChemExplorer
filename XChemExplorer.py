@@ -2778,13 +2778,22 @@ class XChemExplorer(QtGui.QApplication):
         for index in sorted(indexes):
             selected_processing_result=index.row()
 
-        for entry in self.data_collection_dict[sample]:
+        for n,entry in enumerate(self.data_collection_dict[sample]):
             if entry[0]=='logfile':
                 if entry[7]==selected_processing_result:
                     db_dict=entry[6]
+                    program=db_dict['DataProcessingProgram']
+                    visit=db_dict['DataCollectionVisit']
+                    run=db_dict['DataCollectionRun']
+                    self.update_log.insert('user changed data processing files to visit=%s, run=%s, program=%s' %(visit,run,program))
                     # update datasource
 #                    print db_dict
+                    self.update_log.insert('updating datasource...')
                     self.update_data_source(sample,db_dict)
+                    entry[8]=True
+                else:
+                    entry[8]=False
+                self.data_collection_dict[sample][n]=entry
 
         # update Overview table
 #        self.update_header_and_data_from_datasource()
