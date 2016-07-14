@@ -1396,8 +1396,10 @@ class XChemExplorer(QtGui.QApplication):
 #            self.adjust_acceptable_low_resolution_limit.setText(str(self.acceptable_low_resolution_limit_for_data))
             self.reference_file_list=self.get_reference_file_list(' ')
 
-#            if self.data_source_set:
-#                self.update_all_tables()
+            if self.data_source_set:
+                self.db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
+                self.db.create_missing_columns()
+                self.update_all_tables()
 
 
         except KeyError:
@@ -2531,7 +2533,8 @@ class XChemExplorer(QtGui.QApplication):
     def populate_data_collection_summary_table(self):
         self.status_bar.showMessage('Building summary table for data processing results; be patient this may take a while')
         row = self.data_collection_summary_table.rowCount()
-        column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
+#        column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
+        column_name=self.db.translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
 #        new_xtal=False
         for xtal in sorted(self.data_collection_dict):
             new_xtal=False
@@ -2560,7 +2563,7 @@ class XChemExplorer(QtGui.QApplication):
 
 #            if not logfile_found:
 #                db_dict={}
-            outTemp=self.db.get_value_from_field(xtal,'DataCollectionOutcome')
+            outTemp=str(self.db.get_value_from_field(xtal,'DataCollectionOutcome')[0])
             print outTemp
 
             if logfile_found and not too_low_resolution:
