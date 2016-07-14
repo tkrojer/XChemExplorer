@@ -2566,15 +2566,13 @@ class XChemExplorer(QtGui.QApplication):
 
 #            if not logfile_found:
 #                db_dict={}
-            outTemp=str(self.db.get_value_from_field(xtal,'DataCollectionOutcome')[0])
-            print outTemp
-
-            if logfile_found and not too_low_resolution:
-                outcome="success"
-            elif logfile_found and too_low_resolution:
-                outcome="Failed - low resolution"
-            else:
-                outcome="Failed - unknown"
+            outcome=str(self.db.get_value_from_field(xtal,'DataCollectionOutcome')[0])
+#            if logfile_found and not too_low_resolution:
+#                outcome="success"
+#            elif logfile_found and too_low_resolution:
+#                outcome="Failed - low resolution"
+#            else:
+#                outcome="Failed - unknown"
             self.dataset_outcome_dict[xtal]=outcome
 
             # find latest run for crystal and diffraction images
