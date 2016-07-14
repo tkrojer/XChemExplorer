@@ -931,7 +931,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             'DataCollectionOutcome':            'Failed - unknown',
                             'RefinementOutcome':                '-1 - Data Collection Failed'}
             else:
-                for n,entry in self.data_collection_dict[sample]:
+                for n,entry in enumerate(self.data_collection_dict[sample]):
                     if entry[0]==logfile:
                         db_data_collection_dict=entry[6]
                         if user_changed_selection:
