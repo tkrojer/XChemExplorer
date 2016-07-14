@@ -80,6 +80,7 @@ class data_source:
             ['DataProcessingProgram',                'Program',                                 'TEXT',                 1],
             ['DataProcessingSpaceGroup',             'DataProcessing\nSpaceGroup',              'TEXT',                 1],
             ['DataProcessingUnitCell',               'DataProcessing\nUnitCell',                'TEXT',                 0],
+            ['DataProcessingAutoAssigned',           'auto-assigned',                           'TEXT',                 0],
 
             ['DataProcessingA',                      'DataProcessing\nA',                       'TEXT',                 0],
             ['DataProcessingB',                      'DataProcessing\nB',                       'TEXT',                 0],

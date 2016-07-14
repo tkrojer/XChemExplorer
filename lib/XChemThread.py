@@ -914,6 +914,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                         except ValueError:
                             db_dict['DataCollectionOutcome']='Failed - unknown'
                         db_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
+                        db_dict['DataProcessingAutoAssigned']='True'
                 if entry[0]=='image':
                     if len(entry) >= 9:     # need this because some older pkl files won't have the beamline added
                         tmpList.append([datetime.strptime(entry[3], '%Y-%m-%d %H:%M:%S'),entry[1],entry[2],entry[8]])

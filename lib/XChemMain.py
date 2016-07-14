@@ -176,10 +176,12 @@ def change_links_to_selected_data_collection_outcome(sample,data_collection_dict
                 mtz_filename=db_dict['DataProcessingMTZfileName']
                 log_filename=db_dict['DataProcessingLOGfileName']
 
+
                 # first check if folders and files exist
                 # since user might do this before data are actually copied over
 
                 if os.path.isdir(os.path.join(initial_model_directory,sample,'autoprocessing',visit+'-'+run+autoproc)):
+                    db_dict['DataProcessingAutoAssigned']='False'
                     os.chdir(os.path.join(initial_model_directory,sample))
                     # first remove old links
 #                    os.system('/bin/rm '+sample+'.mtz')
