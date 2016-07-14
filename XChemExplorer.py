@@ -2729,12 +2729,13 @@ class XChemExplorer(QtGui.QApplication):
                 self.data_collection_column_three_dict[key][1]=True
                 # need to also update if not yet done
                 user_already_changed_selection=False
-                for entry in self.data_collection_dict[key]:
+                for n,entry in enumerate(self.data_collection_dict[key]):
                     if entry[0]=='user_changed_selection':
                         user_already_changed_selection=True
                     if entry[0]=='logfile':
                         db_dict=entry[6]
                         db_dict['DataProcessingAutoAssigned']='False'
+                        self.data_collection_dict[key][n]=entry
                 if not user_already_changed_selection:
                     self.data_collection_dict[key].append(['user_changed_selection'])
                 XChemMain.change_links_to_selected_data_collection_outcome(key,self.data_collection_dict,
@@ -2979,7 +2980,6 @@ class XChemExplorer(QtGui.QApplication):
             if os.path.isfile(self.data_collection_summary_file):
                 self.update_log.insert('saving results to PKL file')
                 pickle.dump(self.data_collection_dict,open(self.data_collection_summary_file,'wb'))
-
         self.update_log.insert('quitting XCE... bye,bye!')
         QtGui.qApp.quit()
 
