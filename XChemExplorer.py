@@ -2974,6 +2974,12 @@ class XChemExplorer(QtGui.QApplication):
 #            pass
 
     def quit_xce(self):
+        # save pkl file
+        if self.data_collection_dict != {}:
+            if os.path.isfile(self.data_collection_summary_file):
+                self.update_log.insert('saving results to PKL file')
+#                pickle.dump(self.data_collection_dict,open(self.data_collection_summary_file,'wb'))
+
         self.update_log.insert('quitting XCE... bye,bye!')
         QtGui.qApp.quit()
 
