@@ -220,7 +220,7 @@ class XChemExplorer(QtGui.QApplication):
         save.triggered.connect(self.save_config_file)
         quit=QtGui.QAction("Quit", self.window)
         quit.setShortcut('Ctrl+Q')
-        quit.triggered.connect(QtGui.qApp.quit)
+        quit.triggered.connect(self.quit_xce)
         file.addAction(load)
         file.addAction(save)
         file.addAction(quit)
@@ -488,8 +488,8 @@ class XChemExplorer(QtGui.QApplication):
 
         # - Overview Graph ####################################################################
 
+        self.overview_figure, self.overview_axes = plt.subplots()
 #        self.overview_figure, self.overview_axes = plt.subplots(nrows=1, ncols=1)
-        self.overview_figure, self.overview_axes = plt.subplots(nrows=1, ncols=1)
         self.overview_canvas = FigureCanvas(self.overview_figure)
         self.update_summary_plot()
         self.overview_tab_dict['Summary'][1].addWidget(self.overview_canvas)
@@ -2732,6 +2732,9 @@ class XChemExplorer(QtGui.QApplication):
                 for entry in self.data_collection_dict[key]:
                     if entry[0]=='user_changed_selection':
                         user_already_changed_selection=True
+                    if entry[0]=='logfile':
+                        db_dict=entry[6]
+                        db_dict['DataProcessingAutoAssigned']='False'
                 if not user_already_changed_selection:
                     self.data_collection_dict[key].append(['user_changed_selection'])
                 XChemMain.change_links_to_selected_data_collection_outcome(key,self.data_collection_dict,
@@ -2970,6 +2973,9 @@ class XChemExplorer(QtGui.QApplication):
 #        except sqlite3.OperationalError,NameError:
 #            pass
 
+    def quit_xce(self):
+        self.update_log.insert('quitting XCE... bye,bye!')
+        QtGui.qApp.quit
 
 
 if __name__ == "__main__":
