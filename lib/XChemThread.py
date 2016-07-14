@@ -876,12 +876,12 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                 for n,entry in enumerate(self.data_collection_dict[xtal]):
                     if entry[0]=='logfile':
                         self.data_collection_dict[xtal][n][8]=False
-            if self.selection_mechanism=='IsigI*Comp*UniqueRefl':
-                self.max_IsigI_Completeness_Reflections_only(xtal)
-            elif self.selection_mechanism=='lowest_Rfree':
-                self.min_Rfree(xtal)
-            elif self.selection_mechanism=='highest_resolution':
-                self.min_resolution(xtal)
+                if self.selection_mechanism=='IsigI*Comp*UniqueRefl':
+                    self.max_IsigI_Completeness_Reflections_only(xtal)
+                elif self.selection_mechanism=='lowest_Rfree':
+                    self.min_Rfree(xtal)
+                elif self.selection_mechanism=='highest_resolution':
+                    self.min_resolution(xtal)
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
