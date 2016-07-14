@@ -2790,7 +2790,7 @@ class XChemExplorer(QtGui.QApplication):
                         db_dict=entry[6]
                         db_dict['DataProcessingAutoAssigned']='False'
                         if entry[7]==selected_processing_result:
-                            db_dict=entry[6]
+                            db_dict_current=entry[6]
                             program=db_dict['DataProcessingProgram']
                             visit=db_dict['DataCollectionVisit']
                             run=db_dict['DataCollectionRun']
@@ -2831,7 +2831,7 @@ class XChemExplorer(QtGui.QApplication):
                             continue
                         else:
                             cell_text=QtGui.QTableWidgetItem()
-                            cell_text.setText(str( db_dict[ header[1] ]  ))
+                            cell_text.setText(str( db_dict_current[ header[1] ]  ))
                             cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                             self.data_collection_summary_table.setItem(row, column, cell_text)
 
