@@ -914,12 +914,13 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                         except ValueError:
                             db_dict['DataCollectionOutcome']='Failed - unknown'
                         db_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
-                        db_dict['DataProcessingAutoAssigned']='True'
+#                        db_dict['DataProcessingAutoAssigned']='True'
                 if entry[0]=='image':
                     if len(entry) >= 9:     # need this because some older pkl files won't have the beamline added
                         tmpList.append([datetime.strptime(entry[3], '%Y-%m-%d %H:%M:%S'),entry[1],entry[2],entry[8]])
                     else:
                         tmpList.append([datetime.strptime(entry[3], '%Y-%m-%d %H:%M:%S'),entry[1],entry[2],'I04-1'])
+
 
             if not logfile_found:
                 # find latest data collection in tmpList
@@ -929,6 +930,19 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             'DataCollectionDate':               latest_run[0],
                             'DataCollectionOutcome':            'Failed - unknown',
                             'RefinementOutcome':                '-1 - Data Collection Failed'}
+            else:
+                for n,entry in self.data_collection_dict[sample]:
+                    if entry[0]==logfile:
+                        db_data_collection_dict=entry[6]
+                        if user_changed_selection:
+                            db_dict['DataProcessingAutoAssigned']='False'
+                            db_data_collection_dict['DataProcessingAutoAssigned']='False'
+                        else:
+                            db_dict['DataProcessingAutoAssigned']='True'
+                            db_data_collection_dict['DataProcessingAutoAssigned']='True'
+                        entry[6]=db_data_collection_dict
+                        self.data_collection_dict[sample][n]=entry
+
 
             if self.rescore_only:
                 self.data_source.update_insert_data_source(sample,db_dict)
@@ -1101,19 +1115,18 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                         autoproc=file_name.split('/')[len(file_name.split('/'))-3]
                         found_autoproc=False
                         for n,entry in enumerate(self.data_collection_dict[xtal]):
-                            if len(entry)>=9:
-                                if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[4]==autoproc:
-                                    found_autoproc=True
-                                    # need to check this because user may have run this later and otherwise he would need to delete pkl file to pick it up
-                                    if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')):
-                                        dimple_file=os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')
-                                        pdb_info=parse().PDBheader(dimple_file)
-                                        db_dict_old=self.data_collection_dict[xtal][n][6]
-                                        db_dict_old['DataProcessingPathToDimplePDBfile']=dimple_file
-                                        db_dict_old['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
-                                        db_dict_old['DataProcessingRcryst']  = pdb_info['Rcryst']
-                                        db_dict_old['DataProcessingRfree'] = pdb_info['Rfree']
-                                        self.data_collection_dict[xtal][n][6]=db_dict_old
+                            if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[4]==autoproc:
+                                found_autoproc=True
+                                # need to check this because user may have run this later and otherwise he would need to delete pkl file to pick it up
+                                if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')):
+                                    dimple_file=os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')
+                                    pdb_info=parse().PDBheader(dimple_file)
+                                    db_dict_old=self.data_collection_dict[xtal][n][6]
+                                    db_dict_old['DataProcessingPathToDimplePDBfile']=dimple_file
+                                    db_dict_old['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
+                                    db_dict_old['DataProcessingRcryst']  = pdb_info['Rcryst']
+                                    db_dict_old['DataProcessingRfree'] = pdb_info['Rfree']
+                                    self.data_collection_dict[xtal][n][6]=db_dict_old
                         if not found_autoproc:  # i.e. this run is not in pkl file yet
                             aimless_results=parse().read_aimless_logfile(file_name)
                             db_dict.update(aimless_results)
