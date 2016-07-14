@@ -280,7 +280,7 @@ class run_pandda_analyse(QtCore.QThread):
                 os.system('./pandda.sh &')
             else:
                 print '==> running PANDDA on cluster, using qsub...'
-                 os.system('qsub pandda.sh')
+                os.system('qsub pandda.sh')
 
 class check_if_pandda_can_run:
 
