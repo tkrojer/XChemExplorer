@@ -15,7 +15,6 @@ from XChemUtils import external_software
 from XChemUtils import helpers
 import XChemThread
 import XChemDB
-import XChemDialogs
 import XChemPANDDA
 import XChemToolTips
 import XChemMain
@@ -866,7 +865,6 @@ class XChemExplorer(QtGui.QApplication):
         # next three blocks display html documents created by pandda.analyse
         self.pandda_initial_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_initial.html')
         self.pandda_analyse_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_analyse.html')
-#        self.pandda_inspect_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_inspect.html')
         self.pandda_inspect_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_inspect.html')
 
         self.pandda_initial_html = QtWebKit.QWebView()
@@ -883,7 +881,6 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_tab_dict['Inspect Summary'][1].addWidget(self.pandda_inspect_html)
         self.pandda_inspect_html.load(QtCore.QUrl(self.pandda_inspect_html_file))
         self.pandda_inspect_html.show()
-
 
 #        self.pandda_analyse_html = QtWebKit.QWebView()
 #        self.pandda_inspect_html = QtWebKit.QWebView()
@@ -923,13 +920,6 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_reference_directory)
 
         self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nData Source:'))
-#        settings_hbox_database_directory=QtGui.QHBoxLayout()
-#        self.database_directory_label=QtGui.QLabel(self.database_directory)
-#        settings_hbox_database_directory.addWidget(self.database_directory_label)
-#        settings_buttoon_database_directory=QtGui.QPushButton('Select Data Source Directory')
-#        settings_buttoon_database_directory.clicked.connect(self.settings_button_clicked)
-#        settings_hbox_database_directory.addWidget(settings_buttoon_database_directory)
-#        self.data_collection_vbox_for_settings.addLayout(settings_hbox_database_directory)
         settings_hbox_data_source_file=QtGui.QHBoxLayout()
         if self.data_source_file != '':
             self.data_source_file_label=QtGui.QLabel(os.path.join(self.database_directory,self.data_source_file))
@@ -939,9 +929,6 @@ class XChemExplorer(QtGui.QApplication):
         settings_buttoon_data_source_file=QtGui.QPushButton('Select Data Source File')
         settings_buttoon_data_source_file.clicked.connect(self.settings_button_clicked)
         settings_hbox_data_source_file.addWidget(settings_buttoon_data_source_file)
-#        create_new_data_source_button=QtGui.QPushButton("Create New Data\nSource (SQLite)")
-#        create_new_data_source_button.clicked.connect(self.button_clicked)
-#        settings_hbox_data_source_file.addWidget(create_new_data_source_button)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_data_source_file)
 
         #################
@@ -996,36 +983,6 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_panddas_directory.addWidget(settings_button_panddas_directory)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_panddas_directory)
 
-#        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nSites of Interest:'))
-#        self.sites_of_interest_input = QtGui.QTextEdit()
-#        self.sites_of_interest_input.setFixedWidth(400)
-#        self.data_collection_vbox_for_settings.addWidget(self.sites_of_interest_input)
-
-
-#        self.data_collection_vbox_for_settings.addStretch(1)
-        ######################################################################################
-
-        ######################################################################################
-        # Preferences
-#        self.vbox_for_preferences=QtGui.QVBoxLayout()
-#        self.tab_dict[self.workflow_dict['Preferences']][1].addLayout(self.vbox_for_preferences)
-#
-#        self.vbox_for_preferences.addWidget(QtGui.QLabel('Select amount of processed data you wish to copy to initial_model directory:'))
-#        self.preferences_data_to_copy_combobox = QtGui.QComboBox()
-#        for item in self.preferences_data_to_copy:
-#            self.preferences_data_to_copy_combobox.addItem(item[0])
-#        self.preferences_data_to_copy_combobox.currentIndexChanged.connect(self.preferences_data_to_copy_combobox_changed)
-#        self.vbox_for_preferences.addWidget(self.preferences_data_to_copy_combobox)
-#
-#        self.vbox_for_preferences.addWidget(QtGui.QLabel('Dataset Selection Mechanism:'))
-#        self.preferences_selection_mechanism_combobox = QtGui.QComboBox()
-#        for item in self.preferences_selection_mechanism:
-#            self.preferences_selection_mechanism_combobox.addItem(item)
-#        self.preferences_selection_mechanism_combobox.currentIndexChanged.connect(self.preferences_selection_mechanism_combobox_changed)
-#        self.vbox_for_preferences.addWidget(self.preferences_selection_mechanism_combobox)
-#
-#        self.vbox_for_preferences.addStretch(1)
-#
         ######################################################################################
 
 
@@ -1052,10 +1009,6 @@ class XChemExplorer(QtGui.QApplication):
         vbox_main.addLayout(hbox_status)
 
         self.window.setLayout(vbox_main)
-
-        # this can be excrutiatingly slow...
-#        if self.data_source_set:
-#            self.datasource_menu_reload_samples()
 
         self.status_bar.showMessage('Ready')
 #        self.timer = QtCore.QBasicTimer()
@@ -1407,6 +1360,7 @@ class XChemExplorer(QtGui.QApplication):
 
         except KeyError:
             self.update_status_bar('Sorry, this is not a XChemExplorer config file!')
+            self.update_log.insert('Sorry, this is not a XChemExplorer config file!')
 
     def save_config_file(self):
         file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.current_directory))
@@ -1432,7 +1386,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def rerun_dimple_on_all_autoprocessing_files(self):
-        print '==> XCE: running DIMPLE on ALL auto-processing files'
+        self.update_log.insert('running DIMPLE on ALL auto-processing files')
         job_list=[]
         for xtal in self.data_collection_dict:
             for entry in self.data_collection_dict[xtal]:
@@ -1598,16 +1552,16 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_mtz_style_entry.setText(mtzin)
 
     def update_all_tables(self):
-        print '==> checking for new reference files'
+        self.update_log.insert('checking for new reference files')
         self.update_status_bar('checking for new reference files')
         self.reference_file_list=self.get_reference_file_list(' ')
-        print '==> updating Overview table'
+        self.update_log.insert('updating Overview table')
         self.update_status_bar('updating Overview table')
         self.populate_and_update_data_source_table()
-        print '==> updating Maps table'
+        self.update_log.insert('updating Maps table')
         self.update_status_bar('updating Maps table')
         self.create_initial_model_table()
-        print '==> updating PANDDA table'
+        self.update_log.insert('updating PANDDA table')
         self.update_status_bar('updating PANDDA table')
         self.populate_pandda_analyse_input_table()
         self.update_status_bar('idle')
@@ -1837,7 +1791,7 @@ class XChemExplorer(QtGui.QApplication):
 
         elif instruction=="Open COOT":
             if not self.coot_running:
-                print 'starting coot'
+                self.update_log.insert('starting coot...')
                 self.work_thread=XChemThread.start_COOT(self.settings)
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                 self.work_thread.start()
@@ -2039,7 +1993,6 @@ class XChemExplorer(QtGui.QApplication):
 #        print '    * nr SMILES for samples:   ',len(smiles_for_sample)
 #        print '    * nr samples with data:    ',len(samples_with_data)
 #        print '    * nr CIF files created:    ',len(cif_files)
-        print 'here:'
         print XChemMain.get_jobs_running_on_cluster()
         print XChemMain.get_datasource_summary(os.path.join(self.database_directory,self.data_source_file))
 #        out_bytes = subprocess.check_output(['qstat'])
@@ -2315,8 +2268,6 @@ class XChemExplorer(QtGui.QApplication):
             db_dict=self.xtal_db_dict[xtal]
             if str(db_dict['DataCollectionOutcome']).lower().startswith('success'):
                 reference_file=self.find_suitable_reference_file(db_dict)
-                print 'here'
-                print reference_file
                 smallest_uc_difference=min(reference_file,key=lambda x: x[1])
                 row=self.initial_model_table.rowCount()
                 if xtal not in self.initial_model_dimple_dict:
@@ -2430,8 +2381,8 @@ class XChemExplorer(QtGui.QApplication):
                                                     lattice_reference,
                                                     unitcell_volume_reference,
                                                     pointgroup_reference])
-        for i in reference_file_list:
-            print i
+        for n,file in enumerate(reference_file_list):
+            self.update_log.insert('reference file %s: %s' %(n,file))
         return reference_file_list
 
 
@@ -3105,7 +3056,6 @@ if __name__ == "__main__":
 #    print '     #                                                                    #'
 #    print '     ######################################################################'
 #    print '\n\n\n'
-
 
     app=XChemExplorer(sys.argv[1:])
 

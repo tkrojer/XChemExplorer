@@ -19,18 +19,18 @@ class summary_plot(object):
         db_dict=XChemMain.get_datasource_summary(self.datasource)
         print db_dict
 
-        category = ( 'Crystals mounted',
-                            'Data Collection',
-                            'Maps',
-                            'PANDDA',
-                            'Refinement',
-                            'Comp Chem'             )
+        category = (    'Crystals mounted',
+                        'Data Collection',
+                        'Maps',
+                        'PANDDA',
+                        'Refinement',
+                        'Comp Chem'             )
 
 
         N = len(category)
-        Success = np.array([db_dict['no_samples'], 2, 3, 4, 5, 6])
-        Pending = np.array([0, 5, 4, 3, 2, 1])
-        Failure = np.array([db_dict['no_samples_failed_to_mount'], 3, 2, 3, 2, 3])
+        Success = np.array([db_dict['nr_samples'],                  db_dict['nr_data_collection_success'], 3, 4, 5, 6])
+        Pending = np.array([0,                                      db_dict['nr_data_collection_pending'], 4, 3, 2, 1])
+        Failure = np.array([db_dict['nr_samples_failed_to_mount'],  db_dict['nr_data_collection_failed'], 2, 3, 2, 3])
 
 #        Success = np.array([1, 2, 3, 4, 5, 6])
 #        Pending = np.array([6, 5, 4, 3, 2, 1])
