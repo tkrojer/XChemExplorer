@@ -128,6 +128,8 @@ def get_datasource_summary(db_file):
     out_dict={}
 
     out_dict['no_samples']=len(db.execute_statement("select CrystalName from mainTable where CrystalName is not NULL;"))
+    out_dict['no_samples_failed_to_mount']=len(db.execute_statement("select HarvestStatus from mainTable where HarvestStatus is 'fail';"))
+
     out_dict['no_smiles_for_samples']=len(db.execute_statement("select compoundSMILES from mainTable where compoundSMILES is not (NULL or '')"))
 
     out_dict['no_data_collection_success']=len(db.execute_statement("select DataCollectionOutcome from mainTable where DataCollectionOutcome is 'success';"))
