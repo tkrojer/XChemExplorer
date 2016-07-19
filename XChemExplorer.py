@@ -2176,6 +2176,8 @@ class XChemExplorer(QtGui.QApplication):
             for entry in self.data_collection_dict[xtal]:
                 if entry[0]=='logfile':
                     logfile_list.append(entry)
+                    if xtal=='NUDT22A-x0721':
+                        print entry
             for entry in sorted(logfile_list,key=lambda x: x[7]):               # sort by aimless_index and so make sure
                 entry_already_in_table=False                                    # that aimless_index == row
                 for logfile in self.data_collection_table_dict[xtal]:
