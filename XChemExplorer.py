@@ -1816,15 +1816,16 @@ class XChemExplorer(QtGui.QApplication):
             reference_file=self.find_suitable_reference_file(db_dict)
 #            print reference_file
             smallest_uc_difference=min(reference_file,key=lambda x: x[1])
-            print xtal,smallest_uc_difference
-            print reference_file
-            print reference_file[0][0]
-            print smallest_uc_difference[0][0]
-            print '----'
+#            print xtal,smallest_uc_difference
+#            print reference_file
+#            print reference_file[0][0]
+#            print smallest_uc_difference[0][0]
+#            print '----'
+            if smallest_uc_difference[0][0]=='...':
+                continue
             reference_file_selection_combobox=self.initial_model_dimple_dict[xtal][1]
             if float(smallest_uc_difference[1]) < self.allowed_unitcell_difference_percent:
-                print reference_file[0][0]
-                index = reference_file_selection_combobox.findText(str(reference_file[0][0]), QtCore.Qt.MatchFixedString)
+                index = reference_file_selection_combobox.findText(str(smallest_uc_difference[0][0]), QtCore.Qt.MatchFixedString)
                 reference_file_selection_combobox.setCurrentIndex(index)
             else:
                 reference_file_selection_combobox.setCurrentIndex(0)
