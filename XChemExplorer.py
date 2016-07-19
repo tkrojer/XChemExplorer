@@ -1817,6 +1817,7 @@ class XChemExplorer(QtGui.QApplication):
 #            print reference_file
             smallest_uc_difference=min(reference_file,key=lambda x: x[1])
             print xtal,smallest_uc_difference
+            print reference_file
             reference_file_selection_combobox=self.initial_model_dimple_dict[xtal][1]
             if float(smallest_uc_difference[1]) < self.allowed_unitcell_difference_percent:
                 print reference_file[0][0]
@@ -2257,17 +2258,17 @@ class XChemExplorer(QtGui.QApplication):
         for reference in self.reference_file_list:
             # first we need one in the same pointgroup
             if reference[5]==db_dict['DataProcessingPointGroup']:
-                try:
-                    difference=math.fabs(1-(float(db_dict['DataProcessingUnitCellVolume'])/float(reference[4])))*100
-                    if difference < self.allowed_unitcell_difference_percent:
-                        suitable_reference.append([reference,difference])
-                except ValueError:
-                    continue
 #                try:
 #                    difference=math.fabs(1-(float(db_dict['DataProcessingUnitCellVolume'])/float(reference[4])))*100
-#                    reference_file.append([reference,difference])
+#                    if difference < self.allowed_unitcell_difference_percent:
+#                        suitable_reference.append([reference,difference])
 #                except ValueError:
 #                    continue
+                try:
+                    difference=math.fabs(1-(float(db_dict['DataProcessingUnitCellVolume'])/float(reference[4])))*100
+                    reference_file.append([reference,difference])
+                except ValueError:
+                    continue
 #        if suitable_reference != []:
 #            reference_file=min(suitable_reference,key=lambda x: x[1])
         return reference_file
