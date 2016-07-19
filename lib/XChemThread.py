@@ -820,6 +820,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         for n,entry in enumerate(self.data_collection_dict[xtal]):
             if entry[0]=='logfile':
                 if entry[7]==best_file_index:
+                    print entry
                     self.data_collection_dict[xtal][n][8]=True
                     # if this was just a rescoring excersise, the files are already in the project directory
                     # hence we want all the links to be reset immediately
@@ -1113,6 +1114,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     if aimless_index_list==[]:
                         aimless_index=0
                     else:
+#                        aimless_index=max(aimless_index_list)
                         aimless_index=max(aimless_index_list)+1
 
                     ##########################################################################
