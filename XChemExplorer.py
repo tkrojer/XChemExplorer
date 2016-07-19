@@ -1819,6 +1819,7 @@ class XChemExplorer(QtGui.QApplication):
             print xtal,smallest_uc_difference
             print reference_file
             print reference_file[0][0]
+            print smallest_uc_difference[0][0]
             print '----'
             reference_file_selection_combobox=self.initial_model_dimple_dict[xtal][1]
             if float(smallest_uc_difference[1]) < self.allowed_unitcell_difference_percent:
