@@ -367,7 +367,8 @@ class XChemExplorer(QtGui.QApplication):
         self.panddas_file_tasks = [ 'pandda.analyse',
                                     'pandda.inspect',
                                     'Export PANDDA models',
-                                    'Show HTML summary'     ]
+                                    'Show HTML summary',
+                                    'Update datasource with results from pandda.inspect'    ]
 
         frame_panddas_file_task=QtGui.QFrame()
         frame_panddas_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -1787,7 +1788,12 @@ class XChemExplorer(QtGui.QApplication):
             self.run_pandda_inspect()
 
         elif instruction=='Export PANDDA models':
-            self.run_pandda_export()
+            update_datasource_only=False
+            self.run_pandda_export(update_datasource_only)
+
+        elif instruction=='Update datasource with results from pandda.inspect':
+            update_datasource_only=True
+            self.run_pandda_export(update_datasource_only)
 
         elif instruction=='Show HTML summary':
             self.show_pandda_html_summary()
@@ -1937,10 +1943,13 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
-    def run_pandda_export(self):
+    def run_pandda_export(self,update_datasource_only):
         self.settings['panddas_directory']=str(self.pandda_output_data_dir_entry.text())
-        print '==> XCE: exporting PANDDA models'
-        self.work_thread=XChemPANDDA.run_pandda_export(self.panddas_directory,os.path.join(self.database_directory,self.data_source_file),self.initial_model_directory,self.xce_logfile)
+        if update_datasource_only:
+            self.update_log.insert('updating data source with results from pandda.inspect')
+        else:
+            self.update_log.insert('exporting PANDDA models, updating data source and launching inital refinement for new models')
+        self.work_thread=XChemPANDDA.run_pandda_export(self.panddas_directory,os.path.join(self.database_directory,self.data_source_file),self.initial_model_directory,self.xce_logfile,update_datasource_only)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 

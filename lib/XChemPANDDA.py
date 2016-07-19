@@ -10,7 +10,7 @@ import csv
 
 class run_pandda_export(QtCore.QThread):
 
-    def __init__(self,panddas_directory,datasource,initial_model_directory,xce_logfile):
+    def __init__(self,panddas_directory,datasource,initial_model_directory,xce_logfile,update_datasource_only):
         QtCore.QThread.__init__(self)
         self.panddas_directory=panddas_directory
         self.datasource=datasource
@@ -20,6 +20,7 @@ class run_pandda_export(QtCore.QThread):
         self.db_list=self.db.get_empty_db_dict()
         self.external_software=XChemUtils.external_software().check()
         self.Logfile=XChemLog.updateLog(xce_logfile)
+        self.update_datasource_only=update_datasource_only
 
         self.RefmacParams={ 'HKLIN':            '',                 'HKLOUT': '',
                             'XYZIN':            '',                 'XYZOUT': '',
@@ -34,9 +35,10 @@ class run_pandda_export(QtCore.QThread):
                             'TWIN':             ''    }
 
     def run(self):
-        self.export_models()
         self.import_samples_into_datasouce()
-        self.refine_exported_models()
+        if not self.update_datasource_only:
+            self.export_models()
+            self.refine_exported_models()
 
     def refine_exported_models(self):
 
