@@ -75,4 +75,4 @@ class summary_plot(object):
         self.overview_axes.set_xticks(ind + width)
         self.overview_axes.set_xticklabels(category)
 
-        self.overview_axes.legend((p0,[0], p1[0], p2[0], p3[0]), ('Success', 'Processed', 'Pending', 'Failure'))
+        self.overview_axes.legend((p0[0], p1[0], p2[0], p3[0]), ('Success', 'Processed', 'Pending', 'Failure'))
