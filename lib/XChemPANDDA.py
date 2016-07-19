@@ -5,11 +5,12 @@ from XChemUtils import mtztools
 import XChemDB
 import XChemRefine
 import XChemUtils
+import XChemLog
 import csv
 
 class run_pandda_export(QtCore.QThread):
 
-    def __init__(self,panddas_directory,datasource,initial_model_directory):
+    def __init__(self,panddas_directory,datasource,initial_model_directory,xce_logfile):
         QtCore.QThread.__init__(self)
         self.panddas_directory=panddas_directory
         self.datasource=datasource
@@ -18,6 +19,7 @@ class run_pandda_export(QtCore.QThread):
         self.db.create_missing_columns()
         self.db_list=self.db.get_empty_db_dict()
         self.external_software=XChemUtils.external_software().check()
+        self.Logfile=XChemLog.updateLog(xce_logfile)
 
         self.RefmacParams={ 'HKLIN':            '',                 'HKLOUT': '',
                             'XYZIN':            '',                 'XYZOUT': '',
@@ -44,7 +46,7 @@ class run_pandda_export(QtCore.QThread):
             compoundID=str(item[1])
             if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.free.mtz')):
                 if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb')):
-                    print '==> XCE: running inital refinement on PANDDA model of',xtal
+                    self.Logfile.insert('running inital refinement on PANDDA model of'+xtal)
                     Refine=XChemRefine.Refine(self.initial_model_directory,xtal,compoundID,self.datasource)
                     Serial=Refine.GetSerial()
                     os.mkdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+str(Serial)))
@@ -88,11 +90,12 @@ class run_pandda_export(QtCore.QThread):
         # first make a note of all the datasets which were used in pandda directory
         os.chdir(os.path.join(self.panddas_directory,'processed_datasets'))
         for xtal in glob.glob('*'):
+            self.Logfile.insert("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'False',DimplePANDDApath='%s' where CrystalName is '%s'" %(self.panddas_directory,xtal))
             self.db.execute_statement("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'False',DimplePANDDApath='%s' where CrystalName is '%s'" %(self.panddas_directory,xtal))
         # do the same as before, but look for rejected datasets
         os.chdir(os.path.join(self.panddas_directory,'rejected_datasets'))
         for xtal in glob.glob('*'):
-            print "update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'True',DimplePANDDApath='%s',DimplePANDDAhit = 'False' where CrystalName is '%s'" %(self.panddas_directory,xtal)
+            self.Logfile.insert("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'True',DimplePANDDApath='%s',DimplePANDDAhit = 'False' where CrystalName is '%s'" %(self.panddas_directory,xtal))
             self.db.execute_statement("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'True',DimplePANDDApath='%s',DimplePANDDAhit = 'False' where CrystalName is '%s'" %(self.panddas_directory,xtal))
 
         site_list = []
@@ -201,7 +204,7 @@ class run_pandda_export(QtCore.QThread):
                 ' export_ligands=False'
                 ' generate_occupancy_groupings=True\n'
                 )
-        print '==> XCE: running pandda.export with the following command:\n',Cmds
+        self.Logfile.insert('running pandda.export with the following command:\n'+Cmds)
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running pandda.export: check terminal for details')
         os.system(Cmds)
 

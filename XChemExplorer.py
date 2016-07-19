@@ -1940,7 +1940,7 @@ class XChemExplorer(QtGui.QApplication):
     def run_pandda_export(self):
         self.settings['panddas_directory']=str(self.pandda_output_data_dir_entry.text())
         print '==> XCE: exporting PANDDA models'
-        self.work_thread=XChemPANDDA.run_pandda_export(self.panddas_directory,os.path.join(self.database_directory,self.data_source_file),self.initial_model_directory)
+        self.work_thread=XChemPANDDA.run_pandda_export(self.panddas_directory,os.path.join(self.database_directory,self.data_source_file),self.initial_model_directory,self.xce_logfile)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
