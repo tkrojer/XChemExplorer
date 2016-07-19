@@ -658,7 +658,9 @@ class XChemExplorer(QtGui.QApplication):
                         'Reference\nSpaceGroup',
                         'Difference\nUC Volume (%)',
                         'Reference File',
-                        'DataProcessing\nUnitCell'      ]
+                        'DataProcessing\nUnitCell',
+                        'PANDDA\nlaunched?',
+                        'PANDDA\nhit?'                  ]
 
         self.initial_model_table=QtGui.QTableWidget()
         self.initial_model_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
