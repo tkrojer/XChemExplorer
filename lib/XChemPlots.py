@@ -55,6 +55,12 @@ class summary_plot(object):
                                 2,
                                 3   ])
 
+        print 'here:'
+        print Success
+        print Processed
+        print Pending
+        print Failure
+
 #        Success = np.array([1, 2, 3, 4, 5, 6])
 #        Pending = np.array([6, 5, 4, 3, 2, 1])
 #        Failure = np.array([2, 3, 2, 3, 2, 3])
