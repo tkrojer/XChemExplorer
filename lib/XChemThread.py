@@ -799,7 +799,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                 if isinstance(entry[6],dict):
                     try:
                         ranking=entry[6]['DataProcessingScore']
-                        select_stage_three_list.append([index,ranking])
+                        if isinstance(ranking,float):
+                            select_stage_three_list.append([index,ranking])
                     except KeyError:
                         try:
                             ranking = (float(entry[6]['DataProcessingUniqueReflectionsOverall'])*\

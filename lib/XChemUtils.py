@@ -323,7 +323,7 @@ class parse:
                             'DataProcessingUnitCellVolume':                 0,
                             'DataProcessingAlert':                          '#FF0000',
                             'DataCollectionWavelength':                     'n/a',
-                            'DataProcessingScore':                          0.0             }
+                            'DataProcessingScore':                          'n/a'             }
 
 
 
