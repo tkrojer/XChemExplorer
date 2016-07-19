@@ -810,6 +810,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                         except ValueError:
                             continue
         if not select_stage_three_list==[]:
+            print select_stage_three_list
             self.set_best_file_to_true(xtal,'max',select_stage_three_list)
 
 
@@ -821,6 +822,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         for n,entry in enumerate(self.data_collection_dict[xtal]):
             if entry[0]=='logfile':
                 if entry[7]==best_file_index:
+                    print entry
                     self.data_collection_dict[xtal][n][8]=True
                     # if this was just a rescoring excersise, the files are already in the project directory
                     # hence we want all the links to be reset immediately
