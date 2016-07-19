@@ -240,7 +240,6 @@ class data_source:
             existing_columns.append(column[0])
         for column in self.pandda_table_columns:
             if column[0] not in existing_columns:
-                print "alter table panddaTable add column '"+column[0]+"' '"+column[2]+"'"
                 cursor.execute("alter table panddaTable add column '"+column[0]+"' '"+column[2]+"'")
                 connect.commit()
 
@@ -398,7 +397,6 @@ class data_source:
             if not str(value).replace(' ','')=='':  # ignore empty fields
                 update_string+=str(key)+'='+"'"+str(value)+"'"+','
         if update_string != '':
-            print "UPDATE panddaTable SET "+update_string[:-1]+" WHERE CrystalName='%s' and PANDDA_site_index='%s'" %(sampleID,site_index)
             cursor.execute("UPDATE panddaTable SET "+update_string[:-1]+" WHERE CrystalName='%s' and PANDDA_site_index='%s'" %(sampleID,site_index))
             connect.commit()
 

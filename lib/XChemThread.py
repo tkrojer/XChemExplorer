@@ -1113,7 +1113,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     if aimless_index_list==[]:
                         aimless_index=0
                     else:
-                        aimless_index=max(aimless_index_list)
+                        aimless_index=max(aimless_index_list)+1
 
                     ##########################################################################
                     # aimless & Dimple information
@@ -1176,7 +1176,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             # Note: [8]: best automatically selected file=True
                             #       [9]: the moment the user changes the selection manully this changes to True
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False,False])
-                            aimless_index+=1
+#                            aimless_index+=1
 
 
 
@@ -1236,7 +1236,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 db_dict['DataProcessingRfree'] = '999'
                             db_dict['DataProcessingProgram']=autoproc
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False,False])
-                            aimless_index+=1
+#                            aimless_index+=1
 
                     # then exactly the same for autoPROC
                     if os.path.isfile(os.path.join(runs,'autoPROC','ap-run','aimless.log')):
@@ -1293,7 +1293,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 db_dict['DataProcessingRfree'] = '999'
                             db_dict['DataProcessingProgram']=autoproc
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False,False])
-                            aimless_index+=1
+#                            aimless_index+=1
 
 
 
