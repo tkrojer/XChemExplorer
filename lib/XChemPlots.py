@@ -55,7 +55,7 @@ class summary_plot(object):
                                 2,
                                 3   ])
 
-        print 'here:'
+        print 'here:    '
         print Success
         print Processed
         print Pending
@@ -69,10 +69,10 @@ class summary_plot(object):
         ind = np.arange(N)  # the x locations for the groups
         width = 0.35       # the width of the bars
 
-        p0 = self.overview_axes.bar(ind, Success, width, color='g')
-        p1 = self.overview_axes.bar(ind, Success, width, color='b', bottom=Success)
-        p2 = self.overview_axes.bar(ind, Pending, width, color='y', bottom=Success+Processed)
-        p3 = self.overview_axes.bar(ind, Failure, width, color='r', bottom=Pending+Success+Processed)
+        p0 = self.overview_axes.bar(ind, Success,   width, color='g')
+        p1 = self.overview_axes.bar(ind, Processed, width, color='b', bottom=Success)
+        p2 = self.overview_axes.bar(ind, Pending,   width, color='y', bottom=Success+Processed)
+        p3 = self.overview_axes.bar(ind, Failure,   width, color='r', bottom=Pending+Success+Processed)
 
 
         # add some text for labels, title and axes ticks
