@@ -810,7 +810,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                         except ValueError:
                             continue
         if not select_stage_three_list==[]:
-            print select_stage_three_list
             self.set_best_file_to_true(xtal,'max',select_stage_three_list)
 
 
@@ -822,7 +821,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         for n,entry in enumerate(self.data_collection_dict[xtal]):
             if entry[0]=='logfile':
                 if entry[7]==best_file_index:
-                    print entry
+#                    print entry
                     self.data_collection_dict[xtal][n][8]=True
                     # if this was just a rescoring excersise, the files are already in the project directory
                     # hence we want all the links to be reset immediately
@@ -1180,7 +1179,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             # Note: [8]: best automatically selected file=True
                             #       [9]: the moment the user changes the selection manully this changes to True
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False,False])
-#                            aimless_index+=1
+                            aimless_index+=1
 
 
 
@@ -1240,7 +1239,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 db_dict['DataProcessingRfree'] = '999'
                             db_dict['DataProcessingProgram']=autoproc
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False,False])
-#                            aimless_index+=1
+                            aimless_index+=1
 
                     # then exactly the same for autoPROC
                     if os.path.isfile(os.path.join(runs,'autoPROC','ap-run','aimless.log')):
@@ -1297,7 +1296,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 db_dict['DataProcessingRfree'] = '999'
                             db_dict['DataProcessingProgram']=autoproc
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False,False])
-#                            aimless_index+=1
+                            aimless_index+=1
 
 
 
