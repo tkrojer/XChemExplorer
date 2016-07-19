@@ -29,21 +29,21 @@ class summary_plot(object):
         N = len(category)
         Success = np.array([    db_dict['nr_samples'],
                                 db_dict['nr_data_collection_success'],
-                                out_dict['nr_initial_maps_available'],
+                                db_dict['nr_initial_maps_available'],
                                 4,
                                 5,
                                 6   ])
 
         Pending = np.array([    0,
                                 db_dict['nr_data_collection_pending'],
-                                out_dict['nr_initial_maps_pending'],
+                                db_dict['nr_initial_maps_pending'],
                                 3,
                                 2,
                                 1   ])
 
         Failure = np.array([    db_dict['nr_samples_failed_to_mount'],
                                 db_dict['nr_data_collection_failed'],
-                                out_dict['nr_initial_maps_fail'],
+                                db_dict['nr_initial_maps_fail'],
                                 3,
                                 2,
                                 3   ])
