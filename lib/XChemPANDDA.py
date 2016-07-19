@@ -92,6 +92,7 @@ class run_pandda_export(QtCore.QThread):
         # do the same as before, but look for rejected datasets
         os.chdir(os.path.join(self.panddas_directory,'rejected_datasets'))
         for xtal in glob.glob('*'):
+            print "update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'True',DimplePANDDApath='%s',DimplePANDDAhit = 'False' where CrystalName is '%s'" %(self.panddas_directory,xtal)
             self.db.execute_statement("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'True',DimplePANDDApath='%s',DimplePANDDAhit = 'False' where CrystalName is '%s'" %(self.panddas_directory,xtal))
 
         site_list = []
