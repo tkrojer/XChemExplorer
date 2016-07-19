@@ -136,7 +136,9 @@ class data_source:
             ['DimpleRfree',                                 'Dimple\nRfree',                                'TEXT',                 1],
             ['DimplePathToPDB',                             'Dimple\nPath to PDB file',                     'TEXT',                 1],
             ['DimplePathToMTZ',                             'Dimple\nPath to MTZ file',                     'TEXT',                 1],
-            ['DimpleReferencePDB',                          'Dimple\neReference PDB',                       'TEXT',                 0],
+            ['DimpleReferencePDB',                          'Dimple\nReference PDB',                        'TEXT',                 0],
+            ['DimplePANDDAwasRun',                          'PANDDA launched?',                             'TEXT',                 1],
+            ['DimplePANDDAhit',                             'PANDDA hit?',                                  'TEXT',                 1],
 
             ['RefinementResolution',                        'RefinementResolution',                         'TEXT',                 1],
             ['RefinementResolutionTL',                      'RefinementResolutionTL',                       'TEXT',                 0],

@@ -85,7 +85,13 @@ class run_pandda_export(QtCore.QThread):
 
     def import_samples_into_datasouce(self):
 
+        # first make a note of all the datasets which were used in pandda directory
+        os.chdir(os.path.join(self.panddas_directory,'processed_datasets'))
+        for xtal in glob.glob('*'):
+            self.db.execute_statement("update mainTable set DimplePANDDAwasRun = 'True' where CrystalName is '%s'" %xtal)
+
         site_list = []
+        pandda_hit_list=[]
 
         with open(os.path.join(self.panddas_directory,'analyses','pandda_inspect_sites.csv'),'rb') as csv_import:
             csv_dict = csv.DictReader(csv_import)
@@ -112,6 +118,8 @@ class run_pandda_export(QtCore.QThread):
             for i,line in enumerate(csv_dict):
                 db_dict={}
                 sampleID=line['dtag']
+                if sampleID not in pandda_hit_list:
+                    pandda_hit_list.append(sampleID)
                 site_index=line['site_idx']
                 event_index=line['event_idx']
 
@@ -167,8 +175,15 @@ class run_pandda_export(QtCore.QThread):
 
                 self.db.update_insert_panddaTable(sampleID,db_dict)
                 self.db.execute_statement("update mainTable set RefinementOutcome = '2 - PANDDA model' where CrystalName is '%s' and (RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending')" %sampleID)
+                self.db.execute_statement("update mainTable set DimplePANDDAhit = 'True' where CrystalName is '%s'" %sampleID)
                 progress += progress_step
                 self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+        # finally find all samples which do not have a pandda hit
+        os.chdir(os.path.join(self.panddas_directory,'processed_datasets'))
+        for xtal in glob.glob('*'):
+            if xtal not in pandda_hit_list:
+                self.db.execute_statement("update mainTable set DimplePANDDAhit = 'False' where CrystalName is '%s'" %xtal)
 
 
     def export_models(self):
