@@ -30,21 +30,28 @@ class summary_plot(object):
         Success = np.array([    db_dict['nr_samples'],
                                 db_dict['nr_data_collection_success'],
                                 db_dict['nr_initial_maps_available'],
-                                4,
+                                db_dict['nr_pandda_hits'],
                                 5,
                                 6   ])
+
+        Processed = np.array([  0,
+                                0,
+                                0,
+                                db_dict['nr_pandda_processed'],
+                                0,
+                                0   ])
 
         Pending = np.array([    0,
                                 db_dict['nr_data_collection_pending'],
                                 db_dict['nr_initial_maps_pending'],
-                                3,
+                                db_dict['nr_pandda_pending'],
                                 2,
                                 1   ])
 
         Failure = np.array([    db_dict['nr_samples_failed_to_mount'],
                                 db_dict['nr_data_collection_failed'],
                                 db_dict['nr_initial_maps_fail'],
-                                3,
+                                db_dict['nr_pandda_reject'],
                                 2,
                                 3   ])
 
@@ -56,9 +63,10 @@ class summary_plot(object):
         ind = np.arange(N)  # the x locations for the groups
         width = 0.35       # the width of the bars
 
-        p1 = self.overview_axes.bar(ind, Success, width, color='g')
-        p2 = self.overview_axes.bar(ind, Pending, width, color='y', bottom=Success)
-        p3 = self.overview_axes.bar(ind, Failure, width, color='r', bottom=Pending+Success)
+        p0 = self.overview_axes.bar(ind, Success, width, color='g')
+        p1 = self.overview_axes.bar(ind, Success, width, color='b', bottom=Success)
+        p2 = self.overview_axes.bar(ind, Pending, width, color='y', bottom=Success+Processed)
+        p3 = self.overview_axes.bar(ind, Failure, width, color='r', bottom=Pending+Success+Processed)
 
 
         # add some text for labels, title and axes ticks
@@ -67,4 +75,4 @@ class summary_plot(object):
         self.overview_axes.set_xticks(ind + width)
         self.overview_axes.set_xticklabels(category)
 
-        self.overview_axes.legend((p1[0], p2[0], p3[0]), ('Success', 'Pending', 'Failure'))
+        self.overview_axes.legend((p0,[0], p1[0], p2[0], p3[0]), ('Success', 'Processed', 'Pending', 'Failure'))

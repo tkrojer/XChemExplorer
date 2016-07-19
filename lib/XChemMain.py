@@ -166,11 +166,10 @@ def get_datasource_summary(db_file):
     out_dict['nr_initial_maps_fail']=len(db.execute_statement("select DataProcessingDimpleSuccessful from mainTable where DataProcessingDimpleSuccessful = 'False';"))
     out_dict['nr_initial_maps_pending']=out_dict['nr_data_collection_success']-out_dict['nr_initial_maps_available']-out_dict['nr_initial_maps_fail']
 
-    print 'successful data collection',out_dict['nr_data_collection_success']
-    print 'maps available',out_dict['nr_initial_maps_available']
-    print 'maps failed',out_dict['nr_initial_maps_fail']
-    print 'maps pending',out_dict['nr_initial_maps_pending']
-
+    out_dict['nr_pandda_hits']=len(db.execute_statement("select DimplePANDDAhit from mainTable where DimplePANDDAhit = 'True';"))
+    out_dict['nr_pandda_reject']=len(db.execute_statement("select DimplePANDDAreject from mainTable where DimplePANDDAreject = 'True';"))
+    out_dict['nr_pandda_processed']=len(db.execute_statement("select DimplePANDDAwasRun from mainTable where DimplePANDDAwasRun = 'True';"))-out_dict['nr_pandda_hits']-out_dict['nr_pandda_reject']
+    out_dict['nr_pandda_pending']=out_dict['nr_initial_maps_available']-out_dict['nr_pandda_hits']-out_dict['nr_pandda_reject']-out_dict['nr_pandda_processed']
 
     out_dict['nr_cif_files']=len(db.execute_statement("select RefinementCIF from mainTable where RefinementCIF is not (Null or '');"))
 
