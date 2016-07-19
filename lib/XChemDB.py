@@ -130,6 +130,7 @@ class data_source:
             ['DataProcessingRfree',                         'DataProcessing\nRfree',                        'TEXT',                 0],
             ['DataProcessingPathToDimplePDBfile',           'DataProcessingPathToDimplePDBfile',            'TEXT',                 0],
             ['DataProcessingPathToDimpleMTZfile',           'DataProcessingPathToDimpleMTZfile',            'TEXT',                 0],
+            ['DataProcessingDimpleSuccessful',              'DataProcessingDimpleSuccessful',               'TEXT',                 0],
 
             ['DimpleResolutionHigh',                        'Dimple\nResolution High',                      'TEXT',                 1],
             ['DimpleRcryst',                                'Dimple\nRcryst',                               'TEXT',                 1],

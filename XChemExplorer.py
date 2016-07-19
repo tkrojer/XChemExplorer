@@ -1974,12 +1974,12 @@ class XChemExplorer(QtGui.QApplication):
                 compoundID=str(item[1])
             compound_list.append([str(item[0]),compoundID,str(item[2])])
         if compound_list != []:
-            print '==> XCE: trying to create cif and pdb files for ',len(compound_list),' compounds using ACEDRG...'
+            self.update_log.insert('trying to create cif and pdb files for '+str(len(compound_list))+' compounds using ACEDRG...')
             if self.external_software['qsub']:
-                print '==> XCE: will try sending ',len(compound_list),' jobs to your computer cluster!'
+                self.update_log.insert('will try sending '+str(len(compound_list))+' jobs to your computer cluster!')
             else:
-                print '==> XCE: apparently no cluster available, so will run',len(compound_list),' sequential jobs on one core of your local machine.'
-                print '==> XCE: this could take a while...'
+                self.update_log.insert('apparently no cluster available, so will run '+str(len(compound_list))+' sequential jobs on one core of your local machine.')
+                self.update_log.insert('this could take a while...')
             self.explorer_active=1
             self.work_thread=XChemThread.create_png_and_cif_of_compound(self.external_software,
                                                                         self.initial_model_directory,
@@ -2343,9 +2343,9 @@ class XChemExplorer(QtGui.QApplication):
 
 
 
-    def pandda_analyse_crystal_from_selection_combobox_changed(self,i):
-        crystal_form = self.pandda_analyse_crystal_from_selection_combobox.currentText()
-        self.populate_pandda_analyse_input_table(crystal_form)
+#    def pandda_analyse_crystal_from_selection_combobox_changed(self,i):
+#        crystal_form = self.pandda_analyse_crystal_from_selection_combobox.currentText()
+#        self.populate_pandda_analyse_input_table(crystal_form)
 
     def preferences_data_to_copy_combobox_changed(self,i):
         text = str(self.preferences_data_to_copy_combobox.currentText())

@@ -162,6 +162,10 @@ def get_datasource_summary(db_file):
                                                                     out_dict['nr_data_collection_no-X-rays'] - \
                                                                     out_dict['nr_data_collection_unknown']
 
+    out_dict['nr_initial_maps_available']=len(db.execute_statement("select DataProcessingPathToDimpleMTZfile from mainTable where DataProcessingPathToDimpleMTZfile is not (Null or '');"))
+    out_dict['nr_initial_maps_fail']=len(db.execute_statement("select DataProcessingDimpleSuccessful from mainTable where DataProcessingDimpleSuccessful = 'False';"))
+    out_dict['nr_initial_maps_pending']=out_dict['nr_data_collection_success']-out_dict['nr_initial_maps_available']-out_dict['nr_initial_maps_fail']
+
     out_dict['nr_cif_files']=len(db.execute_statement("select RefinementCIF from mainTable where RefinementCIF is not (Null or '');"))
 
     out_dict['nr_analysis-pending']=len(db.execute_statement("select RefinementOutcome from mainTable where RefinementOutcome is '1 - Analysis Pending';"))

@@ -13,8 +13,13 @@ if __name__=='__main__':
     if os.path.isfile(os.path.join(inital_model_directory,xtal,'dimple.pdb')):
         db_dict={}
         db_dict['DimplePathToPDB']=os.path.join(inital_model_directory,xtal,'dimple.pdb')
+        dimple_ran_successfully=False
         if os.path.isfile(os.path.join(inital_model_directory,xtal,'dimple.mtz')):
             db_dict['DimplePathToMTZ']=os.path.join(inital_model_directory,xtal,'dimple.mtz')
+            dimple_ran_successfully=True
+            db_dict['DataProcessingDimpleSuccessful']='True'
+        if not dimple_ran_successfully:
+            db_dict['DataProcessingDimpleSuccessful']='False'
         pdb=parse().PDBheader(os.path.join(inital_model_directory,xtal,'dimple.pdb'))
         db_dict['DimpleRcryst']=pdb['Rcryst']
         db_dict['DimpleRfree']=pdb['Rfree']
