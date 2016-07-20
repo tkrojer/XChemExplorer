@@ -208,6 +208,8 @@ class helpers:
                     '\n'
                     'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
                     '\n'
+                    'source $XChemExplorer_DIR/setup-scripts/xce.setup-sh\n'
+                    '\n'
                     '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','create_png_of_compound.py')+
                     ' "%s" %s %s %s\n' %(smiles,compoundID.replace(' ',''),sample,initial_model_directory)+
                     '\n'

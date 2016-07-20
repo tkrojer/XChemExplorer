@@ -307,6 +307,8 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     '\n'
                     'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc) +
                     '\n'
+                    'source $XChemExplorer_DIR/setup-scripts/xce.setup-sh\n'
+                    '\n'
                     +ccp4_scratch+
                     '\n'
                     'dimple --no-cleanup %s %s %s %s dimple\n' %(mtzin,ref_pdb,ref_mtz,ref_cif) +
