@@ -255,6 +255,13 @@ class run_pandda_analyse(QtCore.QThread):
 
         if os.path.isfile(os.path.join(self.panddas_directory,'pandda.running')):
             self.Logfile.insert('it looks as if a pandda.analyse job is currently running in: '+self.panddas_directory)
+            msg = ( 'there are three possibilities:\n'
+                    '1.) choose another PANDDA directory\n'
+                    '2.) - check if the job is really running either on the cluster (qstat) or on your local machine\n'
+                    '    - if so, be patient and wait until the job has finished\n'
+                    '3.) same as 2., but instead of waiting, kill the job and remove at least the pandda.running file\n'
+                    '   (or all the contents in the directory if you want to start from scratch)\n'   )
+            self.Logfile.insert(msg)
             return None
         else:
             if os.getenv('SHELL') == '/bin/tcsh' or os.getenv('SHELL') == '/bin/csh':
