@@ -254,6 +254,7 @@ class run_pandda_analyse(QtCore.QThread):
             number_of_cyles+=1
 
         if os.path.isfile(os.path.join(self.panddas_directory,'pandda.running')):
+            self.Logfile.insert('it looks as if a pandda.analyse job is currently running in: '+self.panddas_directory)
             return None
         else:
             if os.getenv('SHELL') == '/bin/tcsh' or os.getenv('SHELL') == '/bin/csh':
