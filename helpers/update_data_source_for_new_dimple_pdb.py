@@ -1,5 +1,6 @@
 import os,sys
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
+import glob
 
 from XChemUtils import parse
 import XChemDB

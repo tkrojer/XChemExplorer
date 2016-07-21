@@ -1,9 +1,6 @@
 import os, sys, glob
 from datetime import datetime
 from PyQt4 import QtGui, QtCore
-#from PyQt4.QtCore import QThread, SIGNAL
-
-# last commited: 03/12/2015
 
 import time
 import pickle
@@ -306,8 +303,6 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
                     '\n'
                     'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc) +
-                    '\n'
-                    'source $XChemExplorer_DIR/setup-scripts/xce.setup-sh\n'
                     '\n'
                     +ccp4_scratch+
                     '\n'
@@ -801,8 +796,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                 if isinstance(entry[6],dict):
                     try:
                         ranking=entry[6]['DataProcessingScore']
-                        if isinstance(ranking,float):
-                            select_stage_three_list.append([index,ranking])
+                        select_stage_three_list.append([index,ranking])
                     except KeyError:
                         try:
                             ranking = (float(entry[6]['DataProcessingUniqueReflectionsOverall'])*\
@@ -823,7 +817,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         for n,entry in enumerate(self.data_collection_dict[xtal]):
             if entry[0]=='logfile':
                 if entry[7]==best_file_index:
-#                    print entry
                     self.data_collection_dict[xtal][n][8]=True
                     # if this was just a rescoring excersise, the files are already in the project directory
                     # hence we want all the links to be reset immediately
@@ -1117,8 +1110,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     if aimless_index_list==[]:
                         aimless_index=0
                     else:
-#                        aimless_index=max(aimless_index_list)
-                        aimless_index=max(aimless_index_list)+1
+                        aimless_index=max(aimless_index_list)
 
                     ##########################################################################
                     # aimless & Dimple information
