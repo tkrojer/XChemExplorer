@@ -215,7 +215,7 @@ class run_pandda_export(QtCore.QThread):
 
 class run_pandda_analyse(QtCore.QThread):
 
-    def __init__(self,pandda_params):
+    def __init__(self,pandda_params,xce_logfile):
         QtCore.QThread.__init__(self)
         self.data_directory=pandda_params['data_dir']
         self.panddas_directory=pandda_params['out_dir']
@@ -232,6 +232,7 @@ class run_pandda_analyse(QtCore.QThread):
         self.max_new_datasets=pandda_params['max_new_datasets']
         self.grid_spacing=pandda_params['grid_spacing']
         self.filter_pdb=pandda_params['filter_pdb']
+        self.Logfile=XChemLog.updateLog(xce_logfile)
 
     def run(self):
 
@@ -294,17 +295,17 @@ class run_pandda_analyse(QtCore.QThread):
                     '\n'
                     )
 
-            print '==> XCE: running pandda.analyse with the following command:\n\n',Cmds
+            self.Logfile.insert('running pandda.analyse with the following command:\n'+Cmds)
 
             f = open('pandda.sh','w')
             f.write(Cmds)
             f.close()
             if self.submit_mode=='local machine':
-                print '==> running PANDDA on local machine'
+                self.Logfile.insert('running PANDDA on local machine')
                 os.system('chmod +x pandda.sh')
                 os.system('./pandda.sh &')
             else:
-                print '==> running PANDDA on cluster, using qsub...'
+                self.Logfile.insert('running PANDDA on cluster, using qsub...')
                 os.system('qsub pandda.sh')
 
 class check_if_pandda_can_run:
