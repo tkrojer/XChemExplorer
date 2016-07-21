@@ -66,6 +66,10 @@ class update_datasource_from_file_system(QtCore.QThread):
                 os.system('/bin/rm '+xtal+'.free.mtz')      # remove possible broken link
                 if os.path.isfile(os.path.join(dimple_path,'prepared2.mtz')):
                     os.symlink(os.path.join(dimple_path,'prepared2.mtz'),xtal+'.free.mtz')
+                    db_dict['RefinementMTZfree']=xtal+'.free.mtz'
+                elif os.path.isfile(os.path.join(dimple_path,'prepared.mtz')):
+                    os.symlink(os.path.join(dimple_path,'prepared.mtz'),xtal+'.free.mtz')
+                    db_dict['RefinementMTZfree']=xtal+'.free.mtz'
             if os.path.isfile('refine.mtz'):
                 if sample_dict['RefinementOutcome']=='None' or sample_dict['RefinementOutcome']=='':
                     refinement_in_progress=False
@@ -84,6 +88,7 @@ class update_datasource_from_file_system(QtCore.QThread):
                                 if len(line.split()) >= 1:
                                     db_dict['CompoundSMILES']=line.split()[0]
                                     db_dict['CompoundCode']=smiles[smiles.rfind('/')+1:smiles.rfind('.')]
+                                    compoundID=db_dict['CompoundCode']
                                     break
 
             for file in glob.glob('*'):
