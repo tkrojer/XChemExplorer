@@ -26,13 +26,15 @@ if __name__=='__main__':
         db_dict['DimpleRfree']=pdb['Rfree']
         db_dict['RefinementOutcome']='1 - Analysis Pending'
         db_dict['RefinementSpaceGroup']=pdb['SpaceGroup']
-        if os.path.isfile(os.path.join(inital_model_directory,xtal,'dimple','dimple_rerun_on_selected_file','dimple','prepared2.mtz')):
+        if not os.path.isfile(xtal+'.free.mtz'):
             os.chdir(os.path.join(inital_model_directory,xtal))
-            if os.path.isfile(xtal+'.free.mtz'):
-                os.system('/bin/rm '+xtal+'.free.mtz')
-            os.symlink(os.path.join('dimple','dimple_rerun_on_selected_file','dimple','prepared2.mtz'),xtal+'.free.mtz')
-            db_dict['RefinementMTZfree']=xtal+'.free.mtz'
-
+            os.system('/bin/rm '+xtal+'.free.mtz')
+            if os.path.isfile(os.path.join(inital_model_directory,xtal,'dimple','dimple_rerun_on_selected_file','dimple','prepared2.mtz')):
+                os.symlink(os.path.join('dimple','dimple_rerun_on_selected_file','dimple','prepared2.mtz'),xtal+'.free.mtz')
+                db_dict['RefinementMTZfree']=xtal+'.free.mtz'
+            elif os.path.isfile(os.path.join(inital_model_directory,xtal,'dimple','dimple_rerun_on_selected_file','dimple','prepared.mtz')):
+                os.symlink(os.path.join('dimple','dimple_rerun_on_selected_file','dimple','prepared.mtz'),xtal+'.free.mtz')
+                db_dict['RefinementMTZfree']=xtal+'.free.mtz'
 
         # if no refinement was carried out yet, then we also want to link the dimple files to refine.pdb/refine.log
         # so that we can look at them with the COOT plugin
