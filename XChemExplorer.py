@@ -842,7 +842,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('max_new_datasets'))
         self.pandda_max_new_datasets_entry = QtGui.QLineEdit()
-        self.pandda_max_new_datasets_entry.setText('300')
+        self.pandda_max_new_datasets_entry.setText('200')
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_max_new_datasets_entry)
 
         self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('grid_spacing (default=0.6; higher values speed up calculations, but maps might be less pretty)'))
