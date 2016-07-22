@@ -803,8 +803,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                 if isinstance(entry[6],dict):
                     try:
                         ranking=entry[6]['DataProcessingScore']
-                        print xtal
-                        print entry
+#                        print xtal
+#                        print entry
                         if isinstance(ranking,float):
                             select_stage_three_list.append([index,ranking])
                     except KeyError:
@@ -834,6 +834,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     run=entry[2]
                     autoproc=entry[4]
                     db_dict=entry[6]
+                    print entry
                     path_to_logfile=db_dict['DataProcessingPathToLogfile']
                     path_to_mtzfile=db_dict['DataProcessingPathToMTZfile']
                     mtz_filename=db_dict['DataProcessingMTZfileName']
