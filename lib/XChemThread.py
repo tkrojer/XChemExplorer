@@ -834,22 +834,28 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     run=entry[2]
                     autoproc=entry[4]
                     db_dict=entry[6]
-                    print entry
-                    path_to_logfile=db_dict['DataProcessingPathToLogfile']
-                    path_to_mtzfile=db_dict['DataProcessingPathToMTZfile']
-                    mtz_filename=db_dict['DataProcessingMTZfileName']
-                    log_filename=db_dict['DataProcessingLOGfileName']
-                    # first check if folders and files exist
-                    # since user might do this before data are actually copied over
-                    if os.path.isdir(os.path.join(self.initial_model_directory,xtal,'autoprocessing',visit+'-'+run+autoproc)):
-                        db_dict['DataProcessingAutoAssigned']='False'
-                        os.chdir(os.path.join(self.initial_model_directory,xtal))
-                        # first remove old links
-                        os.system('/bin/rm '+xtal+'.mtz')
-                        os.system('/bin/rm '+xtal+'.log')
-                        # make new links
-                        os.symlink(os.path.join(path_to_logfile,log_filename),xtal+'.log')
-                        os.symlink(os.path.join(path_to_mtzfile,mtz_filename),xtal+'.mtz')
+                    try:
+                        path_to_logfile=db_dict['DataProcessingPathToLogfile']
+                        path_to_mtzfile=db_dict['DataProcessingPathToMTZfile']
+                        mtz_filename=db_dict['DataProcessingMTZfileName']
+                        log_filename=db_dict['DataProcessingLOGfileName']
+                        # first check if folders and files exist
+                        # since user might do this before data are actually copied over
+                        if os.path.isdir(os.path.join(self.initial_model_directory,xtal,'autoprocessing',visit+'-'+run+autoproc)):
+                            db_dict['DataProcessingAutoAssigned']='False'
+                            os.chdir(os.path.join(self.initial_model_directory,xtal))
+                            # first remove old links
+                            os.system('/bin/rm '+xtal+'.mtz')
+                            os.system('/bin/rm '+xtal+'.log')
+                            # make new links
+                            os.symlink(os.path.join(path_to_logfile,log_filename),xtal+'.log')
+                            os.symlink(os.path.join(path_to_mtzfile,mtz_filename),xtal+'.mtz')
+                    # it happened that XCE gave a KeyError because DataProcessingMTZfileName does not exist
+                    # i.e. there was an autoPROC run with an aimless logfile and stats in it and also an aimless.mtz file
+                    # but truncate-unique.mtz did not exist because the file was really rubbish and so XCE
+                    # did not update the respective key
+                    except KeyError:
+                        break
                 else:
                     self.data_collection_dict[xtal][n][8]=False
 
