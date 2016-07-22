@@ -1115,7 +1115,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     if aimless_index_list==[]:
                         aimless_index=0
                     else:
-                        aimless_index=max(aimless_index_list)
+                        aimless_index=max(aimless_index_list)+1
 
                     ##########################################################################
                     # aimless & Dimple information
