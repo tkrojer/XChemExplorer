@@ -1117,6 +1117,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     else:
                         aimless_index=max(aimless_index_list)+1
 
+                    print 'index:',aimless_index
+
                     ##########################################################################
                     # aimless & Dimple information
                     # first for xia2 runs
