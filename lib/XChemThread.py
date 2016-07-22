@@ -309,6 +309,8 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     '\n'
                     'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc) +
                     '\n'
+                    'source $XChemExplorer_DIR/setup-scripts/xce.setup-sh\n'
+                    '\n'
                     +ccp4_scratch+
                     '\n'
                     'dimple --no-cleanup %s %s %s %s dimple\n' %(mtzin,ref_pdb,ref_mtz,ref_cif) +
@@ -801,7 +803,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                 if isinstance(entry[6],dict):
                     try:
                         ranking=entry[6]['DataProcessingScore']
-                        select_stage_three_list.append([index,ranking])
+                        if isinstance(ranking,float):
+                            select_stage_three_list.append([index,ranking])
                     except KeyError:
                         try:
                             ranking = (float(entry[6]['DataProcessingUniqueReflectionsOverall'])*\
@@ -1117,8 +1120,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     else:
                         aimless_index=max(aimless_index_list)+1
 
-                    print 'index:',aimless_index
-
                     ##########################################################################
                     # aimless & Dimple information
                     # first for xia2 runs
@@ -1180,7 +1181,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             # Note: [8]: best automatically selected file=True
                             #       [9]: the moment the user changes the selection manully this changes to True
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False,False])
-                            aimless_index_list.append(aimless_index)
                             aimless_index+=1
 
 
@@ -1241,7 +1241,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 db_dict['DataProcessingRfree'] = '999'
                             db_dict['DataProcessingProgram']=autoproc
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False,False])
-                            aimless_index_list.append(aimless_index)
                             aimless_index+=1
 
                     # then exactly the same for autoPROC
@@ -1299,7 +1298,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 db_dict['DataProcessingRfree'] = '999'
                             db_dict['DataProcessingProgram']=autoproc
                             self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False,False])
-                            aimless_index_list.append(aimless_index)
                             aimless_index+=1
 
 
