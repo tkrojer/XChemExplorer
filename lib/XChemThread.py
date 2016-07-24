@@ -1,3 +1,5 @@
+# last change: 24/07/2016 - 17:29
+
 import os, sys, glob
 from datetime import datetime
 from PyQt4 import QtGui, QtCore
