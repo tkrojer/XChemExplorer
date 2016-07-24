@@ -40,6 +40,11 @@ class update_datasource_from_file_system(QtCore.QThread):
         all_samples_in_datasource=self.db.get_all_samples_in_data_source_as_list()
 
         for directory in sorted(glob.glob(os.path.join(self.initial_model_directory,'*'))):
+            try:
+                os.chdir(directory)
+            except OSError:
+                # this could happen if the user accidentaly left a file in the project directory
+                continue
             xtal=directory[directory.rfind('/')+1:]
             if xtal not in all_samples_in_datasource:
                 print '==> XCE inserting '+xtal+' into data source'
@@ -47,7 +52,6 @@ class update_datasource_from_file_system(QtCore.QThread):
                 all_samples_in_datasource.append(xtal)
             compoundID=str(self.db.get_value_from_field(xtal,'CompoundCode')[0])
             db_dict={}
-            os.chdir(directory)
             sample_dict=self.db.get_db_dict_for_sample(xtal)
 
             dimple_path=''  # will be set to correct path if dimple.pdb is present;
