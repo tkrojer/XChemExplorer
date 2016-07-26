@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# last edited: 26/07/2016
 
 import sys
 import os
@@ -1040,9 +1040,15 @@ class external_software:
         FNULL = open(os.devnull, 'w')
 
         try:
-            subprocess.call(['qstat'], stdout=FNULL, stderr=subprocess.STDOUT)
-            self.available_programs['qsub']=True
+#            subprocess.call(['qstat'], stdout=FNULL, stderr=subprocess.STDOUT)
+            p = subprocess.Popen('qstat', shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
             status='found'
+            for line in p.stdout:
+                if 'symbol lookup error:' in line:
+                    self.available_programs['qsub']=False
+                    status='not found'
+            if status == 'found':
+                self.available_programs['qsub']=True
         except OSError:
             self.available_programs['qsub']=False
             status='not found'

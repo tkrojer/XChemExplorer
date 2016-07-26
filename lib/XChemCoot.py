@@ -1,3 +1,5 @@
+# last edited: 26/07/2016
+
 import gobject
 import sys
 import os
@@ -767,24 +769,6 @@ class GUI(object):
                 coot.set_show_symmetry_molecule(item,1) # show symm for model
 
         #########################################################################################
-        # check for PANDDAs EVENT maps
-#        for map in glob.glob(os.path.join(self.project_directory,self.xtalID,'*')):
-#            if 'event' in str(map) and '.ccp4' in str(map):
-#                occupancy=map[map.find('occupancy')+10:map.rfind('_')]
-#                coot.handle_read_ccp4_map((map),0)
-#                for imol in coot_utils_XChem.molecule_number_list():
-#                    if map in coot.molecule_name(imol):
-#                        coot.set_contour_level_absolute(imol,float(occupancy))
-#                        coot.set_last_map_colour(0.4,0,0.4)
-        if os.path.isfile(self.event_map):
-            coot.handle_read_ccp4_map((self.event_map),0)
-            for imol in coot_utils_XChem.molecule_number_list():
-                if self.event_map in coot.molecule_name(imol):
-                    coot.set_contour_level_absolute(imol,0.5)
-                    coot.set_last_map_colour(0.4,0,0.4)
-
-
-        #########################################################################################
         # read fofo maps
         # - read ccp4 map: 0 - 2fofc map, 1 - fofc.map
         # read 2fofc map last so that one can change its contour level
@@ -805,6 +789,25 @@ class GUI(object):
                     elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.mtz')):
                         os.symlink('dimple.mtz',self.mtz_style)
             coot.auto_read_make_and_draw_maps(os.path.join(self.project_directory,self.xtalID,self.mtz_style))
+
+        #########################################################################################
+        # check for PANDDAs EVENT maps
+#        for map in glob.glob(os.path.join(self.project_directory,self.xtalID,'*')):
+#            if 'event' in str(map) and '.ccp4' in str(map):
+#                occupancy=map[map.find('occupancy')+10:map.rfind('_')]
+#                coot.handle_read_ccp4_map((map),0)
+#                for imol in coot_utils_XChem.molecule_number_list():
+#                    if map in coot.molecule_name(imol):
+#                        coot.set_contour_level_absolute(imol,float(occupancy))
+#                        coot.set_last_map_colour(0.4,0,0.4)
+        if os.path.isfile(self.event_map):
+            coot.handle_read_ccp4_map((self.event_map),0)
+            for imol in coot_utils_XChem.molecule_number_list():
+                if self.event_map in coot.molecule_name(imol):
+                    coot.set_contour_level_in_sigma(imol,2)
+#                    coot.set_contour_level_absolute(imol,0.5)
+                    coot.set_last_map_colour(0.4,0,0.4)
+
 
 #        #########################################################################################
 #        # update Ligand Confidence combobox

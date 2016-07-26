@@ -1,3 +1,5 @@
+# last edited: 26/07/2016
+
 import os, sys, glob
 from datetime import datetime
 
@@ -1219,7 +1221,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def datasource_menu_update_datasource(self):
-        self.work_thread=XChemThread.update_datasource_from_file_system(self.initial_model_directory,os.path.join(self.database_directory,self.data_source_file))
+        self.work_thread=XChemThread.update_datasource_from_file_system(self.initial_model_directory,os.path.join(self.database_directory,self.data_source_file),self.panddas_directory,self.xce_logfile)
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)

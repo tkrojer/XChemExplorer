@@ -1,3 +1,5 @@
+# last edited: 26/07/2016
+
 import os, sys, glob
 from datetime import datetime
 from PyQt4 import QtGui, QtCore
@@ -186,9 +188,11 @@ class run_pandda_export(QtCore.QThread):
                 db_dict['PANDDA_site_initial_model']    =   pandda_model
                 db_dict['PANDDA_site_initial_mtz']      =   inital_mtz
                 db_dict['PANDDA_site_spider_plot']      =   ''
-                db_dict['RefinementOutcome']            =   '2 - PANDDA model'
+#                db_dict['RefinementOutcome']            =   '2 - PANDDA model'
 
                 self.db.update_insert_panddaTable(sampleID,db_dict)
+                # this is necessary, otherwise RefinementOutcome will be reset for samples that are actually already in refinement
+                self.db.execute_statement("update panddaTable set RefinementOutcome = '2 - PANDDA model' where CrystalName is '%s' and RefinementOutcome is null" %sampleID)
                 self.db.execute_statement("update mainTable set RefinementOutcome = '2 - PANDDA model' where CrystalName is '%s' and (RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending')" %sampleID)
                 self.db.execute_statement("update mainTable set DimplePANDDAhit = 'True' where CrystalName is '%s'" %sampleID)
                 progress += progress_step

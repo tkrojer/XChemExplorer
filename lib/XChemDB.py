@@ -1,3 +1,5 @@
+# last edited: 26/07/2016
+
 import sqlite3
 import os,sys
 import csv
@@ -721,6 +723,7 @@ class data_source:
                 "where RefinementOutcome is %s;" %outcome
                 )
 
+        print sqlite
         cursor.execute(sqlite)
 
         tmp = cursor.fetchall()

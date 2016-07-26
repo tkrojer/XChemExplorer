@@ -1,4 +1,4 @@
-# last edited: 25/07/2016 - 13:27
+# last edited: 26/07/2016
 
 import os, sys, glob
 from datetime import datetime
@@ -21,16 +21,21 @@ from XChemUtils import mtztools
 from XChemUtils import helpers
 from XChemUtils import reference
 import XChemDB
+import XChemLog
 
 
 class update_datasource_from_file_system(QtCore.QThread):
-    def __init__(self,initial_model_directory,datasource):
+    def __init__(self,initial_model_directory,datasource,panddas_directory,xce_logfile):
         QtCore.QThread.__init__(self)
         self.initial_model_directory=initial_model_directory
         self.datasource=datasource
         self.db=XChemDB.data_source(self.datasource)
+        self.panddas_directory=panddas_directory
+        self.Logfile=XChemLog.updateLog(xce_logfile)
 
     def run(self):
+        self.Logfile.insert('new project directory: '+self.initial_model_directory)
+        self.Logfile.insert('updating data source from file system')
         progress_step=1
         if len(glob.glob(os.path.join(self.initial_model_directory,'*'))) != 0:
             progress_step=100/float(len(glob.glob(os.path.join(self.initial_model_directory,'*'))))
@@ -49,7 +54,7 @@ class update_datasource_from_file_system(QtCore.QThread):
                 continue
             xtal=directory[directory.rfind('/')+1:]
             if xtal not in all_samples_in_datasource:
-                print '==> XCE inserting '+xtal+' into data source'
+                self.Logfile.insert('inserting '+xtal+' into data source')
                 self.db.execute_statement("insert into mainTable (CrystalName) values ('%s');" %xtal)
                 all_samples_in_datasource.append(xtal)
             compoundID=str(self.db.get_value_from_field(xtal,'CompoundCode')[0])
@@ -136,11 +141,28 @@ class update_datasource_from_file_system(QtCore.QThread):
                 self.db.update_data_source(xtal,db_dict)
 
             # also need to update PANDDA table...
-
+            pandda_models=self.db.execute_statement("select CrystalName,PANDDA_site_index,PANDDA_site_spider_plot,PANDDA_site_event_map from panddaTable where CrystalName='%s'" %xtal)
+            if not pandda_models == []:
+                for entry in pandda_models:
+                    db_pandda_dict={}
+                    db_pandda_dict['PANDDA_site_index']=entry[1]
+                    db_pandda_dict['PANDDApath']=self.panddas_directory
+                    if entry[3] != None:
+                        event_map=os.path.join(self.initial_model_directory,xtal,entry[3].split('/')[len(entry[3].split('/'))-1])
+                        if os.path.isfile(event_map):
+                            db_pandda_dict['PANDDA_site_event_map']=event_map
+                    if entry[2] != None:
+                        spider_plot=os.path.join(self.initial_model_directory,xtal,entry[2].split('/')[len(entry[2].split('/'))-3],entry[2].split('/')[len(entry[2].split('/'))-2],entry[2].split('/')[len(entry[2].split('/'))-1])
+                        if os.path.isfile(spider_plot):
+                            db_pandda_dict['PANDDA_site_spider_plot']=spider_plot
+                            db_pandda_dict['RefinementOutcome']='3 - In Refinement'     # just in case; presence of a spider plot definitely signals that refinement happened
+                    self.Logfile.insert('updating panddaTable for xtal: %s, site: %s' %(entry[0],entry[1]))
+                    self.db.update_insert_panddaTable(xtal,db_pandda_dict)
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
+        self.Logfile.insert('datasource update finished')
 
 class create_png_and_cif_of_compound(QtCore.QThread):
     def __init__(self,external_software,initial_model_directory,compound_list,database_directory,data_source_file,todo,ccp4_scratch_directory):

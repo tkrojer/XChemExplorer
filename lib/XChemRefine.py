@@ -1,3 +1,5 @@
+# last edited: 26/07/2016
+
 import pygtk, gtk, pango
 import os
 import glob
@@ -140,7 +142,13 @@ class Refine(object):
         occupancy_refinement=''
         if external_software['giant.create_occupancy_params']:
             os.chdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
-            os.system("giant.create_occupancy_params pdb=in.pdb refmac_occ_out='refmac_refine.params'")
+            cmd = ( '#!'+os.getenv('SHELL')+'\n'
+                    'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
+                    'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','xce.setup-sh')+'\n'
+                    'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
+                    "giant.create_occupancy_params pdb=in.pdb refmac_occ_out='refmac_refine.params'\n"  )
+#            os.system("giant.create_occupancy_params pdb=in.pdb refmac_occ_out='refmac_refine.params'")
+            os.system(cmd)
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refmac_refine.params')):
             occupancy_refinement='@refmac_refine.params\n'
 
