@@ -35,10 +35,15 @@ class run_pandda_export(QtCore.QThread):
                             'TWIN':             ''    }
 
     def run(self):
-        self.import_samples_into_datasouce()
+
         if not self.update_datasource_only:
             self.export_models()
+
+        self.import_samples_into_datasouce()
+
+        if not self.update_datasource_only:
             self.refine_exported_models()
+
 
     def refine_exported_models(self):
 
