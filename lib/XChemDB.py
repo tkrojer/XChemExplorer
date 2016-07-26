@@ -704,7 +704,7 @@ class data_source:
                 " panddaTable.PANDDA_site_confidence "
                 "from mainTable inner join panddaTable on mainTable.CrystalName = panddaTable.CrystalName "
                 "where panddaTable.PANDDA_site_index is '%s'" %pandda_site+
-#                " and panddaTable.PANDDA_site_ligand_placed is 'True'"
+                " and panddaTable.PANDDA_site_ligand_placed is 'True'"
                 " and panddaTable.RefinementOutcome is %s;" %outcome
                 )
         else:
