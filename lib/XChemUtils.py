@@ -16,6 +16,7 @@ from rdkit.Chem import Draw
 
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 import XChemDB
+import XChemLog
 
 
 class process:
@@ -1020,22 +1021,14 @@ class queue:
 
 class external_software:
 
-    def __init__(self):
-#        self.available_programs={
-#            'qsub':                     False,
-#            'refmac5':                  False,
-#            'phenix.molprobity':        False,
-#            'mmtbx.validate_ligands':   False,
-#            'obabel':                   False,
-#            'acedrg':                   False
-#        }
+    def __init__(self,xce_logfile):
 
         self.available_programs = {}
-
+        self.Logfile=XChemLog.updateLog(xce_logfile)
 
     def check(self):
 
-        print 'Searching for external software:'
+        self.Logfile.insert('Searching for external software...')
 
         FNULL = open(os.devnull, 'w')
 
@@ -1046,13 +1039,26 @@ class external_software:
             for line in p.stdout:
                 if 'symbol lookup error:' in line:
                     self.available_programs['qsub']=False
+                    self.available_programs['qsub_array']=False
                     status='not found'
+                    array_status='not found'
             if status == 'found':
                 self.available_programs['qsub']=True
+                if os.getcwd().startswith('/dls'):
+                    self.available_programs['qsub_array']=True
+                    array_status='found'
+                else:
+                    self.available_programs['qsub_array']=False
+                    array_status='not found'
         except OSError:
             self.available_programs['qsub']=False
+            self.available_programs['qsub_array']=False
             status='not found'
-        print '{0:50} {1:10}'.format('-checking for qsub:', status)
+            array_status='not found'
+        self.Logfile.insert('{0:50} {1:10}'.format('-checking for qsub:', status))
+#        print '{0:50} {1:10}'.format('-checking for qsub:', status)
+        if os.getcwd().startswith('/dls'):
+            self.Logfile.insert('{0:50} {1:10}'.format('-checking for array qsub:', array_status))
 
         try:
             subprocess.call(['refmac5','end'], stdout=FNULL, stderr=subprocess.STDOUT)
@@ -1061,7 +1067,7 @@ class external_software:
         except OSError:
             self.available_programs['refmac5']=False
             status='not found'
-        print '{0:50} {1:10}'.format('-checking for refmac5:', status)
+        self.Logfile.insert('{0:50} {1:10}'.format('-checking for refmac5:', status))
 
         try:
             subprocess.call(['phenix.molprobity'], stdout=FNULL, stderr=subprocess.STDOUT)
@@ -1070,7 +1076,7 @@ class external_software:
         except OSError:
             self.available_programs['phenix.molprobity']=False
             status='not found'
-        print '{0:50} {1:10}'.format('-checking for phenix.molprobity:', status)
+        self.Logfile.insert('{0:50} {1:10}'.format('-checking for phenix.molprobity:', status))
 
         try:
             subprocess.call(['phenix.find_tls_groups'], stdout=FNULL, stderr=subprocess.STDOUT)
@@ -1079,7 +1085,7 @@ class external_software:
         except OSError:
             self.available_programs['phenix.find_tls_groups']=False
             status='not found'
-        print '{0:50} {1:10}'.format('-checking for phenix.find_tls_groups:', status)
+        self.Logfile.insert('{0:50} {1:10}'.format('-checking for phenix.find_tls_groups:', status))
 
         try:
             subprocess.call(['mmtbx.validate_ligands'], stdout=FNULL, stderr=subprocess.STDOUT)
@@ -1088,7 +1094,7 @@ class external_software:
         except OSError:
             self.available_programs['mmtbx.validate_ligands']=False
             status='not found'
-        print '{0:50} {1:10}'.format('-checking for mmtbx.validate_ligands:', status)
+        self.Logfile.insert('{0:50} {1:10}'.format('-checking for mmtbx.validate_ligands:', status))
 
         try:
             subprocess.call(['acedrg'], stdout=FNULL, stderr=subprocess.STDOUT)
@@ -1098,7 +1104,7 @@ class external_software:
         except OSError:
             self.available_programs['acedrg']=False
             status='not found'
-        print '{0:50} {1:10}'.format('-checking for acedrg:', status)
+        self.Logfile.insert('{0:50} {1:10}'.format('-checking for acedrg:', status))
 
         try:
             subprocess.call(['giant.create_occupancy_params'], stdout=FNULL, stderr=subprocess.STDOUT)
@@ -1107,8 +1113,7 @@ class external_software:
         except OSError:
             self.available_programs['giant.create_occupancy_params']=False
             status='not found'
-        print '{0:50} {1:10}'.format('-checking for giant.create_occupancy_params:', status)
-
+        self.Logfile.insert('{0:50} {1:10}'.format('-checking for giant.create_occupancy_params:', status))
 
 
         return self.available_programs

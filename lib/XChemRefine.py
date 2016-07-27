@@ -8,8 +8,10 @@ import getpass
 #sys.path.append(os.path.join(os.getenv('CCP4'),'lib/python2.7/site-packages'))
 #import coot
 #sys.path.append('/usr/local/coot/SoakProc/lib')
-#sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 #import coot_utils_XChem
+
+sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
+import XChemLog
 
 
 class Refine(object):
@@ -40,13 +42,14 @@ class Refine(object):
         return Serial
 
 
-    def RunRefmac(self,Serial,RefmacParams,external_software):
+    def RunRefmac(self,Serial,RefmacParams,external_software,xce_logfile):
+        Logfile=XChemLog.updateLog(xce_logfile)
         Serial=str(Serial)
 
         # first check if refinement is ongoing and exit if yes
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'REFINEMENT_IN_PROGRESS')):
 #            coot.info_dialog('*** REFINEMENT IN PROGRESS ***')
-            print '==> XCE: cannot start new refinement - *** REFINEMENT IN PROGRESS ***'
+            Logfile.insert('cannot start new refinement for %s: *** REFINEMENT IN PROGRESS ***' %self.xtalID)
             return None
 
         #######################################################
@@ -56,7 +59,7 @@ class Refine(object):
         elif os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz')):
             RefmacParams['HKLIN']='HKLIN '+os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz \\\n')
         else:
-            print '\n==> XCE: cannot find HKLIN for refinement; aborting...'
+            Logfile.insert('%s: cannot find HKLIN for refinement; aborting...' %self.xtalID)
             return None
         RefmacParams['HKLOUT']='HKLOUT '+os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refine_'+Serial+'.mtz \\\n')
 
@@ -290,10 +293,13 @@ class Refine(object):
 
         os.chdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
 #        os.system('ssh artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(self.ProjectPath,self.xtalID,Serial))
+        Logfile.insert('changing directory to %s' %(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial)))
         if external_software['qsub']:
+            Logfile.insert('starting refinement on cluster')
             os.system('qsub refmac.csh')
         else:
             os.system('chmod +x refmac.csh')
+            Logfile.insert('starting refinement on local machine')
             os.system('./refmac.csh &')
 #            if '/work/' in os.getcwd():
 #            os.system('ssh artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(self.ProjectPath,self.xtalID,Serial))

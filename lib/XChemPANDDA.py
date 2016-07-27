@@ -20,7 +20,7 @@ class run_pandda_export(QtCore.QThread):
         self.db=XChemDB.data_source(self.datasource)
         self.db.create_missing_columns()
         self.db_list=self.db.get_empty_db_dict()
-        self.external_software=XChemUtils.external_software().check()
+        self.external_software=XChemUtils.external_software(xce_logfile).check()
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.update_datasource_only=update_datasource_only
 

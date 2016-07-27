@@ -39,11 +39,12 @@ class GUI(object):
         print 'setting',self.settings
 #        self.refine_model_directory=self.settings['refine_model_directory']
         self.database_directory=self.settings['database_directory']
+        self.xce_logfile=self.settings['xce_logfile']
         self.data_source=self.settings['data_source']
         self.db=XChemDB.data_source(self.data_source)
 
         # checking for external software packages
-        self.external_software=XChemUtils.external_software().check()
+        self.external_software=XChemUtils.external_software(self.xce_logfile).check()
 
 #        self.selection_criteria =   {   'Show All Datasets':                'RefinementPDB_latest is not null',
 #                                        'Show Analysis Pending Only':       "RefinementOutcome='Analysis Pending'",
@@ -870,7 +871,7 @@ class GUI(object):
 
         #######################################################
         # run REFMAC
-        self.Refine.RunRefmac(self.Serial,self.RefmacParams,self.external_software)
+        self.Refine.RunRefmac(self.Serial,self.RefmacParams,self.external_software,self.xce_logfile)
 
         self.index+=1
         if self.index >= len(self.Todo):

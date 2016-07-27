@@ -188,7 +188,7 @@ class XChemExplorer(QtGui.QApplication):
         # checking for external software packages
         #
 
-        self.external_software=external_software().check()
+        self.external_software=external_software(self.xce_logfile).check()
 
         # start GUI
 

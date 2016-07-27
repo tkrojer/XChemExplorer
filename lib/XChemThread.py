@@ -399,6 +399,7 @@ class start_COOT(QtCore.QThread):
         QtCore.QThread.__init__(self)
         self.settings=settings
 
+
     def run(self):
         cwd=os.getcwd()
 #        pickle.dump(self.settings,open(os.path.join(cwd,'XChemExplorer_settings.pkl'),'wb'))
