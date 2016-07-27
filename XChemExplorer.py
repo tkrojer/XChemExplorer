@@ -1,4 +1,4 @@
-# last edited: 26/07/2016
+# last edited: 27/07/2016
 
 import os, sys, glob
 from datetime import datetime
@@ -204,7 +204,7 @@ class XChemExplorer(QtGui.QApplication):
 
         # GUI setup
         self.window=QtGui.QWidget()
-        self.window.setGeometry(0,0, 800,600)
+        self.window.setGeometry(0,0, 800,500)
         self.window.setWindowTitle("XChemExplorer")
         self.center_main_window()
 
@@ -1987,6 +1987,8 @@ class XChemExplorer(QtGui.QApplication):
             self.update_log.insert('trying to create cif and pdb files for '+str(len(compound_list))+' compounds using ACEDRG...')
             if self.external_software['qsub']:
                 self.update_log.insert('will try sending '+str(len(compound_list))+' jobs to your computer cluster!')
+            elif self.external_software['qsub_array']:
+                self.update_log.insert('will try sending '+str(len(compound_list))+' jobs as part of an ARRAY job to your computer cluster!')
             else:
                 self.update_log.insert('apparently no cluster available, so will run '+str(len(compound_list))+' sequential jobs on one core of your local machine.')
                 self.update_log.insert('this could take a while...')
@@ -1997,7 +1999,8 @@ class XChemExplorer(QtGui.QApplication):
                                                                         self.database_directory,
                                                                         self.data_source_file,
                                                                         todo,
-                                                                        self.ccp4_scratch_directory )
+                                                                        self.ccp4_scratch_directory,
+                                                                        self.xce_logfile    )
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)

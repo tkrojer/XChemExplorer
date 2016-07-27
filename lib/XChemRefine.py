@@ -1,4 +1,4 @@
-# last edited: 26/07/2016
+# last edited: 27/07/2016
 
 import pygtk, gtk, pango
 import os
@@ -287,6 +287,7 @@ class Refine(object):
             '\n'
            )
 
+        Logfile.insert('writing refinement shell script to'+os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refmac.csh'))
         cmd = open(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refmac.csh'),'w')
         cmd.write(refmacCmds)
         cmd.close()

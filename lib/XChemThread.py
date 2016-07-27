@@ -1,4 +1,4 @@
-# last edited: 26/07/2016
+# last edited: 27/07/2016
 
 import os, sys, glob
 from datetime import datetime
@@ -165,7 +165,7 @@ class update_datasource_from_file_system(QtCore.QThread):
         self.Logfile.insert('datasource update finished')
 
 class create_png_and_cif_of_compound(QtCore.QThread):
-    def __init__(self,external_software,initial_model_directory,compound_list,database_directory,data_source_file,todo,ccp4_scratch_directory):
+    def __init__(self,external_software,initial_model_directory,compound_list,database_directory,data_source_file,todo,ccp4_scratch_directory,xce_logfile):
         QtCore.QThread.__init__(self)
         self.external_software=external_software
         self.initial_model_directory=initial_model_directory
@@ -174,10 +174,12 @@ class create_png_and_cif_of_compound(QtCore.QThread):
         self.data_source_file=data_source_file
         self.todo=todo
         self.ccp4_scratch_directory=ccp4_scratch_directory
+        self.xce_logfile=xce_logfile
+        self.Logfile=XChemLog.updateLog(xce_logfile)
 
     def run(self):
         # first remove all ACEDRG input scripts in ccp4_scratch directory
-        print '==> XCE: removing all xce_acedrg scripts from',self.ccp4_scratch_directory
+        self.Logfile.insert('removing all xce_acedrg scripts from '+self.ccp4_scratch_directory)
         os.chdir(self.ccp4_scratch_directory)
         os.system('/bin/rm -f xce_acedrg*')
 
@@ -224,31 +226,48 @@ class create_png_and_cif_of_compound(QtCore.QThread):
                                     sampleID,
                                     compoundID,
                                     smiles,
-                                    self.external_software['qsub'],
+                                    self.external_software,
                                     self.database_directory,
                                     self.data_source_file,
                                     self.ccp4_scratch_directory,
-                                    counter )
+                                    counter,
+                                    self.xce_logfile    )
                 counter += 1
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
         # submit array job at Diamond
-        print '==> XCE: created input scripts for '+str(counter)+' ACEDRG jobs in '+self.ccp4_scratch_directory
+        self.Logfile.insert('created input scripts for '+str(counter)+' ACEDRG jobs in '+self.ccp4_scratch_directory)
         os.chdir(self.ccp4_scratch_directory)
+        self.Logfile.insert('changing directory to '+self.ccp4_scratch_directory)
         if counter > 1:
-            Cmds = (
-                    '#PBS -joe -N xce_acedrg_master\n'
-                    './xce_acedrg_$SGE_TASK_ID.sh\n'
-                    )
-            f = open('acedrg_master.sh','w')
-            f.write(Cmds)
-            f.close()
-            print '==> XCE: submitting array job with maximal 100 jobs running on cluster'
-            print '==> XCE: using the following command:'
-            print '         qsub -t 1:%s -tc 100 acedrg_master.sh' %(str(counter))
-            os.system('qsub -t 1:%s -tc 100 acedrg_master.sh' %(str(counter)))
+            if os.getcwd().startswith('/dls'):
+                if self.external_software['qsub_array']:
+                    Cmds = (
+                            '#PBS -joe -N xce_acedrg_master\n'
+                            './xce_acedrg_$SGE_TASK_ID.sh\n'
+                            )
+                    f = open('acedrg_master.sh','w')
+                    f.write(Cmds)
+                    f.close()
+                    self.Logfile.insert('submitting array job with maximal 100 jobs running on cluster')
+                    self.Logfile.insert('using the following command:')
+                    self.Logfile.insert('         qsub -t 1:%s -tc 100 acedrg_master.sh' %(str(counter)))
+                    os.system('qsub -t 1:%s -tc 100 acedrg_master.sh' %(str(counter)))
+                else:
+                    self.Logfile.insert("cannot start ARRAY job: make sure that 'module load global/cluster' is in your .bashrc or .cshrc file")
+            elif self.external_software['qsub']:
+                self.Logfile.insert('submitting %s individual jobs to cluster' %(str(counter)))
+                self.Logfile.insert('WARNING: this could potentially lead to a crash...')
+                for i in range(counter):
+                    self.Logfile.insert('qsub xce_acedrg_%s.sh' %(str(i+1)))
+                    os.system('qsub xce_acedrg_%s.sh' %(str(i+1)))
+            else:
+                self.Logfile.insert('running %s consecutive ACEDRG jobs on your local machine')
+                for i in range(counter):
+                    self.Logfile.insert('starting xce_acedrg_%s.sh' %(str(i+1)))
+                    os.system('./xce_acedrg_%s.sh' %(str(i+1)))
 
         self.emit(QtCore.SIGNAL("finished()"))
 

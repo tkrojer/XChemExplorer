@@ -1,6 +1,3 @@
 unsetenv PYTHONPATH
-setenv PANDDA_TOP /home/npearce/bin/panddas
-setenv PYTHONPATH $PANDDA_TOP/lib-python
-setenv PATH ${PATH}:$PANDDA_TOP/bin
 source /usr/local/ccp4/7.0/ccp4-7.0/setup-scripts/ccp4.setup-csh
 

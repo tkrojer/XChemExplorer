@@ -1,4 +1,4 @@
-# last edited: 26/07/2016
+# last edited: 27/07/2016
 
 import sys
 import os
@@ -200,12 +200,19 @@ class helpers:
     def pil_rdkit_exist(self):
         return self.pil_rdkit_present
 
-    def make_png(self,initial_model_directory,sample,compoundID,smiles,queueing_system_available,database_directory,data_source_file,ccp4_scratch_directory,counter):
+    def make_png(self,initial_model_directory,sample,compoundID,smiles,external_software,database_directory,data_source_file,ccp4_scratch_directory,counter,xce_logfile):
+        Logfile=XChemLog.updateLog(xce_logfile)
 
 #        if not os.path.isfile(os.path.join(initial_model_directory,sample,'compound','ACEDRG_IN_PROGRESS')):
         os.system('touch ACEDRG_IN_PROGRESS')
+
+        header='#!'+os.getenv('SHELL')+'\n'
+        if external_software['qsub']:
+            if not external_software['qsub_array']:
+                header='#PBS -joe -N xce_acedrg\n'
+
         Cmds = (
-                    '#!'+os.getenv('SHELL')+'\n'
+                    header+
                     '\n'
                     'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
                     '\n'
@@ -230,6 +237,7 @@ class helpers:
                     '/bin/rm compound/ACEDRG_IN_PROGRESS\n'
             )
         os.chdir(ccp4_scratch_directory)
+        Logfile.insert('creating ACEDRG shell script for %s,%s in %s' %(sample,compoundID,ccp4_scratch_directory))
         f = open('xce_acedrg_%s.sh' %str(counter),'w')
         f.write(Cmds)
         f.close()
