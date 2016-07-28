@@ -1419,6 +1419,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     continue
 
                 xtal=collected_xtals[collected_xtals.rfind('/')+1:]
+                print 'xtal',xtal
                 protein_name=collected_xtals.split('/')[len(collected_xtals.split('/'))-2]
 
                 # if crystal is not in the data_collection_dict then add a new one
@@ -1434,6 +1435,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                 run_number_list=[]
                 aimless_index_list=[]
                 for runs in sorted(glob.glob(collected_xtals+'/*')):
+                    print 'runs',runs
                     run=runs[runs.rfind('/')+1:]
                     print 'run',run
                     diffraction_image=''
