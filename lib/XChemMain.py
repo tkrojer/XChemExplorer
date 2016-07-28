@@ -52,10 +52,12 @@ def get_challenging_target_and_visit_list(beamline_directory):
             visit_list.append(os.path.realpath(dir))
 
     for visit in visit_list:
-        os.chdir(visit)
+        os.chdir(os.path.join(visit,'processed'))
         for target in glob.glob('*/*'):
             if target not in ['results','README-log','edna-latest.html']:
-                if target not in target_list:
+                if target not in target_list and target.startswith('20160723'):
+                    target_list.append(target)
+                if target not in target_list and target.startswith('Z'):
                     target_list.append(target)
 
 #    # but os.walk is so so slow...

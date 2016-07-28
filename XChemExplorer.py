@@ -1293,7 +1293,8 @@ class XChemExplorer(QtGui.QApplication):
             pickled_settings = pickle.load(open(file_name,"rb"))
             if pickled_settings['beamline_directory'] != self.beamline_directory:
                 self.beamline_directory=pickled_settings['beamline_directory']
-                self.target_list,self.visit_list=XChemMain.get_target_and_visit_list(self.beamline_directory)
+#                self.target_list,self.visit_list=XChemMain.get_target_and_visit_list(self.beamline_directory)
+                self.target_list,self.visit_list=XChemMain.get_challenging_target_and_visit_list(self.beamline_directory)
                 self.settings['beamline_directory']=self.beamline_directory
                 self.populate_target_selection_combobox(self.target_selection_combobox)
 
