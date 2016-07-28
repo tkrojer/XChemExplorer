@@ -1408,6 +1408,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
             visit='b14379-11'
             beamline='i04-1'
             print 'here'
+            print 'visit_dir',visit_directory
 
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
                 # this step is only relevant when several samples are reviewed in one session
