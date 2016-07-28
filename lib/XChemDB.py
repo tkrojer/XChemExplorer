@@ -500,7 +500,7 @@ class data_source:
                 if not str(value).replace(' ','')=='':  # ignore if nothing in csv field
                     value_string+="'"+str(value)+"'"+','
                     column_string+=key+','
-#            print "INSERT INTO panddaTable ("+column_string[:-1]+") VALUES ("+value_string[:-1]+");"
+            print "INSERT INTO panddaTable ("+column_string[:-1]+") VALUES ("+value_string[:-1]+");"
             cursor.execute("INSERT INTO panddaTable ("+column_string[:-1]+") VALUES ("+value_string[:-1]+");")
         connect.commit()
 
