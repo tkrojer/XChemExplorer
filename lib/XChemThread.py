@@ -1404,6 +1404,9 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                 visit=visit_directory.split('/')[5]
                 beamline=visit_directory.split('/')[2]
 
+            # isthereadisk
+            visit='b14379-11'
+            beamline='i04-1'
 
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
                 # this step is only relevant when several samples are reviewed in one session
