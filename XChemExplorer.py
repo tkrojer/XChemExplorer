@@ -1,4 +1,4 @@
-# last edited: 27/07/2016
+# last edited: 28/07/2016, 16:50
 
 import os, sys, glob
 from datetime import datetime
@@ -371,7 +371,9 @@ class XChemExplorer(QtGui.QApplication):
                                     'pandda.inspect',
                                     'Export PANDDA models',
                                     'Show HTML summary',
-                                    'Update datasource with results from pandda.inspect'    ]
+                                    'Update datasource with results from pandda.inspect',
+                                    'cluster datasets',
+                                    'Calculate CC to selected reference mtz file'   ]
 
         frame_panddas_file_task=QtGui.QFrame()
         frame_panddas_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -809,7 +811,7 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_sort_event_combobox)
 
         # crystal form option
-        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('Use specific space group:'))
+        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('Use space group of reference file:'))
         # reference file combobox, label with spg display
         hbox=QtGui.QHBoxLayout()
         self.reference_file_list=self.get_reference_file_list(' ')
@@ -817,23 +819,10 @@ class XChemExplorer(QtGui.QApplication):
         self.populate_reference_combobox(self.pandda_reference_file_selection_combobox)
         self.pandda_reference_file_selection_combobox.activated[str].connect(self.change_pandda_spg_label)
         hbox.addWidget(self.pandda_reference_file_selection_combobox)
-
-#        frame=QtGui.QFrame()
-#        frame.setFrameShape(QtGui.QFrame.StyledPanel)
-#        tmp=QtGui.QVBoxLayout()
         self.pandda_reference_file_spg_label=QtGui.QLabel()
         hbox.addWidget(self.pandda_reference_file_spg_label)
-#        tmp.addWidget(self.pandda_reference_file_spg_label)
-#        frame.setLayout(tmp)
-#        hbox.addWidget(frame)
         self.pandda_analyse_input_params_vbox.addLayout(hbox)
 
-        # run pandda on specific crystalform only
-#        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('Use Specific Crystal Form Only'))
-#        self.pandda_analyse_crystal_from_selection_combobox = QtGui.QComboBox()
-#        self.pandda_analyse_crystal_from_selection_combobox.currentIndexChanged.connect(self.pandda_analyse_crystal_from_selection_combobox_changed)
-##        self.update_pandda_crystal_from_combobox()
-#        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_analyse_crystal_from_selection_combobox)
 
         self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('\n\n\nExpert Parameters (only change if you know what you are doing!):\n'))
 

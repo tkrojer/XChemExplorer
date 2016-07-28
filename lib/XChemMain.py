@@ -1,4 +1,4 @@
-# last edited: 25/07/2016 - 13:27
+# last edited: 28/07/2016 - 16:50
 
 import os,glob
 import sys
@@ -26,7 +26,7 @@ def get_target_and_visit_list(beamline_directory):
     else:
         for dir in glob.glob(beamline_directory+'/*'):
             visit_list.append(os.path.realpath(dir))
-    print 'visit list',visit_list
+
     for visit in visit_list:
         for target in glob.glob(os.path.join(visit,'processed','*')):
             if target[target.rfind('/')+1:] not in ['results','README-log','edna-latest.html']:
