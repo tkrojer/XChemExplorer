@@ -1406,7 +1406,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                 beamline=visit_directory.split('/')[2]
 
             # isthereadisk
-            visit='b14379-11'
+            visit=visit_directory.split('/')[8]
             beamline='i04-1'
             print 'here'
             print 'visit_dir',visit_directory
