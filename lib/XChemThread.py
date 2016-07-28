@@ -1413,7 +1413,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
             print 'path',os.path.join(visit_directory,'processed',self.target,'*')
 
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
-                print collected_xtals
+#                print collected_xtals
                 # this step is only relevant when several samples are reviewed in one session
                 if 'tmp' in collected_xtals or 'results' in collected_xtals or 'scre' in collected_xtals:
                     continue
@@ -1435,6 +1435,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                 aimless_index_list=[]
                 for runs in sorted(glob.glob(collected_xtals+'/*')):
                     run=runs[runs.rfind('/')+1:]
+                    print 'run',run
                     diffraction_image=''
                     timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
                     if os.path.isfile(os.path.join(visit_directory,protein_name,xtal,run+'0001.cbf')):
@@ -1467,6 +1468,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                         for image in sorted(glob.glob(os.path.join(visit_directory,'jpegs',self.target,xtal,'*t.png'))):
                             if run in image:
                                 image_name=image[image.rfind('/')+1:]
+                                print 'image',image_name
                                 image_file=open(image,"rb")
                                 image_string=base64.b64encode(image_file.read())
                                 image_list.append( [image_name,image_string] )
