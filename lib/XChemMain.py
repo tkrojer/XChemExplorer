@@ -52,19 +52,20 @@ def get_challenging_target_and_visit_list(beamline_directory):
             visit_list.append(os.path.realpath(dir))
 
     for visit in visit_list:
-        for target in glob.glob(os.path.join(visit,'processed','*')):
-            if target[target.rfind('/')+1:] not in ['results','README-log','edna-latest.html']:
-                if target[target.rfind('/')+1:] not in target_list:
-                    target_list.append(target[target.rfind('/')+1:])
+        os.chdir(visit)
+        for target in glob.glob('*/*'):
+            if target not in ['results','README-log','edna-latest.html']:
+                if target not in target_list:
+                    target_list.append(target)
 
-    # but os.walk is so so slow...
-    rootDir='/dls/i04-1/data/2016/lb14379-11/processed'
-    for dirName, subdirList, fileList in os.walk(rootDir):
-        penultimate = dirName.split('/')[len(dirName.split('/'))-2]
-        ultimate =  dirName.split('/')[len(dirName.split('/'))-1]
-        diff=ultimate.replace(penultimate,'')
-        if diff.startswith('_'):
-            print penultimate
+#    # but os.walk is so so slow...
+#    rootDir='/dls/i04-1/data/2016/lb14379-11/processed'
+#    for dirName, subdirList, fileList in os.walk(rootDir):
+#        penultimate = dirName.split('/')[len(dirName.split('/'))-2]
+#        ultimate =  dirName.split('/')[len(dirName.split('/'))-1]
+#        diff=ultimate.replace(penultimate,'')
+#        if diff.startswith('_'):
+#            print penultimate
 
     return target_list,visit_list
 
