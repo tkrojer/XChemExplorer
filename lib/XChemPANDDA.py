@@ -21,6 +21,7 @@ class run_pandda_export(QtCore.QThread):
         self.db.create_missing_columns()
         self.db_list=self.db.get_empty_db_dict()
         self.external_software=XChemUtils.external_software(xce_logfile).check()
+        self.xce_logfile=xce_logfile
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.update_datasource_only=update_datasource_only
 
@@ -61,7 +62,7 @@ class run_pandda_export(QtCore.QThread):
                     os.mkdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+str(Serial)))
                     os.chdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+str(Serial)))
                     os.symlink(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb'),'in.pdb')
-                    Refine.RunRefmac(Serial,self.RefmacParams,self.external_software)
+                    Refine.RunRefmac(Serial,self.RefmacParams,self.external_software,self.xce_logfile)
 
 
 
@@ -114,7 +115,7 @@ class run_pandda_export(QtCore.QThread):
             csv_dict = csv.DictReader(csv_import)
             for i,line in enumerate(csv_dict):
                 site_index=line['site_idx']
-                name=line['Name']
+                name=line['Name'].replace("'","")
                 comment=line['Comment']
                 site_list.append([site_index,name,comment])
 
@@ -174,7 +175,7 @@ class run_pandda_export(QtCore.QThread):
                 db_dict['PANDDA_site_name']             =   site_name
                 db_dict['PANDDA_site_comment']          =   site_comment
                 db_dict['PANDDA_site_event_index']      =   event_index
-                db_dict['PANDDA_site_event_comment']    =   line['Comment']
+                db_dict['PANDDA_site_event_comment']    =   line['Comment'].replace("'","")
                 db_dict['PANDDA_site_confidence']       =   line['Ligand Confidence']
                 db_dict['PANDDA_site_ligand_placed']    =   line['Ligand Placed']
                 db_dict['PANDDA_site_viewed']           =   line['Viewed']
