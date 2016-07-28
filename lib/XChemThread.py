@@ -1415,8 +1415,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
             for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
                 print collected_xtals
                 # this step is only relevant when several samples are reviewed in one session
-                if 'tmp' in collected_xtals or 'results' in collected_xtals or 'scre' in collected_xtals:
-                    continue
+#                if 'tmp' in collected_xtals or 'results' in collected_xtals or 'scre' in collected_xtals:
+#                    continue
 
                 xtal=collected_xtals[collected_xtals.rfind('/')+1:]
                 print 'xtal',xtal
