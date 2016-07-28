@@ -159,7 +159,8 @@ class XChemExplorer(QtGui.QApplication):
         self.timer_to_check_for_new_data_collection = QtCore.QTimer()
 #        self.timer_to_check_for_new_data_collection.timeout.connect(self.check_for_new_autoprocessing_or_rescore(False))
 
-        self.target_list,self.visit_list=XChemMain.get_target_and_visit_list(self.beamline_directory)
+#        self.target_list,self.visit_list=XChemMain.get_target_and_visit_list(self.beamline_directory)
+        self.target_list,self.visit_list=XChemMain.get_target_and_visit_list_for_Pietro(self.beamline_directory)
 
         #
         # internal switches and flags
@@ -1293,8 +1294,8 @@ class XChemExplorer(QtGui.QApplication):
             pickled_settings = pickle.load(open(file_name,"rb"))
             if pickled_settings['beamline_directory'] != self.beamline_directory:
                 self.beamline_directory=pickled_settings['beamline_directory']
-                self.target_list,self.visit_list=XChemMain.get_target_and_visit_list(self.beamline_directory)
-#                self.target_list,self.visit_list=XChemMain.get_target_and_visit_list_isthereadisk(self.beamline_directory)
+#                self.target_list,self.visit_list=XChemMain.get_target_and_visit_list(self.beamline_directory)
+                self.target_list,self.visit_list=XChemMain.get_target_and_visit_list_for_Pietro(self.beamline_directory)
                 self.settings['beamline_directory']=self.beamline_directory
                 self.populate_target_selection_combobox(self.target_selection_combobox)
 
@@ -1609,8 +1610,8 @@ class XChemExplorer(QtGui.QApplication):
             dir_name = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             if dir_name != self.beamline_directory:
                 self.beamline_directory=dir_name
-                self.target_list,self.visit_list=XChemMain.get_target_and_visit_list(self.beamline_directory)
-#                self.target_list,self.visit_list=XChemMain.get_target_and_visit_list_isthereadisk(self.beamline_directory)
+#                self.target_list,self.visit_list=XChemMain.get_target_and_visit_list(self.beamline_directory)
+                self.target_list,self.visit_list=XChemMain.get_target_and_visit_list_for_Pietro(self.beamline_directory)
                 self.populate_target_selection_combobox(self.target_selection_combobox)
             self.beamline_directory_label.setText(self.beamline_directory)
             self.settings['beamline_directory']=self.beamline_directory
