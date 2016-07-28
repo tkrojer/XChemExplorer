@@ -759,7 +759,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         if self.rescore_only:
             self.rescore_and_reset_pkl_file()
         else:
-            self.parse_file_system()
+#            self.parse_file_system()
+            self.parse_challenging_file_system()
 
     def max_IsigI_Completeness_Reflections(self,xtal):
         # before creating the table with the results, try to guess which one to select

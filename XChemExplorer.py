@@ -1872,7 +1872,7 @@ class XChemExplorer(QtGui.QApplication):
         else:
             start_thread=True
         if start_thread:
-            self.work_thread=XChemThread.parse_challenging_file_system(self.visit_list,
+            self.work_thread=XChemThread.NEW_read_autoprocessing_results_from_disc(self.visit_list,
                                                                                 self.target,
                                                                                 self.reference_file_list,
                                                                                 self.database_directory,
