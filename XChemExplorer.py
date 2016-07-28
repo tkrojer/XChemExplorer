@@ -33,7 +33,7 @@ class XChemExplorer(QtGui.QApplication):
 
         # general settings
         self.allowed_unitcell_difference_percent=5
-        self.acceptable_low_resolution_limit_for_data=3
+        self.acceptable_low_resolution_limit_for_data=5
         self.filename_root='${samplename}'
         self.data_source_set=False
 
