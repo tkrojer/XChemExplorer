@@ -51,68 +51,6 @@ def get_target_and_visit_list_for_Pietro(beamline_directory):
     return target_list,visit_list
 
 
-#def get_target_and_visit_list_isthereadisk(beamline_directory):
-##    target_list=['*']      # always give the option to read in all targets
-#    target_list=['=== SELECT TARGET ===']      # always give the option to read in all targets
-#    visit_list=[]
-#    # the beamline directory could be a the real directory or
-#    # a directory where the visits are linked into
-#    if len(beamline_directory.split('/')) and \
-#        beamline_directory.split('/')[1]=='dls' and beamline_directory.split('/')[3]=='data' \
-#        and not 'labxchem' in beamline_directory:
-#        visit_list.append(beamline_directory)
-#    elif os.path.islink(beamline_directory):
-#        visit_list.append(os.path.realpath(beamline_directory))
-#    else:
-#        for dir in glob.glob(beamline_directory+'/*'):
-#            visit_list.append(os.path.realpath(dir))
-#
-#    for visit in visit_list:
-#        for target in glob.glob(os.path.join(visit,'processed','*')):
-#            if target[target.rfind('/')+1:] not in ['results','README-log','edna-latest.html']:
-#                if target[target.rfind('/')+1:] not in target_list:
-#                    target_list.append(target[target.rfind('/')+1:])
-#    return target_list,visit_list
-
-#def get_challenging_target_and_visit_list(beamline_directory):
-##    target_list=['*']      # always give the option to read in all targets
-#    target_list=['=== SELECT TARGET ===']      # always give the option to read in all targets
-#    visit_list=[]
-#    # the beamline directory could be a the real directory or
-#    # a directory where the visits are linked into
-#    if len(beamline_directory.split('/')) and \
-#        beamline_directory.split('/')[1]=='dls' and beamline_directory.split('/')[3]=='data' \
-#        and not 'labxchem' in beamline_directory:
-#        visit_list.append(beamline_directory)
-#    elif os.path.islink(beamline_directory):
-#        visit_list.append(os.path.realpath(beamline_directory))
-#    else:
-#        for dir in glob.glob(beamline_directory+'/*'):
-#            visit_list.append(os.path.realpath(dir))
-#
-#    for visit in visit_list:
-#        os.chdir(os.path.join(visit,'processed'))
-#        for target in glob.glob('*/*'):
-#            if target not in ['results','README-log','edna-latest.html']:
-#                if target not in target_list and target.startswith('20160723'):
-#                    target_list.append(target)
-#                if target not in target_list and target.startswith('Z'):
-#                    target_list.append(target)
-
-#    # but os.walk is so so slow...
-#    rootDir='/dls/i04-1/data/2016/lb14379-11/processed'
-#    for dirName, subdirList, fileList in os.walk(rootDir):
-#        penultimate = dirName.split('/')[len(dirName.split('/'))-2]
-#        ultimate =  dirName.split('/')[len(dirName.split('/'))-1]
-#        diff=ultimate.replace(penultimate,'')
-#        if diff.startswith('_'):
-#            print penultimate
-
-#    return target_list,visit_list
-
-
-
-
 def get_dewar_configuration(beamline_directory):
     dewar_sample_configuration_dict={}
     # need to do it like this for now until we got a way to query ispyb
