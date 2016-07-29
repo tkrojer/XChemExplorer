@@ -299,6 +299,7 @@ class XChemExplorer(QtGui.QApplication):
 
         frame_dataset_task=QtGui.QFrame()
         frame_dataset_task.setFrameShape(QtGui.QFrame.StyledPanel)
+        frame_dataset_task.setStyleSheet("border-width: 0px")
         vboxTask=QtGui.QVBoxLayout()
         label=QtGui.QLabel(self.workflow_dict['Datasets'])
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
