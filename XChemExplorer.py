@@ -737,7 +737,9 @@ class XChemExplorer(QtGui.QApplication):
                                     'Refinement\nSpace Group',
                                     'Resolution\n[Mn<I/sig(I)> = 1.5]',
                                     'Dimple\nRcryst',
-                                    'Dimple\nRfree' ]
+                                    'Dimple\nRfree',
+                                    'Crystal Form\nName'    ]
+        
         self.pandda_analyse_data_table=QtGui.QTableWidget()
         self.pandda_analyse_data_table.setSortingEnabled(True)
         self.pandda_analyse_data_table.resizeColumnsToContents()
