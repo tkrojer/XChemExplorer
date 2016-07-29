@@ -305,6 +305,7 @@ class XChemExplorer(QtGui.QApplication):
         label=QtGui.QLabel(self.workflow_dict['Datasets'])
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
 #        label.setStyleSheet("padding: 0px")
+        label.setStyleSheet("border: 1px solid red; border-radius: 1px; padding: 1px")
         vboxTask.addWidget(label)
         hboxAction=QtGui.QHBoxLayout()
         self.dataset_tasks_combobox = QtGui.QComboBox()
