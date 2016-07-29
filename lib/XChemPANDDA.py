@@ -326,6 +326,46 @@ class run_pandda_analyse(QtCore.QThread):
                 self.Logfile.insert('running PANDDA on cluster, using qsub...')
                 os.system('qsub pandda.sh')
 
+class giant_cluster_datasets(QtCore.QThread):
+
+    def __init__(self,initial_model_directory,pandda_params,xce_logfile):
+        QtCore.QThread.__init__(self)
+        self.data_directory=pandda_params['data_dir']
+        self.panddas_directory=pandda_params['out_dir']
+        self.submit_mode=pandda_params['submit_mode']
+        if self.submit_mode == 'local machine':
+            self.nproc=pandda_params['nproc']
+        else:
+            self.nproc='7'
+        self.min_build_datasets=pandda_params['min_build_datasets']
+        self.pdb_style=pandda_params['pdb_style']
+        self.mtz_style=pandda_params['mtz_style']
+        self.sort_event=pandda_params['sort_event']
+        self.number_of_datasets=pandda_params['N_datasets']
+        self.max_new_datasets=pandda_params['max_new_datasets']
+        self.grid_spacing=pandda_params['grid_spacing']
+        self.filter_pdb=pandda_params['filter_pdb']
+        self.Logfile=XChemLog.updateLog(xce_logfile)
+
+        self.initial_model_directory=initial_model_directory
+
+    def run(self):
+
+        # first go through project directory and make sure that all pdb files really exist
+        # broken links derail the giant.cluster_mtzs_and_pdbs script
+
+        self.Logfile.insert('cleaning up broken links of %s and %s in %s' %(self.pdb_style,self.mtz_style,self.initial_model_directory))
+        os.chdir(self.initial_model_directory)
+        for xtal in glob.glob('*'):
+            if not os.path.isfile(os.path.join(xtal,self.pdb_style)):
+                self.Logfile.insert('missing %s and %s for %s' %(self.pdb_style,self.mtz_style,xtal))
+                os.system('/bin/rm %s/%s 2> /dev/null' %(xtal,self.pdb_style))
+                os.system('/bin/rm %s/%s 2> /dev/null' %(xtal,self.mtz_style))
+
+        self.Logfile.insert("running giant.cluster_mtzs_and_pdbs %s/*/%s pdb_regex='%s/(.*)/%s' out_dir='%s'" %(self.initial_model_directory,self.pdb_style,self.initial_model_directory,self.pdb_style,self.panddas_directory))
+        os.system("giant.cluster_mtzs_and_pdbs %s/*/%s pdb_regex='%s/(.*)/%s' out_dir='%s'" %(self.initial_model_directory,self.pdb_style,self.initial_model_directory,self.pdb_style,self.panddas_directory))
+
+
 class check_if_pandda_can_run:
 
     # reasons why pandda cannot be run
