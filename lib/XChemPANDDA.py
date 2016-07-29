@@ -330,23 +330,10 @@ class giant_cluster_datasets(QtCore.QThread):
 
     def __init__(self,initial_model_directory,pandda_params,xce_logfile):
         QtCore.QThread.__init__(self)
-        self.data_directory=pandda_params['data_dir']
         self.panddas_directory=pandda_params['out_dir']
-        self.submit_mode=pandda_params['submit_mode']
-        if self.submit_mode == 'local machine':
-            self.nproc=pandda_params['nproc']
-        else:
-            self.nproc='7'
-        self.min_build_datasets=pandda_params['min_build_datasets']
         self.pdb_style=pandda_params['pdb_style']
         self.mtz_style=pandda_params['mtz_style']
-        self.sort_event=pandda_params['sort_event']
-        self.number_of_datasets=pandda_params['N_datasets']
-        self.max_new_datasets=pandda_params['max_new_datasets']
-        self.grid_spacing=pandda_params['grid_spacing']
-        self.filter_pdb=pandda_params['filter_pdb']
         self.Logfile=XChemLog.updateLog(xce_logfile)
-
         self.initial_model_directory=initial_model_directory
 
     def run(self):

@@ -1936,18 +1936,9 @@ class XChemExplorer(QtGui.QApplication):
     def cluster_datasets_for_pandda(self):
 
         pandda_params = {
-                'data_dir':             str(self.pandda_input_data_dir_entry.text()),
                 'out_dir':              str(self.pandda_output_data_dir_entry.text()),
-                'submit_mode':          str(self.pandda_submission_mode_selection_combobox.currentText()),
-                'nproc':                str(self.pandda_nproc_entry.text()),
-                'min_build_datasets':   str(self.pandda_min_build_dataset_entry.text()),
                 'pdb_style':            str(self.pandda_pdb_style_entry.text()),
-                'mtz_style':            str(self.pandda_mtz_style_entry.text()),
-                'sort_event':           str(self.pandda_sort_event_combobox.currentText()),
-                'N_datasets':           counter,
-                'max_new_datasets':     str(self.pandda_max_new_datasets_entry.text()),
-                'grid_spacing':         str(self.pandda_grid_spacing_entry.text()),
-                'filter_pdb':           filter_pdb
+                'mtz_style':            str(self.pandda_mtz_style_entry.text())
                         }
         self.update_log.insert('starting giant.cluster_mtzs_and_pdbs')
         self.work_thread=XChemPANDDA.giant_cluster_datasets(self.initial_model_directory,pandda_params,self.xce_logfile)
