@@ -338,19 +338,49 @@ class giant_cluster_datasets(QtCore.QThread):
 
     def run(self):
 
-        # first go through project directory and make sure that all pdb files really exist
-        # broken links derail the giant.cluster_mtzs_and_pdbs script
+        self.emit(QtCore.SIGNAL('update_progress_bar'), 0)
 
+        # 1.) prepare output directory
+        os.chdir(self.panddas_directory)
+        if os.path.isdir('cluster_analysis'):
+            self.Logfile.insert('removing old cluster_analysis directory in %s' %self.panddas_directory)
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'removing old cluster_analysis directory in %s' %self.panddas_directory)
+            os.system('/bin/rm -fr cluster_analysis 2> /dev/null')
+        self.Logfile.insert('creating cluster_analysis directory in %s' %self.panddas_directory)
+        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'creating cluster_analysis directory in %s' %self.panddas_directory)
+        os.mkdir('cluster_analysis')
+        self.emit(QtCore.SIGNAL('update_progress_bar'), 10)
+
+        # 2.) go through project directory and make sure that all pdb files really exist
+        # broken links derail the giant.cluster_mtzs_and_pdbs script
         self.Logfile.insert('cleaning up broken links of %s and %s in %s' %(self.pdb_style,self.mtz_style,self.initial_model_directory))
+        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'cleaning up broken links of %s and %s in %s' %(self.pdb_style,self.mtz_style,self.initial_model_directory))
         os.chdir(self.initial_model_directory)
         for xtal in glob.glob('*'):
             if not os.path.isfile(os.path.join(xtal,self.pdb_style)):
                 self.Logfile.insert('missing %s and %s for %s' %(self.pdb_style,self.mtz_style,xtal))
                 os.system('/bin/rm %s/%s 2> /dev/null' %(xtal,self.pdb_style))
                 os.system('/bin/rm %s/%s 2> /dev/null' %(xtal,self.mtz_style))
+        self.emit(QtCore.SIGNAL('update_progress_bar'), 20)
 
-        self.Logfile.insert("running giant.cluster_mtzs_and_pdbs %s/*/%s pdb_regex='%s/(.*)/%s' out_dir='%s'" %(self.initial_model_directory,self.pdb_style,self.initial_model_directory,self.pdb_style,self.panddas_directory))
-        os.system("giant.cluster_mtzs_and_pdbs %s/*/%s pdb_regex='%s/(.*)/%s' out_dir='%s'" %(self.initial_model_directory,self.pdb_style,self.initial_model_directory,self.pdb_style,self.panddas_directory))
+        # 3.) giant.cluster_mtzs_and_pdbs
+        self.Logfile.insert("running giant.cluster_mtzs_and_pdbs %s/*/%s pdb_regex='%s/(.*)/%s' out_dir='%s/cluster_analysis'" %(self.initial_model_directory,self.pdb_style,self.initial_model_directory,self.pdb_style,self.panddas_directory))
+        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running giant.cluster_mtzs_and_pdbs')
+        os.system("giant.cluster_mtzs_and_pdbs %s/*/%s pdb_regex='%s/(.*)/%s' out_dir='%s/cluster_analysis'" %(self.initial_model_directory,self.pdb_style,self.initial_model_directory,self.pdb_style,self.panddas_directory))
+        self.emit(QtCore.SIGNAL('update_progress_bar'), 80)
+
+        # 4.) analyse output
+        self.Logfile.insert('parsing %s/cluster_analysis' %self.panddas_directory)
+        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'parsing %s/cluster_analysis' %self.panddas_directory)
+        os.chdir('%s/cluster_analysis' %self.panddas_directory)
+        cluster_dict={}
+        for out_dir in sorted(glob.glob('*')):
+            if os.path.isdir(out_dir):
+                cluster_dict[out_dir]=[]
+                for folder in glob.glob(os.path.join(out_dir,'pdbs','*')):
+                    xtal=folder[folder.rfind('/')+1:]
+                    cluster_dict[out_dir].append(xtal)
+        print cluster_dict
 
 
 class check_if_pandda_can_run:
