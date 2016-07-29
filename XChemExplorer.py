@@ -314,7 +314,7 @@ class XChemExplorer(QtGui.QApplication):
         for task in self.dataset_tasks:
             self.dataset_tasks_combobox.addItem(task)
         self.dataset_tasks_combobox.setToolTip(XChemToolTips.dataset_task_tip())
-        self.dataset_tasks_combobox..setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
+        self.dataset_tasks_combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
         hboxAction.addWidget(self.dataset_tasks_combobox)
         vboxButton=QtGui.QVBoxLayout()
         dataset_task_run_button=QtGui.QPushButton("Run")
