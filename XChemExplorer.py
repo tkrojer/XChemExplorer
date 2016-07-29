@@ -305,7 +305,7 @@ class XChemExplorer(QtGui.QApplication):
         label=QtGui.QLabel(self.workflow_dict['Datasets'])
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
 #        label.setStyleSheet("padding: 0px")
-        label.setStyleSheet("border: 1px solid red; border-radius: 1px; padding: 1px")
+#        label.setStyleSheet("border: 1px solid red; border-radius: 1px; padding: 1px")
         vboxTask.addWidget(label)
         hboxAction=QtGui.QHBoxLayout()
         self.dataset_tasks_combobox = QtGui.QComboBox()
@@ -340,6 +340,7 @@ class XChemExplorer(QtGui.QApplication):
 
         frame_map_cif_file_task=QtGui.QFrame()
         frame_map_cif_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
+        frame_map_cif_file_task.setStyleSheet("border: 1px solid green; border-radius: 1px; padding: 1px")
         vboxTask=QtGui.QVBoxLayout()
         label=QtGui.QLabel(self.workflow_dict['Maps'])
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
@@ -381,6 +382,7 @@ class XChemExplorer(QtGui.QApplication):
 
         frame_panddas_file_task=QtGui.QFrame()
         frame_panddas_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
+        frame_panddas_file_task.setStyleSheet("border: 1px solid green; border-radius: 1px; padding: 1px")
         vboxTask=QtGui.QVBoxLayout()
         label=QtGui.QLabel(self.workflow_dict['PANDDAs'])
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
@@ -416,6 +418,7 @@ class XChemExplorer(QtGui.QApplication):
 
         frame_refine_file_task=QtGui.QFrame()
         frame_refine_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
+        frame_refine_file_task.setStyleSheet("border: 1px solid green; border-radius: 1px; padding: 1px")
         vboxTask=QtGui.QVBoxLayout()
         label=QtGui.QLabel(self.workflow_dict['Refinement'])
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
