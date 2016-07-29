@@ -297,11 +297,12 @@ class XChemExplorer(QtGui.QApplication):
                                 'Rescore Datasets',
                                 'Read PKL file'         ]
 
+        QtGui.QFrame().setStyleSheet("border: 2px solid green; border-radius: 4px; padding: 2px")
         frame_dataset_task=QtGui.QFrame()
         frame_dataset_task.setFrameShape(QtGui.QFrame.StyledPanel)
 #        frame_dataset_task.setStyleSheet("border: 2px solid green; border-radius: 4px; padding: 2px")
 #        frame_dataset_task.setStyleSheet("border: 1px green; border-radius: 1px; padding: 1px")
-        frame_dataset_task.setStyleSheet("margin: 1px; padding: 1px; border: 1px gray; border-radius: 1px")
+#        frame_dataset_task.setStyleSheet("margin: 1px; padding: 1px; border: 1px gray; border-radius: 1px")
         vboxTask=QtGui.QVBoxLayout()
         label=QtGui.QLabel(self.workflow_dict['Datasets'])
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
@@ -341,7 +342,7 @@ class XChemExplorer(QtGui.QApplication):
 
         frame_map_cif_file_task=QtGui.QFrame()
         frame_map_cif_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
-        frame_map_cif_file_task.setStyleSheet("margin: 1px; padding: 1px; border: 1px gray; border-radius: 1px")
+#        frame_map_cif_file_task.setStyleSheet("margin: 1px; padding: 1px; border: 1px gray; border-radius: 1px")
         vboxTask=QtGui.QVBoxLayout()
         label=QtGui.QLabel(self.workflow_dict['Maps'])
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
@@ -383,7 +384,7 @@ class XChemExplorer(QtGui.QApplication):
 
         frame_panddas_file_task=QtGui.QFrame()
         frame_panddas_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
-        frame_panddas_file_task.setStyleSheet("margin: 1px; padding: 1px; border: 1px gray; border-radius: 1px")
+#        frame_panddas_file_task.setStyleSheet("margin: 1px; padding: 1px; border: 1px black; border-radius: 1px")
         vboxTask=QtGui.QVBoxLayout()
         label=QtGui.QLabel(self.workflow_dict['PANDDAs'])
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
@@ -419,7 +420,7 @@ class XChemExplorer(QtGui.QApplication):
 
         frame_refine_file_task=QtGui.QFrame()
         frame_refine_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
-        frame_refine_file_task.setStyleSheet("margin: 1px; padding: 1px; border: 1px gray; border-radius: 1px")
+#        frame_refine_file_task.setStyleSheet("margin: 1px; padding: 1px; border: 1px gray; border-radius: 1px")
         vboxTask=QtGui.QVBoxLayout()
         label=QtGui.QLabel(self.workflow_dict['Refinement'])
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
