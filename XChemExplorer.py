@@ -284,13 +284,17 @@ class XChemExplorer(QtGui.QApplication):
         # @ Update from datasource button ###################################################
         #
 
-        update_from_datasource_button=QtGui.QPushButton("Update From\nDatasource")
+#        update_from_datasource_button=QtGui.QPushButton("Update From\nDatasource")
+        update_from_datasource_button=QtGui.QPushButton("Update Tables\nFrom Datasource")
         update_from_datasource_button.setToolTip(XChemToolTips.update_from_datasource_button_tip())
+        update_from_datasource_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
         update_from_datasource_button.clicked.connect(self.datasource_menu_reload_samples)
 
         #
         # @ Datasets ########################################################################
         #
+
+        headlineLabelfont = QtGui.QFont("Arial", 20, QtGui.QFont.Bold)
 
         self.dataset_tasks = [  'Get New Results from Autoprocessing',
                                 'Save Files from Autoprocessing to Project Folder',
@@ -300,15 +304,13 @@ class XChemExplorer(QtGui.QApplication):
 
         frame_dataset_task=QtGui.QFrame()
         frame_dataset_task.setFrameShape(QtGui.QFrame.StyledPanel)
-        frame_dataset_task.setStyleSheet("QFrame { border: 1px solid green; border-radius: 1px; padding: 0px; margin: 0px }")
-#        frame_dataset_task.setContentsMargin(0,0,0,0)
-#        frame_dataset_task.setStyleSheet("border: 1px green; border-radius: 1px; padding: 1px")
-#        frame_dataset_task.setStyleSheet("margin: 1px; padding: 1px; border: 1px gray; border-radius: 1px")
+        frame_dataset_task.setStyleSheet("QFrame { border: 1px solid black; border-radius: 1px; padding: 0px; margin: 0px }")
         vboxTask=QtGui.QVBoxLayout()
-        label=QtGui.QLabel(self.workflow_dict['Datasets'])
+#        label=QtGui.QLabel(self.workflow_dict['Datasets'])
+        label=QtGui.QLabel('Datasets')
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
-#        label.setStyleSheet("padding: 0px")
-        label.setStyleSheet(" QLabel { border: 1px solid red; border-radius: 1px; padding: 0px; margin: 0px }")
+        label.setFont(headlineLabelfont)
+        label.setStyleSheet(" QLabel { border: 1px solid black; border-radius: 1px; background: rgb(240,255,140); padding: 0px; margin: 0px }")
         vboxTask.addWidget(label)
         hboxAction=QtGui.QHBoxLayout()
         self.dataset_tasks_combobox = QtGui.QComboBox()
@@ -321,7 +323,6 @@ class XChemExplorer(QtGui.QApplication):
         dataset_task_run_button=QtGui.QPushButton("Run")
         dataset_task_run_button.setToolTip(XChemToolTips.dataset_task_run_button_tip())
         dataset_task_run_button.clicked.connect(self.button_clicked)
-#        dataset_task_run_button.setStyleSheet("QPushButton { border: 1px solid red; border-radius: 4px; padding: 1px }")
         dataset_task_run_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
         vboxButton.addWidget(dataset_task_run_button)
         dataset_task_status_button=QtGui.QPushButton("Status")
@@ -331,7 +332,6 @@ class XChemExplorer(QtGui.QApplication):
         vboxButton.addWidget(dataset_task_status_button)
         hboxAction.addLayout(vboxButton)
         vboxTask.addLayout(hboxAction)
-#        vboxTask.setContentsMargin(0,0,0,0)
         vboxTask.setSpacing(0)
         vboxTask.setMargin(0)
         frame_dataset_task.setLayout(vboxTask)
@@ -350,11 +350,13 @@ class XChemExplorer(QtGui.QApplication):
 
         frame_map_cif_file_task=QtGui.QFrame()
         frame_map_cif_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
-        frame_map_cif_file_task.setStyleSheet("QFrame { border: 1px solid green; border-radius: 1px; padding: 0px; margin: 0px }")
+        frame_map_cif_file_task.setStyleSheet("QFrame { border: 1px solid black; border-radius: 1px; padding: 0px; margin: 0px }")
         vboxTask=QtGui.QVBoxLayout()
-        label=QtGui.QLabel(self.workflow_dict['Maps'])
+#        label=QtGui.QLabel(self.workflow_dict['Maps'])
+        label=QtGui.QLabel('Maps & Restraints')
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
-        label.setStyleSheet(" QLabel { border: 1px solid red; border-radius: 1px; padding: 0px; margin: 0px }")
+        label.setFont(headlineLabelfont)
+        label.setStyleSheet(" QLabel { border: 1px solid black; border-radius: 1px; background: rgb(140,255,150); padding: 0px; margin: 0px }")
         vboxTask.addWidget(label)
         hboxAction=QtGui.QHBoxLayout()
         self.map_cif_file_tasks_combobox = QtGui.QComboBox()
@@ -398,11 +400,13 @@ class XChemExplorer(QtGui.QApplication):
 
         frame_panddas_file_task=QtGui.QFrame()
         frame_panddas_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
-        frame_panddas_file_task.setStyleSheet("QFrame { border: 1px solid green; border-radius: 1px; padding: 0px; margin: 0px }")
+        frame_panddas_file_task.setStyleSheet("QFrame { border: 1px solid black; border-radius: 1px; padding: 0px; margin: 0px }")
         vboxTask=QtGui.QVBoxLayout()
-        label=QtGui.QLabel(self.workflow_dict['PANDDAs'])
+#        label=QtGui.QLabel(self.workflow_dict['PANDDAs'])
+        label=QtGui.QLabel('Hit Identification')
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
-        label.setStyleSheet(" QLabel { border: 1px solid red; border-radius: 1px; padding: 0px; margin: 0px }")
+        label.setFont(headlineLabelfont)
+        label.setStyleSheet(" QLabel { border: 1px solid black; border-radius: 1px; background: rgb(140,200,255); padding: 0px; margin: 0px }")
         vboxTask.addWidget(label)
         hboxAction=QtGui.QHBoxLayout()
         self.panddas_file_tasks_combobox = QtGui.QComboBox()
@@ -440,11 +444,13 @@ class XChemExplorer(QtGui.QApplication):
 
         frame_refine_file_task=QtGui.QFrame()
         frame_refine_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
-        frame_refine_file_task.setStyleSheet("QFrame { border: 1px solid green; border-radius: 1px; padding: 0px; margin: 0px }")
+        frame_refine_file_task.setStyleSheet("QFrame { border: 1px solid black; border-radius: 1px; padding: 0px; margin: 0px }")
         vboxTask=QtGui.QVBoxLayout()
-        label=QtGui.QLabel(self.workflow_dict['Refinement'])
+#        label=QtGui.QLabel(self.workflow_dict['Refinement'])
+        label=QtGui.QLabel('Refinement')
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
-        label.setStyleSheet(" QLabel { border: 1px solid red; border-radius: 1px; padding: 0px; margin: 0px }")
+        label.setFont(headlineLabelfont)
+        label.setStyleSheet(" QLabel { border: 1px solid black; border-radius: 1px; background: rgb(245,190,255); padding: 0px; margin: 0px }")
         vboxTask.addWidget(label)
         hboxAction=QtGui.QHBoxLayout()
         self.refine_file_tasks_combobox = QtGui.QComboBox()
@@ -1037,6 +1043,9 @@ class XChemExplorer(QtGui.QApplication):
         hboxTaskFrames.addWidget(frame_map_cif_file_task)
         hboxTaskFrames.addWidget(frame_panddas_file_task)
         hboxTaskFrames.addWidget(frame_refine_file_task)
+#        hboxTaskFrames.setSpacing(0)
+#        hboxTaskFrames.setMargin(0)
+
         vbox_main.addLayout(hboxTaskFrames)
 
         vbox_main.addLayout(hbox_status)
