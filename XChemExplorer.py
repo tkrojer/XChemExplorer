@@ -281,26 +281,29 @@ class XChemExplorer(QtGui.QApplication):
         self.workflow_widget_dict = {}
 
         #
+        # check http://doc.qt.io/qt-4.8/stylesheet-customizing.html#the-box-model
+        #
+
+        headlineLabelfont = QtGui.QFont("Arial", 20, QtGui.QFont.Bold)
+
+        #
         # @ Update from datasource button ###################################################
         #
 
-#        update_from_datasource_button=QtGui.QPushButton("Update From\nDatasource")
         update_from_datasource_button=QtGui.QPushButton("Update Tables\nFrom Datasource")
         update_from_datasource_button.setToolTip(XChemToolTips.update_from_datasource_button_tip())
-        update_from_datasource_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
+        update_from_datasource_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px; background: rgb(140,140,140) }")
+        update_from_datasource_button.setFont(headlineLabelfont)
         update_from_datasource_button.clicked.connect(self.datasource_menu_reload_samples)
 
         #
         # @ Datasets ########################################################################
         #
 
-        headlineLabelfont = QtGui.QFont("Arial", 20, QtGui.QFont.Bold)
-
         self.dataset_tasks = [  'Get New Results from Autoprocessing',
                                 'Save Files from Autoprocessing to Project Folder',
                                 'Rescore Datasets',
                                 'Read PKL file'         ]
-
 
         frame_dataset_task=QtGui.QFrame()
         frame_dataset_task.setFrameShape(QtGui.QFrame.StyledPanel)
