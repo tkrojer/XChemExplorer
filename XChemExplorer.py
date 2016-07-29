@@ -357,6 +357,7 @@ class XChemExplorer(QtGui.QApplication):
         for task in self.map_cif_file_tasks:
             self.map_cif_file_tasks_combobox.addItem(task)
         self.map_cif_file_tasks_combobox.setToolTip(XChemToolTips.map_cif_file_task_tip())
+        self.map_cif_file_tasks_combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
         hboxAction.addWidget(self.map_cif_file_tasks_combobox)
         vboxButton=QtGui.QVBoxLayout()
         map_cif_file_task_run_button=QtGui.QPushButton("Run")
@@ -402,6 +403,7 @@ class XChemExplorer(QtGui.QApplication):
         for task in self.panddas_file_tasks:
             self.panddas_file_tasks_combobox.addItem(task)
         self.panddas_file_tasks_combobox.setToolTip(XChemToolTips.panddas_file_task_tip())
+        self.panddas_file_tasks_combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
         hboxAction.addWidget(self.panddas_file_tasks_combobox)
         vboxButton=QtGui.QVBoxLayout()
         panddas_file_task_run_button=QtGui.QPushButton("Run")
@@ -441,6 +443,7 @@ class XChemExplorer(QtGui.QApplication):
         for task in self.refine_file_tasks:
             self.refine_file_tasks_combobox.addItem(task)
         self.refine_file_tasks_combobox.setToolTip(XChemToolTips.refine_file_task_tip())
+        self.refine_file_tasks_combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
         hboxAction.addWidget(self.refine_file_tasks_combobox)
         vboxButton=QtGui.QVBoxLayout()
         refine_file_task_run_button=QtGui.QPushButton("Run")
