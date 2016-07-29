@@ -331,7 +331,9 @@ class XChemExplorer(QtGui.QApplication):
         vboxButton.addWidget(dataset_task_status_button)
         hboxAction.addLayout(vboxButton)
         vboxTask.addLayout(hboxAction)
-        vboxTask.setContentsMargin(0,0,0,0)
+#        vboxTask.setContentsMargin(0,0,0,0)
+        vboxTask.setSpacing(0)
+        vboxTask.setMargin(0)
         frame_dataset_task.setLayout(vboxTask)
 
         self.workflow_widget_dict['Datasets']=[self.dataset_tasks_combobox,dataset_task_run_button,dataset_task_status_button]
@@ -374,6 +376,8 @@ class XChemExplorer(QtGui.QApplication):
         vboxButton.addWidget(map_cif_file_task_status_button)
         hboxAction.addLayout(vboxButton)
         vboxTask.addLayout(hboxAction)
+        vboxTask.setSpacing(0)
+        vboxTask.setMargin(0)
         frame_map_cif_file_task.setLayout(vboxTask)
 
         self.workflow_widget_dict['Maps']=[self.map_cif_file_tasks_combobox,map_cif_file_task_run_button,map_cif_file_task_status_button]
@@ -420,6 +424,8 @@ class XChemExplorer(QtGui.QApplication):
         vboxButton.addWidget(panddas_file_task_status_button)
         hboxAction.addLayout(vboxButton)
         vboxTask.addLayout(hboxAction)
+        vboxTask.setSpacing(0)
+        vboxTask.setMargin(0)
         frame_panddas_file_task.setLayout(vboxTask)
 
         self.workflow_widget_dict['PANDDAs']=[self.panddas_file_tasks_combobox,panddas_file_task_run_button,panddas_file_task_status_button]
@@ -460,6 +466,8 @@ class XChemExplorer(QtGui.QApplication):
         vboxButton.addWidget(refine_file_task_status_button)
         hboxAction.addLayout(vboxButton)
         vboxTask.addLayout(hboxAction)
+        vboxTask.setSpacing(0)
+        vboxTask.setMargin(0)
         frame_refine_file_task.setLayout(vboxTask)
 
         self.workflow_widget_dict['Refinement']=[self.refine_file_tasks_combobox,refine_file_task_run_button,refine_file_task_status_button]
