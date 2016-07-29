@@ -297,10 +297,10 @@ class XChemExplorer(QtGui.QApplication):
                                 'Rescore Datasets',
                                 'Read PKL file'         ]
 
-        QtGui.QFrame().setStyleSheet("border: 2px solid green; border-radius: 4px; padding: 2px")
+
         frame_dataset_task=QtGui.QFrame()
         frame_dataset_task.setFrameShape(QtGui.QFrame.StyledPanel)
-#        frame_dataset_task.setStyleSheet("border: 2px solid green; border-radius: 4px; padding: 2px")
+        frame_dataset_task.setStyleSheet("QFrame { border: 2px solid green; border-radius: 4px; padding: 2px }")
 #        frame_dataset_task.setStyleSheet("border: 1px green; border-radius: 1px; padding: 1px")
 #        frame_dataset_task.setStyleSheet("margin: 1px; padding: 1px; border: 1px gray; border-radius: 1px")
         vboxTask=QtGui.QVBoxLayout()
