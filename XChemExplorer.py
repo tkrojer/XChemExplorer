@@ -331,6 +331,7 @@ class XChemExplorer(QtGui.QApplication):
         vboxButton.addWidget(dataset_task_status_button)
         hboxAction.addLayout(vboxButton)
         vboxTask.addLayout(hboxAction)
+        vboxTask.setContentsMargin(0,0,0,0)
         frame_dataset_task.setLayout(vboxTask)
 
         self.workflow_widget_dict['Datasets']=[self.dataset_tasks_combobox,dataset_task_run_button,dataset_task_status_button]
