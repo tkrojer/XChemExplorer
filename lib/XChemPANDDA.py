@@ -328,13 +328,14 @@ class run_pandda_analyse(QtCore.QThread):
 
 class giant_cluster_datasets(QtCore.QThread):
 
-    def __init__(self,initial_model_directory,pandda_params,xce_logfile):
+    def __init__(self,initial_model_directory,pandda_params,xce_logfile,datasource):
         QtCore.QThread.__init__(self)
         self.panddas_directory=pandda_params['out_dir']
         self.pdb_style=pandda_params['pdb_style']
         self.mtz_style=pandda_params['mtz_style']
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.initial_model_directory=initial_model_directory
+        self.db=XChemDB.data_source(datasource)
 
     def run(self):
 
@@ -380,8 +381,14 @@ class giant_cluster_datasets(QtCore.QThread):
                 for folder in glob.glob(os.path.join(out_dir,'pdbs','*')):
                     xtal=folder[folder.rfind('/')+1:]
                     cluster_dict[out_dir].append(xtal)
-        print cluster_dict
+        self.emit(QtCore.SIGNAL('update_progress_bar'), 90)
 
+        # 5.) update datasource
+        self.Logfile.insert('updating datasource with results from giant.cluster_mtzs_and_pdbs')
+        if cluster_dict != {}:
+            for key in cluster_dict:
+                for xtal in cluster_dict[key]:
+                    print xtal,key
 
 class check_if_pandda_can_run:
 
