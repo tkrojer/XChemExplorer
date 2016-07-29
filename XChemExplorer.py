@@ -1785,7 +1785,7 @@ class XChemExplorer(QtGui.QApplication):
             update_datasource_only=False
             self.run_pandda_export(update_datasource_only)
 
-        elif instruction='cluster datasets':
+        elif instruction=='cluster datasets':
             self.cluster_datasets_for_pandda()
 
         elif instruction=='Update datasource with results from pandda.inspect':
