@@ -388,7 +388,10 @@ class giant_cluster_datasets(QtCore.QThread):
         if cluster_dict != {}:
             for key in cluster_dict:
                 for xtal in cluster_dict[key]:
-                    print xtal,key
+                    db_dict={}
+                    db_dict['CrystalFormName']=key
+                    self.db.update_data_source(xtal,db_dict)
+        self.emit(QtCore.SIGNAL('update_progress_bar'), 90)
 
 class check_if_pandda_can_run:
 
