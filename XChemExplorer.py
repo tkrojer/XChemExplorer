@@ -302,6 +302,7 @@ class XChemExplorer(QtGui.QApplication):
         vboxTask=QtGui.QVBoxLayout()
         label=QtGui.QLabel(self.workflow_dict['Datasets'])
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
+        label.setStyleSheet("border-width: 0px")
         vboxTask.addWidget(label)
         hboxAction=QtGui.QHBoxLayout()
         self.dataset_tasks_combobox = QtGui.QComboBox()
@@ -739,7 +740,7 @@ class XChemExplorer(QtGui.QApplication):
                                     'Dimple\nRcryst',
                                     'Dimple\nRfree',
                                     'Crystal Form\nName'    ]
-        
+
         self.pandda_analyse_data_table=QtGui.QTableWidget()
         self.pandda_analyse_data_table.setSortingEnabled(True)
         self.pandda_analyse_data_table.resizeColumnsToContents()
@@ -813,7 +814,7 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_sort_event_combobox)
 
         # crystal form option
-        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('Use space group of reference file:'))
+        self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('Use space group of reference file as filter:'))
         # reference file combobox, label with spg display
         hbox=QtGui.QHBoxLayout()
         self.reference_file_list=self.get_reference_file_list(' ')

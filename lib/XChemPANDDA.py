@@ -391,7 +391,8 @@ class giant_cluster_datasets(QtCore.QThread):
                     db_dict={}
                     db_dict['CrystalFormName']=key
                     self.db.update_data_source(xtal,db_dict)
-        self.emit(QtCore.SIGNAL('update_progress_bar'), 90)
+        self.emit(QtCore.SIGNAL('update_progress_bar'), 100)
+        self.Logfile.insert('finished giant.cluster_mtzs_and_pdbs')
 
 class check_if_pandda_can_run:
 
