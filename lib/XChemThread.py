@@ -1,4 +1,4 @@
-# last edited: 28/07/2016, 16:50
+# last edited: 29/07/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -165,7 +165,7 @@ class update_datasource_from_file_system(QtCore.QThread):
         self.Logfile.insert('datasource update finished')
 
 class create_png_and_cif_of_compound(QtCore.QThread):
-    def __init__(self,external_software,initial_model_directory,compound_list,database_directory,data_source_file,todo,ccp4_scratch_directory,xce_logfile):
+    def __init__(self,external_software,initial_model_directory,compound_list,database_directory,data_source_file,todo,ccp4_scratch_directory,xce_logfile,max_queue_jobs):
         QtCore.QThread.__init__(self)
         self.external_software=external_software
         self.initial_model_directory=initial_model_directory
@@ -176,6 +176,7 @@ class create_png_and_cif_of_compound(QtCore.QThread):
         self.ccp4_scratch_directory=ccp4_scratch_directory
         self.xce_logfile=xce_logfile
         self.Logfile=XChemLog.updateLog(xce_logfile)
+        self.max_queue_jobs=max_queue_jobs
 
     def run(self):
         # first remove all ACEDRG input scripts in ccp4_scratch directory
@@ -253,8 +254,8 @@ class create_png_and_cif_of_compound(QtCore.QThread):
                     f.close()
                     self.Logfile.insert('submitting array job with maximal 100 jobs running on cluster')
                     self.Logfile.insert('using the following command:')
-                    self.Logfile.insert('         qsub -t 1:%s -tc 100 acedrg_master.sh' %(str(counter)))
-                    os.system('qsub -t 1:%s -tc 100 acedrg_master.sh' %(str(counter)))
+                    self.Logfile.insert('         qsub -t 1:%s -tc %s acedrg_master.sh' %(str(counter),self.max_queue_jobs))
+                    os.system('qsub -t 1:%s -tc %s acedrg_master.sh' %(str(counter),self.max_queue_jobs))
                 else:
                     self.Logfile.insert("cannot start ARRAY job: make sure that 'module load global/cluster' is in your .bashrc or .cshrc file")
             elif self.external_software['qsub']:
@@ -273,14 +274,19 @@ class create_png_and_cif_of_compound(QtCore.QThread):
 
 
 class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
-    def __init__(self,sample_list,initial_model_directory,external_software,ccp4_scratch_directory,database_directory,data_source_file):
+    def __init__(self,sample_list,initial_model_directory,external_software,ccp4_scratch_directory,database_directory,data_source_file,max_queue_jobs,xce_logfile):
         QtCore.QThread.__init__(self)
         self.sample_list=sample_list
         self.initial_model_directory=initial_model_directory
+        self.external_software=external_software
         self.queueing_system_available=external_software['qsub']
         self.ccp4_scratch_directory=ccp4_scratch_directory
         self.database_directory=database_directory
         self.data_source_file=data_source_file
+        self.max_queue_jobs=max_queue_jobs
+        self.xce_logfile=xce_logfile
+        self.Logfile=XChemLog.updateLog(xce_logfile)
+
     def run(self):
         progress_step=1
         if len(self.sample_list) != 0:
@@ -396,20 +402,34 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
         # submit array job at Diamond
-        print '==> XCE: created input scripts for '+str(n+1)+' in '+self.ccp4_scratch_directory
+        self.Logfile.insert('created input scripts for '+str(n+1)+' in '+self.ccp4_scratch_directory)
         os.chdir(self.ccp4_scratch_directory)
-        Cmds = (
-                '#PBS -joe -N xce_dimple_master\n'
-                './xce_dimple_$SGE_TASK_ID.sh\n'
-                )
-        f = open('dimple_master.sh','w')
-        f.write(Cmds)
-        f.close()
-        print '==> XCE: submitting array job with maximal 100 jobs running on cluster'
-        print '==> XCE: using the following command:'
-        print '         qsub -t 1:%s -tc 100 dimple_master.sh' %(str(n+1))
-        os.system('qsub -t 1:%s -tc 100 dimple_master.sh' %(str(n+1)))
-
+        if os.getcwd().startswith('/dls'):
+            if self.external_software['qsub_array']:
+                Cmds = (
+                        '#PBS -joe -N xce_dimple_master\n'
+                        './xce_dimple_$SGE_TASK_ID.sh\n'
+                        )
+                f = open('dimple_master.sh','w')
+                f.write(Cmds)
+                f.close()
+                self.Logfile.insert('submitting array job with maximal 100 jobs running on cluster')
+                self.Logfile.insert('using the following command:')
+                self.Logfile.insert('qsub -t 1:%s -tc %s dimple_master.sh' %(str(n+1),self.max_queue_jobs))
+                os.system('qsub -t 1:%s -tc %s dimple_master.sh' %(str(n+1),self.max_queue_jobs))
+            else:
+                self.Logfile.insert("cannot start ARRAY job: make sure that 'module load global/cluster' is in your .bashrc or .cshrc file")
+        elif self.external_software['qsub']:
+            self.Logfile.insert('submitting %s individual jobs to cluster' %(str(n+1)))
+            self.Logfile.insert('WARNING: this could potentially lead to a crash...')
+            for i in range(n+1):
+                self.Logfile.insert('qsub xce_dimple_%s.sh' %(str(i+1)))
+                os.system('qsub xce_dimple_%s.sh' %(str(i+1)))
+        else:
+            self.Logfile.insert('running %s consecutive DIMPLE jobs on your local machine')
+            for i in range(n+1):
+                self.Logfile.insert('starting xce_dimple_%s.sh' %(str(i+1)))
+                os.system('./xce_dimple_%s.sh' %(str(i+1)))
 
 
 class start_COOT(QtCore.QThread):

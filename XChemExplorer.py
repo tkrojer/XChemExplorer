@@ -1,4 +1,4 @@
-# last edited: 28/07/2016, 16:50
+# last edited: 29/07/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -36,6 +36,7 @@ class XChemExplorer(QtGui.QApplication):
         self.acceptable_low_resolution_limit_for_data=3.5
         self.filename_root='${samplename}'
         self.data_source_set=False
+        self.max_queue_jobs=100
 
         #
         # directories
@@ -127,7 +128,8 @@ class XChemExplorer(QtGui.QApplication):
                              'too_low_resolution_data': self.acceptable_low_resolution_limit_for_data,
                              'filename_root':           self.filename_root,
                              'preferences':             self.preferences,
-                             'xce_logfile':             self.xce_logfile        }
+                             'xce_logfile':             self.xce_logfile,
+                             'max_queue_jobs':          self.max_queue_jobs     }
 
 
         #
@@ -202,10 +204,8 @@ class XChemExplorer(QtGui.QApplication):
 
     def start_GUI(self):
 
-
         # GUI setup
         self.window=QtGui.QWidget()
-        self.window.setGeometry(0,0, 800,500)
         self.window.setWindowTitle("XChemExplorer")
         self.center_main_window()
 
@@ -1025,6 +1025,10 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_panddas_directory.addWidget(settings_button_panddas_directory)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_panddas_directory)
 
+        self.data_collection_vbox_for_settings.setSpacing(0)
+        self.data_collection_vbox_for_settings.setMargin(0)
+
+
         ######################################################################################
 
 
@@ -1056,14 +1060,19 @@ class XChemExplorer(QtGui.QApplication):
         self.window.setLayout(vbox_main)
 
         self.status_bar.showMessage('Ready')
-#        self.timer = QtCore.QBasicTimer()
-#        self.window.showMaximized()
         self.window.show()
 
         if self.data_source_file != '':
             write_enabled=self.check_write_permissions_of_data_source()
             if not write_enabled:
                 self.data_source_set=False
+
+    def center_main_window(self):
+        screen = QtGui.QDesktopWidget().screenGeometry()
+        self.window.setFixedSize(screen.width()-(screen.width()/8),screen.height()-(screen.height()/8))
+        size = self.window.geometry()
+        self.window.move((screen.width()-size.width())/2, (screen.height()-size.height())/2)
+
 
 
     def select_sample_for_dimple(self):
@@ -1141,6 +1150,17 @@ class XChemExplorer(QtGui.QApplication):
         button.clicked.connect(self.set_xce_logfile)
         hbox.addWidget(button)
         vbox.addLayout(hbox)
+
+        settings_hbox_max_queue_jobs=QtGui.QHBoxLayout()
+        adjust_max_queue_jobs_label=QtGui.QLabel('Max. number of jobs running at once on DLS cluster:')
+        settings_hbox_max_queue_jobs.addWidget(adjust_max_queue_jobs_label)
+        adjust_max_queue_jobs = QtGui.QLineEdit()
+        adjust_max_queue_jobs.setFixedWidth(200)
+        adjust_max_queue_jobs.setText(str(self.max_queue_jobs))
+        adjust_max_queue_jobs.textChanged[str].connect(self.change_max_queue_jobs)
+        settings_hbox_max_queue_jobs.addWidget(adjust_max_queue_jobs)
+        vbox.addLayout(settings_hbox_max_queue_jobs)
+
 
         preferencesLayout.addLayout(vbox,0,0)
 
@@ -1432,7 +1452,6 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def rerun_dimple_on_all_autoprocessing_files(self):
-        self.update_log.insert('running DIMPLE on ALL auto-processing files')
         job_list=[]
         for xtal in self.data_collection_dict:
             for entry in self.data_collection_dict[xtal]:
@@ -1449,6 +1468,7 @@ class XChemExplorer(QtGui.QApplication):
                         except KeyError:
                             continue
         if job_list != []:
+            self.update_log.insert('trying to run DIMPLE on ALL auto-processing files')
             self.check_before_running_dimple(job_list)
 
     def run_dimple_on_selected_autoprocessing_file(self):
@@ -1493,6 +1513,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
         if job_list != []:
+            self.update_log.insert('trying to run DIMPLE on SELECTED auto-processing files')
             self.check_before_running_dimple(job_list)
 
 
@@ -1550,12 +1571,20 @@ class XChemExplorer(QtGui.QApplication):
 
         if reply == 0:
             self.status_bar.showMessage('preparing %s DIMPLE jobs' %len(job_list))
+            self.update_log.insert('preparing to run %s DIMPLE jobs' %len(job_list))
+            if self.external_software['qsub_array']:
+                self.update_log.insert('we will be running an ARRAY job on the DLS computer cluster')
+                self.update_log.insert('please note that the maximum number of jobs that will be running at once is %s' %self.max_queue_jobs)
+                self.update_log.insert('you can change this in the PREFERENCES menu, but be warned that to high a number might break the cluster!')
+            self.update_log.insert('preparing input files for DIMPLE...')
             self.work_thread=XChemThread.run_dimple_on_all_autoprocessing_files(    job_list,
                                                                                     self.initial_model_directory,
                                                                                     self.external_software,
                                                                                     self.ccp4_scratch_directory,
                                                                                     self.database_directory,
-                                                                                    self.data_source_file)
+                                                                                    self.data_source_file,
+                                                                                    self.max_queue_jobs,
+                                                                                    self.xce_logfile    )
             self.explorer_active=1
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
@@ -1563,11 +1592,6 @@ class XChemExplorer(QtGui.QApplication):
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.work_thread.start()
 
-
-    def center_main_window(self):
-        screen = QtGui.QDesktopWidget().screenGeometry()
-        size = self.window.geometry()
-        self.window.move((screen.width()-size.width())/2, (screen.height()-size.height())/2)
 
     def select_pandda_input_template(self):
         filepath_temp=QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Select Example PDB or MTZ File', self.initial_model_directory,'*.pdb;;*.mtz')
@@ -1702,12 +1726,28 @@ class XChemExplorer(QtGui.QApplication):
         try:
             self.allowed_unitcell_difference_percent=int(text)
             self.settings['unitcell_difference']=self.allowed_unitcell_difference_percent
+            self.update_log.insert('changing max allowed unit cell difference between reference and xtal to %s percent' %self.allowed_unitcell_difference_percent)
         except ValueError:
             if str(text).find('.') != -1:
                 self.allowed_unitcell_difference_percent=int(str(text)[:str(text).find('.')])
                 self.settings['unitcell_difference']=self.allowed_unitcell_difference_percent
+                self.update_log.insert('changing max allowed unit cell difference between reference and xtal to %s percent' %self.allowed_unitcell_difference_percent)
             else:
                 pass
+
+    def change_max_queue_jobs(self,text):
+        try:
+            self.max_queue_jobs=int(text)
+            self.settings['max_queue_jobs']=self.max_queue_jobs
+            self.update_log.insert('changing max number of jobs running simultaneously on DLS cluster to %s' %self.max_queue_jobs)
+        except ValueError:
+            if str(text).find('.') != -1:
+                self.max_queue_jobs=int(str(text)[:str(text).find('.')])
+                self.settings['max_queue_jobs']=self.max_queue_jobs
+                self.update_log.insert('changing max number of jobs running simultaneously on DLS cluster to %s' %self.max_queue_jobs)
+            else:
+                pass
+
 
     def change_acceptable_low_resolution_limit(self,text):
         try:
@@ -2064,7 +2104,8 @@ class XChemExplorer(QtGui.QApplication):
                                                                         self.data_source_file,
                                                                         todo,
                                                                         self.ccp4_scratch_directory,
-                                                                        self.xce_logfile    )
+                                                                        self.xce_logfile,
+                                                                        self.max_queue_jobs     )
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
