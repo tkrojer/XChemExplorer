@@ -300,7 +300,7 @@ class XChemExplorer(QtGui.QApplication):
 
         frame_dataset_task=QtGui.QFrame()
         frame_dataset_task.setFrameShape(QtGui.QFrame.StyledPanel)
-        frame_dataset_task.setStyleSheet("QFrame { border: 1px solid green; border-radius: 1px; padding: 0px; margin: 0px }")
+        frame_dataset_task.setStyleSheet("QFrame { border: 1px solid green; border-radius: 1px; padding: 0px; margin: -1px }")
 #        frame_dataset_task.setStyleSheet("border: 1px green; border-radius: 1px; padding: 1px")
 #        frame_dataset_task.setStyleSheet("margin: 1px; padding: 1px; border: 1px gray; border-radius: 1px")
         vboxTask=QtGui.QVBoxLayout()
