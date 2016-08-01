@@ -1,4 +1,4 @@
-# last edited: 29/07/2016, 15:00
+# last edited: 01/08/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -73,8 +73,14 @@ class update_datasource_from_file_system(QtCore.QThread):
                 if not os.path.isfile('refine.mtz'):
                     os.system('/bin/rm refine.mtz')
                     os.symlink('dimple.mtz', 'refine.mtz')
+            # this should not really be the case, but if a user does not provide an aimless logfile then that's all we can do
+            if not os.path.isfile(xtal+'.log'):
+                if os.path.isfile(xtal+'.mtz'):
+                    mtz_info=mtztools(xtal+'.mtz').get_information_for_datasource()
+                    db_dict.update(mtz_info)
+                    db_dict['DataCollectionOutcome']='success'
             if not os.path.isfile(xtal+'.free.mtz'):
-                os.system('/bin/rm '+xtal+'.free.mtz')      # remove possible broken link
+                os.system('/bin/rm '+xtal+'.free.mtz 2> /dev/null')      # remove possible broken link
                 if os.path.isfile(os.path.join(dimple_path,'prepared2.mtz')):
                     os.symlink(os.path.join(dimple_path,'prepared2.mtz'),xtal+'.free.mtz')
                     db_dict['RefinementMTZfree']=xtal+'.free.mtz'
@@ -308,6 +314,19 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             ref_mtz =               item[4]
             ref_cif =               item[5]
 
+            # check if reference mtzfile has an Rfree column; if not, then ignore
+            # DIMPLE assumes an Rfree column and barfs if it is not present
+            # note: ref_mtz looks like this: ref mtz  -R reference.mtz
+            if os.path.isfile(ref_mtz.split()[len(ref_mtz.split())-1]):
+                mtz_column_dict=mtztools(ref_mtz.split()[len(ref_mtz.split())-1]).get_all_columns_as_dict()
+                if 'FreeR_flag' not in mtz_column_dict['RFREE']:
+                    self.Logfile.insert('cannot find FreeR_flag in reference mtz file: %s -> ignoring reference mtzfile!!!' %ref_mtz)
+                    ref_mtz = ''
+                    if mtz_column_dict['RFREE'] != []:
+                        self.Logfile.insert('found Rfree set with other column name though: %s' %str(mtz_column_dict['RFREE']))
+                        self.Logfile.insert('try renaming Rfree column to FreeR_flag with CAD!')
+
+
             db_dict={}
             db_dict['DimpleReferencePDB']=ref_pdb
             db.update_data_source(xtal,db_dict)
@@ -390,18 +409,11 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             f.write(Cmds)
             f.close()
             os.system('chmod +x xce_dimple_%s.sh' %str(n+1))
-#            if self.queueing_system_available:
-#                os.system('qsub xce_dimple.sh')
-#            else:
-#                os.system('chmod +x xce_dimple.sh')
-#                os.system('./xce_dimple.sh')
-            if not self.queueing_system_available:
-                os.system('./xce_dimple_%s.sh' %str(n+1))
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
-        # submit array job at Diamond
+        # submit job
         self.Logfile.insert('created input scripts for '+str(n+1)+' in '+self.ccp4_scratch_directory)
         os.chdir(self.ccp4_scratch_directory)
         if os.getcwd().startswith('/dls'):

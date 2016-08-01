@@ -1,4 +1,4 @@
-# last edited: 29/07/2016, 15:00
+# last edited: 01/08/2016, 15:00
 
 import sys
 import os
@@ -818,6 +818,58 @@ class mtztools:
                                     '432':          [207,208,209,210,211,212,213,214]  }
 
 
+        self.aimless = {    'DataProcessingProgram':                        'n/a',
+                            'DataCollectionRun':                            'n/a',
+                            'DataProcessingSpaceGroup':                     'n/a',
+                            'DataProcessingUnitCell':                       'n/a',
+                            'DataProcessingA':                              'n/a',
+                            'DataProcessingB':                              'n/a',
+                            'DataProcessingC':                              'n/a',
+                            'DataProcessingAlpha':                          'n/a',
+                            'DataProcessingBeta':                           'n/a',
+                            'DataProcessingGamma':                          'n/a',
+                            'DataProcessingResolutionLow':                  'n/a',
+                            'DataProcessingResolutionLowInnerShell':        'n/a',
+                            'DataProcessingResolutionHigh':                 'n/a',
+                            'DataProcessingResolutionHighOuterShell':       'n/a',
+                            'DataProcessingResolutionOverall':              'n/a',
+                            'DataProcessingRmergeOverall':                  'n/a',
+                            'DataProcessingRmergeLow':                      'n/a',
+                            'DataProcessingRmergeHigh':                     'n/a',
+                            'DataProcessingIsigOverall':                    'n/a',
+                            'DataProcessingIsigLow':                        'n/a',
+                            'DataProcessingIsigHigh':                       'n/a',
+                            'DataProcessingCompletenessOverall':            'n/a',
+                            'DataProcessingCompletenessLow':                'n/a',
+                            'DataProcessingCompletenessHigh':               'n/a',
+                            'DataProcessingMultiplicityOverall':            'n/a',
+                            'DataProcessingMultiplicityLow':                'n/a',
+                            'DataProcessingMultiplicityHigh':               'n/a',
+                            'DataProcessingCChalfOverall':                  'n/a',
+                            'DataProcessingCChalfLow':                      'n/a',
+                            'DataProcessingCChalfHigh':                     'n/a',
+                            'DataProcessingResolutionHigh15sigma':         'n/a',
+                            'DataProcessingUniqueReflectionsOverall':       'n/a',
+                            'DataProcessingLattice':                        'n/a',
+                            'DataProcessingPointGroup':                     'n/a',
+                            'DataProcessingUnitCellVolume':                 0,
+                            'DataProcessingAlert':                          '#FF0000',
+                            'DataCollectionWavelength':                     'n/a',
+                            'DataProcessingScore':                          'n/a'             }
+
+    def get_information_for_datasource(self):
+        db_dict={}
+        mtz_dict=self.get_all_values_as_dict()
+        pg=self.get_pointgroup_from_mtz()
+        if mtz_dict != {}:
+            db_dict['DataProcessingResolutionHigh']=mtz_dict['resolution_high']
+            db_dict['DataProcessingUnitCell']=mtz_dict['unitcell']
+            db_dict['DataProcessingSpaceGroup']=mtz_dict['spacegroup']
+            db_dict['DataProcessingUnitCellVolume']=mtz_dict['unitcell_volume']
+            db_dict['DataProcessingLattice']=mtz_dict['bravais_lattice']
+        if pg != '':
+            db_dict['DataProcessingPointGroup']=pg
+        return db_dict
 
     def get_bravais_lattice_from_spg_number(self,number):
         lattice=''
