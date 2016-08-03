@@ -1,4 +1,4 @@
-# last edited: 29/07/2016, 15:00
+# last edited: 03/08/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -47,6 +47,7 @@ class XChemExplorer(QtGui.QApplication):
         XChemLog.startLog(self.xce_logfile).create_logfile()
         self.update_log=XChemLog.updateLog(self.xce_logfile)
         self.update_log.insert('new session started')
+        self.diffraction_data_directory=self.current_directory
 
         if 'labxchem' in self.current_directory:
             self.labxchem_directory='/'+os.path.join(*self.current_directory.split('/')[1:6])    # need splat operator: *
@@ -115,21 +116,22 @@ class XChemExplorer(QtGui.QApplication):
         # Settings
         #
 
-        self.settings =     {'current_directory':       self.current_directory,
-                             'beamline_directory':      self.beamline_directory,
-                             'data_collection_summary': self.data_collection_summary_file,
-                             'initial_model_directory': self.initial_model_directory,
-                             'panddas_directory':       self.panddas_directory,
-                             'reference_directory':     self.reference_directory,
-                             'database_directory':      self.database_directory,
-                             'data_source':             os.path.join(self.database_directory,self.data_source_file),
-                             'ccp4_scratch':            self.ccp4_scratch_directory,
-                             'unitcell_difference':     self.allowed_unitcell_difference_percent,
-                             'too_low_resolution_data': self.acceptable_low_resolution_limit_for_data,
-                             'filename_root':           self.filename_root,
-                             'preferences':             self.preferences,
-                             'xce_logfile':             self.xce_logfile,
-                             'max_queue_jobs':          self.max_queue_jobs     }
+        self.settings =     {'current_directory':               self.current_directory,
+                             'beamline_directory':              self.beamline_directory,
+                             'data_collection_summary':         self.data_collection_summary_file,
+                             'initial_model_directory':         self.initial_model_directory,
+                             'panddas_directory':               self.panddas_directory,
+                             'reference_directory':             self.reference_directory,
+                             'database_directory':              self.database_directory,
+                             'data_source':                     os.path.join(self.database_directory,self.data_source_file),
+                             'ccp4_scratch':                    self.ccp4_scratch_directory,
+                             'unitcell_difference':             self.allowed_unitcell_difference_percent,
+                             'too_low_resolution_data':         self.acceptable_low_resolution_limit_for_data,
+                             'filename_root':                   self.filename_root,
+                             'preferences':                     self.preferences,
+                             'xce_logfile':                     self.xce_logfile,
+                             'max_queue_jobs':                  self.max_queue_jobs,
+                             'diffraction_data_directory':      self.diffraction_data_directory }
 
 
         #
@@ -163,6 +165,8 @@ class XChemExplorer(QtGui.QApplication):
 
         self.target_list,self.visit_list=XChemMain.get_target_and_visit_list(self.beamline_directory)
 #        self.target_list,self.visit_list=XChemMain.get_target_and_visit_list_for_Pietro(self.beamline_directory)
+
+        self.diffraction_data_dict={}
 
         #
         # internal switches and flags
@@ -250,6 +254,11 @@ class XChemExplorer(QtGui.QApplication):
         datasource_menu.addAction(update_datasource)
         datasource_menu.addAction(select_columns_to_show)
         datasource_menu.addAction(create_new_data_source)
+
+        data_processing_menu = menu_bar.addMenu("&Data Processing")
+        run_xia2=QtGui.QAction('Run XIA2',self.window)
+        run_xia2.triggered.connect(self.run_xia2)
+        data_processing_menu.addAction(run_xia2)
 
         preferences_menu = menu_bar.addMenu("&Preferences")
         show_preferences=QtGui.QAction('Edit Preferences',self.window)
@@ -1166,6 +1175,44 @@ class XChemExplorer(QtGui.QApplication):
 
         preferences.exec_();
 
+    def run_xia2(self):
+
+        DataProcessing = QtGui.QMessageBox()
+        DataProcessingLayout = DataProcessing.layout()
+
+        vbox = QtGui.QVBoxLayout()
+
+        frame=QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+        vbox_dir=QtGui.QVBoxLayout()
+        hbox=QtGui.QHBoxLayout()
+        label=QtGui.QLabel('Data collection directory')
+        hbox.addWidget(label)
+        button=QtGui.QPushButton("Select")
+        button.clicked.connect(self.select_diffraction_data_directory)
+        hbox.addWidget(button)
+        vbox_dir.addLayout(hbox)
+
+        self.diffraction_data_dir_label=QtGui.QLabel(self.diffraction_data_directory)
+        vbox_dir.addWidget(self.diffraction_data_dir_label)
+        frame.setLayout(vbox_dir)
+
+
+        vbox.addWidget(frame)
+
+        label=QtGui.QLabel('Data processing protocol')
+        vbox.addWidget(label)
+        xia2_3d_checkbox = QtGui.QCheckBox('3d')
+        vbox.addWidget(xia2_3d_checkbox)
+        xia2_3dii_checkbox = QtGui.QCheckBox('3dii')
+        vbox.addWidget(xia2_3dii_checkbox)
+        xia2_dials_checkbox = QtGui.QCheckBox('dials')
+        vbox.addWidget(xia2_dials_checkbox)
+
+        DataProcessingLayout.addLayout(vbox,0,0)
+
+        DataProcessing.exec_();
+
 
     def set_xce_logfile(self):
         file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.current_directory))
@@ -1621,6 +1668,23 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_pdb_style_entry.setText(pdbin)
         self.pandda_mtz_style_entry.setText(mtzin)
 
+    def select_diffraction_data_directory(self):
+        self.diffraction_data_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
+        self.diffraction_data_dir_label.setText(self.diffraction_data_directory)
+        self.settings['diffraction_data_directory']=self.diffraction_data_directory
+        self.update_log.insert('setting diffraction data directory to '+self.diffraction_data_directory)
+        self.work_thread=XChemMain.find_diffraction_image_directory(self.diffraction_data_directory)
+        self.explorer_active=1
+        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_diffraction_data_dict"),self.update_diffraction_data_dict)
+        self.work_thread.start()
+
+    def update_diffraction_data_dict(self,data_dict):
+        self.diffraction_data_dict=data_dict
+        self.update_log.insert('found '+str(len(self.diffraction_data_dict))+' datasets')
+
     def update_all_tables(self):
         self.update_log.insert('checking for new reference files')
         self.update_status_bar('checking for new reference files')
@@ -2053,7 +2117,7 @@ class XChemExplorer(QtGui.QApplication):
     def run_pandda_inspect(self):
         self.settings['panddas_directory']=str(self.pandda_output_data_dir_entry.text())
         print '==> XCE: starting pandda.inspect'
-        self.work_thread=XChemThread.start_pandda_inspect(self.settings)
+        self.work_thread=XChemThread.start_pandda_inspect(self.settings,self.xce_logfile)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 

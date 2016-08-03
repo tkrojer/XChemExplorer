@@ -1,4 +1,4 @@
-# last edited: 28/07/2016, 16:50
+# last edited: 03/08/2016, 15:00
 
 import pygtk, gtk, pango
 import os
@@ -266,8 +266,10 @@ class Refine(object):
             '/bin/mv molprobity.out refine_molprobity.log\n'
             'mmtbx.validate_ligands refine_%s.pdb refine_%s.mtz LIG > validate_ligands.txt\n' %(Serial,Serial)+
             'cd '+self.ProjectPath+'/'+self.xtalID+'\n'
-            'ln -s %s/%s/Refine_%s/refine_%s.pdb refine.pdb\n' %(self.ProjectPath,self.xtalID,Serial,Serial)+
-            'ln -s %s/%s/Refine_%s/refine_%s.mtz refine.mtz\n' %(self.ProjectPath,self.xtalID,Serial,Serial)+
+            '#ln -s %s/%s/Refine_%s/refine_%s.pdb refine.pdb\n' %(self.ProjectPath,self.xtalID,Serial,Serial)+
+            '#ln -s %s/%s/Refine_%s/refine_%s.mtz refine.mtz\n' %(self.ProjectPath,self.xtalID,Serial,Serial)+
+            'ln -s ./Refine_%s/refine_%s.pdb refine.pdb\n' %(Serial,Serial)+
+            'ln -s ./Refine_%s/refine_%s.mtz refine.mtz\n' %(Serial,Serial)+
             'ln -s Refine_%s/validate_ligands.txt .\n' %Serial+
             'ln -s Refine_%s/refine_molprobity.log .\n' %Serial+
             'mmtbx.validation_summary refine.pdb > validation_summary.txt\n'

@@ -1,4 +1,4 @@
-# last edited: 01/08/2016, 15:00
+# last edited: 03/08/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -461,10 +461,12 @@ class start_COOT(QtCore.QThread):
 
 class start_pandda_inspect(QtCore.QThread):
 
-    def __init__(self,settings):
+    def __init__(self,settings,xce_logfile):
         QtCore.QThread.__init__(self)
 #        self.settings=settings
         self.panddas_directory=settings['panddas_directory']
+        self.xce_logfile=xce_logfile
+        self.Logfile=XChemLog.updateLog(xce_logfile)
 
     def run(self):
         if os.getenv('SHELL') == '/bin/tcsh' or os.getenv('SHELL') == '/bin/csh':
@@ -476,15 +478,24 @@ class start_pandda_inspect(QtCore.QThread):
 
         Cmds = (
                 '#!'+os.getenv('SHELL')+'\n'
-                '\n'
                 'source '+source_file+'\n'
-                '\n'
                 'cd '+self.panddas_directory+'\n'
-                '\n'
                 'pandda.inspect\n'
             )
-        print Cmds
+
+        self.Logfile.insert('starting pandda.inspect with the following command:'+Cmds)
         os.system(Cmds)
+
+#        Cmds = (
+#                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
+#                'cd '+self.panddas_directory+'\n'
+#                'pandda.inspect\n'
+#            )
+#
+#        self.Logfile.insert('starting pandda.inspect with the following command:\n/bin/bash\n'+Cmds)
+#        # need to do this because we're having all sorts of csh bash issues at SGC
+#        os.system('/bin/bash\n'+Cmds)
+
 
 
 
@@ -640,6 +651,9 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
         Rfree=''
         refinement_stage=''
         spg=''
+        relative_dimple_destination='.'+dimple_destination.replace(self.initial_model_directory,'')
+        relative_path_to_mtzfile='.'+path_to_mtzfile.replace(self.initial_model_directory,'')
+        relative_path_to_logfile='.'+path_to_logfile.replace(self.initial_model_directory,'')
         # move up to sample directory and link respective files
         # first remove any old symbolic links
         os.chdir(os.path.join(self.initial_model_directory,sample))
@@ -648,8 +662,10 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
         if os.path.islink(os.path.join(self.initial_model_directory,sample,sample+'.log')):
             os.system('/bin/rm '+os.path.join(self.initial_model_directory,sample,sample+'.log'))
         # then link new files
-        os.symlink(os.path.join(path_to_mtzfile,sample+'.mtz'),sample+'.mtz')
-        os.symlink(os.path.join(path_to_logfile,sample+'.log'),sample+'.log')
+#        os.symlink(os.path.join(path_to_mtzfile,sample+'.mtz'),sample+'.mtz')
+#        os.symlink(os.path.join(path_to_logfile,sample+'.log'),sample+'.log')
+        os.symlink(os.path.join(relative_path_to_mtzfile,sample+'.mtz'),sample+'.mtz')
+        os.symlink(os.path.join(relative_path_to_logfile,sample+'.log'),sample+'.log')
         if dimple_destination != '':
             # check if dimple files exist
             if os.path.isfile(os.path.join(dimple_destination,'final.pdb')):
@@ -657,8 +673,11 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
                 #if os.path.isfile('dimple.pdb'):
                 # forget about the if statement; it won't catch broken links,
                 # but broken links will still trip os.symlink
-                os.system('/bin/rm dimple.pdb')
-                os.symlink(os.path.join(dimple_destination,'final.pdb'),'dimple.pdb')
+                os.system('/bin/rm dimple.pdb 2> /dev/null')
+                # symlink with absolute path
+#                os.symlink(os.path.join(dimple_destination,'final.pdb'),'dimple.pdb')
+                # symlink with relative paths
+                os.symlink(os.path.join(relative_dimple_destination,'final.pdb'),'dimple.pdb')
                 pdb_info=parse().PDBheader(os.path.join(dimple_destination,'final.pdb'))
                 Rcryst=pdb_info['Rcryst']
                 Rfree=pdb_info['Rfree']
@@ -668,8 +687,9 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
             if os.path.isfile(os.path.join(dimple_destination,'final.mtz')):
                 # remove old symbolic links if necessary
                 #if os.path.isfile('dimple.mtz'):
-                os.system('/bin/rm dimple.mtz')
-                os.symlink(os.path.join(dimple_destination,'final.mtz'),'dimple.mtz')
+                os.system('/bin/rm dimple.mtz 2> /dev/null')
+#                os.symlink(os.path.join(dimple_destination,'final.mtz'),'dimple.mtz')
+                os.symlink(os.path.join(relative_dimple_destination,'final.mtz'),'dimple.mtz')
             # if no refinement was carried out yet, then we also want to link the dimple files to refine.pdb/refine.log
             # so that we can look at them with the COOT plugin
             found_previous_refinement=False
@@ -680,17 +700,18 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
             if not found_previous_refinement:
                 # first delete possible old symbolic links
                 #if os.path.isfile('refine.pdb'):
-                os.system('/bin/rm refine.pdb')
+                os.system('/bin/rm refine.pdb 2> /dev/null')
                 os.symlink('dimple.pdb','refine.pdb')
                 #if os.path.isfile('refine.mtz'):
-                os.system('/bin/rm refine.mtz')
+                os.system('/bin/rm refine.mtz 2> /dev/null')
                 os.symlink('dimple.mtz','refine.mtz')
             # remove any previous <sample>.free.mtz file, and link new dimple.mtz
             # so if we continue refining, then we do so against the correct file
             # think that REFMAC does not tinker with F,SIGF as long as there is no twinning
             #if os.path.isfile(sample+'.free.mtz'):
             os.system('/bin/rm '+sample+'.free.mtz')
-            os.symlink(os.path.join(dimple_destination,'final.mtz'),sample+'.free.mtz')
+#            os.symlink(os.path.join(dimple_destination,'final.mtz'),sample+'.free.mtz')
+            os.symlink(os.path.join(relative_dimple_destination,'final.mtz'),sample+'.free.mtz')
             mtzfree=os.path.join(dimple_destination,'final.mtz')
         return mtzfree,Rcryst,Rfree,refinement_stage,spg
 

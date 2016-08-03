@@ -1,10 +1,11 @@
-# last edited: 28/07/2016 - 16:50
+# last edited: 03/08/2016 - 15:00
 
 import os,glob
 import sys
 import subprocess
 import getpass
 from datetime import datetime
+from PyQt4 import QtGui, QtCore
 
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 
@@ -226,6 +227,8 @@ def change_links_to_selected_data_collection_outcome(sample,data_collection_dict
                 path_to_mtzfile=db_dict['DataProcessingPathToMTZfile']
                 mtz_filename=db_dict['DataProcessingMTZfileName']
                 log_filename=db_dict['DataProcessingLOGfileName']
+                relative_path_to_mtzfile='.'+path_to_mtzfile.replace(initial_model_directory,'')
+                relative_path_to_logfile='.'+path_to_logfile.replace(initial_model_directory,'')
 
 
                 # first check if folders and files exist
@@ -233,15 +236,20 @@ def change_links_to_selected_data_collection_outcome(sample,data_collection_dict
 
                 if os.path.isdir(os.path.join(initial_model_directory,sample,'autoprocessing',visit+'-'+run+autoproc)):
                     db_dict['DataProcessingAutoAssigned']='False'
+                    Logfile.insert('changing directory to: '+os.path.join(initial_model_directory,sample))
                     os.chdir(os.path.join(initial_model_directory,sample))
                     # first remove old links
-                    os.system('/bin/rm '+sample+'.mtz')
-                    os.system('/bin/rm '+sample+'.log')
+                    os.system('/bin/rm '+sample+'.mtz 2> /dev/null')
+                    os.system('/bin/rm '+sample+'.log 2> /dev/null')
                     # make new links
-                    Logfile.insert('setting symlink: '+os.path.join(path_to_logfile,log_filename)+' -> '+sample+'.log')
-                    os.symlink(os.path.join(path_to_logfile,log_filename),sample+'.log')
-                    Logfile.insert('setting symlink: '+os.path.join(path_to_mtzfile,mtz_filename)+' -> '+sample+'.mtz')
-                    os.symlink(os.path.join(path_to_mtzfile,mtz_filename),sample+'.mtz')
+#                    Logfile.insert('setting symlink: '+os.path.join(path_to_logfile,log_filename)+' -> '+sample+'.log')
+#                    os.symlink(os.path.join(path_to_logfile,log_filename),sample+'.log')
+#                    Logfile.insert('setting symlink: '+os.path.join(path_to_mtzfile,mtz_filename)+' -> '+sample+'.mtz')
+#                    os.symlink(os.path.join(path_to_mtzfile,mtz_filename),sample+'.mtz')
+                    Logfile.insert('setting relative symlink: '+os.path.join(relative_path_to_logfile,log_filename)+' -> '+sample+'.log')
+                    os.symlink(os.path.join(relative_path_to_logfile,log_filename),sample+'.log')
+                    Logfile.insert('setting relative symlink: '+os.path.join(relative_path_to_mtzfile,mtz_filename)+' -> '+sample+'.mtz')
+                    os.symlink(os.path.join(relative_path_to_mtzfile,mtz_filename),sample+'.mtz')
 
                     # update data source
                     data_source=XChemDB.data_source(data_source_file)
@@ -249,3 +257,57 @@ def change_links_to_selected_data_collection_outcome(sample,data_collection_dict
 
                 else:
                     Logfile.insert('please copy data to PROJECT DIRECTORY first!')
+
+
+#def find_diffraction_image_directory(diffraction_data_directory):
+#    data_dict={}
+#    diffraction_image_extension = ['.img','.cbf','.mccd','.mar2560','.mar2300']
+#    os.chdir(diffraction_data_directory)
+#    for xtal in glob.glob('*'):
+#        data_dict[xtal]=[]
+#        for root,dirs,files in os.walk(xtal):
+#            if 'screening' in root:
+#                continue
+#            for n,image_file in enumerate(glob.glob(os.path.join(root,'*'))):
+#                file_extension=image_file[image_file.rfind('.'):]
+#                if n > 20 and file_extension in diffraction_image_extension:
+#                    data_dict[xtal].append(os.path.join(diffraction_data_directory,root))
+#                    break
+#        if data_dict[xtal]==[]:
+#            del data_dict[xtal]
+#    return data_dict
+
+class find_diffraction_image_directory(QtCore.QThread):
+    def __init__(self,diffraction_data_directory):
+        QtCore.QThread.__init__(self)
+        self.diffraction_data_directory=diffraction_data_directory
+        self.data_dict={}
+        self.diffraction_image_extension = ['.img','.cbf','.mccd','.mar2560','.mar2300']
+
+    def run(self):
+        os.chdir(self.diffraction_data_directory)
+        if len(glob.glob(os.path.join(self.diffraction_data_directory,'*'))) != 0:
+            progress_step=100/float(len(glob.glob(os.path.join(self.diffraction_data_directory,'*'))))
+        else:
+            progress_step=100
+        progress=0
+        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'searching diffraction data directory')
+        for xtal in glob.glob('*'):
+            self.data_dict[xtal]=[]
+            for root,dirs,files in os.walk(xtal):
+                if 'screening' in root:
+                    continue
+                for n,image_file in enumerate(glob.glob(os.path.join(root,'*'))):
+                    file_extension=image_file[image_file.rfind('.'):]
+                    if n > 20 and file_extension in self.diffraction_image_extension:
+                        self.data_dict[xtal].append(os.path.join(self.diffraction_data_directory,root))
+                        break
+            if self.data_dict[xtal]==[]:
+                del self.data_dict[xtal]
+
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+        self.emit(QtCore.SIGNAL('update_diffraction_data_dict'), self.data_dict)
