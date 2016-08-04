@@ -1,4 +1,4 @@
-# last edited: 03/08/2016, 15:00
+# last edited: 04/08/2016, 17:00
 
 import os, sys, glob
 from datetime import datetime
@@ -48,6 +48,8 @@ class XChemExplorer(QtGui.QApplication):
         self.update_log=XChemLog.updateLog(self.xce_logfile)
         self.update_log.insert('new session started')
         self.diffraction_data_directory=self.current_directory
+        self.diffraction_data_search_info='n/a'
+        self.diffraction_data_reference_mtz='ignore'
 
         if 'labxchem' in self.current_directory:
             self.labxchem_directory='/'+os.path.join(*self.current_directory.split('/')[1:6])    # need splat operator: *
@@ -255,10 +257,10 @@ class XChemExplorer(QtGui.QApplication):
         datasource_menu.addAction(select_columns_to_show)
         datasource_menu.addAction(create_new_data_source)
 
-        data_processing_menu = menu_bar.addMenu("&Data Processing")
-        run_xia2=QtGui.QAction('Run XIA2',self.window)
-        run_xia2.triggered.connect(self.run_xia2)
-        data_processing_menu.addAction(run_xia2)
+#        data_processing_menu = menu_bar.addMenu("&Data Processing")
+#        run_xia2=QtGui.QAction('Run XIA2',self.window)
+#        run_xia2.triggered.connect(self.run_xia2)
+#        data_processing_menu.addAction(run_xia2)
 
         preferences_menu = menu_bar.addMenu("&Preferences")
         show_preferences=QtGui.QAction('Edit Preferences',self.window)
@@ -583,7 +585,9 @@ class XChemExplorer(QtGui.QApplication):
 
         dls_tab_widget = QtGui.QTabWidget()
         dls_tab_list = [ 'Summary',
-                         'Dewar'    ]
+                         'Dewar',
+                         'Reprocess'    ]
+
         self.dls_tab_dict={}
         for page in dls_tab_list:
             tab=QtGui.QWidget()
@@ -683,6 +687,116 @@ class XChemExplorer(QtGui.QApplication):
         self.dls_tab_dict['Dewar'][1].addLayout(self.dewar_configuration_layout)
 
 
+        # - Reprocessing Sub-Tab ####################################################################
+        reprocess_vbox=QtGui.QVBoxLayout()
+
+        frame=QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+        hbox=QtGui.QHBoxLayout()
+
+
+        frame_select=QtGui.QFrame()
+        frame_select.setFrameShape(QtGui.QFrame.StyledPanel)
+        hbox_select=QtGui.QHBoxLayout()
+        label=QtGui.QLabel('Data collection directory:')
+        hbox_select.addWidget(label)
+        dir_frame=QtGui.QFrame()
+        dir_frame.setFrameShape(QtGui.QFrame.StyledPanel)
+        dir_label_box=QtGui.QVBoxLayout()
+        self.diffraction_data_dir_label=QtGui.QLabel(self.diffraction_data_directory)
+        dir_label_box.addWidget(self.diffraction_data_dir_label)
+        dir_frame.setLayout(dir_label_box)
+        hbox_select.addWidget(dir_frame)
+        button=QtGui.QPushButton("Select")
+        button.clicked.connect(self.select_diffraction_data_directory)
+        hbox_select.addWidget(button)
+        frame_select.setLayout(hbox_select)
+        hbox.addWidget(frame_select)
+        frame_search=QtGui.QFrame()
+        frame_search.setFrameShape(QtGui.QFrame.StyledPanel)
+        hbox_search=QtGui.QHBoxLayout()
+        button=QtGui.QPushButton("Search Datasets")
+        button.clicked.connect(self.search_for_datasets)
+        hbox_search.addWidget(button)
+        frame_search_info=QtGui.QFrame()
+        frame_search_info.setFrameShape(QtGui.QFrame.StyledPanel)
+        hbox_search_info=QtGui.QHBoxLayout()
+        self.diffraction_data_search_label=QtGui.QLabel(self.diffraction_data_search_info)
+        hbox_search_info.addWidget(self.diffraction_data_search_label)
+        frame_search_info.setLayout(hbox_search_info)
+        hbox_search.addWidget(frame_search_info)
+        frame_search.setLayout(hbox_search)
+        hbox.addWidget(frame_search)
+        frame.setLayout(hbox)
+        reprocess_vbox.addWidget(frame)
+
+        self.reprocess_datasets_column_list=[   'Sample ID',
+                                                'Run\nxia2',
+                                                'Resolution\n[Mn<I/sig(I)> = 1.5]',
+                                                'Rmerge\nLow',
+                                                'DataProcessing\nSpaceGroup',
+                                                'DataProcessing\nUnitCell'  ]
+
+        self.reprocess_datasets_table=QtGui.QTableWidget()
+        self.reprocess_datasets_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.reprocess_datasets_table.setSortingEnabled(True)
+        self.reprocess_datasets_table.setColumnCount(len(self.reprocess_datasets_column_list))
+        self.reprocess_datasets_table.setHorizontalHeaderLabels(self.reprocess_datasets_column_list)
+        reprocess_vbox.addWidget(self.reprocess_datasets_table)
+
+        frame=QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+        hbox=QtGui.QHBoxLayout()
+
+        frame_options=QtGui.QFrame()
+        frame_options.setFrameShape(QtGui.QFrame.StyledPanel)
+        hbox_options=QtGui.QHBoxLayout()
+        label=QtGui.QLabel('Data processing protocol:')
+        hbox_options.addWidget(label)
+        self.xia2_3d_checkbox = QtGui.QCheckBox(' xia2 3d')
+        hbox_options.addWidget(self.xia2_3d_checkbox)
+        self.xia2_3dii_checkbox = QtGui.QCheckBox('xia2 3dii')
+        hbox_options.addWidget(self.xia2_3dii_checkbox)
+        self.xia2_dials_checkbox = QtGui.QCheckBox('Dials')
+        hbox_options.addWidget(self.xia2_dials_checkbox)
+        frame_options.setLayout(hbox_options)
+        hbox.addWidget(frame_options)
+
+        frame_sg=QtGui.QFrame()
+        frame_sg.setFrameShape(QtGui.QFrame.StyledPanel)
+        hbox_sg=QtGui.QHBoxLayout()
+        label=QtGui.QLabel('Space Group:')
+        hbox_sg.addWidget(label)
+        self.reprocess_space_group_comboxbox=QtGui.QComboBox()
+        self.reprocess_space_group_comboxbox.addItem('ignore')
+        for sg in XChemMain.space_group_list():
+            self.reprocess_space_group_comboxbox.addItem(sg)
+        hbox_sg.addWidget(self.reprocess_space_group_comboxbox)
+        frame_sg.setLayout(hbox_sg)
+        hbox.addWidget(frame_sg)
+
+        frame_ref=QtGui.QFrame()
+        frame_ref.setFrameShape(QtGui.QFrame.StyledPanel)
+        hbox_ref=QtGui.QHBoxLayout()
+        label=QtGui.QLabel('Reference MTZ:')
+        hbox_ref.addWidget(label)
+        frame_ref_info=QtGui.QFrame()
+        frame_ref_info.setFrameShape(QtGui.QFrame.StyledPanel)
+        hbox_frame_ref_info=QtGui.QHBoxLayout()
+        self.reprocess_reference_mtz_file_label=QtGui.QLabel(self.diffraction_data_reference_mtz)
+        hbox_frame_ref_info.addWidget(self.reprocess_reference_mtz_file_label)
+        frame_ref_info.setLayout(hbox_frame_ref_info)
+        hbox_ref.addWidget(frame_ref_info)
+        button=QtGui.QPushButton("Select")
+        button.clicked.connect(self.select_reprocess_reference_mtz)
+        hbox_ref.addWidget(button)
+        frame_ref.setLayout(hbox_ref)
+        hbox.addWidget(frame_ref)
+
+        frame.setLayout(hbox)
+        reprocess_vbox.addWidget(frame)
+
+        self.dls_tab_dict['Reprocess'][1].addLayout(reprocess_vbox)
 
 
         #
@@ -1175,43 +1289,43 @@ class XChemExplorer(QtGui.QApplication):
 
         preferences.exec_();
 
-    def run_xia2(self):
-
-        DataProcessing = QtGui.QMessageBox()
-        DataProcessingLayout = DataProcessing.layout()
-
-        vbox = QtGui.QVBoxLayout()
-
-        frame=QtGui.QFrame()
-        frame.setFrameShape(QtGui.QFrame.StyledPanel)
-        vbox_dir=QtGui.QVBoxLayout()
-        hbox=QtGui.QHBoxLayout()
-        label=QtGui.QLabel('Data collection directory')
-        hbox.addWidget(label)
-        button=QtGui.QPushButton("Select")
-        button.clicked.connect(self.select_diffraction_data_directory)
-        hbox.addWidget(button)
-        vbox_dir.addLayout(hbox)
-
-        self.diffraction_data_dir_label=QtGui.QLabel(self.diffraction_data_directory)
-        vbox_dir.addWidget(self.diffraction_data_dir_label)
-        frame.setLayout(vbox_dir)
-
-
-        vbox.addWidget(frame)
-
-        label=QtGui.QLabel('Data processing protocol')
-        vbox.addWidget(label)
-        xia2_3d_checkbox = QtGui.QCheckBox('3d')
-        vbox.addWidget(xia2_3d_checkbox)
-        xia2_3dii_checkbox = QtGui.QCheckBox('3dii')
-        vbox.addWidget(xia2_3dii_checkbox)
-        xia2_dials_checkbox = QtGui.QCheckBox('dials')
-        vbox.addWidget(xia2_dials_checkbox)
-
-        DataProcessingLayout.addLayout(vbox,0,0)
-
-        DataProcessing.exec_();
+#    def run_xia2(self):
+#
+#        DataProcessing = QtGui.QMessageBox()
+#        DataProcessingLayout = DataProcessing.layout()
+#
+#        vbox = QtGui.QVBoxLayout()
+#
+#        frame=QtGui.QFrame()
+#        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+#        vbox_dir=QtGui.QVBoxLayout()
+#        hbox=QtGui.QHBoxLayout()
+#        label=QtGui.QLabel('Data collection directory')
+#        hbox.addWidget(label)
+#        button=QtGui.QPushButton("Select")
+#        button.clicked.connect(self.select_diffraction_data_directory)
+#        hbox.addWidget(button)
+#        vbox_dir.addLayout(hbox)
+#
+#        self.diffraction_data_dir_label=QtGui.QLabel(self.diffraction_data_directory)
+#        vbox_dir.addWidget(self.diffraction_data_dir_label)
+#        frame.setLayout(vbox_dir)
+#
+#
+#        vbox.addWidget(frame)
+#
+#        label=QtGui.QLabel('Data processing protocol')
+#        vbox.addWidget(label)
+#        xia2_3d_checkbox = QtGui.QCheckBox('3d')
+#        vbox.addWidget(xia2_3d_checkbox)
+#        xia2_3dii_checkbox = QtGui.QCheckBox('3dii')
+#        vbox.addWidget(xia2_3dii_checkbox)
+#        xia2_dials_checkbox = QtGui.QCheckBox('dials')
+#        vbox.addWidget(xia2_dials_checkbox)
+#
+#        DataProcessingLayout.addLayout(vbox,0,0)
+#
+#        DataProcessing.exec_();
 
 
     def set_xce_logfile(self):
@@ -1300,7 +1414,7 @@ class XChemExplorer(QtGui.QApplication):
         print '==> XCE: found '+str(len(self.xtal_db_dict))+' samples'
 
     def datasource_menu_reload_samples(self):
-        print '==> reading samples from data source: ',os.path.join(self.database_directory,self.data_source_file)
+        self.update_log.insert('reading samples from data source: '+os.path.join(self.database_directory,self.data_source_file))
         self.update_status_bar('reading samples from data source: '+os.path.join(self.database_directory,self.data_source_file))
         self.update_header_and_data_from_datasource()
         self.update_all_tables()
@@ -1673,17 +1787,41 @@ class XChemExplorer(QtGui.QApplication):
         self.diffraction_data_dir_label.setText(self.diffraction_data_directory)
         self.settings['diffraction_data_directory']=self.diffraction_data_directory
         self.update_log.insert('setting diffraction data directory to '+self.diffraction_data_directory)
+
+    def search_for_datasets(self):
+        self.update_log.insert('search diffraction data directory for datasets...')
         self.work_thread=XChemMain.find_diffraction_image_directory(self.diffraction_data_directory)
         self.explorer_active=1
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-        self.connect(self.work_thread, QtCore.SIGNAL("update_diffraction_data_dict"),self.update_diffraction_data_dict)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_reprocess_datasets_table"),self.update_reprocess_datasets_table)
         self.work_thread.start()
 
-    def update_diffraction_data_dict(self,data_dict):
+    def select_reprocess_reference_mtz(self):
+        self.update_log.insert('trying to set new reference mtz file for reprocessing with xia2')
+        file_name = str(QtGui.QFileDialog.getOpenFileName(self.window,'Select file', self.database_directory))
+        if os.path.isfile(file_name):
+            if file_name.endswith('.mtz'):
+                self.diffraction_data_reference_mtz=file_name
+                self.update_log.insert('new reference file for data processing with xia2: '+self.diffraction_data_reference_mtz)
+                self.reprocess_reference_mtz_file_label.setText(self.diffraction_data_reference_mtz)
+            else:
+                self.update_log.insert('this does not seem to be a mtz file: '+file_name)
+
+    def update_reprocess_datasets_table(self,data_dict):
         self.diffraction_data_dict=data_dict
-        self.update_log.insert('found '+str(len(self.diffraction_data_dict))+' datasets')
+        self.diffraction_data_search_info='found '+str(len(self.diffraction_data_dict))+' datasets'
+        self.diffraction_data_search_label.setText(self.diffraction_data_search_info)
+        self.update_log.insert(self.diffraction_data_search_info)
+        self.datasource_menu_reload_samples()
+        if len(self.diffraction_data_dict) > 0:
+            for xtal in sorted(self.diffraction_data_dict):
+                if xtal in self.xtal_db_dict:
+                    db_dict=self.xtal_db_dict[xtal]
+        # update table
+        column_name=self.db.translate_xce_column_list_to_sqlite(self.reprocess_datasets_column_list)
+
 
     def update_all_tables(self):
         self.update_log.insert('checking for new reference files')

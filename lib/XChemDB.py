@@ -1,4 +1,4 @@
-# last edited: 29/07/2016, 15:00
+# last edited: 04/08/2016, 17:00
 
 import sqlite3
 import os,sys
@@ -749,6 +749,9 @@ class data_source:
                 out_list.append([item,item])
                 continue
             if item.startswith('Run\nDimple'):
+                out_list.append([item,item])
+                continue
+            if item.startswith('Run\nxia2'):
                 out_list.append([item,item])
                 continue
             if item.startswith('Reference\nSpaceGroup'):
