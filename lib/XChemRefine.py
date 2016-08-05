@@ -152,6 +152,15 @@ class Refine(object):
                     "giant.create_occupancy_params pdb=in.pdb refmac_occ_out='refmac_refine.params'\n"  )
 #            os.system("giant.create_occupancy_params pdb=in.pdb refmac_occ_out='refmac_refine.params'")
             os.system(cmd)
+            # quick fix for the moment; need to talk to Nick since this should not be necessary
+            params_file = fileinput.input('refmac_refine.params',inplace=True)
+            for line in params_file:
+                if 'incomplete' in line:
+                    line=line.replace('incomplete','complete')
+                    print line,
+                else:
+                    print line,
+            params_file.close()
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refmac_refine.params')):
             occupancy_refinement='@refmac_refine.params\n'
 

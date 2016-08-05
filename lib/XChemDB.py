@@ -79,6 +79,7 @@ class data_source:
             ['DataCollectionComment',                'DataCollection\nComment',                 'TEXT',                 0],
             ['DataCollectionWavelength',             'Wavelength',                              'TEXT',                 0],
 
+            ['DataProcessingPathToImageFiles',       'Path to diffraction\nimage files',        'TEXT',                 1],
             ['DataProcessingProgram',                'Program',                                 'TEXT',                 1],
             ['DataProcessingSpaceGroup',             'DataProcessing\nSpaceGroup',              'TEXT',                 1],
             ['DataProcessingUnitCell',               'DataProcessing\nUnitCell',                'TEXT',                 0],
@@ -752,6 +753,9 @@ class data_source:
                 out_list.append([item,item])
                 continue
             if item.startswith('Run\nxia2'):
+                out_list.append([item,item])
+                continue
+            if item.startswith('Dataset ID'):
                 out_list.append([item,item])
                 continue
             if item.startswith('Reference\nSpaceGroup'):

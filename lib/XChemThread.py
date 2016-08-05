@@ -805,8 +805,11 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         # - but images can only be found of XCE is started in the respective labchem directory
 
     def run(self):
-        if self.target=='=== SELECT TARGET ===':
-            print '==> XCE: please select a target first'
+#        if self.target=='=== SELECT TARGET ===':
+#            print '==> XCE: please select a target first'
+#            return
+        if not self.data_collection_summary_file.endswith('.pkl'):
+            print '==> XCE: please assign new Summary File or select an existing one'
             return
 
         if self.rescore_only:
@@ -1120,6 +1123,9 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
         number_of_visits_to_search=len(self.visit_list)
         search_cycle=1
+
+#        # always check for reprocessed files
+#        self.visit_list.append(self.initial_model_directory)
 
         for visit_directory in sorted(self.visit_list):
             if len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*')))==0:

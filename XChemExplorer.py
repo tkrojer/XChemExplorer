@@ -161,6 +161,7 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_image_dict={}
         self.data_collection_column_three_dict={}
         self.data_collection_summary_dict={}
+        self.diffraction_data_table_dict={}
         self.main_data_collection_table_exists=False
         self.timer_to_check_for_new_data_collection = QtCore.QTimer()
 #        self.timer_to_check_for_new_data_collection.timeout.connect(self.check_for_new_autoprocessing_or_rescore(False))
@@ -314,7 +315,8 @@ class XChemExplorer(QtGui.QApplication):
         self.dataset_tasks = [  'Get New Results from Autoprocessing',
                                 'Save Files from Autoprocessing to Project Folder',
                                 'Rescore Datasets',
-                                'Read PKL file'         ]
+                                'Read PKL file',
+                                'Run xia2 on selected datasets' ]
 
         frame_dataset_task=QtGui.QFrame()
         frame_dataset_task.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -409,8 +411,7 @@ class XChemExplorer(QtGui.QApplication):
                                     'Export PANDDA models',
                                     'Show HTML summary',
                                     'Update datasource with results from pandda.inspect',
-                                    'cluster datasets',
-                                    'Calculate CC to selected reference mtz file'   ]
+                                    'cluster datasets'   ]
 
         frame_panddas_file_task=QtGui.QFrame()
         frame_panddas_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -730,7 +731,8 @@ class XChemExplorer(QtGui.QApplication):
         frame.setLayout(hbox)
         reprocess_vbox.addWidget(frame)
 
-        self.reprocess_datasets_column_list=[   'Sample ID',
+        self.reprocess_datasets_column_list=[   'Dataset ID',
+                                                'Sample ID',
                                                 'Run\nxia2',
                                                 'Resolution\n[Mn<I/sig(I)> = 1.5]',
                                                 'Rmerge\nLow',
@@ -1677,6 +1679,14 @@ class XChemExplorer(QtGui.QApplication):
             self.update_log.insert('trying to run DIMPLE on SELECTED auto-processing files')
             self.check_before_running_dimple(job_list)
 
+    def run_xia2_on_selected_datasets(self):
+        allRows = self.reprocess_datasets_table.rowCount()
+        for row in xrange(0,allRows):
+            print str(self.reprocess_datasets_table.item(row,0).text()),str(self.reprocess_datasets_table.item(row,1).text())
+            dataset_id=str(self.reprocess_datasets_table.item(row,0).text())
+            if self.diffraction_data_table_dict[dataset_id][0].isChecked():
+                print 'eifhuhfue'
+
 
     def get_job_list_for_dimple_rerun(self,xtal,job_list,db_dict,entry):
         self.status_bar.showMessage('checking: '+str(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])))
@@ -1810,17 +1820,49 @@ class XChemExplorer(QtGui.QApplication):
                 self.update_log.insert('this does not seem to be a mtz file: '+file_name)
 
     def update_reprocess_datasets_table(self,data_dict):
+        self.update_log.insert('updating reprocess datasets table')
+        self.diffraction_data_table_dict={}
         self.diffraction_data_dict=data_dict
         self.diffraction_data_search_info='found '+str(len(self.diffraction_data_dict))+' datasets'
         self.diffraction_data_search_label.setText(self.diffraction_data_search_info)
         self.update_log.insert(self.diffraction_data_search_info)
         self.datasource_menu_reload_samples()
-        if len(self.diffraction_data_dict) > 0:
-            for xtal in sorted(self.diffraction_data_dict):
-                if xtal in self.xtal_db_dict:
-                    db_dict=self.xtal_db_dict[xtal]
+#        if len(self.diffraction_data_dict) > 0:
+#            for xtal in sorted(self.diffraction_data_dict):
+#                if xtal in self.xtal_db_dict:
+#                    db_dict=self.xtal_db_dict[xtal]
         # update table
         column_name=self.db.translate_xce_column_list_to_sqlite(self.reprocess_datasets_column_list)
+        # set rows to 0
+        self.reprocess_datasets_table.setRowCount(0)
+        for entry in sorted(self.diffraction_data_dict):
+            if entry in self.xtal_db_dict:
+                db_dict=self.xtal_db_dict[entry]
+            else:
+                db_dict={}
+            row=self.reprocess_datasets_table.rowCount()
+            self.reprocess_datasets_table.insertRow(row)
+            for column,header in enumerate(column_name):
+                if header[0]=='Dataset ID' or header[0]=='Sample ID':
+                    cell_text=QtGui.QTableWidgetItem()
+                    cell_text.setText(str(entry))
+                    cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                    self.reprocess_datasets_table.setItem(row, column, cell_text)
+                elif header[0]=='Run\nxia2':
+                    run_xia2 = QtGui.QCheckBox()
+                    run_xia2.toggle()
+                    self.reprocess_datasets_table.setCellWidget(row, column, run_xia2)
+                    run_xia2.setChecked(False)
+                    self.diffraction_data_table_dict[entry]=[run_xia2]
+                else:
+                    cell_text=QtGui.QTableWidgetItem()
+                    if db_dict != {}:
+                        cell_text.setText(str( db_dict[ header[1] ]  ))
+                    else:
+                        cell_text.setText('')
+                    cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                    self.reprocess_datasets_table.setItem(row, column, cell_text)
+
 
 
     def update_all_tables(self):
@@ -2053,6 +2095,9 @@ class XChemExplorer(QtGui.QApplication):
         elif instruction=="Read PKL file":
             summary = pickle.load( open( self.data_collection_summary_file, "rb") )
             self.create_widgets_for_autoprocessing_results_only(summary)
+
+        elif instruction=='Run xia2 on selected datasets':
+            self.run_xia2_on_selected_datasets()
 
         elif instruction=='Run DIMPLE on All Autoprocessing MTZ files':
             self.rerun_dimple_on_all_autoprocessing_files()
