@@ -50,7 +50,7 @@ class run_pandda_export(QtCore.QThread):
 
     def refine_exported_models(self):
 
-        sample_list=self.db.execute_statement("select CrystalName,CompoundCode from mainTable where RefinementOutcome='2 - PANDDA model';")
+        sample_list=self.db.execute_statement("select CrystalName,CompoundCode from mainTable where RefinementOutcome='2 - PANDDA model' or RefinementOutcome='3 - In Refinement';")
         for item in sample_list:
             xtal=str(item[0])
             compoundID=str(item[1])
