@@ -1,4 +1,4 @@
-# last edited: 04/08/2016 - 17:00
+# last edited: 05/08/2016 - 15:00
 
 import os,glob
 import sys
@@ -303,6 +303,7 @@ class find_diffraction_image_directory(QtCore.QThread):
         self.diffraction_data_directory=diffraction_data_directory
         self.data_dict={}
         self.diffraction_image_extension = ['.img','.cbf','.mccd','.mar2560','.mar2300']
+#        self.datasetID_to_sampleID_conversion='*'
 
     def run(self):
         os.chdir(self.diffraction_data_directory)

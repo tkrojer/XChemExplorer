@@ -1,4 +1,4 @@
-# last edited: 04/08/2016, 17:00
+# last edited: 05/08/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -1680,12 +1680,35 @@ class XChemExplorer(QtGui.QApplication):
             self.check_before_running_dimple(job_list)
 
     def run_xia2_on_selected_datasets(self):
+
+        # check which programs should be run
+        protocol=[]
+        if self.xia2_3d_checkbox.isChecked():
+            protocol.append('3d')
+        if self.xia2_3dii_checkbox.isChecked():
+            protocol.append('3dii')
+        if self.xia2_dials_checkbox.isChecked():
+            protocol.append('dials')
+
+        # space group
+        spg = []
+        if str(self.reprocess_space_group_comboxbox.currentText()) != 'ignore':
+            spg.append(str(self.reprocess_space_group_comboxbox.currentText()))
+
+        # reference file
+        ref = []
+        if os.path.isfile(self.diffraction_data_reference_mtz):
+            ref.append(self.diffraction_data_reference_mtz)
+
+        run_dict={}
         allRows = self.reprocess_datasets_table.rowCount()
         for row in xrange(0,allRows):
-            print str(self.reprocess_datasets_table.item(row,0).text()),str(self.reprocess_datasets_table.item(row,1).text())
             dataset_id=str(self.reprocess_datasets_table.item(row,0).text())
+            sample_id=str(self.reprocess_datasets_table.item(row,1).text())
             if self.diffraction_data_table_dict[dataset_id][0].isChecked():
-                print 'eifhuhfue'
+                run_dict[sample_id]=self.diffraction_data_dict[dataset_id]
+        for key in run_dict:
+            print key, run_dict[key]
 
 
     def get_job_list_for_dimple_rerun(self,xtal,job_list,db_dict,entry):

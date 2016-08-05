@@ -1,4 +1,4 @@
-# last edited: 03/08/2016, 15:00
+# last edited: 05/08/2016, 15:00
 
 import pygtk, gtk, pango
 import os
@@ -159,9 +159,9 @@ class Refine(object):
                 if 'incomplete' in line:
                     line=line.replace('incomplete','complete')
                     print line,
-                elif 'occupancy refine' in line:
-                    line=line.replace('occupancy refine','occupancy refine ncycle 10\noccupancy refine')
-                    print line,
+#                elif 'occupancy refine' in line:
+#                    line=line.replace('occupancy refine','occupancy refine ncycle 10\noccupancy refine')
+#                    print line,
                 else:
                     print line,
             params_file.close()
