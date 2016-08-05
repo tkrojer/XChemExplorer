@@ -5,6 +5,7 @@ import os
 import glob
 import sys
 import getpass
+import fileinput
 #sys.path.append(os.path.join(os.getenv('CCP4'),'lib/python2.7/site-packages'))
 #import coot
 #sys.path.append('/usr/local/coot/SoakProc/lib')
