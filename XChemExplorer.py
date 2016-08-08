@@ -1,4 +1,4 @@
-# last edited: 05/08/2016, 15:00
+# last edited: 08/08/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -1859,6 +1859,7 @@ class XChemExplorer(QtGui.QApplication):
         # set rows to 0
         self.reprocess_datasets_table.setRowCount(0)
         for entry in sorted(self.diffraction_data_dict):
+            print self.diffraction_data_dict[entry]
             if entry in self.xtal_db_dict:
                 db_dict=self.xtal_db_dict[entry]
             else:

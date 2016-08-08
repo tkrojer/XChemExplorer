@@ -1,4 +1,4 @@
-# last edited: 05/08/2016 - 15:00
+# last edited: 85/08/2016 - 15:00
 
 import os,glob
 import sys
@@ -316,16 +316,41 @@ class find_diffraction_image_directory(QtCore.QThread):
 
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'searching diffraction data directory')
         for xtal in glob.glob('*'):
-            self.data_dict[xtal]=[]
+            self.data_dict[xtal]=[[],[]]
             for root,dirs,files in os.walk(xtal):
                 if 'screening' in root:
                     continue
+                image_file_list = []
                 for n,image_file in enumerate(glob.glob(os.path.join(root,'*'))):
                     file_extension=image_file[image_file.rfind('.'):]
+                    if file_extension in self.diffraction_image_extension:
+                        image_file_list.append(image_file)
+
                     if n > 20 and file_extension in self.diffraction_image_extension:
-                        self.data_dict[xtal].append(os.path.join(self.diffraction_data_directory,root))
-                        break
-            if self.data_dict[xtal]==[]:
+                        if os.path.join(self.diffraction_data_directory,root) not in self.data_dict[xtal][0]:
+                            self.data_dict[xtal][0].append(os.path.join(self.diffraction_data_directory,root))
+#                        break
+                if self.data_dict[xtal][0] != []:
+                    found_new_file_root=False
+                    run_list=[]
+                    counter=0
+                    for image in image_file_list:
+                        file_root=image[image.rfind('/')+1:image.rfind('_')]
+                        if file_root not in run_list and not found_new_file_root:
+                            counter=0
+                            found_new_file_root=True
+                        if counter > 20 and file_root not in run_list:
+                            run_list.append(file_root)
+                            found_new_file_root=False
+                            counter=0
+                        if found_new_file_root:
+                            counter+=1
+
+
+                    self.data_dict[xtal][1].append(run_list)
+
+
+            if self.data_dict[xtal]==[[],[]]:
                 del self.data_dict[xtal]
 
             progress += progress_step
