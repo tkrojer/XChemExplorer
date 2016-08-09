@@ -1,4 +1,4 @@
-# last edited: 09/08/2016, 15:00
+# last edited: 09/08/2016, 21:20
 
 import os, sys, glob
 from datetime import datetime
@@ -317,8 +317,10 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             # check if reference mtzfile has an Rfree column; if not, then ignore
             # DIMPLE assumes an Rfree column and barfs if it is not present
             # note: ref_mtz looks like this: ref mtz  -R reference.mtz
-            if os.path.isfile(ref_mtz.split()[len(ref_mtz.split())-1]):
-                mtz_column_dict=mtztools(ref_mtz.split()[len(ref_mtz.split())-1]).get_all_columns_as_dict()
+#            if os.path.isfile(ref_mtz.split()[len(ref_mtz.split())-1]):
+#                mtz_column_dict=mtztools(ref_mtz.split()[len(ref_mtz.split())-1]).get_all_columns_as_dict()
+            if os.path.isfile(ref_mtz):
+                mtz_column_dict=mtztools(ref_mtz).get_all_columns_as_dict()
                 if 'FreeR_flag' not in mtz_column_dict['RFREE']:
                     self.Logfile.insert('cannot find FreeR_flag in reference mtz file: %s -> ignoring reference mtzfile!!!' %ref_mtz)
                     ref_mtz = ''
