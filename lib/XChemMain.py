@@ -334,20 +334,23 @@ class find_diffraction_image_directory(QtCore.QThread):
                     found_new_file_root=False
                     run_list=[]
                     counter=0
+                    current_file_root=''
                     for image in image_file_list:
                         file_root=image[image.rfind('/')+1:image.rfind('_')]
                         if file_root not in run_list and not found_new_file_root:
                             counter=0
                             found_new_file_root=True
+                            current_file_root=file_root
                         if counter > 20 and file_root not in run_list:
+                            print counter,file_root
                             run_list.append(file_root)
                             found_new_file_root=False
                             counter=0
-                        if found_new_file_root:
+                        if found_new_file_root and file_root==current_file_root:
                             counter+=1
 
-
-                    self.data_dict[xtal][1].append(run_list)
+                    if run_list != []:
+                        self.data_dict[xtal][1]=run_list
 
 
             if self.data_dict[xtal]==[[],[]]:

@@ -687,19 +687,28 @@ class parse:
 
                 if line.startswith('REMARK   3   RESOLUTION RANGE HIGH (ANGSTROMS) :'):
                     PDBinfo['ResolutionHigh']=line.split()[7]
-                    if float(line.split()[7]) < 2.4:                                   PDBinfo['ResolutionColor'] = 'green'
-                    if float(line.split()[7]) >= 2.4 and float(line.split()[7]) < 2.8: PDBinfo['ResolutionColor'] = 'orange'
-                    if float(line.split()[7]) >= 2.8:                                  PDBinfo['ResolutionColor'] = 'red'
+                    try:
+                        if float(line.split()[7]) < 2.4:                                   PDBinfo['ResolutionColor'] = 'green'
+                        if float(line.split()[7]) >= 2.4 and float(line.split()[7]) < 2.8: PDBinfo['ResolutionColor'] = 'orange'
+                        if float(line.split()[7]) >= 2.8:                                  PDBinfo['ResolutionColor'] = 'red'
+                    except ValueError:
+                        pass
                 if line.startswith('REMARK   3   BOND LENGTHS REFINED ATOMS        (A):'):
                     PDBinfo['rmsdBonds'] = line.split()[9]
-                    if float(line.split()[9]) < 0.02:                                       PDBinfo['rmsdBondsTL'] = 'green'
-                    if float(line.split()[9]) >= 0.02 and float(line.split()[9]) < 0.03:    PDBinfo['rmsdBondsTL'] = 'orange'
-                    if float(line.split()[9]) >= 0.03:                                      PDBinfo['rmsdBondsTL'] = 'red'
+                    try:
+                        if float(line.split()[9]) < 0.02:                                       PDBinfo['rmsdBondsTL'] = 'green'
+                        if float(line.split()[9]) >= 0.02 and float(line.split()[9]) < 0.03:    PDBinfo['rmsdBondsTL'] = 'orange'
+                        if float(line.split()[9]) >= 0.03:                                      PDBinfo['rmsdBondsTL'] = 'red'
+                    except ValueError:
+                        pass
                 if line.startswith('REMARK   3   BOND ANGLES REFINED ATOMS   (DEGREES):'):
                     PDBinfo['rmsdAngles'] = line.split()[9]
-                    if float(line.split()[9]) < 2.0:                                        PDBinfo['rmsdAnglesTL'] = 'green'
-                    if float(line.split()[9]) >= 2.0 and float(line.split()[9]) < 3.0:      PDBinfo['rmsdAnglesTL'] = 'orange'
-                    if float(line.split()[9]) >= 3.0:                                       PDBinfo['rmsdAnglesTL'] = 'red'
+                    try:
+                        if float(line.split()[9]) < 2.0:                                        PDBinfo['rmsdAnglesTL'] = 'green'
+                        if float(line.split()[9]) >= 2.0 and float(line.split()[9]) < 3.0:      PDBinfo['rmsdAnglesTL'] = 'orange'
+                        if float(line.split()[9]) >= 3.0:                                       PDBinfo['rmsdAnglesTL'] = 'red'
+                    except ValueError:
+                        pass
 
                 if line.startswith('CRYST1'):
                     a=int(float(line.split()[1]))

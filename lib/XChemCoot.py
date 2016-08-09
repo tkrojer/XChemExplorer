@@ -826,19 +826,41 @@ class GUI(object):
             self.RRfreeValue.set_label(  str(round(float(self.QualityIndicators['RefinementRcryst']),3)) +' / '+str(round(float(self.QualityIndicators['RefinementRfree']),3)))
         except ValueError:
             self.RRfreeValue.set_label('-')
-        self.RRfreeBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementRfreeTraficLight']))
+
+        try:
+            self.RRfreeBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementRfreeTraficLight']))
+        except ValueError:
+            pass
         self.ResolutionValue.set_label(self.QualityIndicators['RefinementResolution'])
-        self.ResolutionBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementResolutionTL']))
+        try:
+            self.ResolutionBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementResolutionTL']))
+        except ValueError:
+            pass
         self.MolprobityScoreValue.set_label(self.QualityIndicators['RefinementMolProbityScore'])
-        self.MolprobityScoreBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementMolProbityScoreTL']))
+        try:
+            self.MolprobityScoreBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementMolProbityScoreTL']))
+        except ValueError:
+            pass
         self.RamachandranOutliersValue.set_label(self.QualityIndicators['RefinementRamachandranOutliers'])
-        self.RamachandranOutliersBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementRamachandranOutliersTL']))
+        try:
+            self.RamachandranOutliersBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementRamachandranOutliersTL']))
+        except ValueError:
+            pass
         self.RamachandranFavoredValue.set_label(self.QualityIndicators['RefinementRamachandranFavored'])
-        self.RamachandranFavoredBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementRamachandranFavoredTL']))
+        try:
+            self.RamachandranFavoredBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementRamachandranFavoredTL']))
+        except ValueError:
+            pass
         self.rmsdBondsValue.set_label(self.QualityIndicators['RefinementRmsdBonds'])
-        self.rmsdBondsBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementRmsdBondsTL']))
+        try:
+            self.rmsdBondsBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementRmsdBondsTL']))
+        except ValueError:
+            pass
         self.rmsdAnglesValue.set_label(self.QualityIndicators['RefinementRmsdAngles'])
-        self.rmsdAnglesBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementRmsdAnglesTL']))
+        try:
+            self.rmsdAnglesBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RefinementRmsdAnglesTL']))
+        except ValueError:
+            pass
         self.MatrixWeightValue.set_label(self.QualityIndicators['RefinementMatrixWeight'])
 
         try:

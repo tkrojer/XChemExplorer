@@ -22,6 +22,7 @@ import XChemToolTips
 import XChemMain
 import XChemPlots
 import XChemLog
+import XChemProcess
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -1707,8 +1708,24 @@ class XChemExplorer(QtGui.QApplication):
             sample_id=str(self.reprocess_datasets_table.item(row,1).text())
             if self.diffraction_data_table_dict[dataset_id][0].isChecked():
                 run_dict[sample_id]=self.diffraction_data_dict[dataset_id]
-        for key in run_dict:
-            print key, run_dict[key]
+
+        self.work_thread=XChemProcess.run_xia2( self.initial_model_directory,
+                                                run_dict,
+                                                protocol,
+                                                spg,
+                                                ref,
+                                                self.xce_logfile,
+                                                self.external_software,
+                                                self.ccp4_scratch_directory,
+                                                self.max_queue_jobs     )
+        self.explorer_active=1
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.work_thread.start()
+
+
 
 
     def get_job_list_for_dimple_rerun(self,xtal,job_list,db_dict,entry):
