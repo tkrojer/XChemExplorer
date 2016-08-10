@@ -654,8 +654,8 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
         refinement_stage=''
         spg=''
         relative_dimple_destination='.'+dimple_destination.replace(self.initial_model_directory,'')
-        relative_path_to_mtzfile='.'+path_to_mtzfile.replace(self.initial_model_directory,'')
-        relative_path_to_logfile='.'+path_to_logfile.replace(self.initial_model_directory,'')
+        relative_path_to_mtzfile='./'+path_to_mtzfile.replace(self.initial_model_directory,'')
+        relative_path_to_logfile='./'+path_to_logfile.replace(self.initial_model_directory,'')
         # move up to sample directory and link respective files
         # first remove any old symbolic links
         os.chdir(os.path.join(self.initial_model_directory,sample))
@@ -1509,8 +1509,16 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     protein_name=collected_xtals.split('/')[len(collected_xtals.split('/'))-2]
 
                 # if crystal is not in the data_collection_dict then add a new one
+                found_processing=False
                 if xtal not in self.data_collection_dict:
-                    self.data_collection_dict[xtal]=[]
+                    if visit_directory == self.initial_model_directory:
+                        for new_run in glob.glob(os.path.join(collected_xtals,'processed','*')):
+                            if new_run[new_run.rfind('/')+1:].startswith('run'):
+                                found_processing=True
+                    else:
+                        found_processing=True
+                    if found_processing:
+                        self.data_collection_dict[xtal]=[]
 
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 1 of 2: searching visit '+ \
                                                                        str(search_cycle)+' of '+str(number_of_visits_to_search)+ \
