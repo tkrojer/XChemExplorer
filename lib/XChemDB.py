@@ -168,6 +168,7 @@ class data_source:
             ['RefinementPathToRefinementFolder',            'RefinementPathToRefinementFolder',             'TEXT',                 0],
             ['RefinementLigandConfidence',                  'Ligand\nConfidence',                           'TEXT',                 0],
             ['RefinementLigandBoundConformation',           'RefinementLigandBoundConformation',            'TEXT',                 0],
+            ['RefinementBoundConformation',                 'RefinementBoundConformation',                  'TEXT',                 0],
             ['RefinementMolProbityScore',                   'MolProbity Score',                             'TEXT',                 1],
             ['RefinementMolProbityScoreTL',                 'RefinementMolProbityScoreTL',                  'TEXT',                 0],
             ['RefinementRamachandranOutliers',              'Ramachandran\nOutliers',                       'TEXT',                 1],

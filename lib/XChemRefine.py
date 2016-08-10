@@ -165,9 +165,11 @@ class Refine(object):
                 else:
                     print line,
             params_file.close()
+
+        create_bound_conformation=''
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refmac_refine.params')):
             occupancy_refinement='@refmac_refine.params\n'
-
+            create_bound_conformation="/bin/rm *bound.pdb\ngiant.strip_conformations pdb=refine.pdb suffix='.bound.pdb'\n"
 
         #######################################################
         # we write 'REFINEMENT_IN_PROGRESS' immediately to avoid unncessary refiment
@@ -283,6 +285,9 @@ class Refine(object):
             '#ln -s %s/%s/Refine_%s/refine_%s.mtz refine.mtz\n' %(self.ProjectPath,self.xtalID,Serial,Serial)+
             'ln -s ./Refine_%s/refine_%s.pdb refine.pdb\n' %(Serial,Serial)+
             'ln -s ./Refine_%s/refine_%s.mtz refine.mtz\n' %(Serial,Serial)+
+            '\n'
+            +create_bound_conformation+
+            '\n'
             'ln -s Refine_%s/validate_ligands.txt .\n' %Serial+
             'ln -s Refine_%s/refine_molprobity.log .\n' %Serial+
             'mmtbx.validation_summary refine.pdb > validation_summary.txt\n'
