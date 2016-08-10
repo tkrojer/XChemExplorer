@@ -1617,6 +1617,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def rerun_dimple_on_all_autoprocessing_files(self):
         job_list=[]
+        self.update_log.insert('preparing to run DIMPLE on all autoprocessing files')
         for xtal in self.data_collection_dict:
             for entry in self.data_collection_dict[xtal]:
                 if entry[0]=='logfile':
@@ -1762,6 +1763,7 @@ class XChemExplorer(QtGui.QApplication):
             elif os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
                 mtzin=os.path.join(db_dict['DataProcessingPathToMTZfile'])
 
+            self.update_log.insert('adding '+xtal+visit+'-'+run+autoproc+' to list')
             job_list.append([   xtal,
                                 visit+'-'+run+autoproc,
                                 mtzin,
