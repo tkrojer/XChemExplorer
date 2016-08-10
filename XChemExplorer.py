@@ -2374,7 +2374,11 @@ class XChemExplorer(QtGui.QApplication):
                 compoundID='compound'
             else:
                 compoundID=str(item[1])
-            compound_list.append([str(item[0]),compoundID,str(item[2])])
+            if todo == 'ALL':
+                compound_list.append([str(item[0]),compoundID,str(item[2])])
+            if todo == 'NEW':
+                if not os.path.isfile(os.path.join(self.initial_model_directory,str(item[0]),compoundID+'.cif')):
+                    compound_list.append([str(item[0]),compoundID,str(item[2])])
         if compound_list != []:
             self.update_log.insert('trying to create cif and pdb files for '+str(len(compound_list))+' compounds using ACEDRG...')
             if self.external_software['qsub']:
