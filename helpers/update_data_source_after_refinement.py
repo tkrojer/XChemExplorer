@@ -1,3 +1,5 @@
+# last edited: 10/08/2016, 16:00
+
 import os,sys
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 
