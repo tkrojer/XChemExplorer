@@ -889,15 +889,40 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         # STAGE 3:
         # finally, select the file with the highest
         # max(unique_reflections*completeness*Mn(I/sig<I>)
+#        select_stage_three_list=[]
+#        for index in select_stage_two_list:
+#            for n,entry in enumerate(self.data_collection_dict[xtal]):
+#                if entry[0]=='logfile':
+#                    if isinstance(entry[6],dict) and entry[7]==index:
+#                        ranking=entry[6]['DataProcessingScore']
+#                        select_stage_three_list.append([index,ranking])
+#        if not select_stage_three_list==[]:
+#            self.set_best_file_to_true(xtal,'max',select_stage_three_list)
+
+        ############################################################################################
+        # select the file with the highest DataProcessingScore
         select_stage_three_list=[]
         for index in select_stage_two_list:
             for n,entry in enumerate(self.data_collection_dict[xtal]):
                 if entry[0]=='logfile':
                     if isinstance(entry[6],dict) and entry[7]==index:
-                        ranking=entry[6]['DataProcessingScore']
-                        select_stage_three_list.append([index,ranking])
+                        try:
+                            ranking=entry[6]['DataProcessingScore']
+#                            print xtal
+#                        print entry
+                            if isinstance(ranking,float):
+                                select_stage_three_list.append([index,ranking])
+                        except KeyError:
+                            try:
+                                ranking = (float(entry[6]['DataProcessingUniqueReflectionsOverall'])*\
+                                           float(entry[6]['DataProcessingCompletenessOverall'])*\
+                                           float(entry[6]['DataProcessingIsigOverall']))/float(entry[6]['DataProcessingUnitCellVolume'])
+                                select_stage_three_list.append([index,ranking])
+                            except ValueError:
+                                continue
         if not select_stage_three_list==[]:
-            self.set_best_file_to_true(xtal,'max',select_stage_three_list)
+                self.set_best_file_to_true(xtal,'max',select_stage_three_list)
+
 
 
     def max_IsigI_Completeness_Reflections_only(self,xtal):
@@ -925,6 +950,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                             select_stage_three_list.append([index,ranking])
                         except ValueError:
                             continue
+
         if not select_stage_three_list==[]:
             self.set_best_file_to_true(xtal,'max',select_stage_three_list)
 
@@ -1022,7 +1048,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     if entry[0]=='logfile':
                         self.data_collection_dict[xtal][n][8]=False
                 if self.selection_mechanism=='IsigI*Comp*UniqueRefl':
-                    self.max_IsigI_Completeness_Reflections_only(xtal)
+#                    self.max_IsigI_Completeness_Reflections_only(xtal)
+                    self.max_IsigI_Completeness_Reflections(xtal)
                 elif self.selection_mechanism=='lowest_Rfree':
                     self.min_Rfree(xtal)
                 elif self.selection_mechanism=='highest_resolution':
