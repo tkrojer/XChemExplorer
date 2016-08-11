@@ -297,6 +297,18 @@ class parse:
                                     '23':   ['P23','F23','I23','P213','I213'],
                                     '432':  ['P432','P4232','F432','F4132','I432','P4332','P4132','I4132' ] }
 
+        self.nr_asu_in_unitcell_for_point_group =   {   '1':            1,
+                                                        '2':            2,
+                                                        '222':          4,
+                                                        '4':            4,
+                                                        '422':          8,
+                                                        '3':            3,
+                                                        '32':           6,
+                                                        '6':            6,
+                                                        '622':          12,
+                                                        '23':           12,
+                                                        '432':          24  }
+
         self.aimless = {    'DataProcessingProgram':                        'n/a',
                             'DataCollectionRun':                            'n/a',
                             'DataProcessingSpaceGroup':                     'n/a',
@@ -558,8 +570,10 @@ class parse:
                                                                                  math.radians(float(gamma)),
                                                                                  self.aimless['DataProcessingLattice']))
                     try:
+                        high_symmetry_boost=self.nr_asu_in_unitcell_for_point_group[self.aimless['DataProcessingPointGroup']]
                         self.aimless['DataProcessingScore'] = (float(self.aimless['DataProcessingUniqueReflectionsOverall'])*\
                                                                float(self.aimless['DataProcessingCompletenessOverall'])*\
+                                                               high_symmetry_boost*\
                                                                float(self.aimless['DataProcessingIsigOverall']))/float(self.aimless['DataProcessingUnitCellVolume'])
                     except ValueError:
                         self.aimless['DataProcessingScore']=0.0
@@ -826,6 +840,17 @@ class mtztools:
                                     '23':           [195,196,197,198,199],
                                     '432':          [207,208,209,210,211,212,213,214]  }
 
+        self.nr_asu_in_unitcell_for_point_group =   {   '1':            1,
+                                                        '2':            2,
+                                                        '222':          4,
+                                                        '4':            4,
+                                                        '422':          8,
+                                                        '3':            3,
+                                                        '32':           6,
+                                                        '6':            6,
+                                                        '622':          12,
+                                                        '23':           12,
+                                                        '432':          24  }
 
         self.aimless = {    'DataProcessingProgram':                        'n/a',
                             'DataCollectionRun':                            'n/a',
