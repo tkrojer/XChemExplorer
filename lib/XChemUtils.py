@@ -1,4 +1,4 @@
-# last edited: 11/08/2016, 17:00
+# last edited: 15/08/2016, 15:00
 
 import sys
 import os
@@ -1131,7 +1131,7 @@ class external_software:
             p = subprocess.Popen('qstat', shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
             status='found'
             for line in p.stdout:
-                if 'symbol lookup error:' in line or 'command not found' in line:
+                if 'symbol lookup error:' in line or 'command not found' in line or 'error' in line:
                     self.available_programs['qsub']=False
                     self.available_programs['qsub_array']=False
                     status='not found'
