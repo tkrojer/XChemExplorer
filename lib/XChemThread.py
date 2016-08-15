@@ -22,6 +22,7 @@ from XChemUtils import helpers
 from XChemUtils import reference
 import XChemDB
 import XChemLog
+import XChemMain
 
 
 class update_datasource_from_file_system(QtCore.QThread):
@@ -819,8 +820,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         if self.rescore_only:
             self.rescore_and_reset_pkl_file()
         else:
-            self.parse_file_system()
-#            self.parse_file_system_NEW()
+#            self.parse_file_system()
+            self.parse_file_system_NEW()
 #            self.parse_challenging_file_system()
 
     def max_IsigI_Completeness_Reflections(self,xtal):
@@ -1501,6 +1502,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         if self.initial_model_directory not in self.visit_list:
             self.visit_list.append(self.initial_model_directory)
 
+
         for visit_directory in sorted(self.visit_list):
             if visit_directory == self.initial_model_directory:
                 current_directory=self.initial_model_directory
@@ -1524,6 +1526,9 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     visit=visit_directory.split('/')[5]
                     beamline=visit_directory.split('/')[2]
 
+            gda_pin_dict=XChemMain.get_dict_of_gda_barcodes(beamline)
+
+
             for collected_xtals in sorted(glob.glob(os.path.join(current_directory,'*'))):
                 # this step is only relevant when several samples are reviewed in one session
                 if 'tmp' in collected_xtals or 'results' in collected_xtals or 'scre' in collected_xtals:
@@ -1546,6 +1551,11 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                         found_processing=True
                     if found_processing:
                         self.data_collection_dict[xtal]=[]
+
+                if xtal in gda_pin_dict:
+                    gda_pin_id=gda_pin_dict[xtal]
+                    self.data_source.execute_statement("update mainTable set DataCollectionPinBarcode ='%s' where CrystalName = '%s'"%(gda_pin_id,xtal))
+
 
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 1 of 2: searching visit '+ \
                                                                        str(search_cycle)+' of '+str(number_of_visits_to_search)+ \

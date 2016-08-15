@@ -78,6 +78,7 @@ class data_source:
             ['DataCollectionRun',                    'Run',                                     'TEXT',                 0],
             ['DataCollectionComment',                'DataCollection\nComment',                 'TEXT',                 0],
             ['DataCollectionWavelength',             'Wavelength',                              'TEXT',                 0],
+            ['DataCollectionPinBarcode',             'DataCollectionPinBarcode',                'TEXT',                 1],
 
             ['DataProcessingPathToImageFiles',       'Path to diffraction\nimage files',        'TEXT',                 1],
             ['DataProcessingProgram',                'Program',                                 'TEXT',                 1],
