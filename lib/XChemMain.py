@@ -4,6 +4,7 @@ import os,glob
 import sys
 import subprocess
 import getpass
+import gzip
 from datetime import datetime
 from PyQt4 import QtGui, QtCore
 
