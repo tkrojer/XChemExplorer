@@ -1526,6 +1526,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     visit=visit_directory.split('/')[5]
                     beamline=visit_directory.split('/')[2]
 
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'parsing '+os.path.join('/dls_sw',beamline,'logs')+' for GDA logiles')
             gda_pin_dict=XChemMain.get_dict_of_gda_barcodes(beamline)
 
 
