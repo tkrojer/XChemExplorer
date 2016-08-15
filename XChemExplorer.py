@@ -605,6 +605,8 @@ class XChemExplorer(QtGui.QApplication):
                                                         'Resolution\n[Mn<I/sig(I)> = 1.5]',
                                                         'DataProcessing\nSpaceGroup',
                                                         'DataProcessing\nRfree',
+                                                        'SoakDB\nBarcode',
+                                                        'GDA\nBarcode',
                                                         'Rmerge\nLow',
                                                         'auto-assigned',
                                                         'DataCollection\nOutcome',

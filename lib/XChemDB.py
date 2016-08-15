@@ -50,7 +50,7 @@ class data_source:
             ['CrystalName',                          'Sample ID',                               'TEXT',                 0],
             ['Puck',                                 'Puck',                                    'TEXT',                 1],
             ['PuckPosition',                         'PuckPosition',                            'TEXT',                 1],
-            ['PinBarcode',                           'PinBarcode',                              'TEXT',                 1],
+            ['PinBarcode',                           'SoakDB\nBarcode',                         'TEXT',                 1],
             ['MountingResult',                       'MountingResult',                          'TEXT',                 0],
             ['MountingArrivalTime',                  'MountingArrivalTime',                     'TEXT',                 0],
             ['MountedTimestamp',                     'MountedTimestamp',                        'TEXT',                 0],
@@ -78,7 +78,7 @@ class data_source:
             ['DataCollectionRun',                    'Run',                                     'TEXT',                 0],
             ['DataCollectionComment',                'DataCollection\nComment',                 'TEXT',                 0],
             ['DataCollectionWavelength',             'Wavelength',                              'TEXT',                 0],
-            ['DataCollectionPinBarcode',             'DataCollectionPinBarcode',                'TEXT',                 1],
+            ['DataCollectionPinBarcode',             'GDA\nBarcode',                            'TEXT',                 1],
 
             ['DataProcessingPathToImageFiles',       'Path to diffraction\nimage files',        'TEXT',                 1],
             ['DataProcessingProgram',                'Program',                                 'TEXT',                 1],
