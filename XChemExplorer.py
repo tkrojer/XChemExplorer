@@ -3054,7 +3054,9 @@ class XChemExplorer(QtGui.QApplication):
                         else:
                             cell_text.setText('')
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                        cell_text.setBackground(QtGui.QColor(100,100,150))
                         self.data_collection_summary_table.setItem(current_row, column, cell_text)
+
                 elif header[0].startswith('GDA\nBarcode'):
                     if new_xtal:
                         cell_text=QtGui.QTableWidgetItem()
