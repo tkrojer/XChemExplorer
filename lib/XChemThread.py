@@ -787,7 +787,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                  initial_model_directory,
                  rescore_only,
                  acceptable_low_resolution_limit_for_data,
-                 data_source_file):
+                 data_source_file,
+                 xce_logfile):
         QtCore.QThread.__init__(self)
         self.visit_list=visit_list
         self.target=target
@@ -800,6 +801,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         self.rescore_only=rescore_only
         self.acceptable_low_resolution_limit_for_data=acceptable_low_resolution_limit_for_data
         self.data_source=XChemDB.data_source(os.path.join(data_source_file))
+        self.Logfile=XChemLog.updateLog(xce_logfile)
+#        self.gda_log_directories_parsed=gda_log_directories_parsed
 
         # - open data source if possible
         # - get sampleID, xtbm
@@ -1504,6 +1507,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
 
         for visit_directory in sorted(self.visit_list):
+
             if visit_directory == self.initial_model_directory:
                 current_directory=self.initial_model_directory
             else:
@@ -1511,6 +1515,8 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
             if len(glob.glob(os.path.join(current_directory,'*')))==0:
                 continue
+
+            self.Logfile.insert('checking for new data processing results in '+current_directory)
 
             beamline='n/a'
             if 'attic' in visit_directory:
@@ -1534,6 +1540,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
             gda_pin_dict={}
             for files in glob.glob(os.path.join('/dls_sw',beamline,'logs','*')):
+                self.Logfile.insert('parsing '+files+' for sampleID and pinID')
                 gda_pin_dict=XChemMain.append_dict_of_gda_barcodes(gda_pin_dict,files)
                 progress += progress_step
                 self.emit(QtCore.SIGNAL('update_progress_bar'), progress)

@@ -2256,7 +2256,8 @@ class XChemExplorer(QtGui.QApplication):
                                                                                 self.initial_model_directory,
                                                                                 rescore_only,
                                                                                 self.acceptable_low_resolution_limit_for_data,
-                                                                                os.path.join(self.database_directory,self.data_source_file))
+                                                                                os.path.join(self.database_directory,self.data_source_file),
+                                                                                self.xce_logfile    )
             self.explorer_active=1
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
@@ -2921,9 +2922,6 @@ class XChemExplorer(QtGui.QApplication):
         pinDict={}
         for item in pinList:
             pinDict[str(item[0])]=[str(item[1]),str(item[2])]
-
-        for i in pinDict:
-            print i,pinDict[i]
 
         for xtal in sorted(self.data_collection_dict):
             new_xtal=False
