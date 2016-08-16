@@ -1574,7 +1574,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
                 for runs in sorted(glob.glob(os.path.join(current_run,'*'))):
                     run=runs[runs.rfind('/')+1:]
-                    print 'runs',run
+#                    print 'runs',run
                     diffraction_image=''
                     timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
                     if os.path.isfile(os.path.join(visit_directory,protein_name,xtal,run+'0001.cbf')):

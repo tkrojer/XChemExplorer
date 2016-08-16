@@ -2918,8 +2918,9 @@ class XChemExplorer(QtGui.QApplication):
 #        new_xtal=False
 
         pinList = self.db.execute_statement('Select CrystalName,PinBarcode,DataCollectionPinBarcode from mainTable')
+        pinDict={}
         for item in pinList:
-            print item
+            print str(item[0]),str(item[1]),str(item[2])
 
         for xtal in sorted(self.data_collection_dict):
             new_xtal=False
