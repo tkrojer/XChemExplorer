@@ -3046,6 +3046,27 @@ class XChemExplorer(QtGui.QApplication):
                         show_data_collection_details_checkbox.stateChanged.connect(self.show_data_collection_details)
                         self.data_collection_summary_table.setCellWidget(current_row,column,show_data_collection_details_checkbox)
                         self.data_collection_summary_dict[xtal].append(show_data_collection_details_checkbox)
+                elif header[0].startswith('SoakDB\nBarcode'):
+                    if new_xtal:
+                        cell_text=QtGui.QTableWidgetItem()
+                        if xtal in pinDict:
+                            cell_text.setText(str(pinDict[xtal][0]))
+                        else:
+                            cell_text.setText('')
+                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                        self.data_collection_summary_table.setItem(current_row, column, cell_text)
+                elif header[0].startswith('GDA\nBarcode'):
+                    if new_xtal:
+                        cell_text=QtGui.QTableWidgetItem()
+                        if xtal in pinDict:
+                            cell_text.setText(str(pinDict[xtal][1]))
+                        else:
+                            cell_text.setText('')
+                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                        self.data_collection_summary_table.setItem(current_row, column, cell_text)
+
+
+
                 else:
                     cell_text=QtGui.QTableWidgetItem()
                     # in case data collection failed for whatever reason
