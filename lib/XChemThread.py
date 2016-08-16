@@ -1539,7 +1539,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
             progress=0
 
             gda_pin_dict={}
-            for files in glob.glob(os.path.join('/dls_sw',beamline,'logs','*')):
+            for files in glob.glob(os.path.join('/dls_sw',beamline,'logs','gda_server*')):
                 self.Logfile.insert('parsing '+files+' for sampleID and pinID')
                 gda_pin_dict=XChemMain.append_dict_of_gda_barcodes(gda_pin_dict,files)
                 progress += progress_step
