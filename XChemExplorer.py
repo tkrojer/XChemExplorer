@@ -2917,10 +2917,13 @@ class XChemExplorer(QtGui.QApplication):
         column_name=self.db.translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
 #        new_xtal=False
 
-        pinList = self.db.execute_statement('Select CrystalName,PinBarcode,DataCollectionPinBarcode from mainTable')
+        pinList = self.db.execute_statement("Select CrystalName,PinBarcode,DataCollectionPinBarcode from mainTable where CrystalName is not ''")
         pinDict={}
         for item in pinList:
-            print '1',str(item[0]),'2',str(item[1]),'3',str(item[2]),'fee',item
+            pinDict[str(item[0])]=[str(item[1]),str(item[2])]
+
+        for i in pinDict:
+            print i,pinDict[i]
 
         for xtal in sorted(self.data_collection_dict):
             new_xtal=False
