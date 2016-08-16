@@ -2916,6 +2916,11 @@ class XChemExplorer(QtGui.QApplication):
 #        column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
         column_name=self.db.translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
 #        new_xtal=False
+
+        pinList = self.db.execute_statement('Select CrystalName,PinBarcode,DataCollectionPinBarcode from mainTable')
+        for item in pinList:
+            print item
+
         for xtal in sorted(self.data_collection_dict):
             new_xtal=False
             if xtal not in self.data_collection_summary_dict:
