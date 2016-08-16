@@ -1511,8 +1511,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
 
             if len(glob.glob(os.path.join(current_directory,'*')))==0:
                 continue
-            progress_step=100/float(len(glob.glob(os.path.join(current_directory,'*'))))
-            progress=0
 
             beamline='n/a'
             if 'attic' in visit_directory:
@@ -1527,8 +1525,23 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                     beamline=visit_directory.split('/')[2]
 
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'parsing '+os.path.join('/dls_sw',beamline,'logs')+' for GDA logiles')
-            gda_pin_dict=XChemMain.get_dict_of_gda_barcodes(beamline)
+            nr_gda_logfiles=XChemMain.get_nr_files_from_gda_log_folder(beamline)
+            if nr_gda_logfiles > 0:
+                progress_step=100/float(nr_gda_logfiles)
+            else:
+                progress_step=1
+            progress=0
 
+            gda_pin_dict={}
+            for files in glob.glob(os.path.join('/dls_sw',beamline,'logs','*')):
+                gda_pin_dict=XChemMain.append_dict_of_gda_barcodes(gda_pin_dict,files)
+                progress += progress_step
+                self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+#            gda_pin_dict=XChemMain.get_dict_of_gda_barcodes(beamline)
+
+            progress_step=100/float(len(glob.glob(os.path.join(current_directory,'*'))))
+            progress=0
 
             for collected_xtals in sorted(glob.glob(os.path.join(current_directory,'*'))):
                 # this step is only relevant when several samples are reviewed in one session

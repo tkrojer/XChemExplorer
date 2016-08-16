@@ -298,38 +298,12 @@ def change_links_to_selected_data_collection_outcome(sample,data_collection_dict
 #            del data_dict[xtal]
 #    return data_dict
 
+def get_nr_files_from_gda_log_folder(beamline):
+    n=len(glob.glob(os.path.join('/dls_sw',beamline,'logs','gda_server*')))
+    return n
 
 def get_dict_of_gda_barcodes(beamline):
     out_dict={}
-#    logs_in_tmp_directory=[]
-#    for files in glob.glob(os.path.join(ccp4_scratch,'*')):
-#        log = files[files.rfind('/')+1:]
-#        if log.startswith('gda_server.'):
-#            logs_in_tmp_directory.append(log)
-#
-#    for files in glob.glob(os.path.join('/dls_sw',beamline,'logs','*')):
-#        gda_log = files[files.rfind('/')+1:]
-#        if gda_log.startswith('gda_server.'):
-#            if not gda_log in logs_in_tmp_directory:
-#                os.system('/bin/cp '+files+' '+ccp4_scratch)
-#                if gda_log.endswith('.gz'):
-#                    os.system('gunzip '+os.path.join(ccp4_scratch,gda_log))
-#
-#    found_barcode_entry=False
-#    for files in glob.glob(os.path.join(ccp4_scratch,'*')):
-#        log = files[files.rfind('/')+1:]
-#        if log.startswith('gda_server.'):
-#            for line in open(files):
-#                if 'BART SampleChanger - getBarcode() returning' in line:
-#                    barcode=line.split()[len(line.split())-1]
-#                    found_barcode_entry=True
-#                if found_barcode_entry:
-#                    if 'Snapshots will be saved' in line:
-#                        sampleID=line.split()[len(line.split())-1].split('/')[-1]
-#                        print sampleID,barcode
-#                        out_dict[sampleID]=barcode
-#                        found_barcode_entry=False
-
     for files in glob.glob(os.path.join('/dls_sw',beamline,'logs','*')):
         found_barcode_entry=False
         gda_log= files[files.rfind('/')+1:]
@@ -359,6 +333,34 @@ def get_dict_of_gda_barcodes(beamline):
 
     return out_dict
 
+def append_dict_of_gda_barcodes(out_dict,files):
+#    out_dict={}
+#    for files in glob.glob(os.path.join('/dls_sw',beamline,'logs','*')):
+    found_barcode_entry=False
+    gda_log= files[files.rfind('/')+1:]
+    if gda_log.startswith('gda_server.') and gda_log.endswith('.gz'):
+        with gzip.open(files,'r') as f:
+            for line in f:
+                if 'BART SampleChanger - getBarcode() returning' in line:
+                    barcode=line.split()[len(line.split())-1]
+                    found_barcode_entry=True
+                if found_barcode_entry:
+                    if 'Snapshots will be saved' in line:
+                        sampleID=line.split()[len(line.split())-1].split('/')[-1]
+                        out_dict[sampleID]=barcode
+                        found_barcode_entry=False
+    elif gda_log.startswith('gda_server.') and gda_log.endswith('.log'):
+        for line in files:
+            if 'BART SampleChanger - getBarcode() returning' in line:
+                barcode=line.split()[len(line.split())-1]
+                found_barcode_entry=True
+            if found_barcode_entry:
+                if 'Snapshots will be saved' in line:
+                    sampleID=line.split()[len(line.split())-1].split('/')[-1]
+                    out_dict[sampleID]=barcode
+                    found_barcode_entry=False
+
+    return out_dict
 
 
 class find_diffraction_image_directory(QtCore.QThread):
