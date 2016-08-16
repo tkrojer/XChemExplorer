@@ -3051,10 +3051,13 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text=QtGui.QTableWidgetItem()
                         if xtal in pinDict:
                             cell_text.setText(str(pinDict[xtal][0]))
+                            if pinDict[xtal][0] == 'Null' or pinDict[xtal][1] == 'Null':
+                                cell_text.setBackground(QtGui.QColor(255,165,0))
+                            elif pinDict[xtal][0] != pinDict[xtal][1]:
+                                cell_text.setBackground(QtGui.QColor(255,0,0))
                         else:
                             cell_text.setText('')
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                        cell_text.setBackground(QtGui.QColor(100,100,150))
                         self.data_collection_summary_table.setItem(current_row, column, cell_text)
 
                 elif header[0].startswith('GDA\nBarcode'):
@@ -3062,6 +3065,10 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text=QtGui.QTableWidgetItem()
                         if xtal in pinDict:
                             cell_text.setText(str(pinDict[xtal][1]))
+                            if pinDict[xtal][0] == 'Null' or pinDict[xtal][1] == 'Null':
+                                cell_text.setBackground(QtGui.QColor(255,165,0))
+                            elif pinDict[xtal][0] != pinDict[xtal][1]:
+                                cell_text.setBackground(QtGui.QColor(255,0,0))
                         else:
                             cell_text.setText('')
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
