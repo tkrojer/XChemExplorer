@@ -1,3 +1,5 @@
+# last edited: 17/08/2016, 15:00
+
 import getpass
 
 def dataset_task_tip():
@@ -101,17 +103,18 @@ def run_pandda_inspect_at_home(pandda_directory):
                         '    e.g. cd /home/tkrojer/fragment_screening\n\n'
                         ' 3. At home: run the following command:\n'
                         '    rsync -av %s@nx.diamond.ac.uk:%s .\n\n' %(getpass.getuser(),pandda_directory)+
-                        ' 4. At home: go into pandda direcotory\n'
+                        ' 4. At home: go into the pandda directory\n'
                         '    cd %s\n\n' %pandda_directory[pandda_directory.rfind('/')+1:]+
                         ' 5. At home: run pandda.inspect\n'
                         '    pandda.inspect\n\n'
                         ' 6. Once you finished inspecting your models, close pandda.inspect and copy the data back to DLS\n'
+                        '    with the following command:\n'
                         '    rsync -av * %s@nx.diamond.ac.uk:%s\n\n' %(getpass.getuser(),pandda_directory)+
                         ' 7. At DLS: continue using XChemExplorer; go to the PANDDA tab and run:\n'
                         '    "Export PANDDA models"\n'
-                        '    This will trigger the follwing steps:\n'
+                        '    This will trigger the following steps:\n'
                         '    - transform the pandda models back into the crystallographic unit cell\n'
                         '    - copy the transformed models into the respective folder of the project directory\n'
                         '    - launch an initial round of refinement with REFMAC\n\n'
-                        ' 8. At DLS: go to the REFINEMENT tab and run "Open COOT" to review and further refine your models\n' )
+                        ' 8. At DLS: go to the REFINEMENT tab and run "Open COOT" to review and further refine your models if necessary\n' )
     print instruction
