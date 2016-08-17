@@ -93,23 +93,25 @@ def check_status_create_pdb_cif_png_files():
     return tip
 
 def run_pandda_inspect_at_home(pandda_directory):
-    instruction =   (   ' 1. Make sure that the pandda package is installed at your home institution.\n'
-                        '    For more details see: http://pandda.bitbucket.org\n'
+    instruction =   (   '\n\n'
+                        'Please follow the instructions below to run pandda.inspect at your home institution:\n\n'
+                        ' 1. Make sure that the pandda package is installed at your home institution.\n'
+                        '    For more details see: http://pandda.bitbucket.org\n\n'
                         ' 2. At home: go to the folder where you want the files from pandda.analyse to be;\n'
-                        '    e.g. cd /home/tkrojer/fragment_screening\n'
+                        '    e.g. cd /home/tkrojer/fragment_screening\n\n'
                         ' 3. At home: run the following command:\n'
-                        '    rsync -av %s@nx.diamond.ac.uk:%s .\n' %(getpass.getuser(),pandda_directory)+
+                        '    rsync -av %s@nx.diamond.ac.uk:%s .\n\n' %(getpass.getuser(),pandda_directory)+
                         ' 4. At home: go into pandda direcotory\n'
-                        '    cd %s\n' %pandda_directory[pandda_directory.rfind('/')+1:]+
+                        '    cd %s\n\n' %pandda_directory[pandda_directory.rfind('/')+1:]+
                         ' 5. At home: run pandda.inspect\n'
-                        '    pandda.inspect\n'
+                        '    pandda.inspect\n\n'
                         ' 6. Once you finished inspecting your models, close pandda.inspect and copy the data back to DLS\n'
-                        '    rsync -av * %s@nx.diamond.ac.uk:%s\n' %(getpass.getuser(),pandda_directory)+
+                        '    rsync -av * %s@nx.diamond.ac.uk:%s\n\n' %(getpass.getuser(),pandda_directory)+
                         ' 7. At DLS: continue using XChemExplorer; go to the PANDDA tab an run:\n'
                         '    "Export PANDDA models"\n'
                         '    This will trigger the follwing steps:\n'
                         '    - transform the pandda models back into the crystallographic unit cell\n'
                         '    - copy the transformed models into the respective folder of the project directory\n'
-                        '    - launch an initial round of refinement with REFMAC\n'
+                        '    - launch an initial round of refinement with REFMAC\n\n'
                         ' 8. At DLS: go to the REFINEMENT tab and run "Open COOT" to review and further refine your models\n' )
     print instruction
