@@ -115,6 +115,10 @@ def run_pandda_inspect_at_home(pandda_directory):
                         '    This will trigger the following steps:\n'
                         '    - transform the pandda models back into the crystallographic unit cell\n'
                         '    - copy the transformed models into the respective folder of the project directory\n'
-                        '    - launch an initial round of refinement with REFMAC\n\n'
+                        '    - launch an initial round of refinement with REFMAC\n'
+                        '      Note: All refinement jobs run on the cluster at DLS.\n'
+                        '            You can check the status of the jobs by typing:\n'
+                        '            module load global/cluster\n'
+                        '            qstat\n\n'
                         ' 8. At DLS: go to the REFINEMENT tab and run "Open COOT" to review and further refine your models if necessary\n' )
     print instruction
