@@ -409,6 +409,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.panddas_file_tasks = [ 'pandda.analyse',
                                     'pandda.inspect',
+                                    'run pandda.inspect at home'
                                     'Export PANDDA models',
                                     'Show HTML summary',
                                     'Update datasource with results from pandda.inspect',
@@ -2161,6 +2162,10 @@ class XChemExplorer(QtGui.QApplication):
 
         elif instruction=='pandda.inspect':
             self.run_pandda_inspect()
+
+        elif instruction=='run pandda.inspect at home':
+            self.status_bar.showMessage('Please check terminal output for more information')
+            XChemToolTips.run_pandda_inspect_at_home(self.panddas_directory)
 
         elif instruction=='Export PANDDA models':
             update_datasource_only=False

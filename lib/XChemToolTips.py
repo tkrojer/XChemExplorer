@@ -1,3 +1,5 @@
+import getpass
+
 def dataset_task_tip():
     tip =   (   'describes what you can do'   )
     return tip
@@ -89,3 +91,25 @@ def check_status_create_pdb_cif_png_files():
     tip =   (   'the jobs are sent to a computer cluster if available\n'
                 'gives you an overview about how it progresses')
     return tip
+
+def run_pandda_inspect_at_home(pandda_directory):
+    instruction =   (   ' 1. Make sure that the pandda package is installed at your home institution.\n'
+                        '    For more details see: http://pandda.bitbucket.org\n'
+                        ' 2. At home: go to the folder where you want the files from pandda.analyse to be;\n'
+                        '    e.g. cd /home/tkrojer/fragment_screening\n'
+                        ' 3. At home: run the following command:\n'
+                        '    rsync -av %s@nx.diamond.ac.uk:%s .\n' %(getpass.getuser(),pandda_directory)+
+                        ' 4. At home: go into pandda direcotory\n'
+                        '    cd %s\n' %pandda_directory[pandda_directory.rfind('/')+1:]+
+                        ' 5. At home: run pandda.inspect\n'
+                        '    pandda.inspect\n'
+                        ' 6. Once you finished inspecting your models, close pandda.inspect and copy the data back to DLS\n'
+                        '    rsync -av * %s@nx.diamond.ac.uk:%s\n' %(getpass.getuser(),pandda_directory)+
+                        ' 7. At DLS: continue using XChemExplorer; go to the PANDDA tab an run:\n'
+                        '    "Export PANDDA models"\n'
+                        '    This will trigger the follwing steps:\n'
+                        '    - transform the pandda models back into the crystallographic unit cell\n'
+                        '    - copy the transformed models into the respective folder of the project directory\n'
+                        '    - launch an initial round of refinement with REFMAC\n'
+                        ' 8. At DLS: go to the REFINEMENT tab and run "Open COOT" to review and further refine your models\n' )
+    print instruction

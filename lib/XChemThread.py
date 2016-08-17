@@ -654,7 +654,7 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
         Rfree=''
         refinement_stage=''
         spg=''
-        relative_dimple_destination='.'+dimple_destination.replace(self.initial_model_directory,'')
+        relative_dimple_destination='.'+dimple_destination.replace(os.path.join(self.initial_model_directory,sample),'')
         relative_path_to_mtzfile='./'+path_to_mtzfile.replace(self.initial_model_directory,'')
         relative_path_to_logfile='./'+path_to_logfile.replace(self.initial_model_directory,'')
         # move up to sample directory and link respective files
