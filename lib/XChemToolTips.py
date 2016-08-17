@@ -107,7 +107,7 @@ def run_pandda_inspect_at_home(pandda_directory):
                         '    pandda.inspect\n\n'
                         ' 6. Once you finished inspecting your models, close pandda.inspect and copy the data back to DLS\n'
                         '    rsync -av * %s@nx.diamond.ac.uk:%s\n\n' %(getpass.getuser(),pandda_directory)+
-                        ' 7. At DLS: continue using XChemExplorer; go to the PANDDA tab an run:\n'
+                        ' 7. At DLS: continue using XChemExplorer; go to the PANDDA tab and run:\n'
                         '    "Export PANDDA models"\n'
                         '    This will trigger the follwing steps:\n'
                         '    - transform the pandda models back into the crystallographic unit cell\n'
