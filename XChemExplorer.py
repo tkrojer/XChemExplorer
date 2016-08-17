@@ -1198,7 +1198,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def center_main_window(self):
         screen = QtGui.QDesktopWidget().screenGeometry()
-        self.window.setFixedSize(screen.width()-(screen.width()/8),screen.height()-(screen.height()/8))
+#        self.window.setFixedSize(screen.width()-(screen.width()/8),screen.height()-(screen.height()/8))
         size = self.window.geometry()
         self.window.move((screen.width()-size.width())/2, (screen.height()-size.height())/2)
 
