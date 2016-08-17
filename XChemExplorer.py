@@ -409,7 +409,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.panddas_file_tasks = [ 'pandda.analyse',
                                     'pandda.inspect',
-                                    'run pandda.inspect at home'
+                                    'run pandda.inspect at home',
                                     'Export PANDDA models',
                                     'Show HTML summary',
                                     'Update datasource with results from pandda.inspect',
