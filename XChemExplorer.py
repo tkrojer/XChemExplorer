@@ -1226,7 +1226,7 @@ class XChemExplorer(QtGui.QApplication):
         for index in sorted(indexes):
             xtal=str(self.reprocess_datasets_table.item(index.row(), 1).text())
             print xtal,self.diffraction_data_table_dict[xtal][0]
-            self.update_log.insert('%s is marked for reprocessing' %index.row())
+            self.update_log.insert('%s marked for reprocessing' %index.row())
             self.diffraction_data_table_dict[xtal][0].setChecked(True)
 
 
