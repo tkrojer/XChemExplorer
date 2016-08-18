@@ -753,7 +753,7 @@ class XChemExplorer(QtGui.QApplication):
         # create context menu
         self.popMenu_for_reprocess_datasets_table = QtGui.QMenu()
         run_xia2_on_selected=QtGui.QAction("mark selected for reprocessing", self.window)
-        run_xia2_on_selected.triggered.connect(self.select_sample_for_dimple)
+        run_xia2_on_selected.triggered.connect(self.select_sample_for_xia2)
         self.popMenu_for_reprocess_datasets_table.addAction(run_xia2_on_selected)
         self.reprocess_datasets_table.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.reprocess_datasets_table.customContextMenuRequested.connect(self.on_context_menu_reprocess_data)
@@ -1225,8 +1225,9 @@ class XChemExplorer(QtGui.QApplication):
         indexes = self.reprocess_datasets_table.selectionModel().selectedRows()
         for index in sorted(indexes):
             xtal=str(self.reprocess_datasets_table.item(index.row(), 1).text())
+            print xtal,self.diffraction_data_table_dict[xtal][0]
             self.update_log.insert('%s is marked for reprocessing' %index.row())
-            self.self.diffraction_data_table_dict[xtal][0].setChecked(True)
+            self.diffraction_data_table_dict[xtal][0].setChecked(True)
 
 
     def update_summary_plot(self):
