@@ -1138,7 +1138,8 @@ class external_software:
                     array_status='not found'
             if status == 'found':
                 self.available_programs['qsub']=True
-                if os.getcwd().startswith('/dls'):
+#                if os.getcwd().startswith('/dls'):
+                if os.path.isdir('/dls'):
                     self.available_programs['qsub_array']=True
                     array_status='found'
                 else:
