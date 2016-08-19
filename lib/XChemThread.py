@@ -585,8 +585,12 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
                     mtz_filename=db_dict['DataProcessingMTZfileName']
                     log_filename=db_dict['DataProcessingLOGfileName']
                     dimple_destination=''
-                    path_to_dimple_pdbfile=db_dict['DataProcessingPathToDimplePDBfile']
-                    path_to_dimple_mtzfile=db_dict['DataProcessingPathToDimpleMTZfile']
+                    try:
+                        path_to_dimple_pdbfile=db_dict['DataProcessingPathToDimplePDBfile']
+                        path_to_dimple_mtzfile=db_dict['DataProcessingPathToDimpleMTZfile']
+                    except KeyError:
+                        path_to_dimple_pdbfile=''
+                        path_to_dimple_mtzfile=''
 
                     # create all the directories if necessary
                     if not os.path.isdir(os.path.join(self.initial_model_directory,sample)):
