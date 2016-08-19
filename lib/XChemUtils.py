@@ -1151,7 +1151,8 @@ class external_software:
             array_status='not found'
         self.Logfile.insert('{0:50} {1:10}'.format('checking for qsub:', status))
 #        print '{0:50} {1:10}'.format('-checking for qsub:', status)
-        if os.getcwd().startswith('/dls'):
+#        if os.getcwd().startswith('/dls'):
+        if os.path.isdir('/dls'):
             self.Logfile.insert('{0:50} {1:10}'.format('checking for array qsub:', array_status))
 
         try:

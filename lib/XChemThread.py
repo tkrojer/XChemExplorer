@@ -250,7 +250,8 @@ class create_png_and_cif_of_compound(QtCore.QThread):
         os.chdir(self.ccp4_scratch_directory)
         self.Logfile.insert('changing directory to '+self.ccp4_scratch_directory)
         if counter > 1:
-            if os.getcwd().startswith('/dls'):
+#            if os.getcwd().startswith('/dls'):
+            if os.path.isdir('/dls'):
                 if self.external_software['qsub_array']:
                     Cmds = (
                             '#PBS -joe -N xce_acedrg_master\n'
