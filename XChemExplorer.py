@@ -1629,7 +1629,7 @@ class XChemExplorer(QtGui.QApplication):
     def update_reference_files(self,reference_root):
         self.reference_file_list=self.get_reference_file_list(reference_root)
         self.populate_reference_combobox(self.reference_file_selection_combobox)
-
+        self.populate_reference_combobox(self.pandda_reference_file_selection_combobox)
 
     def target_selection_combobox_activated(self,text):
         self.target=str(text)
