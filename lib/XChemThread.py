@@ -419,7 +419,8 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
         # submit job
         self.Logfile.insert('created input scripts for '+str(n+1)+' in '+self.ccp4_scratch_directory)
         os.chdir(self.ccp4_scratch_directory)
-        if os.getcwd().startswith('/dls'):
+#        if os.getcwd().startswith('/dls'):
+        if os.path.isdir('/dls'):
             if self.external_software['qsub_array']:
                 Cmds = (
                         '#PBS -joe -N xce_dimple_master\n'
