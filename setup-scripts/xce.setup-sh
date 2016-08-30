@@ -7,6 +7,6 @@ for dir in /*
             module load global/cluster
             module load phenix
             module load coot
-            module load ccp4/7
+#            module load ccp4/7
         fi
     done;
