@@ -1,4 +1,4 @@
-# last edited: 12/08/2016, 16:00
+# last edited: 31/08/2016, 11:00
 
 import pygtk, gtk, pango
 import os
