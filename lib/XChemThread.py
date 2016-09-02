@@ -67,6 +67,8 @@ class update_datasource_from_file_system(QtCore.QThread):
                 if not os.path.isfile('refine.pdb'):
                     os.system('/bin/rm refine.pdb')         # this removes broken links that could trip the symlink
                     os.symlink('dimple.pdb', 'refine.pdb')
+            else:
+                os.system('/bin/rm dimple.pdb 2> /dev/null')    # this makes sure that any broken link which could rerail PANDDA gets removed
             if os.path.isfile('dimple.mtz'):
                 db_dict['DimplePathToMTZ']=os.path.realpath(os.path.join(directory,'dimple.mtz'))
                 dimple_mtz=db_dict['DimplePathToMTZ']
@@ -74,6 +76,8 @@ class update_datasource_from_file_system(QtCore.QThread):
                 if not os.path.isfile('refine.mtz'):
                     os.system('/bin/rm refine.mtz')
                     os.symlink('dimple.mtz', 'refine.mtz')
+            else:
+                os.system('/bin/rm dimple.mtz 2> /dev/null')    # this makes sure that any broken link which could rerail PANDDA gets removed
             # this should not really be the case, but if a user does not provide an aimless logfile then that's all we can do
             if not os.path.isfile(xtal+'.log'):
                 if os.path.isfile(xtal+'.mtz'):
@@ -629,7 +633,15 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
                         db_dict=entry[6]
                         db_dict['DataCollectionOutcome']=self.dataset_outcome_dict[sample]
                         db_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
-                        db_dict['RefinementMTZfree'],db_dict['DimpleRcryst'],db_dict['DimpleRfree'],db_dict['RefinementOutcome'],db_dict['RefinementSpaceGroup'] =self.link_mtz_log_files_to_sample_directory(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename,dimple_destination)
+                        tmp_dict={}
+                        tmp_dict['RefinementMTZfree'],tmp_dict['DimpleRcryst'],tmp_dict['DimpleRfree'],tmp_dict['RefinementOutcome'],tmp_dict['RefinementSpaceGroup'] =self.link_mtz_log_files_to_sample_directory(sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename,dimple_destination)
+                        if tmp_dict['RefinementOutcome'] != '':
+                            # this assumes that no manual DIMPLE run was launched successfully
+                            db_dict['RefinementMTZfree'] = tmp_dict['RefinementMTZfree']
+                            db_dict['DimpleRcryst'] = tmp_dict['DimpleRcryst']
+                            db_dict['DimpleRfree'] = tmp_dict['DimpleRfree']
+                            db_dict['RefinementOutcome'] = tmp_dict['RefinementOutcome']
+                            db_dict['RefinementSpaceGroup'] = tmp_dict['RefinementSpaceGroup']
                         current_refinement_outcome=data_source.get_value_from_field(sample,'RefinementOutcome')
                         if str(current_refinement_outcome[0]).split()[0].lower().startswith('none'):
                             db_dict['RefinementOutcome']='1 - Analysis Pending'
@@ -675,53 +687,56 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
 #        os.symlink(os.path.join(path_to_logfile,sample+'.log'),sample+'.log')
         os.symlink(os.path.join(relative_path_to_mtzfile,sample+'.mtz'),sample+'.mtz')
         os.symlink(os.path.join(relative_path_to_logfile,sample+'.log'),sample+'.log')
-        if dimple_destination != '':
-            # check if dimple files exist
-            if os.path.isfile(os.path.join(dimple_destination,'final.pdb')):
-                # remove old symbolic links if necessary
-                #if os.path.isfile('dimple.pdb'):
-                # forget about the if statement; it won't catch broken links,
-                # but broken links will still trip os.symlink
-                os.system('/bin/rm dimple.pdb 2> /dev/null')
-                # symlink with absolute path
-#                os.symlink(os.path.join(dimple_destination,'final.pdb'),'dimple.pdb')
-                # symlink with relative paths
-                os.symlink(os.path.join(relative_dimple_destination,'final.pdb'),'dimple.pdb')
-                pdb_info=parse().PDBheader(os.path.join(dimple_destination,'final.pdb'))
-                Rcryst=pdb_info['Rcryst']
-                Rfree=pdb_info['Rfree']
-                spg=pdb_info['SpaceGroup']
-                refinement_stage='1 - Analysis Pending'
 
-            if os.path.isfile(os.path.join(dimple_destination,'final.mtz')):
-                # remove old symbolic links if necessary
-                #if os.path.isfile('dimple.mtz'):
-                os.system('/bin/rm dimple.mtz 2> /dev/null')
-#                os.symlink(os.path.join(dimple_destination,'final.mtz'),'dimple.mtz')
-                os.symlink(os.path.join(relative_dimple_destination,'final.mtz'),'dimple.mtz')
-            # if no refinement was carried out yet, then we also want to link the dimple files to refine.pdb/refine.log
-            # so that we can look at them with the COOT plugin
-            found_previous_refinement=False
-            for dirs in glob.glob('*'):
-                if os.path.isdir(dirs) and dirs.startswith('Refine_'):
-                    found_previous_refinement=True
-                    break
-            if not found_previous_refinement:
-                # first delete possible old symbolic links
-                #if os.path.isfile('refine.pdb'):
-                os.system('/bin/rm refine.pdb 2> /dev/null')
-                os.symlink('dimple.pdb','refine.pdb')
-                #if os.path.isfile('refine.mtz'):
-                os.system('/bin/rm refine.mtz 2> /dev/null')
-                os.symlink('dimple.mtz','refine.mtz')
-            # remove any previous <sample>.free.mtz file, and link new dimple.mtz
-            # so if we continue refining, then we do so against the correct file
-            # think that REFMAC does not tinker with F,SIGF as long as there is no twinning
-            #if os.path.isfile(sample+'.free.mtz'):
-            os.system('/bin/rm '+sample+'.free.mtz')
-#            os.symlink(os.path.join(dimple_destination,'final.mtz'),sample+'.free.mtz')
-            os.symlink(os.path.join(relative_dimple_destination,'final.mtz'),sample+'.free.mtz')
-            mtzfree=os.path.join(dimple_destination,'final.mtz')
+        # only continue changing DIMPLE links if it was not yet run successfully an selected mtz files
+        if not os.path.isfile(os.path.join(self.initial_model_directory,sample,'dimple','dimple_rerun_on_selected_file','dimple','final.pdb')):
+
+            if dimple_destination != '':
+                if os.path.isfile(os.path.join(dimple_destination,'final.pdb')):
+                    # remove old symbolic links if necessary
+                    #if os.path.isfile('dimple.pdb'):
+                    # forget about the if statement; it won't catch broken links,
+                    # but broken links will still trip os.symlink
+                    os.system('/bin/rm dimple.pdb 2> /dev/null')
+                    # symlink with absolute path
+#                    os.symlink(os.path.join(dimple_destination,'final.pdb'),'dimple.pdb')
+                    # symlink with relative paths
+                    os.symlink(os.path.join(relative_dimple_destination,'final.pdb'),'dimple.pdb')
+                    pdb_info=parse().PDBheader(os.path.join(dimple_destination,'final.pdb'))
+                    Rcryst=pdb_info['Rcryst']
+                    Rfree=pdb_info['Rfree']
+                    spg=pdb_info['SpaceGroup']
+                    refinement_stage='1 - Analysis Pending'
+
+                if os.path.isfile(os.path.join(dimple_destination,'final.mtz')):
+                    # remove old symbolic links if necessary
+                    #if os.path.isfile('dimple.mtz'):
+                    os.system('/bin/rm dimple.mtz 2> /dev/null')
+#                   os.symlink(os.path.join(dimple_destination,'final.mtz'),'dimple.mtz')
+                    os.symlink(os.path.join(relative_dimple_destination,'final.mtz'),'dimple.mtz')
+                # if no refinement was carried out yet, then we also want to link the dimple files to refine.pdb/refine.log
+                # so that we can look at them with the COOT plugin
+                found_previous_refinement=False
+                for dirs in glob.glob('*'):
+                    if os.path.isdir(dirs) and dirs.startswith('Refine_'):
+                        found_previous_refinement=True
+                        break
+                if not found_previous_refinement:
+                    # first delete possible old symbolic links
+                    #if os.path.isfile('refine.pdb'):
+                    os.system('/bin/rm refine.pdb 2> /dev/null')
+                    os.symlink('dimple.pdb','refine.pdb')
+                    #if os.path.isfile('refine.mtz'):
+                    os.system('/bin/rm refine.mtz 2> /dev/null')
+                    os.symlink('dimple.mtz','refine.mtz')
+                # remove any previous <sample>.free.mtz file, and link new dimple.mtz
+                # so if we continue refining, then we do so against the correct file
+                # think that REFMAC does not tinker with F,SIGF as long as there is no twinning
+                #if os.path.isfile(sample+'.free.mtz'):
+                os.system('/bin/rm '+sample+'.free.mtz')
+#                os.symlink(os.path.join(dimple_destination,'final.mtz'),sample+'.free.mtz')
+                os.symlink(os.path.join(relative_dimple_destination,'final.mtz'),sample+'.free.mtz')
+                mtzfree=os.path.join(dimple_destination,'final.mtz')
         return mtzfree,Rcryst,Rfree,refinement_stage,spg
 
 
