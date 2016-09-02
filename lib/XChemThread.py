@@ -349,6 +349,8 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                 os.mkdir(os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc))
             os.chdir(os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc))
             os.system('touch dimple_run_in_progress')
+            os.system('/bin/rm final.mtz 2> /dev/null')
+            os.system('/bin/rm final.pdb 2> /dev/null')
 
             if self.queueing_system_available:
                 top_line='#PBS -joe -N XCE_dimple\n'
@@ -410,6 +412,9 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc) +
                     '\n'
                     '/bin/rm dimple_run_in_progress\n'
+                    '\n'
+                    'ln -s dimple/final.pdb .\n'
+                    'ln -s dimple/final.mtz .\n'
                     )
 
             os.chdir(self.ccp4_scratch_directory)
