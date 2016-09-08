@@ -333,9 +333,10 @@ def get_dict_of_gda_barcodes(beamline):
 
     return out_dict
 
-def append_dict_of_gda_barcodes(out_dict,files):
+def append_dict_of_gda_barcodes(out_dict,files,xce_logfile):
 #    out_dict={}
 #    for files in glob.glob(os.path.join('/dls_sw',beamline,'logs','*')):
+    Logfile=XChemLog.updateLog(xce_logfile)
     found_barcode_entry=False
     gda_log= files[files.rfind('/')+1:]
     if gda_log.startswith('gda_server.') and gda_log.endswith('.gz'):
@@ -348,6 +349,7 @@ def append_dict_of_gda_barcodes(out_dict,files):
                     if 'Snapshots will be saved' in line:
                         sampleID=line.split()[len(line.split())-1].split('/')[-1]
                         out_dict[sampleID]=barcode
+                        Logfile.insert('found: sample=%s, barcode=%s, file=%s' %(sampleID,barcode,files))
                         found_barcode_entry=False
     elif gda_log.startswith('gda_server.') and gda_log.endswith('.log'):
         for line in files:
@@ -358,6 +360,7 @@ def append_dict_of_gda_barcodes(out_dict,files):
                 if 'Snapshots will be saved' in line:
                     sampleID=line.split()[len(line.split())-1].split('/')[-1]
                     out_dict[sampleID]=barcode
+                    Logfile.insert('found: sample=%s, barcode=%s, file=%s' %(sampleID,barcode,files))
                     found_barcode_entry=False
 
     return out_dict

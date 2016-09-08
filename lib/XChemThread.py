@@ -827,6 +827,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         self.rescore_only=rescore_only
         self.acceptable_low_resolution_limit_for_data=acceptable_low_resolution_limit_for_data
         self.data_source=XChemDB.data_source(os.path.join(data_source_file))
+        self.xce_logfile=xce_logfile
         self.Logfile=XChemLog.updateLog(xce_logfile)
 #        self.gda_log_directories_parsed=gda_log_directories_parsed
 
@@ -1567,7 +1568,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
             gda_pin_dict={}
             for files in glob.glob(os.path.join('/dls_sw',beamline,'logs','gda_server*')):
                 self.Logfile.insert('parsing '+files+' for sampleID and pinID')
-                gda_pin_dict=XChemMain.append_dict_of_gda_barcodes(gda_pin_dict,files)
+                gda_pin_dict=XChemMain.append_dict_of_gda_barcodes(gda_pin_dict,files,self.xce_logfile)
                 progress += progress_step
                 self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
