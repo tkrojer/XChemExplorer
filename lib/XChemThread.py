@@ -1,4 +1,4 @@
-# last edited: 08/09/2016, 12:00
+# last edited: 02/09/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -64,9 +64,10 @@ class update_datasource_from_file_system(QtCore.QThread):
 
             dimple_path=''  # will be set to correct path if dimple.pdb is present;
             if os.path.isfile('dimple.pdb'):
-                if not os.path.isfile('refine.pdb'):
-                    os.system('/bin/rm refine.pdb')         # this removes broken links that could trip the symlink
-                    os.symlink('dimple.pdb', 'refine.pdb')
+                print ''
+#                if not os.path.isfile('refine.pdb'):
+#                    os.system('/bin/rm refine.pdb')         # this removes broken links that could trip the symlink
+#                    os.symlink('dimple.pdb', 'refine.pdb')
             else:
                 os.system('/bin/rm dimple.pdb 2> /dev/null')    # this makes sure that any broken link which could rerail PANDDA gets removed
             if os.path.isfile('dimple.mtz'):
@@ -730,10 +731,10 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
                     # first delete possible old symbolic links
                     #if os.path.isfile('refine.pdb'):
                     os.system('/bin/rm refine.pdb 2> /dev/null')
-                    os.symlink('dimple.pdb','refine.pdb')
+#                    os.symlink('dimple.pdb','refine.pdb')
                     #if os.path.isfile('refine.mtz'):
                     os.system('/bin/rm refine.mtz 2> /dev/null')
-                    os.symlink('dimple.mtz','refine.mtz')
+#                    os.symlink('dimple.mtz','refine.mtz')
                 # remove any previous <sample>.free.mtz file, and link new dimple.mtz
                 # so if we continue refining, then we do so against the correct file
                 # think that REFMAC does not tinker with F,SIGF as long as there is no twinning
@@ -827,7 +828,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
         self.rescore_only=rescore_only
         self.acceptable_low_resolution_limit_for_data=acceptable_low_resolution_limit_for_data
         self.data_source=XChemDB.data_source(os.path.join(data_source_file))
-        self.xce_logfile=xce_logfile
         self.Logfile=XChemLog.updateLog(xce_logfile)
 #        self.gda_log_directories_parsed=gda_log_directories_parsed
 
@@ -1568,7 +1568,7 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
             gda_pin_dict={}
             for files in glob.glob(os.path.join('/dls_sw',beamline,'logs','gda_server*')):
                 self.Logfile.insert('parsing '+files+' for sampleID and pinID')
-                gda_pin_dict=XChemMain.append_dict_of_gda_barcodes(gda_pin_dict,files,self.xce_logfile)
+                gda_pin_dict=XChemMain.append_dict_of_gda_barcodes(gda_pin_dict,files)
                 progress += progress_step
                 self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 

@@ -756,8 +756,8 @@ class GUI(object):
             os.chdir(os.path.join(self.project_directory,self.xtalID))
             # we want to be able to check dimple results immediately, but don't want to interfere with refinement
             if not os.path.isfile('REFINEMENT_IN_PROGRESS'):
-                if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.xtalID+'-pandda-model.pdb')):
-                    os.symlink(self.xtalID+'-pandda-model.pdb',self.pdb_style)
+                if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.xtalID+'-ensemble-model.pdb')):
+                    os.symlink(self.xtalID+'-ensemble-model.pdb',self.pdb_style)
                 elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.pdb')):
                     os.symlink('dimple.pdb',self.pdb_style)
                 else:
