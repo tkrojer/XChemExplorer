@@ -62,13 +62,14 @@ class GUI(object):
 
         self.experiment_stage =     [   ['Review PANDDA export',    '2 - PANDDA model',     65000,  0,  0],
                                         ['In Refinement',           '3 - In Refinement',    65000,  0,  0],
-                                        ['Comp Chem Ready!',        '4 - ComChem ready',    65000,  0,  0],
+                                        ['Comp Chem Ready!',        '4 - CompChem ready',   65000,  0,  0],
                                         ['Ready for Deposition!',   '5 - Deposition ready', 65000,  0,  0]   ]
 
         self.ligand_confidence_category = [     '0 - no ligand present',
-                                                '1 - low confidence',
-                                                '2 - pose/identity uncertain',
-                                                '3 - high confidence'   ]
+                                                '1 - Low Confidence',
+                                                '2 - Correct ligand, weak density',
+                                                '3 - Clear density, unexpected ligand',
+                                                '4 - High Confidence'   ]
 
         self.ligand_site_information =  self.db.get_list_of_pandda_sites_for_coot()
     
