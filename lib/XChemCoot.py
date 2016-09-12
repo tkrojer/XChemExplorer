@@ -587,7 +587,8 @@ class GUI(object):
             current_stage=0
             for i,entry in enumerate(self.ligand_confidence_category):
                 print '--->',entry,self.ligand_confidence
-                if entry==self.ligand_confidence:
+#                if entry==self.ligand_confidence:
+                if entry.split()[0] == self.ligand_confidence.split()[0]:
                     current_stage=i
                     break
             for i,button in enumerate(self.ligand_confidence_button_list):

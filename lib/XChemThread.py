@@ -167,7 +167,8 @@ class update_datasource_from_file_system(QtCore.QThread):
                         spider_plot=os.path.join(self.initial_model_directory,xtal,entry[2].split('/')[len(entry[2].split('/'))-3],entry[2].split('/')[len(entry[2].split('/'))-2],entry[2].split('/')[len(entry[2].split('/'))-1])
                         if os.path.isfile(spider_plot):
                             db_pandda_dict['PANDDA_site_spider_plot']=spider_plot
-                            db_pandda_dict['RefinementOutcome']='3 - In Refinement'     # just in case; presence of a spider plot definitely signals that refinement happened
+#                            db_pandda_dict['RefinementOutcome']='3 - In Refinement'    # just in case; presence of a spider plot definitely signals that refinement happened
+                                                                                        # should probably be not updated! Will overwrite CompChem ready
                     self.Logfile.insert('updating panddaTable for xtal: %s, site: %s' %(entry[0],entry[1]))
                     self.db.update_insert_panddaTable(xtal,db_pandda_dict)
 
