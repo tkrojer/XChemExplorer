@@ -978,9 +978,9 @@ class XChemExplorer(QtGui.QApplication):
         # qstat or local machine
         self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('submit'))
         self.pandda_submission_mode_selection_combobox = QtGui.QComboBox()
-        self.pandda_submission_mode_selection_combobox.addItem('local machine')
         if self.external_software['qsub']:
             self.pandda_submission_mode_selection_combobox.addItem('qsub')
+        self.pandda_submission_mode_selection_combobox.addItem('local machine')
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_submission_mode_selection_combobox)
 
         self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('number of processors'))
@@ -991,8 +991,8 @@ class XChemExplorer(QtGui.QApplication):
 
         self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('order events by:'))
         self.pandda_sort_event_combobox = QtGui.QComboBox()
-        self.pandda_sort_event_combobox.addItem('z_peak')
         self.pandda_sort_event_combobox.addItem('cluster_size')
+        self.pandda_sort_event_combobox.addItem('z_peak')
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_sort_event_combobox)
 
         # crystal form option
