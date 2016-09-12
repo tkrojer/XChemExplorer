@@ -230,10 +230,11 @@ class run_pandda_analyse(QtCore.QThread):
         self.data_directory=pandda_params['data_dir']
         self.panddas_directory=pandda_params['out_dir']
         self.submit_mode=pandda_params['submit_mode']
-        if self.submit_mode == 'local machine':
-            self.nproc=pandda_params['nproc']
-        else:
-            self.nproc='7'
+#        if self.submit_mode == 'local machine':
+#            self.nproc=pandda_params['nproc']
+#        else:
+#            self.nproc='7'
+        self.nproc=pandda_params['nproc']
         self.min_build_datasets=pandda_params['min_build_datasets']
         self.pdb_style=pandda_params['pdb_style']
         self.mtz_style=pandda_params['mtz_style']
