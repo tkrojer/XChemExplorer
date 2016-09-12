@@ -673,11 +673,12 @@ class GUI(object):
             self.db_dict_mainTable['RefinementLigandConfidence']=data
             print '==> XCE: setting Ligand Confidence for '+self.xtalID+' to '+str(data)+' in mainTable of datasource'
             self.db.update_data_source(self.xtalID,self.db_dict_mainTable)
+            self.Todo[self.index][6]=data
         else:
             self.db_dict_panddaTable['PANDDA_site_confidence']=data
             print '==> XCE: setting Ligand Confidence for '+self.xtalID+' (site='+str(self.selected_site)+') to '+str(data)+' in panddaTable of datasource'
             self.db.update_panddaTable(self.xtalID,self.selected_site[0],self.db_dict_panddaTable)
-
+            self.Todo[self.index][6]=data
 
     def RefreshData(self):
         # initialize Refinement library
