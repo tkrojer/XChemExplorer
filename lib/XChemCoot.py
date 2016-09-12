@@ -56,7 +56,7 @@ class GUI(object):
                                         '1 - Analysis Pending',
                                         '2 - PANDDA model',
                                         '3 - In Refinement',
-                                        '4 - ComChem ready',
+                                        '4 - CompChem ready',
                                         '5 - Deposition ready',
                                         '6 - Deposited'         ]
 
@@ -576,7 +576,8 @@ class GUI(object):
             # updating dataset outcome radiobuttons
             current_stage=0
             for i,entry in enumerate(self.experiment_stage):
-                if entry[1]==self.refinement_outcome:
+#                if entry[1]==self.refinement_outcome:                          # use number as identifier, not string since this one might change
+                if entry[1].split()[0] == self.refinement_outcome.split()[0]:
                     current_stage=i
                     break
             for i,button in enumerate(self.experiment_stage_button_list):
@@ -587,7 +588,7 @@ class GUI(object):
             current_stage=0
             for i,entry in enumerate(self.ligand_confidence_category):
                 print '--->',entry,self.ligand_confidence
-#                if entry==self.ligand_confidence:
+#                if entry==self.ligand_confidence:                              # use number as identifier, not string since this one might change
                 if entry.split()[0] == self.ligand_confidence.split()[0]:
                     current_stage=i
                     break

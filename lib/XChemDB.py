@@ -698,6 +698,20 @@ class data_source:
             outcome = " '%s' " %RefinementOutcome
 
         if int(pandda_site) > 0:
+#            sqlite = (
+#                "select"
+#                " mainTable.CrystalName,"
+#                " mainTable.CompoundCode,"
+#                " mainTable.RefinementCIF,"
+#                " mainTable.RefinementMTZfree,"
+#                " mainTable.RefinementPathToRefinementFolder,"
+#                " panddaTable.RefinementOutcome, "
+#                " panddaTable.PANDDA_site_confidence "
+#                "from mainTable inner join panddaTable on mainTable.CrystalName = panddaTable.CrystalName "
+#                "where panddaTable.PANDDA_site_index is '%s'" %pandda_site+
+#                " and panddaTable.PANDDA_site_ligand_placed is 'True'"
+#                " and panddaTable.RefinementOutcome is %s;" %outcome
+#                )
             sqlite = (
                 "select"
                 " mainTable.CrystalName,"
@@ -710,9 +724,21 @@ class data_source:
                 "from mainTable inner join panddaTable on mainTable.CrystalName = panddaTable.CrystalName "
                 "where panddaTable.PANDDA_site_index is '%s'" %pandda_site+
                 " and panddaTable.PANDDA_site_ligand_placed is 'True'"
-                " and panddaTable.RefinementOutcome is %s;" %outcome
+                " and panddaTable.RefinementOutcome like "+outcome.split()[0]+"%';"
                 )
         else:
+#            sqlite = (
+#                "select"
+#                " CrystalName,"
+#                " CompoundCode,"
+#                " RefinementCIF,"
+#                " RefinementMTZfree,"
+#                " RefinementPathToRefinementFolder,"
+#                " RefinementOutcome,"
+#                " RefinementLigandConfidence "
+#                "from mainTable "
+#                "where RefinementOutcome is %s;" %outcome
+#                )
             sqlite = (
                 "select"
                 " CrystalName,"
@@ -723,7 +749,7 @@ class data_source:
                 " RefinementOutcome,"
                 " RefinementLigandConfidence "
                 "from mainTable "
-                "where RefinementOutcome is %s;" %outcome
+                "where RefinementOutcome like "+outcome.split()[0]+"%';"
                 )
 
         print sqlite
