@@ -589,9 +589,12 @@ class GUI(object):
             for i,entry in enumerate(self.ligand_confidence_category):
                 print '--->',entry,self.ligand_confidence
 #                if entry==self.ligand_confidence:                              # use number as identifier, not string since this one might change
-                if entry.split()[0] == self.ligand_confidence.split()[0]:
-                    current_stage=i
-                    break
+                try:
+                    if entry.split()[0] == self.ligand_confidence.split()[0]:
+                        current_stage=i
+                        break
+                except IndexError:
+                    pass
             for i,button in enumerate(self.ligand_confidence_button_list):
                 if i==current_stage:
                     button.set_active(True)
