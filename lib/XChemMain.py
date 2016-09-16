@@ -351,8 +351,8 @@ def append_dict_of_gda_barcodes(out_dict,files,xce_logfile):
                         out_dict[sampleID]=barcode
                         Logfile.insert('found: sample=%s, barcode=%s, file=%s' %(sampleID,barcode,files))
                         found_barcode_entry=False
-    elif gda_log.startswith('gda_server.') and gda_log.endswith('.log'):
-        for line in files:
+    elif gda_log.startswith('gda_server') and gda_log.endswith('log'):
+        for line in open(files):
             if 'BART SampleChanger - getBarcode() returning' in line:
                 barcode=line.split()[len(line.split())-1]
                 found_barcode_entry=True
