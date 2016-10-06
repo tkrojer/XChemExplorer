@@ -1,4 +1,4 @@
-# last edited: 12/09/2016, 13:00
+# last edited: 06/10/2016, 16:00
 
 import os, sys, glob
 from datetime import datetime
@@ -1081,7 +1081,7 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_vbox_for_settings=QtGui.QVBoxLayout()
         self.tab_dict[self.workflow_dict['Settings']][1].addLayout(self.data_collection_vbox_for_settings)
 
-        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nProject Directory:'))
+        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nProject Directory: - REQUIRED -'))
         settings_hbox_initial_model_directory=QtGui.QHBoxLayout()
         self.initial_model_directory_label=QtGui.QLabel(self.initial_model_directory)
         settings_hbox_initial_model_directory.addWidget(self.initial_model_directory_label)
@@ -1091,7 +1091,7 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_initial_model_directory)
 
 
-        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nReference Structure Directory:'))
+        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nReference Structure Directory: - OPTIONAL -'))
         settings_hbox_reference_directory=QtGui.QHBoxLayout()
         self.reference_directory_label=QtGui.QLabel(self.reference_directory)
         settings_hbox_reference_directory.addWidget(self.reference_directory_label)
@@ -1100,7 +1100,7 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_reference_directory.addWidget(settings_buttoon_reference_directory)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_reference_directory)
 
-        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nData Source:'))
+        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nData Source: - REQUIRED -'))
         settings_hbox_data_source_file=QtGui.QHBoxLayout()
         if self.data_source_file != '':
             self.data_source_file_label=QtGui.QLabel(os.path.join(self.database_directory,self.data_source_file))
@@ -1114,7 +1114,7 @@ class XChemExplorer(QtGui.QApplication):
 
         #################
         # Data Collection
-        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nData Collection Directory'))
+        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nData Collection Directory: - OPTIONAL -'))
 
         settings_beamline_frame = QtGui.QFrame()
         settings_beamline_frame.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -1146,7 +1146,7 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_vbox_for_settings.addWidget(settings_beamline_frame)
         #################
 
-        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nCCP4_SCR Directory:'))
+        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nCCP4_SCR Directory: - OPTIONAL -'))
         settings_hbox_ccp4_scratch_directory=QtGui.QHBoxLayout()
         self.ccp4_scratch_directory_label=QtGui.QLabel(self.ccp4_scratch_directory)
         settings_hbox_ccp4_scratch_directory.addWidget(self.ccp4_scratch_directory_label)
@@ -1155,7 +1155,7 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_ccp4_scratch_directory.addWidget(settings_buttoon_ccp4_scratch_directory)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_ccp4_scratch_directory)
 
-        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nPANDDAs directory:'))
+        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nPANDDAs directory: - OPTIONAL -'))
         settings_hbox_panddas_directory=QtGui.QHBoxLayout()
         self.panddas_directory_label=QtGui.QLabel(self.panddas_directory)
         settings_hbox_panddas_directory.addWidget(self.panddas_directory_label)
