@@ -1,4 +1,4 @@
-# last edited: 12/09/2016, 08:00
+# last edited: 10/10/2016, 10:00
 
 import sqlite3
 import os,sys
@@ -727,18 +727,6 @@ class data_source:
                 " and panddaTable.RefinementOutcome like "+outcome.split()[0]+"%';"
                 )
         else:
-#            sqlite = (
-#                "select"
-#                " CrystalName,"
-#                " CompoundCode,"
-#                " RefinementCIF,"
-#                " RefinementMTZfree,"
-#                " RefinementPathToRefinementFolder,"
-#                " RefinementOutcome,"
-#                " RefinementLigandConfidence "
-#                "from mainTable "
-#                "where RefinementOutcome is %s;" %outcome
-#                )
             sqlite = (
                 "select"
                 " CrystalName,"
@@ -749,10 +737,22 @@ class data_source:
                 " RefinementOutcome,"
                 " RefinementLigandConfidence "
                 "from mainTable "
-                "where RefinementOutcome like "+outcome.split()[0]+"%';"
+                "where RefinementOutcome is %s;" %outcome
                 )
+#            sqlite = (
+#                "select"
+#                " CrystalName,"
+#                " CompoundCode,"
+#                " RefinementCIF,"
+#                " RefinementMTZfree,"
+#                " RefinementPathToRefinementFolder,"
+#                " RefinementOutcome,"
+#                " RefinementLigandConfidence "
+#                "from mainTable "
+#                "where RefinementOutcome like "+outcome.split()[0]+"%';"
+#                )
 
-        print sqlite
+#        print sqlite
         cursor.execute(sqlite)
 
         tmp = cursor.fetchall()
