@@ -1,4 +1,4 @@
-# last edited: 12/09/2016, 08:00
+# last edited: 20/10/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -268,8 +268,8 @@ class create_png_and_cif_of_compound(QtCore.QThread):
                     f.close()
                     self.Logfile.insert('submitting array job with maximal 100 jobs running on cluster')
                     self.Logfile.insert('using the following command:')
-                    self.Logfile.insert('         qsub -t 1:%s -tc %s acedrg_master.sh' %(str(counter),self.max_queue_jobs))
-                    os.system('qsub -t 1:%s -tc %s acedrg_master.sh' %(str(counter),self.max_queue_jobs))
+                    self.Logfile.insert('         qsub -P labxchem -t 1:%s -tc %s acedrg_master.sh' %(str(counter),self.max_queue_jobs))
+                    os.system('qsub -P labxchem -t 1:%s -tc %s acedrg_master.sh' %(str(counter),self.max_queue_jobs))
                 else:
                     self.Logfile.insert("cannot start ARRAY job: make sure that 'module load global/cluster' is in your .bashrc or .cshrc file")
             elif self.external_software['qsub']:
@@ -443,8 +443,8 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                 f.close()
                 self.Logfile.insert('submitting array job with maximal 100 jobs running on cluster')
                 self.Logfile.insert('using the following command:')
-                self.Logfile.insert('qsub -t 1:%s -tc %s dimple_master.sh' %(str(n+1),self.max_queue_jobs))
-                os.system('qsub -t 1:%s -tc %s dimple_master.sh' %(str(n+1),self.max_queue_jobs))
+                self.Logfile.insert('qsub -P labxchem -t 1:%s -tc %s dimple_master.sh' %(str(n+1),self.max_queue_jobs))
+                os.system('qsub -P labxchem -t 1:%s -tc %s dimple_master.sh' %(str(n+1),self.max_queue_jobs))
             else:
                 self.Logfile.insert("cannot start ARRAY job: make sure that 'module load global/cluster' is in your .bashrc or .cshrc file")
         elif self.external_software['qsub']:
