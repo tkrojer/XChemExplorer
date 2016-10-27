@@ -1,4 +1,4 @@
-# last edited: 10/10/2016, 10:00
+# last edited: 27/10/2016, 17:00
 
 import sqlite3
 import os,sys
@@ -177,6 +177,10 @@ class data_source:
             ['RefinementRamachandranFavored',               'Ramachandran\nFavored',                        'TEXT',                 1],
             ['RefinementRamachandranFavoredTL',             'RefinementRamachandranFavoredTL',              'TEXT',                 0],
 
+            ['Deposition_PDB_ID',                           'Deposition_PDB_ID',                            'TEXT',                 1],
+            ['Deposition_Date',                             'Deposition_Date',                              'TEXT',                 1],
+
+
             ['AssayIC50',                                   'AssayIC50',                                    'TEXT',                 0],
             ['LastUpdated',                                 'LastUpdated',                                  'TEXT',                 0],
             ['LastUpdated_by',                              'LastUpdated_by',                               'TEXT',                 0]
@@ -201,6 +205,7 @@ class data_source:
             ['PANDDA_site_z',                               'PANDDA_site_z',                            'TEXT'],
             ['PANDDA_site_ligand_id',                       'PANDDA_site_ligand_id',                    'TEXT'],
             ['PANDDA_site_event_map',                       'PANDDA_site_event_map',                    'TEXT'],
+            ['PANDDA_site_event_map_mtz',                   'PANDDA_site_event_map_mtz',                'TEXT'],
             ['PANDDA_site_initial_model',                   'PANDDA_site_initial_model',                'TEXT'],
             ['PANDDA_site_initial_mtz',                     'PANDDA_site_initial_mtz',                  'TEXT'],
             ['PANDDA_site_spider_plot',                     'PANDDA_site_spider_plot',                  'TEXT'],

@@ -1,4 +1,4 @@
-# last edited: 06/10/2016, 16:00
+# last edited: 27/10/2016, 17:00
 
 import os, sys, glob
 from datetime import datetime
@@ -138,6 +138,13 @@ class XChemExplorer(QtGui.QApplication):
 
 
         #
+        # Deposition
+        #
+
+        self.deposit_dict = {}
+
+
+        #
         # internal lists and dictionaries
         #
 
@@ -268,6 +275,11 @@ class XChemExplorer(QtGui.QApplication):
         show_preferences=QtGui.QAction('Edit Preferences',self.window)
         show_preferences.triggered.connect(self.show_preferences)
         preferences_menu.addAction(show_preferences)
+
+        deposition_menu = menu_bar.addMenu("&Deposition")
+        edit_deposition_info=QtGui.QAction('Edit Information',self.window)
+        edit_deposition_info.triggered.connect(self.deposition_data)
+        deposition_menu.addAction(edit_deposition_info)
 
         help = menu_bar.addMenu("&Help")
 
@@ -1312,6 +1324,124 @@ class XChemExplorer(QtGui.QApplication):
         preferencesLayout.addLayout(vbox,0,0)
 
         preferences.exec_();
+
+
+    def deposition_data(self):
+
+        depositData = QtGui.QMessageBox()
+        depositDataLayout = depositData.layout()
+
+        vbox = QtGui.QVBoxLayout()
+
+        hbox=QtGui.QHBoxLayout()
+        label=QtGui.QLabel('TEST')
+        hbox.addWidget(label)
+        self.test_input = QtGui.QLineEdit()
+        self.test_input.setText('hallo')
+        self.test_input.setFixedWidth(200)
+        hbox.addWidget(self.test_input)
+        vbox.addLayout(hbox)
+
+#        settings_hbox_filename_root=QtGui.QHBoxLayout()
+#        filename_root_label=QtGui.QLabel('filename root:')
+#        settings_hbox_filename_root.addWidget(filename_root_label)
+#        filename_root_input = QtGui.QLineEdit()
+#        filename_root_input.setFixedWidth(400)
+#        filename_root_input.setText(str(self.filename_root))
+#        filename_root_input.textChanged[str].connect(self.change_filename_root)
+#        settings_hbox_filename_root.addWidget(filename_root_input)
+#        vbox.addLayout(settings_hbox_filename_root)
+#
+#        settings_hbox_adjust_allowed_unit_cell_difference=QtGui.QHBoxLayout()
+#        adjust_allowed_unit_cell_difference_label=QtGui.QLabel('Max. Allowed Unit Cell Difference between Reference and Target (%):')
+#        settings_hbox_adjust_allowed_unit_cell_difference.addWidget(adjust_allowed_unit_cell_difference_label)
+#        adjust_allowed_unit_cell_difference = QtGui.QLineEdit()
+#        adjust_allowed_unit_cell_difference.setFixedWidth(200)
+#        adjust_allowed_unit_cell_difference.setText(str(self.allowed_unitcell_difference_percent))
+#        adjust_allowed_unit_cell_difference.textChanged[str].connect(self.change_allowed_unitcell_difference_percent)
+#        settings_hbox_adjust_allowed_unit_cell_difference.addWidget(adjust_allowed_unit_cell_difference)
+#        vbox.addLayout(settings_hbox_adjust_allowed_unit_cell_difference)
+#
+#        settings_hbox_acceptable_low_resolution_limit=QtGui.QHBoxLayout()
+#        adjust_acceptable_low_resolution_limit_label=QtGui.QLabel('Acceptable low resolution limit for datasets (in Angstrom):')
+#        settings_hbox_acceptable_low_resolution_limit.addWidget(adjust_acceptable_low_resolution_limit_label)
+#        adjust_acceptable_low_resolution_limit = QtGui.QLineEdit()
+#        adjust_acceptable_low_resolution_limit.setFixedWidth(200)
+#        adjust_acceptable_low_resolution_limit.setText(str(self.acceptable_low_resolution_limit_for_data))
+#        adjust_acceptable_low_resolution_limit.textChanged[str].connect(self.change_acceptable_low_resolution_limit)
+#        settings_hbox_acceptable_low_resolution_limit.addWidget(adjust_acceptable_low_resolution_limit)
+#        vbox.addLayout(settings_hbox_acceptable_low_resolution_limit)
+#
+#        vbox_data=QtGui.QVBoxLayout()
+#        vbox_data.addWidget(QtGui.QLabel('Select amount of processed data you wish to copy to initial_model directory:'))
+#        self.depositData_data_to_copy_combobox = QtGui.QComboBox()
+#        for item in self.depositData_data_to_copy:
+#            self.depositData_data_to_copy_combobox.addItem(item[0])
+#        self.depositData_data_to_copy_combobox.currentIndexChanged.connect(self.depositData_data_to_copy_combobox_changed)
+#        vbox_data.addWidget(self.depositData_data_to_copy_combobox)
+#        vbox.addLayout(vbox_data)
+
+#        vbox_select=QtGui.QVBoxLayout()
+#        vbox_select.addWidget(QtGui.QLabel('Dataset Selection Mechanism:'))
+#        self.depositData_selection_mechanism_combobox = QtGui.QComboBox()
+#        for item in self.depositData_selection_mechanism:
+#            self.depositData_selection_mechanism_combobox.addItem(item)
+#        self.depositData_selection_mechanism_combobox.currentIndexChanged.connect(self.depositData_selection_mechanism_combobox_changed)
+#        vbox_select.addWidget(self.depositData_selection_mechanism_combobox)
+#        vbox.addLayout(vbox_select)
+
+#        hbox=QtGui.QHBoxLayout()
+#        hbox.addWidget(QtGui.QLabel('XCE logfile:'))
+#        self.xce_logfile_label=QtGui.QLabel(self.xce_logfile)
+#        hbox.addWidget(self.xce_logfile_label)
+#        button=QtGui.QPushButton("Change")
+#        button.clicked.connect(self.set_xce_logfile)
+#        hbox.addWidget(button)
+#        vbox.addLayout(hbox)
+#
+#        settings_hbox_max_queue_jobs=QtGui.QHBoxLayout()
+#        adjust_max_queue_jobs_label=QtGui.QLabel('Max. number of jobs running at once on DLS cluster:')
+#        settings_hbox_max_queue_jobs.addWidget(adjust_max_queue_jobs_label)
+#        adjust_max_queue_jobs = QtGui.QLineEdit()
+#        adjust_max_queue_jobs.setFixedWidth(200)
+#        adjust_max_queue_jobs.setText(str(self.max_queue_jobs))
+#        adjust_max_queue_jobs.textChanged[str].connect(self.change_max_queue_jobs)
+#        settings_hbox_max_queue_jobs.addWidget(adjust_max_queue_jobs)
+#        vbox.addLayout(settings_hbox_max_queue_jobs)
+
+        hbox=QtGui.QHBoxLayout()
+        button=QtGui.QPushButton('Load\nFile')
+        button.clicked.connect(self.load_deposit_config_file)
+        hbox.addWidget(button)
+        button=QtGui.QPushButton('Save\nFile')
+        button.clicked.connect(self.save_deposit_config_file)
+        hbox.addWidget(button)
+
+        vbox.addLayout(hbox)
+        depositDataLayout.addLayout(vbox,0,0)
+
+        depositData.exec_();
+
+
+
+
+    def load_deposit_config_file(self):
+        file_name_temp = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Open file', self.current_directory,'*.deposit')
+        file_name=tuple(file_name_temp)[0]
+#        try:
+#            pickled_settings = pickle.load(open(file_name,"rb"))
+#        except KeyError:
+#            pass
+        self.update_deposit_input()
+        print file_name
+
+    def update_deposit_input(self):
+        self.test_input.setText('COOL')
+
+
+    def save_deposit_config_file(self):
+        print 'hallo'
+
 
 #    def run_xia2(self):
 #

@@ -1,4 +1,4 @@
-# last edited: 19/08/2016, 15:00
+# last edited: 27/10/2016, 17:00
 
 import sys
 import os
@@ -1447,6 +1447,23 @@ class pdbtools(object):
                 f.close()
         return Ligands
 
+    def save_specific_ligands_to_pdb(self,resname,chainID,resseq,altLoc):
+        pdb=''
+        for line in open(self.pdb):
+            if line.startswith('ATOM') or line.startswith('HETATM'):
+                resname_line=str(line[17:20]).replace(' ','')
+                chainID_line=str(line[21:23]).replace(' ','')
+                resseq_line=str(line[23:26]).replace(' ','')
+                altLoc_line=str(line[16:17]).replace(' ','')
+                if resname_line==str(resname) and chainID_line==str(chainID) and resseq_line==str(resseq) and altLoc_line==str(altLoc):
+                    pdb=pdb+line
+
+        if pdb != '':
+            f=open('ligand_%s_%s_%s_%s.pdb' %(str(resname),str(chainID),str(resseq),str(altLoc)),'w')
+            f.write(pdb)
+            f.close()
+
+
     def get_xyz_coordinated_of_residue(self,chain,number):
         X=0.0
         Y=0.0
@@ -1534,3 +1551,34 @@ class misc:
         distance=0.0
         distance=math.sqrt(math.pow(x1-x2,2)+math.pow(y1-y2,2)+math.pow(z1-z2,2))
         return distance
+
+class maptools(object):
+    def __init__(self,map):
+        self.map=map
+        cmd = ( 'mapdump mapin %s << eof\n' %self.map+
+                'end\n'
+                'eof'   )
+        self.mapdump=subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE)
+        self.grid_sampling=[0,0,0]
+        self.cell_dimensions=[]
+        self.space_group_number=0
+        for line in iter(mapdump.stdout.readline,''):
+            if 'Grid sampling on x, y, z' in line:
+                if len(line.split()) == 10:
+                    self.grid_sampling=[line.split()[7],line.split()[8],line.split()[9]]
+            if 'Cell dimensions' in line:
+                if len(line.split()) == 9:
+                    self.cell_dimensions=[line.split()[3],line.split()[4],line.split()[5],line.split()[6],line.split()[7],line.split()[8]]
+            if 'Space-group' in line:
+                if len(line.split()) == 3:
+                    self.space_group_number=line.split()[2]
+
+    def grid_sampling(self):
+        return self.grid_sampling
+
+    def cell_dimensions(self):
+        return self.cell_dimensions
+
+    def space_group_number(self):
+        return self.space_group_number
+

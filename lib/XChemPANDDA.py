@@ -1,4 +1,4 @@
-# last edited: 12/09/2016, 13:00
+# last edited: 27/10/2016, 17:00
 
 import os, sys, glob
 from datetime import datetime
@@ -461,3 +461,154 @@ class check_if_pandda_can_run:
             message='Not enough datasets available'
 
         return message
+
+
+class convert_EventMap_to_SF:
+    def __init__(self,project_directory,xtalID,pdb,mtz,PANDDA_site_ligand_id,event_map,xce_logfile,resolution,db_file):
+        self.Logfile=XChemLog.updateLog(xce_logfile)
+        # ligand as queried from DB: PANDDA_site_ligand_id
+        if len(PANDDA_site_ligand_id.split('-')) == 3:
+            self.PANDDA_site_ligand_id=PANDDA_site_ligand_id
+            self.ligand_name=PANDDA_site_ligand_id.split('-')[0]
+            self.ligand_chain=PANDDA_site_ligand_id.split('-')[1]
+            self.ligand_number=PANDDA_site_ligand_id.split('-')[2]
+            self.ligand_altLoc=''
+        else:
+            self.Logfile.insert('entry for ligand not correct in database: '+ligand)
+            self.Logfile.insert('cannot convert event_map to structure factors!')
+            return None
+
+        self.pdb=pdb
+        self.mtz=mtz
+        if not os.path.isfile(self.pdb):
+            self.Logfile.insert('cannot find final PDB file: '+self.pdb)
+            self.Logfile.insert('cannot convert event_map to structure factors!')
+            return None
+
+        self.event_map=event_map
+        if not os.path.isfile(self.event_map):
+            self.Logfile.insert('cannot find Event map: '+self.event_map)
+            self.Logfile.insert('cannot convert event_map to structure factors!')
+            return None
+
+        self.project_directory=project_directory
+        self.event=event_map[event_map.rfind('/')+1:].replace('.map','').replace('.ccp4','')
+        self.resolution=resolution
+        self.db_file=db_file
+
+        if not os.path.isfile(os.path.join(self.project_directory,'2fofc.map')):
+            self.calculate_electron_density_map()
+
+        ElectronDensityMap=XChemUtils.maptools(os.path.join(self.project_directory,'2fofc.map'))
+        self.gridElectronDensityMap=ElectronDensityMap.grid_sampling()
+        self.space_group_numberElectronDensityMap=ElectronDensityMap.space_group_number()
+
+    def run(self):
+        os.chdir(self.project_directory)
+
+        # extract ligand from pdb file
+        XChemUtils.pdbtools(self.pdb).save_ligands_to_pdb()
+
+        # prepare input script
+        self.prepare_conversion_script()
+
+        # run script
+        self.run_conversion_script()
+
+        # check if output files exist
+        if not os.path.isfile('%s.mtz' %self.event):
+            self.Logfile.insert('cannot find %s.mtz' %self.event)
+        else:
+            self.Logfile.insert('conversion successful, %s.mtz exists' %self.event)
+
+        # update datasource with event_map_mtz information
+
+
+
+        # remove all temporary files
+        self.clean_output_directory()
+
+
+    def calculate_electron_density_map(self):
+        os.chdir(self.project_directory)
+        cmd = (
+            'fft hklin %s mapout 2fofc.map << EOF\n' %self.mtz+
+            ' labin F1=2FOFCWT PHI=PH2FOFCWT\n'
+            'EOF\n'
+                )
+        self.Logfile.insert('calculating 2fofc map from '+self.mtz)
+        os.system(cmd)
+
+    def prepare_conversion_script(self):
+
+        os.chdir(self.project_directory)
+
+        # see also:
+        # http://www.phaser.cimr.cam.ac.uk/index.php/Using_Electron_Density_as_a_Model
+
+        cmd = (
+            'pdbset XYZIN %s XYZOUT mask_targetcell.pdb << eof\n' %self.ligand_pdb+
+            ' SPACEGROUP %s\n' %self.space_group+
+            ' CELL %s\n' %self.unit_cell+
+            ' END\n'
+            'eof\n'
+            '\n'
+            'ncsmask XYZIN mask_targetcell.pdb MSKOUT mask_targetcell.msk << eof\n'
+            ' GRID %s\n' %self.gridElectronDensityMap+
+            ' RADIUS 8\n'
+            ' PEAK 1\n'
+            'eof\n'
+            '\n'
+            'mapmask MAPIN %s MAPOUT onecell.map << eof\n' %self.event_map+
+            ' XYZLIM CELL\n'
+            'eof\n'
+            '\n'
+            'maprot MAPIN onecell.map MSKIN mask_targetcell.msk WRKOUT masked_targetcell.map << eof\n'
+            ' MODE FROM\n'
+            ' SYMMETRY WORK %s\n' %self.space_group_numberElectronDensityMap+
+            ' AVERAGE\n'
+            ' ROTATE EULER 0 0 0\n'
+            ' TRANSLATE 0 0 0\n'
+            'eof\n'
+            '\n'
+            'mapmask MAPIN masked_targetcell.map MAPOUT masked_fullcell.map << eof\n'
+            ' XYZLIM CELL\n'
+            ' PAD 0.0\n'
+            'eof\n'
+            '\n'
+            'sfall HKLOUT masked_%s.mtz MAPIN masked_fullcell.map << eof\n' %self.event+
+            ' LABOUT FC=FC_event PHIC=PHIC_event\n'
+            ' MODE SFCALC MAPIN\n'
+            ' RESOLUTION %s\n' %self.resolution+
+            ' END\n'
+            'eof\n'
+        )
+
+        self.Logfile.insert('preparing script for conversion of Event map to SF')
+        f = open('eventMap2sf.sh','w')
+        f.write(cmd)
+        f.close()
+        os.system('chmod +x eventMap2sf.sh')
+
+    def run_conversion_script(self):
+        self.Logfile.insert('running conversion script...')
+        os.system('./eventMap2sf.sh')
+
+    def update_database(self):
+        db=XChemDB.data_source(self.db_file)
+        sqlite = ( "update panddaTable set "
+                   " PANDDA_site_event_map_mtz = '%s' " %os.path.join(self.project_directory,self.event+'.mtz')+
+                   " where PANDDA_site_ligand_id is '%s' " %self.PANDDA_site_ligand_id
+                    )
+        self.Logfile.insert('updating data source: '+sqlite)
+        db.execute_statement(sqlite)
+
+
+    def clean_output_directory(self):
+        os.system('/bin/rm mask_targetcell.pdb')
+        os.system('/bin/rm mask_targetcell.msk')
+        os.system('/bin/rm onecell.map')
+        os.system('/bin/rm masked_targetcell.map')
+        os.system('/bin/rm masked_fullcell.map')
+        os.system('/bin/rm eventMap2sf.sh')
+
