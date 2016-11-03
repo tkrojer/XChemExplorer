@@ -1,4 +1,4 @@
-# last edited: 27/10/2016, 17:00
+# last edited: 03/11/2016, 17:00
 
 import os, sys, glob
 from datetime import datetime
@@ -1331,83 +1331,491 @@ class XChemExplorer(QtGui.QApplication):
         depositData = QtGui.QMessageBox()
         depositDataLayout = depositData.layout()
 
+
         vbox = QtGui.QVBoxLayout()
 
-        hbox=QtGui.QHBoxLayout()
-        label=QtGui.QLabel('TEST')
-        hbox.addWidget(label)
-        self.test_input = QtGui.QLineEdit()
-        self.test_input.setText('hallo')
-        self.test_input.setFixedWidth(200)
-        hbox.addWidget(self.test_input)
-        vbox.addLayout(hbox)
+        deposit_tab_widget = QtGui.QTabWidget()
+        deposit_tab_list = [ 'Contact',
+                             'General',
+                             'Authors',
+                             'Citation'
+                            ]
 
-#        settings_hbox_filename_root=QtGui.QHBoxLayout()
-#        filename_root_label=QtGui.QLabel('filename root:')
-#        settings_hbox_filename_root.addWidget(filename_root_label)
-#        filename_root_input = QtGui.QLineEdit()
-#        filename_root_input.setFixedWidth(400)
-#        filename_root_input.setText(str(self.filename_root))
-#        filename_root_input.textChanged[str].connect(self.change_filename_root)
-#        settings_hbox_filename_root.addWidget(filename_root_input)
-#        vbox.addLayout(settings_hbox_filename_root)
-#
-#        settings_hbox_adjust_allowed_unit_cell_difference=QtGui.QHBoxLayout()
-#        adjust_allowed_unit_cell_difference_label=QtGui.QLabel('Max. Allowed Unit Cell Difference between Reference and Target (%):')
-#        settings_hbox_adjust_allowed_unit_cell_difference.addWidget(adjust_allowed_unit_cell_difference_label)
-#        adjust_allowed_unit_cell_difference = QtGui.QLineEdit()
-#        adjust_allowed_unit_cell_difference.setFixedWidth(200)
-#        adjust_allowed_unit_cell_difference.setText(str(self.allowed_unitcell_difference_percent))
-#        adjust_allowed_unit_cell_difference.textChanged[str].connect(self.change_allowed_unitcell_difference_percent)
-#        settings_hbox_adjust_allowed_unit_cell_difference.addWidget(adjust_allowed_unit_cell_difference)
-#        vbox.addLayout(settings_hbox_adjust_allowed_unit_cell_difference)
-#
-#        settings_hbox_acceptable_low_resolution_limit=QtGui.QHBoxLayout()
-#        adjust_acceptable_low_resolution_limit_label=QtGui.QLabel('Acceptable low resolution limit for datasets (in Angstrom):')
-#        settings_hbox_acceptable_low_resolution_limit.addWidget(adjust_acceptable_low_resolution_limit_label)
-#        adjust_acceptable_low_resolution_limit = QtGui.QLineEdit()
-#        adjust_acceptable_low_resolution_limit.setFixedWidth(200)
-#        adjust_acceptable_low_resolution_limit.setText(str(self.acceptable_low_resolution_limit_for_data))
-#        adjust_acceptable_low_resolution_limit.textChanged[str].connect(self.change_acceptable_low_resolution_limit)
-#        settings_hbox_acceptable_low_resolution_limit.addWidget(adjust_acceptable_low_resolution_limit)
-#        vbox.addLayout(settings_hbox_acceptable_low_resolution_limit)
-#
-#        vbox_data=QtGui.QVBoxLayout()
-#        vbox_data.addWidget(QtGui.QLabel('Select amount of processed data you wish to copy to initial_model directory:'))
-#        self.depositData_data_to_copy_combobox = QtGui.QComboBox()
-#        for item in self.depositData_data_to_copy:
-#            self.depositData_data_to_copy_combobox.addItem(item[0])
-#        self.depositData_data_to_copy_combobox.currentIndexChanged.connect(self.depositData_data_to_copy_combobox_changed)
-#        vbox_data.addWidget(self.depositData_data_to_copy_combobox)
-#        vbox.addLayout(vbox_data)
+        deposit_tab_dict={}
+        for page in deposit_tab_list:
+            tab=QtGui.QWidget()
+            vb=QtGui.QVBoxLayout(tab)
+            deposit_tab_widget.addTab(tab,page)
+            deposit_tab_dict[page]=[tab,vb]
 
-#        vbox_select=QtGui.QVBoxLayout()
-#        vbox_select.addWidget(QtGui.QLabel('Dataset Selection Mechanism:'))
-#        self.depositData_selection_mechanism_combobox = QtGui.QComboBox()
-#        for item in self.depositData_selection_mechanism:
-#            self.depositData_selection_mechanism_combobox.addItem(item)
-#        self.depositData_selection_mechanism_combobox.currentIndexChanged.connect(self.depositData_selection_mechanism_combobox_changed)
-#        vbox_select.addWidget(self.depositData_selection_mechanism_combobox)
-#        vbox.addLayout(vbox_select)
 
-#        hbox=QtGui.QHBoxLayout()
-#        hbox.addWidget(QtGui.QLabel('XCE logfile:'))
-#        self.xce_logfile_label=QtGui.QLabel(self.xce_logfile)
-#        hbox.addWidget(self.xce_logfile_label)
-#        button=QtGui.QPushButton("Change")
-#        button.clicked.connect(self.set_xce_logfile)
-#        hbox.addWidget(button)
-#        vbox.addLayout(hbox)
-#
-#        settings_hbox_max_queue_jobs=QtGui.QHBoxLayout()
-#        adjust_max_queue_jobs_label=QtGui.QLabel('Max. number of jobs running at once on DLS cluster:')
-#        settings_hbox_max_queue_jobs.addWidget(adjust_max_queue_jobs_label)
-#        adjust_max_queue_jobs = QtGui.QLineEdit()
-#        adjust_max_queue_jobs.setFixedWidth(200)
-#        adjust_max_queue_jobs.setText(str(self.max_queue_jobs))
-#        adjust_max_queue_jobs.textChanged[str].connect(self.change_max_queue_jobs)
-#        settings_hbox_max_queue_jobs.addWidget(adjust_max_queue_jobs)
-#        vbox.addLayout(settings_hbox_max_queue_jobs)
+        #
+        # PI & Scientist information
+        #
+
+        vb=QtGui.QVBoxLayout()
+        hbox = QtGui.QHBoxLayout()
+
+        frame=QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+
+        grid = QtGui.QGridLayout()
+        grid.addWidget(QtGui.QLabel('Principal Investigator'), 0,0)
+
+        grid.addWidget(QtGui.QLabel('Salutation'), 1,0)
+        self.contact_author_PI_salutation = QtGui.QLineEdit()
+        self.contact_author_PI_salutation.setText('Dr.')
+        self.contact_author_PI_salutation.setFixedWidth(200)
+        grid.addWidget(self.contact_author_PI_salutation, 1,1)
+
+        grid.addWidget(QtGui.QLabel('First name'), 2,0)
+        self.contact_author_PI_first_name = QtGui.QLineEdit()
+        self.contact_author_PI_first_name.setText('')
+        self.contact_author_PI_first_name.setFixedWidth(200)
+        grid.addWidget(self.contact_author_PI_first_name, 2,1)
+
+        grid.addWidget(QtGui.QLabel('Last name'), 3,0)
+        self.contact_author_PI_last_name = QtGui.QLineEdit()
+        self.contact_author_PI_last_name.setText('')
+        self.contact_author_PI_last_name.setFixedWidth(200)
+        grid.addWidget(self.contact_author_PI_last_name, 3,1)
+
+        grid.addWidget(QtGui.QLabel('Middle name'), 4,0)
+        self.contact_author_PI_middle_name = QtGui.QLineEdit()
+        self.contact_author_PI_middle_name.setText('')
+        self.contact_author_PI_middle_name.setFixedWidth(200)
+        grid.addWidget(self.contact_author_PI_middle_name, 4,1)
+
+        grid.addWidget(QtGui.QLabel('PI role'), 5,0)
+        self.contact_author_PI_role = QtGui.QLineEdit()
+        self.contact_author_PI_role.setText('group leader')
+        self.contact_author_PI_role.setFixedWidth(200)
+        grid.addWidget(self.contact_author_PI_role, 5,1)
+
+        grid.addWidget(QtGui.QLabel('Organization type'), 6,0)
+        self.contact_author_PI_organization_type = QtGui.QLineEdit()
+        self.contact_author_PI_organization_type.setText('academic')
+        self.contact_author_PI_organization_type.setFixedWidth(200)
+        grid.addWidget(self.contact_author_PI_organization_type, 6,1)
+
+        grid.addWidget(QtGui.QLabel('Email'), 7,0)
+        self.contact_author_PI_email = QtGui.QLineEdit()
+        self.contact_author_PI_email.setText('')
+        self.contact_author_PI_email.setFixedWidth(200)
+        grid.addWidget(self.contact_author_PI_email, 7,1)
+
+        grid.addWidget(QtGui.QLabel('Street'), 8,0)
+        self.contact_author_PI_address = QtGui.QLineEdit()
+        self.contact_author_PI_address.setText('')
+        self.contact_author_PI_address.setFixedWidth(200)
+        grid.addWidget(self.contact_author_PI_address, 8,1)
+
+        grid.addWidget(QtGui.QLabel('City'), 9,0)
+        self.contact_author_PI_city = QtGui.QLineEdit()
+        self.contact_author_PI_city.setText('')
+        self.contact_author_PI_city.setFixedWidth(200)
+        grid.addWidget(self.contact_author_PI_city, 9,1)
+
+        grid.addWidget(QtGui.QLabel('State'), 10,0)
+        self.contact_author_PI_State_or_Province = QtGui.QLineEdit()
+        self.contact_author_PI_State_or_Province.setText('')
+        self.contact_author_PI_State_or_Province.setFixedWidth(200)
+        grid.addWidget(self.contact_author_PI_State_or_Province, 10,1)
+
+        grid.addWidget(QtGui.QLabel('ZIP code'), 11,0)
+        self.contact_author_PI_Zip_Code = QtGui.QLineEdit()
+        self.contact_author_PI_Zip_Code.setText('')
+        self.contact_author_PI_Zip_Code.setFixedWidth(200)
+        grid.addWidget(self.contact_author_PI_Zip_Code, 11,1)
+
+        grid.addWidget(QtGui.QLabel('Country'), 12,0)
+        self.contact_author_PI_Country = QtGui.QLineEdit()
+        self.contact_author_PI_Country.setText('')
+        self.contact_author_PI_Country.setFixedWidth(200)
+        grid.addWidget(self.contact_author_PI_Country, 12,1)
+
+        grid.addWidget(QtGui.QLabel('Fax'), 13,0)
+        self.contact_author_PI_fax_number = QtGui.QLineEdit()
+        self.contact_author_PI_fax_number.setText('')
+        self.contact_author_PI_fax_number.setFixedWidth(200)
+        grid.addWidget(self.contact_author_PI_fax_number, 13,1)
+
+        grid.addWidget(QtGui.QLabel('Fax'), 14,0)
+        self.contact_author_PI_phone_number = QtGui.QLineEdit()
+        self.contact_author_PI_phone_number.setText('')
+        self.contact_author_PI_phone_number.setFixedWidth(200)
+        grid.addWidget(self.contact_author_PI_phone_number, 14,1)
+
+        frame.setLayout(grid)
+        hbox.addWidget(frame)
+
+
+        frame=QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+        grid = QtGui.QGridLayout()
+        grid.addWidget(QtGui.QLabel('Responsible Scientist'), 0,0)
+
+        grid.addWidget(QtGui.QLabel('Salutation'), 1,0)
+        self.contact_author_salutation = QtGui.QLineEdit()
+        self.contact_author_salutation.setText('Dr.')
+        self.contact_author_salutation.setFixedWidth(200)
+        grid.addWidget(self.contact_author_salutation, 1,1)
+
+        grid.addWidget(QtGui.QLabel('First name'), 2,0)
+        self.contact_author_first_name = QtGui.QLineEdit()
+        self.contact_author_first_name.setText('')
+        self.contact_author_first_name.setFixedWidth(200)
+        grid.addWidget(self.contact_author_first_name, 2,1)
+
+        grid.addWidget(QtGui.QLabel('Last name'), 3,0)
+        self.contact_author_last_name = QtGui.QLineEdit()
+        self.contact_author_last_name.setText('')
+        self.contact_author_last_name.setFixedWidth(200)
+        grid.addWidget(self.contact_author_last_name, 3,1)
+
+        grid.addWidget(QtGui.QLabel('Middle name'), 4,0)
+        self.contact_author_middle_name = QtGui.QLineEdit()
+        self.contact_author_middle_name.setText('')
+        self.contact_author_middle_name.setFixedWidth(200)
+        grid.addWidget(self.contact_author_middle_name, 4,1)
+
+        grid.addWidget(QtGui.QLabel('Role'), 5,0)
+        self.contact_author_role = QtGui.QLineEdit()
+        self.contact_author_role.setText('scientist')
+        self.contact_author_role.setFixedWidth(200)
+        grid.addWidget(self.contact_author_role, 5,1)
+
+        grid.addWidget(QtGui.QLabel('Organization type'), 6,0)
+        self.contact_author_organization_type = QtGui.QLineEdit()
+        self.contact_author_organization_type.setText('academic')
+        self.contact_author_organization_type.setFixedWidth(200)
+        grid.addWidget(self.contact_author_organization_type, 6,1)
+
+        grid.addWidget(QtGui.QLabel('Email'), 7,0)
+        self.contact_author_email = QtGui.QLineEdit()
+        self.contact_author_email.setText('')
+        self.contact_author_email.setFixedWidth(200)
+        grid.addWidget(self.contact_author_email, 7,1)
+
+        grid.addWidget(QtGui.QLabel('Street'), 8,0)
+        self.contact_author_address = QtGui.QLineEdit()
+        self.contact_author_address.setText('')
+        self.contact_author_address.setFixedWidth(200)
+        grid.addWidget(self.contact_author_address, 8,1)
+
+        grid.addWidget(QtGui.QLabel('City'), 9,0)
+        self.contact_author_city = QtGui.QLineEdit()
+        self.contact_author_city.setText('')
+        self.contact_author_city.setFixedWidth(200)
+        grid.addWidget(self.contact_author_city, 9,1)
+
+        grid.addWidget(QtGui.QLabel('State'), 10,0)
+        self.contact_author_State_or_Province = QtGui.QLineEdit()
+        self.contact_author_State_or_Province.setText('')
+        self.contact_author_State_or_Province.setFixedWidth(200)
+        grid.addWidget(self.contact_author_State_or_Province, 10,1)
+
+        grid.addWidget(QtGui.QLabel('ZIP code'), 11,0)
+        self.contact_author_Zip_Code = QtGui.QLineEdit()
+        self.contact_author_Zip_Code.setText('')
+        self.contact_author_Zip_Code.setFixedWidth(200)
+        grid.addWidget(self.contact_author_Zip_Code, 11,1)
+
+        grid.addWidget(QtGui.QLabel('Country'), 12,0)
+        self.contact_author_Country = QtGui.QLineEdit()
+        self.contact_author_Country.setText('')
+        self.contact_author_Country.setFixedWidth(200)
+        grid.addWidget(self.contact_author_Country, 12,1)
+
+        grid.addWidget(QtGui.QLabel('Fax'), 13,0)
+        self.contact_author_fax_number = QtGui.QLineEdit()
+        self.contact_author_fax_number.setText('')
+        self.contact_author_fax_number.setFixedWidth(200)
+        grid.addWidget(self.contact_author_fax_number, 13,1)
+
+        grid.addWidget(QtGui.QLabel('Fax'), 14,0)
+        self.contact_author_phone_number = QtGui.QLineEdit()
+        self.contact_author_phone_number.setText('')
+        self.contact_author_phone_number.setFixedWidth(200)
+        grid.addWidget(self.contact_author_phone_number, 14,1)
+
+        frame.setLayout(grid)
+        hbox.addWidget(frame)
+
+        vb.addLayout(hbox)
+        vb.addStretch(1)
+
+
+        deposit_tab_dict['Contact'][1].addLayout(vb)
+
+        #
+        # Release status
+        #
+
+        vb=QtGui.QVBoxLayout()
+
+        frame=QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+
+        grid = QtGui.QGridLayout()
+        grid.addWidget(QtGui.QLabel('Release status'), 0,0)
+
+        grid.addWidget(QtGui.QLabel('Release Status for coordinates'), 1,0)
+        self.Release_status_for_coordinates = QtGui.QLineEdit()
+        self.Release_status_for_coordinates.setText('')
+        self.Release_status_for_coordinates.setFixedWidth(200)
+        grid.addWidget(self.Release_status_for_coordinates, 1,1)
+        grid.addWidget(QtGui.QLabel('(e.g. HOLD FOR PUBLICATION, RELEASE NOW)'), 1,2)
+
+        grid.addWidget(QtGui.QLabel('Release Status for structure factors'), 2,0)
+        self.Release_status_for_structure_factor = QtGui.QLineEdit()
+        self.Release_status_for_structure_factor.setText('')
+        self.Release_status_for_structure_factor.setFixedWidth(200)
+        grid.addWidget(self.Release_status_for_structure_factor, 2,1)
+        grid.addWidget(QtGui.QLabel('(e.g. HOLD FOR PUBLICATION, RELEASE NOW)'), 2,2)
+
+        grid.addWidget(QtGui.QLabel('Release Status for sequence'), 3,0)
+        self.Release_status_for_sequence = QtGui.QLineEdit()
+        self.Release_status_for_sequence.setText('')
+        self.Release_status_for_sequence.setFixedWidth(200)
+        grid.addWidget(self.Release_status_for_sequence, 3,1)
+        grid.addWidget(QtGui.QLabel('(e.g. RELEASE NOW, HOLD FOR RELEASE)'), 3,2)
+
+        frame.setLayout(grid)
+        vb.addWidget(frame)
+
+        #
+        # Release status
+        #
+
+        frame=QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+
+        grid = QtGui.QGridLayout()
+        grid.addWidget(QtGui.QLabel('Title & Details'), 0,0)
+
+        grid.addWidget(QtGui.QLabel('Title'), 1,0)
+        self.structure_title = QtGui.QLineEdit()
+        self.structure_title.setText('')
+        self.structure_title.setFixedWidth(600)
+        grid.addWidget(self.structure_title, 1,1)
+#        grid.addWidget(QtGui.QLabel('(e.g. HOLD FOR PUBLICATION, RELEASE NOW)'), 1,2)
+
+        grid.addWidget(QtGui.QLabel('Details'), 2,0)
+        self.structure_details = QtGui.QLineEdit()
+        self.structure_details.setText('')
+        self.structure_details.setFixedWidth(600)
+        grid.addWidget(self.structure_details, 2,1)
+#        grid.addWidget(QtGui.QLabel('(e.g. HOLD FOR PUBLICATION, RELEASE NOW)'), 2,2)
+
+        frame.setLayout(grid)
+        vb.addWidget(frame)
+
+        vb.addStretch(1)
+
+        deposit_tab_dict['General'][1].addLayout(vb)
+
+        #
+        # Authors
+        #
+
+        vb=QtGui.QVBoxLayout()
+
+        frame=QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+
+        grid = QtGui.QGridLayout()
+        grid.addWidget(QtGui.QLabel('Deposition authors'), 0,0)
+
+        grid.addWidget(QtGui.QLabel('Name'), 1,0)
+        self.structure_author_name_A = QtGui.QLineEdit()
+        self.structure_author_name_A.setText('')
+        self.structure_author_name_A.setFixedWidth(300)
+        grid.addWidget(self.structure_author_name_A, 1,1)
+        grid.addWidget(QtGui.QLabel('(e.g. Surname, F.M.)'), 1,2)
+
+        grid.addWidget(QtGui.QLabel('Name'), 2,0)
+        self.structure_author_name_B = QtGui.QLineEdit()
+        self.structure_author_name_B.setText('')
+        self.structure_author_name_B.setFixedWidth(300)
+        grid.addWidget(self.structure_author_name_B, 2,1)
+
+        grid.addWidget(QtGui.QLabel('Name'), 3,0)
+        self.structure_author_name_C = QtGui.QLineEdit()
+        self.structure_author_name_C.setText('')
+        self.structure_author_name_C.setFixedWidth(300)
+        grid.addWidget(self.structure_author_name_C, 3,1)
+
+        grid.addWidget(QtGui.QLabel('Name'), 4,0)
+        self.structure_author_name_D = QtGui.QLineEdit()
+        self.structure_author_name_D.setText('')
+        self.structure_author_name_D.setFixedWidth(300)
+        grid.addWidget(self.structure_author_name_D, 4,1)
+
+        grid.addWidget(QtGui.QLabel('Name'), 5,0)
+        self.structure_author_name_E = QtGui.QLineEdit()
+        self.structure_author_name_E.setText('')
+        self.structure_author_name_E.setFixedWidth(300)
+        grid.addWidget(self.structure_author_name_E, 5,1)
+
+        grid.addWidget(QtGui.QLabel('Name'), 6,0)
+        self.structure_author_name_F = QtGui.QLineEdit()
+        self.structure_author_name_F.setText('')
+        self.structure_author_name_F.setFixedWidth(300)
+        grid.addWidget(self.structure_author_name_F, 6,1)
+
+        grid.addWidget(QtGui.QLabel('Name'), 7,0)
+        self.structure_author_name_G = QtGui.QLineEdit()
+        self.structure_author_name_G.setText('')
+        self.structure_author_name_G.setFixedWidth(300)
+        grid.addWidget(self.structure_author_name_G, 7,1)
+
+        grid.addWidget(QtGui.QLabel('Name'), 8,0)
+        self.structure_author_name_H = QtGui.QLineEdit()
+        self.structure_author_name_H.setText('')
+        self.structure_author_name_H.setFixedWidth(300)
+        grid.addWidget(self.structure_author_name_H, 8,1)
+
+        frame.setLayout(grid)
+        vb.addWidget(frame)
+
+        vb.addStretch(1)
+
+        deposit_tab_dict['Authors'][1].addLayout(vb)
+
+
+        #
+        # Primary citation
+        #
+
+        vb=QtGui.QVBoxLayout()
+
+        frame=QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+
+        grid = QtGui.QGridLayout()
+        grid.addWidget(QtGui.QLabel('Primary Citation'), 0,0)
+
+        grid.addWidget(QtGui.QLabel('ID'), 1,0)
+        self.primary_citation_id = QtGui.QLineEdit()
+        self.primary_citation_id.setText('primary')
+        self.primary_citation_id.setFixedWidth(200)
+        grid.addWidget(self.Release_status_for_coordinates, 1,1)
+
+        grid.addWidget(QtGui.QLabel('Journal'), 2,0)
+        self.primary_citation_journal_abbrev = QtGui.QLineEdit()
+        self.primary_citation_journal_abbrev.setText('To be published')
+        self.primary_citation_journal_abbrev.setFixedWidth(200)
+        grid.addWidget(self.primary_citation_journal_abbrev, 2,1)
+
+        grid.addWidget(QtGui.QLabel('Title'), 3,0)
+        self.primary_citation_title = QtGui.QLineEdit()
+        self.primary_citation_title.setText('')
+        self.primary_citation_title.setFixedWidth(200)
+        grid.addWidget(self.primary_citation_title, 3,1)
+
+        grid.addWidget(QtGui.QLabel('Year'), 4,0)
+        self.primary_citation_year = QtGui.QLineEdit()
+        self.primary_citation_year.setText('')
+        self.primary_citation_year.setFixedWidth(200)
+        grid.addWidget(self.primary_citation_year, 4,1)
+
+        grid.addWidget(QtGui.QLabel('Volume'), 5,0)
+        self.primary_citation_journal_volume = QtGui.QLineEdit()
+        self.primary_citation_journal_volume.setText('')
+        self.primary_citation_journal_volume.setFixedWidth(200)
+        grid.addWidget(self.primary_citation_journal_volume, 5,1)
+
+        grid.addWidget(QtGui.QLabel('Page, first'), 6,0)
+        self.primary_citation_page_first = QtGui.QLineEdit()
+        self.primary_citation_page_first.setText('')
+        self.primary_citation_page_first.setFixedWidth(200)
+        grid.addWidget(self.primary_citation_page_first, 6,1)
+
+        grid.addWidget(QtGui.QLabel('Page, last'), 7,0)
+        self.primary_citation_page_last = QtGui.QLineEdit()
+        self.primary_citation_page_last.setText('')
+        self.primary_citation_page_last.setFixedWidth(200)
+        grid.addWidget(self.primary_citation_page_last, 7,1)
+
+        frame.setLayout(grid)
+        vb.addWidget(frame)
+
+
+        #
+        # citation authors
+        #
+
+        frame=QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+
+        grid = QtGui.QGridLayout()
+        set_primary_citation_authors = QtGui.QCheckBox('same as deposition authors')
+        set_primary_citation_authors.toggle()
+        set_primary_citation_authors.setChecked(False)
+        set_primary_citation_authors.stateChanged.connect(self.set_primary_citation_as_structure_authors)
+        grid.addWidget(set_primary_citation_authors, 0,0)
+
+        grid.addWidget(QtGui.QLabel('Name'), 1,0)
+        self.primary_citation_author_name_A = QtGui.QLineEdit()
+        self.primary_citation_author_name_A.setText('')
+        self.primary_citation_author_name_A.setFixedWidth(300)
+        grid.addWidget(self.primary_citation_author_name_A, 1,1)
+        grid.addWidget(QtGui.QLabel('(e.g. Surname, F.M.)'), 1,2)
+
+        grid.addWidget(QtGui.QLabel('Name'), 2,0)
+        self.primary_citation_author_name_B = QtGui.QLineEdit()
+        self.primary_citation_author_name_B.setText('')
+        self.primary_citation_author_name_B.setFixedWidth(300)
+        grid.addWidget(self.primary_citation_author_name_B, 2,1)
+
+        grid.addWidget(QtGui.QLabel('Name'), 3,0)
+        self.primary_citation_author_name_C = QtGui.QLineEdit()
+        self.primary_citation_author_name_C.setText('')
+        self.primary_citation_author_name_C.setFixedWidth(300)
+        grid.addWidget(self.primary_citation_author_name_C, 3,1)
+
+        grid.addWidget(QtGui.QLabel('Name'), 4,0)
+        self.primary_citation_author_name_D = QtGui.QLineEdit()
+        self.primary_citation_author_name_D.setText('')
+        self.primary_citation_author_name_D.setFixedWidth(300)
+        grid.addWidget(self.primary_citation_author_name_D, 4,1)
+
+        grid.addWidget(QtGui.QLabel('Name'), 5,0)
+        self.primary_citation_author_name_E = QtGui.QLineEdit()
+        self.primary_citation_author_name_E.setText('')
+        self.primary_citation_author_name_E.setFixedWidth(300)
+        grid.addWidget(self.primary_citation_author_name_E, 5,1)
+
+        grid.addWidget(QtGui.QLabel('Name'), 6,0)
+        self.primary_citation_author_name_F = QtGui.QLineEdit()
+        self.primary_citation_author_name_F.setText('')
+        self.primary_citation_author_name_F.setFixedWidth(300)
+        grid.addWidget(self.primary_citation_author_name_F, 6,1)
+
+        grid.addWidget(QtGui.QLabel('Name'), 7,0)
+        self.primary_citation_author_name_G = QtGui.QLineEdit()
+        self.primary_citation_author_name_G.setText('')
+        self.primary_citation_author_name_G.setFixedWidth(300)
+        grid.addWidget(self.primary_citation_author_name_G, 7,1)
+
+        grid.addWidget(QtGui.QLabel('Name'), 8,0)
+        self.primary_citation_author_name_H = QtGui.QLineEdit()
+        self.primary_citation_author_name_H.setText('')
+        self.primary_citation_author_name_H.setFixedWidth(300)
+        grid.addWidget(self.primary_citation_author_name_H, 8,1)
+
+        frame.setLayout(grid)
+        vb.addWidget(frame)
+
+        vb.addStretch(1)
+
+        deposit_tab_dict['Citation'][1].addLayout(vb)
+
+
+
+
+        vbox.addWidget(deposit_tab_widget)
 
         hbox=QtGui.QHBoxLayout()
         button=QtGui.QPushButton('Load\nFile')
@@ -1428,58 +1836,252 @@ class XChemExplorer(QtGui.QApplication):
     def load_deposit_config_file(self):
         file_name_temp = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Open file', self.current_directory,'*.deposit')
         file_name=tuple(file_name_temp)[0]
-#        try:
-#            pickled_settings = pickle.load(open(file_name,"rb"))
-#        except KeyError:
-#            pass
+        self.deposit_dict = pickle.load(open(file_name,"rb"))
         self.update_deposit_input()
-        print file_name
 
     def update_deposit_input(self):
-        self.test_input.setText('COOL')
+        try:
+            self.contact_author_PI_salutation.setText(self.deposit_dict['contact_author_PI_salutation'])
+            self.contact_author_PI_first_name.setText(self.deposit_dict['contact_author_PI_first_name'])
+            self.contact_author_PI_last_name.setText(self.deposit_dict['contact_author_PI_last_name'])
+            self.contact_author_PI_middle_name.setText(self.deposit_dict['contact_author_PI_middle_name'])
+            self.contact_author_PI_role.setText(self.deposit_dict['contact_author_PI_role'])
+            self.contact_author_PI_organization_type.setText(self.deposit_dict['contact_author_PI_organization_type'])
+            self.contact_author_PI_email.setText(self.deposit_dict['contact_author_PI_email'])
+            self.contact_author_PI_address.setText(self.deposit_dict['contact_author_PI_address'])
+            self.contact_author_PI_city.setText(self.deposit_dict['contact_author_PI_city'])
+            self.contact_author_PI_State_or_Province.setText(self.deposit_dict['contact_author_PI_State_or_Province'])
+            self.contact_author_PI_Zip_Code.setText(self.deposit_dict['contact_author_PI_Zip_Code'])
+            self.contact_author_PI_Country.setText(self.deposit_dict['contact_author_PI_Country'])
+            self.contact_author_PI_fax_number.setText(self.deposit_dict['contact_author_PI_fax_number'])
+            self.contact_author_PI_phone_number.setText(self.deposit_dict['contact_author_PI_phone_number'])
+
+            self.contact_author_salutation.setText(self.deposit_dict['contact_author_salutation'])
+            self.contact_author_first_name.setText(self.deposit_dict['contact_author_first_name'])
+            self.contact_author_last_name.setText(self.deposit_dict['contact_author_last_name'])
+            self.contact_author_middle_name.setText(self.deposit_dict['contact_author_middle_name'])
+            self.contact_author_role.setText(self.deposit_dict['contact_author_role'])
+            self.contact_author_organization_type.setText(self.deposit_dict['contact_author_organization_type'])
+            self.contact_author_email.setText(self.deposit_dict['contact_author_email'])
+            self.contact_author_address.setText(self.deposit_dict['contact_author_address'])
+            self.contact_author_city.setText(self.deposit_dict['contact_author_city'])
+            self.contact_author_State_or_Province.setText(self.deposit_dict['contact_author_State_or_Province'])
+            self.contact_author_Zip_Code.setText(self.deposit_dict['contact_author_Zip_Code'])
+            self.contact_author_Country.setText(self.deposit_dict['contact_author_Country'])
+            self.contact_author_fax_number.setText(self.deposit_dict['contact_author_fax_number'])
+            self.contact_author_phone_number.setText(self.deposit_dict['contact_author_phone_number'])
+
+            self.Release_status_for_coordinates.setText(self.deposit_dict['Release_status_for_coordinates'])
+            self.Release_status_for_structure_factor.setText(self.deposit_dict['Release_status_for_structure_factor'])
+            self.Release_status_for_sequence.setText(self.deposit_dict['Release_status_for_sequence'])
+
+            self.structure_title.setText(self.deposit_dict['structure_title'])
+            self.structure_details.setText(self.deposit_dict['structure_details'])
+
+            self.structure_author_name_A.setText(self.deposit_dict['structure_author_name_A'])
+            self.structure_author_name_B.setText(self.deposit_dict['structure_author_name_B'])
+            self.structure_author_name_C.setText(self.deposit_dict['structure_author_name_C'])
+            self.structure_author_name_D.setText(self.deposit_dict['structure_author_name_D'])
+            self.structure_author_name_E.setText(self.deposit_dict['structure_author_name_E'])
+            self.structure_author_name_F.setText(self.deposit_dict['structure_author_name_F'])
+            self.structure_author_name_G.setText(self.deposit_dict['structure_author_name_G'])
+            self.structure_author_name_H.setText(self.deposit_dict['structure_author_name_H'])
+
+            self.primary_citation_id.setText(self.deposit_dict['primary_citation_id'])
+            self.primary_citation_journal_abbrev.setText(self.deposit_dict['primary_citation_journal_abbrev'])
+            self.primary_citation_title.setText(self.deposit_dict['primary_citation_title'])
+            self.primary_citation_year.setText(self.deposit_dict['primary_citation_year'])
+            self.primary_citation_journal_volume.setText(self.deposit_dict['primary_citation_journal_volume'])
+            self.primary_citation_page_first.setText(self.deposit_dict['primary_citation_page_first'])
+            self.primary_citation_page_last.setText(self.deposit_dict['primary_citation_page_last'])
+
+            self.primary_citation_author_name_A.setText(self.deposit_dict['primary_citation_author_name_A'])
+            self.primary_citation_author_name_B.setText(self.deposit_dict['primary_citation_author_name_B'])
+            self.primary_citation_author_name_C.setText(self.deposit_dict['primary_citation_author_name_C'])
+            self.primary_citation_author_name_D.setText(self.deposit_dict['primary_citation_author_name_D'])
+            self.primary_citation_author_name_E.setText(self.deposit_dict['primary_citation_author_name_E'])
+            self.primary_citation_author_name_F.setText(self.deposit_dict['primary_citation_author_name_F'])
+            self.primary_citation_author_name_G.setText(self.deposit_dict['primary_citation_author_name_G'])
+            self.primary_citation_author_name_H.setText(self.deposit_dict['primary_citation_author_name_H'])
+
+
+        except KeyError:
+            self.update_status_bar('Sorry, this is not a XChemExplorer deposit file!')
+            self.update_log.insert('Sorry, this is not a XChemExplorer deposit file!')
+
+
+
 
 
     def save_deposit_config_file(self):
-        print 'hallo'
+        self.deposit_dict = {
+            'contact_author_PI_salutation':         str(self.contact_author_PI_salutation.text()),
+            'contact_author_PI_first_name':         str(self.contact_author_PI_first_name.text()),
+            'contact_author_PI_last_name':          str(self.contact_author_PI_last_name.text()),
+            'contact_author_PI_middle_name':        str(self.contact_author_PI_middle_name.text()),
+            'contact_author_PI_role':               str(self.contact_author_PI_role.text()),
+            'contact_author_PI_organization_type':  str(self.contact_author_PI_organization_type.text()),
+            'contact_author_PI_email':              str(self.contact_author_PI_email.text()),
+            'contact_author_PI_address':            str(self.contact_author_PI_address.text()),
+            'contact_author_PI_city':               str(self.contact_author_PI_city.text()),
+            'contact_author_PI_State_or_Province':  str(self.contact_author_PI_State_or_Province.text()),
+            'contact_author_PI_Zip_Code':           str(self.contact_author_PI_Zip_Code.text()),
+            'contact_author_PI_Country':            str(self.contact_author_PI_Country.text()),
+            'contact_author_PI_fax_number':         str(self.contact_author_PI_fax_number.text()),
+            'contact_author_PI_phone_number':       str(self.contact_author_PI_phone_number.text()),
+
+            'contact_author_salutation':            str(self.contact_author_salutation.text()),
+            'contact_author_first_name':            str(self.contact_author_first_name.text()),
+            'contact_author_last_name':             str(self.contact_author_last_name.text()),
+            'contact_author_middle_name':           str(self.contact_author_middle_name.text()),
+            'contact_author_role':                  str(self.contact_author_role.text()),
+            'contact_author_organization_type':     str(self.contact_author_organization_type.text()),
+            'contact_author_email':                 str(self.contact_author_email.text()),
+            'contact_author_address':               str(self.contact_author_address.text()),
+            'contact_author_city':                  str(self.contact_author_city.text()),
+            'contact_author_State_or_Province':     str(self.contact_author_State_or_Province.text()),
+            'contact_author_Zip_Code':              str(self.contact_author_Zip_Code.text()),
+            'contact_author_Country':               str(self.contact_author_Country.text()),
+            'contact_author_fax_number':            str(self.contact_author_fax_number.text()),
+            'contact_author_phone_number':          str(self.contact_author_phone_number.text()),
+
+            'Release_status_for_coordinates':       str(self.Release_status_for_coordinates.text()),
+            'Release_status_for_structure_factor':  str(self.Release_status_for_structure_factor.text()),
+            'Release_status_for_sequence':          str(self.Release_status_for_sequence.text()),
+
+            'structure_title':                      str(self.structure_title.text()),
+            'structure_details':                    str(self.structure_details.text()),
+
+            'structure_author_name_A':              str(self.structure_author_name_A.text()),
+            'structure_author_name_B':              str(self.structure_author_name_B.text()),
+            'structure_author_name_C':              str(self.structure_author_name_C.text()),
+            'structure_author_name_D':              str(self.structure_author_name_D.text()),
+            'structure_author_name_E':              str(self.structure_author_name_E.text()),
+            'structure_author_name_F':              str(self.structure_author_name_F.text()),
+            'structure_author_name_G':              str(self.structure_author_name_G.text()),
+            'structure_author_name_H':              str(self.structure_author_name_H.text()),
+
+            'primary_citation_id':                  str(self.primary_citation_id.text()),
+            'primary_citation_journal_abbrev':      str(self.primary_citation_journal_abbrev.text()),
+            'primary_citation_title':               str(self.primary_citation_title.text()),
+            'primary_citation_year':                str(self.primary_citation_year.text()),
+            'primary_citation_journal_volume':      str(self.primary_citation_journal_volume.text()),
+            'primary_citation_page_first':          str(self.primary_citation_page_first.text()),
+            'primary_citation_page_last':           str(self.primary_citation_page_last.text()),
+
+            'primary_citation_author_name_A':              str(self.primary_citation_author_name_A.text()),
+            'primary_citation_author_name_B':              str(self.primary_citation_author_name_B.text()),
+            'primary_citation_author_name_C':              str(self.primary_citation_author_name_C.text()),
+            'primary_citation_author_name_D':              str(self.primary_citation_author_name_D.text()),
+            'primary_citation_author_name_E':              str(self.primary_citation_author_name_E.text()),
+            'primary_citation_author_name_F':              str(self.primary_citation_author_name_F.text()),
+            'primary_citation_author_name_G':              str(self.primary_citation_author_name_G.text()),
+            'primary_citation_author_name_H':              str(self.primary_citation_author_name_H.text())
 
 
-#    def run_xia2(self):
+        }
+
+        file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.current_directory))
+        #make sure that the file always has .deposit extension
+        if str(file_name).rfind('.') != -1:
+            file_name=file_name[:file_name.rfind('.')]+'.deposit'
+        else:
+            file_name=file_name+'.deposit'
+        pickle.dump(self.deposit_dict,open(file_name,'wb'))
+
+
+    def set_primary_citation_as_structure_authors(self,state):
+        if state == QtCore.Qt.Checked:
+            self.primary_citation_author_name_A.setText(str(self.structure_author_name_A.text()))
+            self.primary_citation_author_name_B.setText(str(self.structure_author_name_B.text()))
+            self.primary_citation_author_name_C.setText(str(self.structure_author_name_C.text()))
+            self.primary_citation_author_name_D.setText(str(self.structure_author_name_D.text()))
+            self.primary_citation_author_name_E.setText(str(self.structure_author_name_E.text()))
+            self.primary_citation_author_name_F.setText(str(self.structure_author_name_F.text()))
+            self.primary_citation_author_name_G.setText(str(self.structure_author_name_G.text()))
+            self.primary_citation_author_name_H.setText(str(self.structure_author_name_G.text()))
+        else:
+            self.primary_citation_author_name_A.setText('')
+            self.primary_citation_author_name_B.setText('')
+            self.primary_citation_author_name_C.setText('')
+            self.primary_citation_author_name_D.setText('')
+            self.primary_citation_author_name_E.setText('')
+            self.primary_citation_author_name_F.setText('')
+            self.primary_citation_author_name_G.setText('')
+            self.primary_citation_author_name_H.setText('')
+
+
+# --------------------------------------------------
+
+
+#        self.contact_author_PI_salutation
+#        self.contact_author_PI_first_name
+#        self.contact_author_PI_last_name
+#        self.contact_author_PI_middle_name
+#        self.contact_author_PI_role
+#        self.contact_author_PI_organization_type
+#        self.contact_author_PI_email
+#        self.contact_author_PI_address
+#        self.contact_author_PI_city
+#        self.contact_author_PI_city
+#        self.contact_author_PI_State_or_Province
+#        self.contact_author_PI_Zip_Code
+#        self.contact_author_PI_Country
+#        self.contact_author_PI_fax_number
+#        self.contact_author_PI_phone_number
 #
-#        DataProcessing = QtGui.QMessageBox()
-#        DataProcessingLayout = DataProcessing.layout()
-#
-#        vbox = QtGui.QVBoxLayout()
-#
-#        frame=QtGui.QFrame()
-#        frame.setFrameShape(QtGui.QFrame.StyledPanel)
-#        vbox_dir=QtGui.QVBoxLayout()
-#        hbox=QtGui.QHBoxLayout()
-#        label=QtGui.QLabel('Data collection directory')
-#        hbox.addWidget(label)
-#        button=QtGui.QPushButton("Select")
-#        button.clicked.connect(self.select_diffraction_data_directory)
-#        hbox.addWidget(button)
-#        vbox_dir.addLayout(hbox)
-#
-#        self.diffraction_data_dir_label=QtGui.QLabel(self.diffraction_data_directory)
-#        vbox_dir.addWidget(self.diffraction_data_dir_label)
-#        frame.setLayout(vbox_dir)
-#
-#
-#        vbox.addWidget(frame)
-#
-#        label=QtGui.QLabel('Data processing protocol')
-#        vbox.addWidget(label)
-#        xia2_3d_checkbox = QtGui.QCheckBox('3d')
-#        vbox.addWidget(xia2_3d_checkbox)
-#        xia2_3dii_checkbox = QtGui.QCheckBox('3dii')
-#        vbox.addWidget(xia2_3dii_checkbox)
-#        xia2_dials_checkbox = QtGui.QCheckBox('dials')
-#        vbox.addWidget(xia2_dials_checkbox)
-#
-#        DataProcessingLayout.addLayout(vbox,0,0)
-#
-#        DataProcessing.exec_();
+#        self.contact_author_salutation
+#        self.contact_author_first_name
+#        self.contact_author_last_name
+#        self.contact_author_middle_name
+#        self.contact_author_role
+#        self.contact_author_organization_type
+#        self.contact_author_email
+#        self.contact_author_address
+#        self.contact_author_city
+#        self.contact_author_city
+#        self.contact_author_State_or_Province
+#        self.contact_author_Zip_Code
+#        self.contact_author_Country
+#        self.contact_author_fax_number
+#        self.contact_author_phone_number
+
+#        self.Release_status_for_coordinates
+#        self.Release_status_for_structure_factor
+#        self.Release_status_for_sequence
+
+#        self.structure_title
+#        self.structure_details
+
+#        self.structure_author_name_A
+#        self.structure_author_name_B
+#        self.structure_author_name_C
+#        self.structure_author_name_D
+#        self.structure_author_name_E
+#        self.structure_author_name_F
+#        self.structure_author_name_G
+#        self.structure_author_name_H
+
+#        self.primary_citation_id
+#        self.primary_citation_journal_abbrev
+#        self.primary_citation_title
+#        self.primary_citation_year
+#        self.primary_citation_journal_volume
+#        self.primary_citation_page_first
+#        self.primary_citation_page_last
+
+#        self.primary_citation_author_name_A
+#        self.primary_citation_author_name_B
+#        self.primary_citation_author_name_C
+#        self.primary_citation_author_name_D
+#        self.primary_citation_author_name_E
+#        self.primary_citation_author_name_F
+#        self.primary_citation_author_name_G
+#        self.primary_citation_author_name_H
+
+
+###################################################################################################
+
 
 
     def set_xce_logfile(self):
@@ -1734,12 +2336,6 @@ class XChemExplorer(QtGui.QApplication):
 #            self.adjust_allowed_unit_cell_difference.setText(str(self.allowed_unitcell_difference_percent))
 #            self.adjust_acceptable_low_resolution_limit.setText(str(self.acceptable_low_resolution_limit_for_data))
             self.reference_file_list=self.get_reference_file_list(' ')
-
-#            if self.data_source_set:
-#                self.db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
-#                self.update_header_and_data_from_datasource()
-#                self.db.create_missing_columns()
-#                self.update_all_tables()
 
 
         except KeyError:
@@ -3000,17 +3596,6 @@ class XChemExplorer(QtGui.QApplication):
             self.db.update_insert_data_source(xtal,update_dict)
 
 
-
-#        for button in self.dataset_outcome_dict[dataset]:
-#            if str(button.text())==outcome:
-#                if outcome.startswith('success'):
-#                    button.setStyleSheet("font-size:9px;background-color: rgb(0,255,0)")
-#                else:
-#                    button.setStyleSheet("font-size:9px;background-color: rgb(255,0,0)")
-#            else:
-#
-#                button.setStyleSheet("font-size:9px;background-color: "+self.dataset_outcome[str(button.text())])
-
     def set_run_dimple_flag(self,state):
         if state == QtCore.Qt.Checked:
             for key in self.initial_model_dimple_dict:
@@ -3609,30 +4194,6 @@ class XChemExplorer(QtGui.QApplication):
                     break
         return columns_to_show
 
-#    def get_columns_to_show(self,column_list,header_of_current_datasource):
-#        # maybe I coded some garbage before, but I need to find out which column name in the
-#        # data source corresponds to the actually displayed column name in the table
-#        # reason being that the unique column ID for DB may not be nice to look at
-#        columns_to_show=[]
-#        for column in column_list:
-#            # first find out what the column name in the header is:
-#            column_name=''
-#            for name in self.all_columns_in_data_source:
-#                if column==name[1]:
-#                    column_name=name[0]
-#            for n,all_column in enumerate(header_of_current_datasource):
-#                if column_name==all_column:
-#                    columns_to_show.append(n)
-#                    break
-#        return columns_to_show
-
-#    def get_rows_with_sample_id_not_null(self,header,data):
-#        sample_id_column=self.get_columns_to_show(['Sample ID'],header)
-#        n_rows=0
-#        for row in data:
-#            if not str(row[sample_id_column[0]]).lower() != 'none' or not str(row[sample_id_column[0]]).replace(' ','') == '':
-#                n_rows+=1
-#        return n_rows
 
     def get_rows_with_sample_id_not_null_from_datasource(self):
         sample_id_column=self.get_columns_to_show(['Sample ID'])
@@ -3661,20 +4222,20 @@ class XChemExplorer(QtGui.QApplication):
 
 
 if __name__ == "__main__":
-#    print '\n\n\n'
-#    print '     ######################################################################'
-#    print '     #                                                                    #'
-#    print '     # XCHEMEXPLORER - multi dataset analysis                             #'
-#    print '     #                                                                    #'
-#    print '     # Version: 0.1                                                       #'
-#    print '     #                                                                    #'
-#    print '     # Date:                                                              #'
-#    print '     #                                                                    #'
-#    print '     # Author: Tobias Krojer, Structural Genomics Consortium, Oxford, UK  #'
-#    print '     #         tobias.krojer@sgc.ox.ac.uk                                 #'
-#    print '     #                                                                    #'
-#    print '     ######################################################################'
-#    print '\n\n\n'
+    print '\n\n\n'
+    print '     ######################################################################'
+    print '     #                                                                    #'
+    print '     # XCHEMEXPLORER - multi dataset analysis                             #'
+    print '     #                                                                    #'
+    print '     # Version: 0.1                                                       #'
+    print '     #                                                                    #'
+    print '     # Date:                                                              #'
+    print '     #                                                                    #'
+    print '     # Author: Tobias Krojer, Structural Genomics Consortium, Oxford, UK  #'
+    print '     #         tobias.krojer@sgc.ox.ac.uk                                 #'
+    print '     #                                                                    #'
+    print '     ######################################################################'
+    print '\n\n\n'
 
     app=XChemExplorer(sys.argv[1:])
 
