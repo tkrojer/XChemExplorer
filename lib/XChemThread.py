@@ -1,4 +1,4 @@
-# last edited: 20/10/2016, 15:00
+# last edited: 04/11/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -176,6 +176,270 @@ class update_datasource_from_file_system(QtCore.QThread):
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
         self.Logfile.insert('datasource update finished')
+
+
+class synchronise_db_and_filesystem(QtCore.QThread):
+
+    '''
+        - remove broken links
+        - insert new samples in DB
+        - update data for existing samples
+    '''
+
+    def __init__(self,initial_model_directory,datasource,panddas_directory,xce_logfile,mode):
+        QtCore.QThread.__init__(self)
+        self.initial_model_directory=initial_model_directory
+        self.datasource=datasource
+        self.db=XChemDB.data_source(self.datasource)
+        self.all_samples_in_datasource=self.db.get_all_samples_in_data_source_as_list()
+        self.panddas_directory=panddas_directory
+        self.Logfile=XChemLog.updateLog(xce_logfile)
+        self.mode=mode
+
+    def run(self):
+        self.Logfile.insert('synchronising database and filesystem')
+        self.Logfile.insert('current project directory: '+self.initial_model_directory)
+
+        #
+        # get list of xtals
+        #
+
+        self.xtal_list = []
+        progress_step=1
+        progress=0
+        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+        if self.mode != 'project_directory':
+            # if only a single xtal is synched, then self.mode==xtalID
+            self.Logfile.insert('synchronising '+self.mode+' only')
+            self.xtal_list.append(self.mode)
+        else:
+            if len(glob.glob(os.path.join(self.initial_model_directory,'*'))) != 0:
+                progress_step=100/float(len(glob.glob(os.path.join(self.initial_model_directory,'*'))))
+            self.Logfile.insert('found '+str(len(glob.glob(os.path.join(self.initial_model_directory,'*'))))+' samples in project directory')
+            for directory in sorted(glob.glob(os.path.join(self.initial_model_directory,'*'))):
+                try:
+                    os.chdir(directory)
+                except OSError:
+                    # this could happen if the user accidentaly left a file in the project directory
+                    continue
+                xtal=directory[directory.rfind('/')+1:]
+                self.xtal_list.append(xtal)
+
+        #
+        # go through list
+        #
+
+        for xtal in self.xtal_list:
+            self.Logfile.insert('directory name: '+xtal+' = sampleID in database')
+            os.chdir(os.path.join(self.initial_model_directory,xtal))
+            if xtal not in all_samples_in_datasource:
+                self.Logfile.insert('sampleID not found in database: inserting '+xtal)
+                self.db.execute_statement("insert into mainTable (CrystalName) values ('%s');" %xtal)
+                self.all_samples_in_datasource.append(xtal)
+
+            db_dict=self.db.get_db_dict_for_sample(xtal)
+
+            db_dict=self.sync_data_processing(xtal,db_dict)
+
+            db_dict=self.sync_dimple_results(db_dict)
+
+            db_dict=self.sync_compound_information(db_dict)
+
+            db_dict=self.sync_refinement_results(db_dict)
+
+            if db_dict != {}:
+                self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating datasource for '+xtal)
+                self.db.update_data_source(xtal,db_dict)
+
+            self.sync_pandda_table(xtal)
+
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+        self.Logfile.insert('datasource update finished')
+
+
+
+    def sync_data_processing(self,xtal,db_dict):
+
+        # AIMLESS logfile
+
+        found_logfile=False
+        if os.path.isfile(xtal+'.log'):
+            found_logfile=True
+            db_dict['DataProcessingPathToLogfile']=os.path.join(directory,xtal+'.log')
+            db_dict['DataProcessingLOGfileName']=xtal+'.log'
+            if db_dict['DataCollectionOutcome']=='None' or db_dict['DataCollectionOutcome']=='':
+                db_dict['DataCollectionOutcome']='success'
+            aimless_results=parse().read_aimless_logfile(os.path.join(self.initial_model_directory,xtal,xtal+'log'))
+            db_dict.update(aimless_results)
+        else:
+            db_dict['DataProcessingPathToLogfile']=''
+            db_dict['DataProcessingLOGfileName']=''
+            os.system('/bin/rm %s.log 2> /dev/null' %xtal)
+
+        # MTZ file
+
+        if os.path.isfile(xtal+'.mtz'):
+            db_dict['DataProcessingPathToMTZfile']=os.path.join(directory,xtal+'.mtz')
+            db_dict['DataProcessingMTZfileName']=xtal+'.mtz'
+            if not found_logfile:
+                mtz_info=mtztools(xtal+'.mtz').get_information_for_datasource()
+                db_dict.update(mtz_info)
+                db_dict['DataCollectionOutcome']='success'
+        else:
+            db_dict['DataProcessingPathToMTZfile']=''
+            db_dict['DataProcessingMTZfileName']=''
+            os.system('/bin/rm %s.mtz 2> /dev/null' %xtal)
+
+        # MTZ free file
+
+        if os.path.isfile(xtal+'.free.mtz'):
+            db_dict['RefinementMTZfree']=os.path.join(directory,xtal+'.free.mtz')
+        else:
+            db_dict['RefinementMTZfree']=''
+            os.system('/bin/rm %s.free.mtz 2> /dev/null' %xtal)
+            dimple_path=db_dict['DimplePathToMTZ']
+            if os.path.isfile(os.path.join(dimple_path,'prepared2.mtz')):
+                os.symlink(os.path.join(dimple_path,'prepared2.mtz'),xtal+'.free.mtz')
+                db_dict['RefinementMTZfree']=xtal+'.free.mtz'
+            elif os.path.isfile(os.path.join(dimple_path,'prepared.mtz')):
+                os.symlink(os.path.join(dimple_path,'prepared.mtz'),xtal+'.free.mtz')
+                db_dict['RefinementMTZfree']=xtal+'.free.mtz'
+
+        return db_dict
+
+
+    def sync_dimple_results(self,db_dict):
+
+        # DIMPLE pdb
+
+        if os.path.isfile('dimple.pdb'):
+            db_dict['DimplePathToPDB']=os.path.realpath(os.path.join(self.initial_model_directory,'dimple.pdb'))
+            pdb_info=parse().PDBheader('dimple.pdb')
+            db_dict['DimpleRcryst']=pdb_info['Rcryst']
+            db_dict['DimpleRfree']=pdb_info['Rfree']
+            db_dict['DimpleResolutionHigh']=pdb_info['ResolutionHigh']
+        else:
+            db_dict['DimplePathToPDB']=''
+            db_dict['DimpleRcryst']=''
+            db_dict['DimpleRfree']=''
+            db_dict['DimpleResolutionHigh']=''
+            os.system('/bin/rm dimple.pdb 2> /dev/null')
+
+        # DIMPLE mtz
+
+        if os.path.isfile('dimple.mtz'):
+            db_dict['DimplePathToMTZ']=os.path.realpath(os.path.join(self.initial_model_directory,'dimple.mtz'))
+            dimple_mtz=db_dict['DimplePathToMTZ']
+            dimple_path=dimple_mtz[:dimple_mtz.rfind('/')]
+        else:
+            db_dict['DimplePathToMTZ']=''
+            os.system('/bin/rm dimple.mtz 2> /dev/null')    # this makes sure that any broken link which could rerail PANDDA gets removed
+
+        return db_dict
+
+
+    def sync_compound_information(self,db_dict):
+        # only update database if SMILES or compoundID field is blank!
+
+        compoundID=db_dict['CompoundCode']
+        if compoundID=='None' or compoundID=='':
+            if os.path.isdir('compound'):
+                for smiles in glob.glob('compound/*'):
+                    if smiles.endswith('smiles'):
+                        for line in open(smiles):
+                            if len(line.split()) >= 1:
+                                db_dict['CompoundCode']=smiles[smiles.rfind('/')+1:smiles.rfind('.')]
+                                compoundID=db_dict['CompoundCode']
+                                break
+
+        smilesDB=db_dict['CompoundSMILES']
+        if smilesDB=='None' or smilesDB=='':
+            if os.path.isdir('compound'):
+                for smiles in glob.glob('compound/*'):
+                    if smiles.endswith('smiles'):
+                        for line in open(smiles):
+                            if len(line.split()) >= 1:
+                                db_dict['CompoundSMILES']=line.split()[0]
+                                smilesDB=db_dict['CompoundSMILES']
+                                break
+
+        if not os.path.isfile(compoundID+'.pdb'):
+            os.system('/bin/rm %s.pdb 2> /dev/null' %compoundID)
+
+        if not os.path.isfile(compoundID+'.png'):
+            os.system('/bin/rm %s.png 2> /dev/null' %compoundID)
+
+        if os.path.isfile(compoundID+'.cif'):
+            db_dict['RefinementCIF']=os.path.join(directory,compoundID+'.cif')
+        else:
+            os.system('/bin/rm %s.cif 2> /dev/null' %compoundID)
+            db_dict['RefinementCIF']=''
+
+        return db_dict
+
+
+    def sync_refinement_results(self,db_dict):
+
+        #
+        # REFINE pdb
+        #
+
+        if os.path.isfile('refine.pdb'):
+            db_dict['RefinementPDB_latest']=os.path.realpath(os.path.join(self.initial_model_directory,'refine.pdb'))
+            pdb_info=parse().PDBheader('refine.pdb')
+            db_dict.update(pdb_info)
+            if db_dict['RefinementOutcome']=='None' or db_dict['RefinementOutcome']=='':
+                db_dict['RefinementOutcome']='3 - In Refinement'
+            elif str(db_dict['RefinementOutcome']).startswith('1'):
+                db_dict['RefinementOutcome']='3 - In Refinement'
+            elif str(db_dict['RefinementOutcome']).startswith('2'):
+                db_dict['RefinementOutcome']='3 - In Refinement'
+        else:
+            db_dict['RefinementPDB_latest']=''
+            os.system('/bin/rm refine.pdb 2> /dev/null')
+
+        #
+        # REFINE mtz
+        #
+
+        if os.path.isfile('refine.mtz'):
+            db_dict['RefinementMTZ_latest']=os.path.realpath(os.path.join(self.initial_model_directory,'refine.mtz'))
+        else:
+            db_dict['RefinementMTZ_latest']=''
+            os.system('/bin/rm refine.mtz 2> /dev/null')
+
+        return db_dict
+
+
+    def sync_pandda_table(self,xtal):
+
+        # also need to update PANDDA table...
+        pandda_models=self.db.execute_statement("select CrystalName,PANDDA_site_index,PANDDA_site_spider_plot,PANDDA_site_event_map from panddaTable where CrystalName='%s'" %xtal)
+        if pandda_models != []:
+            for entry in pandda_models:
+                db_pandda_dict={}
+                db_pandda_dict['PANDDA_site_index']=entry[1]
+                db_pandda_dict['PANDDApath']=self.panddas_directory
+                if entry[3] != None:
+                    event_map=os.path.join(self.initial_model_directory,xtal,entry[3].split('/')[len(entry[3].split('/'))-1])
+                    if os.path.isfile(event_map):
+                        db_pandda_dict['PANDDA_site_event_map']=event_map
+                if entry[2] != None:
+                    spider_plot=os.path.join(self.initial_model_directory,xtal,entry[2].split('/')[len(entry[2].split('/'))-3],entry[2].split('/')[len(entry[2].split('/'))-2],entry[2].split('/')[len(entry[2].split('/'))-1])
+                    if os.path.isfile(spider_plot):
+                        db_pandda_dict['PANDDA_site_spider_plot']=spider_plot
+#                            db_pandda_dict['RefinementOutcome']='3 - In Refinement'    # just in case; presence of a spider plot definitely signals that refinement happened
+                                                                                        # should probably be not updated! Will overwrite CompChem ready
+                self.Logfile.insert('updating panddaTable for xtal: %s, site: %s' %(entry[0],entry[1]))
+                self.db.update_insert_panddaTable(xtal,db_pandda_dict)
+
+
+
+
+
+
 
 class create_png_and_cif_of_compound(QtCore.QThread):
     def __init__(self,external_software,initial_model_directory,compound_list,database_directory,data_source_file,todo,ccp4_scratch_directory,xce_logfile,max_queue_jobs):
@@ -528,7 +792,7 @@ class start_dials_image_viewer(QtCore.QThread):
 
 
 
-class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
+class save_autoprocessing_results_to_disc(QtCore.QThread):
     def __init__(self,dataset_outcome_dict,
                       data_collection_table_dict,
                       data_collection_column_three_dict,
@@ -804,7 +1068,7 @@ class LATEST_save_autoprocessing_results_to_disc(QtCore.QThread):
 
 
 
-class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
+class read_autoprocessing_results_from_disc(QtCore.QThread):
     def __init__(self,visit_list,
                  target,
                  reference_file_list,
@@ -1912,346 +2176,6 @@ class NEW_read_autoprocessing_results_from_disc(QtCore.QThread):
                                 aimless_index+=1
 
 
-
-
-
-                progress += progress_step
-                self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-
-            search_cycle+=1
-
-        # finally decide which dataset should be pre-selected
-        self.select_best_dataset()
-
-        # and now update datasource
-        self.update_datasource()
-
-        # save everything so that it's quicker to reload and is available outside DLS
-        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'pickling results')
-#        pickle.dump(self.data_collection_dict,open(self.data_collection_summary_file,'wb'))
-        cPickle.dump(self.data_collection_dict,open(self.data_collection_summary_file,'wb'))
-
-        self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results_only'), self.data_collection_dict)
-
-
-
-
-
-
-
-
-
-    def parse_challenging_file_system(self):
-        # only do once, ignore if just refreshing table
-        if self.data_collection_dict=={}:
-            if os.path.isfile(self.data_collection_summary_file):
-                self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'unpickling: '+self.data_collection_summary_file)
-#                self.data_collection_dict = pickle.load( open(self.data_collection_summary_file, "rb" ) )
-                self.data_collection_dict = cPickle.load( open(self.data_collection_summary_file, "rb" ) )
-
-        number_of_visits_to_search=len(self.visit_list)
-        search_cycle=1
-
-        for visit_directory in sorted(self.visit_list):
-            if len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*')))==0:
-                continue
-            progress_step=100/float(len(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))))
-            progress=0
-
-            beamline='n/a'
-            if 'attic' in visit_directory:
-                visit=visit_directory.split('/')[6]
-                beamline=visit_directory.split('/')[3]
-            else:
-                visit=visit_directory.split('/')[5]
-                beamline=visit_directory.split('/')[2]
-
-            # isthereadisk
-            visit=visit_directory.split('/')[8]
-            beamline='i04-1'
-            print 'here'
-            print 'visit_dir',visit_directory
-            print 'path',os.path.join(visit_directory,'processed',self.target,'*')
-
-            for collected_xtals in sorted(glob.glob(os.path.join(visit_directory,'processed',self.target,'*'))):
-                print collected_xtals
-                # this step is only relevant when several samples are reviewed in one session
-#                if 'tmp' in collected_xtals or 'results' in collected_xtals or 'scre' in collected_xtals:
-#                    continue
-
-                xtal=collected_xtals[collected_xtals.rfind('/')+1:]
-                print 'xtal',xtal
-                protein_name=collected_xtals.split('/')[len(collected_xtals.split('/'))-2]
-
-                # if crystal is not in the data_collection_dict then add a new one
-                if xtal not in self.data_collection_dict:
-                    self.data_collection_dict[xtal]=[]
-
-                self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 1 of 2: searching visit '+ \
-                                                                       str(search_cycle)+' of '+str(number_of_visits_to_search)+ \
-                                                                       ' ('+visit+'/'+xtal+')')
-
-                # check if there is already an entry for the current run
-                # obviously create if not and fill in basic information
-                run_number_list=[]
-                aimless_index_list=[]
-                for runs in sorted(glob.glob(collected_xtals+'/*')):
-                    print 'runs',runs
-                    run=runs[runs.rfind('/')+1:]
-                    print 'run',run
-                    diffraction_image=''
-                    timestamp=datetime.fromtimestamp(os.path.getmtime(runs)).strftime('%Y-%m-%d %H:%M:%S')
-                    if os.path.isfile(os.path.join(visit_directory,protein_name,xtal,run+'0001.cbf')):
-                        diffraction_image=os.path.join(visit_directory,protein_name,xtal,run+'0001.cbf')
-
-                    ###############################################################
-                    # image files
-                    image_files_in_list=False
-                    for entry in self.data_collection_dict[xtal]:
-                        image_files_in_list=False
-                        if entry[0]=='image':
-                            if entry[0]=='image' and entry[1]==visit and entry[2]==run:
-                                image_files_in_list=True
-                                break
-
-                    if not image_files_in_list:
-                        if run_number_list==[]:
-                            run_number=0                                # every run gets and keeps(!) a unique digit assigned
-                        else:                                           # the order is arbitrary
-                            run_number=max(run_number_list)+1
-                        run_number_list.append(run_number)
-
-                    if not image_files_in_list:
-                        image_list=[]
-                        # we're expecting exactly 5 images: 1 x distl plot; 4 x crystal centring images
-                        # for all the ones that are not present, IMAGE_NOT_AVAILABLE.png from
-                        # $XChemExplorer_DIR/image will be used instead
-                        image_counter=0
-                        # first four images are the crystal centring images
-                        for image in sorted(glob.glob(os.path.join(visit_directory,'jpegs',self.target,xtal,'*t.png'))):
-                            if run in image:
-                                image_name=image[image.rfind('/')+1:]
-                                print 'image',image_name
-                                image_file=open(image,"rb")
-                                image_string=base64.b64encode(image_file.read())
-                                image_list.append( [image_name,image_string] )
-                                image_counter+=1
-                        while image_counter < 4:
-                            image_file=open( os.path.join(os.getenv('XChemExplorer_DIR'),'image','IMAGE_NOT_AVAILABLE.png') ,"rb")
-                            image_string=base64.b64encode(image_file.read())
-                            image_list.append( ['image_'+str(image_counter)+'.png',image_string] )
-                            image_counter+=1
-                        # now comes the distl plot
-                        image_name=run+'.png'
-                        if os.path.isfile(os.path.join(visit_directory,'jpegs',self.target,xtal,run+'.png')):
-                            if os.stat(os.path.join(visit_directory,'jpegs',self.target,xtal,run+'.png')).st_size != 0:
-                                image_file=open(os.path.join(visit_directory,'jpegs',self.target,xtal,run+'.png'),"rb")
-                            else:
-                                image_file=open( os.path.join(os.getenv('XChemExplorer_DIR'),'image','IMAGE_NOT_AVAILABLE.png') ,"rb")
-                            image_string=base64.b64encode(image_file.read())
-                            image_list.append( [image_name,image_string] )
-                        else:
-                            image_file=open( os.path.join(os.getenv('XChemExplorer_DIR'),'image','IMAGE_NOT_AVAILABLE.png') ,"rb")
-                            image_string=base64.b64encode(image_file.read())
-                            image_list.append( [image_name,image_string] )
-                        # and finally comes the html page
-                        if os.path.isfile(os.path.join(visit_directory,'jpegs',self.target,xtal,run+'index.html')):
-                            html_summary=os.path.join(visit_directory,'jpegs',self.target,xtal,run+'index.html')
-                        else:
-                            html_summary=''
-                        self.data_collection_dict[xtal].append(['image',visit,run,timestamp,image_list,
-                                                                diffraction_image,run_number,html_summary,beamline])
-
-
-                    # before we start, check if there are already entries in the aimless_index_list
-                    # this list contains integers which serve a unique identifier for each autoprocessing outcome
-                    for entry in self.data_collection_dict[xtal]:
-                        if entry[0]=='logfile':
-                            aimless_index_list.append(entry[7])
-                    if aimless_index_list==[]:
-                        aimless_index=0
-                    else:
-                        aimless_index=max(aimless_index_list)+1
-
-                    ##########################################################################
-                    # aimless & Dimple information
-                    # first for xia2 runs
-                    for file_name in glob.glob(os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2','*','LogFiles','*aimless.log')):
-                        db_dict={   'DataCollectionVisit':              visit,
-                                    'DataCollectionBeamline':           beamline,
-                                    'DataCollectionDate':               timestamp,
-                                    'DataProcessingPathToLogfile':      file_name,
-                                    'DataProcessingPathToMTZfile':      '',
-                                    'DataProcessingLOGfileName':        file_name[file_name.rfind('/')+1:],
-                                    'DataProcessingDirectoryOriginal':  '/'.join(file_name.split('/')[:len(file_name.split('/'))-2])    }
-                        # try to find free.mtz file
-                        data_path='/'.join(file_name.split('/')[:len(file_name.split('/'))-2])
-                        for data_file in glob.glob(os.path.join(data_path,'DataFiles','*')):
-                            if 'free' in data_file:
-                                db_dict['DataProcessingPathToMTZfile']=data_file
-                                db_dict['DataProcessingMTZfileName']=data_file[data_file.rfind('/')+1:]
-                                break
-                        autoproc=file_name.split('/')[len(file_name.split('/'))-3]
-                        found_autoproc=False
-                        for n,entry in enumerate(self.data_collection_dict[xtal]):
-                            if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[4]==autoproc:
-                                found_autoproc=True
-                                # need to check this because user may have run this later and otherwise he would need to delete pkl file to pick it up
-                                if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')):
-                                    dimple_file=os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')
-                                    pdb_info=parse().PDBheader(dimple_file)
-                                    db_dict_old=self.data_collection_dict[xtal][n][6]
-                                    db_dict_old['DataProcessingPathToDimplePDBfile']=dimple_file
-                                    db_dict_old['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
-                                    db_dict_old['DataProcessingRcryst']  = pdb_info['Rcryst']
-                                    db_dict_old['DataProcessingRfree'] = pdb_info['Rfree']
-                                    self.data_collection_dict[xtal][n][6]=db_dict_old
-                        if not found_autoproc:  # i.e. this run is not in pkl file yet
-                            aimless_results=parse().read_aimless_logfile(file_name)
-                            db_dict.update(aimless_results)
-                            # first check if user ran dimple already manually
-                            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')):
-                                dimple_file=os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')
-                                pdb_info=parse().PDBheader(dimple_file)
-                                db_dict['DataProcessingPathToDimplePDBfile']=dimple_file
-                                db_dict['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
-                                db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
-                                db_dict['DataProcessingRfree'] = pdb_info['Rfree']
-                            # only then start looking into the regular processed folder
-                            elif os.path.isfile(os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2',autoproc,'dimple','final.pdb')):
-                                dimple_file=os.path.join(visit_directory,'processed',protein_name,xtal,run,'xia2',autoproc,'dimple','final.pdb')
-                                pdb_info=parse().PDBheader(dimple_file)
-                                db_dict['DataProcessingPathToDimplePDBfile']=dimple_file
-                                db_dict['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
-                                db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
-                                db_dict['DataProcessingRfree'] = pdb_info['Rfree']
-                            else:
-                                db_dict['DataProcessingPathToDimplePDBfile']=''
-                                db_dict['DataProcessingPathToDimpleMTZfile']=''
-                                db_dict['DataProcessingRcryst']  = '999'
-                                db_dict['DataProcessingRfree'] = '999'
-                            db_dict['DataProcessingProgram']=autoproc
-                            # Note: [8]: best automatically selected file=True
-                            #       [9]: the moment the user changes the selection manully this changes to True
-                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False,False])
-                            aimless_index+=1
-
-
-
-
-                    # then exactly the same for fast_dp
-                    if os.path.isfile(os.path.join(runs,'fast_dp','aimless.log')):
-                        file_name=os.path.join(runs,'fast_dp','aimless.log')
-                        db_dict={   'DataCollectionVisit':              visit,
-                                    'DataCollectionBeamline':           beamline,
-                                    'DataCollectionDate':               timestamp,
-                                    'DataProcessingPathToLogfile':      file_name,
-                                    'DataProcessingPathToMTZfile':      '',
-                                    'DataProcessingLOGfileName':        'aimless.log',
-                                    'DataProcessingDirectoryOriginal':  os.path.join(runs,'fast_dp')    }
-                        if os.path.isfile(os.path.join(runs,'fast_dp','fast_dp.mtz')):
-                            db_dict['DataProcessingPathToMTZfile']=os.path.join(runs,'fast_dp','fast_dp.mtz')
-                            db_dict['DataProcessingMTZfileName']='fast_dp.mtz'
-                        autoproc=file_name.split('/')[len(file_name.split('/'))-2]
-                        found_autoproc=False
-                        for n,entry in enumerate(self.data_collection_dict[xtal]):
-#                        for entry in self.data_collection_dict[xtal]:
-                            if len(entry)>=9:
-                                if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[4]==autoproc:
-                                    found_autoproc=True
-                                    # need to check this because user may have run this later and otherwise he would need to delete pkl file to pick it up
-                                    if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')):
-                                        dimple_file=os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')
-                                        pdb_info=parse().PDBheader(dimple_file)
-                                        db_dict_old=self.data_collection_dict[xtal][n][6]
-                                        db_dict_old['DataProcessingPathToDimplePDBfile']=dimple_file
-                                        db_dict_old['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
-                                        db_dict_old['DataProcessingRcryst']  = pdb_info['Rcryst']
-                                        db_dict_old['DataProcessingRfree'] = pdb_info['Rfree']
-                                        self.data_collection_dict[xtal][n][6]=db_dict_old
-                        if not found_autoproc:
-                            aimless_results=parse().read_aimless_logfile(file_name)
-                            db_dict.update(aimless_results)
-                            # first check if user ran dimple already manually
-                            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')):
-                                dimple_file=os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')
-                                pdb_info=parse().PDBheader(dimple_file)
-                                db_dict['DataProcessingPathToDimplePDBfile']=dimple_file
-                                db_dict['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
-                                db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
-                                db_dict['DataProcessingRfree'] = pdb_info['Rfree']
-                            elif os.path.isfile(os.path.join(runs,'fast_dp','dimple','final.pdb')):
-                                dimple_file=os.path.join(runs,'fast_dp','dimple','final.pdb')
-                                pdb_info=parse().PDBheader(dimple_file)
-                                db_dict['DataProcessingPathToDimplePDBfile']=dimple_file
-                                db_dict['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
-                                db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
-                                db_dict['DataProcessingRfree'] = pdb_info['Rfree']
-                            else:
-                                db_dict['DataProcessingPathToDimplePDBfile']=''
-                                db_dict['DataProcessingPathToDimpleMTZfile']=''
-                                db_dict['DataProcessingRcryst']  = '999'
-                                db_dict['DataProcessingRfree'] = '999'
-                            db_dict['DataProcessingProgram']=autoproc
-                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False,False])
-                            aimless_index+=1
-
-                    # then exactly the same for autoPROC
-                    if os.path.isfile(os.path.join(runs,'autoPROC','ap-run','aimless.log')):
-                        file_name=os.path.join(runs,'autoPROC','ap-run','aimless.log')
-                        db_dict={   'DataCollectionVisit':              visit,
-                                    'DataCollectionBeamline':           beamline,
-                                    'DataCollectionDate':               timestamp,
-                                    'DataProcessingPathToLogfile':      file_name,
-                                    'DataProcessingPathToMTZfile':      '',
-                                    'DataProcessingLOGfileName':        'aimless.log',
-                                    'DataProcessingDirectoryOriginal':  os.path.join(runs,'autoPROC')   }
-                        if os.path.isfile(os.path.join(runs,'autoPROC','ap-run','truncate-unique.mtz')):
-                            db_dict['DataProcessingPathToMTZfile']=os.path.join(runs,'autoPROC','ap-run','truncate-unique.mtz')
-                            db_dict['DataProcessingMTZfileName']='truncate-unique.mtz'
-                        autoproc=file_name.split('/')[len(file_name.split('/'))-3]
-                        found_autoproc=False
-                        for n,entry in enumerate(self.data_collection_dict[xtal]):
-#                        for entry in self.data_collection_dict[xtal]:
-                            if len(entry)>=9:
-                                if entry[0]=='logfile' and entry[1]==visit and entry[2]==run and entry[4]==autoproc:
-                                    found_autoproc=True
-                                    # need to check this because user may have run this later and otherwise he would need to delete pkl file to pick it up
-                                    if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')):
-                                        dimple_file=os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')
-                                        pdb_info=parse().PDBheader(dimple_file)
-                                        db_dict_old=self.data_collection_dict[xtal][n][6]
-                                        db_dict_old['DataProcessingPathToDimplePDBfile']=dimple_file
-                                        db_dict_old['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
-                                        db_dict_old['DataProcessingRcryst']  = pdb_info['Rcryst']
-                                        db_dict_old['DataProcessingRfree'] = pdb_info['Rfree']
-                                        self.data_collection_dict[xtal][n][6]=db_dict_old
-                        if not found_autoproc:
-                            aimless_results=parse().read_aimless_logfile(file_name)
-                            db_dict.update(aimless_results)
-                            # first check if user ran dimple already manually
-                            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')):
-                                dimple_file=os.path.join(self.initial_model_directory,xtal,'dimple',visit+'-'+run+autoproc,'dimple','final.pdb')
-                                pdb_info=parse().PDBheader(dimple_file)
-                                db_dict['DataProcessingPathToDimplePDBfile']=dimple_file
-                                db_dict['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
-                                db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
-                                db_dict['DataProcessingRfree'] = pdb_info['Rfree']
-                            elif os.path.isfile(os.path.join(runs,'autoPROC','dimple','final.pdb')):
-                                dimple_file=os.path.join(runs,'autoPROC','dimple','final.pdb')
-                                pdb_info=parse().PDBheader(dimple_file)
-                                db_dict['DataProcessingPathToDimplePDBfile']=dimple_file
-                                db_dict['DataProcessingPathToDimpleMTZfile']=dimple_file.replace('.pdb','.mtz')
-                                db_dict['DataProcessingRcryst']  = pdb_info['Rcryst']
-                                db_dict['DataProcessingRfree'] = pdb_info['Rfree']
-                            else:
-                                db_dict['DataProcessingPathToDimplePDBfile']=''
-                                db_dict['DataProcessingPathToDimpleMTZfile']=''
-                                db_dict['DataProcessingRcryst']  = '999'
-                                db_dict['DataProcessingRfree'] = '999'
-                            db_dict['DataProcessingProgram']=autoproc
-                            self.data_collection_dict[xtal].append(['logfile',visit,run,timestamp,autoproc,file_name,db_dict,aimless_index,False,False])
-                            aimless_index+=1
 
 
 

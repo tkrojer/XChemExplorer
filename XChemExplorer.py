@@ -1,4 +1,4 @@
-# last edited: 03/11/2016, 17:00
+# last edited: 04/11/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -326,7 +326,8 @@ class XChemExplorer(QtGui.QApplication):
         #
 
         self.dataset_tasks = [  'Get New Results from Autoprocessing',
-                                'Save Files from Autoprocessing to Project Folder',
+                               # 'Save Files from Autoprocessing to Project Folder',
+                                'Run DIMPLE on All Autoprocessing MTZ files\n(*** run Rescore Datasets when finished ***))',
                                 'Rescore Datasets',
                                 'Read PKL file',
                                 'Run xia2 on selected datasets' ]
@@ -372,8 +373,7 @@ class XChemExplorer(QtGui.QApplication):
         # @ MAP & CIF files #######################################################################
         #
 
-        self.map_cif_file_tasks = [ 'Run DIMPLE on All Autoprocessing MTZ files',
-                                    'Run DIMPLE on selected MTZ files',
+        self.map_cif_file_tasks = [ 'Run DIMPLE on selected MTZ files',
                                     'Create CIF/PDB/PNG file of ALL soaked compound',
                                     'Create CIF/PDB/PNG file of NEW soaked compounds'    ]
 
@@ -2879,8 +2879,8 @@ class XChemExplorer(QtGui.QApplication):
         if instruction=='Get New Results from Autoprocessing':
             self.check_for_new_autoprocessing_or_rescore(False)
 
-        elif instruction=="Save Files from Autoprocessing to Project Folder" :
-            self.save_files_to_initial_model_folder()
+#        elif instruction=="Save Files from Autoprocessing to Project Folder" :
+#            self.save_files_to_initial_model_folder()
 
         elif instruction=='Rescore Datasets':
             self.check_for_new_autoprocessing_or_rescore(True)
@@ -2998,7 +2998,7 @@ class XChemExplorer(QtGui.QApplication):
         else:
             start_thread=True
         if start_thread:
-            self.work_thread=XChemThread.NEW_read_autoprocessing_results_from_disc(self.visit_list,
+            self.work_thread=XChemThread.read_autoprocessing_results_from_disc(self.visit_list,
                                                                                 self.target,
                                                                                 self.reference_file_list,
                                                                                 self.database_directory,
@@ -3019,7 +3019,7 @@ class XChemExplorer(QtGui.QApplication):
             self.work_thread.start()
 
     def save_files_to_initial_model_folder(self):
-        self.work_thread=XChemThread.LATEST_save_autoprocessing_results_to_disc(self.dataset_outcome_dict,
+        self.work_thread=XChemThread.save_autoprocessing_results_to_disc(self.dataset_outcome_dict,
                                                                              self.data_collection_table_dict,
                                                                              self.data_collection_column_three_dict,
                                                                              self.data_collection_dict,
@@ -3849,6 +3849,8 @@ class XChemExplorer(QtGui.QApplication):
 #        self.populate_and_update_data_source_table()
 
         self.status_bar.showMessage('idle')
+
+        self.save_files_to_initial_model_folder()
 
         self.update_dewar_configuration_tab()
 

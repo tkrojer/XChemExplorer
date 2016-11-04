@@ -1,4 +1,4 @@
-# last edited: 12/08/2016 - 08:00
+# last edited: 04/11/2016 - 15:00
 
 import gobject
 import sys
@@ -762,14 +762,20 @@ class GUI(object):
         if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style)):
             os.chdir(os.path.join(self.project_directory,self.xtalID))
             # we want to be able to check dimple results immediately, but don't want to interfere with refinement
-            if not os.path.isfile('REFINEMENT_IN_PROGRESS'):
-                if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.xtalID+'-ensemble-model.pdb')):
-                    os.symlink(self.xtalID+'-ensemble-model.pdb',self.pdb_style)
-                elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.pdb')):
-                    os.symlink('dimple.pdb',self.pdb_style)
-                else:
-                    self.go_to_next_xtal()
-        imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style),0)
+#            if not os.path.isfile('REFINEMENT_IN_PROGRESS'):
+#                if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.xtalID+'-ensemble-model.pdb')):
+#                    os.symlink(self.xtalID+'-ensemble-model.pdb',self.pdb_style)
+#                elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.pdb')):
+#                    os.symlink('dimple.pdb',self.pdb_style)
+#                else:
+#                    self.go_to_next_xtal()
+        if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style)):
+            os.chdir(os.path.join(self.project_directory,self.xtalID))
+            imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style),0)
+        elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.pdb')):
+            imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,'dimple.pdb'),0)
+        else:
+            self.go_to_next_xtal()
         self.mol_dict['protein']=imol
         for item in coot_utils_XChem.molecule_number_list():
             if coot.molecule_name(item).endswith(self.pdb_style):
@@ -789,25 +795,20 @@ class GUI(object):
         else:
             # try to open mtz file with same name as pdb file
             coot.set_default_initial_contour_level_for_map(1)
-            if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.mtz_style)):
-                os.chdir(os.path.join(self.project_directory,self.xtalID))
-                if not os.path.isfile('REFINEMENT_IN_PROGRESS'):
-                    if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.xtalID+'-pandda-input.mtz')):
-                        os.symlink(self.xtalID+'-pandda-input.mtz',self.mtz_style)
-                    elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.mtz')):
-                        os.symlink('dimple.mtz',self.mtz_style)
-            coot.auto_read_make_and_draw_maps(os.path.join(self.project_directory,self.xtalID,self.mtz_style))
+#            if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.mtz_style)):
+#                os.chdir(os.path.join(self.project_directory,self.xtalID))
+#                if not os.path.isfile('REFINEMENT_IN_PROGRESS'):
+#                    if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.xtalID+'-pandda-input.mtz')):
+#                        os.symlink(self.xtalID+'-pandda-input.mtz',self.mtz_style)
+#                    elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.mtz')):
+#                        os.symlink('dimple.mtz',self.mtz_style)
+            if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.mtz_style)):
+                coot.auto_read_make_and_draw_maps(os.path.join(self.project_directory,self.xtalID,self.mtz_style))
+            elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.mtz')):
+                coot.auto_read_make_and_draw_maps(os.path.join(self.project_directory,self.xtalID,'dimple.mtz'))
 
         #########################################################################################
         # check for PANDDAs EVENT maps
-#        for map in glob.glob(os.path.join(self.project_directory,self.xtalID,'*')):
-#            if 'event' in str(map) and '.ccp4' in str(map):
-#                occupancy=map[map.find('occupancy')+10:map.rfind('_')]
-#                coot.handle_read_ccp4_map((map),0)
-#                for imol in coot_utils_XChem.molecule_number_list():
-#                    if map in coot.molecule_name(imol):
-#                        coot.set_contour_level_absolute(imol,float(occupancy))
-#                        coot.set_last_map_colour(0.4,0,0.4)
         if os.path.isfile(self.event_map):
             coot.handle_read_ccp4_map((self.event_map),0)
             for imol in coot_utils_XChem.molecule_number_list():
@@ -897,6 +898,11 @@ class GUI(object):
         for item in coot_utils_XChem.molecule_number_list():
             if coot.molecule_name(item).endswith(self.pdb_style):
                 coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial),'in.pdb'))
+                break
+            elif coot.molecule_name(item).endswith('dimple.pdb'):
+                coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial),'in.pdb'))
+                break
+
 
         #######################################################
         # run REFMAC
