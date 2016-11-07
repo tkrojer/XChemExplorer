@@ -4228,7 +4228,7 @@ class XChemExplorer(QtGui.QApplication):
                             for y,entry in enumerate(panddaDict[xtal]):
                                 for x,info in enumerate(entry):
                                     frame=QtGui.QFrame()
-                                    frame.setFrameShape(QtGui.QFrame.StyledPanel)
+                                    frame.setFrameShape(QtGui.QFrame.Box)
                                     vbox=QtGui.QVBoxLayout()
                                     vbox.addWidget(QtGui.QLabel(str(entry[x])))
                                     frame.setLayout(vbox)
