@@ -888,7 +888,6 @@ class XChemExplorer(QtGui.QApplication):
         self.summary_vbox_for_table=QtGui.QVBoxLayout()
         self.summary_column_name=[ 'Sample ID',
                                     'Compound ID',
-#                                    'Compound\nImage',
                                     'Refinement\nSpace Group',
                                     'Refinement\nResolution',
                                     'Refinement\nRcryst',
@@ -898,6 +897,7 @@ class XChemExplorer(QtGui.QApplication):
         self.summary_table=QtGui.QTableWidget()
         self.summary_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.summary_table.setSortingEnabled(True)
+        self.summary_table.setColumnCount(len(self.summary_column_name))
         self.summary_table.setHorizontalHeaderLabels(self.summary_column_name)
         self.summary_vbox_for_table.addWidget(self.summary_table)
         self.tab_dict[self.workflow_dict['Refinement']][1].addLayout(self.summary_vbox_for_table)
