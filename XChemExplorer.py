@@ -4232,8 +4232,7 @@ class XChemExplorer(QtGui.QApplication):
                                     vbox=QtGui.QVBoxLayout()
                                     vbox.addWidget(QtGui.QLabel(str(entry[x])))
                                     frame.setLayout(vbox)
-                                    grid.addWidget(frame,y,x)
-                                    print 'ifefie'
+                                    grid.addWidget(frame,y,x,Qt.Alignment 0)
 #                            button.setLayout(grid)
 #                            self.summary_table.setCellWidget(current_row, column, button)
                             widget.setLayout(grid)
