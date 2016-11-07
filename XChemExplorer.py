@@ -4256,6 +4256,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.summary_table_dict[xtal]=[]
 
         self.summary_table.resizeColumnsToContents()
+        self.summary_table.resizeRowsToContents()
 
 
 
