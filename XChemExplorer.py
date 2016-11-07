@@ -4216,7 +4216,7 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text.setText(str(xtal))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.summary_table.setItem(current_row, column, cell_text)
-                    elif header[0]=='Details':
+                    elif header[0]=='PanDDA site details':
                         try:
                             panddaDict[xtal].insert(0,['PANDDA_site_index','PANDDA_site_name','RefinementOutcome'])
 #                            button=QtGui.QPushButton()
