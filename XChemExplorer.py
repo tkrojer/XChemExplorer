@@ -4219,15 +4219,18 @@ class XChemExplorer(QtGui.QApplication):
                     elif header[0]=='Details':
                         try:
                             panddaDict[xtal].insert(0,['PANDDA_site_index','PANDDA_site_name','RefinementOutcome'])
-                            button=QtGui.QPushButton()
+#                            button=QtGui.QPushButton()
+                            widget=QtGui.QWidget()
 #                            cell=QtGui.QTableWidgetItem()
                             grid = QtGui.QGridLayout()
                             for y,entry in enumerate(panddaDict[xtal]):
                                 for x,info in enumerate(entry):
                                     print x,str(entry[x])
                                     grid.addWidget(QtGui.QLabel(str(entry[x])),y,x)
-                            button.setLayout(grid)
-                            self.summary_table.setCellWidget(current_row, column, button)
+#                            button.setLayout(grid)
+#                            self.summary_table.setCellWidget(current_row, column, button)
+                            widget.setLayout(grid)
+                            self.summary_table.setCellWidget(current_row, column, widget)
 #                            cell.setLayout(grid)
 #                            self.summary_table.setItem(current_row, column, cell)
                         except KeyError:
