@@ -4200,7 +4200,6 @@ class XChemExplorer(QtGui.QApplication):
                 stage = 0
 
             if stage >= 3:
-                print 'hallooooo',xtal
                 row=self.summary_table.rowCount()
                 if xtal not in self.summary_table_dict:
                     self.summary_table.insertRow(row)
@@ -4220,20 +4219,21 @@ class XChemExplorer(QtGui.QApplication):
                     elif header[0]=='Details':
                         try:
                             panddaDict[xtal].insert(0,['PANDDA_site_index','PANDDA_site_name','RefinementOutcome'])
-                            widget=QtGui.QWidget()
+#                            widget=QtGui.QWidget()
+                            cell=QtGui.QTableWidgetItem()
                             grid = QtGui.QGridLayout()
                             for y,entry in enumerate(panddaDict[xtal]):
                                 for x,info in enumerate(entry):
                                     grid.addWidget(QtGui.QLabel(str(entry[x])),y,x)
-                            widget.setLayout(grid)
-                            self.summary_table.setCellWidget(current_row, column, widget)
+#                            widget.setLayout(grid)
+#                            self.summary_table.setCellWidget(current_row, column, widget)
+                            cell.setLayout(grid)
+                            self.summary_table.setItem(current_row, column, cell)
                         except KeyError:
-                            print 'hallo - done'
-
-#                        cell_text=QtGui.QTableWidgetItem()
-#                        cell_text.setText('*** N/A ***')
-#                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-#                        self.summary_table.setItem(current_row, column, cell_text)
+                            cell_text=QtGui.QTableWidgetItem()
+                            cell_text.setText('*** N/A ***')
+                            cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                            self.summary_table.setItem(current_row, column, cell_text)
                     else:
                         cell_text=QtGui.QTableWidgetItem()
                         cell_text.setText(str( db_dict[ header[1] ]  ))
