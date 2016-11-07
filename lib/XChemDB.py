@@ -147,7 +147,7 @@ class data_source:
             ['DimplePANDDAreject',                          'PANDDA\nreject?',                              'TEXT',                 1],
             ['DimplePANDDApath',                            'PANDDA\npath?',                                'TEXT',                 1],
 
-            ['RefinementResolution',                        'RefinementResolution',                         'TEXT',                 1],
+            ['RefinementResolution',                        'Refinement\nResolution',                       'TEXT',                 1],
             ['RefinementResolutionTL',                      'RefinementResolutionTL',                       'TEXT',                 0],
             ['RefinementRcryst',                            'Refinement\nRcryst',                           'TEXT',                 1],
             ['RefinementRcrystTraficLight',                 'RefinementRcrystTraficLight',                  'TEXT',                 0],
@@ -595,67 +595,67 @@ class data_source:
 
 
 
-    def get_samples_for_coot(self,RefinementOutcome,pandda_site):
-        sample_list_for_coot=[]
-        connect=sqlite3.connect(self.data_source_file)
-        cursor = connect.cursor()
-
-        if RefinementOutcome=='0 - All Datasets':
-            outcome = " not null "
-        else:
-            outcome = " '%s' " %RefinementOutcome
-
-        if int(pandda_site) > 0:
-            sqlite = (
-                "select"
-                " mainTable.CrystalName,"
-                " mainTable.CompoundCode,"
-                " mainTable.RefinementCIF,"
-                " mainTable.RefinementMTZfree,"
-                " mainTable.RefinementPathToRefinementFolder,"
-                " panddaTable.RefinementOutcome, "
-                " panddaTable.PANDDA_site_event_map,"
-                " panddaTable.PANDDA_site_confidence,"
-                " panddaTable.PANDDA_site_x,"
-                " panddaTable.PANDDA_site_y,"
-                " panddaTable.PANDDA_site_z,"
-                " panddaTable.PANDDA_site_initial_model,"
-                " panddaTable.PANDDA_site_initial_mtz,"
-                " panddaTable.PANDDA_site_spider_plot, "
-                " panddaTable.PANDDA_site_index "
-                "from mainTable inner join panddaTable on mainTable.CrystalName = panddaTable.CrystalName "
-                "where panddaTable.PANDDA_site_index is '%s'" %pandda_site+
-                " and panddaTable.PANDDA_site_ligand_placed is 'True'"
-                " and panddaTable.RefinementOutcome is %s;" %outcome
-                )
-
-        else:
-            sqlite = (
-                "select"
-                " CrystalName,"
-                " CompoundCode,"
-                " RefinementCIF,"
-                " RefinementMTZfree,"
-                " RefinementPathToRefinementFolder,"
-                " RefinementOutcome "
-                "from mainTable "
-                "where RefinementOutcome is %s;" %outcome
-                )
-
-        cursor.execute(sqlite)
-
-        tmp = cursor.fetchall()
-        for item in tmp:
-            tmpx=[]
-            for i in list(item):
-                if i==None:
-                    tmpx.append('None')
-                else:
-                    tmpx.append(i)
-            line=[x.encode('UTF8') for x in tmpx]
-            sample_list_for_coot.append(line)
-
-        return sample_list_for_coot
+#    def get_samples_for_coot(self,RefinementOutcome,pandda_site):
+#        sample_list_for_coot=[]
+#        connect=sqlite3.connect(self.data_source_file)
+#        cursor = connect.cursor()
+#
+#        if RefinementOutcome=='0 - All Datasets':
+#            outcome = " not null "
+#        else:
+#            outcome = " '%s' " %RefinementOutcome
+#
+#        if int(pandda_site) > 0:
+#            sqlite = (
+#                "select"
+#                " mainTable.CrystalName,"
+#                " mainTable.CompoundCode,"
+#                " mainTable.RefinementCIF,"
+#                " mainTable.RefinementMTZfree,"
+#                " mainTable.RefinementPathToRefinementFolder,"
+#                " panddaTable.RefinementOutcome, "
+#                " panddaTable.PANDDA_site_event_map,"
+#                " panddaTable.PANDDA_site_confidence,"
+#                " panddaTable.PANDDA_site_x,"
+#                " panddaTable.PANDDA_site_y,"
+#                " panddaTable.PANDDA_site_z,"
+#                " panddaTable.PANDDA_site_initial_model,"
+#                " panddaTable.PANDDA_site_initial_mtz,"
+#                " panddaTable.PANDDA_site_spider_plot, "
+#                " panddaTable.PANDDA_site_index "
+#                "from mainTable inner join panddaTable on mainTable.CrystalName = panddaTable.CrystalName "
+#                "where panddaTable.PANDDA_site_index is '%s'" %pandda_site+
+#                " and panddaTable.PANDDA_site_ligand_placed is 'True'"
+#                " and panddaTable.RefinementOutcome is %s;" %outcome
+#                )
+#
+#        else:
+#            sqlite = (
+#                "select"
+#                " CrystalName,"
+#                " CompoundCode,"
+#                " RefinementCIF,"
+#                " RefinementMTZfree,"
+#                " RefinementPathToRefinementFolder,"
+#                " RefinementOutcome "
+#                "from mainTable "
+#                "where RefinementOutcome is %s;" %outcome
+#                )
+#
+#        cursor.execute(sqlite)
+#
+#        tmp = cursor.fetchall()
+#        for item in tmp:
+#            tmpx=[]
+#            for i in list(item):
+#                if i==None:
+#                    tmpx.append('None')
+#                else:
+#                    tmpx.append(i)
+#            line=[x.encode('UTF8') for x in tmpx]
+#            sample_list_for_coot.append(line)
+#
+#        return sample_list_for_coot
 
     def get_pandda_info_for_coot(self,xtalID,pandda_site):
         pandda_info_for_coot=[]
@@ -798,6 +798,9 @@ class data_source:
                 out_list.append([item,item])
                 continue
             if item.startswith('Reference File'):
+                out_list.append([item,item])
+                continue
+            if item.startswith('Details'):
                 out_list.append([item,item])
                 continue
             for entry in self.column_list:

@@ -900,6 +900,7 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
 #                        self.copy_and_link_selected_dimple_files(dimple_destination,sample,path_to_dimple_mtzfile,path_to_dimple_pdbfile)
 
                     # update data source if this is the selected file
+                    # and make respective links
                     if entry[7]==selected_processing_result:
                         db_dict=entry[6]
                         db_dict['DataCollectionOutcome']=self.dataset_outcome_dict[sample]

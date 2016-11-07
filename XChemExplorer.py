@@ -33,7 +33,7 @@ class XChemExplorer(QtGui.QApplication):
         QtGui.QApplication.__init__(self,args)
 
         # general settings
-        self.allowed_unitcell_difference_percent=5
+        self.allowed_unitcell_difference_percent=12
         self.acceptable_low_resolution_limit_for_data=3.5
         self.filename_root='${samplename}'
         self.data_source_set=False
@@ -170,6 +170,7 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_column_three_dict={}
         self.data_collection_summary_dict={}
         self.diffraction_data_table_dict={}
+        self.summary_table_dict={}
         self.main_data_collection_table_exists=False
         self.timer_to_check_for_new_data_collection = QtCore.QTimer()
 #        self.timer_to_check_for_new_data_collection.timeout.connect(self.check_for_new_autoprocessing_or_rescore(False))
@@ -888,12 +889,12 @@ class XChemExplorer(QtGui.QApplication):
         self.summary_column_name=[ 'Sample ID',
                                     'Compound ID',
 #                                    'Compound\nImage',
-                                    'DataCollection\nOutcome',
-                                    'DataProcessing\nSpaceGroup',
-                                    'DataProcessing\nResolutionHigh',
-                                    'Refinement\nOutcome',
+                                    'Refinement\nSpace Group',
+                                    'Refinement\nResolution',
                                     'Refinement\nRcryst',
-                                    'Refinement\nRfree' ]
+                                    'Refinement\nRfree',
+                                    'Refinement\nOutcome',
+                                    'Details' ]
         self.summary_table=QtGui.QTableWidget()
         self.summary_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.summary_table.setSortingEnabled(True)
@@ -2671,6 +2672,9 @@ class XChemExplorer(QtGui.QApplication):
         self.update_log.insert('updating PANDDA table')
         self.update_status_bar('updating PANDDA table')
         self.populate_pandda_analyse_input_table()
+        self.update_log.insert('updating REFINEMENT table')
+        self.update_status_bar('updating REFINEMENT table')
+        self.populate_and_update_refinement_table()
         self.update_status_bar('idle')
         self.update_summary_plot()
 
@@ -4176,6 +4180,61 @@ class XChemExplorer(QtGui.QApplication):
                         self.pandda_analyse_data_table.setItem(current_row, column, cell_text)
             if new_xtal:
                 self.pandda_analyse_input_table_dict[xtal]=[]
+
+    def populate_and_update_refinement_table(self):
+
+        panddaList = self.db.execute_statement("select CrystalName,PANDDA_site_index,PANDDA_site_name,RefinementOutcome from panddaTable where CrystalName is not '';")
+        panddaDict={}
+        for item in panddaList:
+            if str(item[0]) not in panddaDict:
+                panddaDict[str(item[0])]=[]
+            panddaDict[str(item[0])].append([str(item[1]),str(item[2]),str(item[3])])
+
+        print 'hallo'
+        for tmp in sorted(panddaDict):
+            for tmpx in sorted(tmp):
+                print tmpx
+        print 'hallo - done'
+
+        column_name=self.db.translate_xce_column_list_to_sqlite(self.summary_column_name)
+        for xtal in sorted(self.xtal_db_dict):
+            new_xtal=False
+            db_dict=self.xtal_db_dict[xtal]
+            try:
+                stage = int(str(db_dict['RefinementOutcome']).split()[0])
+            except ValueError:
+                stage = 0
+
+            if stage >= 3:
+                row=self.summary_table.rowCount()
+                if xtal not in self.summary_table_dict:
+                    self.summary_table.insertRow(row)
+                    current_row=row
+                    new_xtal=True
+                else:
+                    for table_row in range(row):
+                        if self.summary_table.item(table_row,0).text() == xtal:
+                            current_row=table_row
+                            break
+                for column,header in enumerate(column_name):
+                    if header[0]=='Sample ID':
+                        cell_text=QtGui.QTableWidgetItem()
+                        cell_text.setText(str(xtal))
+                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                        self.summary_table.setItem(current_row, column, cell_text)
+                    if header[0]=='Details':
+                        cell_text=QtGui.QTableWidgetItem()
+                        cell_text.setText('*** N/A ***')
+                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                        self.summary_table.setItem(current_row, column, cell_text)
+                    else:
+                        cell_text=QtGui.QTableWidgetItem()
+                        cell_text.setText(str( db_dict[ header[1] ]  ))
+                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                        self.summary_table.setItem(current_row, column, cell_text)
+            if new_xtal:
+                self.summary_table_dict[xtal]=[]
+
 
 
 

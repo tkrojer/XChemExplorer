@@ -46,12 +46,6 @@ class GUI(object):
         # checking for external software packages
         self.external_software=XChemUtils.external_software(self.xce_logfile).check()
 
-#        self.selection_criteria =   {   'Show All Datasets':                'RefinementPDB_latest is not null',
-#                                        'Show Analysis Pending Only':       "RefinementOutcome='Analysis Pending'",
-#                                        'Show Datasets Under Refinement':   "RefinementOutcome='Refinement Ongoing'",
-#                                        'Show Confirmed Ligands':           "RefinementOutcome='Ligand Confirmed'",
-#                                        'SHow Final Structures':            "RefinementOutcome='Structure Finished'"   }
-
         self.selection_criteria = [     '0 - All Datasets',
                                         '1 - Analysis Pending',
                                         '2 - PANDDA model',
@@ -615,43 +609,6 @@ class GUI(object):
         self.RefreshData()
 
 
-# this works, but will try something else
-#    def ChooseXtal(self, widget):
-#        self.xtalID = str(widget.get_active_text())
-#        for n,item in enumerate(self.Todo):
-#            if str(item[0]) == self.xtalID:
-#                self.index = n
-#        self.xtalID=str(self.Todo[self.index][0])
-#        self.db_dict_mainTable={}
-#        self.db_dict_panddaTable={}
-#        looking_at_pandda_models=False
-#        if str(self.Todo[self.index][0]) != None:
-#            self.compoundID=str(self.Todo[self.index][1])
-#            self.refinement_folder=str(self.Todo[self.index][4])
-#            self.refinement_outcome=str(self.Todo[self.index][5])
-#            current_stage=0
-#            for i,entry in enumerate(self.experiment_stage):
-#                if entry[1]==self.refinement_outcome:
-#                    current_stage=i
-#                    break
-#            for i,button in enumerate(self.experiment_stage_button_list):
-#                if i==current_stage:
-#                    button.set_active(True)
-#                    break
-#            if len(self.Todo[self.index]) > 6:
-#                self.ligand_confidence_of_sample=str(self.Todo[self.index][7])
-#                self.event_map=str(self.Todo[self.index][6])
-#                coot.set_rotation_centre(float(self.Todo[self.index][8]),float(self.Todo[self.index][9]),float(self.Todo[self.index][10]))
-#                looking_at_pandda_models=True
-#        if not looking_at_pandda_models:
-#            self.compoundID=''
-#            self.ligand_confidence_of_sample=''
-#            self.refinement_folder=''
-#            self.event_map=''
-#        self.RefreshData()
-
-
-
     def update_data_source(self,widget,data=None):              # update and move to next xtal
 #        outcome_dict={'RefinementOutcome': data}
 #        self.db.update_data_source(self.xtalID,outcome_dict)
@@ -693,6 +650,11 @@ class GUI(object):
                 print '==> XCE: updating quality indicators in data source for '+self.xtalID
                 XChemUtils.parse().update_datasource_with_PDBheader(self.xtalID,self.data_source,os.path.join(self.project_directory,self.xtalID,self.pdb_style))
                 XChemUtils.parse().update_datasource_with_phenix_validation_summary(self.xtalID,self.data_source,'')   # '' because file does not exist
+            elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.pdb')):
+                print '==> XCE: updating quality indicators in data source for '+self.xtalID
+                XChemUtils.parse().update_datasource_with_PDBheader(self.xtalID,self.data_source,os.path.join(self.project_directory,self.xtalID,'dimple.pdb'))
+                XChemUtils.parse().update_datasource_with_phenix_validation_summary(self.xtalID,self.data_source,'')   # '' because file does not exist
+
         # all this information is now updated in the datasource after each refinement cycle
         self.QualityIndicators=self.db.get_db_dict_for_sample(self.xtalID)
         if int(self.selected_site[0]) > 0:
@@ -773,6 +735,7 @@ class GUI(object):
             os.chdir(os.path.join(self.project_directory,self.xtalID))
             imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style),0)
         elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.pdb')):
+            os.chdir(os.path.join(self.project_directory,self.xtalID))
             imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,'dimple.pdb'),0)
         else:
             self.go_to_next_xtal()
