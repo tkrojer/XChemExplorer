@@ -4232,7 +4232,7 @@ class XChemExplorer(QtGui.QApplication):
                                     vbox=QtGui.QVBoxLayout()
                                     vbox.addWidget(QtGui.QLabel(str(entry[x])))
                                     frame.setLayout(vbox)
-                                    frame.setSizePolicy(QSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed))
+                                    frame.setSizePolicy(QtGui.QSizePolicy(QSizePolicy.Expanding,QtGui.QSizePolicy.Fixed))
                                     grid.addWidget(frame,y,x)
 #                            button.setLayout(grid)
 #                            self.summary_table.setCellWidget(current_row, column, button)
