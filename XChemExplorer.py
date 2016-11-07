@@ -4224,8 +4224,9 @@ class XChemExplorer(QtGui.QApplication):
                             grid = QtGui.QGridLayout()
                             for y,entry in enumerate(panddaDict[xtal]):
                                 for x,info in enumerate(entry):
+                                    print x,str(entry[x]
                                     grid.addWidget(QtGui.QLabel(str(entry[x])),y,x)
-                            button.addLayout(grid)
+                            button.setLayout(grid)
                             self.summary_table.setCellWidget(current_row, column, button)
 #                            cell.setLayout(grid)
 #                            self.summary_table.setItem(current_row, column, cell)
