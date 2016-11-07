@@ -800,7 +800,7 @@ class data_source:
             if item.startswith('Reference File'):
                 out_list.append([item,item])
                 continue
-            if item.startswith('Details'):
+            if item.startswith('PanDDA site details'):
                 out_list.append([item,item])
                 continue
             for entry in self.column_list:
