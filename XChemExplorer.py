@@ -4192,8 +4192,9 @@ class XChemExplorer(QtGui.QApplication):
 
         print 'hallo'
         for tmp in sorted(panddaDict):
-            for tmpx in sorted(tmp):
-                print tmpx
+            print tmp
+#            for tmpx in sorted(tmp):
+#                print tmpx
         print 'hallo - done'
 
         column_name=self.db.translate_xce_column_list_to_sqlite(self.summary_column_name)
