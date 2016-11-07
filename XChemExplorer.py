@@ -4207,6 +4207,7 @@ class XChemExplorer(QtGui.QApplication):
                 stage = 0
 
             if stage >= 3:
+                print 'hallooooo',xtal
                 row=self.summary_table.rowCount()
                 if xtal not in self.summary_table_dict:
                     self.summary_table.insertRow(row)
