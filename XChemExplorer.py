@@ -893,7 +893,7 @@ class XChemExplorer(QtGui.QApplication):
                                     'Refinement\nRcryst',
                                     'Refinement\nRfree',
                                     'Refinement\nOutcome',
-                                    'Details' ]
+                                    'PanDDA site details' ]
         self.summary_table=QtGui.QTableWidget()
         self.summary_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.summary_table.setSortingEnabled(True)
@@ -4219,10 +4219,8 @@ class XChemExplorer(QtGui.QApplication):
                     elif header[0]=='Details':
                         try:
                             panddaDict[xtal].insert(0,['PANDDA_site_index','PANDDA_site_name','RefinementOutcome'])
-#                            button=QtGui.QPushButton()
-#                            widget=QtGui.QWidget()
                             outerFrame=QtGui.QFrame()
-#                            cell=QtGui.QTableWidgetItem()
+                            outerFrame.setFrameShape(QtGui.QFrame.StyledPanel)
                             grid = QtGui.QGridLayout()
                             for y,entry in enumerate(panddaDict[xtal]):
                                 for x,info in enumerate(entry):
@@ -4232,15 +4230,8 @@ class XChemExplorer(QtGui.QApplication):
                                     vbox.addWidget(QtGui.QLabel(str(entry[x])))
                                     frame.setLayout(vbox)
                                     grid.addWidget(frame,y,x)
-                                    print 'ifefie'
-#                            button.setLayout(grid)
-#                            self.summary_table.setCellWidget(current_row, column, button)
-#                            widget.setLayout(grid)
                             outerFrame.setLayout(grid)
-#                            self.summary_table.setCellWidget(current_row, column, widget)
                             self.summary_table.setCellWidget(current_row, column, outerFrame)
-#                            cell.setLayout(grid)
-#                            self.summary_table.setItem(current_row, column, cell)
                         except KeyError:
                             cell_text=QtGui.QTableWidgetItem()
                             cell_text.setText('*** N/A ***')
