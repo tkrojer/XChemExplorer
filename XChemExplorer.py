@@ -4230,10 +4230,10 @@ class XChemExplorer(QtGui.QApplication):
                         except KeyError:
                             print 'hallo - done'
 
-                        cell_text=QtGui.QTableWidgetItem()
-                        cell_text.setText('*** N/A ***')
-                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                        self.summary_table.setItem(current_row, column, cell_text)
+#                        cell_text=QtGui.QTableWidgetItem()
+#                        cell_text.setText('*** N/A ***')
+#                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+#                        self.summary_table.setItem(current_row, column, cell_text)
                     else:
                         cell_text=QtGui.QTableWidgetItem()
                         cell_text.setText(str( db_dict[ header[1] ]  ))
