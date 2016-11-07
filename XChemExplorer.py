@@ -4223,7 +4223,7 @@ class XChemExplorer(QtGui.QApplication):
                             grid = QtGui.QGridLayout()
                             for y,entry in enumerate(panddaDict[xtal]):
                                 for x,info in enumerate(entry):
-                                    grid.addWidget(QtGui.QLabel(entry),y,x)
+                                    grid.addWidget(QtGui.QLabel(str(entry[x])),y,x)
                             self.summary_table.setCellWidget(current_row, column, grid)
                         except KeyError:
                             print 'hallo - done'
