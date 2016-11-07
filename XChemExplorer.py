@@ -4219,8 +4219,11 @@ class XChemExplorer(QtGui.QApplication):
                     elif header[0]=='Details':
                         try:
                             panddaDict[xtal].insert(0,['PANDDA_site_index','PANDDA_site_name','RefinementOutcome'])
+#                            button=QtGui.QPushButton()
+#                            widget=QtGui.QWidget()
                             outerFrame=QtGui.QFrame()
-                            outerFrame.setFrameShape(QtGui.QFrame.StyledPanel)
+#                            outerFrame.setFrameShape(QtGui.QFrame.StyledPanel)
+#                            cell=QtGui.QTableWidgetItem()
                             grid = QtGui.QGridLayout()
                             for y,entry in enumerate(panddaDict[xtal]):
                                 for x,info in enumerate(entry):
@@ -4230,8 +4233,15 @@ class XChemExplorer(QtGui.QApplication):
                                     vbox.addWidget(QtGui.QLabel(str(entry[x])))
                                     frame.setLayout(vbox)
                                     grid.addWidget(frame,y,x)
+                                    print 'ifefie'
+#                            button.setLayout(grid)
+#                            self.summary_table.setCellWidget(current_row, column, button)
+#                            widget.setLayout(grid)
                             outerFrame.setLayout(grid)
+#                            self.summary_table.setCellWidget(current_row, column, widget)
                             self.summary_table.setCellWidget(current_row, column, outerFrame)
+#                            cell.setLayout(grid)
+#                            self.summary_table.setItem(current_row, column, cell)
                         except KeyError:
                             cell_text=QtGui.QTableWidgetItem()
                             cell_text.setText('*** N/A ***')
