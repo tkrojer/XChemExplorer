@@ -4190,13 +4190,6 @@ class XChemExplorer(QtGui.QApplication):
                 panddaDict[str(item[0])]=[]
             panddaDict[str(item[0])].append([str(item[1]),str(item[2]),str(item[3])])
 
-        print 'hallo'
-        for tmp in sorted(panddaDict):
-            print tmp
-            for tmpx in sorted(panddaDict[tmp]):
-                print tmpx
-        print 'hallo - done'
-
         column_name=self.db.translate_xce_column_list_to_sqlite(self.summary_column_name)
         for xtal in sorted(self.xtal_db_dict):
             new_xtal=False
@@ -4225,6 +4218,16 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.summary_table.setItem(current_row, column, cell_text)
                     elif header[0]=='Details':
+                        try:
+                            panddaDict[xtal].insert(0,['PANDDA_site_index','PANDDA_site_name','RefinementOutcome'])
+                            grid = QtGui.QGridLayout()
+                            for y,entry in enumerate(panddaDict[xtal]):
+                                for x,info in enumerate(entry):
+                                    grid.addWidget(QtGui.QLabel(entry),y,x)
+                            self.summary_table.setCellWidget(current_row, column, grid)
+                        except KeyError:
+                            print 'hallo - done'
+
                         cell_text=QtGui.QTableWidgetItem()
                         cell_text.setText('*** N/A ***')
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
