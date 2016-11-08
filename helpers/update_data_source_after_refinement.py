@@ -1,4 +1,4 @@
-# last edited: 10/08/2016, 16:00
+# last edited: 08/11/2016, 14:00
 
 import os,sys
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
@@ -102,7 +102,7 @@ def parse_ligand_validation(refinement_directory,xtal):
                         distance = misc().calculate_distance_between_coordinates(residue_xyz[0], residue_xyz[1],residue_xyz[2],
                                                                                  event_x, event_y,event_z)
                         print 'distance',distance
-                        # if coordinate of ligand and event are closer than 5A, then we assume they belong together
+                        # if coordinate of ligand and event are closer than 7A, then we assume they belong together
                         if distance < 7:
                             db_pandda_dict['PANDDA_site_ligand_id'] = residue
                             db_pandda_dict['PANDDA_site_occupancy'] = line['Occupancy']
