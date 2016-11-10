@@ -1,4 +1,4 @@
-# last edited: 27/10/2016, 17:00
+# last edited: 10/11/2016, 17:00
 
 import sys
 import os
@@ -751,6 +751,26 @@ class parse:
                     
         return PDBinfo
 
+
+    def dict_for_datasource_update(self,pdbfile):
+        db_dict={}
+        db_dict['RefinementPDB_latest']=os.path.realpath(pdbfile)
+        pdb=self.PDBheader(pdbfile)
+        db_dict['RefinementRcryst'] =               pdb['Rcryst']
+        db_dict['RefinementRcrystTraficLight'] =    pdb['RcrystTL']
+        db_dict['RefinementRfree']=                 pdb['Rfree']
+        db_dict['RefinementRfreeTraficLight'] =     pdb['RfreeTL']
+        db_dict['RefinementRmsdBonds']  =           pdb['rmsdBonds']
+        db_dict['RefinementRmsdBondsTL'] =          pdb['rmsdBondsTL']
+        db_dict['RefinementRmsdAngles'] =           pdb['rmsdAngles']
+        db_dict['RefinementRmsdAnglesTL'] =         pdb['rmsdAnglesTL']
+        db_dict['RefinementSpaceGroup'] =           pdb['SpaceGroup']
+        db_dict['RefinementResolution'] =           pdb['ResolutionHigh']
+        db_dict['RefinementResolutionTL'] =         pdb['ResolutionColor']
+        return db_dict
+
+
+
     def update_datasource_with_PDBheader(self,xtal,datasource,pdbfile):
         db_dict={}
         db_dict['RefinementPDB_latest']=os.path.realpath(pdbfile)
@@ -1341,6 +1361,7 @@ class pdbtools(object):
         self.AAdict = {'ALA':'A','ARG':'R','ASN':'N','ASP':'D','CYS':'C','GLU':'E','GLN':'Q',
                        'GLY':'G','HIS':'H','ILE':'I','LEU':'L','LYS':'K','MET':'M','PHE':'F',
                        'PRO':'P','SER':'S','THR':'T','TRP':'W','TYR':'Y','VAL':'V'}
+        self.xce_ligands = ['LIG','DRG','FRS']
 
 
     def GetSequence(self):
@@ -1462,6 +1483,21 @@ class pdbtools(object):
             f=open('ligand_%s_%s_%s_%s.pdb' %(str(resname),str(chainID),str(resseq),str(altLoc)),'w')
             f.write(pdb)
             f.close()
+
+    def find_xce_ligand_details(self):
+        Ligands = []
+        for line in open(self.pdb):
+            if line.startswith('ATOM') or line.startswith('HETATM'):
+                resname=str(line[17:20]).replace(' ','')
+                if resname in self.xce_ligands:
+                    chainID=str(line[21:23]).replace(' ','')
+                    resseq=str(line[23:26]).replace(' ','')
+                    altLoc=str(line[16:17]).replace(' ','')
+                    if [resname,chainID,resseq,altLoc] not in Ligands:
+                        Ligands.append([resname,chainID,resseq,altLoc])
+        return Ligands
+
+
 
 
     def get_xyz_coordinated_of_residue(self,chain,number):

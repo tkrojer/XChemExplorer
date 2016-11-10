@@ -1,4 +1,4 @@
-# last edited: 07/11/2016, 15:00
+# last edited: 10/11/2016, 17:00
 
 import os, sys, glob
 from datetime import datetime
@@ -232,12 +232,14 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         for xtal in self.xtal_list:
             self.Logfile.insert('directory name: '+xtal+' = sampleID in database')
             os.chdir(os.path.join(self.initial_model_directory,xtal))
-            if xtal not in all_samples_in_datasource:
+            if xtal not in self.all_samples_in_datasource:
                 self.Logfile.insert('sampleID not found in database: inserting '+xtal)
                 self.db.execute_statement("insert into mainTable (CrystalName) values ('%s');" %xtal)
                 self.all_samples_in_datasource.append(xtal)
 
             db_dict=self.db.get_db_dict_for_sample(xtal)
+
+            db_dict['ProjectDirectory'] = self.initial_model_directory
 
             db_dict=self.sync_data_processing(xtal,db_dict)
 
@@ -258,6 +260,12 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         self.Logfile.insert('datasource update finished')
 
+    def change_absolute_to_relative_links(self,filename):
+        if os.path.islink(filename):
+            if os.readlink(filename).startswith('/'):
+                target=os.path.relpath(os.path.realpath(filename))
+                os.unlink(filename)
+                os.symlink(target,filename)
 
 
     def sync_data_processing(self,xtal,db_dict):
@@ -267,12 +275,14 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         found_logfile=False
         if os.path.isfile(xtal+'.log'):
             found_logfile=True
-            db_dict['DataProcessingPathToLogfile']=os.path.join(directory,xtal+'.log')
+            db_dict['DataProcessingPathToLogfile']=os.path.realpath(xtal+'.log')
             db_dict['DataProcessingLOGfileName']=xtal+'.log'
             if db_dict['DataCollectionOutcome']=='None' or db_dict['DataCollectionOutcome']=='':
                 db_dict['DataCollectionOutcome']='success'
-            aimless_results=parse().read_aimless_logfile(os.path.join(self.initial_model_directory,xtal,xtal+'log'))
+            aimless_results=parse().read_aimless_logfile(xtal+'.log')
             db_dict.update(aimless_results)
+            print 'here'
+            self.change_absolute_to_relative_links(xtal+'.log')
         else:
             db_dict['DataProcessingPathToLogfile']=''
             db_dict['DataProcessingLOGfileName']=''
@@ -281,7 +291,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         # MTZ file
 
         if os.path.isfile(xtal+'.mtz'):
-            db_dict['DataProcessingPathToMTZfile']=os.path.join(directory,xtal+'.mtz')
+            db_dict['DataProcessingPathToMTZfile']=os.path.realpath(xtal+'.mtz')
             db_dict['DataProcessingMTZfileName']=xtal+'.mtz'
             if not found_logfile:
                 mtz_info=mtztools(xtal+'.mtz').get_information_for_datasource()
@@ -295,7 +305,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         # MTZ free file
 
         if os.path.isfile(xtal+'.free.mtz'):
-            db_dict['RefinementMTZfree']=os.path.join(directory,xtal+'.free.mtz')
+            db_dict['RefinementMTZfree']=os.path.realpath(xtal+'.free.mtz')
         else:
             db_dict['RefinementMTZfree']=''
             os.system('/bin/rm %s.free.mtz 2> /dev/null' %xtal)
@@ -315,7 +325,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         # DIMPLE pdb
 
         if os.path.isfile('dimple.pdb'):
-            db_dict['DimplePathToPDB']=os.path.realpath(os.path.join(self.initial_model_directory,'dimple.pdb'))
+            db_dict['DimplePathToPDB']=os.path.realpath('dimple.pdb')
             pdb_info=parse().PDBheader('dimple.pdb')
             db_dict['DimpleRcryst']=pdb_info['Rcryst']
             db_dict['DimpleRfree']=pdb_info['Rfree']
@@ -330,7 +340,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         # DIMPLE mtz
 
         if os.path.isfile('dimple.mtz'):
-            db_dict['DimplePathToMTZ']=os.path.realpath(os.path.join(self.initial_model_directory,'dimple.mtz'))
+            db_dict['DimplePathToMTZ']=os.path.realpath('dimple.mtz')
             dimple_mtz=db_dict['DimplePathToMTZ']
             dimple_path=dimple_mtz[:dimple_mtz.rfind('/')]
         else:
@@ -372,7 +382,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
             os.system('/bin/rm %s.png 2> /dev/null' %compoundID)
 
         if os.path.isfile(compoundID+'.cif'):
-            db_dict['RefinementCIF']=os.path.join(directory,compoundID+'.cif')
+            db_dict['RefinementCIF']=os.path.realpath(compoundID+'.cif')
         else:
             os.system('/bin/rm %s.cif 2> /dev/null' %compoundID)
             db_dict['RefinementCIF']=''
@@ -387,8 +397,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         #
 
         if os.path.isfile('refine.pdb'):
-            db_dict['RefinementPDB_latest']=os.path.realpath(os.path.join(self.initial_model_directory,'refine.pdb'))
-            pdb_info=parse().PDBheader('refine.pdb')
+            db_dict['RefinementPDB_latest']=os.path.realpath('refine.pdb')
+            pdb_info=parse().dict_for_datasource_update('refine.pdb')
             db_dict.update(pdb_info)
             if db_dict['RefinementOutcome']=='None' or db_dict['RefinementOutcome']=='':
                 db_dict['RefinementOutcome']='3 - In Refinement'

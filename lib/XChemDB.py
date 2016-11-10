@@ -1,4 +1,4 @@
-# last edited: 07/11/2016, 15:00
+# last edited: 10/11/2016, 17:00
 
 import sqlite3
 import os,sys
@@ -59,6 +59,8 @@ class data_source:
             ['DataCollectionVisit',                  'Visit',                                   'TEXT',                 1],
 
             # from XChemExplorer
+
+            ['ProjectDirectory',                     'ProjectDirectory',                        'TEXT',                 0],
 
             ['CrystalTag',                           'Tag',                                     'TEXT',                 0],
             ['CrystalFormName',                      'Crystal Form\nName',                      'TEXT',                 0],
@@ -204,6 +206,13 @@ class data_source:
             ['PANDDA_site_y',                               'PANDDA_site_y',                            'TEXT'],
             ['PANDDA_site_z',                               'PANDDA_site_z',                            'TEXT'],
             ['PANDDA_site_ligand_id',                       'PANDDA_site_ligand_id',                    'TEXT'],
+
+            ['PANDDA_site_ligand_resname',                  'PANDDA_site_ligand_resname',               'TEXT'],
+            ['PANDDA_site_ligand_chain',                    'PANDDA_site_ligand_chain',                 'TEXT'],
+            ['PANDDA_site_ligand_sequence_number',          'PANDDA_site_ligand_sequence_number',       'TEXT'],
+            ['PANDDA_site_ligand_altLoc',                   'PANDDA_site_ligand_altLoc',                'TEXT'],
+
+
             ['PANDDA_site_event_map',                       'PANDDA_site_event_map',                    'TEXT'],
             ['PANDDA_site_event_map_mtz',                   'PANDDA_site_event_map_mtz',                'TEXT'],
             ['PANDDA_site_initial_model',                   'PANDDA_site_initial_model',                'TEXT'],
@@ -396,6 +405,7 @@ class data_source:
             if not str(value).replace(' ','')=='':  # ignore empty fields
                 update_string+=str(key)+'='+"'"+str(value)+"'"+','
         if update_string != '':
+#            print "UPDATE mainTable SET "+update_string[:-1]+" WHERE CrystalName="+"'"+sampleID+"'"
             cursor.execute("UPDATE mainTable SET "+update_string[:-1]+" WHERE CrystalName="+"'"+sampleID+"'")
             connect.commit()
 

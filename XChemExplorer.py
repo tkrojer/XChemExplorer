@@ -1,4 +1,4 @@
-# last edited: 07/11/2016, 15:00
+# last edited: 10/11/2016, 17:00
 
 import os, sys, glob
 from datetime import datetime
@@ -423,7 +423,8 @@ class XChemExplorer(QtGui.QApplication):
         self.panddas_file_tasks = [ 'pandda.analyse',
                                     'pandda.inspect',
                                     'run pandda.inspect at home',
-                                    'Export PANDDA models',
+                                    'Export NEW PANDDA models',
+                                    'Export ALL PANDDA models',
                                     'Show HTML summary',
                                     'Update datasource with results from pandda.inspect',
                                     'cluster datasets'   ]
@@ -2198,7 +2199,13 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def datasource_menu_update_datasource(self):
-        self.work_thread=XChemThread.update_datasource_from_file_system(self.initial_model_directory,os.path.join(self.database_directory,self.data_source_file),self.panddas_directory,self.xce_logfile)
+#        self.work_thread=XChemThread.update_datasource_from_file_system(self.initial_model_directory,os.path.join(self.database_directory,self.data_source_file),self.panddas_directory,self.xce_logfile)
+#        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+#        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+#        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#        self.connect(self.work_thread, QtCore.SIGNAL("create_initial_model_table"),self.create_initial_model_table)
+#        self.work_thread.start()
+        self.work_thread=XChemThread.synchronise_db_and_filesystem(self.initial_model_directory,os.path.join(self.database_directory,self.data_source_file),self.panddas_directory,self.xce_logfile,'project_directory')
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
@@ -2918,9 +2925,15 @@ class XChemExplorer(QtGui.QApplication):
             self.status_bar.showMessage('Please check terminal output for more information')
             XChemToolTips.run_pandda_inspect_at_home(self.panddas_directory)
 
-        elif instruction=='Export PANDDA models':
+        elif instruction=='Export NEW PANDDA models':
             update_datasource_only=False
-            self.run_pandda_export(update_datasource_only)
+            which_models='new'
+            self.run_pandda_export(update_datasource_only,which_models)
+
+        elif instruction=='Export ALL PANDDA models':
+            update_datasource_only=False
+            which_models='all'
+            self.run_pandda_export(update_datasource_only,which_models)
 
         elif instruction=='cluster datasets':
             self.cluster_datasets_for_pandda()
@@ -3106,15 +3119,34 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
-    def run_pandda_export(self,update_datasource_only):
+    def run_pandda_export(self,update_datasource_only,which_models):
         self.settings['panddas_directory']=str(self.pandda_output_data_dir_entry.text())
         if update_datasource_only:
             self.update_log.insert('updating data source with results from pandda.inspect')
         else:
             self.update_log.insert('exporting PANDDA models, updating data source and launching inital refinement for new models')
-        self.work_thread=XChemPANDDA.run_pandda_export(self.panddas_directory,os.path.join(self.database_directory,self.data_source_file),self.initial_model_directory,self.xce_logfile,update_datasource_only)
-        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-        self.work_thread.start()
+
+        start_thread=False
+        if which_models=='all':
+            self.update_log.insert('exporting ALL models! *** WARNING *** This may overwrite previous refinements!!!')
+            msgBox = QtGui.QMessageBox()
+            msgBox.setText("*** WARNING ***\nThis will overwrite all your manual selections!\nDo you want to continue?")
+            msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.YesRole)
+            msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.RejectRole)
+            reply = msgBox.exec_();
+            if reply == 0:
+                self.update_log.insert('OK, will export ALL models!')
+                start_thread=True
+            else:
+                start_thread=False
+        else:
+            self.update_log.insert('exporting new models only')
+            start_thread=True
+
+        if start_thread:
+            self.work_thread=XChemPANDDA.run_pandda_export(self.panddas_directory,os.path.join(self.database_directory,self.data_source_file),self.initial_model_directory,self.xce_logfile,update_datasource_only,which_models)
+            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.work_thread.start()
 
 
     def show_pandda_html_summary(self):

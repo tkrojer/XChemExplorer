@@ -1,4 +1,4 @@
-# last edited: 27/10/2016, 17:00
+# last edited: 10/11/2016, 17:00
 
 import os, sys, glob
 from datetime import datetime
@@ -12,7 +12,7 @@ import csv
 
 class run_pandda_export(QtCore.QThread):
 
-    def __init__(self,panddas_directory,datasource,initial_model_directory,xce_logfile,update_datasource_only):
+    def __init__(self,panddas_directory,datasource,initial_model_directory,xce_logfile,update_datasource_only,which_models):
         QtCore.QThread.__init__(self)
         self.panddas_directory=panddas_directory
         self.datasource=datasource
@@ -24,6 +24,8 @@ class run_pandda_export(QtCore.QThread):
         self.xce_logfile=xce_logfile
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.update_datasource_only=update_datasource_only
+        self.which_models=which_models
+        self.already_exported_models=[]
 
         self.RefmacParams={ 'HKLIN':            '',                 'HKLOUT': '',
                             'XYZIN':            '',                 'XYZOUT': '',
@@ -50,7 +52,10 @@ class run_pandda_export(QtCore.QThread):
 
     def refine_exported_models(self):
 
-        sample_list=self.db.execute_statement("select CrystalName,CompoundCode from mainTable where RefinementOutcome='2 - PANDDA model' or RefinementOutcome='3 - In Refinement';")
+        if self.which_models=='new':
+            sample_list=self.db.execute_statement("select CrystalName,CompoundCode from mainTable where RefinementOutcome='2 - PANDDA model';")
+        elif self.which_models=='all':
+            sample_list=self.db.execute_statement("select CrystalName,CompoundCode from mainTable where RefinementOutcome='2 - PANDDA model' or RefinementOutcome='3 - In Refinement';")
         for item in sample_list:
             xtal=str(item[0])
             compoundID=str(item[1])
@@ -63,36 +68,6 @@ class run_pandda_export(QtCore.QThread):
                     os.chdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+str(Serial)))
                     os.symlink(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb'),'in.pdb')
                     Refine.RunRefmac(Serial,self.RefmacParams,self.external_software,self.xce_logfile)
-
-
-
-
-
- #       progress_step=1
- #       if len(db_dict) != 0:
- #           progress_step=100/float(len(db_dict))
- #       else:
- #           progress_step=0
- #       progress=0
-#
-#        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-#
-#        for xtal in db_dict:
-##            print '==> XCE: updating panddaTable of data source with PANDDA site information for',xtal
-#            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating data source with PANDDA site information for '+xtal)
-#            self.db.update_insert_panddaTable(xtal,db_dict[xtal])
-#            self.db.execute_statement("update mainTable set RefinementOutcome = '2 - PANDDA model' where CrystalName is '%s' and RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending'" %xtal)
-#            os.chdir(os.path.join(self.initial_model_directory,xtal))
-#            if os.path.isfile(xtal+'-ensemble-model.pdb'):
-#                if os.path.isfile('refine.pdb'):
-#                    os.system('/bin/rm refine.pdb')
-#                os.symlink(xtal+'-ensemble-model.pdb','refine.pdb')
-#            if os.path.isfile(xtal+'-pandda-input.mtz'):
-#                if os.path.isfile('refine.mtz'):
-#                    os.system('/bin/rm refine.mtz')
-#                os.symlink(xtal+'-pandda-input.mtz','refine.mtz')
-#            progress += progress_step
-#            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
 
     def import_samples_into_datasouce(self):
@@ -161,6 +136,8 @@ class run_pandda_export(QtCore.QThread):
                     filename=file[file.rfind('/')+1:]
                     if filename.endswith('-ensemble-model.pdb'):
                         pandda_model=file
+                        if sampleID not in self.already_exported_models:
+                            self.already_exported_models.append(sampleID)
                         break
                 inital_mtz='initial_mtz'
                 for file in glob.glob(os.path.join(self.initial_model_directory,sampleID,'*mtz')):
