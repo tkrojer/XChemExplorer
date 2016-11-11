@@ -1,4 +1,4 @@
-# last edited: 31/08/2016, 11:00
+# last edited: 11/11/2016, 15:00
 
 import pygtk, gtk, pango
 import os
@@ -214,14 +214,27 @@ class Refine(object):
         if os.getcwd().startswith('/dls'):
             module_load='module load phenix\n'
 
+        source =''
+        if 'bash' in os.getenv('SHELL'):
+            source = (
+                'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
+                '\n'
+                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','xce.setup-sh')+'\n'
+                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'   )
+        elif 'csh' in os.getenv('SHELL'):
+            source = (
+                'setenv XChemExplorer_DIR '+os.getenv('XChemExplorer_DIR')+'\n'
+                '\n'
+                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','xce.setup-csh')+'\n'
+                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-csh')+'\n'   )
+
+
         refmacCmds = (
             '#!'+os.getenv('SHELL')+'\n'
             +pbs_line+
             '\n'
-            'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
+            +source+
             '\n'
-            'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','xce.setup-sh')+'\n'
-            'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
             +module_load+
             'cd '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'\n'
             +findTLS+
