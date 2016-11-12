@@ -1,4 +1,4 @@
-# last edited: 10/11/2016, 17:00
+# last edited: 11/11/2016, 15:00
 
 import sqlite3
 import os,sys
@@ -421,6 +421,8 @@ class data_source:
                 continue
             if not str(value).replace(' ','')=='':  # ignore empty fields
                 update_string+=str(key)+'='+"'"+str(value)+"'"+','
+            else:
+                update_string+=str(key)+' = null,'
         if update_string != '':
             cursor.execute("UPDATE panddaTable SET "+update_string[:-1]+" WHERE CrystalName='%s' and PANDDA_site_index='%s'" %(sampleID,site_index))
             connect.commit()

@@ -1,4 +1,4 @@
-# last edited: 10/11/2016, 17:00
+# last edited: 11/11/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -18,8 +18,10 @@ from XChemUtils import process
 from XChemUtils import parse
 from XChemUtils import queue
 from XChemUtils import mtztools
+from XChemUtils import pdbtools
 from XChemUtils import helpers
 from XChemUtils import reference
+from XChemUtils import misc
 import XChemDB
 import XChemLog
 import XChemMain
@@ -243,29 +245,55 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
             db_dict=self.sync_data_processing(xtal,db_dict)
 
-            db_dict=self.sync_dimple_results(db_dict)
+            db_dict=self.sync_dimple_results(xtal,db_dict)
 
             db_dict=self.sync_compound_information(db_dict)
 
-            db_dict=self.sync_refinement_results(db_dict)
+            db_dict=self.sync_refinement_results(xtal,db_dict)
 
             if db_dict != {}:
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating datasource for '+xtal)
                 self.db.update_data_source(xtal,db_dict)
 
-            self.sync_pandda_table(xtal)
-
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
-        self.Logfile.insert('datasource update finished')
+        self.Logfile.insert('database mainTable update finished')
+        self.Logfile.insert('updating panddaTable')
+        self.sync_pandda_table()
+        self.Logfile.insert('database panddaTable update finished')
 
-    def change_absolute_to_relative_links(self,filename):
-        if os.path.islink(filename):
-            if os.readlink(filename).startswith('/'):
-                target=os.path.relpath(os.path.realpath(filename))
-                os.unlink(filename)
-                os.symlink(target,filename)
+    def change_absolute_to_relative_links(self,target,filename):
+        os.unlink(filename)
+        os.symlink(os.path.relpath(target),filename)
+        self.Logfile.insert('%s -> %s' %(os.readlink(filename),target))
+
+    def find_file(self,filename,xtal):
+        found_file=False
+        for files in glob.glob('*'):
+            if files == filename:
+                # at this point, this could ba a file or a (broken) symbolic link
+                try:
+                    link=os.readlink(filename)
+                    if link.startswith('/'):
+                        if os.path.isfile(link.replace(link[:link.find(xtal)],self.initial_model_directory+'/')):
+                            target=link.replace(link[:link.find(xtal)],self.initial_model_directory+'/')
+                            print 'here'
+                            self.change_absolute_to_relative_links(target,filename)
+                        else:
+                            self.Logfile.insert('removing broken link: '+filename)
+                            os.system('/bin/rm %s 2> /dev/null' %filename)
+                    else:
+                        if not os.path.isfile(link):
+                            self.Logfile.insert('removing broken link: '+filename)
+                            os.system('/bin/rm %s 2> /dev/null' %filename)
+                except OSError:
+                    if os.path.isfile(filename):
+                        found_file=True
+                break
+        return found_file
+
+
 
 
     def sync_data_processing(self,xtal,db_dict):
@@ -273,7 +301,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         # AIMLESS logfile
 
         found_logfile=False
-        if os.path.isfile(xtal+'.log'):
+        if self.find_file(xtal+'.log',xtal):
             found_logfile=True
             db_dict['DataProcessingPathToLogfile']=os.path.realpath(xtal+'.log')
             db_dict['DataProcessingLOGfileName']=xtal+'.log'
@@ -281,16 +309,13 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                 db_dict['DataCollectionOutcome']='success'
             aimless_results=parse().read_aimless_logfile(xtal+'.log')
             db_dict.update(aimless_results)
-            print 'here'
-            self.change_absolute_to_relative_links(xtal+'.log')
         else:
             db_dict['DataProcessingPathToLogfile']=''
             db_dict['DataProcessingLOGfileName']=''
-            os.system('/bin/rm %s.log 2> /dev/null' %xtal)
 
         # MTZ file
 
-        if os.path.isfile(xtal+'.mtz'):
+        if self.find_file(xtal+'.mtz',xtal):
             db_dict['DataProcessingPathToMTZfile']=os.path.realpath(xtal+'.mtz')
             db_dict['DataProcessingMTZfileName']=xtal+'.mtz'
             if not found_logfile:
@@ -300,31 +325,15 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         else:
             db_dict['DataProcessingPathToMTZfile']=''
             db_dict['DataProcessingMTZfileName']=''
-            os.system('/bin/rm %s.mtz 2> /dev/null' %xtal)
-
-        # MTZ free file
-
-        if os.path.isfile(xtal+'.free.mtz'):
-            db_dict['RefinementMTZfree']=os.path.realpath(xtal+'.free.mtz')
-        else:
-            db_dict['RefinementMTZfree']=''
-            os.system('/bin/rm %s.free.mtz 2> /dev/null' %xtal)
-            dimple_path=db_dict['DimplePathToMTZ']
-            if os.path.isfile(os.path.join(dimple_path,'prepared2.mtz')):
-                os.symlink(os.path.join(dimple_path,'prepared2.mtz'),xtal+'.free.mtz')
-                db_dict['RefinementMTZfree']=xtal+'.free.mtz'
-            elif os.path.isfile(os.path.join(dimple_path,'prepared.mtz')):
-                os.symlink(os.path.join(dimple_path,'prepared.mtz'),xtal+'.free.mtz')
-                db_dict['RefinementMTZfree']=xtal+'.free.mtz'
 
         return db_dict
 
 
-    def sync_dimple_results(self,db_dict):
+    def sync_dimple_results(self,xtal,db_dict):
 
         # DIMPLE pdb
 
-        if os.path.isfile('dimple.pdb'):
+        if self.find_file('dimple.pdb',xtal):
             db_dict['DimplePathToPDB']=os.path.realpath('dimple.pdb')
             pdb_info=parse().PDBheader('dimple.pdb')
             db_dict['DimpleRcryst']=pdb_info['Rcryst']
@@ -335,17 +344,29 @@ class synchronise_db_and_filesystem(QtCore.QThread):
             db_dict['DimpleRcryst']=''
             db_dict['DimpleRfree']=''
             db_dict['DimpleResolutionHigh']=''
-            os.system('/bin/rm dimple.pdb 2> /dev/null')
 
         # DIMPLE mtz
 
-        if os.path.isfile('dimple.mtz'):
+        dimple_path=''
+        if self.find_file('dimple.mtz',xtal):
             db_dict['DimplePathToMTZ']=os.path.realpath('dimple.mtz')
             dimple_mtz=db_dict['DimplePathToMTZ']
             dimple_path=dimple_mtz[:dimple_mtz.rfind('/')]
         else:
             db_dict['DimplePathToMTZ']=''
-            os.system('/bin/rm dimple.mtz 2> /dev/null')    # this makes sure that any broken link which could rerail PANDDA gets removed
+
+        # MTZ free file
+
+        if self.find_file(xtal+'.free.mtz',xtal):
+            db_dict['RefinementMTZfree']=os.path.realpath(xtal+'.free.mtz')
+        else:
+            db_dict['RefinementMTZfree']=''
+            if os.path.isfile(os.path.join(dimple_path,'prepared2.mtz')):
+                os.symlink(os.path.relpath(os.path.join(dimple_path,'prepared2.mtz')),xtal+'.free.mtz')
+                db_dict['RefinementMTZfree']=xtal+'.free.mtz'
+            elif os.path.isfile(os.path.join(dimple_path,'prepared.mtz')):
+                os.symlink(os.path.relpath(os.path.join(dimple_path,'prepared.mtz')),xtal+'.free.mtz')
+                db_dict['RefinementMTZfree']=xtal+'.free.mtz'
 
         return db_dict
 
@@ -390,13 +411,13 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         return db_dict
 
 
-    def sync_refinement_results(self,db_dict):
+    def sync_refinement_results(self,xtal,db_dict):
 
         #
         # REFINE pdb
         #
 
-        if os.path.isfile('refine.pdb'):
+        if self.find_file('refine.pdb',xtal):
             db_dict['RefinementPDB_latest']=os.path.realpath('refine.pdb')
             pdb_info=parse().dict_for_datasource_update('refine.pdb')
             db_dict.update(pdb_info)
@@ -408,44 +429,110 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                 db_dict['RefinementOutcome']='3 - In Refinement'
         else:
             db_dict['RefinementPDB_latest']=''
-            os.system('/bin/rm refine.pdb 2> /dev/null')
+
+        #
+        # REFINE bound pdb
+        #
+
+        if os.path.isfile('refine.bound.pdb'):
+            db_dict['RefinementBoundConformation']='refine.bound.pdb'
+        else:
+            db_dict['RefinementBoundConformation']=''
 
         #
         # REFINE mtz
         #
 
-        if os.path.isfile('refine.mtz'):
-            db_dict['RefinementMTZ_latest']=os.path.realpath(os.path.join(self.initial_model_directory,'refine.mtz'))
+        if self.find_file('refine.mtz',xtal):
+            db_dict['RefinementMTZ_latest']=os.path.realpath('refine.mtz')
         else:
             db_dict['RefinementMTZ_latest']=''
-            os.system('/bin/rm refine.mtz 2> /dev/null')
 
         return db_dict
 
 
-    def sync_pandda_table(self,xtal):
+    def sync_pandda_table(self):
 
         # also need to update PANDDA table...
-        pandda_models=self.db.execute_statement("select CrystalName,PANDDA_site_index,PANDDA_site_spider_plot,PANDDA_site_event_map from panddaTable where CrystalName='%s'" %xtal)
+        pandda_models=self.db.execute_statement("select CrystalName,PANDDA_site_index,PANDDA_site_event_index,PANDDA_site_x,PANDDA_site_y,PANDDA_site_z from panddaTable")
         if pandda_models != []:
             for entry in pandda_models:
                 db_pandda_dict={}
-                db_pandda_dict['PANDDA_site_index']=entry[1]
+                xtal=entry[0]
+                site_index=entry[1]
+                event_index=entry[2]
+                event_x = float(str(entry[3]))
+                event_y = float(str(entry[4]))
+                event_z = float(str(entry[5]))
+
                 db_pandda_dict['PANDDApath']=self.panddas_directory
-                if entry[3] != None:
-                    event_map=os.path.join(self.initial_model_directory,xtal,entry[3].split('/')[len(entry[3].split('/'))-1])
-                    if os.path.isfile(event_map):
+
+                # event map
+
+                found_event_map=False
+                db_pandda_dict['PANDDA_site_event_map']=''
+                for file in glob.glob(os.path.join(self.initial_model_directory,xtal,'*ccp4')):
+                    filename=file[file.rfind('/')+1:]
+                    if filename.startswith(xtal+'-event_'+event_index) and filename.endswith('map.native.ccp4'):
+                        event_map=file
                         db_pandda_dict['PANDDA_site_event_map']=event_map
-                if entry[2] != None:
-                    spider_plot=os.path.join(self.initial_model_directory,xtal,entry[2].split('/')[len(entry[2].split('/'))-3],entry[2].split('/')[len(entry[2].split('/'))-2],entry[2].split('/')[len(entry[2].split('/'))-1])
-                    if os.path.isfile(spider_plot):
-                        db_pandda_dict['PANDDA_site_spider_plot']=spider_plot
-#                            db_pandda_dict['RefinementOutcome']='3 - In Refinement'    # just in case; presence of a spider plot definitely signals that refinement happened
-                                                                                        # should probably be not updated! Will overwrite CompChem ready
-                self.Logfile.insert('updating panddaTable for xtal: %s, site: %s' %(entry[0],entry[1]))
-                self.db.update_insert_panddaTable(xtal,db_pandda_dict)
+                        found_event_map=True
+                        break
+                if not found_event_map:
+                    db_pandda_dict['PANDDA_site_event_map']=''
+
+                db_pandda_dict['PANDDA_site_initial_model']=''
+                for file in glob.glob(os.path.join(self.initial_model_directory,xtal,'*pdb')):
+                    filename=file[file.rfind('/')+1:]
+                    if filename.endswith('-ensemble-model.pdb'):
+                        db_pandda_dict['PANDDA_site_initial_model']=file
+                        break
+
+                db_pandda_dict['PANDDA_site_initial_mtz']=''
+                for file in glob.glob(os.path.join(self.initial_model_directory,xtal,'*mtz')):
+                    filename=file[file.rfind('/')+1:]
+                    if filename.endswith('pandda-input.mtz'):
+                        db_pandda_dict['PANDDA_site_initial_mtz']=file
+                        break
 
 
+                db_pandda_dict['PANDDA_site_ligand_resname'] = ''
+                db_pandda_dict['PANDDA_site_ligand_chain'] = ''
+                db_pandda_dict['PANDDA_site_ligand_sequence_number'] = ''
+                db_pandda_dict['PANDDA_site_ligand_altLoc'] = ''
+                db_pandda_dict['PANDDA_site_ligand_placed'] = 'False'
+                db_pandda_dict['PANDDA_site_spider_plot'] = ''
+                db_pandda_dict['PANDDA_site_ligand_id'] = ''
+
+                if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'refine.pdb')):
+                    ligands_in_file=pdbtools(os.path.join(self.initial_model_directory,xtal,'refine.pdb')).find_xce_ligand_details()
+
+                    for ligand in ligands_in_file:
+                        residue_name=   ligand[0]
+                        residue_chain=  ligand[1]
+                        residue_number= ligand[2]
+                        residue_altLoc= ligand[3]
+                        residue_xyz = pdbtools(os.path.join(self.initial_model_directory,xtal,'refine.pdb')).get_center_of_gravity_of_residue_ish(residue_chain, residue_number)
+                        distance = misc().calculate_distance_between_coordinates(residue_xyz[0], residue_xyz[1],residue_xyz[2],event_x, event_y,event_z)
+                        # if coordinate of ligand and event are closer than 7A, then we assume they belong together
+                        if distance < 7:
+                            db_pandda_dict['PANDDA_site_ligand_resname'] = residue_name
+                            db_pandda_dict['PANDDA_site_ligand_chain'] = residue_chain
+                            db_pandda_dict['PANDDA_site_ligand_sequence_number'] = residue_number
+                            db_pandda_dict['PANDDA_site_ligand_altLoc'] = residue_altLoc
+                            db_pandda_dict['PANDDA_site_ligand_placed'] = 'True'
+                            db_pandda_dict['PANDDA_site_ligand_id']=residue_name+'-'+residue_chain+'-'+residue_number
+
+                            if xtal+'/Refine_' in os.path.realpath(os.path.join(self.initial_model_directory,xtal,'refine.pdb')):
+                                tmp=os.path.realpath(os.path.join(self.initial_model_directory,xtal,'refine.pdb'))
+                                spider_plot=os.path.join(tmp[:tmp.rfind('/')],'residue_plots',residue_name+'-'+residue_chain+'-'+residue_number+'.png')
+                                if os.path.isfile(spider_plot):
+                                    db_pandda_dict['PANDDA_site_spider_plot']=spider_plot
+                            break
+
+                if db_pandda_dict != {}:
+                    self.db.update_panddaTable(xtal, site_index, db_pandda_dict)
+                    self.Logfile.insert('updating panddaTable for xtal: %s, site: %s' %(xtal,site_index))
 
 
 

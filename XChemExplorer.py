@@ -1,4 +1,4 @@
-# last edited: 10/11/2016, 17:00
+# last edited: 11/11/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -10,6 +10,7 @@ import base64
 import math
 import multiprocessing
 import webbrowser
+import getpass
 
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 from XChemUtils import parse
@@ -45,7 +46,11 @@ class XChemExplorer(QtGui.QApplication):
 
         self.current_directory=os.getcwd()
         self.xce_logfile=os.path.join(self.current_directory,'xce.log')
-        XChemLog.startLog(self.xce_logfile).create_logfile()
+        try:
+            XChemLog.startLog(self.xce_logfile).create_logfile()
+        except IOError:
+            self.xce_logfile=os.path.join(self.current_directory,'xce_'+getpass.getuser()+'.log')
+            XChemLog.startLog(self.xce_logfile).create_logfile()
         self.update_log=XChemLog.updateLog(self.xce_logfile)
         self.update_log.insert('new session started')
         self.diffraction_data_directory=self.current_directory
