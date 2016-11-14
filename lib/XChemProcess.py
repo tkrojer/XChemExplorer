@@ -40,6 +40,7 @@ class run_xia2(QtCore.QThread):
 
             if os.getcwd().startswith('/dls'):
                 script+='module load ccp4\n'
+                script+='module load phenix/1.10\n'
 
             if self.spg == []:
                 spg_option=''
