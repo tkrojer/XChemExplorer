@@ -429,3 +429,4 @@ class find_diffraction_image_directory(QtCore.QThread):
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
         self.emit(QtCore.SIGNAL('update_reprocess_datasets_table'), self.data_dict)
+

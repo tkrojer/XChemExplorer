@@ -7,13 +7,14 @@ sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 import XChemLog
 
 class run_xia2(QtCore.QThread):
-    def __init__(self,initial_model_directory,run_dict,protocol,spg,ref,xce_logfile,external_software,ccp4_scratch_directory,max_queue_jobs):
+    def __init__(self,initial_model_directory,run_dict,protocol,spg,ref,reso_limit,xce_logfile,external_software,ccp4_scratch_directory,max_queue_jobs):
         QtCore.QThread.__init__(self)
         self.initial_model_directory=initial_model_directory
         self.run_dict=run_dict
         self.protocol=protocol
         self.spg=spg
         self.ref=ref
+        self.reso_limit=reso_limit
         self.xce_logfile=xce_logfile
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.external_software=external_software
@@ -47,6 +48,12 @@ class run_xia2(QtCore.QThread):
                 ref_option=''
             else:
                 ref_option='-reference_reflection_file '+str(self.ref[0])
+
+            if self.reso_limit == []:
+                reso_limit_option=''
+            else:
+                reso_limit_option='-misigma '+str(self.reso_limit[0])
+
 
             # first link diffraction images into directory
             if not os.path.isdir(os.path.join(self.initial_model_directory,xtal)):
@@ -88,7 +95,7 @@ class run_xia2(QtCore.QThread):
                         script+='cd '+os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline)+'\n'
                         if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline)):
                             os.mkdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline))
-                        script+='xia2 -'+pipeline+' '+ref_option+' '+spg_option+' '+image_dir+'\n'
+                        script+='xia2 -'+pipeline+' '+ref_option+' '+spg_option+' '+reso_limit_option+' '+image_dir+'\n'
 
             script+='cd '+os.path.join(self.initial_model_directory,xtal,'processed')+'\n'
             script+='/bin/rm run_in_progress\n'

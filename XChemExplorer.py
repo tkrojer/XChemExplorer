@@ -751,8 +751,19 @@ class XChemExplorer(QtGui.QApplication):
         hbox_search.addWidget(frame_search_info)
         frame_search.setLayout(hbox_search)
         hbox.addWidget(frame_search)
+
+        frame_translate=QtGui.QFrame()
+        vbox_translate=QtGui.QVBoxLayout()
+        vbox_translate.addWidget(QtGui.QLabel('translate:\ndatasetID -> sampleID'))
+        button=QtGui.QPushButton('Open CSV')
+        button.clicked.connect(self.translate_datasetID_to_sampleID)
+        vbox_translate.addWidget(button)
+        frame_translate.setLayout(vbox_translate)
+        hbox.addWidget(frame_translate)
+
         frame.setLayout(hbox)
         reprocess_vbox.addWidget(frame)
+
 
         self.reprocess_datasets_column_list=[   'Dataset ID',
                                                 'Sample ID',
@@ -827,6 +838,18 @@ class XChemExplorer(QtGui.QApplication):
         hbox_ref.addWidget(button)
         frame_ref.setLayout(hbox_ref)
         hbox.addWidget(frame_ref)
+
+        frame_isigma=QtGui.QFrame()
+        vbox_isigma=QtGui.QVBoxLayout()
+        vbox_isigma.addWidget(QtGui.QLabel('Resolution\nLimit\n(Mn<I/sig(I)>)'))
+        self.reprocess_isigma_combobox=QtGui.QComboBox()
+        misigma = ['default','3','2','1.5','1','0.5']
+        for item in misigma:
+            self.reprocess_isigma_combobox.addItem(item)
+        self.reprocess_isigma_combobox.setCurrentIndex(0)
+        vbox_isigma.addWidget(self.reprocess_isigma_combobox)
+        frame_isigma.setLayout(vbox_isigma)
+        hbox.addWidget(frame_isigma)
 
         frame.setLayout(hbox)
         reprocess_vbox.addWidget(frame)
@@ -2465,6 +2488,11 @@ class XChemExplorer(QtGui.QApplication):
         if os.path.isfile(self.diffraction_data_reference_mtz):
             ref.append(self.diffraction_data_reference_mtz)
 
+        # resolution limit
+        reso_limit = []
+        if str(self.reprocess_isigma_combobox.currentText()) != 'default':
+            reso_limit.append(str(self.reprocess_isigma_combobox.currentText()))
+
         run_dict={}
         allRows = self.reprocess_datasets_table.rowCount()
         for row in xrange(0,allRows):
@@ -2478,6 +2506,7 @@ class XChemExplorer(QtGui.QApplication):
                                                 protocol,
                                                 spg,
                                                 ref,
+                                                reso_limit,
                                                 self.xce_logfile,
                                                 self.external_software,
                                                 self.ccp4_scratch_directory,
@@ -2612,6 +2641,48 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.connect(self.work_thread, QtCore.SIGNAL("update_reprocess_datasets_table"),self.update_reprocess_datasets_table)
         self.work_thread.start()
+
+    def translate_datasetID_to_sampleID(self):
+        translate = QtGui.QMessageBox()
+        translateLayout = translate.layout()
+        self.translate_datasetID_to_sampleID_file='-'
+        vbox = QtGui.QVBoxLayout()
+        button=QtGui.QPushButton('Open CSV')
+        button.clicked.connect(self.open_csv_file_translate_datasetID_to_sampleID)
+        vbox.addWidget(button)
+        self.translate_datasetID_to_sampleID_csv_label=QtGui.QLabel(self.translate_datasetID_to_sampleID_file)
+        vbox.addWidget(self.translate_datasetID_to_sampleID_csv_label)
+        translateLayout.addLayout(vbox,0,0)
+#        translate.exec_();
+        translate.addButton(QtGui.QPushButton('OK'), QtGui.QMessageBox.YesRole)
+        translate.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
+        reply=translate.exec_();
+        if reply == 0:
+            if os.path.isfile(self.translate_datasetID_to_sampleID_file):
+                trans_dict={}
+                for line in open(self.translate_datasetID_to_sampleID_file):
+                    if len(line.split(','))==2:
+                        dataset=line.split(',')[0]
+                        new_sample_id=line.split(',')[1]
+                        trans_dict[dataset]=new_sample_id
+                if len(trans_dict) >= 1:
+                    allRows = self.reprocess_datasets_table.rowCount()
+                    for row in xrange(0,allRows):
+                        dataset_id=str(self.reprocess_datasets_table.item(row,0).text())
+                        sample_id=str(self.reprocess_datasets_table.item(row,1).text())
+                        if dataset_id in trans_dict:
+                            cell_text=QtGui.QTableWidgetItem()
+                            cell_text.setText(trans_dict[dataset_id])
+                            cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                            self.reprocess_datasets_table.setItem(row, 1, cell_text)
+                            self.update_log.insert('dataset: %s -> changing sampleID to: %s' %(dataset_id,trans_dict[dataset_id]))
+
+
+    def open_csv_file_translate_datasetID_to_sampleID(self):
+        file_name_temp = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Open file', self.current_directory,'*.csv')
+        file_name=tuple(file_name_temp)[0]
+        self.translate_datasetID_to_sampleID_csv_label.setText(file_name)
+        self.translate_datasetID_to_sampleID_file=file_name
 
     def select_reprocess_reference_mtz(self):
         self.update_log.insert('trying to set new reference mtz file for reprocessing with xia2')
