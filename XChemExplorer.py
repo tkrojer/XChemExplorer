@@ -848,6 +848,7 @@ class XChemExplorer(QtGui.QApplication):
         for item in misigma:
             self.reprocess_isigma_combobox.addItem(item)
         self.reprocess_isigma_combobox.setCurrentIndex(0)
+        self.reprocess_isigma_combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
         vbox_isigma.addWidget(self.reprocess_isigma_combobox)
         frame_isigma.setLayout(vbox_isigma)
         hbox.addWidget(frame_isigma)
