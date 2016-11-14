@@ -1,4 +1,4 @@
-# last edited: 11/11/2016, 15:00
+# last edited: 14/11/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -380,6 +380,7 @@ class XChemExplorer(QtGui.QApplication):
         #
 
         self.map_cif_file_tasks = [ 'Run DIMPLE on selected MTZ files',
+                                    'Remove selected DIMPLE PDB/MTZ files',
                                     'Create CIF/PDB/PNG file of ALL soaked compound',
                                     'Create CIF/PDB/PNG file of NEW soaked compounds'    ]
 
@@ -2471,6 +2472,38 @@ class XChemExplorer(QtGui.QApplication):
             self.update_log.insert('trying to run DIMPLE on SELECTED auto-processing files')
             self.check_before_running_dimple(job_list)
 
+
+    def remove_selected_dimple_files(self):
+        job_list=[]
+        for xtal in sorted(self.initial_model_dimple_dict):
+            if self.initial_model_dimple_dict[xtal][0].isChecked():
+                job_list.append(xtal)
+
+        if job_list != []:
+            msgBox = QtGui.QMessageBox()
+            msgBox.setText("Do you really want to delete %s Dimple files?" %len(job_list))
+            msgBox.addButton(QtGui.QPushButton('Go'), QtGui.QMessageBox.YesRole)
+            msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
+            reply = msgBox.exec_();
+
+            if reply == 0:
+                self.status_bar.showMessage('preparing to remove DIMPLE files')
+                self.update_log.insert('preparing to remove DIMPLE files')
+                self.work_thread=XChemThread.remove_selected_dimple_files(  job_list,
+                                                                            self.initial_model_directory,
+                                                                            self.xce_logfile,
+                                                                            self.database_directory,
+                                                                            self.data_source_file    )
+                self.explorer_active=1
+                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+                self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+                self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+                self.connect(self.work_thread, QtCore.SIGNAL("update_all_tables"),self.update_all_tables)
+                self.work_thread.start()
+
+
+
     def run_xia2_on_selected_datasets(self):
 
         # check which programs should be run
@@ -2505,22 +2538,26 @@ class XChemExplorer(QtGui.QApplication):
             if self.diffraction_data_table_dict[dataset_id][0].isChecked():
                 run_dict[sample_id]=self.diffraction_data_dict[dataset_id]
 
-        self.work_thread=XChemProcess.run_xia2( self.initial_model_directory,
-                                                run_dict,
-                                                protocol,
-                                                spg,
-                                                ref,
-                                                reso_limit,
-                                                self.xce_logfile,
-                                                self.external_software,
-                                                self.ccp4_scratch_directory,
-                                                self.max_queue_jobs     )
-        self.explorer_active=1
-        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-        self.work_thread.start()
+        if protcol != [] and run_dict !={}
+            self.work_thread=XChemProcess.run_xia2( self.initial_model_directory,
+                                                    run_dict,
+                                                    protocol,
+                                                    spg,
+                                                    ref,
+                                                    reso_limit,
+                                                    self.xce_logfile,
+                                                    self.external_software,
+                                                    self.ccp4_scratch_directory,
+                                                    self.max_queue_jobs     )
+            self.explorer_active=1
+            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.work_thread.start()
+        else:
+            self.update_log.insert('please select datasets and/ or data processing protocol')
+            self.update_status_bar('please select datasets and/ or data processing protocol')
 
 
 
@@ -2988,6 +3025,9 @@ class XChemExplorer(QtGui.QApplication):
 
         elif instruction=='Run DIMPLE on selected MTZ files':
             self.run_dimple_on_selected_autoprocessing_file()
+
+        elif instruction=='Remove selected DIMPLE PDB/MTZ files':
+            self.remove_selected_dimple_files()
 
         elif instruction=='Create CIF/PDB/PNG file of ALL soaked compound':
             self.create_cif_pdb_png_files('ALL')

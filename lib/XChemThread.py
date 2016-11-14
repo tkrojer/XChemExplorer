@@ -821,6 +821,56 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                 os.system('./xce_dimple_%s.sh' %(str(i+1)))
 
 
+class remove_selected_dimple_files(QtCore.QThread):
+    def __init__(self,sample_list,initial_model_directory,xce_logfile,database_directory,data_source_file,):
+        QtCore.QThread.__init__(self)
+        self.sample_list=sample_list
+        self.initial_model_directory=initial_model_directory
+        self.xce_logfile=xce_logfile
+        self.Logfile=XChemLog.updateLog(xce_logfile)
+        self.db=XChemDB.data_source(os.path.join(database_directory,data_source_file))
+
+    def run(self):
+        progress_step=1
+        if len(self.sample_list) != 0:
+            progress_step=100/float(len(self.sample_list))
+        progress=0
+        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+        for n,xtal in enumerate(self.sample_list):
+            db_dict={}
+            os.chdir(os.path.join(self.initial_model_directory,xtal))
+            self.Logfile.insert('%s: removing dimple.pdb/dimple.mtz' %xtal)
+            os.system('/bin/rm dimple.pdb 2> /dev/null')
+            os.system('/bin/rm dimple.mtz 2> /dev/null')
+            if os.path.isdir(os.path.join(self.initial_model_directory,xtal,'dimple','dimple_rerun_on_selected_file')):
+                os.chir('dimple')
+                self.Logfile.insert('%s removing directory dimple/dimple_rerun_on_selected_file' %xtal)
+                os.system('/bin/rm -fr dimple_rerun_on_selected_file')
+
+            db_dict['DimpleResolutionHigh']=''
+            db_dict['DimpleRcryst']=''
+            db_dict['DimpleRfree']=''
+            db_dict['DimplePathToPDB']=''
+            db_dict['DimplePathToMTZ']=''
+            db_dict['DimpleReferencePDB']=''
+            db_dict['DimplePANDDAwasRun']='False'
+            db_dict['DimplePANDDAhit']='False'
+            db_dict['DimplePANDDAreject']='False'
+            db_dict['DimplePANDDApath']=''
+
+            self.Logfile.insert('%s: updating database' %xtal)
+            self.db.update_data_source(xtal,db_dict)
+
+
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+        self.emit(QtCore.SIGNAL('update_all_tables'))
+
+
+
+
 class start_COOT(QtCore.QThread):
 
     def __init__(self,settings):

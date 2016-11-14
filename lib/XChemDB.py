@@ -404,6 +404,8 @@ class data_source:
                 continue
             if not str(value).replace(' ','')=='':  # ignore empty fields
                 update_string+=str(key)+'='+"'"+str(value)+"'"+','
+            else:
+                update_string+=str(key)+' = null,'
         if update_string != '':
 #            print "UPDATE mainTable SET "+update_string[:-1]+" WHERE CrystalName="+"'"+sampleID+"'"
             cursor.execute("UPDATE mainTable SET "+update_string[:-1]+" WHERE CrystalName="+"'"+sampleID+"'")
