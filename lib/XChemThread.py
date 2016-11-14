@@ -906,6 +906,7 @@ class start_pandda_inspect(QtCore.QThread):
         Cmds = (
                 '#!'+os.getenv('SHELL')+'\n'
                 'source '+source_file+'\n'
+                'echo $CCP4\n'
                 'cd '+self.panddas_directory+'\n'
                 'pandda.inspect\n'
             )
