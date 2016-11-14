@@ -333,7 +333,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.dataset_tasks = [  'Get New Results from Autoprocessing',
                                # 'Save Files from Autoprocessing to Project Folder',
-                                'Run DIMPLE on All Autoprocessing MTZ files\n(*** run Rescore Datasets when finished ***))',
+                                'Run DIMPLE on All Autoprocessing MTZ files',
                                 'Rescore Datasets',
                                 'Read PKL file',
                                 'Run xia2 on selected datasets' ]
