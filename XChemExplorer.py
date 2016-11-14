@@ -762,6 +762,8 @@ class XChemExplorer(QtGui.QApplication):
         frame_translate.setLayout(vbox_translate)
         hbox.addWidget(frame_translate)
 
+        hbox.addStretch(0)
+
         frame.setLayout(hbox)
         reprocess_vbox.addWidget(frame)
 
@@ -852,6 +854,8 @@ class XChemExplorer(QtGui.QApplication):
         vbox_isigma.addWidget(self.reprocess_isigma_combobox)
         frame_isigma.setLayout(vbox_isigma)
         hbox.addWidget(frame_isigma)
+
+        hbox.addStretch(0)
 
         frame.setLayout(hbox)
         reprocess_vbox.addWidget(frame)
