@@ -607,7 +607,7 @@ class XChemExplorer(QtGui.QApplication):
 
         dls_tab_widget = QtGui.QTabWidget()
         dls_tab_list = [ 'Summary',
-                         'Dewar',
+        #                 'Dewar',
                          'Reprocess'    ]
 
         self.dls_tab_dict={}
@@ -706,9 +706,7 @@ class XChemExplorer(QtGui.QApplication):
 #                    frame.setLayout(vbox_for_frame)
                 self.dewar_configuration_layout.addWidget(frame, position, puck)
 
-#        self.data_collection_summarys_vbox_for_details=QtGui.QVBoxLayout()
-#        self.data_collection_details_currently_on_display=None
-        self.dls_tab_dict['Dewar'][1].addLayout(self.dewar_configuration_layout)
+#        self.dls_tab_dict['Dewar'][1].addLayout(self.dewar_configuration_layout)
 
 
         # - Reprocessing Sub-Tab ####################################################################
