@@ -866,7 +866,7 @@ class remove_selected_dimple_files(QtCore.QThread):
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
-        self.emit(QtCore.SIGNAL('update_all_tables'))
+        self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
 
 
 

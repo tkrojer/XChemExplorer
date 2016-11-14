@@ -2499,7 +2499,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
                 self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-                self.connect(self.work_thread, QtCore.SIGNAL("update_all_tables"),self.update_all_tables)
+                self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
                 self.work_thread.start()
 
 
