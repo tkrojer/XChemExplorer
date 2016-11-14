@@ -799,6 +799,9 @@ class data_source:
             if item.startswith('Run\nDimple'):
                 out_list.append([item,item])
                 continue
+            if item.startswith('Select'):
+                out_list.append([item,item])
+                continue
             if item.startswith('Run\nxia2'):
                 out_list.append([item,item])
                 continue

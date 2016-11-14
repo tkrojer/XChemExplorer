@@ -886,7 +886,7 @@ class XChemExplorer(QtGui.QApplication):
         self.tab_dict[self.workflow_dict['Maps']][1].addLayout(initial_model_checkbutton_hbox)
         self.initial_model_vbox_for_table=QtGui.QVBoxLayout()
         self.inital_model_column_list=[   'Sample ID',
-                        'Run\nDimple',
+                        'Select',
                         'Resolution\n[Mn<I/sig(I)> = 1.5]',
                         'Dimple\nRcryst',
                         'Dimple\nRfree',
@@ -3620,7 +3620,7 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text.setText(str(xtal))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.initial_model_table.setItem(current_row, column, cell_text)
-                    elif header[0]=='Run\nDimple':
+                    elif header[0]=='Select':
                         if new_xtal:
                             run_dimple = QtGui.QCheckBox()
                             run_dimple.toggle()
