@@ -756,6 +756,7 @@ class XChemExplorer(QtGui.QApplication):
         vbox_translate=QtGui.QVBoxLayout()
         vbox_translate.addWidget(QtGui.QLabel('translate:\ndatasetID -> sampleID'))
         button=QtGui.QPushButton('Open CSV')
+        button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
         button.clicked.connect(self.translate_datasetID_to_sampleID)
         vbox_translate.addWidget(button)
         frame_translate.setLayout(vbox_translate)

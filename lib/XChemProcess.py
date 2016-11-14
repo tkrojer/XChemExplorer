@@ -38,9 +38,6 @@ class run_xia2(QtCore.QThread):
             else:
                 script+='#!'+os.getenv('SHELL')+'\n'
 
-            if os.getcwd().startswith('/dls'):
-                script+='module load ccp4\n'
-                script+='module load phenix/1.10\n'
 
             if self.spg == []:
                 spg_option=''
@@ -98,7 +95,7 @@ class run_xia2(QtCore.QThread):
                         script+='cd '+os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline)+'\n'
                         if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline)):
                             os.mkdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline))
-                        script+='xia2 pipeline='+pipeline+' '+ref_option+' '+spg_option+' '+reso_limit_option+' '+image_dir+'\n'
+                        script+='xia2 -'+pipeline+' '+ref_option+' '+spg_option+' '+reso_limit_option+' '+image_dir+'\n'
 
             script+='cd '+os.path.join(self.initial_model_directory,xtal,'processed')+'\n'
             script+='/bin/rm run_in_progress\n'
