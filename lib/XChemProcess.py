@@ -52,7 +52,7 @@ class run_xia2(QtCore.QThread):
             if self.reso_limit == []:
                 reso_limit_option=''
             else:
-                reso_limit_option='-misigma '+str(self.reso_limit[0])
+                reso_limit_option='misigma '+str(self.reso_limit[0])
 
 
             # first link diffraction images into directory
