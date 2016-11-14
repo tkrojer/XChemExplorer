@@ -4348,7 +4348,9 @@ class XChemExplorer(QtGui.QApplication):
             db_dict=self.xtal_db_dict[xtal]
             try:
                 stage = int(str(db_dict['RefinementOutcome']).split()[0])
-            except ValueError:
+#            except ValueError:
+#                stage = 0
+            except IndexError:
                 stage = 0
 
             if stage >= 3:
