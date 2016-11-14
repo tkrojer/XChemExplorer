@@ -1,4 +1,4 @@
-# last edited: 11/11/2016, 15:00
+# last edited: 14/11/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -906,12 +906,11 @@ class start_pandda_inspect(QtCore.QThread):
         Cmds = (
                 '#!'+os.getenv('SHELL')+'\n'
                 'source '+source_file+'\n'
-                'echo $CCP4\n'
                 'cd '+self.panddas_directory+'\n'
                 'pandda.inspect\n'
             )
 
-        self.Logfile.insert('starting pandda.inspect with the following command:'+Cmds)
+        self.Logfile.insert('starting pandda.inspect with the following command:\n'+Cmds)
         os.system(Cmds)
 
 #        Cmds = (
