@@ -3060,7 +3060,7 @@ class XChemExplorer(QtGui.QApplication):
                 job_ids = []
                 for n,item in enumerate(cluster_dict['xia2']):
                     cumulative_runtime += item[2]
-                    if item[1] in in job_ids:
+                    if item[1] in job_ids:
                         job_ids.append(item[1])
                 average_runtime=round(float(cumulative_runtime)/float(n+1),0)
                 self.update_log.insert('average run time '+str(average_runtime)+' minutes')
