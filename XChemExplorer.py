@@ -2589,8 +2589,16 @@ class XChemExplorer(QtGui.QApplication):
             self.update_log.insert('please select datasets and/ or data processing protocol')
             self.update_status_bar('please select datasets and/ or data processing protocol')
 
-
-
+    def update_reprocessing_table(self):
+        allRows = self.reprocess_datasets_table.rowCount()
+        for row in xrange(0,allRows):
+            sample_id=str(self.reprocess_datasets_table.item(row,1).text())
+            if sample_id in self.xtal_db_dict:
+                db_dict=self.xtal_db_dict[sampleID]
+                cell_text=QtGui.QTableWidgetItem()
+                cell_text.setText(db_dict['DataProcessingStatus'])
+                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                self.reprocess_datasets_table.setItem(row, 7, cell_text)
 
     def get_job_list_for_dimple_rerun(self,xtal,job_list,db_dict,entry):
         self.status_bar.showMessage('checking: '+str(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])))
@@ -2829,6 +2837,9 @@ class XChemExplorer(QtGui.QApplication):
         self.update_log.insert('updating REFINEMENT table')
         self.update_status_bar('updating REFINEMENT table')
         self.populate_and_update_refinement_table()
+        self.update_log.insert('updating REPROCESSING table')
+        self.update_status_bar('updating REPROCESSING table')
+        self.update_reprocessing_table()
         self.update_status_bar('idle')
         self.update_summary_plot()
 

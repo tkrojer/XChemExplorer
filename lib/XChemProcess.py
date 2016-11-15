@@ -122,7 +122,7 @@ class run_xia2(QtCore.QThread):
             os.system('chmod +x xce_xia2_%s.sh' %str(i+1))
             db_dict={}
             db_dict['DataProcessingStatus']='started'
-            self.Logfile.insert('%s: setting DataProcessingStatus flag to started')
+            self.Logfile.insert('%s: setting DataProcessingStatus flag to started' %xtal)
             self.db.update_data_source(xtal,db_dict)
 
         # submit job
