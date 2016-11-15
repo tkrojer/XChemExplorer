@@ -3061,9 +3061,11 @@ class XChemExplorer(QtGui.QApplication):
 
         cluster_dict=XChemMain.get_jobs_running_on_cluster()
 
-        self.update_log.insert('gettting status updates...')
+        self.update_log.insert('getting status updates...')
 
         self.status_bar.showMessage('please check terminal window for further information')
+
+        self.update_log.insert('%s samples are currently in database' %str(len(self.xtal_db_dict)))
 
         if instruction=='Run DIMPLE on All Autoprocessing MTZ files' or \
            instruction=='Run DIMPLE on selected MTZ files':
@@ -3071,12 +3073,44 @@ class XChemExplorer(QtGui.QApplication):
 
         elif instruction=='Create CIF/PDB/PNG file of ALL soaked compound' or \
              instruction=='Create CIF/PDB/PNG file of NEW soaked compounds':
-            self.check_status_create_cif_pdb_png_files()
             self.print_status_message('acedrg',cluster_dict)
 
         elif instruction=='Run xia2 on selected datasets':
             self.print_status_message('xia2',cluster_dict)
 
+    def print_acedrg_status(self):
+        self.update_log.insert('compound restraints summary')
+        pending=0
+        started=0
+        running=0
+        missing_smiles=0
+        failed=0
+        success=0
+        unknown=0
+        for xtal in self.xtal_db_dict:
+            db_dict=self.xtal_db_dict[xtal]
+            status=db_dict['RefinementCIFStatus']
+            if 'pending' in status:
+                pending+=1
+            elif 'started' in status:
+                status+=1
+            elif 'running' in status:
+                running+=1
+            elif 'missing' in status:
+                missing_smiles+=1
+            elif 'failed' in status:
+                failed +=1
+            elif 'generated' in status:
+                success+=1
+            else:
+                unknown+=1
+        self.update_log.insert('pending restraints: ................ %s' %str(pending))
+        self.update_log.insert('restraint generation started: ...... %s' %str(started))
+        self.update_log.insert('restraint generation running: ...... %s' %str(running))
+        self.update_log.insert('missing smiles string: ............. %s' %str(missing_smiles))
+        self.update_log.insert('restraint generation failed: ....... %s' %str(failed))
+        self.update_log.insert('restraints successfully created: ... %s' %str(success))
+        self.update_log.insert('unknown status: .................... %s' %str(unknown))
 
     def print_status_message(self,program,cluster_dict):
         self.update_log.insert('%s %s jobs are running on the cluster' %(len(cluster_dict[program]),program))
@@ -3412,33 +3446,33 @@ class XChemExplorer(QtGui.QApplication):
             self.work_thread.start()
 
 
-    def check_status_create_cif_pdb_png_files(self):
-        self.update_status_bar('Please check terminal window for details!')
-#        samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not NULL;")
-#        smiles_for_sample=self.db.execute_statement("select CrystalName,compoundSMILES from mainTable where compoundSMILES is not NULL or compoundSMILES is not '';")
-#        samples_with_data=self.db.execute_statement("select CrystalName from mainTable where DataCollectionOutcome is 'success';")
-#        cif_files=self.db.execute_statement("select CrystalName,RefinementCIF from mainTable where RefinementCIF is not Null or RefinementCIF is not '';")
-        print '==> XCE: summary for compounds:'
-#        print '    * nr samples in datasource:',len(samples_in_db)
-#        print '    * nr SMILES for samples:   ',len(smiles_for_sample)
-#        print '    * nr samples with data:    ',len(samples_with_data)
-#        print '    * nr CIF files created:    ',len(cif_files)
-        print XChemMain.get_jobs_running_on_cluster()
-        print XChemMain.get_datasource_summary(os.path.join(self.database_directory,self.data_source_file))
-#        out_bytes = subprocess.check_output(['qstat'])
-#        out_text = out_bytes.decode('utf-8')
-#        jobs_on_cluster = subprocess.check_output(['qstat'])
-#        jobs_running=0
-#        for n,line in enumerate(jobs_on_cluster):
-#
-#        jobs_running=n
-#        print '==> XCE: job info'
-#        print '    * nr jobs currently running on cluster:',jobs_running
-#        print '    * nr ACEDRG jobs submitted'
-#        print '    * nr ACEDRG jobs waiting'
-#        print '    * nr ACEDRG jobs finished'
-#        print '    * time ACEDRG queue started'
-#        print '    * expected time to finish'
+#    def check_status_create_cif_pdb_png_files(self):
+#        self.update_status_bar('Please check terminal window for details!')
+##        samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not NULL;")
+##        smiles_for_sample=self.db.execute_statement("select CrystalName,compoundSMILES from mainTable where compoundSMILES is not NULL or compoundSMILES is not '';")
+##        samples_with_data=self.db.execute_statement("select CrystalName from mainTable where DataCollectionOutcome is 'success';")
+##        cif_files=self.db.execute_statement("select CrystalName,RefinementCIF from mainTable where RefinementCIF is not Null or RefinementCIF is not '';")
+#        print '==> XCE: summary for compounds:'
+##        print '    * nr samples in datasource:',len(samples_in_db)
+##        print '    * nr SMILES for samples:   ',len(smiles_for_sample)
+##        print '    * nr samples with data:    ',len(samples_with_data)
+##        print '    * nr CIF files created:    ',len(cif_files)
+#        print XChemMain.get_jobs_running_on_cluster()
+#        print XChemMain.get_datasource_summary(os.path.join(self.database_directory,self.data_source_file))
+##        out_bytes = subprocess.check_output(['qstat'])
+##        out_text = out_bytes.decode('utf-8')
+##        jobs_on_cluster = subprocess.check_output(['qstat'])
+##        jobs_running=0
+##        for n,line in enumerate(jobs_on_cluster):
+##
+##        jobs_running=n
+##        print '==> XCE: job info'
+##        print '    * nr jobs currently running on cluster:',jobs_running
+##        print '    * nr ACEDRG jobs submitted'
+##        print '    * nr ACEDRG jobs waiting'
+##        print '    * nr ACEDRG jobs finished'
+##        print '    * time ACEDRG queue started'
+##        print '    * expected time to finish'
 
     def show_html_summary_and_diffraction_image(self):
         for key in self.albula_button_dict:
