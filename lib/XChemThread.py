@@ -281,7 +281,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                     if link.startswith('/'):
                         if os.path.isfile(link.replace(link[:link.find(xtal)],self.initial_model_directory+'/')):
                             target=link.replace(link[:link.find(xtal)],self.initial_model_directory+'/')
-                            print 'here'
+                            found_file=True
                             self.change_absolute_to_relative_links(target,filename)
                         else:
                             self.Logfile.insert('removing broken link: '+filename)
