@@ -3054,22 +3054,26 @@ class XChemExplorer(QtGui.QApplication):
             self.check_status_create_cif_pdb_png_files()
 
         elif instruction=='Run xia2 on selected datasets':
-            self.update_log.insert('%s xia2 jobs are running on the cluster' %len(cluster_dict['xia2']))
-            if len(cluster_dict['xia2']) > 0:
-                cumulative_runtime=0
-                job_ids = []
-                for n,item in enumerate(cluster_dict['xia2']):
-                    cumulative_runtime += item[2]
-                    if not item[0] in job_ids:
-                        job_ids.append(item[0])
-                average_runtime=round(float(cumulative_runtime)/float(n+1),0)
-                self.update_log.insert('average run time '+str(average_runtime)+' minutes')
-                if job_ids != []:
-                    self.update_log.insert('you can kill them by pasting the following line into a new terminal window:')
-                    out='qdel '
-                    for job in job_ids:
-                        out += str(job)+' '
-                    self.update_log.insert(out)
+            self.print_status_message('xia2',cluster_dict)
+
+
+    def print_status_message(self,program,cluster_dict):
+        self.update_log.insert('%s %s jobs are running on the cluster' %(len(cluster_dict[program]),program))
+        if len(cluster_dict[program]) > 0:
+            cumulative_runtime=0
+            job_ids = []
+            for n,item in enumerate(cluster_dict[program]):
+                cumulative_runtime += item[2]
+                if not item[0] in job_ids:
+                    job_ids.append(item[0])
+            average_runtime=round(float(cumulative_runtime)/float(n+1),0)
+            self.update_log.insert('average run time '+str(average_runtime)+' minutes')
+            if job_ids != []:
+                self.update_log.insert('you can kill them by pasting the following line into a new terminal window:')
+                out='qdel '
+                for job in job_ids:
+                    out += str(job)+' '
+                self.update_log.insert(out)
 
 
     def prepare_and_run_task(self,instruction):
