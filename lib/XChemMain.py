@@ -186,13 +186,13 @@ def print_acedrg_status(xce_logfile,xtal_db_dict):
             success+=1
         else:
             unknown+=1
-    update_log.insert('restraint generation pending: ...... %s' %str(pending))
-    update_log.insert('restraint generation started: ...... %s' %str(started))
-    update_log.insert('restraint generation running: ...... %s' %str(running))
-    update_log.insert('missing smiles string: ............. %s' %str(missing_smiles))
-    update_log.insert('restraint generation failed: ....... %s' %str(failed))
-    update_log.insert('restraints successfully created: ... %s' %str(success))
-    update_log.insert('unknown status: .................... %s' %str(unknown))
+    Logfile.insert('restraint generation pending: ...... %s' %str(pending))
+    Logfile.insert('restraint generation started: ...... %s' %str(started))
+    Logfile.insert('restraint generation running: ...... %s' %str(running))
+    Logfile.insert('missing smiles string: ............. %s' %str(missing_smiles))
+    Logfile.insert('restraint generation failed: ....... %s' %str(failed))
+    Logfile.insert('restraints successfully created: ... %s' %str(success))
+    Logfile.insert('unknown status: .................... %s' %str(unknown))
 
 def print_cluster_status_message(program,cluster_dict,xce_logfile):
     Logfile=XChemLog.updateLog(xce_logfile)
