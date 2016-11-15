@@ -3042,6 +3042,10 @@ class XChemExplorer(QtGui.QApplication):
 
         cluster_dict=XChemMain.get_jobs_running_on_cluster()
 
+        self.update_log.insert('gettting status updates...')
+
+        self.status_bar.showMessage('please check terminal window for further information')
+
         if instruction=='Run DIMPLE on All Autoprocessing MTZ files':
             self.check_status_rerun_dimple_on_all_autoprocessing_files()
 
@@ -3050,6 +3054,13 @@ class XChemExplorer(QtGui.QApplication):
             self.check_status_create_cif_pdb_png_files()
 
         elif instruction=='Run xia2 on selected datasets':
+            self.update_log.insert('%s xia2 jobs are running on the cluster' %len(cluster_dict['xia2']))
+            if len(cluster_dict['xia2']) > 0:
+                cumulative_runtime=0
+                for n,item in enumerate(cluster_dict['xia2']):
+                    cumulative_runtime += item[2]
+                average_runtime=round(float(cumulative_runtime)/float(n),0)
+                self.update_log.insert('average run time '+str(average_runtime))
             print cluster_dict
 
 
