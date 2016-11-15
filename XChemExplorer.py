@@ -752,8 +752,11 @@ class XChemExplorer(QtGui.QApplication):
         hbox.addWidget(frame_search)
 
         frame_translate=QtGui.QFrame()
+        frame_translate.setFrameShape(QtGui.QFrame.StyledPanel)
         vbox_translate=QtGui.QVBoxLayout()
-        vbox_translate.addWidget(QtGui.QLabel('translate:\ndatasetID -> sampleID'))
+        label=QtGui.QLabel('translate:\ndatasetID -> sampleID')
+        label.setAlignment(QtCore.Qt.AlignCenter)
+        vbox_translate.addWidget(label)
         button=QtGui.QPushButton('Open CSV')
         button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
         button.clicked.connect(self.translate_datasetID_to_sampleID)
@@ -842,10 +845,13 @@ class XChemExplorer(QtGui.QApplication):
         hbox.addWidget(frame_ref)
 
         frame_isigma=QtGui.QFrame()
+        frame_isigma.setFrameShape(QtGui.QFrame.StyledPanel)
         vbox_isigma=QtGui.QVBoxLayout()
-        vbox_isigma.addWidget(QtGui.QLabel('Resolution\nLimit\n(Mn<I/sig(I)>)'))
+        label=QtGui.QLabel('Resolution\nLimit:\nMn<I/sig(I)>')
+        label.setAlignment(QtCore.Qt.AlignCenter)
+        vbox_isigma.addWidget(label)
         self.reprocess_isigma_combobox=QtGui.QComboBox()
-        misigma = ['default','3','2','1.5','1','0.5']
+        misigma = ['default','4','3','2.5','2','1.5','1','0.5']
         for item in misigma:
             self.reprocess_isigma_combobox.addItem(item)
         self.reprocess_isigma_combobox.setCurrentIndex(0)
@@ -853,6 +859,22 @@ class XChemExplorer(QtGui.QApplication):
         vbox_isigma.addWidget(self.reprocess_isigma_combobox)
         frame_isigma.setLayout(vbox_isigma)
         hbox.addWidget(frame_isigma)
+
+        frame_cc_half=QtGui.QFrame()
+        frame_cc_half.setFrameShape(QtGui.QFrame.StyledPanel)
+        vbox_cc_half=QtGui.QVBoxLayout()
+        label=QtGui.QLabel('Resolution\nLimit:\nCC 1/2')
+        label.setAlignment(QtCore.Qt.AlignCenter)
+        vbox_cc_half.addWidget(label)
+        self.reprocess_cc_half_combobox=QtGui.QComboBox()
+        cc_half = ['default','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1']
+        for item in cc_half:
+            self.reprocess_cc_half_combobox.addItem(item)
+        self.reprocess_cc_half_combobox.setCurrentIndex(0)
+        self.reprocess_cc_half_combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
+        vbox_cc_half.addWidget(self.reprocess_cc_half_combobox)
+        frame_cc_half.setLayout(vbox_cc_half)
+        hbox.addWidget(frame_cc_half)
 
         hbox.addStretch(0)
 
@@ -2530,6 +2552,11 @@ class XChemExplorer(QtGui.QApplication):
         if str(self.reprocess_isigma_combobox.currentText()) != 'default':
             reso_limit.append(str(self.reprocess_isigma_combobox.currentText()))
 
+        # cc 1/2
+        cc_half = []
+        if str(self.reprocess_cc_half_combobox.currentText()) != 'default':
+            cc_half.append(str(self.reprocess_cc_half_combobox.currentText()))
+
         run_dict={}
         allRows = self.reprocess_datasets_table.rowCount()
         for row in xrange(0,allRows):
@@ -2545,6 +2572,7 @@ class XChemExplorer(QtGui.QApplication):
                                                     spg,
                                                     ref,
                                                     reso_limit,
+                                                    cc_half,
                                                     self.xce_logfile,
                                                     self.external_software,
                                                     self.ccp4_scratch_directory,

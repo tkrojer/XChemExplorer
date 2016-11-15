@@ -7,7 +7,7 @@ sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 import XChemLog
 
 class run_xia2(QtCore.QThread):
-    def __init__(self,initial_model_directory,run_dict,protocol,spg,ref,reso_limit,xce_logfile,external_software,ccp4_scratch_directory,max_queue_jobs):
+    def __init__(self,initial_model_directory,run_dict,protocol,spg,ref,reso_limit,cc_half,xce_logfile,external_software,ccp4_scratch_directory,max_queue_jobs):
         QtCore.QThread.__init__(self)
         self.initial_model_directory=initial_model_directory
         self.run_dict=run_dict
@@ -15,6 +15,7 @@ class run_xia2(QtCore.QThread):
         self.spg=spg
         self.ref=ref
         self.reso_limit=reso_limit
+        self.cc_half=cc_half
         self.xce_logfile=xce_logfile
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.external_software=external_software
@@ -38,6 +39,10 @@ class run_xia2(QtCore.QThread):
             else:
                 script+='#!'+os.getenv('SHELL')+'\n'
 
+            if os.getcwd().startswith('/dls'):
+                script += 'module load ccp4\n'
+                script += 'module load phenix\n'
+                script += 'module load XDS\n'
 
             if self.spg == []:
                 spg_option=''
@@ -52,7 +57,12 @@ class run_xia2(QtCore.QThread):
             if self.reso_limit == []:
                 reso_limit_option=''
             else:
-                reso_limit_option='misigma '+str(self.reso_limit[0])
+                reso_limit_option='misigma='+str(self.reso_limit[0])
+
+            if self.cc_half == []:
+                cc_half_option=''
+            else:
+                cc_half_option='cc_half='+str(self.cc_half[0])
 
 
             # first link diffraction images into directory
@@ -95,7 +105,7 @@ class run_xia2(QtCore.QThread):
                         script+='cd '+os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline)+'\n'
                         if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline)):
                             os.mkdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline))
-                        script+='xia2 -'+pipeline+' '+ref_option+' '+spg_option+' '+reso_limit_option+' '+image_dir+'\n'
+                        script+='xia2 pipeline='+pipeline+' '+ref_option+' '+spg_option+' '+reso_limit_option+' '+cc_half_option+' '+image_dir+'\n'
 
             script+='cd '+os.path.join(self.initial_model_directory,xtal,'processed')+'\n'
             script+='/bin/rm run_in_progress\n'
