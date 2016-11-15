@@ -2992,6 +2992,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def create_new_data_source(self):
         file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
+        print 'huhu'
         #make sure that the file always has .sqlite extension
         if file_name.rfind('.') != -1:
             file_name=file_name[:file_name.rfind('.')]+'.sqlite'
