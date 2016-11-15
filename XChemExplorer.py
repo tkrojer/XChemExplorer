@@ -920,7 +920,8 @@ class XChemExplorer(QtGui.QApplication):
                         'DataProcessing\nUnitCell',
                         'PANDDA\nlaunched?',
                         'PANDDA\nhit?',
-                        'PANDDA\nreject?'           ]
+                        'PANDDA\nreject?',
+                        'Dimple\nStatus'        ]
 
         self.initial_model_table=QtGui.QTableWidget()
         self.initial_model_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
