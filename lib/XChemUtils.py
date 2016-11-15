@@ -538,9 +538,10 @@ class parse:
             if line.startswith('Estimates of resolution limits: overall'):
                 resolution_at_sigma_line_overall_found=True
             if resolution_at_sigma_line_overall_found:
-                if 'from Mn(I/sd)' in line and len(line.split())==7:
-                    self.aimless['DataProcessingResolutionHigh15sigma']=line.split()[6][:-1]
-                    resolution_at_sigma_line_overall_found=False
+                if 'from Mn(I/sd)' in line and len(line.split()) >= 7:
+                    if '1.5' in line.split()[3]:
+                        self.aimless['DataProcessingResolutionHigh15sigma']=line.split()[6][:-1]
+                        resolution_at_sigma_line_overall_found=False
             if line.startswith('Average unit cell:') and len(line.split())==9:
                 tmp = []
                 tmp.append(line.split())
