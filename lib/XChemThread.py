@@ -339,7 +339,6 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         # DIMPLE pdb
 
         found_dimple_pdb=self.find_file('dimple.pdb',xtal)
-        print 'xtal @ dimple',found_dimple_pdb
         if found_dimple_pdb:
             db_dict['DimplePathToPDB']=os.path.realpath('dimple.pdb')
             pdb_info=parse().PDBheader('dimple.pdb')
@@ -433,6 +432,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         found_refine_pdb=self.find_file('refine.pdb',xtal)
         if found_refine_pdb:
             db_dict['RefinementPDB_latest']=os.path.realpath('refine.pdb')
+            db_dict['RefinementStatus']='finished'
             pdb_info=parse().dict_for_datasource_update('refine.pdb')
             db_dict.update(pdb_info)
             if db_dict['RefinementOutcome']=='None' or db_dict['RefinementOutcome']=='':
@@ -443,6 +443,10 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                 db_dict['RefinementOutcome']='3 - In Refinement'
         else:
             db_dict['RefinementPDB_latest']=''
+            db_dict['RefinementStatus']='pending'
+
+        if os.path.isfile('REFINEMENT_IN_PROGRESS'):
+            db_dict['RefinementStatus']='running'
 
         #
         # REFINE bound pdb

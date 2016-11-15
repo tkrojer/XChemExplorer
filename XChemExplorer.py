@@ -3736,6 +3736,13 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text=QtGui.QTableWidgetItem()
                         cell_text.setText(str( db_dict[ header[1] ]  ))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                        if header[0]=='Dimple\nStatus':
+                            if str( db_dict[ header[1] ]  ) == 'running':
+                                cell_text.setBackground(QtGui.QColor(100,230,150))
+                            elif str( db_dict[ header[1] ]  ) == 'pending':
+                                cell_text.setBackground(QtGui.QColor(20,100,230))
+                            elif str( db_dict[ header[1] ]  ) == 'finisged':
+                                cell_text.setBackground(QtGui.QColor(255,255,255))
                         self.initial_model_table.setItem(current_row, column, cell_text)
             if new_xtal:
                 self.initial_model_dimple_dict[xtal]=[run_dimple,reference_file_selection_combobox]

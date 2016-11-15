@@ -237,6 +237,9 @@ class Refine(object):
             '\n'
             +module_load+
             'cd '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'\n'
+            '\n'
+            '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(self.datasource,self.xtalID,'RefinementStatus','running') +
+            '\n'
             +findTLS+
             'refmac5 '
             +RefmacParams['HKLIN']
