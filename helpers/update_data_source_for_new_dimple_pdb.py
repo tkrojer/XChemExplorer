@@ -19,8 +19,10 @@ if __name__=='__main__':
             db_dict['DimplePathToMTZ']=os.path.join(inital_model_directory,xtal,'dimple.mtz')
             dimple_ran_successfully=True
             db_dict['DataProcessingDimpleSuccessful']='True'
+            db_dict['DimpleStatus'] = 'finished'
         if not dimple_ran_successfully:
             db_dict['DataProcessingDimpleSuccessful']='False'
+            db_dict['DimpleStatus'] = 'failed'
         pdb=parse().PDBheader(os.path.join(inital_model_directory,xtal,'dimple.pdb'))
         db_dict['DimpleRcryst']=pdb['Rcryst']
         db_dict['DimpleRfree']=pdb['Rfree']

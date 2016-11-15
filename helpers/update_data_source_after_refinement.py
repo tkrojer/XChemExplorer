@@ -25,6 +25,9 @@ def parse_pdb(inital_model_directory,xtal,db_dict):
         db_dict['RefinementSpaceGroup'] =           pdb['SpaceGroup']
         db_dict['RefinementResolution'] =           pdb['ResolutionHigh']
         db_dict['RefinementResolutionTL'] =         pdb['ResolutionColor']
+        db_dict['RefinementStatus'] =               'finished'
+    else:
+        db_dict['RefinementStatus'] =               'failed'
     if os.path.isfile(os.path.join(inital_model_directory,xtal,'refine.bound.pdb')):
         db_dict['RefinementBoundConformation']=os.path.realpath(os.path.join(inital_model_directory,xtal,'refine.bound.pdb'))
 

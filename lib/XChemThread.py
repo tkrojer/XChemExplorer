@@ -673,6 +673,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
         os.system('/bin/rm -f xce_dimple*sh')
 
         db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
+        database=os.path.join(self.database_directory,self.data_source_file)
 
         for n,item in enumerate(self.sample_list):
 
@@ -758,6 +759,8 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     '\n'
                     +ccp4_scratch+
                     '\n'
+                    '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(database,xtal,'DimpleStatus','running') +
+                    '\n'
                     'dimple --no-cleanup %s %s %s %s dimple\n' %(mtzin,ref_pdb,ref_mtz,ref_cif) +
                     '\n'
                     'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc,'dimple') +
@@ -785,6 +788,11 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             f.write(Cmds)
             f.close()
             os.system('chmod +x xce_dimple_%s.sh' %str(n+1))
+            db_dict={}
+            db_dict['DimpleStatus']='started'
+            self.Logfile.insert('%s: setting DataProcessingStatus flag to started' %xtal)
+            db.update_data_source(xtal,db_dict)
+
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
@@ -858,6 +866,7 @@ class remove_selected_dimple_files(QtCore.QThread):
             db_dict['DimplePANDDAhit']='False'
             db_dict['DimplePANDDAreject']='False'
             db_dict['DimplePANDDApath']=''
+            db_dict['DimpleStatus']='pending'
 
             self.Logfile.insert('%s: updating database' %xtal)
             self.db.update_data_source(xtal,db_dict)
