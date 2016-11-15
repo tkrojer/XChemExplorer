@@ -2599,6 +2599,14 @@ class XChemExplorer(QtGui.QApplication):
                 cell_text=QtGui.QTableWidgetItem()
                 cell_text.setText(db_dict['DataProcessingStatus'])
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                if db_dict['DataProcessingStatus'] == 'running':
+                    cell_text.setBackground(QtGui.QColor(100,230,150))
+                elif db_dict['DataProcessingStatus'] == 'pending':
+                    cell_text.setBackground(QtGui.QColor(20,100,230))
+                elif db_dict['DataProcessingStatus'] == 'started':
+                    cell_text.setBackground(QtGui.QColor(230,240,110))
+                elif db_dict['DataProcessingStatus'] == 'finished':
+                    cell_text.setBackground(QtGui.QColor(255,255,255))
                 self.reprocess_datasets_table.setItem(row, 7, cell_text)
 
     def get_job_list_for_dimple_rerun(self,xtal,job_list,db_dict,entry):
@@ -3741,7 +3749,9 @@ class XChemExplorer(QtGui.QApplication):
                                 cell_text.setBackground(QtGui.QColor(100,230,150))
                             elif str( db_dict[ header[1] ]  ) == 'pending':
                                 cell_text.setBackground(QtGui.QColor(20,100,230))
-                            elif str( db_dict[ header[1] ]  ) == 'finisged':
+                            elif str( db_dict[ header[1] ]  ) == 'started':
+                                cell_text.setBackground(QtGui.QColor(230,240,110))
+                            elif str( db_dict[ header[1] ]  ) == 'finished':
                                 cell_text.setBackground(QtGui.QColor(255,255,255))
                         self.initial_model_table.setItem(current_row, column, cell_text)
             if new_xtal:
