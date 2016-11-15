@@ -2675,6 +2675,7 @@ class XChemExplorer(QtGui.QApplication):
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
             self.work_thread.start()
 
 
@@ -3048,10 +3049,12 @@ class XChemExplorer(QtGui.QApplication):
 
         if instruction=='Run DIMPLE on All Autoprocessing MTZ files':
             self.check_status_rerun_dimple_on_all_autoprocessing_files()
+            self.print_status_message('dimple',cluster_dict)
 
         elif instruction=='Create CIF/PDB/PNG file of ALL soaked compound' or \
              instruction=='Create CIF/PDB/PNG file of NEW soaked compounds':
             self.check_status_create_cif_pdb_png_files()
+            self.print_status_message('acedrg',cluster_dict)
 
         elif instruction=='Run xia2 on selected datasets':
             self.print_status_message('xia2',cluster_dict)

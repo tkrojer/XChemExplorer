@@ -828,6 +828,8 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                 self.Logfile.insert('starting xce_dimple_%s.sh' %(str(i+1)))
                 os.system('./xce_dimple_%s.sh' %(str(i+1)))
 
+        self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
+
 
 class remove_selected_dimple_files(QtCore.QThread):
     def __init__(self,sample_list,initial_model_directory,xce_logfile,database_directory,data_source_file,):

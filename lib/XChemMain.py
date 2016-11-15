@@ -151,6 +151,7 @@ def get_jobs_running_on_cluster():
                     others_jobs.append([job_id,job_status,run_time_minutes])
 
     out_dict['dimple']=dimple_jobs
+    out_dict['acedrg']=acedrg_jobs
     out_dict['pandda']=pandda_jobs
     out_dict['refmac']=refmac_jobs
     out_dict['xia2']=xia2_jobs
