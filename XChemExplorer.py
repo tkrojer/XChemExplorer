@@ -3069,67 +3069,16 @@ class XChemExplorer(QtGui.QApplication):
 
         if instruction=='Run DIMPLE on All Autoprocessing MTZ files' or \
            instruction=='Run DIMPLE on selected MTZ files':
-            self.print_status_message('dimple',cluster_dict)
+            XChemMain.print_cluster_status_message('dimple',cluster_dict,self.xce_logfile)
 
         elif instruction=='Create CIF/PDB/PNG file of ALL soaked compound' or \
              instruction=='Create CIF/PDB/PNG file of NEW soaked compounds':
-            self.print_acedrg_status()
-            self.print_status_message('acedrg',cluster_dict)
+            XChemMain.print_acedrg_status(self.xce_logfile,self.xtal_db_dict)
+            XChemMain.print_cluster_status_message('acedrg',cluster_dict,self.xce_logfile)
 
         elif instruction=='Run xia2 on selected datasets':
-            self.print_status_message('xia2',cluster_dict)
+            XChemMain.print_cluster_status_message('xia2',cluster_dict,self.xce_logfile)
 
-    def print_acedrg_status(self):
-        self.update_log.insert('compound restraints summary')
-        pending=0
-        started=0
-        running=0
-        missing_smiles=0
-        failed=0
-        success=0
-        unknown=0
-        for xtal in self.xtal_db_dict:
-            db_dict=self.xtal_db_dict[xtal]
-            status=db_dict['RefinementCIFStatus']
-            if 'pending' in status:
-                pending+=1
-            elif 'started' in status:
-                status+=1
-            elif 'running' in status:
-                running+=1
-            elif 'missing' in status:
-                missing_smiles+=1
-            elif 'failed' in status:
-                failed +=1
-            elif 'generated' in status:
-                success+=1
-            else:
-                unknown+=1
-        self.update_log.insert('pending restraints: ................ %s' %str(pending))
-        self.update_log.insert('restraint generation started: ...... %s' %str(started))
-        self.update_log.insert('restraint generation running: ...... %s' %str(running))
-        self.update_log.insert('missing smiles string: ............. %s' %str(missing_smiles))
-        self.update_log.insert('restraint generation failed: ....... %s' %str(failed))
-        self.update_log.insert('restraints successfully created: ... %s' %str(success))
-        self.update_log.insert('unknown status: .................... %s' %str(unknown))
-
-    def print_status_message(self,program,cluster_dict):
-        self.update_log.insert('%s %s jobs are running on the cluster' %(len(cluster_dict[program]),program))
-        if len(cluster_dict[program]) > 0:
-            cumulative_runtime=0
-            job_ids = []
-            for n,item in enumerate(cluster_dict[program]):
-                cumulative_runtime += item[2]
-                if not item[0] in job_ids:
-                    job_ids.append(item[0])
-            average_runtime=round(float(cumulative_runtime)/float(n+1),0)
-            self.update_log.insert('average run time '+str(average_runtime)+' minutes')
-            if job_ids != []:
-                self.update_log.insert('you can kill them by pasting the following line into a new terminal window:')
-                out='qdel '
-                for job in job_ids:
-                    out += str(job)+' '
-                self.update_log.insert(out)
 
 
     def prepare_and_run_task(self,instruction):

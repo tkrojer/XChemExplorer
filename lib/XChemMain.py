@@ -159,6 +159,63 @@ def get_jobs_running_on_cluster():
 
     return out_dict
 
+def print_acedrg_status(xce_logfile,xtal_db_dict):
+    Logfile=XChemLog.updateLog(xce_logfile)
+    Logfile.insert('compound restraints summary:')
+    pending=0
+    started=0
+    running=0
+    missing_smiles=0
+    failed=0
+    success=0
+    unknown=0
+    for xtal in xtal_db_dict:
+        db_dict=xtal_db_dict[xtal]
+        status=db_dict['RefinementCIFStatus']
+        if 'pending' in status:
+            pending+=1
+        elif 'started' in status:
+            status+=1
+        elif 'running' in status:
+            running+=1
+        elif 'missing' in status:
+            missing_smiles+=1
+        elif 'failed' in status:
+            failed +=1
+        elif 'generated' in status:
+            success+=1
+        else:
+            unknown+=1
+    update_log.insert('restraint generation pending: ...... %s' %str(pending))
+    update_log.insert('restraint generation started: ...... %s' %str(started))
+    update_log.insert('restraint generation running: ...... %s' %str(running))
+    update_log.insert('missing smiles string: ............. %s' %str(missing_smiles))
+    update_log.insert('restraint generation failed: ....... %s' %str(failed))
+    update_log.insert('restraints successfully created: ... %s' %str(success))
+    update_log.insert('unknown status: .................... %s' %str(unknown))
+
+def print_cluster_status_message(program,cluster_dict,xce_logfile):
+    Logfile=XChemLog.updateLog(xce_logfile)
+    Logfile.insert('cluster status summary:')
+    Logfile.insert('%s %s jobs are running on the cluster' %(len(cluster_dict[program]),program))
+    if len(cluster_dict[program]) > 0:
+        cumulative_runtime=0
+        job_ids = []
+        for n,item in enumerate(cluster_dict[program]):
+            cumulative_runtime += item[2]
+            if not item[0] in job_ids:
+                job_ids.append(item[0])
+        average_runtime=round(float(cumulative_runtime)/float(n+1),0)
+        Logfile.insert('average run time '+str(average_runtime)+' minutes')
+        if job_ids != []:
+            Logfile.insert('you can kill them by pasting the following line into a new terminal window:')
+            out='qdel '
+            for job in job_ids:
+                out += str(job)+' '
+            Logfile.insert(out)
+
+
+
 def display_queue_status_in_terminal(in_dict):
     # latest_run=max(tmp,key=lambda x: x[1])[0]
     max_dimple_runtime=max(in_dict['dimple'],key=lambda  x:x[2])[2]
