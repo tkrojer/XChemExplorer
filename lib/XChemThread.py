@@ -336,7 +336,9 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         # DIMPLE pdb
 
+        print 'here'
         if self.find_file('dimple.pdb',xtal):
+            print 'found_it'
             db_dict['DimplePathToPDB']=os.path.realpath('dimple.pdb')
             pdb_info=parse().PDBheader('dimple.pdb')
             db_dict['DimpleRcryst']=pdb_info['Rcryst']
