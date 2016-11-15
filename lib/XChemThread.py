@@ -854,7 +854,7 @@ class remove_selected_dimple_files(QtCore.QThread):
             os.system('/bin/rm dimple.pdb 2> /dev/null')
             os.system('/bin/rm dimple.mtz 2> /dev/null')
             if os.path.isdir(os.path.join(self.initial_model_directory,xtal,'dimple','dimple_rerun_on_selected_file')):
-                os.chir('dimple')
+                os.chdir('dimple')
                 self.Logfile.insert('%s removing directory dimple/dimple_rerun_on_selected_file' %xtal)
                 os.system('/bin/rm -fr dimple_rerun_on_selected_file')
 
