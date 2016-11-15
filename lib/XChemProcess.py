@@ -5,9 +5,10 @@ from PyQt4 import QtGui, QtCore
 
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 import XChemLog
+import XChemDB
 
 class run_xia2(QtCore.QThread):
-    def __init__(self,initial_model_directory,run_dict,protocol,spg,ref,reso_limit,cc_half,xce_logfile,external_software,ccp4_scratch_directory,max_queue_jobs):
+    def __init__(self,initial_model_directory,run_dict,protocol,spg,ref,reso_limit,cc_half,xce_logfile,external_software,ccp4_scratch_directory,max_queue_jobs,database):
         QtCore.QThread.__init__(self)
         self.initial_model_directory=initial_model_directory
         self.run_dict=run_dict
@@ -21,6 +22,8 @@ class run_xia2(QtCore.QThread):
         self.external_software=external_software
         self.ccp4_scratch_directory=ccp4_scratch_directory
         self.max_queue_jobs=max_queue_jobs
+        self.database=database
+        self.db=XChemDB.data_source(database)
 
     def run(self):
         os.chdir(os.path.join(self.initial_model_directory))
@@ -105,8 +108,13 @@ class run_xia2(QtCore.QThread):
                         script+='cd '+os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline)+'\n'
                         if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline)):
                             os.mkdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline))
+                        script+='$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_status_flag.py')+' %s %s %s %s\n' %(self.database,xtal,'DataProcessingStatus','running')
                         script+='xia2 pipeline='+pipeline+' '+ref_option+' '+spg_option+' '+reso_limit_option+' '+cc_half_option+' '+image_dir+'\n'
 
+            '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_after_refinement.py')+
+            ' %s %s %s %s\n' %(self.datasource,self.xtalID,self.ProjectPath,os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))+
+            '\n'
+            script+='$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_status_flag.py')+' %s %s %s %s\n' %(self.database,xtal,'DataProcessingStatus','finished')
             script+='cd '+os.path.join(self.initial_model_directory,xtal,'processed')+'\n'
             script+='/bin/rm run_in_progress\n'
 
@@ -115,6 +123,10 @@ class run_xia2(QtCore.QThread):
             f.write(script)
             f.close()
             os.system('chmod +x xce_xia2_%s.sh' %str(i+1))
+            db_dict={}
+            db_dict['DataProcessingStatus']='started'
+            self.Logfile.insert('%s: setting DataProcessingStatus flag to started')
+            self.db.update_data_source(xtal,db_dict)
 
         # submit job
         self.Logfile.insert('created input scripts for '+str(n+1)+' in '+self.ccp4_scratch_directory)

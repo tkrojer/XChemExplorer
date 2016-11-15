@@ -132,6 +132,8 @@ class data_source:
             ['DataProcessingAlert',                         'DataProcessing\nAlert',                        'TEXT',                 0],
             ['DataProcessingScore',                         'DataProcessing\nScore',                        'TEXT',                 1],
 
+            ['DataProcessingStatus',                        'DataProcessing\nStatus',                       'TEXT',                 1],
+
             ['DataProcessingRcryst',                        'DataProcessing\nRcryst',                       'TEXT',                 0],
             ['DataProcessingRfree',                         'DataProcessing\nRfree',                        'TEXT',                 0],
             ['DataProcessingPathToDimplePDBfile',           'DataProcessingPathToDimplePDBfile',            'TEXT',                 0],
@@ -148,6 +150,7 @@ class data_source:
             ['DimplePANDDAhit',                             'PANDDA\nhit?',                                 'TEXT',                 1],
             ['DimplePANDDAreject',                          'PANDDA\nreject?',                              'TEXT',                 1],
             ['DimplePANDDApath',                            'PANDDA\npath?',                                'TEXT',                 1],
+            ['DimpleStatus',                                'Dimple\nStatus',                               'TEXT',                 1],
 
             ['RefinementResolution',                        'Refinement\nResolution',                       'TEXT',                 1],
             ['RefinementResolutionTL',                      'RefinementResolutionTL',                       'TEXT',                 0],
@@ -178,6 +181,7 @@ class data_source:
             ['RefinementRamachandranOutliersTL',            'RefinementRamachandranOutliersTL',             'TEXT',                 0],
             ['RefinementRamachandranFavored',               'Ramachandran\nFavored',                        'TEXT',                 1],
             ['RefinementRamachandranFavoredTL',             'RefinementRamachandranFavoredTL',              'TEXT',                 0],
+            ['RefinementStatus',                            'Refinement\nStatus',                           'TEXT',                 1],
 
             ['Deposition_PDB_ID',                           'Deposition_PDB_ID',                            'TEXT',                 1],
             ['Deposition_Date',                             'Deposition_Date',                              'TEXT',                 1],

@@ -776,7 +776,8 @@ class XChemExplorer(QtGui.QApplication):
                                                 'Resolution\n[Mn<I/sig(I)> = 1.5]',
                                                 'Rmerge\nLow',
                                                 'DataProcessing\nSpaceGroup',
-                                                'DataProcessing\nUnitCell'  ]
+                                                'DataProcessing\nUnitCell',
+                                                'DataProcessing\nStatus'    ]
 
         self.reprocess_datasets_table=QtGui.QTableWidget()
         self.reprocess_datasets_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -2576,7 +2577,8 @@ class XChemExplorer(QtGui.QApplication):
                                                     self.xce_logfile,
                                                     self.external_software,
                                                     self.ccp4_scratch_directory,
-                                                    self.max_queue_jobs     )
+                                                    self.max_queue_jobs,
+                                                    os.path.join(self.database_directory,self.data_source_file)     )
             self.explorer_active=1
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
