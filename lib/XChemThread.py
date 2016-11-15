@@ -942,9 +942,8 @@ class start_pandda_inspect(QtCore.QThread):
             source_file=''
 
         Cmds = (
-#                '#!'+os.getenv('SHELL')+'\n'
-                'unset PATH\n'
-                "export PATH='/usr/lib64/qt-3.3/bin:/usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin'\n"
+                '#!'+os.getenv('SHELL')+'\n'
+                'unset PYTHONPATH\n'
                 'source '+source_file+'\n'
                 'cd '+self.panddas_directory+'\n'
                 'pandda.inspect\n'
