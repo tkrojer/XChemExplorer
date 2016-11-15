@@ -3047,8 +3047,8 @@ class XChemExplorer(QtGui.QApplication):
 
         self.status_bar.showMessage('please check terminal window for further information')
 
-        if instruction=='Run DIMPLE on All Autoprocessing MTZ files':
-            self.check_status_rerun_dimple_on_all_autoprocessing_files()
+        if instruction=='Run DIMPLE on All Autoprocessing MTZ files' or \
+           instruction=='Run DIMPLE on selected MTZ files':
             self.print_status_message('dimple',cluster_dict)
 
         elif instruction=='Create CIF/PDB/PNG file of ALL soaked compound' or \

@@ -1,4 +1,4 @@
-# last edited: 14/11/2016, 15:00
+# last edited: 15/11/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -339,6 +339,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
             db_dict['DimpleRcryst']=pdb_info['Rcryst']
             db_dict['DimpleRfree']=pdb_info['Rfree']
             db_dict['DimpleResolutionHigh']=pdb_info['ResolutionHigh']
+            db_dict['DimpleStatus']='finished'
         else:
             db_dict['DimplePathToPDB']=''
             db_dict['DimpleRcryst']=''
@@ -354,6 +355,11 @@ class synchronise_db_and_filesystem(QtCore.QThread):
             dimple_path=dimple_mtz[:dimple_mtz.rfind('/')]
         else:
             db_dict['DimplePathToMTZ']=''
+
+        if os.path.isfile(os.path.join(dimple_path,'dimple','dimple_rerun_on_selected_file','dimple_run_in_progress')):
+            db_dict['DimpleStatus']='running'
+        else:
+            db_dict['DimpleStatus']='pending'
 
         # MTZ free file
 
