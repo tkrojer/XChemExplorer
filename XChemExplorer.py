@@ -2991,6 +2991,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def create_new_data_source(self):
+        print 'xxx'
         file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
         print 'huhu'
         #make sure that the file always has .sqlite extension
