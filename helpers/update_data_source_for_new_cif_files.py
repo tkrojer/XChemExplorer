@@ -16,8 +16,8 @@ if __name__=='__main__':
     db_dict={}
     if os.path.isfile(os.path.join(inital_model_directory,xtal,'compound',compoundID+'.cif')):
         db_dict['RefinementCIF']=os.path.join(inital_model_directory,xtal,'compound',compoundID+'.cif')
-        db_dict['RefinementCIFStatus']='restraints\ngenerated'
+        db_dict['RefinementCIFStatus']='restraints generated'
     else:
         db_dict['RefinementCIF']=''
-        db_dict['RefinementCIFStatus']='restraints\nfailed'
+        db_dict['RefinementCIFStatus']='restraints failed'
     db.update_data_source(xtal,db_dict)

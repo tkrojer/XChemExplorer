@@ -3770,10 +3770,12 @@ class XChemExplorer(QtGui.QApplication):
                                 cell_text.setBackground(QtGui.QColor(20,100,230))
                             elif str( db_dict[ header[1] ]  ) == 'started':
                                 cell_text.setBackground(QtGui.QColor(230,240,110))
-                            elif str( db_dict[ header[1] ]  ) == 'restraints\ngenerated':
+                            elif str( db_dict[ header[1] ]  ) == 'restraints generated':
                                 cell_text.setBackground(QtGui.QColor(255,255,255))
-                            elif str( db_dict[ header[1] ]  ) == 'restraints\nfailed':
+                            elif str( db_dict[ header[1] ]  ) == 'restraints failed':
                                 cell_text.setBackground(QtGui.QColor(255,0,0))
+                            elif str( db_dict[ header[1] ]  ) == 'missing smiles':
+                                cell_text.setBackground(QtGui.QColor(240,150,20))
                         self.initial_model_table.setItem(current_row, column, cell_text)
             if new_xtal:
                 self.initial_model_dimple_dict[xtal]=[run_dimple,reference_file_selection_combobox]

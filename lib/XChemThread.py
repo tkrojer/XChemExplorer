@@ -399,7 +399,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         if os.path.isfile(compoundID+'.cif'):
             db_dict['RefinementCIF']=os.path.realpath(compoundID+'.cif')
-            db_dict['RefinementCIFStatus']='restraints\ngenerated'
+            db_dict['RefinementCIFStatus']='restraints generated'
         else:
             os.system('/bin/rm %s.cif 2> /dev/null' %compoundID)
             db_dict['RefinementCIF']=''
@@ -420,7 +420,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                                 break
 
         if not smiles_found:
-            db_dict['RefinementCIFStatus']='missing\nsmiles'
+            db_dict['RefinementCIFStatus']='missing smiles'
 
         if not os.path.isfile(compoundID+'.pdb'):
             os.system('/bin/rm %s.pdb 2> /dev/null' %compoundID)
