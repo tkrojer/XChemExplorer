@@ -1,4 +1,4 @@
-# last edited: 14/11/2016, 15:00
+# last edited: 15/11/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -2997,6 +2997,7 @@ class XChemExplorer(QtGui.QApplication):
             file_name=file_name[:file_name.rfind('.')]+'.sqlite'
         else:
             file_name=file_name+'.sqlite'
+        print 'here'
         self.db=XChemDB.data_source(file_name)
         print '==> XCE: creating new data source'
         self.db.create_empty_data_source_file()
