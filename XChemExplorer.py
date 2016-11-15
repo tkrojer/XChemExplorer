@@ -2594,7 +2594,7 @@ class XChemExplorer(QtGui.QApplication):
         for row in xrange(0,allRows):
             sample_id=str(self.reprocess_datasets_table.item(row,1).text())
             if sample_id in self.xtal_db_dict:
-                db_dict=self.xtal_db_dict[sampleID]
+                db_dict=self.xtal_db_dict[sample_id]
                 cell_text=QtGui.QTableWidgetItem()
                 cell_text.setText(db_dict['DataProcessingStatus'])
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
