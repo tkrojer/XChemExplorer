@@ -274,7 +274,6 @@ class synchronise_db_and_filesystem(QtCore.QThread):
     def find_file(self,filename,xtal):
         found_file=False
         for files in glob.glob('*'):
-            print 'xxxxxx',files
             if files == filename:
                 # at this point, this could ba a file or a (broken) symbolic link
                 try:
@@ -304,9 +303,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         # AIMLESS logfile
 
-        found_logfile=False
-        if self.find_file(xtal+'.log',xtal):
-            found_logfile=True
+        found_logfile=self.find_file(xtal+'.log',xtal)
+        if found_logfile:
             db_dict['DataProcessingPathToLogfile']=os.path.realpath(xtal+'.log')
             db_dict['DataProcessingLOGfileName']=xtal+'.log'
             if db_dict['DataCollectionOutcome']=='None' or db_dict['DataCollectionOutcome']=='':
@@ -319,7 +317,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         # MTZ file
 
-        if self.find_file(xtal+'.mtz',xtal):
+        found_mtzfile=self.find_file(xtal+'.mtz',xtal)
+        if found_mtzfile:
             db_dict['DataProcessingPathToMTZfile']=os.path.realpath(xtal+'.mtz')
             db_dict['DataProcessingMTZfileName']=xtal+'.mtz'
             if not found_logfile:
@@ -337,9 +336,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         # DIMPLE pdb
 
-        print 'here'
-        if self.find_file('dimple.pdb',xtal):
-            print 'found_it'
+        found_dimple_pdb=self.find_file('dimple.pdb',xtal)
+        if found_dimple_pdb:
             db_dict['DimplePathToPDB']=os.path.realpath('dimple.pdb')
             pdb_info=parse().PDBheader('dimple.pdb')
             db_dict['DimpleRcryst']=pdb_info['Rcryst']
@@ -355,7 +353,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         # DIMPLE mtz
 
         dimple_path=''
-        if self.find_file('dimple.mtz',xtal):
+        found_dimple_mtz=self.find_file('dimple.mtz',xtal)
+        if found_dimple_mtz:
             db_dict['DimplePathToMTZ']=os.path.realpath('dimple.mtz')
             dimple_mtz=db_dict['DimplePathToMTZ']
             dimple_path=dimple_mtz[:dimple_mtz.rfind('/')]
@@ -367,7 +366,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         # MTZ free file
 
-        if self.find_file(xtal+'.free.mtz',xtal):
+        found_free_mtz=self.find_file(xtal+'.free.mtz',xtal)
+        if found_free_mtz:
             db_dict['RefinementMTZfree']=os.path.realpath(xtal+'.free.mtz')
         else:
             db_dict['RefinementMTZfree']=''
@@ -427,7 +427,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         # REFINE pdb
         #
 
-        if self.find_file('refine.pdb',xtal):
+        found_refine_pdb=self.find_file('refine.pdb',xtal)
+        if found_refine_pdb:
             db_dict['RefinementPDB_latest']=os.path.realpath('refine.pdb')
             pdb_info=parse().dict_for_datasource_update('refine.pdb')
             db_dict.update(pdb_info)
@@ -453,7 +454,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         # REFINE mtz
         #
 
-        if self.find_file('refine.mtz',xtal):
+        found_refine_mtz=self.find_file('refine.mtz',xtal)
+        if found_refine_mtz:
             db_dict['RefinementMTZ_latest']=os.path.realpath('refine.mtz')
         else:
             db_dict['RefinementMTZ_latest']=''
