@@ -3057,11 +3057,19 @@ class XChemExplorer(QtGui.QApplication):
             self.update_log.insert('%s xia2 jobs are running on the cluster' %len(cluster_dict['xia2']))
             if len(cluster_dict['xia2']) > 0:
                 cumulative_runtime=0
+                job_ids = []
                 for n,item in enumerate(cluster_dict['xia2']):
                     cumulative_runtime += item[2]
-                average_runtime=round(float(cumulative_runtime)/float(n),0)
-                self.update_log.insert('average run time '+str(average_runtime))
-            print cluster_dict
+                    if item[1] in in job_ids:
+                        job_ids.append(item[1])
+                average_runtime=round(float(cumulative_runtime)/float(n+1),0)
+                self.update_log.insert('average run time '+str(average_runtime)+' minutes')
+                if job_ids != []:
+                    self.update_log.insert('you can kill them by pasting the following line into a new terminal window:')
+                    out='qdel '
+                    for job in job_ids:
+                        out += str(job)+' '
+                    self.update_log.insert(out)
 
 
     def prepare_and_run_task(self,instruction):
