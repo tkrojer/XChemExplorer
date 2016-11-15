@@ -290,6 +290,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                         if not os.path.isfile(link):
                             self.Logfile.insert('removing broken link: '+filename)
                             os.system('/bin/rm %s 2> /dev/null' %filename)
+                        else:
+                            found_file=True
                 except OSError:
                     if os.path.isfile(filename):
                         found_file=True
