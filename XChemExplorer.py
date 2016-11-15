@@ -921,7 +921,8 @@ class XChemExplorer(QtGui.QApplication):
                         'PANDDA\nlaunched?',
                         'PANDDA\nhit?',
                         'PANDDA\nreject?',
-                        'Dimple\nStatus'        ]
+                        'Dimple\nStatus',
+                        'Compound\nStatus'                  ]
 
         self.initial_model_table=QtGui.QTableWidget()
         self.initial_model_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -3762,6 +3763,17 @@ class XChemExplorer(QtGui.QApplication):
                                 cell_text.setBackground(QtGui.QColor(230,240,110))
                             elif str( db_dict[ header[1] ]  ) == 'finished':
                                 cell_text.setBackground(QtGui.QColor(255,255,255))
+                        if header[0]=='Compound\nStatus':
+                            if str( db_dict[ header[1] ]  ) == 'running':
+                                cell_text.setBackground(QtGui.QColor(100,230,150))
+                            elif str( db_dict[ header[1] ]  ) == 'pending':
+                                cell_text.setBackground(QtGui.QColor(20,100,230))
+                            elif str( db_dict[ header[1] ]  ) == 'started':
+                                cell_text.setBackground(QtGui.QColor(230,240,110))
+                            elif str( db_dict[ header[1] ]  ) == 'restraints\ngenerated':
+                                cell_text.setBackground(QtGui.QColor(255,255,255))
+                            elif str( db_dict[ header[1] ]  ) == 'restraints\nfailed':
+                                cell_text.setBackground(QtGui.QColor(255,0,0))
                         self.initial_model_table.setItem(current_row, column, cell_text)
             if new_xtal:
                 self.initial_model_dimple_dict[xtal]=[run_dimple,reference_file_selection_combobox]

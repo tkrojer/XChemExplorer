@@ -167,6 +167,7 @@ class data_source:
             ['RefinementOutcome',                           'Refinement\nOutcome',                          'TEXT',                 1],
             ['RefinementMTZfree',                           'RefinementMTZfree',                            'TEXT',                 1],
             ['RefinementCIF',                               'RefinementCIF',                                'TEXT',                 1],
+            ['RefinementCIFStatus',                         'Compound\nStatus',                             'TEXT',                 1],
             ['RefinementPDB_latest',                        'RefinementPDB_latest',                         'TEXT',                 1],
             ['RefinementMTZ_latest',                        'RefinementMTZ_latest',                         'TEXT',                 1],
             ['RefinementMatrixWeight',                      'RefinementMatrixWeight',                       'TEXT',                 0],

@@ -397,8 +397,18 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                                 compoundID=db_dict['CompoundCode']
                                 break
 
+        if os.path.isfile(compoundID+'.cif'):
+            db_dict['RefinementCIF']=os.path.realpath(compoundID+'.cif')
+            db_dict['RefinementCIFStatus']='restraints\ngenerated'
+        else:
+            os.system('/bin/rm %s.cif 2> /dev/null' %compoundID)
+            db_dict['RefinementCIF']=''
+            db_dict['RefinementCIFStatus']='pending'
+
         smilesDB=db_dict['CompoundSMILES']
+        smiles_found=True
         if smilesDB=='None' or smilesDB=='':
+            smiles_found=False
             if os.path.isdir('compound'):
                 for smiles in glob.glob('compound/*'):
                     if smiles.endswith('smiles'):
@@ -406,19 +416,17 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                             if len(line.split()) >= 1:
                                 db_dict['CompoundSMILES']=line.split()[0]
                                 smilesDB=db_dict['CompoundSMILES']
+                                smiles_found=True
                                 break
+
+        if not smiles_found:
+            db_dict['RefinementCIFStatus']='missing\nsmiles'
 
         if not os.path.isfile(compoundID+'.pdb'):
             os.system('/bin/rm %s.pdb 2> /dev/null' %compoundID)
 
         if not os.path.isfile(compoundID+'.png'):
             os.system('/bin/rm %s.png 2> /dev/null' %compoundID)
-
-        if os.path.isfile(compoundID+'.cif'):
-            db_dict['RefinementCIF']=os.path.realpath(compoundID+'.cif')
-        else:
-            os.system('/bin/rm %s.cif 2> /dev/null' %compoundID)
-            db_dict['RefinementCIF']=''
 
         return db_dict
 
