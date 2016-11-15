@@ -2823,6 +2823,15 @@ class XChemExplorer(QtGui.QApplication):
                 else:
                     cell_text=QtGui.QTableWidgetItem()
                     if db_dict != {}:
+                        if header[0]=='DataProcessing\nStatus':
+                            if str( db_dict[ header[1] ]  ) == 'running':
+                                cell_text.setBackground(QtGui.QColor(100,230,150))
+                            elif str( db_dict[ header[1] ]  ) == 'pending':
+                                cell_text.setBackground(QtGui.QColor(20,100,230))
+                            elif str( db_dict[ header[1] ]  ) == 'started':
+                                cell_text.setBackground(QtGui.QColor(230,240,110))
+                            elif str( db_dict[ header[1] ]  ) == 'finished':
+                                cell_text.setBackground(QtGui.QColor(255,255,255))
                         cell_text.setText(str( db_dict[ header[1] ]  ))
                     else:
                         cell_text.setText('')
