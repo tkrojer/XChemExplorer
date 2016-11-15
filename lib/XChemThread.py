@@ -943,6 +943,7 @@ class start_pandda_inspect(QtCore.QThread):
 
         Cmds = (
 #                '#!'+os.getenv('SHELL')+'\n'
+                'unset CCP4\n'
                 'source '+source_file+'\n'
                 'cd '+self.panddas_directory+'\n'
                 'pandda.inspect\n'
