@@ -3073,6 +3073,7 @@ class XChemExplorer(QtGui.QApplication):
 
         elif instruction=='Create CIF/PDB/PNG file of ALL soaked compound' or \
              instruction=='Create CIF/PDB/PNG file of NEW soaked compounds':
+            self.print_acedrg_status()
             self.print_status_message('acedrg',cluster_dict)
 
         elif instruction=='Run xia2 on selected datasets':
