@@ -274,6 +274,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
     def find_file(self,filename,xtal):
         found_file=False
         for files in glob.glob('*'):
+            print 'xxxxxx',files
             if files == filename:
                 # at this point, this could ba a file or a (broken) symbolic link
                 try:
