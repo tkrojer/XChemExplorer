@@ -2565,7 +2565,7 @@ class XChemExplorer(QtGui.QApplication):
             if self.diffraction_data_table_dict[dataset_id][0].isChecked():
                 run_dict[sample_id]=self.diffraction_data_dict[dataset_id]
 
-        if protcol != [] and run_dict !={}:
+        if protocol != [] and run_dict !={}:
             self.work_thread=XChemProcess.run_xia2( self.initial_model_directory,
                                                     run_dict,
                                                     protocol,
