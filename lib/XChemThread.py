@@ -263,6 +263,9 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         self.sync_pandda_table()
         self.Logfile.insert('database panddaTable update finished')
 
+        self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
+
+
     def change_absolute_to_relative_links(self,target,filename):
         os.unlink(filename)
         os.symlink(os.path.relpath(target),filename)
@@ -345,7 +348,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
             db_dict['DimpleRcryst']=''
             db_dict['DimpleRfree']=''
             db_dict['DimpleResolutionHigh']=''
-
+            db_dict['DimpleStatus']='pending'
         # DIMPLE mtz
 
         dimple_path=''
@@ -358,8 +361,6 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         if os.path.isfile(os.path.join(dimple_path,'dimple','dimple_rerun_on_selected_file','dimple_run_in_progress')):
             db_dict['DimpleStatus']='running'
-        else:
-            db_dict['DimpleStatus']='pending'
 
         # MTZ free file
 
