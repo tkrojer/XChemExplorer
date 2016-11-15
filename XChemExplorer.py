@@ -3037,12 +3037,21 @@ class XChemExplorer(QtGui.QApplication):
                         self.need_to_switch_main_tab(task_index)
 
     def get_status_of_workflow_milestone(self,instruction):
+        # first update all tables
+        self.datasource_menu_reload_samples()
+
+        cluster_dict=XChemMain.get_jobs_running_on_cluster()
+
         if instruction=='Run DIMPLE on All Autoprocessing MTZ files':
             self.check_status_rerun_dimple_on_all_autoprocessing_files()
 
         elif instruction=='Create CIF/PDB/PNG file of ALL soaked compound' or \
              instruction=='Create CIF/PDB/PNG file of NEW soaked compounds':
             self.check_status_create_cif_pdb_png_files()
+
+        elif instruction=='Run xia2 on selected datasets':
+            print cluster_dict
+
 
     def prepare_and_run_task(self,instruction):
 

@@ -97,6 +97,7 @@ def get_jobs_running_on_cluster():
     acedrg_jobs=[]
     pandda_jobs=[]
     refmac_jobs=[]
+    xia2_jobs=[]
     others_jobs=[]
 
     # note: each job_details list contains a list with
@@ -144,12 +145,15 @@ def get_jobs_running_on_cluster():
                     pandda_jobs.append([job_id,job_status,run_time_minutes])
                 elif 'refmac' in job_name:
                     refmac_jobs.append([job_id,job_status,run_time_minutes])
+                elif 'xia2' in job_name:
+                    xia2_jobs.append([job_id,job_status,run_time_minutes])
                 else:
                     others_jobs.append([job_id,job_status,run_time_minutes])
 
     out_dict['dimple']=dimple_jobs
     out_dict['pandda']=pandda_jobs
     out_dict['refmac']=refmac_jobs
+    out_dict['xia2']=xia2_jobs
     out_dict['others']=others_jobs
 
     return out_dict
