@@ -678,8 +678,8 @@ class create_png_and_cif_of_compound(QtCore.QThread):
                     self.Logfile.insert('starting xce_acedrg_%s.sh' %(str(i+1)))
                     os.system('./xce_acedrg_%s.sh' %(str(i+1)))
 
-        self.emit(QtCore.SIGNAL("finished()"))
-
+#        self.emit(QtCore.SIGNAL("finished()"))
+        self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
 
 class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
     def __init__(self,sample_list,initial_model_directory,external_software,ccp4_scratch_directory,database_directory,data_source_file,max_queue_jobs,xce_logfile):

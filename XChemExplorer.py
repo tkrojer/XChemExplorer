@@ -381,8 +381,9 @@ class XChemExplorer(QtGui.QApplication):
 
         self.map_cif_file_tasks = [ 'Run DIMPLE on selected MTZ files',
                                     'Remove selected DIMPLE PDB/MTZ files',
-                                    'Create CIF/PDB/PNG file of ALL soaked compound',
-                                    'Create CIF/PDB/PNG file of NEW soaked compounds'    ]
+                                    'Create CIF/PDB/PNG file of ALL compound',
+                                    'Create CIF/PDB/PNG file of NEW compounds',
+                                    'Create CIF/PDB/PNG file of SELECTED compounds' ]
 
         frame_map_cif_file_task=QtGui.QFrame()
         frame_map_cif_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -3110,11 +3111,14 @@ class XChemExplorer(QtGui.QApplication):
         elif instruction=='Remove selected DIMPLE PDB/MTZ files':
             self.remove_selected_dimple_files()
 
-        elif instruction=='Create CIF/PDB/PNG file of ALL soaked compound':
+        elif instruction=='Create CIF/PDB/PNG file of ALL compound':
             self.create_cif_pdb_png_files('ALL')
 
-        elif instruction=='Create CIF/PDB/PNG file of NEW soaked compounds':
+        elif instruction=='Create CIF/PDB/PNG file of NEW compounds':
             self.create_cif_pdb_png_files('NEW')
+
+        elif instruction=='Create CIF/PDB/PNG file of SELECTED compounds':
+            self.create_cif_pdb_png_files('SELECTED')
 
         elif instruction=='pandda.analyse':
             self.run_pandda_analyse()
@@ -3391,11 +3395,17 @@ class XChemExplorer(QtGui.QApplication):
                 compoundID='compound'
             else:
                 compoundID=str(item[1])
+
             if todo == 'ALL':
                 compound_list.append([str(item[0]),compoundID,str(item[2])])
-            if todo == 'NEW':
+            elif todo == 'NEW':
                 if not os.path.isfile(os.path.join(self.initial_model_directory,str(item[0]),compoundID+'.cif')):
                     compound_list.append([str(item[0]),compoundID,str(item[2])])
+            elif todo == 'SELECTED':
+                if str(item[0]) in self.initial_model_dimple_dict:
+                    if self.initial_model_dimple_dict[str(item[0])][0].isChecked():
+                        compound_list.append([str(item[0]),compoundID,str(item[2])])
+
         if compound_list != []:
             self.update_log.insert('trying to create cif and pdb files for '+str(len(compound_list))+' compounds using ACEDRG...')
             if self.external_software['qsub']:
@@ -3418,6 +3428,7 @@ class XChemExplorer(QtGui.QApplication):
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
             self.work_thread.start()
 
 
