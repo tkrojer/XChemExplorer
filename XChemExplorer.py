@@ -3272,7 +3272,7 @@ class XChemExplorer(QtGui.QApplication):
                 if not os.path.isfile(os.path.join(self.reference_directory,cluster+'.pdb')):
 #                    os.system('/bin/cp %s %s' %(cluster_dict[cluster][0],os.path.join(self.reference_directory,cluster+'.pdb')))
                     print '/bin/cp %s %s' %(cluster_dict[cluster][0],os.path.join(self.reference_directory,cluster+'.pdb'))
-                    self.update_log.insert('copying %s as reference file for cluster % in reference directory as %s.pdb' %(cluster_dict[cluster][0],cluster,cluster))
+                    self.update_log.insert('copying %s as reference file for cluster %s in reference directory as %s.pdb' %(cluster_dict[cluster][0],cluster,cluster))
 
         self.update_log.insert('updating combobox')
         self.populate_reference_combobox(self.pandda_reference_file_selection_combobox)

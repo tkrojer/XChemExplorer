@@ -367,7 +367,23 @@ class giant_cluster_datasets(QtCore.QThread):
         # 3.) giant.cluster_mtzs_and_pdbs
         self.Logfile.insert("running giant.cluster_mtzs_and_pdbs %s/*/%s pdb_regex='%s/(.*)/%s' out_dir='%s/cluster_analysis'" %(self.initial_model_directory,self.pdb_style,self.initial_model_directory,self.pdb_style,self.panddas_directory))
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running giant.cluster_mtzs_and_pdbs')
-        os.system("giant.cluster_mtzs_and_pdbs %s/*/%s pdb_regex='%s/(.*)/%s' out_dir='%s/cluster_analysis'" %(self.initial_model_directory,self.pdb_style,self.initial_model_directory,self.pdb_style,self.panddas_directory))
+
+        if os.getenv('SHELL') == '/bin/tcsh' or os.getenv('SHELL') == '/bin/csh':
+            source_file=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-csh')
+        elif os.getenv('SHELL') == '/bin/bash':
+            source_file=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')
+        else:
+            source_file=''
+
+        Cmds = (
+                '#!'+os.getenv('SHELL')+'\n'
+                'unset PYTHONPATH\n'
+                'source '+source_file+'\n'
+                "giant.cluster_mtzs_and_pdbs %s/*/%s pdb_regex='%s/(.*)/%s' out_dir='%s/cluster_analysis'" %(self.initial_model_directory,self.pdb_style,self.initial_model_directory,self.pdb_style,self.panddas_directory)
+            )
+
+#        os.system("giant.cluster_mtzs_and_pdbs %s/*/%s pdb_regex='%s/(.*)/%s' out_dir='%s/cluster_analysis'" %(self.initial_model_directory,self.pdb_style,self.initial_model_directory,self.pdb_style,self.panddas_directory))
+        os.system(Cmds)
         self.emit(QtCore.SIGNAL('update_progress_bar'), 80)
 
         # 4.) analyse output
