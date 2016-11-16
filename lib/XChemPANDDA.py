@@ -97,12 +97,12 @@ class run_pandda_export(QtCore.QThread):
         # first make a note of all the datasets which were used in pandda directory
         os.chdir(os.path.join(self.panddas_directory,'processed_datasets'))
         for xtal in glob.glob('*'):
-            self.Logfile.insert("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'False',DimplePANDDApath='%s' where CrystalName is '%s'" %(self.panddas_directory,xtal))
+#            self.Logfile.insert("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'False',DimplePANDDApath='%s' where CrystalName is '%s'" %(self.panddas_directory,xtal))
             self.db.execute_statement("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'False',DimplePANDDApath='%s' where CrystalName is '%s'" %(self.panddas_directory,xtal))
         # do the same as before, but look for rejected datasets
         os.chdir(os.path.join(self.panddas_directory,'rejected_datasets'))
         for xtal in glob.glob('*'):
-            self.Logfile.insert("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'True',DimplePANDDApath='%s',DimplePANDDAhit = 'False' where CrystalName is '%s'" %(self.panddas_directory,xtal))
+#            self.Logfile.insert("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'True',DimplePANDDApath='%s',DimplePANDDAhit = 'False' where CrystalName is '%s'" %(self.panddas_directory,xtal))
             self.db.execute_statement("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'True',DimplePANDDApath='%s',DimplePANDDAhit = 'False' where CrystalName is '%s'" %(self.panddas_directory,xtal))
 
         site_list = []
@@ -183,8 +183,8 @@ class run_pandda_export(QtCore.QThread):
                 db_dict['PANDDA_site_x']                =   line['x']
                 db_dict['PANDDA_site_y']                =   line['y']
                 db_dict['PANDDA_site_z']                =   line['z']
-                db_dict['PANDDA_site_ligand_id']        =   'LIG'
-                db_dict['PANDDA_site_event_map']        =   event_map
+                db_dict['PANDDA_site_ligand_id']        =   ''
+                db_dict['PANDDA_site_event_map']        =   ''
                 db_dict['PANDDA_site_initial_model']    =   pandda_model
                 db_dict['PANDDA_site_initial_mtz']      =   inital_mtz
                 db_dict['PANDDA_site_spider_plot']      =   ''
@@ -226,7 +226,7 @@ class run_pandda_export(QtCore.QThread):
                 ' generate_occupancy_groupings=True\n'
                 )
 #        os.system(Cmds)
-        os.system('$CCP4/bin/pandda.export pandda_dir=%s export_dir=%s export_ligands=False generate_occupancy_groupings=True' %(self.panddas_directory,self.initial_model_directory))
+        os.system('pandda.export pandda_dir=%s export_dir=%s export_ligands=False generate_occupancy_groupings=True' %(self.panddas_directory,self.initial_model_directory))
 #        self.Logfile.insert('ran pandda.export with the following command:\n'+Cmds)
 #        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running pandda.export: check terminal for details')
 
