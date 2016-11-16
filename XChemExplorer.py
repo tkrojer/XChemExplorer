@@ -3139,7 +3139,8 @@ class XChemExplorer(QtGui.QApplication):
 
         elif instruction=='Update datasource with results from pandda.inspect':
             update_datasource_only=True
-            self.run_pandda_export(update_datasource_only)
+            which_models='all'
+            self.run_pandda_export(update_datasource_only,which_models)
 
         elif instruction=='Show HTML summary':
             self.show_pandda_html_summary()
