@@ -216,18 +216,14 @@ class run_pandda_export(QtCore.QThread):
 #                ' generate_occupancy_groupings=True\n'
 #                )
         Cmds = (
-                'pandda.export'
+                '$CCP4/bin/pandda.export'
                 ' pandda_dir=%s' %self.panddas_directory+
                 ' export_dir=%s' %self.initial_model_directory+
                 ' export_ligands=False'
                 ' generate_occupancy_groupings=True\n'
                 )
-        print 'os.system:'
-        os.system('which pandda.export')
-        print 'xxx'
         self.Logfile.insert('running pandda.export with the following command:\n'+Cmds)
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running pandda.export: check terminal for details')
-        quit()
         os.system(Cmds)
 
 
