@@ -1,4 +1,4 @@
-# last edited: 15/11/2016, 15:00
+# last edited: 16/11/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -3073,8 +3073,7 @@ class XChemExplorer(QtGui.QApplication):
            instruction=='Run DIMPLE on selected MTZ files':
             XChemMain.print_cluster_status_message('dimple',cluster_dict,self.xce_logfile)
 
-        elif instruction=='Create CIF/PDB/PNG file of ALL soaked compounds' or \
-             instruction=='Create CIF/PDB/PNG file of NEW soaked compounds':
+        elif 'Create CIF/PDB/PNG file' in instruction:
             XChemMain.print_acedrg_status(self.xce_logfile,self.xtal_db_dict)
             XChemMain.print_cluster_status_message('acedrg',cluster_dict,self.xce_logfile)
 
