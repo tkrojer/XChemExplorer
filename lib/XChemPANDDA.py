@@ -216,6 +216,9 @@ class run_pandda_export(QtCore.QThread):
 #                ' generate_occupancy_groupings=True\n'
 #                )
         Cmds = (
+                '#!'+os.getenv('SHELL')+'\n'
+                'unset PYTHONPATH\n'
+                'module load ccp4\n'
                 '$CCP4/bin/pandda.export'
                 ' pandda_dir=%s' %self.panddas_directory+
                 ' export_dir=%s' %self.initial_model_directory+
