@@ -10,6 +10,28 @@ import XChemUtils
 import XChemLog
 import csv
 
+def get_names_of_current_clusters(xce_logfile,panddas_directory):
+    Logfile=XChemLog.updateLog(xce_logfile)
+    Logfile.insert('parsing %s/cluster_analysis' %panddas_directory)
+    os.chdir('%s/cluster_analysis' %panddas_directory)
+    cluster_dict={}
+    for out_dir in sorted(glob.glob('*')):
+        if os.path.isdir(out_dir):
+            cluster_dict[out_dir]=[]
+            found_first_pdb=False
+            for folder in glob.glob(os.path.join(out_dir,'pdbs','*')):
+                xtal=folder[folder.rfind('/')+1:]
+                if not found_first_pdb:
+                    if os.path.isfile(os.path.join(panddas_directory,'cluster_analysis',out_dir,'pdbs',xtal,xtal+'.pdb') ):
+                        cluster_dict[out_dir].append(os.path.join(panddas_directory,'cluster_analysis',out_dir,'pdbs',xtal,xtal+'.pdb'))
+                        found_first_pdb=True
+                cluster_dict[out_dir].append(xtal)
+    for key in cluster_dict:
+        Logfile.insert('cluster %s:   %s datasets' %(str(key),str(len(cluster_dict[key])-1)))
+    return cluster_dict
+
+
+
 class run_pandda_export(QtCore.QThread):
 
     def __init__(self,panddas_directory,datasource,initial_model_directory,xce_logfile,update_datasource_only,which_models):
@@ -371,6 +393,7 @@ class giant_cluster_datasets(QtCore.QThread):
                     self.db.update_data_source(xtal,db_dict)
         self.emit(QtCore.SIGNAL('update_progress_bar'), 100)
         self.Logfile.insert('finished giant.cluster_mtzs_and_pdbs')
+        self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
 
 class check_if_pandda_can_run:
 

@@ -1538,6 +1538,24 @@ class pdbtools(object):
         Z=((max(z_list)-min(z_list))/2)+min(z_list)
         return X,Y,Z
 
+    def get_init_pdb_as_list(self):
+        return self.get_pdb_as_list(self.pdb)
+
+    def get_pdb_as_list(self,pdbin):
+        pdb_list=[]
+        for line in open(pdbin):
+            if line.startswith('ATOM') or line.startswith('HETATM'):
+                atom_line=str(line[12:16]).replace(' ','')
+                resname_line=str(line[17:20]).replace(' ','')
+                chainID_line=str(line[21:23]).replace(' ','')
+                resseq_line=str(line[23:26]).replace(' ','')
+                altLoc_line=str(line[16:17]).replace(' ','')
+                pdb_list.append([atom_line,altLoc_line,resname_line,chainID_line,resseq_line])
+        return pdb_list
+
+#    def compare_pdb_to_init_pdb(self,pdbin):
+#        for line in open(self.pdb):
+#            if line.startswith
 
 
 class reference:

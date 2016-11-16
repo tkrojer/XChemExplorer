@@ -3079,7 +3079,8 @@ class XChemExplorer(QtGui.QApplication):
         elif instruction=='Run xia2 on selected datasets':
             XChemMain.print_cluster_status_message('xia2',cluster_dict,self.xce_logfile)
 
-
+        elif 'pandda' in instruction.lower():
+            XChemMain.print_cluster_status_message('pandda',cluster_dict,self.xce_logfile)
 
     def prepare_and_run_task(self,instruction):
 
@@ -3258,6 +3259,25 @@ class XChemExplorer(QtGui.QApplication):
             self.update_log.insert('pandda.analyse: not enough datasets found')
             return
 
+        # cluster datasets first
+        self.cluster_datasets_for_pandda()
+
+        # count number of clusters
+        # Note: could do so from the self.xtal_db_dict, but cannot be certain that database contains
+        #       information from crystals which are not actually in the project directory
+        cluster_dict=XChemPANDDA.get_names_of_current_clusters(self.xce_logfile,self.panddas_directory)
+        if len(cluster_dict) > 1:
+            # copy first pdb file in each cluster into reference directory
+            for cluster in cluster_dict:
+                if not os.path.isfile(os.path.join(self.reference_directory,cluster+'.pdb')):
+#                    os.system('/bin/cp %s %s' %(cluster_dict[cluster][0],os.path.join(self.reference_directory,cluster+'.pdb')))
+                    print '/bin/cp %s %s' %(cluster_dict[cluster][0],os.path.join(self.reference_directory,cluster+'.pdb'))
+                    self.update_log.insert('copying %s as reference file for cluster % in reference directory as %s.pdb' %(cluster_dict[cluster][0],cluster,cluster))
+
+        self.update_log.insert('updating combobox')
+        self.populate_reference_combobox(self.pandda_reference_file_selection_combobox)
+        quit()
+
         reference_file=str(self.pandda_reference_file_selection_combobox.currentText())
         if os.path.isfile(os.path.join(self.reference_directory,reference_file+'.pdb')):
             filter_pdb=os.path.join(self.reference_directory,reference_file+'.pdb')
@@ -3297,6 +3317,7 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
