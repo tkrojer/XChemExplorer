@@ -952,7 +952,8 @@ class XChemExplorer(QtGui.QApplication):
                                     'Refinement\nRcryst',
                                     'Refinement\nRfree',
                                     'Refinement\nOutcome',
-                                    'PanDDA site details' ]
+                                    'PanDDA site details',
+                                    'Refinement\nStatus'    ]
         self.summary_table=QtGui.QTableWidget()
         self.summary_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.summary_table.setSortingEnabled(True)
@@ -4520,6 +4521,15 @@ class XChemExplorer(QtGui.QApplication):
                     else:
                         cell_text=QtGui.QTableWidgetItem()
                         cell_text.setText(str( db_dict[ header[1] ]  ))
+                        if header[0]=='Refinement\nStatus':
+                            if str( db_dict[ header[1] ]  ) == 'running':
+                                cell_text.setBackground(QtGui.QColor(100,230,150))
+                            elif str( db_dict[ header[1] ]  ) == 'pending':
+                                cell_text.setBackground(QtGui.QColor(20,100,230))
+                            elif str( db_dict[ header[1] ]  ) == 'started':
+                                cell_text.setBackground(QtGui.QColor(230,240,110))
+                            elif str( db_dict[ header[1] ]  ) == 'finished':
+                                cell_text.setBackground(QtGui.QColor(255,255,255))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.summary_table.setItem(current_row, column, cell_text)
             if new_xtal:
