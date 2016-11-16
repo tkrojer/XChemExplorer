@@ -425,9 +425,11 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         if not os.path.isfile(compoundID+'.pdb') or  os.path.getsize(compoundID+'.pdb') < 20:
             os.system('/bin/rm %s.pdb 2> /dev/null' %compoundID)
+            os.system('/bin/rm compound/%s.pdb 2> /dev/null' %compoundID)
 
         if not os.path.isfile(compoundID+'.png') or  os.path.getsize(compoundID+'.png') < 20:
             os.system('/bin/rm %s.png 2> /dev/null' %compoundID)
+            os.system('/bin/rm compound/%s.png 2> /dev/null' %compoundID)
 
         return db_dict
 
@@ -439,7 +441,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         #
 
         found_refine_pdb=self.find_file('refine.pdb',xtal)
-        if found_refine_pdb:
+        if found_refine_pdb and not 'dimple' in os.path.realpath('refine.pdb'):
             db_dict['RefinementPDB_latest']=os.path.realpath('refine.pdb')
             db_dict['RefinementStatus']='finished'
             pdb_info=parse().dict_for_datasource_update('refine.pdb')
@@ -453,6 +455,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         else:
             db_dict['RefinementPDB_latest']=''
             db_dict['RefinementStatus']='pending'
+            db_dict['RefinementOutcome']='1 - Analysis Pending'
+            os.system('/bin/rm refine.pdb 2> /dev/null')
 
         if os.path.isfile('REFINEMENT_IN_PROGRESS'):
             db_dict['RefinementStatus']='running'
@@ -471,10 +475,11 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         #
 
         found_refine_mtz=self.find_file('refine.mtz',xtal)
-        if found_refine_mtz:
+        if found_refine_mtz and not 'dimple' in os.path.realpath('refine.mtz'):
             db_dict['RefinementMTZ_latest']=os.path.realpath('refine.mtz')
         else:
             db_dict['RefinementMTZ_latest']=''
+            os.system('/bin/rm refine.mtz 2> /dev/null')
 
         return db_dict
 
