@@ -225,8 +225,8 @@ class run_pandda_export(QtCore.QThread):
                 ' export_ligands=False'
                 ' generate_occupancy_groupings=True\n'
                 )
-        self.Logfile.insert('running pandda.export with the following command:\n'+Cmds)
         os.system(Cmds)
+        self.Logfile.insert('ran pandda.export with the following command:\n'+Cmds)
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running pandda.export: check terminal for details')
 
 

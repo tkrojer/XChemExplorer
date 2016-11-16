@@ -83,7 +83,8 @@ class Refine(object):
                 if file.endswith('.cif'):
                     if self.compoundID not in file:
                         additional_cif_file=file
-                        additional_cif=True
+#                        additional_cif=True   <- should be true, but need to check this part of the code! 16/11/2016
+                        additional_cif=False
             if additional_cif:
                 Cmds = (
                     '#!'+os.getenv('SHELL')+'\n'
