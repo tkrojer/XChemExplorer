@@ -381,7 +381,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.map_cif_file_tasks = [ 'Run DIMPLE on selected MTZ files',
                                     'Remove selected DIMPLE PDB/MTZ files',
-                                    'Create CIF/PDB/PNG file of ALL compound',
+                                    'Create CIF/PDB/PNG file of ALL compounds',
                                     'Create CIF/PDB/PNG file of NEW compounds',
                                     'Create CIF/PDB/PNG file of SELECTED compounds' ]
 
@@ -3073,7 +3073,7 @@ class XChemExplorer(QtGui.QApplication):
            instruction=='Run DIMPLE on selected MTZ files':
             XChemMain.print_cluster_status_message('dimple',cluster_dict,self.xce_logfile)
 
-        elif instruction=='Create CIF/PDB/PNG file of ALL soaked compound' or \
+        elif instruction=='Create CIF/PDB/PNG file of ALL soaked compounds' or \
              instruction=='Create CIF/PDB/PNG file of NEW soaked compounds':
             XChemMain.print_acedrg_status(self.xce_logfile,self.xtal_db_dict)
             XChemMain.print_cluster_status_message('acedrg',cluster_dict,self.xce_logfile)
@@ -3111,7 +3111,7 @@ class XChemExplorer(QtGui.QApplication):
         elif instruction=='Remove selected DIMPLE PDB/MTZ files':
             self.remove_selected_dimple_files()
 
-        elif instruction=='Create CIF/PDB/PNG file of ALL compound':
+        elif instruction=='Create CIF/PDB/PNG file of ALL compounds':
             self.create_cif_pdb_png_files('ALL')
 
         elif instruction=='Create CIF/PDB/PNG file of NEW compounds':
