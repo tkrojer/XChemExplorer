@@ -3265,7 +3265,9 @@ class XChemExplorer(QtGui.QApplication):
         # count number of clusters
         # Note: could do so from the self.xtal_db_dict, but cannot be certain that database contains
         #       information from crystals which are not actually in the project directory
+        print 'here'
         cluster_dict=XChemPANDDA.get_names_of_current_clusters(self.xce_logfile,self.panddas_directory)
+        print 'len cluster_dict',len(cluster_dict),cluster_dict
         if len(cluster_dict) > 1:
             # copy first pdb file in each cluster into reference directory
             for cluster in cluster_dict:
