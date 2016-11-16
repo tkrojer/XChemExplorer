@@ -397,11 +397,12 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                                 compoundID=db_dict['CompoundCode']
                                 break
 
-        if os.path.isfile(compoundID+'.cif'):
+        if os.path.isfile(compoundID+'.cif') and os.path.getsize(compoundID+'.cif') > 20:
             db_dict['RefinementCIF']=os.path.realpath(compoundID+'.cif')
             db_dict['RefinementCIFStatus']='restraints generated'
         else:
             os.system('/bin/rm %s.cif 2> /dev/null' %compoundID)
+            os.system('/bin/rm compound/%s.cif 2> /dev/null' %compoundID)
             db_dict['RefinementCIF']=''
             db_dict['RefinementCIFStatus']='pending'
 
@@ -422,10 +423,10 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         if not smiles_found:
             db_dict['RefinementCIFStatus']='missing smiles'
 
-        if not os.path.isfile(compoundID+'.pdb'):
+        if not os.path.isfile(compoundID+'.pdb') or  os.path.getsize(compoundID+'.pdb') < 20:
             os.system('/bin/rm %s.pdb 2> /dev/null' %compoundID)
 
-        if not os.path.isfile(compoundID+'.png'):
+        if not os.path.isfile(compoundID+'.png') or  os.path.getsize(compoundID+'.png') < 20:
             os.system('/bin/rm %s.png 2> /dev/null' %compoundID)
 
         return db_dict
