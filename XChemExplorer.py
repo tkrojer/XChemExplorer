@@ -2,6 +2,7 @@
 
 import os, sys, glob
 from datetime import datetime
+import time
 
 from PyQt4 import QtGui, QtCore, QtWebKit
 
@@ -3292,6 +3293,10 @@ class XChemExplorer(QtGui.QApplication):
 
         # cluster datasets first
         self.cluster_datasets_for_pandda()
+
+        while self.explorer_active==1:
+            print 'waiting'
+            time.sleep(0.5)
 
         # count number of clusters
         # Note: could do so from the self.xtal_db_dict, but cannot be certain that database contains
