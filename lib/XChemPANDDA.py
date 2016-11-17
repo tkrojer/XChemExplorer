@@ -434,15 +434,31 @@ class check_if_pandda_can_run:
     # - required input paramters are not complete
     # - map amplitude and phase labels don't exist
 
-    def __init__(self,pandda_params):
+    def __init__(self,pandda_params,xce_logfile):
         self.data_directory=pandda_params['data_dir']
         self.panddas_directory=pandda_params['out_dir']
         self.min_build_datasets=pandda_params['min_build_datasets']
         self.pdb_style=pandda_params['pdb_style']
         self.mtz_style=pandda_params['mtz_style']
-
         self.problem_found=False
         self.error_code=-1
+        self.Logfile=XChemLog.updateLog(xce_logfile)
+
+    def number_of_available_datasets(self,input_dir_structure):
+        counter=0
+        for file in glob.glob(os.path.join(input_dir_structure,self.pdb_style)):
+            if os.path.isfile(file):
+                counter+=1
+        self.Logfile.insert('pandda.analyse: found %s useable datasets' %counter)
+        return counter
+
+    def get_first_dataset_in_project_directory(self,input_dir_structure):
+        first_dataset=''
+        for file in glob.glob(os.path.join(input_dir_structure,self.pdb_style)):
+            if os.path.isfile(file):
+                first_dataset=file
+                break
+        return first_dataset
 
     def analyse_pdb_style(self):
         pdb_found=False

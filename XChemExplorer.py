@@ -3287,7 +3287,24 @@ class XChemExplorer(QtGui.QApplication):
         self.work_thread.start()
 
     def run_pandda_analyse(self):
-        counter=self.check_data_for_pandda_analyse()
+        pandda_params = {
+                'data_dir':             str(self.pandda_input_data_dir_entry.text()),
+                'out_dir':              str(self.pandda_output_data_dir_entry.text()),
+                'submit_mode':          str(self.pandda_submission_mode_selection_combobox.currentText()),
+                'nproc':                str(self.pandda_nproc_entry.text()),
+                'min_build_datasets':   str(self.pandda_min_build_dataset_entry.text()),
+                'pdb_style':            str(self.pandda_pdb_style_entry.text()),
+                'mtz_style':            str(self.pandda_mtz_style_entry.text()),
+                'sort_event':           str(self.pandda_sort_event_combobox.currentText()),
+                'N_datasets':           counter,
+                'max_new_datasets':     str(self.pandda_max_new_datasets_entry.text()),
+                'grid_spacing':         str(self.pandda_grid_spacing_entry.text()),
+                'filter_pdb':           filter_pdb
+                        }
+
+        pandda_checks=XChemPANDDA.check_if_pandda_can_run(pandda_params,self.xce_logfile)
+
+        counter=pandda_checks.number_of_available_datasets(str(self.pandda_input_data_dir_entry.text()))
         if counter < 10:
             self.status_bar.showMessage('pandda.analyse: not enough datasets found')
             self.update_log.insert('pandda.analyse: not enough datasets found')
@@ -3309,6 +3326,7 @@ class XChemExplorer(QtGui.QApplication):
         reference_file=str(self.pandda_reference_file_selection_combobox.currentText())
         if os.path.isfile(os.path.join(self.reference_directory,reference_file+'.pdb')):
             filter_pdb=os.path.join(self.reference_directory,reference_file+'.pdb')
+            self.update_log.insert('using %s as reference file for PanDDA' %reference_file)
         else:
             if len(cluster_dict) > 1:
                 msg = (
@@ -3324,21 +3342,17 @@ class XChemExplorer(QtGui.QApplication):
                 return
             else:
                 filter_pdb=''
+                self.update_log.insert('only one crystal form; continuing without reference file')
 
-        pandda_params = {
-                'data_dir':             str(self.pandda_input_data_dir_entry.text()),
-                'out_dir':              str(self.pandda_output_data_dir_entry.text()),
-                'submit_mode':          str(self.pandda_submission_mode_selection_combobox.currentText()),
-                'nproc':                str(self.pandda_nproc_entry.text()),
-                'min_build_datasets':   str(self.pandda_min_build_dataset_entry.text()),
-                'pdb_style':            str(self.pandda_pdb_style_entry.text()),
-                'mtz_style':            str(self.pandda_mtz_style_entry.text()),
-                'sort_event':           str(self.pandda_sort_event_combobox.currentText()),
-                'N_datasets':           counter,
-                'max_new_datasets':     str(self.pandda_max_new_datasets_entry.text()),
-                'grid_spacing':         str(self.pandda_grid_spacing_entry.text()),
-                'filter_pdb':           filter_pdb
-                        }
+        if len(cluster) > 1:
+            self.update_log.insert('checking if pdb files in project directory contain same number of atoms as reference file (%s)' %reference_file)
+        else:
+            reference_file=pandda_checks.get_first_dataset_in_project_directory(str(self.pandda_input_data_dir_entry.text()))
+            self.update_log.insert('checking if pdb files in project directory contain same number of atoms as reference file (%s)' %reference_file)
+
+        return
+
+
         self.update_log.insert('preparing pandda.analyse input script')
         self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params,self.xce_logfile)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
