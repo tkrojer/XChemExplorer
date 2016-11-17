@@ -423,7 +423,7 @@ class giant_cluster_datasets(QtCore.QThread):
         self.emit(QtCore.SIGNAL('update_progress_bar'), 100)
         self.Logfile.insert('finished giant.cluster_mtzs_and_pdbs')
         self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
-        if self.run_pandda_analyse
+        if self.run_pandda_analyse:
             self.emit(QtCore.SIGNAL('run_pandda_analyse'))
 
 class check_if_pandda_can_run:
