@@ -3319,6 +3319,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.update_log.insert(msg)
                 msgBox = QtGui.QMessageBox()
                 msgBox.setText(msg)
+                msgBox.exec_()
                 return
             else:
                 filter_pdb=''
