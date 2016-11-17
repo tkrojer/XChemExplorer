@@ -3314,7 +3314,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.update_log.insert('updating combobox')
         self.populate_reference_combobox(self.pandda_reference_file_selection_combobox)
-        quit()
+        return 
 
         reference_file=str(self.pandda_reference_file_selection_combobox.currentText())
         if os.path.isfile(os.path.join(self.reference_directory,reference_file+'.pdb')):
