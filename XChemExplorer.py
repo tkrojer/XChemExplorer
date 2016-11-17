@@ -3297,12 +3297,13 @@ class XChemExplorer(QtGui.QApplication):
                 'mtz_style':            str(self.pandda_mtz_style_entry.text()),
                 'sort_event':           str(self.pandda_sort_event_combobox.currentText()),
                 'max_new_datasets':     str(self.pandda_max_new_datasets_entry.text()),
-                'grid_spacing':         str(self.pandda_grid_spacing_entry.text())
+                'grid_spacing':         str(self.pandda_grid_spacing_entry.text()),
+                'pandda_dir_structure': str(self.pandda_input_data_dir_entry.text())
                         }
 
         pandda_checks=XChemPANDDA.check_if_pandda_can_run(pandda_params,self.xce_logfile)
 
-        counter=pandda_checks.number_of_available_datasets(str(self.pandda_input_data_dir_entry.text()))
+        counter=pandda_checks.number_of_available_datasets()
         if counter < 10:
             self.status_bar.showMessage('pandda.analyse: not enough datasets found')
             self.update_log.insert('pandda.analyse: not enough datasets found')
@@ -3356,10 +3357,14 @@ class XChemExplorer(QtGui.QApplication):
         if len(cluster) > 1:
             self.update_log.insert('checking if pdb files in project directory contain same number of atoms as reference file (%s)' %filter_pdb)
         else:
-            reference_file=pandda_checks.get_first_dataset_in_project_directory(str(self.pandda_input_data_dir_entry.text()))
-            self.update_log.insert('checking if pdb files in project directory contain same number of atoms as reference file (%s)' %filter_pdb)
+            reference_file=pandda_checks.get_first_dataset_in_project_directory()
+            self.update_log.insert('checking if pdb files in project directory contain same number of atoms as reference file (%s)' %reference_file)
+
+        x=pandda_checks.compare_number_of_atoms_in_reference_vs_all_datasets(reference_file)
+        print 'fueigfwygfyegyfegw',len(x)
 
         return
+
 
 
         self.update_log.insert('preparing pandda.analyse input script')

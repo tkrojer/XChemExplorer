@@ -440,25 +440,31 @@ class check_if_pandda_can_run:
         self.min_build_datasets=pandda_params['min_build_datasets']
         self.pdb_style=pandda_params['pdb_style']
         self.mtz_style=pandda_params['mtz_style']
+        self.input_dir_structure=pandda_params['pandda_dir_structure']
         self.problem_found=False
         self.error_code=-1
         self.Logfile=XChemLog.updateLog(xce_logfile)
 
-    def number_of_available_datasets(self,input_dir_structure):
+    def number_of_available_datasets(self):
         counter=0
-        for file in glob.glob(os.path.join(input_dir_structure,self.pdb_style)):
+        for file in glob.glob(os.path.join(self.input_dir_structure,self.pdb_style)):
             if os.path.isfile(file):
                 counter+=1
         self.Logfile.insert('pandda.analyse: found %s useable datasets' %counter)
         return counter
 
-    def get_first_dataset_in_project_directory(self,input_dir_structure):
+    def get_first_dataset_in_project_directory(self):
         first_dataset=''
-        for file in glob.glob(os.path.join(input_dir_structure,self.pdb_style)):
+        for file in glob.glob(os.path.join(self.input_dir_structure,self.pdb_style)):
             if os.path.isfile(file):
                 first_dataset=file
                 break
         return first_dataset
+
+    def compare_number_of_atoms_in_reference_vs_all_datasets(self,refData):
+        pdbtools=XChemUtils.pdbtools(refData)
+        refPDBlist=pdbtools.get_init_pdb_as_list()
+        return refPDBlist
 
     def analyse_pdb_style(self):
         pdb_found=False
