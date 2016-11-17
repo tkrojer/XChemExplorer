@@ -200,16 +200,22 @@ class helpers:
     def pil_rdkit_exist(self):
         return self.pil_rdkit_present
 
-    def make_png(self,initial_model_directory,sample,compoundID,smiles,external_software,database_directory,data_source_file,ccp4_scratch_directory,counter,xce_logfile):
+    def make_png(self,initial_model_directory,sample,compoundID,smiles,external_software,database_directory,data_source_file,ccp4_scratch_directory,counter,xce_logfile,restraints_program):
         Logfile=XChemLog.updateLog(xce_logfile)
 
 #        if not os.path.isfile(os.path.join(initial_model_directory,sample,'compound','ACEDRG_IN_PROGRESS')):
-        os.system('touch ACEDRG_IN_PROGRESS')
+        os.system('touch RESTRAINTS_IN_PROGRESS')
 
         header='#!'+os.getenv('SHELL')+'\n'
         if external_software['qsub']:
             if not external_software['qsub_array']:
                 header='#PBS -joe -N xce_acedrg\n'
+
+        software=''
+        if restraints_program=='acedrg':
+            software='acedrg --res LIG -i "%s" -o %s\n' %(smiles,compoundID.replace(' ',''))
+        elif restraints_program=='phenix.elbow':
+            software='phenix.elbow --smiles="%s" --id LIG --output %s\n' %(smiles,compoundID.replace(' ',''))
 
         Cmds = (
                     header+
@@ -225,7 +231,7 @@ class helpers:
                     '\n'
                     'cd '+os.path.join(initial_model_directory,sample,'compound')+'\n'
                     '\n'
-                    'acedrg --res LIG -i "%s" -o %s\n' %(smiles,compoundID.replace(' ',''))+
+                    +software+
                     '\n'
                     'cd '+os.path.join(initial_model_directory,sample)+'\n'
                     '\n'
@@ -236,7 +242,7 @@ class helpers:
                     '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_for_new_cif_files.py')+
                     ' %s %s %s %s\n' %(os.path.join(database_directory,data_source_file),sample,initial_model_directory,compoundID.replace(' ','') )+
                     '\n'
-                    '/bin/rm compound/ACEDRG_IN_PROGRESS\n'
+                    '/bin/rm compound/RESTRAINTS_IN_PROGRESS\n'
             )
         os.chdir(ccp4_scratch_directory)
         Logfile.insert('creating ACEDRG shell script for %s,%s in %s' %(sample,compoundID,ccp4_scratch_directory))
@@ -244,6 +250,8 @@ class helpers:
         f.write(Cmds)
         f.close()
         os.system('chmod +x xce_acedrg_%s.sh' %str(counter))
+
+
 
 #                if queueing_system_available:
 #                    os.system('qsub acedrg.sh')
@@ -1224,6 +1232,15 @@ class external_software:
             self.available_programs['acedrg']=False
             status='not found'
         self.Logfile.insert('{0:50} {1:10}'.format('checking for acedrg:', status))
+
+        try:
+            subprocess.call(['phenix.elbow'], stdout=FNULL, stderr=subprocess.STDOUT)
+            self.available_programs['phenix.elbow']=True
+            status='found'
+        except OSError:
+            self.available_programs['phenix.elbow']=False
+            status='not found'
+        self.Logfile.insert('{0:50} {1:10}'.format('checking for phenix.elbow:', status))
 
         try:
             subprocess.call(['giant.create_occupancy_params'], stdout=FNULL, stderr=subprocess.STDOUT)

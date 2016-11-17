@@ -572,7 +572,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
 
 class create_png_and_cif_of_compound(QtCore.QThread):
-    def __init__(self,external_software,initial_model_directory,compound_list,database_directory,data_source_file,todo,ccp4_scratch_directory,xce_logfile,max_queue_jobs):
+    def __init__(self,external_software,initial_model_directory,compound_list,database_directory,data_source_file,todo,ccp4_scratch_directory,xce_logfile,max_queue_jobs,restraints_program):
         QtCore.QThread.__init__(self)
         self.external_software=external_software
         self.initial_model_directory=initial_model_directory
@@ -584,6 +584,8 @@ class create_png_and_cif_of_compound(QtCore.QThread):
         self.xce_logfile=xce_logfile
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.max_queue_jobs=max_queue_jobs
+        self.db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
+        self.restraints_program=restraints_program
 
     def run(self):
         # first remove all ACEDRG input scripts in ccp4_scratch directory
@@ -639,8 +641,15 @@ class create_png_and_cif_of_compound(QtCore.QThread):
                                     self.data_source_file,
                                     self.ccp4_scratch_directory,
                                     counter,
-                                    self.xce_logfile    )
+                                    self.xce_logfile,
+                                    self.restraints_program )
                 counter += 1
+
+                db_dict={}
+                db_dict['RefinementCIFprogram']=self.restraints_program
+                db_dict['RefinementCIFStatus']='started'
+                self.Logfile.insert('%s: setting RefinementCIFStatus flag to started' %sample)
+                self.db.update_data_source(sampleID,db_dict)
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)

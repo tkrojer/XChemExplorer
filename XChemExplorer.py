@@ -213,6 +213,15 @@ class XChemExplorer(QtGui.QApplication):
         #
 
         self.external_software=external_software(self.xce_logfile).check()
+        if self.external_software['acedrg']:
+            self.restraints_program='acedrg'
+            self.update_log.insert('will use ACEDRG for generation of ligand coordinates and restraints')
+        elif self.external_software['phenix.elbow']:
+            self.restraints_program='phenix.elbow'
+            self.update_log.insert('will use PHENIX.ELBOW for generation of ligand coordinates and restraints')
+        else:
+            self.restraints_program=''
+            self.update_log.insert('No program for generation of ligand coordinates and restraints available!')
 
         # start GUI
 
@@ -1362,6 +1371,20 @@ class XChemExplorer(QtGui.QApplication):
         self.preferences_selection_mechanism_combobox.currentIndexChanged.connect(self.preferences_selection_mechanism_combobox_changed)
         vbox_select.addWidget(self.preferences_selection_mechanism_combobox)
         vbox.addLayout(vbox_select)
+
+        vbox_restraints=QtGui.QVBoxLayout()
+        vbox_restraints.addWidget(QtGui.QLabel('Restraints generation program:'))
+        self.preferences_restraints_generation_combobox = QtGui.QComboBox()
+        program_list=[]
+        if self.external_software['acedrg']: program_list.append('acedrg')
+        if self.external_software['phenix.elbow']: program_list.append('phenix.elbow')
+        for item in program_list:
+            self.preferences_restraints_generation_combobox.addItem(item)
+        self.preferences_restraints_generation_combobox.currentIndexChanged.connect(self.preferences_restraints_generation_combobox_changed)
+        index = self.preferences_restraints_generation_combobox.findText(self.restraints_program, QtCore.Qt.MatchFixedString)
+        self.preferences_restraints_generation_combobox.setCurrentIndex(index)
+        vbox_restraints.addWidget(self.preferences_restraints_generation_combobox)
+        vbox.addLayout(vbox_restraints)
 
         hbox=QtGui.QHBoxLayout()
         hbox.addWidget(QtGui.QLabel('XCE logfile:'))
@@ -3189,9 +3212,9 @@ class XChemExplorer(QtGui.QApplication):
         cif_file_generated=0
         for folder in glob.glob(os.path.join(self.initial_model_directory,'*','compound')):
             number_of_samples += 1
-            if os.path.isfile(os.path.join(folder,'ACEDRG_IN_PROGRESS')):
+            if os.path.isfile(os.path.join(folder,'RESTRAINTS_IN_PROGRESS')):
                 running += 1
-                timestamp=datetime.fromtimestamp(os.path.getmtime(os.path.join(folder,'ACEDRG_IN_PROGRESS'))).strftime('%Y-%m-%d %H:%M:%S')
+                timestamp=datetime.fromtimestamp(os.path.getmtime(os.path.join(folder,'RESTRAINTS_IN_PROGRESS'))).strftime('%Y-%m-%d %H:%M:%S')
                 timestamp_list.append(timestamp)
             for cif_file in glob.glob(os.path.join(folder,'*.cif')):
                 if os.path.isfile(cif_file):
@@ -3423,7 +3446,8 @@ class XChemExplorer(QtGui.QApplication):
                                                                         todo,
                                                                         self.ccp4_scratch_directory,
                                                                         self.xce_logfile,
-                                                                        self.max_queue_jobs     )
+                                                                        self.max_queue_jobs,
+                                                                        self.restraints_program )
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
@@ -3816,6 +3840,11 @@ class XChemExplorer(QtGui.QApplication):
     def preferences_selection_mechanism_combobox_changed(self,i):
         text = str(self.preferences_selection_mechanism_combobox.currentText())
         self.preferences['dataset_selection_mechanism']=text
+
+    def preferences_restraints_generation_combobox_changed(self):
+        text = str(self.preferences_restraints_generation_combobox.currentText())
+        self.restraints_program=text
+        self.update_log.insert('will use %s for generation of ligand coordinates and restraints' %text)
 
     def get_reference_file_list(self,reference_root):
         # check available reference files
