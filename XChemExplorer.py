@@ -3295,7 +3295,7 @@ class XChemExplorer(QtGui.QApplication):
         self.cluster_datasets_for_pandda()
 
         while self.explorer_active==1:
-            print 'waiting'
+            print 'waiting, xce active',self.explorer_active
             time.sleep(0.5)
 
         # count number of clusters
