@@ -648,7 +648,7 @@ class create_png_and_cif_of_compound(QtCore.QThread):
                 db_dict={}
                 db_dict['RefinementCIFprogram']=self.restraints_program
                 db_dict['RefinementCIFStatus']='started'
-                self.Logfile.insert('%s: setting RefinementCIFStatus flag to started' %sample)
+                self.Logfile.insert('%s: setting RefinementCIFStatus flag to started' %sampleID)
                 self.db.update_data_source(sampleID,db_dict)
 
             progress += progress_step
