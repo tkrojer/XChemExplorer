@@ -1,4 +1,4 @@
-# last edited: 16/11/2016, 15:00
+# last edited: 17/11/2016, 17:00
 
 import os, sys, glob
 from datetime import datetime
@@ -3355,13 +3355,13 @@ class XChemExplorer(QtGui.QApplication):
         pandda_params['filter_pdb']=filter_pdb
 
         if len(cluster) > 1:
-            reference_file=filter_pdb
+            first_file=filter_pdb
             self.update_log.insert('checking if pdb files in project directory contain same number of atoms as reference file (%s)' %filter_pdb)
         else:
-            reference_file=pandda_checks.get_first_dataset_in_project_directory()
-            self.update_log.insert('checking if pdb files in project directory contain same number of atoms as reference file (%s)' %reference_file)
+            first_file=pandda_checks.get_first_dataset_in_project_directory()
+            self.update_log.insert('checking if pdb files in project directory contain same number of atoms as reference file (%s)' %first_file)
 
-        x=pandda_checks.compare_number_of_atoms_in_reference_vs_all_datasets(reference_file)
+        x=pandda_checks.compare_number_of_atoms_in_reference_vs_all_datasets(first_file,cluster_dict[reference_file])
         print 'fueigfwygfyegyfegw',len(x)
 
         return

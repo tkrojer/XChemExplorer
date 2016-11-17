@@ -1,4 +1,4 @@
-# last edited: 16/11/2016, 17:00
+# last edited: 17/11/2016, 17:00
 
 import os, sys, glob
 from datetime import datetime
@@ -461,9 +461,12 @@ class check_if_pandda_can_run:
                 break
         return first_dataset
 
-    def compare_number_of_atoms_in_reference_vs_all_datasets(self,refData):
+    def compare_number_of_atoms_in_reference_vs_all_datasets(self,refData,dataset_list):
         pdbtools=XChemUtils.pdbtools(refData)
         refPDBlist=pdbtools.get_init_pdb_as_list()
+        for cluster in cluster_dict:
+
+
         return refPDBlist
 
     def analyse_pdb_style(self):
