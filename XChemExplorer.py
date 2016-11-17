@@ -2344,6 +2344,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def populate_reference_combobox(self,combobox):
         combobox.clear()
+        self.reference_file_list=self.get_reference_file_list(' ')
 #        combobox.addItem('...')
         for reference_file in self.reference_file_list:
             combobox.addItem(reference_file[0])
@@ -3313,7 +3314,7 @@ class XChemExplorer(QtGui.QApplication):
                 msg = (
                     '*** WARNING ***\n'
                     'The datasets in your project directory belong to more than one crystal form.\n'
-                    'But you did not select a specific reference file\n.'
+                    'But you did not select a specific reference file.\n'
                     'Please select a reference file and try again!\n'
                 )
                 self.update_log.insert(msg)
