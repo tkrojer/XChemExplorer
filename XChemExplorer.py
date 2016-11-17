@@ -3294,9 +3294,9 @@ class XChemExplorer(QtGui.QApplication):
         # cluster datasets first
         self.cluster_datasets_for_pandda()
 
-#        while self.explorer_active==1:
-#            print 'waiting, xce active',self.explorer_active
-#            time.sleep(1)
+        while self.explorer_active==1:
+            print 'waiting, xce active',self.explorer_active
+            time.sleep(1)
 
         # count number of clusters
         # Note: could do so from the self.xtal_db_dict, but cannot be certain that database contains
@@ -3314,7 +3314,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.update_log.insert('updating combobox')
         self.populate_reference_combobox(self.pandda_reference_file_selection_combobox)
-        return 
+        return
 
         reference_file=str(self.pandda_reference_file_selection_combobox.currentText())
         if os.path.isfile(os.path.join(self.reference_directory,reference_file+'.pdb')):
@@ -3550,7 +3550,6 @@ class XChemExplorer(QtGui.QApplication):
 
     def thread_finished(self):
         self.explorer_active=0
-        print 'THREAD finished:::::::::::::::',self.explorer_active
         self.update_progress_bar(0)
         self.update_status_bar('idle')
 
