@@ -3351,7 +3351,7 @@ class XChemExplorer(QtGui.QApplication):
                 'mtz_style':            str(self.pandda_mtz_style_entry.text())
                         }
         self.update_log.insert('starting giant.cluster_mtzs_and_pdbs')
-        self.work_thread=XChemPANDDA.giant_cluster_datasets(self.initial_model_directory,pandda_params,self.xce_logfile,os.path.join(self.database_directory,self.data_source_file,run_pandda_analyse))
+        self.work_thread=XChemPANDDA.giant_cluster_datasets(self.initial_model_directory,pandda_params,self.xce_logfile,os.path.join(self.database_directory,self.data_source_file),run_pandda_analyse)
         self.explorer_active=1
 #        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
