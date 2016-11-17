@@ -3355,6 +3355,7 @@ class XChemExplorer(QtGui.QApplication):
         pandda_params['filter_pdb']=filter_pdb
 
         if len(cluster) > 1:
+            reference_file=filter_pdb
             self.update_log.insert('checking if pdb files in project directory contain same number of atoms as reference file (%s)' %filter_pdb)
         else:
             reference_file=pandda_checks.get_first_dataset_in_project_directory()
