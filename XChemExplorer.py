@@ -3297,8 +3297,7 @@ class XChemExplorer(QtGui.QApplication):
                 'mtz_style':            str(self.pandda_mtz_style_entry.text()),
                 'sort_event':           str(self.pandda_sort_event_combobox.currentText()),
                 'max_new_datasets':     str(self.pandda_max_new_datasets_entry.text()),
-                'grid_spacing':         str(self.pandda_grid_spacing_entry.text()),
-                'filter_pdb':           filter_pdb
+                'grid_spacing':         str(self.pandda_grid_spacing_entry.text())
                         }
 
         pandda_checks=XChemPANDDA.check_if_pandda_can_run(pandda_params,self.xce_logfile)
