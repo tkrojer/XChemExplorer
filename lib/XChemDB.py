@@ -1,4 +1,4 @@
-# last edited: 11/11/2016, 15:00
+# last edited: 15/11/2016, 15:00
 
 import sqlite3
 import os,sys
@@ -132,6 +132,8 @@ class data_source:
             ['DataProcessingAlert',                         'DataProcessing\nAlert',                        'TEXT',                 0],
             ['DataProcessingScore',                         'DataProcessing\nScore',                        'TEXT',                 1],
 
+            ['DataProcessingStatus',                        'DataProcessing\nStatus',                       'TEXT',                 1],
+
             ['DataProcessingRcryst',                        'DataProcessing\nRcryst',                       'TEXT',                 0],
             ['DataProcessingRfree',                         'DataProcessing\nRfree',                        'TEXT',                 0],
             ['DataProcessingPathToDimplePDBfile',           'DataProcessingPathToDimplePDBfile',            'TEXT',                 0],
@@ -148,6 +150,7 @@ class data_source:
             ['DimplePANDDAhit',                             'PANDDA\nhit?',                                 'TEXT',                 1],
             ['DimplePANDDAreject',                          'PANDDA\nreject?',                              'TEXT',                 1],
             ['DimplePANDDApath',                            'PANDDA\npath?',                                'TEXT',                 1],
+            ['DimpleStatus',                                'Dimple\nStatus',                               'TEXT',                 1],
 
             ['RefinementResolution',                        'Refinement\nResolution',                       'TEXT',                 1],
             ['RefinementResolutionTL',                      'RefinementResolutionTL',                       'TEXT',                 0],
@@ -164,6 +167,7 @@ class data_source:
             ['RefinementOutcome',                           'Refinement\nOutcome',                          'TEXT',                 1],
             ['RefinementMTZfree',                           'RefinementMTZfree',                            'TEXT',                 1],
             ['RefinementCIF',                               'RefinementCIF',                                'TEXT',                 1],
+            ['RefinementCIFStatus',                         'Compound\nStatus',                             'TEXT',                 1],
             ['RefinementPDB_latest',                        'RefinementPDB_latest',                         'TEXT',                 1],
             ['RefinementMTZ_latest',                        'RefinementMTZ_latest',                         'TEXT',                 1],
             ['RefinementMatrixWeight',                      'RefinementMatrixWeight',                       'TEXT',                 0],
@@ -178,6 +182,7 @@ class data_source:
             ['RefinementRamachandranOutliersTL',            'RefinementRamachandranOutliersTL',             'TEXT',                 0],
             ['RefinementRamachandranFavored',               'Ramachandran\nFavored',                        'TEXT',                 1],
             ['RefinementRamachandranFavoredTL',             'RefinementRamachandranFavoredTL',              'TEXT',                 0],
+            ['RefinementStatus',                            'Refinement\nStatus',                           'TEXT',                 1],
 
             ['Deposition_PDB_ID',                           'Deposition_PDB_ID',                            'TEXT',                 1],
             ['Deposition_Date',                             'Deposition_Date',                              'TEXT',                 1],
@@ -404,6 +409,8 @@ class data_source:
                 continue
             if not str(value).replace(' ','')=='':  # ignore empty fields
                 update_string+=str(key)+'='+"'"+str(value)+"'"+','
+            else:
+                update_string+=str(key)+' = null,'
         if update_string != '':
 #            print "UPDATE mainTable SET "+update_string[:-1]+" WHERE CrystalName="+"'"+sampleID+"'"
             cursor.execute("UPDATE mainTable SET "+update_string[:-1]+" WHERE CrystalName="+"'"+sampleID+"'")
@@ -795,6 +802,9 @@ class data_source:
                 out_list.append([item,item])
                 continue
             if item.startswith('Run\nDimple'):
+                out_list.append([item,item])
+                continue
+            if item.startswith('Select'):
                 out_list.append([item,item])
                 continue
             if item.startswith('Run\nxia2'):

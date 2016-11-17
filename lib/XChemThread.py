@@ -1,4 +1,4 @@
-# last edited: 11/11/2016, 15:00
+# last edited: 16/11/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -263,6 +263,9 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         self.sync_pandda_table()
         self.Logfile.insert('database panddaTable update finished')
 
+        self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
+
+
     def change_absolute_to_relative_links(self,target,filename):
         os.unlink(filename)
         os.symlink(os.path.relpath(target),filename)
@@ -278,7 +281,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                     if link.startswith('/'):
                         if os.path.isfile(link.replace(link[:link.find(xtal)],self.initial_model_directory+'/')):
                             target=link.replace(link[:link.find(xtal)],self.initial_model_directory+'/')
-                            print 'here'
+                            found_file=True
                             self.change_absolute_to_relative_links(target,filename)
                         else:
                             self.Logfile.insert('removing broken link: '+filename)
@@ -287,6 +290,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                         if not os.path.isfile(link):
                             self.Logfile.insert('removing broken link: '+filename)
                             os.system('/bin/rm %s 2> /dev/null' %filename)
+                        else:
+                            found_file=True
                 except OSError:
                     if os.path.isfile(filename):
                         found_file=True
@@ -300,9 +305,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         # AIMLESS logfile
 
-        found_logfile=False
-        if self.find_file(xtal+'.log',xtal):
-            found_logfile=True
+        found_logfile=self.find_file(xtal+'.log',xtal)
+        if found_logfile:
             db_dict['DataProcessingPathToLogfile']=os.path.realpath(xtal+'.log')
             db_dict['DataProcessingLOGfileName']=xtal+'.log'
             if db_dict['DataCollectionOutcome']=='None' or db_dict['DataCollectionOutcome']=='':
@@ -315,7 +319,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         # MTZ file
 
-        if self.find_file(xtal+'.mtz',xtal):
+        found_mtzfile=self.find_file(xtal+'.mtz',xtal)
+        if found_mtzfile:
             db_dict['DataProcessingPathToMTZfile']=os.path.realpath(xtal+'.mtz')
             db_dict['DataProcessingMTZfileName']=xtal+'.mtz'
             if not found_logfile:
@@ -333,31 +338,38 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         # DIMPLE pdb
 
-        if self.find_file('dimple.pdb',xtal):
+        found_dimple_pdb=self.find_file('dimple.pdb',xtal)
+        if found_dimple_pdb:
             db_dict['DimplePathToPDB']=os.path.realpath('dimple.pdb')
             pdb_info=parse().PDBheader('dimple.pdb')
             db_dict['DimpleRcryst']=pdb_info['Rcryst']
             db_dict['DimpleRfree']=pdb_info['Rfree']
             db_dict['DimpleResolutionHigh']=pdb_info['ResolutionHigh']
+            db_dict['DimpleStatus']='finished'
         else:
             db_dict['DimplePathToPDB']=''
             db_dict['DimpleRcryst']=''
             db_dict['DimpleRfree']=''
             db_dict['DimpleResolutionHigh']=''
-
+            db_dict['DimpleStatus']='pending'
         # DIMPLE mtz
 
         dimple_path=''
-        if self.find_file('dimple.mtz',xtal):
+        found_dimple_mtz=self.find_file('dimple.mtz',xtal)
+        if found_dimple_mtz:
             db_dict['DimplePathToMTZ']=os.path.realpath('dimple.mtz')
             dimple_mtz=db_dict['DimplePathToMTZ']
             dimple_path=dimple_mtz[:dimple_mtz.rfind('/')]
         else:
             db_dict['DimplePathToMTZ']=''
 
+        if os.path.isfile(os.path.join(dimple_path,'dimple','dimple_rerun_on_selected_file','dimple_run_in_progress')):
+            db_dict['DimpleStatus']='running'
+
         # MTZ free file
 
-        if self.find_file(xtal+'.free.mtz',xtal):
+        found_free_mtz=self.find_file(xtal+'.free.mtz',xtal)
+        if found_free_mtz:
             db_dict['RefinementMTZfree']=os.path.realpath(xtal+'.free.mtz')
         else:
             db_dict['RefinementMTZfree']=''
@@ -385,8 +397,19 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                                 compoundID=db_dict['CompoundCode']
                                 break
 
+        if os.path.isfile(compoundID+'.cif') and os.path.getsize(compoundID+'.cif') > 20:
+            db_dict['RefinementCIF']=os.path.realpath(compoundID+'.cif')
+            db_dict['RefinementCIFStatus']='restraints generated'
+        else:
+            os.system('/bin/rm %s.cif 2> /dev/null' %compoundID)
+            os.system('/bin/rm compound/%s.cif 2> /dev/null' %compoundID)
+            db_dict['RefinementCIF']=''
+            db_dict['RefinementCIFStatus']='pending'
+
         smilesDB=db_dict['CompoundSMILES']
+        smiles_found=True
         if smilesDB=='None' or smilesDB=='':
+            smiles_found=False
             if os.path.isdir('compound'):
                 for smiles in glob.glob('compound/*'):
                     if smiles.endswith('smiles'):
@@ -394,19 +417,19 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                             if len(line.split()) >= 1:
                                 db_dict['CompoundSMILES']=line.split()[0]
                                 smilesDB=db_dict['CompoundSMILES']
+                                smiles_found=True
                                 break
 
-        if not os.path.isfile(compoundID+'.pdb'):
+        if not smiles_found:
+            db_dict['RefinementCIFStatus']='missing smiles'
+
+        if not os.path.isfile(compoundID+'.pdb') or  os.path.getsize(compoundID+'.pdb') < 20:
             os.system('/bin/rm %s.pdb 2> /dev/null' %compoundID)
+            os.system('/bin/rm compound/%s.pdb 2> /dev/null' %compoundID)
 
-        if not os.path.isfile(compoundID+'.png'):
+        if not os.path.isfile(compoundID+'.png') or  os.path.getsize(compoundID+'.png') < 20:
             os.system('/bin/rm %s.png 2> /dev/null' %compoundID)
-
-        if os.path.isfile(compoundID+'.cif'):
-            db_dict['RefinementCIF']=os.path.realpath(compoundID+'.cif')
-        else:
-            os.system('/bin/rm %s.cif 2> /dev/null' %compoundID)
-            db_dict['RefinementCIF']=''
+            os.system('/bin/rm compound/%s.png 2> /dev/null' %compoundID)
 
         return db_dict
 
@@ -417,8 +440,10 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         # REFINE pdb
         #
 
-        if self.find_file('refine.pdb',xtal):
+        found_refine_pdb=self.find_file('refine.pdb',xtal)
+        if found_refine_pdb and not 'dimple' in os.path.realpath('refine.pdb'):
             db_dict['RefinementPDB_latest']=os.path.realpath('refine.pdb')
+            db_dict['RefinementStatus']='finished'
             pdb_info=parse().dict_for_datasource_update('refine.pdb')
             db_dict.update(pdb_info)
             if db_dict['RefinementOutcome']=='None' or db_dict['RefinementOutcome']=='':
@@ -429,6 +454,12 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                 db_dict['RefinementOutcome']='3 - In Refinement'
         else:
             db_dict['RefinementPDB_latest']=''
+            db_dict['RefinementStatus']='pending'
+            db_dict['RefinementOutcome']='1 - Analysis Pending'
+            os.system('/bin/rm refine.pdb 2> /dev/null')
+
+        if os.path.isfile('REFINEMENT_IN_PROGRESS'):
+            db_dict['RefinementStatus']='running'
 
         #
         # REFINE bound pdb
@@ -443,10 +474,12 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         # REFINE mtz
         #
 
-        if self.find_file('refine.mtz',xtal):
+        found_refine_mtz=self.find_file('refine.mtz',xtal)
+        if found_refine_mtz and not 'dimple' in os.path.realpath('refine.mtz'):
             db_dict['RefinementMTZ_latest']=os.path.realpath('refine.mtz')
         else:
             db_dict['RefinementMTZ_latest']=''
+            os.system('/bin/rm refine.mtz 2> /dev/null')
 
         return db_dict
 
@@ -572,7 +605,7 @@ class create_png_and_cif_of_compound(QtCore.QThread):
             if not os.path.isdir(os.path.join(self.initial_model_directory,sampleID)):
                 os.mkdir(os.path.join(self.initial_model_directory,sampleID))
 
-            if self.todo=='ALL':
+            if self.todo=='ALL' or self.todo=='SELECTED':
                 # remove symbolic links if present
                 if os.path.isfile(os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.pdb')):
                     os.system('/bin/rm '+os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.pdb'))
@@ -645,8 +678,8 @@ class create_png_and_cif_of_compound(QtCore.QThread):
                     self.Logfile.insert('starting xce_acedrg_%s.sh' %(str(i+1)))
                     os.system('./xce_acedrg_%s.sh' %(str(i+1)))
 
-        self.emit(QtCore.SIGNAL("finished()"))
-
+#        self.emit(QtCore.SIGNAL("finished()"))
+        self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
 
 class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
     def __init__(self,sample_list,initial_model_directory,external_software,ccp4_scratch_directory,database_directory,data_source_file,max_queue_jobs,xce_logfile):
@@ -673,6 +706,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
         os.system('/bin/rm -f xce_dimple*sh')
 
         db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
+        database=os.path.join(self.database_directory,self.data_source_file)
 
         for n,item in enumerate(self.sample_list):
 
@@ -758,6 +792,8 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     '\n'
                     +ccp4_scratch+
                     '\n'
+                    '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(database,xtal,'DimpleStatus','running') +
+                    '\n'
                     'dimple --no-cleanup %s %s %s %s dimple\n' %(mtzin,ref_pdb,ref_mtz,ref_cif) +
                     '\n'
                     'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc,'dimple') +
@@ -785,6 +821,11 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             f.write(Cmds)
             f.close()
             os.system('chmod +x xce_dimple_%s.sh' %str(n+1))
+            db_dict={}
+            db_dict['DimpleStatus']='started'
+            self.Logfile.insert('%s: setting DataProcessingStatus flag to started' %xtal)
+            db.update_data_source(xtal,db_dict)
+
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
@@ -819,6 +860,59 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             for i in range(n+1):
                 self.Logfile.insert('starting xce_dimple_%s.sh' %(str(i+1)))
                 os.system('./xce_dimple_%s.sh' %(str(i+1)))
+
+        self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
+
+
+class remove_selected_dimple_files(QtCore.QThread):
+    def __init__(self,sample_list,initial_model_directory,xce_logfile,database_directory,data_source_file,):
+        QtCore.QThread.__init__(self)
+        self.sample_list=sample_list
+        self.initial_model_directory=initial_model_directory
+        self.xce_logfile=xce_logfile
+        self.Logfile=XChemLog.updateLog(xce_logfile)
+        self.db=XChemDB.data_source(os.path.join(database_directory,data_source_file))
+
+    def run(self):
+        progress_step=1
+        if len(self.sample_list) != 0:
+            progress_step=100/float(len(self.sample_list))
+        progress=0
+        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+        for n,xtal in enumerate(self.sample_list):
+            db_dict={}
+            os.chdir(os.path.join(self.initial_model_directory,xtal))
+            self.Logfile.insert('%s: removing dimple.pdb/dimple.mtz' %xtal)
+            os.system('/bin/rm dimple.pdb 2> /dev/null')
+            os.system('/bin/rm dimple.mtz 2> /dev/null')
+            if os.path.isdir(os.path.join(self.initial_model_directory,xtal,'dimple','dimple_rerun_on_selected_file')):
+                os.chdir('dimple')
+                self.Logfile.insert('%s removing directory dimple/dimple_rerun_on_selected_file' %xtal)
+                os.system('/bin/rm -fr dimple_rerun_on_selected_file')
+
+            db_dict['DimpleResolutionHigh']=''
+            db_dict['DimpleRcryst']=''
+            db_dict['DimpleRfree']=''
+            db_dict['DimplePathToPDB']=''
+            db_dict['DimplePathToMTZ']=''
+            db_dict['DimpleReferencePDB']=''
+            db_dict['DimplePANDDAwasRun']='False'
+            db_dict['DimplePANDDAhit']='False'
+            db_dict['DimplePANDDAreject']='False'
+            db_dict['DimplePANDDApath']=''
+            db_dict['DimpleStatus']='pending'
+
+            self.Logfile.insert('%s: updating database' %xtal)
+            self.db.update_data_source(xtal,db_dict)
+
+
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+        self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
+
+
 
 
 class start_COOT(QtCore.QThread):
@@ -855,12 +949,13 @@ class start_pandda_inspect(QtCore.QThread):
 
         Cmds = (
                 '#!'+os.getenv('SHELL')+'\n'
+                'unset PYTHONPATH\n'
                 'source '+source_file+'\n'
                 'cd '+self.panddas_directory+'\n'
                 'pandda.inspect\n'
             )
 
-        self.Logfile.insert('starting pandda.inspect with the following command:'+Cmds)
+        self.Logfile.insert('starting pandda.inspect with the following command:\n'+Cmds)
         os.system(Cmds)
 
 #        Cmds = (

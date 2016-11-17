@@ -1,4 +1,4 @@
-# last edited: 11/11/2016, 15:00
+# last edited: 16/11/2016, 15:00
 
 import pygtk, gtk, pango
 import os
@@ -83,7 +83,8 @@ class Refine(object):
                 if file.endswith('.cif'):
                     if self.compoundID not in file:
                         additional_cif_file=file
-                        additional_cif=True
+#                        additional_cif=True   <- should be true, but need to check this part of the code! 16/11/2016
+                        additional_cif=False
             if additional_cif:
                 Cmds = (
                     '#!'+os.getenv('SHELL')+'\n'
@@ -237,6 +238,9 @@ class Refine(object):
             '\n'
             +module_load+
             'cd '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'\n'
+            '\n'
+            '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(self.datasource,self.xtalID,'RefinementStatus','running') +
+            '\n'
             +findTLS+
             'refmac5 '
             +RefmacParams['HKLIN']

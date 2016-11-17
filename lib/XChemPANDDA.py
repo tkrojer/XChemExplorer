@@ -1,4 +1,4 @@
-# last edited: 10/11/2016, 17:00
+# last edited: 16/11/2016, 17:00
 
 import os, sys, glob
 from datetime import datetime
@@ -9,6 +9,28 @@ import XChemRefine
 import XChemUtils
 import XChemLog
 import csv
+
+def get_names_of_current_clusters(xce_logfile,panddas_directory):
+    Logfile=XChemLog.updateLog(xce_logfile)
+    Logfile.insert('parsing %s/cluster_analysis' %panddas_directory)
+    os.chdir('%s/cluster_analysis' %panddas_directory)
+    cluster_dict={}
+    for out_dir in sorted(glob.glob('*')):
+        if os.path.isdir(out_dir):
+            cluster_dict[out_dir]=[]
+            found_first_pdb=False
+            for folder in glob.glob(os.path.join(out_dir,'pdbs','*')):
+                xtal=folder[folder.rfind('/')+1:]
+                if not found_first_pdb:
+                    if os.path.isfile(os.path.join(panddas_directory,'cluster_analysis',out_dir,'pdbs',xtal,xtal+'.pdb') ):
+                        cluster_dict[out_dir].append(os.path.join(panddas_directory,'cluster_analysis',out_dir,'pdbs',xtal,xtal+'.pdb'))
+                        found_first_pdb=True
+                cluster_dict[out_dir].append(xtal)
+    for key in cluster_dict:
+        Logfile.insert('cluster %s:   %s datasets' %(str(key),str(len(cluster_dict[key])-1)))
+    return cluster_dict
+
+
 
 class run_pandda_export(QtCore.QThread):
 
@@ -75,12 +97,12 @@ class run_pandda_export(QtCore.QThread):
         # first make a note of all the datasets which were used in pandda directory
         os.chdir(os.path.join(self.panddas_directory,'processed_datasets'))
         for xtal in glob.glob('*'):
-            self.Logfile.insert("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'False',DimplePANDDApath='%s' where CrystalName is '%s'" %(self.panddas_directory,xtal))
+#            self.Logfile.insert("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'False',DimplePANDDApath='%s' where CrystalName is '%s'" %(self.panddas_directory,xtal))
             self.db.execute_statement("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'False',DimplePANDDApath='%s' where CrystalName is '%s'" %(self.panddas_directory,xtal))
         # do the same as before, but look for rejected datasets
         os.chdir(os.path.join(self.panddas_directory,'rejected_datasets'))
         for xtal in glob.glob('*'):
-            self.Logfile.insert("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'True',DimplePANDDApath='%s',DimplePANDDAhit = 'False' where CrystalName is '%s'" %(self.panddas_directory,xtal))
+#            self.Logfile.insert("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'True',DimplePANDDApath='%s',DimplePANDDAhit = 'False' where CrystalName is '%s'" %(self.panddas_directory,xtal))
             self.db.execute_statement("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'True',DimplePANDDApath='%s',DimplePANDDAhit = 'False' where CrystalName is '%s'" %(self.panddas_directory,xtal))
 
         site_list = []
@@ -161,8 +183,8 @@ class run_pandda_export(QtCore.QThread):
                 db_dict['PANDDA_site_x']                =   line['x']
                 db_dict['PANDDA_site_y']                =   line['y']
                 db_dict['PANDDA_site_z']                =   line['z']
-                db_dict['PANDDA_site_ligand_id']        =   'LIG'
-                db_dict['PANDDA_site_event_map']        =   event_map
+                db_dict['PANDDA_site_ligand_id']        =   ''
+                db_dict['PANDDA_site_event_map']        =   ''
                 db_dict['PANDDA_site_initial_model']    =   pandda_model
                 db_dict['PANDDA_site_initial_mtz']      =   inital_mtz
                 db_dict['PANDDA_site_spider_plot']      =   ''
@@ -184,18 +206,30 @@ class run_pandda_export(QtCore.QThread):
 
 
     def export_models(self):
+#        Cmds = (
+#                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
+#                '\n'
+#                'pandda.export'
+#                ' pandda_dir=%s' %self.panddas_directory+
+#                ' export_dir=%s' %self.initial_model_directory+
+#                ' export_ligands=False'
+#                ' generate_occupancy_groupings=True\n'
+#                )
         Cmds = (
-                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
-                '\n'
-                'pandda.export'
+                '#!'+os.getenv('SHELL')+'\n'
+                'unset PYTHONPATH\n'
+                'module load ccp4\n'
+                '$CCP4/bin/pandda.export'
                 ' pandda_dir=%s' %self.panddas_directory+
                 ' export_dir=%s' %self.initial_model_directory+
                 ' export_ligands=False'
                 ' generate_occupancy_groupings=True\n'
                 )
-        self.Logfile.insert('running pandda.export with the following command:\n'+Cmds)
-        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running pandda.export: check terminal for details')
-        os.system(Cmds)
+#        os.system(Cmds)
+        os.system('pandda.export pandda_dir=%s export_dir=%s export_ligands=False generate_occupancy_groupings=True' %(self.panddas_directory,self.initial_model_directory))
+#        self.Logfile.insert('ran pandda.export with the following command:\n'+Cmds)
+#        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running pandda.export: check terminal for details')
+
 
 
 
@@ -345,7 +379,23 @@ class giant_cluster_datasets(QtCore.QThread):
         # 3.) giant.cluster_mtzs_and_pdbs
         self.Logfile.insert("running giant.cluster_mtzs_and_pdbs %s/*/%s pdb_regex='%s/(.*)/%s' out_dir='%s/cluster_analysis'" %(self.initial_model_directory,self.pdb_style,self.initial_model_directory,self.pdb_style,self.panddas_directory))
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running giant.cluster_mtzs_and_pdbs')
-        os.system("giant.cluster_mtzs_and_pdbs %s/*/%s pdb_regex='%s/(.*)/%s' out_dir='%s/cluster_analysis'" %(self.initial_model_directory,self.pdb_style,self.initial_model_directory,self.pdb_style,self.panddas_directory))
+
+        if os.getenv('SHELL') == '/bin/tcsh' or os.getenv('SHELL') == '/bin/csh':
+            source_file=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-csh')
+        elif os.getenv('SHELL') == '/bin/bash':
+            source_file=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')
+        else:
+            source_file=''
+
+        Cmds = (
+                '#!'+os.getenv('SHELL')+'\n'
+                'unset PYTHONPATH\n'
+                'source '+source_file+'\n'
+                "giant.cluster_mtzs_and_pdbs %s/*/%s pdb_regex='%s/(.*)/%s' out_dir='%s/cluster_analysis'" %(self.initial_model_directory,self.pdb_style,self.initial_model_directory,self.pdb_style,self.panddas_directory)
+            )
+
+#        os.system("giant.cluster_mtzs_and_pdbs %s/*/%s pdb_regex='%s/(.*)/%s' out_dir='%s/cluster_analysis'" %(self.initial_model_directory,self.pdb_style,self.initial_model_directory,self.pdb_style,self.panddas_directory))
+        os.system(Cmds)
         self.emit(QtCore.SIGNAL('update_progress_bar'), 80)
 
         # 4.) analyse output
@@ -371,6 +421,7 @@ class giant_cluster_datasets(QtCore.QThread):
                     self.db.update_data_source(xtal,db_dict)
         self.emit(QtCore.SIGNAL('update_progress_bar'), 100)
         self.Logfile.insert('finished giant.cluster_mtzs_and_pdbs')
+        self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
 
 class check_if_pandda_can_run:
 

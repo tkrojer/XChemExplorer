@@ -1,3 +1,5 @@
+# last edited: 15/11/2016, 15:00
+
 import os,sys
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 import glob
@@ -19,8 +21,10 @@ if __name__=='__main__':
             db_dict['DimplePathToMTZ']=os.path.join(inital_model_directory,xtal,'dimple.mtz')
             dimple_ran_successfully=True
             db_dict['DataProcessingDimpleSuccessful']='True'
+            db_dict['DimpleStatus'] = 'finished'
         if not dimple_ran_successfully:
             db_dict['DataProcessingDimpleSuccessful']='False'
+            db_dict['DimpleStatus'] = 'failed'
         pdb=parse().PDBheader(os.path.join(inital_model_directory,xtal,'dimple.pdb'))
         db_dict['DimpleRcryst']=pdb['Rcryst']
         db_dict['DimpleRfree']=pdb['Rfree']
@@ -38,18 +42,19 @@ if __name__=='__main__':
 
         # if no refinement was carried out yet, then we also want to link the dimple files to refine.pdb/refine.log
         # so that we can look at them with the COOT plugin
-        found_previous_refinement=False
-        os.chdir(os.path.join(inital_model_directory,xtal))
-        for dirs in glob.glob('*'):
-            if os.path.isdir(dirs) and dirs.startswith('Refine_'):
-                found_previous_refinement=True
-                break
-        if not found_previous_refinement:
-            # first delete possible old symbolic links
-            if os.path.isfile('refine.pdb'): os.system('/bin/rm refine.pdb')
-            os.symlink('dimple.pdb','refine.pdb')
-            if os.path.isfile('refine.mtz'): os.system('/bin/rm refine.mtz')
-            os.symlink('dimple.mtz','refine.mtz')
+        # 15/11/2016: obsolete since COOT will now read dimple.pdb/dimple.mtz if no refine.pdb/refine.mtz is present
+#        found_previous_refinement=False
+#        os.chdir(os.path.join(inital_model_directory,xtal))
+#        for dirs in glob.glob('*'):
+#            if os.path.isdir(dirs) and dirs.startswith('Refine_'):
+#                found_previous_refinement=True
+#                break
+#        if not found_previous_refinement:
+#            # first delete possible old symbolic links
+#            if os.path.isfile('refine.pdb'): os.system('/bin/rm refine.pdb')
+#            os.symlink('dimple.pdb','refine.pdb')
+#            if os.path.isfile('refine.mtz'): os.system('/bin/rm refine.mtz')
+#            os.symlink('dimple.mtz','refine.mtz')
 
         # finally, update data source
         print '==> xce: updating data source after DIMPLE run'

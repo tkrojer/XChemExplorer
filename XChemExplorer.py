@@ -1,4 +1,4 @@
-# last edited: 11/11/2016, 15:00
+# last edited: 16/11/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -333,7 +333,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.dataset_tasks = [  'Get New Results from Autoprocessing',
                                # 'Save Files from Autoprocessing to Project Folder',
-                                'Run DIMPLE on All Autoprocessing MTZ files\n(*** run Rescore Datasets when finished ***))',
+                                'Run DIMPLE on All Autoprocessing MTZ files',
                                 'Rescore Datasets',
                                 'Read PKL file',
                                 'Run xia2 on selected datasets' ]
@@ -380,8 +380,10 @@ class XChemExplorer(QtGui.QApplication):
         #
 
         self.map_cif_file_tasks = [ 'Run DIMPLE on selected MTZ files',
-                                    'Create CIF/PDB/PNG file of ALL soaked compound',
-                                    'Create CIF/PDB/PNG file of NEW soaked compounds'    ]
+                                    'Remove selected DIMPLE PDB/MTZ files',
+                                    'Create CIF/PDB/PNG file of ALL compounds',
+                                    'Create CIF/PDB/PNG file of NEW compounds',
+                                    'Create CIF/PDB/PNG file of SELECTED compounds' ]
 
         frame_map_cif_file_task=QtGui.QFrame()
         frame_map_cif_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -607,7 +609,7 @@ class XChemExplorer(QtGui.QApplication):
 
         dls_tab_widget = QtGui.QTabWidget()
         dls_tab_list = [ 'Summary',
-                         'Dewar',
+        #                 'Dewar',
                          'Reprocess'    ]
 
         self.dls_tab_dict={}
@@ -706,9 +708,7 @@ class XChemExplorer(QtGui.QApplication):
 #                    frame.setLayout(vbox_for_frame)
                 self.dewar_configuration_layout.addWidget(frame, position, puck)
 
-#        self.data_collection_summarys_vbox_for_details=QtGui.QVBoxLayout()
-#        self.data_collection_details_currently_on_display=None
-        self.dls_tab_dict['Dewar'][1].addLayout(self.dewar_configuration_layout)
+#        self.dls_tab_dict['Dewar'][1].addLayout(self.dewar_configuration_layout)
 
 
         # - Reprocessing Sub-Tab ####################################################################
@@ -751,8 +751,25 @@ class XChemExplorer(QtGui.QApplication):
         hbox_search.addWidget(frame_search_info)
         frame_search.setLayout(hbox_search)
         hbox.addWidget(frame_search)
+
+        frame_translate=QtGui.QFrame()
+        frame_translate.setFrameShape(QtGui.QFrame.StyledPanel)
+        vbox_translate=QtGui.QVBoxLayout()
+        label=QtGui.QLabel('translate:\ndatasetID -> sampleID')
+        label.setAlignment(QtCore.Qt.AlignCenter)
+        vbox_translate.addWidget(label)
+        button=QtGui.QPushButton('Open CSV')
+        button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
+        button.clicked.connect(self.translate_datasetID_to_sampleID)
+        vbox_translate.addWidget(button)
+        frame_translate.setLayout(vbox_translate)
+        hbox.addWidget(frame_translate)
+
+        hbox.addStretch(0)
+
         frame.setLayout(hbox)
         reprocess_vbox.addWidget(frame)
+
 
         self.reprocess_datasets_column_list=[   'Dataset ID',
                                                 'Sample ID',
@@ -760,7 +777,8 @@ class XChemExplorer(QtGui.QApplication):
                                                 'Resolution\n[Mn<I/sig(I)> = 1.5]',
                                                 'Rmerge\nLow',
                                                 'DataProcessing\nSpaceGroup',
-                                                'DataProcessing\nUnitCell'  ]
+                                                'DataProcessing\nUnitCell',
+                                                'DataProcessing\nStatus'    ]
 
         self.reprocess_datasets_table=QtGui.QTableWidget()
         self.reprocess_datasets_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -828,6 +846,40 @@ class XChemExplorer(QtGui.QApplication):
         frame_ref.setLayout(hbox_ref)
         hbox.addWidget(frame_ref)
 
+        frame_isigma=QtGui.QFrame()
+        frame_isigma.setFrameShape(QtGui.QFrame.StyledPanel)
+        vbox_isigma=QtGui.QVBoxLayout()
+        label=QtGui.QLabel('Resolution\nLimit:\nMn<I/sig(I)>')
+        label.setAlignment(QtCore.Qt.AlignCenter)
+        vbox_isigma.addWidget(label)
+        self.reprocess_isigma_combobox=QtGui.QComboBox()
+        misigma = ['default','4','3','2.5','2','1.5','1','0.5']
+        for item in misigma:
+            self.reprocess_isigma_combobox.addItem(item)
+        self.reprocess_isigma_combobox.setCurrentIndex(0)
+        self.reprocess_isigma_combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
+        vbox_isigma.addWidget(self.reprocess_isigma_combobox)
+        frame_isigma.setLayout(vbox_isigma)
+        hbox.addWidget(frame_isigma)
+
+        frame_cc_half=QtGui.QFrame()
+        frame_cc_half.setFrameShape(QtGui.QFrame.StyledPanel)
+        vbox_cc_half=QtGui.QVBoxLayout()
+        label=QtGui.QLabel('Resolution\nLimit:\nCC 1/2')
+        label.setAlignment(QtCore.Qt.AlignCenter)
+        vbox_cc_half.addWidget(label)
+        self.reprocess_cc_half_combobox=QtGui.QComboBox()
+        cc_half = ['default','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1']
+        for item in cc_half:
+            self.reprocess_cc_half_combobox.addItem(item)
+        self.reprocess_cc_half_combobox.setCurrentIndex(0)
+        self.reprocess_cc_half_combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
+        vbox_cc_half.addWidget(self.reprocess_cc_half_combobox)
+        frame_cc_half.setLayout(vbox_cc_half)
+        hbox.addWidget(frame_cc_half)
+
+        hbox.addStretch(0)
+
         frame.setLayout(hbox)
         reprocess_vbox.addWidget(frame)
 
@@ -858,7 +910,7 @@ class XChemExplorer(QtGui.QApplication):
         self.tab_dict[self.workflow_dict['Maps']][1].addLayout(initial_model_checkbutton_hbox)
         self.initial_model_vbox_for_table=QtGui.QVBoxLayout()
         self.inital_model_column_list=[   'Sample ID',
-                        'Run\nDimple',
+                        'Select',
                         'Resolution\n[Mn<I/sig(I)> = 1.5]',
                         'Dimple\nRcryst',
                         'Dimple\nRfree',
@@ -869,7 +921,9 @@ class XChemExplorer(QtGui.QApplication):
                         'DataProcessing\nUnitCell',
                         'PANDDA\nlaunched?',
                         'PANDDA\nhit?',
-                        'PANDDA\nreject?'           ]
+                        'PANDDA\nreject?',
+                        'Dimple\nStatus',
+                        'Compound\nStatus'                  ]
 
         self.initial_model_table=QtGui.QTableWidget()
         self.initial_model_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -899,7 +953,8 @@ class XChemExplorer(QtGui.QApplication):
                                     'Refinement\nRcryst',
                                     'Refinement\nRfree',
                                     'Refinement\nOutcome',
-                                    'PanDDA site details' ]
+                                    'PanDDA site details',
+                                    'Refinement\nStatus'    ]
         self.summary_table=QtGui.QTableWidget()
         self.summary_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.summary_table.setSortingEnabled(True)
@@ -2214,7 +2269,7 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-        self.connect(self.work_thread, QtCore.SIGNAL("create_initial_model_table"),self.create_initial_model_table)
+        self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
         self.work_thread.start()
 
 
@@ -2444,6 +2499,38 @@ class XChemExplorer(QtGui.QApplication):
             self.update_log.insert('trying to run DIMPLE on SELECTED auto-processing files')
             self.check_before_running_dimple(job_list)
 
+
+    def remove_selected_dimple_files(self):
+        job_list=[]
+        for xtal in sorted(self.initial_model_dimple_dict):
+            if self.initial_model_dimple_dict[xtal][0].isChecked():
+                job_list.append(xtal)
+
+        if job_list != []:
+            msgBox = QtGui.QMessageBox()
+            msgBox.setText("Do you really want to delete %s Dimple files?" %len(job_list))
+            msgBox.addButton(QtGui.QPushButton('Go'), QtGui.QMessageBox.YesRole)
+            msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
+            reply = msgBox.exec_();
+
+            if reply == 0:
+                self.status_bar.showMessage('preparing to remove DIMPLE files')
+                self.update_log.insert('preparing to remove DIMPLE files')
+                self.work_thread=XChemThread.remove_selected_dimple_files(  job_list,
+                                                                            self.initial_model_directory,
+                                                                            self.xce_logfile,
+                                                                            self.database_directory,
+                                                                            self.data_source_file    )
+                self.explorer_active=1
+                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+                self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+                self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+                self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
+                self.work_thread.start()
+
+
+
     def run_xia2_on_selected_datasets(self):
 
         # check which programs should be run
@@ -2465,6 +2552,16 @@ class XChemExplorer(QtGui.QApplication):
         if os.path.isfile(self.diffraction_data_reference_mtz):
             ref.append(self.diffraction_data_reference_mtz)
 
+        # resolution limit
+        reso_limit = []
+        if str(self.reprocess_isigma_combobox.currentText()) != 'default':
+            reso_limit.append(str(self.reprocess_isigma_combobox.currentText()))
+
+        # cc 1/2
+        cc_half = []
+        if str(self.reprocess_cc_half_combobox.currentText()) != 'default':
+            cc_half.append(str(self.reprocess_cc_half_combobox.currentText()))
+
         run_dict={}
         allRows = self.reprocess_datasets_table.rowCount()
         for row in xrange(0,allRows):
@@ -2473,24 +2570,47 @@ class XChemExplorer(QtGui.QApplication):
             if self.diffraction_data_table_dict[dataset_id][0].isChecked():
                 run_dict[sample_id]=self.diffraction_data_dict[dataset_id]
 
-        self.work_thread=XChemProcess.run_xia2( self.initial_model_directory,
-                                                run_dict,
-                                                protocol,
-                                                spg,
-                                                ref,
-                                                self.xce_logfile,
-                                                self.external_software,
-                                                self.ccp4_scratch_directory,
-                                                self.max_queue_jobs     )
-        self.explorer_active=1
-        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-        self.work_thread.start()
+        if protocol != [] and run_dict !={}:
+            self.work_thread=XChemProcess.run_xia2( self.initial_model_directory,
+                                                    run_dict,
+                                                    protocol,
+                                                    spg,
+                                                    ref,
+                                                    reso_limit,
+                                                    cc_half,
+                                                    self.xce_logfile,
+                                                    self.external_software,
+                                                    self.ccp4_scratch_directory,
+                                                    self.max_queue_jobs,
+                                                    os.path.join(self.database_directory,self.data_source_file)     )
+            self.explorer_active=1
+            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.work_thread.start()
+        else:
+            self.update_log.insert('please select datasets and/ or data processing protocol')
+            self.update_status_bar('please select datasets and/ or data processing protocol')
 
-
-
+    def update_reprocessing_table(self):
+        allRows = self.reprocess_datasets_table.rowCount()
+        for row in xrange(0,allRows):
+            sample_id=str(self.reprocess_datasets_table.item(row,1).text())
+            if sample_id in self.xtal_db_dict:
+                db_dict=self.xtal_db_dict[sample_id]
+                cell_text=QtGui.QTableWidgetItem()
+                cell_text.setText(db_dict['DataProcessingStatus'])
+                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                if db_dict['DataProcessingStatus'] == 'running':
+                    cell_text.setBackground(QtGui.QColor(100,230,150))
+                elif db_dict['DataProcessingStatus'] == 'pending':
+                    cell_text.setBackground(QtGui.QColor(20,100,230))
+                elif db_dict['DataProcessingStatus'] == 'started':
+                    cell_text.setBackground(QtGui.QColor(230,240,110))
+                elif db_dict['DataProcessingStatus'] == 'finished':
+                    cell_text.setBackground(QtGui.QColor(255,255,255))
+                self.reprocess_datasets_table.setItem(row, 7, cell_text)
 
     def get_job_list_for_dimple_rerun(self,xtal,job_list,db_dict,entry):
         self.status_bar.showMessage('checking: '+str(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])))
@@ -2566,6 +2686,7 @@ class XChemExplorer(QtGui.QApplication):
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
             self.work_thread.start()
 
 
@@ -2612,6 +2733,48 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.connect(self.work_thread, QtCore.SIGNAL("update_reprocess_datasets_table"),self.update_reprocess_datasets_table)
         self.work_thread.start()
+
+    def translate_datasetID_to_sampleID(self):
+        translate = QtGui.QMessageBox()
+        translateLayout = translate.layout()
+        self.translate_datasetID_to_sampleID_file='-'
+        vbox = QtGui.QVBoxLayout()
+        button=QtGui.QPushButton('Open CSV')
+        button.clicked.connect(self.open_csv_file_translate_datasetID_to_sampleID)
+        vbox.addWidget(button)
+        self.translate_datasetID_to_sampleID_csv_label=QtGui.QLabel(self.translate_datasetID_to_sampleID_file)
+        vbox.addWidget(self.translate_datasetID_to_sampleID_csv_label)
+        translateLayout.addLayout(vbox,0,0)
+#        translate.exec_();
+        translate.addButton(QtGui.QPushButton('OK'), QtGui.QMessageBox.YesRole)
+        translate.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
+        reply=translate.exec_();
+        if reply == 0:
+            if os.path.isfile(self.translate_datasetID_to_sampleID_file):
+                trans_dict={}
+                for line in open(self.translate_datasetID_to_sampleID_file):
+                    if len(line.split(','))==2:
+                        dataset=line.split(',')[0]
+                        new_sample_id=line.split(',')[1]
+                        trans_dict[dataset]=new_sample_id
+                if len(trans_dict) >= 1:
+                    allRows = self.reprocess_datasets_table.rowCount()
+                    for row in xrange(0,allRows):
+                        dataset_id=str(self.reprocess_datasets_table.item(row,0).text())
+                        sample_id=str(self.reprocess_datasets_table.item(row,1).text())
+                        if dataset_id in trans_dict:
+                            cell_text=QtGui.QTableWidgetItem()
+                            cell_text.setText(trans_dict[dataset_id])
+                            cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                            self.reprocess_datasets_table.setItem(row, 1, cell_text)
+                            self.update_log.insert('dataset: %s -> changing sampleID to: %s' %(dataset_id,trans_dict[dataset_id]))
+
+
+    def open_csv_file_translate_datasetID_to_sampleID(self):
+        file_name_temp = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Open file', self.current_directory,'*.csv')
+        file_name=tuple(file_name_temp)[0]
+        self.translate_datasetID_to_sampleID_csv_label.setText(file_name)
+        self.translate_datasetID_to_sampleID_file=file_name
 
     def select_reprocess_reference_mtz(self):
         self.update_log.insert('trying to set new reference mtz file for reprocessing with xia2')
@@ -2663,6 +2826,15 @@ class XChemExplorer(QtGui.QApplication):
                 else:
                     cell_text=QtGui.QTableWidgetItem()
                     if db_dict != {}:
+                        if header[0]=='DataProcessing\nStatus':
+                            if str( db_dict[ header[1] ]  ) == 'running':
+                                cell_text.setBackground(QtGui.QColor(100,230,150))
+                            elif str( db_dict[ header[1] ]  ) == 'pending':
+                                cell_text.setBackground(QtGui.QColor(20,100,230))
+                            elif str( db_dict[ header[1] ]  ) == 'started':
+                                cell_text.setBackground(QtGui.QColor(230,240,110))
+                            elif str( db_dict[ header[1] ]  ) == 'finished':
+                                cell_text.setBackground(QtGui.QColor(255,255,255))
                         cell_text.setText(str( db_dict[ header[1] ]  ))
                     else:
                         cell_text.setText('')
@@ -2687,6 +2859,9 @@ class XChemExplorer(QtGui.QApplication):
         self.update_log.insert('updating REFINEMENT table')
         self.update_status_bar('updating REFINEMENT table')
         self.populate_and_update_refinement_table()
+        self.update_log.insert('updating REPROCESSING table')
+        self.update_status_bar('updating REPROCESSING table')
+        self.update_reprocessing_table()
         self.update_status_bar('idle')
         self.update_summary_plot()
 
@@ -2883,12 +3058,30 @@ class XChemExplorer(QtGui.QApplication):
                         self.need_to_switch_main_tab(task_index)
 
     def get_status_of_workflow_milestone(self,instruction):
-        if instruction=='Run DIMPLE on All Autoprocessing MTZ files':
-            self.check_status_rerun_dimple_on_all_autoprocessing_files()
+        # first update all tables
+        self.datasource_menu_reload_samples()
 
-        elif instruction=='Create CIF/PDB/PNG file of ALL soaked compound' or \
-             instruction=='Create CIF/PDB/PNG file of NEW soaked compounds':
-            self.check_status_create_cif_pdb_png_files()
+        cluster_dict=XChemMain.get_jobs_running_on_cluster()
+
+        self.update_log.insert('getting status updates...')
+
+        self.status_bar.showMessage('please check terminal window for further information')
+
+        self.update_log.insert('%s samples are currently in database' %str(len(self.xtal_db_dict)))
+
+        if instruction=='Run DIMPLE on All Autoprocessing MTZ files' or \
+           instruction=='Run DIMPLE on selected MTZ files':
+            XChemMain.print_cluster_status_message('dimple',cluster_dict,self.xce_logfile)
+
+        elif 'Create CIF/PDB/PNG file' in instruction:
+            XChemMain.print_acedrg_status(self.xce_logfile,self.xtal_db_dict)
+            XChemMain.print_cluster_status_message('acedrg',cluster_dict,self.xce_logfile)
+
+        elif instruction=='Run xia2 on selected datasets':
+            XChemMain.print_cluster_status_message('xia2',cluster_dict,self.xce_logfile)
+
+        elif 'pandda' in instruction.lower():
+            XChemMain.print_cluster_status_message('pandda',cluster_dict,self.xce_logfile)
 
     def prepare_and_run_task(self,instruction):
 
@@ -2914,11 +3107,17 @@ class XChemExplorer(QtGui.QApplication):
         elif instruction=='Run DIMPLE on selected MTZ files':
             self.run_dimple_on_selected_autoprocessing_file()
 
-        elif instruction=='Create CIF/PDB/PNG file of ALL soaked compound':
+        elif instruction=='Remove selected DIMPLE PDB/MTZ files':
+            self.remove_selected_dimple_files()
+
+        elif instruction=='Create CIF/PDB/PNG file of ALL compounds':
             self.create_cif_pdb_png_files('ALL')
 
-        elif instruction=='Create CIF/PDB/PNG file of NEW soaked compounds':
+        elif instruction=='Create CIF/PDB/PNG file of NEW compounds':
             self.create_cif_pdb_png_files('NEW')
+
+        elif instruction=='Create CIF/PDB/PNG file of SELECTED compounds':
+            self.create_cif_pdb_png_files('SELECTED')
 
         elif instruction=='pandda.analyse':
             self.run_pandda_analyse()
@@ -2945,7 +3144,8 @@ class XChemExplorer(QtGui.QApplication):
 
         elif instruction=='Update datasource with results from pandda.inspect':
             update_datasource_only=True
-            self.run_pandda_export(update_datasource_only)
+            which_models='all'
+            self.run_pandda_export(update_datasource_only,which_models)
 
         elif instruction=='Show HTML summary':
             self.show_pandda_html_summary()
@@ -3063,6 +3263,27 @@ class XChemExplorer(QtGui.QApplication):
             self.update_log.insert('pandda.analyse: not enough datasets found')
             return
 
+        # cluster datasets first
+        self.cluster_datasets_for_pandda()
+
+        # count number of clusters
+        # Note: could do so from the self.xtal_db_dict, but cannot be certain that database contains
+        #       information from crystals which are not actually in the project directory
+        print 'here'
+        cluster_dict=XChemPANDDA.get_names_of_current_clusters(self.xce_logfile,self.panddas_directory)
+        print 'len cluster_dict',len(cluster_dict),cluster_dict
+        if len(cluster_dict) > 1:
+            # copy first pdb file in each cluster into reference directory
+            for cluster in cluster_dict:
+                if not os.path.isfile(os.path.join(self.reference_directory,cluster+'.pdb')):
+#                    os.system('/bin/cp %s %s' %(cluster_dict[cluster][0],os.path.join(self.reference_directory,cluster+'.pdb')))
+                    print '/bin/cp %s %s' %(cluster_dict[cluster][0],os.path.join(self.reference_directory,cluster+'.pdb'))
+                    self.update_log.insert('copying %s as reference file for cluster %s in reference directory as %s.pdb' %(cluster_dict[cluster][0],cluster,cluster))
+
+        self.update_log.insert('updating combobox')
+        self.populate_reference_combobox(self.pandda_reference_file_selection_combobox)
+        quit()
+
         reference_file=str(self.pandda_reference_file_selection_combobox.currentText())
         if os.path.isfile(os.path.join(self.reference_directory,reference_file+'.pdb')):
             filter_pdb=os.path.join(self.reference_directory,reference_file+'.pdb')
@@ -3102,6 +3323,7 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
@@ -3172,11 +3394,17 @@ class XChemExplorer(QtGui.QApplication):
                 compoundID='compound'
             else:
                 compoundID=str(item[1])
+
             if todo == 'ALL':
                 compound_list.append([str(item[0]),compoundID,str(item[2])])
-            if todo == 'NEW':
+            elif todo == 'NEW':
                 if not os.path.isfile(os.path.join(self.initial_model_directory,str(item[0]),compoundID+'.cif')):
                     compound_list.append([str(item[0]),compoundID,str(item[2])])
+            elif todo == 'SELECTED':
+                if str(item[0]) in self.initial_model_dimple_dict:
+                    if self.initial_model_dimple_dict[str(item[0])][0].isChecked():
+                        compound_list.append([str(item[0]),compoundID,str(item[2])])
+
         if compound_list != []:
             self.update_log.insert('trying to create cif and pdb files for '+str(len(compound_list))+' compounds using ACEDRG...')
             if self.external_software['qsub']:
@@ -3199,36 +3427,37 @@ class XChemExplorer(QtGui.QApplication):
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
             self.work_thread.start()
 
 
-    def check_status_create_cif_pdb_png_files(self):
-        self.update_status_bar('Please check terminal window for details!')
-#        samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not NULL;")
-#        smiles_for_sample=self.db.execute_statement("select CrystalName,compoundSMILES from mainTable where compoundSMILES is not NULL or compoundSMILES is not '';")
-#        samples_with_data=self.db.execute_statement("select CrystalName from mainTable where DataCollectionOutcome is 'success';")
-#        cif_files=self.db.execute_statement("select CrystalName,RefinementCIF from mainTable where RefinementCIF is not Null or RefinementCIF is not '';")
-        print '==> XCE: summary for compounds:'
-#        print '    * nr samples in datasource:',len(samples_in_db)
-#        print '    * nr SMILES for samples:   ',len(smiles_for_sample)
-#        print '    * nr samples with data:    ',len(samples_with_data)
-#        print '    * nr CIF files created:    ',len(cif_files)
-        print XChemMain.get_jobs_running_on_cluster()
-        print XChemMain.get_datasource_summary(os.path.join(self.database_directory,self.data_source_file))
-#        out_bytes = subprocess.check_output(['qstat'])
-#        out_text = out_bytes.decode('utf-8')
-#        jobs_on_cluster = subprocess.check_output(['qstat'])
-#        jobs_running=0
-#        for n,line in enumerate(jobs_on_cluster):
-#
-#        jobs_running=n
-#        print '==> XCE: job info'
-#        print '    * nr jobs currently running on cluster:',jobs_running
-#        print '    * nr ACEDRG jobs submitted'
-#        print '    * nr ACEDRG jobs waiting'
-#        print '    * nr ACEDRG jobs finished'
-#        print '    * time ACEDRG queue started'
-#        print '    * expected time to finish'
+#    def check_status_create_cif_pdb_png_files(self):
+#        self.update_status_bar('Please check terminal window for details!')
+##        samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not NULL;")
+##        smiles_for_sample=self.db.execute_statement("select CrystalName,compoundSMILES from mainTable where compoundSMILES is not NULL or compoundSMILES is not '';")
+##        samples_with_data=self.db.execute_statement("select CrystalName from mainTable where DataCollectionOutcome is 'success';")
+##        cif_files=self.db.execute_statement("select CrystalName,RefinementCIF from mainTable where RefinementCIF is not Null or RefinementCIF is not '';")
+#        print '==> XCE: summary for compounds:'
+##        print '    * nr samples in datasource:',len(samples_in_db)
+##        print '    * nr SMILES for samples:   ',len(smiles_for_sample)
+##        print '    * nr samples with data:    ',len(samples_with_data)
+##        print '    * nr CIF files created:    ',len(cif_files)
+#        print XChemMain.get_jobs_running_on_cluster()
+#        print XChemMain.get_datasource_summary(os.path.join(self.database_directory,self.data_source_file))
+##        out_bytes = subprocess.check_output(['qstat'])
+##        out_text = out_bytes.decode('utf-8')
+##        jobs_on_cluster = subprocess.check_output(['qstat'])
+##        jobs_running=0
+##        for n,line in enumerate(jobs_on_cluster):
+##
+##        jobs_running=n
+##        print '==> XCE: job info'
+##        print '    * nr jobs currently running on cluster:',jobs_running
+##        print '    * nr ACEDRG jobs submitted'
+##        print '    * nr ACEDRG jobs waiting'
+##        print '    * nr ACEDRG jobs finished'
+##        print '    * time ACEDRG queue started'
+##        print '    * expected time to finish'
 
     def show_html_summary_and_diffraction_image(self):
         for key in self.albula_button_dict:
@@ -3505,7 +3734,7 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text.setText(str(xtal))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.initial_model_table.setItem(current_row, column, cell_text)
-                    elif header[0]=='Run\nDimple':
+                    elif header[0]=='Select':
                         if new_xtal:
                             run_dimple = QtGui.QCheckBox()
                             run_dimple.toggle()
@@ -3544,6 +3773,28 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text=QtGui.QTableWidgetItem()
                         cell_text.setText(str( db_dict[ header[1] ]  ))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                        if header[0]=='Dimple\nStatus':
+                            if str( db_dict[ header[1] ]  ) == 'running':
+                                cell_text.setBackground(QtGui.QColor(100,230,150))
+                            elif str( db_dict[ header[1] ]  ) == 'pending':
+                                cell_text.setBackground(QtGui.QColor(20,100,230))
+                            elif str( db_dict[ header[1] ]  ) == 'started':
+                                cell_text.setBackground(QtGui.QColor(230,240,110))
+                            elif str( db_dict[ header[1] ]  ) == 'finished':
+                                cell_text.setBackground(QtGui.QColor(255,255,255))
+                        if header[0]=='Compound\nStatus':
+                            if str( db_dict[ header[1] ]  ) == 'running':
+                                cell_text.setBackground(QtGui.QColor(100,230,150))
+                            elif str( db_dict[ header[1] ]  ) == 'pending':
+                                cell_text.setBackground(QtGui.QColor(20,100,230))
+                            elif str( db_dict[ header[1] ]  ) == 'started':
+                                cell_text.setBackground(QtGui.QColor(230,240,110))
+                            elif str( db_dict[ header[1] ]  ) == 'restraints generated':
+                                cell_text.setBackground(QtGui.QColor(255,255,255))
+                            elif str( db_dict[ header[1] ]  ) == 'restraints failed':
+                                cell_text.setBackground(QtGui.QColor(255,0,0))
+                            elif str( db_dict[ header[1] ]  ) == 'missing smiles':
+                                cell_text.setBackground(QtGui.QColor(240,150,20))
                         self.initial_model_table.setItem(current_row, column, cell_text)
             if new_xtal:
                 self.initial_model_dimple_dict[xtal]=[run_dimple,reference_file_selection_combobox]
@@ -4235,6 +4486,8 @@ class XChemExplorer(QtGui.QApplication):
                 stage = int(str(db_dict['RefinementOutcome']).split()[0])
             except ValueError:
                 stage = 0
+            except IndexError:
+                stage = 0
 
             if stage >= 3:
                 row=self.summary_table.rowCount()
@@ -4278,6 +4531,15 @@ class XChemExplorer(QtGui.QApplication):
                     else:
                         cell_text=QtGui.QTableWidgetItem()
                         cell_text.setText(str( db_dict[ header[1] ]  ))
+                        if header[0]=='Refinement\nStatus':
+                            if str( db_dict[ header[1] ]  ) == 'running':
+                                cell_text.setBackground(QtGui.QColor(100,230,150))
+                            elif str( db_dict[ header[1] ]  ) == 'pending':
+                                cell_text.setBackground(QtGui.QColor(20,100,230))
+                            elif str( db_dict[ header[1] ]  ) == 'started':
+                                cell_text.setBackground(QtGui.QColor(230,240,110))
+                            elif str( db_dict[ header[1] ]  ) == 'finished':
+                                cell_text.setBackground(QtGui.QColor(255,255,255))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.summary_table.setItem(current_row, column, cell_text)
             if new_xtal:

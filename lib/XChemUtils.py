@@ -1,4 +1,4 @@
-# last edited: 10/11/2016, 17:00
+# last edited: 16/11/2016, 15:00
 
 import sys
 import os
@@ -217,6 +217,8 @@ class helpers:
                     'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
                     '\n'
                     'source $XChemExplorer_DIR/setup-scripts/xce.setup-sh\n'
+                    '\n'
+                    '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(os.path.join(database_directory,data_source_file),sample,'RefinementCIFStatus','running') +
                     '\n'
                     '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','create_png_of_compound.py')+
                     ' "%s" %s %s %s\n' %(smiles,compoundID.replace(' ',''),sample,initial_model_directory)+
@@ -538,9 +540,10 @@ class parse:
             if line.startswith('Estimates of resolution limits: overall'):
                 resolution_at_sigma_line_overall_found=True
             if resolution_at_sigma_line_overall_found:
-                if 'from Mn(I/sd)' in line and len(line.split())==7:
-                    self.aimless['DataProcessingResolutionHigh15sigma']=line.split()[6][:-1]
-                    resolution_at_sigma_line_overall_found=False
+                if 'from Mn(I/sd)' in line and len(line.split()) >= 7:
+                    if '1.5' in line.split()[3]:
+                        self.aimless['DataProcessingResolutionHigh15sigma']=line.split()[6][:-1]
+                        resolution_at_sigma_line_overall_found=False
             if line.startswith('Average unit cell:') and len(line.split())==9:
                 tmp = []
                 tmp.append(line.split())
@@ -1535,6 +1538,24 @@ class pdbtools(object):
         Z=((max(z_list)-min(z_list))/2)+min(z_list)
         return X,Y,Z
 
+    def get_init_pdb_as_list(self):
+        return self.get_pdb_as_list(self.pdb)
+
+    def get_pdb_as_list(self,pdbin):
+        pdb_list=[]
+        for line in open(pdbin):
+            if line.startswith('ATOM') or line.startswith('HETATM'):
+                atom_line=str(line[12:16]).replace(' ','')
+                resname_line=str(line[17:20]).replace(' ','')
+                chainID_line=str(line[21:23]).replace(' ','')
+                resseq_line=str(line[23:26]).replace(' ','')
+                altLoc_line=str(line[16:17]).replace(' ','')
+                pdb_list.append([atom_line,altLoc_line,resname_line,chainID_line,resseq_line])
+        return pdb_list
+
+#    def compare_pdb_to_init_pdb(self,pdbin):
+#        for line in open(self.pdb):
+#            if line.startswith
 
 
 class reference:
