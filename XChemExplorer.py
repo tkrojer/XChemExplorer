@@ -3292,36 +3292,36 @@ class XChemExplorer(QtGui.QApplication):
             self.update_log.insert('pandda.analyse: not enough datasets found')
             return
 
-#        # cluster datasets first
-#        self.cluster_datasets_for_pandda()
-#
-#        while self.explorer_active==1:
-#            print 'waiting, xce active',self.explorer_active
-#            time.sleep(1)
-
-        # count number of clusters
-        # Note: could do so from the self.xtal_db_dict, but cannot be certain that database contains
-        #       information from crystals which are not actually in the project directory
-        print 'here'
         cluster_dict=XChemPANDDA.get_names_of_current_clusters(self.xce_logfile,self.panddas_directory)
-        print 'len cluster_dict',len(cluster_dict),cluster_dict
+
         if len(cluster_dict) > 1:
             # copy first pdb file in each cluster into reference directory
             for cluster in cluster_dict:
                 if not os.path.isfile(os.path.join(self.reference_directory,cluster+'.pdb')):
-#                    os.system('/bin/cp %s %s' %(cluster_dict[cluster][0],os.path.join(self.reference_directory,cluster+'.pdb')))
-                    print '/bin/cp %s %s' %(cluster_dict[cluster][0],os.path.join(self.reference_directory,cluster+'.pdb'))
+                    os.system('/bin/cp %s %s' %(cluster_dict[cluster][0],os.path.join(self.reference_directory,cluster+'.pdb')))
+#                    print '/bin/cp %s %s' %(cluster_dict[cluster][0],os.path.join(self.reference_directory,cluster+'.pdb'))
                     self.update_log.insert('copying %s as reference file for cluster %s in reference directory as %s.pdb' %(cluster_dict[cluster][0],cluster,cluster))
 
         self.update_log.insert('updating combobox')
         self.populate_reference_combobox(self.pandda_reference_file_selection_combobox)
-        return
 
         reference_file=str(self.pandda_reference_file_selection_combobox.currentText())
         if os.path.isfile(os.path.join(self.reference_directory,reference_file+'.pdb')):
             filter_pdb=os.path.join(self.reference_directory,reference_file+'.pdb')
         else:
-            filter_pdb=''
+            if len(cluster_dict) > 1:
+                msg = (
+                    '*** WARNING ***\n'
+                    'The datasets in your project directory belong to more than one crystal form.\n'
+                    'But you did not select a specific reference file\n.'
+                    'Please select a reference file and try again!\n'
+                )
+                self.update_log.insert(msg)
+                msgBox = QtGui.QMessageBox()
+                msgBox.setText(msg)
+                return
+            else:
+                filter_pdb=''
 
         pandda_params = {
                 'data_dir':             str(self.pandda_input_data_dir_entry.text()),
