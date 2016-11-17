@@ -216,6 +216,8 @@ class helpers:
             software='acedrg --res LIG -i "%s" -o %s\n' %(smiles,compoundID.replace(' ',''))
         elif restraints_program=='phenix.elbow':
             software='phenix.elbow --smiles="%s" --id LIG --output %s\n' %(smiles,compoundID.replace(' ',''))
+        elif restraints_program=='grade':
+            software='grade -resname LIG -nomogul "%s" -ocif %s.cif -opdb %s.pdb\n' %(smiles,compoundID.replace(' ',''),compoundID.replace(' ',''))
 
         Cmds = (
                     header+
@@ -1241,6 +1243,15 @@ class external_software:
             self.available_programs['phenix.elbow']=False
             status='not found'
         self.Logfile.insert('{0:50} {1:10}'.format('checking for phenix.elbow:', status))
+
+        try:
+            subprocess.call(['grade'], stdout=FNULL, stderr=subprocess.STDOUT)
+            self.available_programs['grade']=True
+            status='found'
+        except OSError:
+            self.available_programs['grade']=False
+            status='not found'
+        self.Logfile.insert('{0:50} {1:10}'.format('checking for grade:', status))
 
         try:
             subprocess.call(['giant.create_occupancy_params'], stdout=FNULL, stderr=subprocess.STDOUT)

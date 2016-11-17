@@ -206,27 +206,27 @@ class run_pandda_export(QtCore.QThread):
 
 
     def export_models(self):
-#        Cmds = (
-#                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
-#                '\n'
-#                'pandda.export'
-#                ' pandda_dir=%s' %self.panddas_directory+
-#                ' export_dir=%s' %self.initial_model_directory+
-#                ' export_ligands=False'
-#                ' generate_occupancy_groupings=True\n'
-#                )
         Cmds = (
-                '#!'+os.getenv('SHELL')+'\n'
-                'unset PYTHONPATH\n'
-                'module load ccp4\n'
-                '$CCP4/bin/pandda.export'
+                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
+                '\n'
+                '/dls/science/groups/i04-1/software/pandda-install/ccp4-pandda/bin/pandda.export'
                 ' pandda_dir=%s' %self.panddas_directory+
                 ' export_dir=%s' %self.initial_model_directory+
                 ' export_ligands=False'
                 ' generate_occupancy_groupings=True\n'
                 )
-#        os.system(Cmds)
-        os.system('pandda.export pandda_dir=%s export_dir=%s export_ligands=False generate_occupancy_groupings=True' %(self.panddas_directory,self.initial_model_directory))
+#        Cmds = (
+#                '#!'+os.getenv('SHELL')+'\n'
+#                'unset PYTHONPATH\n'
+#                'module load ccp4\n'
+#                '$CCP4/bin/pandda.export'
+#                ' pandda_dir=%s' %self.panddas_directory+
+#                ' export_dir=%s' %self.initial_model_directory+
+#                ' export_ligands=False'
+#                ' generate_occupancy_groupings=True\n'
+#                )
+        os.system(Cmds)
+#        os.system('pandda.export pandda_dir=%s export_dir=%s export_ligands=False generate_occupancy_groupings=True' %(self.panddas_directory,self.initial_model_directory))
 #        self.Logfile.insert('ran pandda.export with the following command:\n'+Cmds)
 #        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running pandda.export: check terminal for details')
 

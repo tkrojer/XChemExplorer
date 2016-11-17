@@ -219,6 +219,9 @@ class XChemExplorer(QtGui.QApplication):
         elif self.external_software['phenix.elbow']:
             self.restraints_program='phenix.elbow'
             self.update_log.insert('will use PHENIX.ELBOW for generation of ligand coordinates and restraints')
+        elif self.external_software['grade']:
+            self.restraints_program='grade'
+            self.update_log.insert('will use GRADE for generation of ligand coordinates and restraints')
         else:
             self.restraints_program=''
             self.update_log.insert('No program for generation of ligand coordinates and restraints available!')
@@ -1376,8 +1379,9 @@ class XChemExplorer(QtGui.QApplication):
         vbox_restraints.addWidget(QtGui.QLabel('Restraints generation program:'))
         self.preferences_restraints_generation_combobox = QtGui.QComboBox()
         program_list=[]
-        if self.external_software['acedrg']: program_list.append('acedrg')
+        if self.external_software['acedrg']:       program_list.append('acedrg')
         if self.external_software['phenix.elbow']: program_list.append('phenix.elbow')
+        if self.external_software['grade']:        program_list.append('grade')
         for item in program_list:
             self.preferences_restraints_generation_combobox.addItem(item)
         self.preferences_restraints_generation_combobox.currentIndexChanged.connect(self.preferences_restraints_generation_combobox_changed)
