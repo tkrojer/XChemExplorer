@@ -217,7 +217,9 @@ class helpers:
         elif restraints_program=='phenix.elbow':
             software='phenix.elbow --smiles="%s" --id LIG --output %s\n' %(smiles,compoundID.replace(' ',''))
         elif restraints_program=='grade':
-            software='grade -resname LIG -nomogul "%s" -ocif %s.cif -opdb %s.pdb\n' %(smiles,compoundID.replace(' ',''),compoundID.replace(' ',''))
+            if os.getcwd().startswith('/dls'):
+                software+='module load buster\n'
+            software+='grade -resname LIG -nomogul "%s" -ocif %s.cif -opdb %s.pdb\n' %(smiles,compoundID.replace(' ',''),compoundID.replace(' ',''))
 
         Cmds = (
                     header+

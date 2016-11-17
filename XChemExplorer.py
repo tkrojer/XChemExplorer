@@ -2344,7 +2344,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def populate_reference_combobox(self,combobox):
         combobox.clear()
-        self.reference_file_list=self.get_reference_file_list(' ')
+#        self.reference_file_list=self.get_reference_file_list(' ')
 #        combobox.addItem('...')
         for reference_file in self.reference_file_list:
             combobox.addItem(reference_file[0])
@@ -3312,16 +3312,23 @@ class XChemExplorer(QtGui.QApplication):
 
         cluster_dict=XChemPANDDA.get_names_of_current_clusters(self.xce_logfile,self.panddas_directory)
 
+        added_new_reference_files=False
         if len(cluster_dict) > 1:
             # copy first pdb file in each cluster into reference directory
             for cluster in cluster_dict:
                 if not os.path.isfile(os.path.join(self.reference_directory,cluster+'.pdb')):
+                    added_new_reference_files=True
                     os.system('/bin/cp %s %s' %(cluster_dict[cluster][0],os.path.join(self.reference_directory,cluster+'.pdb')))
 #                    print '/bin/cp %s %s' %(cluster_dict[cluster][0],os.path.join(self.reference_directory,cluster+'.pdb'))
                     self.update_log.insert('copying %s as reference file for cluster %s in reference directory as %s.pdb' %(cluster_dict[cluster][0],cluster,cluster))
 
-        self.update_log.insert('updating combobox')
-        self.populate_reference_combobox(self.pandda_reference_file_selection_combobox)
+        if added_new_reference_files:
+            currentRef = str(self.pandda_reference_file_selection_combobox.currentText())
+            self.update_log.insert('updating combobox')
+            self.update_reference_files(' ')
+            index = self.pandda_reference_file_selection_combobox.findText(currentRef)
+            self.pandda_reference_file_selection_combobox.setCurrentIndex(index)
+#        self.populate_reference_combobox(self.pandda_reference_file_selection_combobox)
 
         reference_file=str(self.pandda_reference_file_selection_combobox.currentText())
         if os.path.isfile(os.path.join(self.reference_directory,reference_file+'.pdb')):
