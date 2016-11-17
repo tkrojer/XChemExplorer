@@ -3296,7 +3296,7 @@ class XChemExplorer(QtGui.QApplication):
 
         while self.explorer_active==1:
             print 'waiting, xce active',self.explorer_active
-            time.sleep(0.5)
+            time.sleep(1)
 
         # count number of clusters
         # Note: could do so from the self.xtal_db_dict, but cannot be certain that database contains
@@ -3352,7 +3352,7 @@ class XChemExplorer(QtGui.QApplication):
         self.update_log.insert('starting giant.cluster_mtzs_and_pdbs')
         self.work_thread=XChemPANDDA.giant_cluster_datasets(self.initial_model_directory,pandda_params,self.xce_logfile,os.path.join(self.database_directory,self.data_source_file))
         self.explorer_active=1
-        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
@@ -3550,6 +3550,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def thread_finished(self):
         self.explorer_active=0
+        print 'THREAD finished:::::::::::::::',self.explorer_active
         self.update_progress_bar(0)
         self.update_status_bar('idle')
 
