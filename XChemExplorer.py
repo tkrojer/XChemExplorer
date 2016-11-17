@@ -4569,6 +4569,8 @@ class XChemExplorer(QtGui.QApplication):
                                 cell_text.setBackground(QtGui.QColor(230,240,110))
                             elif str( db_dict[ header[1] ]  ) == 'finished':
                                 cell_text.setBackground(QtGui.QColor(255,255,255))
+                            elif 'problem' in str( db_dict[ header[1] ]  ):
+                                cell_text.setBackground(QtGui.QColor(255,0,0))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.summary_table.setItem(current_row, column, cell_text)
             if new_xtal:

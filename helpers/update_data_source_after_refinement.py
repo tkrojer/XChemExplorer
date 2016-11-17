@@ -45,6 +45,13 @@ def check_refmac_matrix_weight(refinement_directory,db_dict):
                 db_dict['RefinementMatrixWeight'] = line.split()[2]
     return db_dict
 
+def check_refmac_logfile(refinement_directory,db_dict):
+    if os.path.isfile(os.path.join(refinement_directory,'refmac.log')):
+        for line in open(os.path.join(refinement_directory,'refmac.log')):
+            if 'Your coordinate file has a ligand which has either minimum or no description in the library' in line:
+                db_dict['RefinementStatus'] = 'CIF problem'
+    return db_dict
+
 def parse_molprobity_output(inital_model_directory,xtal,db_dict):
     if os.path.isfile(os.path.join(inital_model_directory,xtal,'validation_summary.txt')):
         for line in open(os.path.join(inital_model_directory,xtal,'validation_summary.txt')):
@@ -187,6 +194,7 @@ if __name__=='__main__':
     db_dict=parse_mtz(inital_model_directory,xtal,db_dict)
     db_dict=check_refmac_matrix_weight(refinement_directory,db_dict)
     db_dict=parse_molprobity_output(inital_model_directory,xtal,db_dict)
+    db_dict=check_refmac_logfile(refinement_directory,db_dict)
 
     update_ligand_information_in_panddaTable(inital_model_directory,xtal)
 
