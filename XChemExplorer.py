@@ -3148,7 +3148,8 @@ class XChemExplorer(QtGui.QApplication):
             self.create_cif_pdb_png_files('SELECTED')
 
         elif instruction=='pandda.analyse':
-            self.run_pandda_analyse()
+            run_pandda_analyse=True
+            self.cluster_datasets_for_pandda(run_pandda_analyse)
 
         elif instruction=='pandda.inspect':
             self.run_pandda_inspect()
@@ -3168,7 +3169,7 @@ class XChemExplorer(QtGui.QApplication):
             self.run_pandda_export(update_datasource_only,which_models)
 
         elif instruction=='cluster datasets':
-            self.cluster_datasets_for_pandda()
+            self.cluster_datasets_for_pandda(False)
 
         elif instruction=='Update datasource with results from pandda.inspect':
             update_datasource_only=True
@@ -3291,12 +3292,12 @@ class XChemExplorer(QtGui.QApplication):
             self.update_log.insert('pandda.analyse: not enough datasets found')
             return
 
-        # cluster datasets first
-        self.cluster_datasets_for_pandda()
-
-        while self.explorer_active==1:
-            print 'waiting, xce active',self.explorer_active
-            time.sleep(1)
+#        # cluster datasets first
+#        self.cluster_datasets_for_pandda()
+#
+#        while self.explorer_active==1:
+#            print 'waiting, xce active',self.explorer_active
+#            time.sleep(1)
 
         # count number of clusters
         # Note: could do so from the self.xtal_db_dict, but cannot be certain that database contains
@@ -3342,7 +3343,7 @@ class XChemExplorer(QtGui.QApplication):
         self.work_thread.start()
 
 
-    def cluster_datasets_for_pandda(self):
+    def cluster_datasets_for_pandda(self,run_pandda_analyse):
 
         pandda_params = {
                 'out_dir':              str(self.pandda_output_data_dir_entry.text()),
@@ -3350,12 +3351,14 @@ class XChemExplorer(QtGui.QApplication):
                 'mtz_style':            str(self.pandda_mtz_style_entry.text())
                         }
         self.update_log.insert('starting giant.cluster_mtzs_and_pdbs')
-        self.work_thread=XChemPANDDA.giant_cluster_datasets(self.initial_model_directory,pandda_params,self.xce_logfile,os.path.join(self.database_directory,self.data_source_file))
+        self.work_thread=XChemPANDDA.giant_cluster_datasets(self.initial_model_directory,pandda_params,self.xce_logfile,os.path.join(self.database_directory,self.data_source_file,run_pandda_analyse))
         self.explorer_active=1
 #        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
+        if run_pandda_analyse:
+            self.connect(self.work_thread, QtCore.SIGNAL("run_pandda_analyse"),self.run_pandda_analyse)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
