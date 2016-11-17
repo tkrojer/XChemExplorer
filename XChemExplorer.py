@@ -3296,7 +3296,6 @@ class XChemExplorer(QtGui.QApplication):
                 'pdb_style':            str(self.pandda_pdb_style_entry.text()),
                 'mtz_style':            str(self.pandda_mtz_style_entry.text()),
                 'sort_event':           str(self.pandda_sort_event_combobox.currentText()),
-                'N_datasets':           counter,
                 'max_new_datasets':     str(self.pandda_max_new_datasets_entry.text()),
                 'grid_spacing':         str(self.pandda_grid_spacing_entry.text()),
                 'filter_pdb':           filter_pdb
@@ -3309,6 +3308,8 @@ class XChemExplorer(QtGui.QApplication):
             self.status_bar.showMessage('pandda.analyse: not enough datasets found')
             self.update_log.insert('pandda.analyse: not enough datasets found')
             return
+        else:
+            pandda_params['N_datasets'] = counter
 
         cluster_dict=XChemPANDDA.get_names_of_current_clusters(self.xce_logfile,self.panddas_directory)
 
@@ -3344,11 +3345,13 @@ class XChemExplorer(QtGui.QApplication):
                 filter_pdb=''
                 self.update_log.insert('only one crystal form; continuing without reference file')
 
+        pandda_params['filter_pdb']=filter_pdb
+
         if len(cluster) > 1:
-            self.update_log.insert('checking if pdb files in project directory contain same number of atoms as reference file (%s)' %reference_file)
+            self.update_log.insert('checking if pdb files in project directory contain same number of atoms as reference file (%s)' %filter_pdb)
         else:
             reference_file=pandda_checks.get_first_dataset_in_project_directory(str(self.pandda_input_data_dir_entry.text()))
-            self.update_log.insert('checking if pdb files in project directory contain same number of atoms as reference file (%s)' %reference_file)
+            self.update_log.insert('checking if pdb files in project directory contain same number of atoms as reference file (%s)' %filter_pdb)
 
         return
 
