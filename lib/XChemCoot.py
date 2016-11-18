@@ -548,6 +548,7 @@ class GUI(object):
 
     def ChangeXtal(self,widget,data=None):
         self.index = self.index + data
+        print 'here',self.index,len(self.Todo)
         if self.index < 0:
             self.index = 0
         if self.index >= len(self.Todo):
