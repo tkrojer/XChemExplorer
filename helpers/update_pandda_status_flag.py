@@ -8,6 +8,7 @@ import XChemDB
 
 def update_data_source(db_file,crystalString,status):
     db=XChemDB.data_source(db_file)
+    print "update mainTable set PANDDAStatus = '%s' where CrystalName in (%s)" %(status,crystalString)
     db.execute_statement("update mainTable set PANDDAStatus = '%s' where CrystalName in (%s)" %(status,crystalString))
 
 
