@@ -466,9 +466,9 @@ class check_if_pandda_can_run:
         refPDBlist=pdbtools.get_init_pdb_as_list()
         n_atom_ref=len(refPDBlist)
         for dataset in dataset_list:
-            print os.path.join(self.data_directory,dataset,self.pdb_style)
-            if os.path.isfile(os.path.join(self.data_directory,dataset,self.pdb_style)):
-                n_atom=len(pdbtools.get_pdb_as_list(os.path.join(self.data_directory,dataset,self.pdb_style)))
+            print os.path.join(self.data_directory.replace('*',''),dataset,self.pdb_style)
+            if os.path.isfile(os.path.join(self.data_directory.replace('*',''),dataset,self.pdb_style)):
+                n_atom=len(pdbtools.get_pdb_as_list(os.path.join(self.data_directory.replace('*',''),dataset,self.pdb_style)))
                 print n_atom_ref,n_atom
 
         return refPDBlist
