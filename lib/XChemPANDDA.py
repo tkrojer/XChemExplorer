@@ -256,6 +256,7 @@ class run_pandda_analyse(QtCore.QThread):
         self.filter_pdb=pandda_params['filter_pdb']
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.dataset_list=dataset_list
+        self.datasource=datasource
         self.db=XChemDB.data_source(datasource)
 
     def run(self):
@@ -313,6 +314,9 @@ class run_pandda_analyse(QtCore.QThread):
                 'source '+source_file+'\n'
                 '\n'
                 'cd '+self.panddas_directory+'\n'
+                '\n'
+                '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_pandda_status_flag.py %s %s %s\n' %(self.datasource,crystalString[:-1],'running') +
+                '\n'
                 )
 
             for i in range(number_of_cyles):
@@ -332,6 +336,8 @@ class run_pandda_analyse(QtCore.QThread):
                     ' mtz_style='+self.mtz_style+'\n'
                     '\n'
                     )
+
+            Cmds += '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_pandda_status_flag.py %s %s %s\n' %(self.datasource,crystalString[:-1],'finished')
 
             self.Logfile.insert('running pandda.analyse with the following command:\n'+Cmds)
 
