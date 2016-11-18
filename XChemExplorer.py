@@ -3091,49 +3091,49 @@ class XChemExplorer(QtGui.QApplication):
 
 
 
-#    def button_clicked(self):
-#
-#        if self.data_source_set==False:
-#            if self.sender().text()=="Create New Data\nSource (SQLite)":
-#                file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
-#                #make sure that the file always has .sqlite extension
-#                if file_name.rfind('.') != -1:
-#                    file_name=file_name[:file_name.rfind('.')]+'.sqlite'
-#                else:
-#                    file_name=file_name+'.sqlite'
-#                self.db=XChemDB.data_source(file_name)
-#                print '==> XCE: creating new data source'
-#                self.db.create_empty_data_source_file()
-#                self.db.create_missing_columns()
-#                if self.data_source_file=='':
-#                    self.database_directory=file_name[:file_name.rfind('/')]
-#                    self.data_source_file=file_name[file_name.rfind('/')+1:]
-#                    self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
-##                    self.database_directory_label.setText(str(self.database_directory))
-#                    self.settings['database_directory']=self.database_directory
-#                    self.settings['data_source']=self.data_source_file
-#                    self.data_source_set=True
-#            else:
-#                self.no_data_source_selected()
-#                pass
-#
-#        # first find out which of the 'Run' or 'Status' buttons is sending
-#        for item in self.workflow_widget_dict:
-#            for widget in self.workflow_widget_dict[item]:
-#                if widget==self.sender():
-#                    # get index of item in self.workflow; Note this index should be the same as the index
-#                    # of the self.main_tab_widget which belongs to this task
-#                    task_index=self.workflow.index(item)
-#                    instruction =   str(self.workflow_widget_dict[item][0].currentText())
-#                    action =        str(self.sender().text())
-#                    if self.main_tab_widget.currentIndex()==task_index:
-#                        if self.explorer_active==0 and self.data_source_set==True:
-#                            if action=='Run':
-#                                self.prepare_and_run_task(instruction)
-#                            elif action=='Status':
-#                                self.get_status_of_workflow_milestone(instruction)
-#                    else:
-#                        self.need_to_switch_main_tab(task_index)
+    def button_clicked(self):
+
+        if self.data_source_set==False:
+            if self.sender().text()=="Create New Data\nSource (SQLite)":
+                file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
+                #make sure that the file always has .sqlite extension
+                if file_name.rfind('.') != -1:
+                    file_name=file_name[:file_name.rfind('.')]+'.sqlite'
+                else:
+                    file_name=file_name+'.sqlite'
+                self.db=XChemDB.data_source(file_name)
+                print '==> XCE: creating new data source'
+                self.db.create_empty_data_source_file()
+                self.db.create_missing_columns()
+                if self.data_source_file=='':
+                    self.database_directory=file_name[:file_name.rfind('/')]
+                    self.data_source_file=file_name[file_name.rfind('/')+1:]
+                    self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
+#                    self.database_directory_label.setText(str(self.database_directory))
+                    self.settings['database_directory']=self.database_directory
+                    self.settings['data_source']=self.data_source_file
+                    self.data_source_set=True
+            else:
+                self.no_data_source_selected()
+                pass
+
+        # first find out which of the 'Run' or 'Status' buttons is sending
+        for item in self.workflow_widget_dict:
+            for widget in self.workflow_widget_dict[item]:
+                if widget==self.sender():
+                    # get index of item in self.workflow; Note this index should be the same as the index
+                    # of the self.main_tab_widget which belongs to this task
+                    task_index=self.workflow.index(item)
+                    instruction =   str(self.workflow_widget_dict[item][0].currentText())
+                    action =        str(self.sender().text())
+                    if self.main_tab_widget.currentIndex()==task_index:
+                        if self.explorer_active==0 and self.data_source_set==True:
+                            if action=='Run':
+                                self.prepare_and_run_task(instruction)
+                            elif action=='Status':
+                                self.get_status_of_workflow_milestone(instruction)
+                    else:
+                        self.need_to_switch_main_tab(task_index)
 
     def get_status_of_workflow_milestone(self,instruction):
         # first update all tables
