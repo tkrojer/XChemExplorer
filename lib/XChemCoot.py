@@ -1,4 +1,4 @@
-# last edited: 07/11/2016 - 15:00
+# last edited: 18/11/2016 - 15:00
 
 import gobject
 import sys

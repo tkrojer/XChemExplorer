@@ -1,4 +1,4 @@
-# last edited: 17/11/2016, 17:00
+# last edited: 18/11/2016, 15:00
 
 import sqlite3
 import os,sys
@@ -237,6 +237,73 @@ class data_source:
             ['LastUpdated',                                 'LastUpdated',                              'TEXT'],
             ['LastUpdated_by',                              'LastUpdated_by',                           'TEXT']
             ]
+
+
+        # this is the planned replacement for the PKL file, 18/11/2016
+        self.data_collection_columns = [
+            ['CrystalName',                          'Sample ID',                               'TEXT',                 0],
+
+            ['SelectedPipeline',                          'SelectedPipeline',                               'TEXT',                 0],
+
+            ['DataCollectionRun',                    'Run',                                     'TEXT',                 0],
+            ['DataCollectionBeamline',               'Beamline',                                'TEXT',                 0],
+            ['DataCollectionDate',                   'Data Collection\nDate',                   'TEXT',                 1],
+            ['DataCollectionWavelength',             'Wavelength',                              'TEXT',                 0],
+            ['DataCollectionPinBarcode',             'GDA\nBarcode',                            'TEXT',                 1],
+
+            ['DataCollectionCrystalImage1',             'img1',                            'TEXT',                 1],
+            ['DataCollectionCrystalImage2',             'img2',                            'TEXT',                 1],
+            ['DataCollectionCrystalImage3',             'img3',                            'TEXT',                 1],
+            ['DataCollectionCrystalImage4',             'img4',                            'TEXT',                 1],
+
+            ['DataProcessingPathToImageFiles',       'Path to diffraction\nimage files',        'TEXT',                 1],
+            ['DataProcessingProgram',                'Program',                                 'TEXT',                 1],
+            ['DataProcessingSpaceGroup',             'DataProcessing\nSpaceGroup',              'TEXT',                 1],
+            ['DataProcessingUnitCell',               'DataProcessing\nUnitCell',                'TEXT',                 0],
+            ['DataProcessingAutoAssigned',           'auto-assigned',                           'TEXT',                 0],
+            ['DataProcessingA',                      'DataProcessing\nA',                       'TEXT',                 0],
+            ['DataProcessingB',                      'DataProcessing\nB',                       'TEXT',                 0],
+            ['DataProcessingC',                      'DataProcessing\nC',                       'TEXT',                 0],
+            ['DataProcessingAlpha',                  'DataProcessing\nAlpha',                   'TEXT',                 0],
+            ['DataProcessingBeta',                   'DataProcessing\nBeta',                    'TEXT',                 0],
+            ['DataProcessingGamma',                  'DataProcessing\nGamma',                   'TEXT',                 0],
+            ['DataProcessingResolutionOverall',             'Resolution\nOverall',                          'TEXT',                 0],
+            ['DataProcessingResolutionLow',                 'Resolution\nLow',                              'TEXT',                 0],
+            ['DataProcessingResolutionLowInnerShell',       'Resolution\nLow (Inner Shell)',                'TEXT',                 0],
+            ['DataProcessingResolutionHigh',                'Resolution\nHigh',                             'TEXT',                 1],
+            ['DataProcessingResolutionHigh15sigma',         'Resolution\n[Mn<I/sig(I)> = 1.5]',             'TEXT',                 1],
+            ['DataProcessingResolutionHighOuterShell',      'Resolution\nHigh (Outer Shell)',               'TEXT',                 0],
+            ['DataProcessingRmergeOverall',                 'Rmerge\nOverall',                              'TEXT',                 1],
+            ['DataProcessingRmergeLow',                     'Rmerge\nLow',                                  'TEXT',                 1],
+            ['DataProcessingRmergeHigh',                    'Rmerge\nHigh',                                 'TEXT',                 1],
+            ['DataProcessingIsigOverall',                   'Mn<I/sig(I)>\nOverall',                        'TEXT',                 1],
+            ['DataProcessingIsigLow',                       'Mn<I/sig(I)>\nLow',                            'TEXT',                 1],
+            ['DataProcessingIsigHigh',                      'Mn<I/sig(I)>\nHigh',                           'TEXT',                 1],
+            ['DataProcessingCompletenessOverall',           'Completeness\nOverall',                        'TEXT',                 1],
+            ['DataProcessingCompletenessLow',               'Completeness\nLow',                            'TEXT',                 1],
+            ['DataProcessingCompletenessHigh',              'Completeness\nHigh',                           'TEXT',                 1],
+            ['DataProcessingMultiplicityOverall',           'Multiplicity\nOverall',                        'TEXT',                 1],
+            ['DataProcessingMultiplicityLow',               'Multiplicity\nLow',                            'TEXT',                 1],
+            ['DataProcessingMultiplicityHigh',              'Multiplicity\nHigh',                           'TEXT',                 1],
+            ['DataProcessingCChalfOverall',                 'CC(1/2)\nOverall',                             'TEXT',                 1],
+            ['DataProcessingCChalfLow',                     'CC(1/2)\nLow',                                 'TEXT',                 1],
+            ['DataProcessingCChalfHigh',                    'CC(1/2)\nHigh',                                'TEXT',                 1],
+            ['DataProcessingPathToLogfile',                 'DataProcessingPathToLogfile',                  'TEXT',                 1],
+            ['DataProcessingPathToMTZfile',                 'DataProcessingPathToMTZfile',                  'TEXT',                 1],
+            ['DataProcessingLOGfileName',                   'DataProcessingLOGfileName',                    'TEXT',                 0],
+            ['DataProcessingMTZfileName',                   'DataProcessingMTZfileName',                    'TEXT',                 0],
+            ['DataProcessingDirectoryOriginal',             'DataProcessingDirectoryOriginal',              'TEXT',                 0],
+            ['DataProcessingUniqueReflectionsOverall',      'Unique Reflections\nOverall',                  'TEXT',                 1],
+            ['DataProcessingLattice',                       'DataProcessing\nLattice',                      'TEXT',                 0],
+            ['DataProcessingPointGroup',                    'DataProcessing\nPointGroup',                   'TEXT',                 0],
+            ['DataProcessingUnitCellVolume',                'DataProcessing\nUnit Cell Volume',             'TEXT',                 0],
+            ['DataProcessingAlert',                         'DataProcessing\nAlert',                        'TEXT',                 0],
+            ['DataProcessingScore',                         'DataProcessing\nScore',                        'TEXT',                 1],
+            ['DataProcessingStatus',                        'DataProcessing\nStatus',                       'TEXT',                 1],
+
+
+            ]
+
 
     def columns_not_to_display(self):
         do_not_display = []
