@@ -552,7 +552,8 @@ class GUI(object):
         if self.index < 0:
             self.index = 0
         if self.index >= len(self.Todo):
-            self.index = len(self.Todo)
+#            self.index = len(self.Todo)
+            self.index = 0
         self.cb.set_active(self.index)
 
     def ChooseXtal(self, widget):
