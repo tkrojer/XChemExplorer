@@ -3147,8 +3147,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.update_log.insert('%s samples are currently in database' %str(len(self.xtal_db_dict)))
 
-        if instruction=='Run DIMPLE on All Autoprocessing MTZ files' or \
-           instruction=='Run DIMPLE on selected MTZ files':
+        if 'DIMPLE' in instruction:
             XChemMain.print_cluster_status_message('dimple',cluster_dict,self.xce_logfile)
 
         elif 'Create CIF/PDB/PNG file' in instruction:
@@ -3160,6 +3159,10 @@ class XChemExplorer(QtGui.QApplication):
 
         elif 'pandda' in instruction.lower():
             XChemMain.print_cluster_status_message('pandda',cluster_dict,self.xce_logfile)
+
+        elif 'coot' in instruction.lower():
+            XChemMain.print_cluster_status_message('refmac',cluster_dict,self.xce_logfile)
+
 
     def prepare_and_run_task(self,instruction):
 
