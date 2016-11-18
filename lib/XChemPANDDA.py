@@ -275,8 +275,9 @@ class run_pandda_analyse(QtCore.QThread):
         # 3) Repeat 2) until you don't add any "new" datasets. Then you can build the models as normal.
 
         crystalString=''
-        for dataset in self.dataset_list:
-            crystalString+="'"+dataset+"',"
+        for n,dataset in enumerate(self.dataset_list):
+            if n > 0:       # first entry is reference file!
+                crystalString+="'"+dataset+"',"
         print ("update mainTable set PANDDAStatus = 'started' where CrystalName in (%s)" %crystalString[:-1])
         self.db.execute_statement("update mainTable set PANDDAStatus = 'started' where CrystalName in (%s)" %crystalString[:-1])
 
