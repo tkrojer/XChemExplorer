@@ -276,8 +276,8 @@ class run_pandda_analyse(QtCore.QThread):
         crystalString=''
         for dataset in self.dataset_list:
             crystalString+="'"+dataset+"',"
-        print ("update mainTable set PANDDAStatus = 'started' where CrystalName in (%s)" %crystalString)
-        self.db.execute_statement("update mainTable set PANDDAStatus = 'started' where CrystalName in (%s)" %crystalString)
+        print ("update mainTable set PANDDAStatus = 'started' where CrystalName in (%s)" %crystalString[:-1])
+        self.db.execute_statement("update mainTable set PANDDAStatus = 'started' where CrystalName in (%s)" %crystalString[:-1])
 
         number_of_cyles=int(self.number_of_datasets)/int(self.max_new_datasets)
         if int(self.number_of_datasets) % int(self.max_new_datasets) != 0:  # modulo gives remainder after integer division
