@@ -3367,7 +3367,7 @@ class XChemExplorer(QtGui.QApplication):
             if n_datasets < int(pandda_params['min_build_datasets']):
                     self.update_log.insert('need %s datasets, but only %s are available' %(str(pandda_params['min_build_datasets']),str(n_datasets)))
             if mismatched_datasets != []:
-                self.update_log.insert('the following PDB files have a different number of atoms than the reference file:'B)
+                self.update_log.insert('the following PDB files have a different number of atoms than the reference file:')
                 for dataset in mismatched_datasets:
                     self.update_log.insert(dataset)
             self.update_log('please correct the errors and try again')
