@@ -924,6 +924,8 @@ class XChemExplorer(QtGui.QApplication):
         self.initial_model_vbox_for_table=QtGui.QVBoxLayout()
         self.inital_model_column_list=[   'Sample ID',
                         'Select',
+                        'Compound ID',
+                        'Smiles',
                         'Resolution\n[Mn<I/sig(I)> = 1.5]',
                         'Dimple\nRcryst',
                         'Dimple\nRfree',
@@ -932,9 +934,6 @@ class XChemExplorer(QtGui.QApplication):
                         'Difference\nUC Volume (%)',
                         'Reference File',
                         'DataProcessing\nUnitCell',
-                        'PANDDA\nlaunched?',
-                        'PANDDA\nhit?',
-                        'PANDDA\nreject?',
                         'Dimple\nStatus',
                         'Compound\nStatus'                  ]
 
@@ -1008,7 +1007,11 @@ class XChemExplorer(QtGui.QApplication):
                                     'Resolution\n[Mn<I/sig(I)> = 1.5]',
                                     'Dimple\nRcryst',
                                     'Dimple\nRfree',
-                                    'Crystal Form\nName'    ]
+                                    'Crystal Form\nName',
+                                    'PanDDA\nlaunched?',
+                                    'PanDDA\nhit?',
+                                    'PanDDA\nreject?',
+                                    'PanDDA\nStatus'    ]
 
         self.pandda_analyse_data_table=QtGui.QTableWidget()
         self.pandda_analyse_data_table.setSortingEnabled(True)
@@ -3376,6 +3379,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.update_log.insert('preparing pandda.analyse input script')
         self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params,self.xce_logfile)
+        self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 

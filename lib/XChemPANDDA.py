@@ -338,6 +338,8 @@ class run_pandda_analyse(QtCore.QThread):
                 self.Logfile.insert('running PANDDA on cluster, using qsub...')
                 os.system('qsub pandda.sh')
 
+        self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
+
 class giant_cluster_datasets(QtCore.QThread):
 
     def __init__(self,initial_model_directory,pandda_params,xce_logfile,datasource,run_pandda_analyse):
