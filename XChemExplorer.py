@@ -3368,10 +3368,10 @@ class XChemExplorer(QtGui.QApplication):
                     self.update_log.insert('need %s datasets, but only %s are available' %(str(pandda_params['min_build_datasets']),str(n_datasets)))
             if mismatch != []:
                 self.update_log.insert('the following PDB files have a different number of atoms than the reference file:')
-                for dataset in mismatched_datasets:
+                for dataset in mismatch:
                     self.update_log.insert(dataset)
             self.update_log('please correct the errors and try again')
-            self.status_bar.showMessage('cannot starts pandda.analyse; please check terminal for further information')
+            self.status_bar.showMessage('cannot start pandda.analyse; please check terminal for further information')
             return
 
         self.update_log.insert('preparing pandda.analyse input script')
