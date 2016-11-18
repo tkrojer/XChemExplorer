@@ -464,8 +464,8 @@ class check_if_pandda_can_run:
     def compare_number_of_atoms_in_reference_vs_all_datasets(self,refData,dataset_list):
         pdbtools=XChemUtils.pdbtools(refData)
         refPDBlist=pdbtools.get_init_pdb_as_list()
-        for cluster in cluster_dict:
-
+        for dataset in dataset_list:
+            print dataset
 
         return refPDBlist
 
