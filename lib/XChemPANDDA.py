@@ -464,8 +464,12 @@ class check_if_pandda_can_run:
     def compare_number_of_atoms_in_reference_vs_all_datasets(self,refData,dataset_list):
         pdbtools=XChemUtils.pdbtools(refData)
         refPDBlist=pdbtools.get_init_pdb_as_list()
+        n_atom_ref=len(refPDBlist)
         for dataset in dataset_list:
-            print dataset
+            print os.path.join(self.panddas_directory,dataset,self.pdb_style)
+            if os.path.isfile(os.path.join(self.panddas_directory,dataset,self.pdb_style)):
+                n_atom=len(pdbtools.get_pdb_as_list(os.path.join(self.panddas_directory,dataset,self.pdb_style)))
+                print n_atom_ref,n_atom
 
         return refPDBlist
 
