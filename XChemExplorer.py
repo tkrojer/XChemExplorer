@@ -1020,6 +1020,8 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_data_table.setHorizontalHeaderLabels(self.pandda_column_name)
         self.pandda_analyse_hbox.addWidget(self.pandda_analyse_data_table)
 
+        self.pandda_analyse_hbox.addStretch(1)
+
         # right hand side: input parameters for PANDDAs run
 
         frame=QtGui.QFrame()
