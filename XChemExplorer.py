@@ -3370,7 +3370,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.update_log.insert('the following PDB files have a different number of atoms than the reference file:')
                 for dataset in mismatch:
                     self.update_log.insert(dataset)
-            self.update_log('please correct the errors and try again')
+            self.update_log.insert('please correct the errors and try again')
             self.status_bar.showMessage('cannot start pandda.analyse; please check terminal for further information')
             return
 
