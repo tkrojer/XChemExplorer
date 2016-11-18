@@ -3341,8 +3341,8 @@ class XChemExplorer(QtGui.QApplication):
                 self.update_log.insert('only one crystal form; continuing without reference file')
             else:
                 self.update_log.insert('cannot find %s -> stopping pandda.analyse' %reference_file)
-        elif os.path.isfile(os.path.join(self.reference_directory,reference_file+'.pdb')):
-            reference_file=os.path.join(self.reference_directory,reference_file+'.pdb')
+        elif os.path.isfile(os.path.join(self.reference_directory,reference_ID+'.pdb')):
+            reference_file=os.path.join(self.reference_directory,reference_ID+'.pdb')
             filter_pdb=reference_file
             self.update_log.insert('using %s as reference file for PanDDA' %reference_file)
 
