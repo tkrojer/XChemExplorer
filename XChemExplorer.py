@@ -1075,7 +1075,7 @@ class XChemExplorer(QtGui.QApplication):
         if self.external_software['qsub']:
             self.pandda_submission_mode_selection_combobox.addItem('qsub')
         self.pandda_submission_mode_selection_combobox.addItem('local machine')
-        self.pandda_submission_mode_selection_combobox..setMaximumWidth(200)
+        self.pandda_submission_mode_selection_combobox.setMaximumWidth(200)
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_submission_mode_selection_combobox)
 
         self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('number of processors'))
