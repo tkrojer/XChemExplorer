@@ -462,6 +462,7 @@ class check_if_pandda_can_run:
         return first_dataset
 
     def compare_number_of_atoms_in_reference_vs_all_datasets(self,refData,dataset_list):
+        mismatched_datasets=[]
         pdbtools=XChemUtils.pdbtools(refData)
         refPDBlist=pdbtools.get_init_pdb_as_list()
         n_atom_ref=len(refPDBlist)
@@ -469,8 +470,15 @@ class check_if_pandda_can_run:
             print os.path.join(self.data_directory.replace('*',''),dataset,self.pdb_style)
             if os.path.isfile(os.path.join(self.data_directory.replace('*',''),dataset,self.pdb_style)):
                 n_atom=len(pdbtools.get_pdb_as_list(os.path.join(self.data_directory.replace('*',''),dataset,self.pdb_style)))
-                print n_atom_ref,n_atom
-
+                if n_atom_ref == n_atom:
+                    self.Logfile.insert('%s: atoms in PDB file (%s): %s; atoms in Reference file: %s ===> OK' %(dataset,self.pdb_style,str(n_atom),str(n_atom_ref)))
+                if n_atom_ref != n_atom:
+                    self.Logfile.insert('%s: atoms in PDB file (%s): %s; atoms in Reference file: %s ===> ERROR' %(dataset,self.pdb_style,str(n_atom),str(n_atom_ref)))
+                    mismatched_datasets.append(dataset)
+        if mismatched_datasets != []:
+            self.Logfile.insert('the following PDB files have a different number of atoms than the reference file:')
+            for dataset in mismatched_datasets:
+                self.Logfile.insert(dataset)
         return refPDBlist
 
     def analyse_pdb_style(self):
