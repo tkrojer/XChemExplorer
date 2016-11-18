@@ -1082,12 +1082,14 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_nproc=multiprocessing.cpu_count()-1
         self.pandda_nproc_entry = QtGui.QLineEdit()
         self.pandda_nproc_entry.setText(str(self.pandda_nproc).replace(' ',''))
+        self.pandda_nproc_entry.setFixedWidth(200)
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_nproc_entry)
 
         self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('order events by:'))
         self.pandda_sort_event_combobox = QtGui.QComboBox()
         self.pandda_sort_event_combobox.addItem('cluster_size')
         self.pandda_sort_event_combobox.addItem('z_peak')
+        self.pandda_sort_event_combobox.setMaximumWidth(200)
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_sort_event_combobox)
 
         # crystal form option
@@ -1110,16 +1112,19 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('min_build_datasets'))
         self.pandda_min_build_dataset_entry = QtGui.QLineEdit()
         self.pandda_min_build_dataset_entry.setText('40')
+        self.pandda_min_build_dataset_entry.setFixedWidth(200)
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_min_build_dataset_entry)
 
         self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('max_new_datasets'))
         self.pandda_max_new_datasets_entry = QtGui.QLineEdit()
         self.pandda_max_new_datasets_entry.setText('200')
+        self.pandda_max_new_datasets_entry.setFixedWidth(200)
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_max_new_datasets_entry)
 
         self.pandda_analyse_input_params_vbox.addWidget(QtGui.QLabel('grid_spacing (default=0.6)\nNote: higher values speed up calculations, but maps might be less pretty)'))
         self.pandda_grid_spacing_entry = QtGui.QLineEdit()
         self.pandda_grid_spacing_entry.setText('0.6')
+        self.pandda_grid_spacing_entry.setFixedWidth(200)
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_grid_spacing_entry)
 
         self.pandda_analyse_input_params_vbox.addStretch(1)
