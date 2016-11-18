@@ -3303,25 +3303,15 @@ class XChemExplorer(QtGui.QApplication):
 
         pandda_checks=XChemPANDDA.check_if_pandda_can_run(pandda_params,self.xce_logfile)
 
-        counter=pandda_checks.number_of_available_datasets()
-        if counter < 10:
-            self.status_bar.showMessage('pandda.analyse: not enough datasets found')
-            self.update_log.insert('pandda.analyse: not enough datasets found')
-            return
-        else:
-            pandda_params['N_datasets'] = counter
-
         cluster_dict=XChemPANDDA.get_names_of_current_clusters(self.xce_logfile,self.panddas_directory)
 
         added_new_reference_files=False
-        if len(cluster_dict) > 1:
-            # copy first pdb file in each cluster into reference directory
-            for cluster in cluster_dict:
-                if not os.path.isfile(os.path.join(self.reference_directory,cluster+'.pdb')):
-                    added_new_reference_files=True
-                    os.system('/bin/cp %s %s' %(cluster_dict[cluster][0],os.path.join(self.reference_directory,cluster+'.pdb')))
-#                    print '/bin/cp %s %s' %(cluster_dict[cluster][0],os.path.join(self.reference_directory,cluster+'.pdb'))
-                    self.update_log.insert('copying %s as reference file for cluster %s in reference directory as %s.pdb' %(cluster_dict[cluster][0],cluster,cluster))
+        # copy first pdb file in each cluster into reference directory
+        for cluster in cluster_dict:
+            if not os.path.isfile(os.path.join(self.reference_directory,cluster+'.pdb')):
+                added_new_reference_files=True
+                os.system('/bin/cp %s %s' %(cluster_dict[cluster][0],os.path.join(self.reference_directory,cluster+'.pdb')))
+                self.update_log.insert('copying %s as reference file for cluster %s in reference directory as %s.pdb' %(cluster_dict[cluster][0],cluster,cluster))
 
         if added_new_reference_files:
             currentRef = str(self.pandda_reference_file_selection_combobox.currentText())
@@ -3329,44 +3319,60 @@ class XChemExplorer(QtGui.QApplication):
             self.update_reference_files(' ')
             index = self.pandda_reference_file_selection_combobox.findText(currentRef)
             self.pandda_reference_file_selection_combobox.setCurrentIndex(index)
-#        self.populate_reference_combobox(self.pandda_reference_file_selection_combobox)
 
-        reference_file=str(self.pandda_reference_file_selection_combobox.currentText())
-        if os.path.isfile(os.path.join(self.reference_directory,reference_file+'.pdb')):
-            filter_pdb=os.path.join(self.reference_directory,reference_file+'.pdb')
-            self.update_log.insert('using %s as reference file for PanDDA' %reference_file)
-        else:
-            if len(cluster_dict) > 1:
-                msg = (
+        reference_ID=str(self.pandda_reference_file_selection_combobox.currentText())
+        if len(cluster_dict) > 1 and not os.path.isfile(os.path.join(self.reference_directory,reference_ID+'.pdb')):
+            msg = (
                     '*** WARNING ***\n'
                     'The datasets in your project directory belong to more than one crystal form.\n'
                     'But you did not select a specific reference file.\n'
                     'Please select a reference file and try again!\n'
                 )
-                self.update_log.insert(msg)
-                msgBox = QtGui.QMessageBox()
-                msgBox.setText(msg)
-                msgBox.exec_()
-                return
-            else:
-                filter_pdb=''
+            self.update_log.insert(msg)
+            msgBox = QtGui.QMessageBox()
+            msgBox.setText(msg)
+            msgBox.exec_()
+            return
+        elif len(cluster_dict) == 1 and reference_file == '...':
+            reference_ID=cluster_dict.keys[0]
+            reference_file=os.path.join(self.reference_directory,reference_ID+'.pdb')
+            filter_pdb=''
+            if os.path.isfile(reference_file):
                 self.update_log.insert('only one crystal form; continuing without reference file')
+            else:
+                self.update_log.insert('cannot find %s -> stopping pandda.analyse' %reference_file)
+        elif os.path.isfile(os.path.join(self.reference_directory,reference_file+'.pdb')):
+            reference_file=os.path.join(self.reference_directory,reference_file+'.pdb')
+            filter_pdb=reference_file
+            self.update_log.insert('using %s as reference file for PanDDA' %reference_file)
 
         pandda_params['filter_pdb']=filter_pdb
 
-        if len(cluster) > 1:
-            first_file=filter_pdb
-            self.update_log.insert('checking if pdb files in project directory contain same number of atoms as reference file (%s)' %filter_pdb)
-        else:
-            first_file=pandda_checks.get_first_dataset_in_project_directory()
-            self.update_log.insert('checking if pdb files in project directory contain same number of atoms as reference file (%s)' %first_file)
+        self.update_log.insert('checking if PDB files in project directory contain same number of atoms as reference file')
+        n_datasets,mismatch=pandda_checks.compare_number_of_atoms_in_reference_vs_all_datasets(reference_file,cluster_dict[reference_ID])
+        pandda_params['N_datasets']=n_datasets
 
-        x=pandda_checks.compare_number_of_atoms_in_reference_vs_all_datasets(first_file,cluster_dict[reference_file])
-        print 'fueigfwygfyegyfegw',len(x)
+        error=True
+        if mismatch == [] and n_datasets >= int(pandda_params['min_build_datasets']):
+            error=False
+            self.update_log.insert('found sufficient number of datasets: %s; all PDB files have the same number of atoms ==> OK' %str(n_datasets))
+        elif mismatch != [] and n_datasets >= int(pandda_params['min_build_datasets']):
+            self.update_log.insert('found sufficient number of datasets: %s; but NOT all PDB files have the same number of atoms ==> ERROR' %str(n_datasets))
+        elif mismatch == [] and n_datasets < int(pandda_params['min_build_datasets']):
+            self.update_log.insert('did NOT find sufficient number of datasets: %s; all PDB files have the same number of atoms ==> ERROR' %str(n_datasets))
+        elif mismatch != [] and n_datasets < int(pandda_params['min_build_datasets']):
+            self.update_log.insert('did NOT find sufficient number of datasets: %s; but NOT all PDB files have the same number of atoms ==> ERROR' %str(n_datasets))
 
-        return
-
-
+        if error:
+            if n_datasets < int(pandda_params['min_build_datasets']):
+                    self.update_log.insert('need %s datasets, but only %s are available' %(str(pandda_params['min_build_datasets']),str(n_datasets)))
+            if mismatched_datasets != []:
+                self.update_log.insert('the following PDB files have a different number of atoms than the reference file:'B)
+                for dataset in mismatched_datasets:
+                    self.update_log.insert(dataset)
+            self.update_log('please correct the errors and try again')
+            self.status_bar.showMessage('cannot starts pandda.analyse; please check terminal for further information')
+            return
 
         self.update_log.insert('preparing pandda.analyse input script')
         self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params,self.xce_logfile)
@@ -3396,14 +3402,14 @@ class XChemExplorer(QtGui.QApplication):
 
 
 
-    def check_data_for_pandda_analyse(self):
-        counter=0
-        for file in glob.glob(os.path.join(str(self.pandda_input_data_dir_entry.text()),str(self.pandda_pdb_style_entry.text()))):
-            if os.path.isfile(file):
-                counter+=1
-        self.status_bar.showMessage('pandda.analyse: found %s useable datasets' %counter)
-        self.update_log.insert('pandda.analyse: found %s useable datasets' %counter)
-        return counter
+#    def check_data_for_pandda_analyse(self):
+#        counter=0
+#        for file in glob.glob(os.path.join(str(self.pandda_input_data_dir_entry.text()),str(self.pandda_pdb_style_entry.text()))):
+#            if os.path.isfile(file):
+#                counter+=1
+#        self.status_bar.showMessage('pandda.analyse: found %s useable datasets' %counter)
+#        self.update_log.insert('pandda.analyse: found %s useable datasets' %counter)
+#        return counter
 
     def run_pandda_inspect(self):
         self.settings['panddas_directory']=str(self.pandda_output_data_dir_entry.text())
