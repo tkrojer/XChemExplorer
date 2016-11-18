@@ -1001,6 +1001,8 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_hbox=QtGui.QHBoxLayout()
         self.pandda_tab_dict['pandda.analyse'][1].addLayout(self.pandda_analyse_hbox)
 
+        grid_pandda = QtGui.QGridLayout()
+
         # left hand side: table with information about available datasets
         self.pandda_column_name = [ 'Sample ID',
                                     'Refinement\nSpace Group',
@@ -1018,9 +1020,12 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_data_table.resizeColumnsToContents()
         self.pandda_analyse_data_table.setColumnCount(len(self.pandda_column_name))
         self.pandda_analyse_data_table.setHorizontalHeaderLabels(self.pandda_column_name)
-#        self.pandda_analyse_data_table.setSizePolicy(QtGui.QSizePolicy.Maximum,QtGui.QSizePolicy.Maximum)
-#        self.pandda_analyse_data_table.setSizePolicy(QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Minimum)
-        self.pandda_analyse_hbox.addWidget(self.pandda_analyse_data_table)
+##        self.pandda_analyse_data_table.setSizePolicy(QtGui.QSizePolicy.Maximum,QtGui.QSizePolicy.Maximum)
+##        self.pandda_analyse_data_table.setSizePolicy(QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Minimum)
+#        self.pandda_analyse_hbox.addWidget(self.pandda_analyse_data_table)
+
+        frame_pandda=QtGui.QFrame()
+        grid_pandda.addWidget(self.pandda_analyse_data_table,0,0)
 
 #        self.pandda_analyse_hbox.addStretch(1)
 
@@ -1037,7 +1042,7 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_input_params_vbox.addWidget(label)
         self.pandda_input_data_dir_entry = QtGui.QLineEdit()
         self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory,'*'))
-        self.pandda_input_data_dir_entry.setFixedWidth(300)
+        self.pandda_input_data_dir_entry.setFixedWidth(200)
         pandda_input_dir_hbox.addWidget(self.pandda_input_data_dir_entry)
         self.select_pandda_input_dir_button=QtGui.QPushButton("Select Input Template")
 #        self.select_pandda_input_dir_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
@@ -1072,7 +1077,7 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_input_params_vbox.addWidget(label)
         self.pandda_output_data_dir_entry = QtGui.QLineEdit()
         self.pandda_output_data_dir_entry.setText(self.panddas_directory)
-        self.pandda_output_data_dir_entry.setFixedWidth(300)
+        self.pandda_output_data_dir_entry.setFixedWidth(200)
         pandda_output_dir_hbox.addWidget(self.pandda_output_data_dir_entry)
         self.select_pandda_output_dir_button=QtGui.QPushButton("Select PANNDAs Directory")
 #        self.select_pandda_output_dir_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
@@ -1158,6 +1163,7 @@ class XChemExplorer(QtGui.QApplication):
 
         frame_right.setSizePolicy(QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Minimum)
         frame_right.setLayout(self.pandda_analyse_input_params_vbox)
+#        self.pandda_analyse_hbox.addWidget(frame_right)
 
 #        # green 'Run Pandda' button (which is red when pandda run in progress
 #        self.run_panddas_button=QtGui.QPushButton("Run PANDDAs")
@@ -1168,7 +1174,9 @@ class XChemExplorer(QtGui.QApplication):
 #        self.pandda_analyse_input_params_vbox.addWidget(self.run_panddas_button)
 
 #        self.pandda_analyse_hbox.addLayout(self.pandda_analyse_input_params_vbox)
-        self.pandda_analyse_hbox.addWidget(frame_right)
+        grid_pandda.addWidget(frame_right,0,1,5,5)
+        frame_pandda.setLayout(grid_pandda)
+        self.pandda_analyse_hbox.addWidget(frame_pandda)
 
         #######################################################
         # next three blocks display html documents created by pandda.analyse
