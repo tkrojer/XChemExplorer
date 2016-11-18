@@ -3424,7 +3424,7 @@ class XChemExplorer(QtGui.QApplication):
             return
 
         self.update_log.insert('preparing pandda.analyse input script')
-        self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params,self.xce_logfile)
+        self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params,self.xce_logfile,cluster_dict[reference_ID],os.path.join(self.database_directory,self.data_source_file))
         self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
@@ -4592,6 +4592,17 @@ class XChemExplorer(QtGui.QApplication):
                     else:
                         cell_text=QtGui.QTableWidgetItem()
                         cell_text.setText(str( db_dict[ header[1] ]  ))
+                        if header[0]=='PanDDA\nStatus':
+                            if str( db_dict[ header[1] ]  ) == 'running':
+                                cell_text.setBackground(QtGui.QColor(100,230,150))
+                            elif str( db_dict[ header[1] ]  ) == 'pending':
+                                cell_text.setBackground(QtGui.QColor(20,100,230))
+                            elif str( db_dict[ header[1] ]  ) == 'started':
+                                cell_text.setBackground(QtGui.QColor(230,240,110))
+                            elif str( db_dict[ header[1] ]  ) == 'finished':
+                                cell_text.setBackground(QtGui.QColor(255,255,255))
+                            elif 'problem' in str( db_dict[ header[1] ]  ):
+                                cell_text.setBackground(QtGui.QColor(255,0,0))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.pandda_analyse_data_table.setItem(current_row, column, cell_text)
             if new_xtal:

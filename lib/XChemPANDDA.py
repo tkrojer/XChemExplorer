@@ -236,7 +236,7 @@ class run_pandda_export(QtCore.QThread):
 
 class run_pandda_analyse(QtCore.QThread):
 
-    def __init__(self,pandda_params,xce_logfile):
+    def __init__(self,pandda_params,xce_logfile,dataset_list,datasource):
         QtCore.QThread.__init__(self)
         self.data_directory=pandda_params['data_dir']
         self.panddas_directory=pandda_params['out_dir']
@@ -255,6 +255,8 @@ class run_pandda_analyse(QtCore.QThread):
         self.grid_spacing=pandda_params['grid_spacing']
         self.filter_pdb=pandda_params['filter_pdb']
         self.Logfile=XChemLog.updateLog(xce_logfile)
+        self.dataset_list=dataset_list
+        self.db=XChemDB.data_source(datasource)
 
     def run(self):
 
@@ -270,6 +272,11 @@ class run_pandda_analyse(QtCore.QThread):
         # (this will be quicker than the original analysis). It will then merge the results of the two analyses.
         #
         # 3) Repeat 2) until you don't add any "new" datasets. Then you can build the models as normal.
+
+        crystalString=''
+        for dataset in self.dataset_list:
+            crystalString+="'"+dataset+"',"
+        self.db.execute_statement("update mainTable set PANDDAStatus = 'started' where CrystalName in (%s)" %crystalString)
 
         number_of_cyles=int(self.number_of_datasets)/int(self.max_new_datasets)
         if int(self.number_of_datasets) % int(self.max_new_datasets) != 0:  # modulo gives remainder after integer division
