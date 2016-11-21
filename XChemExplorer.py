@@ -3370,6 +3370,9 @@ class XChemExplorer(QtGui.QApplication):
             if not str(item[0]).startswith('.') and str(item[0]) not in cluster_dict:
                 cluster_dict=pandda_checks.get_datasets_which_fit_to_reference_file(str(item[0]),self.reference_directory,cluster_dict)
 
+        for key in cluster_dict:
+            self.update_log.insert('cluster %s:   %s datasets' %(str(key),str(len(cluster_dict[key])-1)))
+
         if added_new_reference_files:
             currentRef = str(self.pandda_reference_file_selection_combobox.currentText())
             self.update_log.insert('updating combobox')
