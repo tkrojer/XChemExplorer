@@ -1,4 +1,4 @@
-# last edited: 18/11/2016, 15:00
+# last edited: 21/11/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -3452,7 +3452,7 @@ class XChemExplorer(QtGui.QApplication):
                 else:
                     self.update_log.insert('stopping pandda.analyse...')
                     return
-            return 
+            return
 
         self.update_log.insert('preparing pandda.analyse input script')
         self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params,self.xce_logfile,cluster_dict[reference_ID],os.path.join(self.database_directory,self.data_source_file))

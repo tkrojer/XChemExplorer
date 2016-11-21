@@ -617,8 +617,10 @@ class create_png_and_cif_of_compound(QtCore.QThread):
                     os.system('/bin/rm '+os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.png'))
                 if os.path.isdir(os.path.join(self.initial_model_directory,sampleID,'compound')):
                     os.system('/bin/rm -fr '+os.path.join(self.initial_model_directory,sampleID,'compound'))
+                    db_dict={}
                     db_dict['RefinementCIFStatus']='pending'
                     self.Logfile.insert('%s: removed compound directory and all its contents' %sampleID)
+                    self.Logfile.insert('%s: setting RefinementCIFStatus flag to started' %sampleID)
                     self.db.update_data_source(sampleID,db_dict)
 
             # create 'compound' directory if not present
