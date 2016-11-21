@@ -3353,7 +3353,7 @@ class XChemExplorer(QtGui.QApplication):
                 'pandda_dir_structure': str(self.pandda_input_data_dir_entry.text())
                         }
 
-        pandda_checks=XChemPANDDA.check_if_pandda_can_run(pandda_params,self.xce_logfile)
+        pandda_checks=XChemPANDDA.check_if_pandda_can_run(pandda_params,self.xce_logfile,os.path.join(self.database_directory,self.data_source_file))
 
         cluster_dict=XChemPANDDA.get_names_of_current_clusters(self.xce_logfile,self.panddas_directory)
 
@@ -3417,14 +3417,41 @@ class XChemExplorer(QtGui.QApplication):
 
         if error:
             if n_datasets < int(pandda_params['min_build_datasets']):
-                    self.update_log.insert('need %s datasets, but only %s are available' %(str(pandda_params['min_build_datasets']),str(n_datasets)))
-            if mismatch != []:
+                msgBox = QtGui.QMessageBox()
+                msgText = (
+                    'Need %s datasets, but only %s are available\n' %(str(pandda_params['min_build_datasets']),str(n_datasets))+
+                    'pandda.analyse cannot start!'
+                )
+                self.update_log.insert(msgText)
+                msgBox.setText(msgText)
+                msgBox.exec_();
+                return
+            elif mismatch != []:
                 self.update_log.insert('the following PDB files have a different number of atoms than the reference file:')
                 for dataset in mismatch:
                     self.update_log.insert(dataset)
-            self.update_log.insert('please correct the errors and try again')
-            self.status_bar.showMessage('cannot start pandda.analyse; please check terminal for further information')
-            return
+                fraction=round((float(len(mismatch))/float(n_datasets))*100,1)
+                msgBox = QtGui.QMessageBox()
+                msgText = (
+                    'XCE found that %s of your datasets contain a different number of atoms than your reference file.\n' %str(fraction)+
+                    'Unfortunately, pandda.analyse cannot run under these circumstances!\n'
+                    'Please check the terminal output for details about which datasets are affected.\n'
+                    'Most of the time it will be sufficient to calculate Maps again.\n'
+                    'Press "Cancel" if you want to abort the current task.\n'
+                    'Press "GO" to delete all problematic datasets and continue!'
+                )
+                self.update_log.insert(msgText)
+                msgBox.setText(msgText)
+                msgBox.addButton(QtGui.QPushButton('Go'), QtGui.QMessageBox.YesRole)
+                msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
+                reply = msgBox.exec_();
+                if reply == 0:
+                    pandda_checks.remove_dimple_files(mismatch)
+                    # need to run cluster function again, because N_datasets could be too low now.
+                    self.cluster_datasets_for_pandda(True)
+                else:
+                    self.update_log.insert('stopping pandda.analyse...')
+                    return
 
         self.update_log.insert('preparing pandda.analyse input script')
         self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params,self.xce_logfile,cluster_dict[reference_ID],os.path.join(self.database_directory,self.data_source_file))

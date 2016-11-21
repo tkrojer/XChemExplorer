@@ -451,7 +451,7 @@ class check_if_pandda_can_run:
     # - required input paramters are not complete
     # - map amplitude and phase labels don't exist
 
-    def __init__(self,pandda_params,xce_logfile):
+    def __init__(self,pandda_params,xce_logfile,datasource):
         self.data_directory=pandda_params['data_dir']
         self.panddas_directory=pandda_params['out_dir']
         self.min_build_datasets=pandda_params['min_build_datasets']
@@ -461,6 +461,7 @@ class check_if_pandda_can_run:
         self.problem_found=False
         self.error_code=-1
         self.Logfile=XChemLog.updateLog(xce_logfile)
+        self.db=XChemDB.data_source(datasource)
 
     def number_of_available_datasets(self):
         counter=0
@@ -493,6 +494,25 @@ class check_if_pandda_can_run:
                     self.Logfile.insert('%s: atoms in PDB file (%s): %s; atoms in Reference file: %s ===> ERROR' %(dataset,self.pdb_style,str(n_atom),str(n_atom_ref)))
                     mismatched_datasets.append(dataset)
         return n_datasets,mismatched_datasets
+
+    def remove_dimple_files(self,dataset_list):
+        for n_datasets,dataset in enumerate(dataset_list):
+            db_dict={}
+            if os.path.isfile(os.path.join(self.data_directory.replace('*',''),dataset,self.pdb_style)):
+                os.system('/bin/rm '+os.path.join(self.data_directory.replace('*',''),dataset,self.pdb_style))
+                self.Logfile.insert('%s: removing %s' %(dataset,self.pdb_style))
+                db_dict['DimplePathToPDB']=''
+                db_dict['DimpleRcryst']=''
+                db_dict['DimpleRfree']=''
+                db_dict['DimpleResolutionHigh']=''
+                db_dict['DimpleStatus']='pending'
+            if os.path.isfile(os.path.join(self.data_directory.replace('*',''),dataset,self.mtz_style)):
+                os.system('/bin/rm '+os.path.join(self.data_directory.replace('*',''),dataset,self.mtz_style))
+                self.Logfile.insert('%s: removing %s' %(dataset,self.mtz_style))
+                db_dict['DimplePathToMTZ']=''
+            if db_dict != {}:
+                self.db.update_data_source(dataset,db_dict)
+
 
     def analyse_pdb_style(self):
         pdb_found=False
