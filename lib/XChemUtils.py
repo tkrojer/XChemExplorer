@@ -1,4 +1,4 @@
-# last edited: 17/11/2016, 17:00
+# last edited: 21/11/2016, 15:00
 
 import sys
 import os
@@ -862,6 +862,22 @@ class mtztools:
                                     'cubic':        [195,196,197,198,199,
                                                      207,208,209,210,211,212,213,214]  }
 
+        self.translate_spg_to_number_dict = {
+            'p1': 1, 'p2': 3, 'p121': 4, 'c2': 5, 'c121': 5, 'p222': 16,
+            'p2122': 17, 'p2212': 17, 'p2221': 17, 'p21212': 18, 'p21221': 18, 'p22121': 18,
+            'p212121': 19, 'c2221': 20, 'c222': 21, 'f222': 22, 'i222': 23, 'i212121': 24,
+            'p4': 75, 'p41': 76, 'p42': 77, 'p43': 78, 'i4': 79, 'i41': 80,
+            'p422': 89, 'p4212': 90, 'p4122': 91, 'p41212': 92, 'p4222': 93, 'p42212': 94,
+            'p4322': 95, 'p43212': 96, 'i422': 97, 'i4122': 98,
+            'p3': 143, 'p31': 144, 'p32': 145, 'p312': 149, 'p321': 150, 'p3112': 151, 'p3121': 152,
+            'p3212': 153, 'p3221': 154, 'p6': 168, 'p61': 169, 'p65': 170, 'p62': 171, 'p64': 172, 'p63': 173,
+            'p622': 177, 'p6122': 178, 'p6522': 179, 'p6222': 180, 'p6422': 181, 'p6322': 182,
+            'r3': 146, 'h3': 146, 'r32': 155, 'h32': 155,
+            'p23': 195, 'f23': 196, 'i23': 197, 'p213': 198, 'i213': 199,
+            'p432': 207, 'p4232': 208, 'f432': 209, 'f4132': 210, 'i432': 211, 'p4332': 212,
+            'p4132': 213, 'i4132': 214
+        }
+
 
         self.point_group_dict=   {  '1':            [1],
                                     '2':            [3,4,5],
@@ -1396,6 +1412,57 @@ class pdbtools(object):
                        'PRO':'P','SER':'S','THR':'T','TRP':'W','TYR':'Y','VAL':'V'}
         self.xce_ligands = ['LIG','DRG','FRS']
 
+        self.space_group_dict=   {  'triclinic':    [1],
+                                    'monoclinic':   [3,4,5],
+                                    'orthorhombic': [16,17,18,19,20,21,22,23,24],
+                                    'tetragonal':   [75,76,77,78,79,80,89,90,91,92,93,94,95,96,97,98],
+                                    'hexagonal':    [143,144,145,149,150,151,152,153,154,168,169,170,
+                                                     171,172,173,177,178,179,180,181,182],
+                                    'rhombohedral': [146,155],
+                                    'cubic':        [195,196,197,198,199,
+                                                     207,208,209,210,211,212,213,214]  }
+
+        self.translate_spg_to_number_dict = {
+            'p1': 1, 'p2': 3, 'p121': 4, 'c2': 5, 'c121': 5, 'p222': 16,
+            'p2122': 17, 'p2212': 17, 'p2221': 17, 'p21212': 18, 'p21221': 18, 'p22121': 18,
+            'p212121': 19, 'c2221': 20, 'c222': 21, 'f222': 22, 'i222': 23, 'i212121': 24,
+            'p4': 75, 'p41': 76, 'p42': 77, 'p43': 78, 'i4': 79, 'i41': 80,
+            'p422': 89, 'p4212': 90, 'p4122': 91, 'p41212': 92, 'p4222': 93, 'p42212': 94,
+            'p4322': 95, 'p43212': 96, 'i422': 97, 'i4122': 98,
+            'p3': 143, 'p31': 144, 'p32': 145, 'p312': 149, 'p321': 150, 'p3112': 151, 'p3121': 152,
+            'p3212': 153, 'p3221': 154, 'p6': 168, 'p61': 169, 'p65': 170, 'p62': 171, 'p64': 172, 'p63': 173,
+            'p622': 177, 'p6122': 178, 'p6522': 179, 'p6222': 180, 'p6422': 181, 'p6322': 182,
+            'r3': 146, 'h3': 146, 'r32': 155, 'h32': 155,
+            'p23': 195, 'f23': 196, 'i23': 197, 'p213': 198, 'i213': 199,
+            'p432': 207, 'p4232': 208, 'f432': 209, 'f4132': 210, 'i432': 211, 'p4332': 212,
+            'p4132': 213, 'i4132': 214
+        }
+
+
+        self.point_group_dict=   {  '1':            [1],
+                                    '2':            [3,4,5],
+                                    '222':          [16,17,18,19,20,21,22,23,24],
+                                    '4':            [75,76,77,78,79,80],
+                                    '422':          [89,90,91,92,93,94,95,96,97,98],
+                                    '3':            [143,144,145,146],
+                                    '32':           [149,150,151,152,153,154,155],
+                                    '6':            [168,169,170,171,172,173],
+                                    '622':          [177,178,179,180,181,182],
+                                    '23':           [195,196,197,198,199],
+                                    '432':          [207,208,209,210,211,212,213,214]  }
+
+        self.nr_asu_in_unitcell_for_point_group =   {   '1':            1,
+                                                        '2':            2,
+                                                        '222':          4,
+                                                        '4':            4,
+                                                        '422':          8,
+                                                        '3':            3,
+                                                        '32':           6,
+                                                        '6':            6,
+                                                        '622':          12,
+                                                        '23':           12,
+                                                        '432':          24  }
+
 
     def GetSequence(self):
         chain = []
@@ -1442,6 +1509,67 @@ class pdbtools(object):
                 gamma=line.split()[6]
                 spg=line[55:len(line)-1]
         return [a,b,c,alpha,beta,gamma,spg]
+
+    def get_spg_from_pdb(self):
+        spg=self.GetSymm()[6]
+        return spg
+
+    def get_spg_number_from_pdb(self):
+        spg=self.get_spg_from_pdb().replace(' ','').lower()
+        spg_number='0'
+        for key in self.translate_spg_to_number_dict:
+            if key==spg:
+                spg_number=str(self.translate_spg_to_number_dict[key])
+                break
+        return spg_number
+
+    def get_bravais_lattice_from_pdb(self):
+        bravais_lattice=''
+        spg_number=self.get_spg_number_from_pdb()
+        bravais_lattice=self.get_bravais_lattice_from_spg_number(spg_number)
+        return bravais_lattice
+
+    def get_bravais_lattice_from_spg_number(self,number):
+        lattice=''
+        for bravaislattice in self.space_group_dict:
+            for spg_number in self.space_group_dict[bravaislattice]:
+                if spg_number==number:
+                    lattice=bravaislattice
+        return lattice
+
+    def get_pointgroup_from_pdb(self):
+        pointgroup=''
+        spg_number=self.get_spg_number_from_pdb()
+        pointgroup=self.get_point_group_from_spg_number(spg_number)
+        return pointgroup
+
+    def get_unit_cell_from_pdb(self):
+        symm=self.GetSymm()
+        unit_cell=symm[0:6]
+        return unit_cell
+
+    def calc_unitcell_volume_from_pdb(self):
+        spg_number=self.get_spg_number_from_pdb()
+        lattice=self.get_bravais_lattice_from_spg_number(spg_number)
+        unitcell=self.get_unit_cell_from_pdb()
+        a=float(unitcell[0])
+        b=float(unitcell[1])
+        c=float(unitcell[2])
+        alpha=math.radians(float(unitcell[3]))
+        beta= math.radians(float(unitcell[4]))
+        gamma=math.radians(float(unitcell[5]))
+        unitcell_volume=0
+        if lattice=='triclinic':
+            unitcell_volume=a*b*c* \
+                            math.sqrt((1-math.cos(alpha)**2-math.cos(beta)**2-math.cos(gamma)**2) \
+                                      +2*(math.cos(alpha)*math.cos(beta)*math.cos(gamma)))
+        if lattice=='monoclinic':
+            unitcell_volume=round(a*b*c*math.sin(beta),1)
+        if lattice=='orthorhombic' or lattice=='tetragonal' or lattice=='cubic':
+            unitcell_volume=round(a*b*c,1)
+        if lattice=='hexagonal' or lattice=='rhombohedral':
+            unitcell_volume=round(a*b*c*(math.sin(math.radians(60))),1)
+        return unitcell_volume
 
 
     def MatthewsCoefficient(self,sequence):

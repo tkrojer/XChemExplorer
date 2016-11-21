@@ -3368,7 +3368,7 @@ class XChemExplorer(QtGui.QApplication):
         # now need to check for the other reference files in the reference file folder
         for item in self.reference_file_list:
             if not str(item[0]).startswith('.') and str(item[0]) not in cluster_dict:
-                cluster_dict=pandda_checks.get_datasets_which_fit_to_reference_file(str(item[0]),self.reference_directory,cluster_dict)
+                cluster_dict=pandda_checks.get_datasets_which_fit_to_reference_file(str(item[0]),self.reference_directory,cluster_dict,self.allowed_unitcell_difference_percent)
 
         for key in cluster_dict:
             self.update_log.insert('cluster %s:   %s datasets' %(str(key),str(len(cluster_dict[key])-1)))

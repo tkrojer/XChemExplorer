@@ -495,17 +495,23 @@ class check_if_pandda_can_run:
                     mismatched_datasets.append(dataset)
         return n_datasets,mismatched_datasets
 
-    def get_datasets_which_fit_to_reference_file(self,ref,reference_directory,cluster_dict):
-        symmRef=XChemUtils.pdbtools(os.path.join(reference_directory,ref+'.pdb')).GetSymm()
+    def get_datasets_which_fit_to_reference_file(self,ref,reference_directory,cluster_dict,allowed_unitcell_difference_percent):
+        refStructure=XChemUtils.pdbtools(os.path.join(reference_directory,ref+'.pdb'))
+        symmRef=refStructure.get_spg_number_from_pdb()
+        ucVolRef=refStructure.calc_unitcell_volume_from_pdb()
         cluster_dict[ref]=[]
         cluster_dict[ref].append(os.path.join(reference_directory,ref+'.pdb'))
-#        print 'HHHH',os.path.join(self.data_directory,self.pdb_style)
         for dataset in glob.glob(os.path.join(self.data_directory,self.pdb_style)):
-            symmDataset=XChemUtils.pdbtools(dataset).GetSymm()
+            datasetStructure=XChemUtils.pdbtools(dataset)
+            symmDataset=datasetStructure.get_spg_number_from_pdb()
+            ucVolDataset=datasetStructure.calc_unitcell_volume_from_pdb()
+            ucVolDataset=XChemUtils.pdbtools(dataset)
 #            print 'uuu',dataset,symmDataset,symmRef
             if symmDataset == symmRef:
-                sampleID=dataset.replace('/'+self.pdb_style,'')[dataset.replace('/'+self.pdb_style,'').rfind('/')+1:]
-                cluster_dict[ref.append(sampleID)]
+                difference=math.fabs(1-(float(ucVolRef)/float(ucVolDataset)))*100
+                if difference < allowed_unitcell_difference_percent:
+                    sampleID=dataset.replace('/'+self.pdb_style,'')[dataset.replace('/'+self.pdb_style,'').rfind('/')+1:]
+                    cluster_dict[ref.append(sampleID)]
 #        for key in cluster_dict:
 #            self.Logfile.insert('cluster %s:   %s datasets' %(str(key),str(len(cluster_dict[key])-1)))
         return cluster_dict
