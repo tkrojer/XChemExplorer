@@ -3433,10 +3433,10 @@ class XChemExplorer(QtGui.QApplication):
                 fraction=round((float(len(mismatch))/float(n_datasets))*100,1)
                 msgBox = QtGui.QMessageBox()
                 msgText = (
-                    'XCE found that %s of your datasets contain a different number of atoms than your reference file.\n' %str(fraction)+
-                    'Unfortunately, pandda.analyse cannot run under these circumstances!\n'
-                    'Please check the terminal output for details about which datasets are affected.\n'
-                    'Most of the time it will be sufficient to calculate Maps again.\n'
+                    'XCE found that %s% of your datasets contain a different number of atoms than your reference file. ' %str(fraction)+
+                    'Unfortunately, pandda.analyse cannot run under these circumstances! '
+                    'Please check the terminal output for details about which datasets are affected. '
+                    'Most of the time it will be sufficient to calculate inital maps for the affected data again.\n'
                     'Press "Cancel" if you want to abort the current task.\n'
                     'Press "GO" to delete all problematic datasets and continue!'
                 )
