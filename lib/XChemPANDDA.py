@@ -495,6 +495,17 @@ class check_if_pandda_can_run:
                     mismatched_datasets.append(dataset)
         return n_datasets,mismatched_datasets
 
+    def get_datasets_which_fit_to_reference_file(self,ref,reference_directory,cluster_dict):
+        symmRef=XChemUtils.pdbtools(os.path.join(reference_directory,ref+'.pdb')).GetSymm()
+        cluster_dict[ref]=[]
+        cluster_dict[ref].append(os.path.join(reference_directory,ref+'.pdb'))
+        for dataset in glob.glob(os.path.join(self.data_directory,self.pdb_style)):
+            symmDataset=XChemUtils.pdbtools(dataset).GetSymm()
+            if symmDataset == symmRef:
+                sampleID=dataset.replace('/'+self.pdb_style,'')[dataset.replace('/'+self.pdb_style,'').rfind('/')+1:]
+                cluster_dict[ref.append(sampleID)]
+        return cluster_dict
+
     def remove_dimple_files(self,dataset_list):
         for n_datasets,dataset in enumerate(dataset_list):
             db_dict={}

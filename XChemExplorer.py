@@ -3365,6 +3365,11 @@ class XChemExplorer(QtGui.QApplication):
                 os.system('/bin/cp %s %s' %(cluster_dict[cluster][0],os.path.join(self.reference_directory,cluster+'.pdb')))
                 self.update_log.insert('copying %s as reference file for cluster %s in reference directory as %s.pdb' %(cluster_dict[cluster][0],cluster,cluster))
 
+        # now need to check for the other reference files in the reference file folder
+        for item in self.reference_file_list:
+            if not str(item[0]).startswith('.') and str(item[0]) not in cluster_dict:
+                cluster_dict=pandda_checks.get_datasets_which_fit_to_reference_file(str(item[0]),self.reference_directory,cluster_dict)
+
         if added_new_reference_files:
             currentRef = str(self.pandda_reference_file_selection_combobox.currentText())
             self.update_log.insert('updating combobox')
@@ -3453,7 +3458,7 @@ class XChemExplorer(QtGui.QApplication):
                     self.update_log.insert('stopping pandda.analyse...')
                     return
             return
-
+        return 
         self.update_log.insert('preparing pandda.analyse input script')
         self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params,self.xce_logfile,cluster_dict[reference_ID],os.path.join(self.database_directory,self.data_source_file))
         self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
