@@ -499,10 +499,10 @@ class check_if_pandda_can_run:
         symmRef=XChemUtils.pdbtools(os.path.join(reference_directory,ref+'.pdb')).GetSymm()
         cluster_dict[ref]=[]
         cluster_dict[ref].append(os.path.join(reference_directory,ref+'.pdb'))
-        print 'HHHH',os.path.join(self.data_directory,self.pdb_style)
+#        print 'HHHH',os.path.join(self.data_directory,self.pdb_style)
         for dataset in glob.glob(os.path.join(self.data_directory,self.pdb_style)):
             symmDataset=XChemUtils.pdbtools(dataset).GetSymm()
-            print 'uuu',dataset,symmDataset,symmRef
+#            print 'uuu',dataset,symmDataset,symmRef
             if symmDataset == symmRef:
                 sampleID=dataset.replace('/'+self.pdb_style,'')[dataset.replace('/'+self.pdb_style,'').rfind('/')+1:]
                 cluster_dict[ref.append(sampleID)]
