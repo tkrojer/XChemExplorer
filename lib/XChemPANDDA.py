@@ -26,8 +26,8 @@ def get_names_of_current_clusters(xce_logfile,panddas_directory):
                         cluster_dict[out_dir].append(os.path.join(panddas_directory,'cluster_analysis',out_dir,'pdbs',xtal,xtal+'.pdb'))
                         found_first_pdb=True
                 cluster_dict[out_dir].append(xtal)
-    for key in cluster_dict:
-        Logfile.insert('cluster %s:   %s datasets' %(str(key),str(len(cluster_dict[key])-1)))
+#    for key in cluster_dict:
+#        Logfile.insert('cluster %s:   %s datasets' %(str(key),str(len(cluster_dict[key])-1)))
     return cluster_dict
 
 
@@ -504,6 +504,8 @@ class check_if_pandda_can_run:
             if symmDataset == symmRef:
                 sampleID=dataset.replace('/'+self.pdb_style,'')[dataset.replace('/'+self.pdb_style,'').rfind('/')+1:]
                 cluster_dict[ref.append(sampleID)]
+        for key in cluster_dict:
+            self.Logfile.insert('cluster %s:   %s datasets' %(str(key),str(len(cluster_dict[key])-1)))
         return cluster_dict
 
     def remove_dimple_files(self,dataset_list):
