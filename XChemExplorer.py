@@ -3436,7 +3436,7 @@ class XChemExplorer(QtGui.QApplication):
                     'XCE found that %s percent of your datasets contain a different number of atoms than your reference file. ' %str(fraction)+
                     'Unfortunately, pandda.analyse cannot run under these circumstances! '
                     'Please check the terminal output for details about which datasets are affected. '
-                    'Most of the time it will be sufficient to calculate inital maps for the affected data again.\n'
+                    'Most of the time it will be sufficient to calculate inital maps with the selected reference file again.\n'
                     'Press "Cancel" if you want to abort the current task.\n'
                     'Press "GO" to delete all problematic datasets and continue!'
                 )
@@ -3452,6 +3452,7 @@ class XChemExplorer(QtGui.QApplication):
                 else:
                     self.update_log.insert('stopping pandda.analyse...')
                     return
+            return 
 
         self.update_log.insert('preparing pandda.analyse input script')
         self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params,self.xce_logfile,cluster_dict[reference_ID],os.path.join(self.database_directory,self.data_source_file))
