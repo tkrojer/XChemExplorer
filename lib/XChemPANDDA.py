@@ -499,15 +499,15 @@ class check_if_pandda_can_run:
     def get_datasets_which_fit_to_reference_file(self,ref,reference_directory,cluster_dict,allowed_unitcell_difference_percent):
         refStructure=XChemUtils.pdbtools(os.path.join(reference_directory,ref+'.pdb'))
         symmRef=refStructure.get_spg_number_from_pdb()
+        print 'symmRef',symmRef
         ucVolRef=refStructure.calc_unitcell_volume_from_pdb()
         cluster_dict[ref]=[]
         cluster_dict[ref].append(os.path.join(reference_directory,ref+'.pdb'))
         for dataset in glob.glob(os.path.join(self.data_directory,self.pdb_style)):
+            print dataset
             datasetStructure=XChemUtils.pdbtools(dataset)
             symmDataset=datasetStructure.get_spg_number_from_pdb()
             ucVolDataset=datasetStructure.calc_unitcell_volume_from_pdb()
-            ucVolDataset=XChemUtils.pdbtools(dataset)
-#            print 'uuu',dataset,symmDataset,symmRef
             if symmDataset == symmRef:
                 print 'ref',ucVolRef,'dat',ucVolDataset
                 difference=math.fabs(1-(float(ucVolRef)/float(ucVolDataset)))*100
