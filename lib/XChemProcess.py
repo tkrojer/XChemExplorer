@@ -145,7 +145,7 @@ class run_xia2(QtCore.QThread):
                 self.Logfile.insert('submitting array job with maximal 100 jobs running on cluster')
                 self.Logfile.insert('using the following command:')
                 self.Logfile.insert('qsub -t 1:%s -tc %s xia2_master.sh' %(str(i+1),self.max_queue_jobs))
-                os.system('qsub -t 1:%s -tc %s xia2_master.sh' %(str(i+1),self.max_queue_jobs))
+                os.system('qsub -P labxchem -t 1:%s -tc %s xia2_master.sh' %(str(i+1),self.max_queue_jobs))
             else:
                 self.Logfile.insert("cannot start ARRAY job: make sure that 'module load global/cluster' is in your .bashrc or .cshrc file")
         elif self.external_software['qsub']:

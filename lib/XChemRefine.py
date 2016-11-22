@@ -338,7 +338,7 @@ class Refine(object):
         Logfile.insert('changing directory to %s' %(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial)))
         if external_software['qsub']:
             Logfile.insert('starting refinement on cluster')
-            os.system('qsub refmac.csh')
+            os.system('qsub -P labxchem refmac.csh')
         else:
             os.system('chmod +x refmac.csh')
             Logfile.insert('starting refinement on local machine')

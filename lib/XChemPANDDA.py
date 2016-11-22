@@ -1,4 +1,4 @@
-# last edited: 21/11/2016, 15:00
+# last edited: 22/11/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -352,7 +352,7 @@ class run_pandda_analyse(QtCore.QThread):
                 os.system('./pandda.sh &')
             else:
                 self.Logfile.insert('running PANDDA on cluster, using qsub...')
-                os.system('qsub pandda.sh')
+                os.system('qsub -P labxchem pandda.sh')
 
         self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
 
@@ -499,17 +499,14 @@ class check_if_pandda_can_run:
     def get_datasets_which_fit_to_reference_file(self,ref,reference_directory,cluster_dict,allowed_unitcell_difference_percent):
         refStructure=XChemUtils.pdbtools(os.path.join(reference_directory,ref+'.pdb'))
         symmRef=refStructure.get_spg_number_from_pdb()
-        print 'symmRef',symmRef
         ucVolRef=refStructure.calc_unitcell_volume_from_pdb()
         cluster_dict[ref]=[]
         cluster_dict[ref].append(os.path.join(reference_directory,ref+'.pdb'))
         for dataset in glob.glob(os.path.join(self.data_directory,self.pdb_style)):
-            print dataset
             datasetStructure=XChemUtils.pdbtools(dataset)
             symmDataset=datasetStructure.get_spg_number_from_pdb()
             ucVolDataset=datasetStructure.calc_unitcell_volume_from_pdb()
             if symmDataset == symmRef:
-                print 'ref',ucVolRef,'dat',ucVolDataset
                 try:
                     difference=math.fabs(1-(float(ucVolRef)/float(ucVolDataset)))*100
                     if difference < allowed_unitcell_difference_percent:
@@ -517,8 +514,6 @@ class check_if_pandda_can_run:
                         cluster_dict[ref].append(sampleID)
                 except ZeroDivisionError:
                     continue
-#        for key in cluster_dict:
-#            self.Logfile.insert('cluster %s:   %s datasets' %(str(key),str(len(cluster_dict[key])-1)))
         return cluster_dict
 
     def remove_dimple_files(self,dataset_list):
