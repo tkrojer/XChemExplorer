@@ -82,12 +82,12 @@ class run_xia2(QtCore.QThread):
             if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'processed')):
                 os.mkdir(os.path.join(self.initial_model_directory,xtal,'processed'))
 
-            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'processed','run_in_progress')):
-                self.Logfile.insert('data processing is in progress; skipping...')
-                continue
-            else:
-                os.chdir(os.path.join(self.initial_model_directory,xtal,'processed'))
-                os.system('touch run_in_progress')
+#            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'processed','run_in_progress')):
+#                self.Logfile.insert('data processing is in progress; skipping...')
+#                continue
+#            else:
+#                os.chdir(os.path.join(self.initial_model_directory,xtal,'processed'))
+#                os.system('touch run_in_progress')
 
             for n,root in enumerate(self.run_dict[xtal]):
                 if n==0:
@@ -106,19 +106,27 @@ class run_xia2(QtCore.QThread):
                         os.mkdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n)))
 
 
-                    os.chdir(os.path.join(self.initial_model_directory,xtal,'processed'))
-                    os.system('touch run_in_progress')
+#                    os.chdir(os.path.join(self.initial_model_directory,xtal,'processed'))
+#                    os.system('touch run_in_progress')
 
                     for pipeline in self.protocol:
                         script+='cd '+os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline)+'\n'
                         if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline)):
                             os.mkdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline))
+
+                        if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline,'run_in_progress')):
+                            self.Logfile.insert('data processing is in progress; skipping...')
+                            continue
+                        else:
+                            os.chdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline))
+                            os.system('touch run_in_progress')
+
                         script+='$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_status_flag.py')+' %s %s %s %s\n' %(self.database,xtal,'DataProcessingStatus','running')
                         script+='xia2 pipeline='+pipeline+' '+ref_option+' '+spg_option+' '+reso_limit_option+' '+cc_half_option+' '+image_dir+'\n'
 
             script+='$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_status_flag.py')+' %s %s %s %s\n' %(self.database,xtal,'DataProcessingStatus','finished')
             script+='cd '+os.path.join(self.initial_model_directory,xtal,'processed')+'\n'
-            script+='/bin/rm run_in_progress\n'
+            script+='/bin/rm '+os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline,'run_in_progress')+'\n'
 
             os.chdir(self.ccp4_scratch_directory)
             f = open('xce_xia2_%s.sh' %str(i+1),'w')
