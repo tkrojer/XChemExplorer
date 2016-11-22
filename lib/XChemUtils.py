@@ -1551,7 +1551,9 @@ class pdbtools(object):
     def calc_unitcell_volume_from_pdb(self):
         spg_number=self.get_spg_number_from_pdb()
         lattice=self.get_bravais_lattice_from_spg_number(spg_number)
+        print 'lattice',lattice,'file',self.pdb
         unitcell=self.get_unit_cell_from_pdb()
+        print 'unitcell',unitcell,'file',self.pdb
         a=float(unitcell[0])
         b=float(unitcell[1])
         c=float(unitcell[2])
@@ -1569,6 +1571,7 @@ class pdbtools(object):
             unitcell_volume=round(a*b*c,1)
         if lattice=='hexagonal' or lattice=='rhombohedral':
             unitcell_volume=round(a*b*c*(math.sin(math.radians(60))),1)
+        print 'uc volume',unitcell_volume,'file',self.pdb
         return unitcell_volume
 
 
