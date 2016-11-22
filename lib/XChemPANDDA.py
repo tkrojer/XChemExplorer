@@ -509,6 +509,7 @@ class check_if_pandda_can_run:
             ucVolDataset=XChemUtils.pdbtools(dataset)
 #            print 'uuu',dataset,symmDataset,symmRef
             if symmDataset == symmRef:
+                print 'ref',ucVolRef,'dat',ucVolDataset
                 difference=math.fabs(1-(float(ucVolRef)/float(ucVolDataset)))*100
                 if difference < allowed_unitcell_difference_percent:
                     sampleID=dataset.replace('/'+self.pdb_style,'')[dataset.replace('/'+self.pdb_style,'').rfind('/')+1:]
