@@ -1533,7 +1533,7 @@ class pdbtools(object):
         lattice=''
         for bravaislattice in self.space_group_dict:
             for spg_number in self.space_group_dict[bravaislattice]:
-                if spg_number==number:
+                if str(spg_number)==str(number):
                     lattice=bravaislattice
         return lattice
 
