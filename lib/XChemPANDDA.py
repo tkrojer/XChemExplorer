@@ -3,6 +3,7 @@
 import os, sys, glob
 from datetime import datetime
 from PyQt4 import QtGui, QtCore
+import math
 from XChemUtils import mtztools
 import XChemDB
 import XChemRefine
