@@ -447,7 +447,8 @@ class XChemExplorer(QtGui.QApplication):
                                     'Export ALL PANDDA models',
                                     'Show HTML summary',
                                     'Update datasource with results from pandda.inspect',
-                                    'cluster datasets'   ]
+                                    'cluster datasets',
+                                    'Event Map -> SF'   ]
 
         frame_panddas_file_task=QtGui.QFrame()
         frame_panddas_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -3231,6 +3232,9 @@ class XChemExplorer(QtGui.QApplication):
 
         elif instruction=='Show HTML summary':
             self.show_pandda_html_summary()
+
+        elif instruction=='Event Map -> SF':
+            print 'hallo'
 
         elif instruction=="Open COOT":
             if not self.coot_running:
