@@ -510,10 +510,13 @@ class check_if_pandda_can_run:
             ucVolDataset=datasetStructure.calc_unitcell_volume_from_pdb()
             if symmDataset == symmRef:
                 print 'ref',ucVolRef,'dat',ucVolDataset
-                difference=math.fabs(1-(float(ucVolRef)/float(ucVolDataset)))*100
-                if difference < allowed_unitcell_difference_percent:
-                    sampleID=dataset.replace('/'+self.pdb_style,'')[dataset.replace('/'+self.pdb_style,'').rfind('/')+1:]
-                    cluster_dict[ref.append(sampleID)]
+                try:
+                    difference=math.fabs(1-(float(ucVolRef)/float(ucVolDataset)))*100
+                    if difference < allowed_unitcell_difference_percent:
+                        sampleID=dataset.replace('/'+self.pdb_style,'')[dataset.replace('/'+self.pdb_style,'').rfind('/')+1:]
+                        cluster_dict[ref].append(sampleID)
+                except ZeroDivisionError:
+                    continue
 #        for key in cluster_dict:
 #            self.Logfile.insert('cluster %s:   %s datasets' %(str(key),str(len(cluster_dict[key])-1)))
         return cluster_dict
