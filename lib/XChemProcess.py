@@ -42,9 +42,14 @@ class run_xia2(QtCore.QThread):
             else:
                 script+='#!'+os.getenv('SHELL')+'\n'
 
+            if 'bash' in os.getenv('SHELL'):
+                script += 'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
+            elif 'csh' in os.getenv('SHELL'):
+                script += 'setenv XChemExplorer_DIR '+os.getenv('XChemExplorer_DIR')+'\n'
+
             if os.getcwd().startswith('/dls'):
-                script += 'module load ccp4\n'
-                script += 'module load phenix\n'
+#                script += 'module load ccp4\n'
+#                script += 'module load phenix\n'
                 script += 'module load XDS\n'
 
             if self.spg == []:
