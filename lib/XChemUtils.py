@@ -219,6 +219,7 @@ class helpers:
         elif restraints_program=='grade':
             if os.getcwd().startswith('/dls'):
                 software+='module load buster\n'
+            software+="export BDG_TOOL_OBABEL='none'\n"
             software+='grade -resname LIG -nomogul "%s" -ocif %s.cif -opdb %s.pdb\n' %(smiles,compoundID.replace(' ',''),compoundID.replace(' ',''))
 
         Cmds = (
