@@ -359,6 +359,7 @@ class run_pandda_analyse(QtCore.QThread):
 class convert_all_event_maps_in_database(QtCore.QThread):
 
     def __init__(self,initial_model_directory,xce_logfile,datasource):
+        QtCore.QThread.__init__(self)
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.initial_model_directory=initial_model_directory
         self.db=XChemDB.data_source(datasource)

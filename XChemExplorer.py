@@ -3516,6 +3516,7 @@ class XChemExplorer(QtGui.QApplication):
         self.work_thread=XChemPANDDA.convert_all_event_maps_in_database(self.initial_model_directory,
                                                                         self.xce_logfile,
                                                                         os.path.join(self.database_directory,self.data_source_file))
+        self.explorer_active=1
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
