@@ -703,7 +703,7 @@ class convert_event_map_to_SF:
         self.space_group_numberElectronDensityMap=ElectronDensityMap.space_group_number
         self.Logfile.insert('using '+str(self.space_group_numberElectronDensityMap)+' as space group')
 
-        self.space_group=ElectronDensityMap.space_group
+        self.space_group=ElectronDensityMap.space_group()
         self.Logfile.insert('using '+str(self.space_group)+' as space group')
 
         self.unit_cell=ElectronDensityMap.cell_dimensions
@@ -764,7 +764,7 @@ class convert_event_map_to_SF:
         cmd = (
             'pdbset XYZIN %s XYZOUT mask_targetcell.pdb << eof\n' %self.ligand_pdb+
             ' SPACEGROUP %s\n' %self.space_group+
-            ' CELL %s\n' %self.unit_cell+
+            ' CELL %s\n' %(' '.join(self.unit_cell))+
             ' END\n'
             'eof\n'
             '\n'
