@@ -383,7 +383,7 @@ class convert_all_event_maps_in_database(QtCore.QThread):
             even_map=str(item[1])
             resname=str(item[2])
             chain=str(item[3])
-            resseq=str(itme[4])
+            resseq=str(item[4])
             altLoc=str(item[5])
             if os.path.isfile(os.path.join(self.initial_model_directory,xtalID,'refine.pdb')):
                 os.chdir(os.path.join(self.initial_model_directory,xtalID))
