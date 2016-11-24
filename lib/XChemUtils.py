@@ -1774,7 +1774,7 @@ class maptools(object):
         cmd = ( 'mapdump mapin %s << eof\n' %self.map+
                 'end\n'
                 'eof'   )
-        self.mapdump=subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE)
+        mapdump=subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE)
         self.grid_sampling=[0,0,0]
         self.cell_dimensions=[]
         self.space_group_number=0
