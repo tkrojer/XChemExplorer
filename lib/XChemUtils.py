@@ -1816,7 +1816,7 @@ class maptools(object):
 
     def space_group(self):
         space_group=''
-        space_group_number=self.space_group_number()
+        space_group_number=self.space_group_number
         for spg in self.translate_spg_to_number_dict:
             if str(self.translate_spg_to_number_dict[spg]) == str(space_group_number):
                 space_group=str(spg)
