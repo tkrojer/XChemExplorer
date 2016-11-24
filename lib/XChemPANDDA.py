@@ -762,7 +762,7 @@ class convert_event_map_to_SF:
         # http://www.phaser.cimr.cam.ac.uk/index.php/Using_Electron_Density_as_a_Model
 
         if os.getcwd().startswith('/dls'):
-            phenix_module'module_load_phenix\n'
+            phenix_module='module_load_phenix\n'
         else:
             phenix_module=''
 
