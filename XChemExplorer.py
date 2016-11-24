@@ -1,4 +1,4 @@
-# last edited: 22/11/2016, 15:00
+# last edited: 24/11/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -3234,7 +3234,7 @@ class XChemExplorer(QtGui.QApplication):
             self.show_pandda_html_summary()
 
         elif instruction=='Event Map -> SF':
-            print 'hallo'
+            self.convert_event_maps_to_SF()
 
         elif instruction=="Open COOT":
             if not self.coot_running:
@@ -3510,6 +3510,16 @@ class XChemExplorer(QtGui.QApplication):
         self.work_thread=XChemThread.start_pandda_inspect(self.settings,self.xce_logfile)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
+
+    def convert_event_maps_to_SF(self):
+        self.update_log.insert('converting all event maps in %s to mtz files' %self.initial_model_directory)
+        self.work_thread=XChemPANDDA.convert_all_event_maps_in_database(self.initial_model_directory,
+                                                                        self.xce_logfile,
+                                                                        os.path.join(self.database_directory,self.data_source_file))
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.work_thread.start()
+
+
 
     def run_pandda_export(self,update_datasource_only,which_models):
         self.settings['panddas_directory']=str(self.pandda_output_data_dir_entry.text())
