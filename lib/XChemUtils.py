@@ -1798,3 +1798,4 @@ class maptools(object):
     def space_group_number(self):
         return self.space_group_number
 
+

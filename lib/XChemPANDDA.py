@@ -356,41 +356,7 @@ class run_pandda_analyse(QtCore.QThread):
 
         self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
 
-class convert_all_event_maps_in_database(QtCore.QThread):
 
-    def __init__(self,initial_model_directory,xce_logfile,datasource):
-        QtCore.QThread.__init__(self)
-        self.Logfile=XChemLog.updateLog(xce_logfile)
-        self.initial_model_directory=initial_model_directory
-        self.db=XChemDB.data_source(datasource)
-
-    def run(self):
-        sqlite = (
-            'select'
-            ' CrystalName,'
-            ' PANDDA_site_event_map,'
-            ' PANDDA_site_ligand_resname,'
-            ' PANDDA_site_ligand_chain,'
-            ' PANDDA_site_ligand_sequence_number,'
-            ' PANDDA_site_ligand_altLoc '
-            'from panddaTable '
-            'where PANDDA_site_event_map not like "event%"'
-        )
-
-        query=self.db.execute_statement(sqlite)
-        for item in query:
-            xtalID=str(item[0])
-            even_map=str(item[1])
-            resname=str(item[2])
-            chainID=str(item[3])
-            resseq=str(item[4])
-            altLoc=str(item[5])
-            if os.path.isfile(os.path.join(self.initial_model_directory,xtalID,'refine.pdb')):
-                os.chdir(os.path.join(self.initial_model_directory,xtalID))
-                self.Logfile.insert('extracting ligand (%s,%s,%s,%s) from refine.pdb' %(str(resname),str(chainID),str(resseq),str(altLoc)))
-                XChemUtils.pdbtools('refine.pdb').save_specific_ligands_to_pdb(resname,chainID,resseq,altLoc)
-                if os.path.isfile('ligand_%s_%s_%s_%s.pdb' %(str(resname),str(chainID),str(resseq),str(altLoc))):
-                    print os.path.join(self.initial_model_directory,xtalID,'ligand_%s_%s_%s_%s.pdb' %(str(resname),str(chainID),str(resseq),str(altLoc)))
 
 class giant_cluster_datasets(QtCore.QThread):
 
@@ -621,6 +587,73 @@ class check_if_pandda_can_run:
         return message
 
 
+class convert_all_event_maps_in_database(QtCore.QThread):
+
+    def __init__(self,initial_model_directory,xce_logfile,datasource):
+        QtCore.QThread.__init__(self)
+        self.Logfile=XChemLog.updateLog(xce_logfile)
+        self.initial_model_directory=initial_model_directory
+        self.datasource=datasource
+        self.db=XChemDB.data_source(datasource)
+
+    def run(self):
+        sqlite = (
+            'select'
+            ' CrystalName,'
+            ' PANDDA_site_event_map,'
+            ' PANDDA_site_ligand_resname,'
+            ' PANDDA_site_ligand_chain,'
+            ' PANDDA_site_ligand_sequence_number,'
+            ' PANDDA_site_ligand_altLoc '
+            'from panddaTable '
+            'where PANDDA_site_event_map not like "event%"'
+        )
+
+        query=self.db.execute_statement(sqlite)
+
+        progress_step=1
+        if len(query) != 0:
+            progress_step=100/float(len(query))
+        else:
+            progress_step=1
+        progress=0
+        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+        for item in query:
+            xtalID=str(item[0])
+            event_map=str(item[1])
+            resname=str(item[2])
+            chainID=str(item[3])
+            resseq=str(item[4])
+            altLoc=str(item[5])
+
+            if os.path.isfile(os.path.join(self.initial_model_directory,xtalID,'refine.pdb')):
+                os.chdir(os.path.join(self.initial_model_directory,xtalID))
+                self.Logfile.insert('extracting ligand (%s,%s,%s,%s) from refine.pdb' %(str(resname),str(chainID),str(resseq),str(altLoc)))
+                XChemUtils.pdbtools('refine.pdb').save_specific_ligands_to_pdb(resname,chainID,resseq,altLoc)
+                if os.path.isfile('ligand_%s_%s_%s_%s.pdb' %(str(resname),str(chainID),str(resseq),str(altLoc))):
+                    ligand_pdb='ligand_%s_%s_%s_%s.pdb' %(str(resname),str(chainID),str(resseq),str(altLoc))
+                    print os.path.join(self.initial_model_directory,xtalID,ligand_pdb)
+                else:
+                    self.Logfile.insert('could not extract ligand; trying next...')
+                    continue
+            else:
+                self.Logfile.insert('directory: '+os.path.join(self.initial_model_directory,xtalID)+' -> cannot find refine.pdb; trying next')
+                continue
+
+            if os.path.isfile(os.path.join(self.initial_model_directory,xtalID,'refine.mtz')):
+                resolution=XChemUtils.mtztools(os.path.join(self.initial_model_directory,xtalID,'refine.mtz')).get_high_resolution_from_mtz()
+            else:
+                self.Logfile.insert('directory: '+os.path.join(self.initial_model_directory,xtalID)+' -> cannot find refine.mtz; trying next')
+                continue
+
+            convert_event_map_to_SF(self.initial_model_directory,xtalID,event_map,ligand_pdb,self.datasource)
+
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+
+
 class convert_event_map_to_SF:
     def __init__(self,project_directory,xtalID,event_map,ligand_pdb,xce_logfile,db_file,resolution):
         self.Logfile=XChemLog.updateLog(xce_logfile)
@@ -674,21 +707,21 @@ class convert_event_map_to_SF:
             return None
 
         # prepare input script
-        self.prepare_conversion_script()
-
-        # run script
-        self.run_conversion_script()
-
-        # check if output files exist
-        if not os.path.isfile('%s.mtz' %self.event):
-            self.Logfile.insert('cannot find %s.mtz' %self.event)
-        else:
-            self.Logfile.insert('conversion successful, %s.mtz exists' %self.event)
-            # update datasource with event_map_mtz information
-            self.update_database()
-
-        # remove all temporary files
-        self.clean_output_directory()
+#        self.prepare_conversion_script()
+#
+#        # run script
+#        self.run_conversion_script()
+#
+#        # check if output files exist
+#        if not os.path.isfile('%s.mtz' %self.event):
+#            self.Logfile.insert('cannot find %s.mtz' %self.event)
+#        else:
+#            self.Logfile.insert('conversion successful, %s.mtz exists' %self.event)
+#            # update datasource with event_map_mtz information
+#            self.update_database()
+#
+#        # remove all temporary files
+#        self.clean_output_directory()
 
 
     def calculate_electron_density_map(self,mtzin):

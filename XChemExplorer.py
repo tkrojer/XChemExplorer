@@ -3517,6 +3517,8 @@ class XChemExplorer(QtGui.QApplication):
                                                                         self.xce_logfile,
                                                                         os.path.join(self.database_directory,self.data_source_file))
         self.explorer_active=1
+        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
