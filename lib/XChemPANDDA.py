@@ -678,6 +678,7 @@ class convert_event_map_to_SF:
     def run(self):
         os.chdir(os.path.join(self.project_directory,self.xtalID))
 
+#        if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,'2fofc.map')):
         if not os.path.isfile(os.path.join(self.project_directory,'2fofc.map')):
             self.Logfile.insert('cannot find 2fofc.map in '+os.path.join(self.project_directory,self.xtalID))
             self.Logfile.insert('--> need 2fofc.map to determine grid')
@@ -726,14 +727,26 @@ class convert_event_map_to_SF:
 
 
     def calculate_electron_density_map(self,mtzin):
-        os.chdir(os.path.join(self.project_directory,self.xtalID))
-        cmd = (
-            'fft hklin %s mapout 2fofc.map << EOF\n' %mtzin+
-            ' labin F1=2FOFCWT PHI=PH2FOFCWT\n'
-            'EOF\n'
-                )
-        self.Logfile.insert('calculating 2fofc map from '+mtzin)
-        os.system(cmd)
+        missing_columns=False
+        column_dict=XChemUtils.mtztools(mtzin).get_all_columns_as_dict()
+        if 'FWT' in column_dict['F'] and 'PHWT' in column_dict['PHS']:
+            labin=' labin F1=FWT PHI=PHWT\n'
+        elif '2FOFCWT' in column_dict['F'] and 'PH2FOFCWT' in column_dict['PHS']:
+            labin=' labin F1=2FOFCWT PHI=PH2FOFCWT\n'
+        else:
+            missing_columns=True
+
+        if not missing_columns:
+            os.chdir(os.path.join(self.project_directory,self.xtalID))
+            cmd = (
+                'fft hklin '+mtzin+' mapout 2fofc.map << EOF\n'
+                +labin+
+                'EOF\n'
+                    )
+            self.Logfile.insert('calculating 2fofc map from '+mtzin)
+            os.system(cmd)
+        else:
+            self.Logfile.insert('cannot calculate 2fofc.map; missing map coefficients')
 
     def prepare_conversion_script(self):
 
