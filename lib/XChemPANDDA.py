@@ -716,18 +716,18 @@ class convert_event_map_to_SF:
 
         # prepare input script
         self.prepare_conversion_script()
-#
-#        # run script
-#        self.run_conversion_script()
-#
-#        # check if output files exist
-#        if not os.path.isfile('%s.mtz' %self.event):
-#            self.Logfile.insert('cannot find %s.mtz' %self.event)
-#        else:
-#            self.Logfile.insert('conversion successful, %s.mtz exists' %self.event)
-#            # update datasource with event_map_mtz information
-#            self.update_database()
-#
+
+        # run script
+        self.run_conversion_script()
+
+        # check if output files exist
+        if not os.path.isfile('%s.mtz' %self.event):
+            self.Logfile.insert('cannot find %s.mtz' %self.event)
+        else:
+            self.Logfile.insert('conversion successful, %s.mtz exists' %self.event)
+            # update datasource with event_map_mtz information
+            self.update_database()
+
 #        # remove all temporary files
 #        self.clean_output_directory()
 
@@ -762,6 +762,8 @@ class convert_event_map_to_SF:
         # http://www.phaser.cimr.cam.ac.uk/index.php/Using_Electron_Density_as_a_Model
 
         cmd = (
+            '#!'+os.getenv('SHELL')+'\n'
+            '\n'
             'pdbset XYZIN %s XYZOUT mask_targetcell.pdb << eof\n' %self.ligand_pdb+
             ' SPACEGROUP %s\n' %self.space_group+
             ' CELL %s\n' %(' '.join(self.unit_cell))+
@@ -800,11 +802,10 @@ class convert_event_map_to_SF:
         )
 
         self.Logfile.insert('preparing script for conversion of Event map to SF')
-#        f = open('eventMap2sf.sh','w')
-#        f.write(cmd)
-#        f.close()
-#        os.system('chmod +x eventMap2sf.sh')
-        print cmd
+        f = open('eventMap2sf.sh','w')
+        f.write(cmd)
+        f.close()
+        os.system('chmod +x eventMap2sf.sh')
 
     def run_conversion_script(self):
         self.Logfile.insert('running conversion script...')
