@@ -1770,6 +1770,22 @@ class misc:
 
 class maptools(object):
     def __init__(self,map):
+
+        self.translate_spg_to_number_dict = {
+            'p1': 1, 'p2': 3, 'p121': 4, 'c2': 5, 'c121': 5, 'p222': 16,
+            'p2122': 17, 'p2212': 17, 'p2221': 17, 'p21212': 18, 'p21221': 18, 'p22121': 18,
+            'p212121': 19, 'c2221': 20, 'c222': 21, 'f222': 22, 'i222': 23, 'i212121': 24,
+            'p4': 75, 'p41': 76, 'p42': 77, 'p43': 78, 'i4': 79, 'i41': 80,
+            'p422': 89, 'p4212': 90, 'p4122': 91, 'p41212': 92, 'p4222': 93, 'p42212': 94,
+            'p4322': 95, 'p43212': 96, 'i422': 97, 'i4122': 98,
+            'p3': 143, 'p31': 144, 'p32': 145, 'p312': 149, 'p321': 150, 'p3112': 151, 'p3121': 152,
+            'p3212': 153, 'p3221': 154, 'p6': 168, 'p61': 169, 'p65': 170, 'p62': 171, 'p64': 172, 'p63': 173,
+            'p622': 177, 'p6122': 178, 'p6522': 179, 'p6222': 180, 'p6422': 181, 'p6322': 182,
+            'r3': 146, 'h3': 146, 'r32': 155, 'h32': 155,
+            'p23': 195, 'f23': 196, 'i23': 197, 'p213': 198, 'i213': 199,
+            'p432': 207, 'p4232': 208, 'f432': 209, 'f4132': 210, 'i432': 211, 'p4332': 212,
+            'p4132': 213, 'i4132': 214        }
+
         self.map=map
         cmd = ( 'mapdump mapin %s << eof\n' %self.map+
                 'end\n'
@@ -1798,4 +1814,11 @@ class maptools(object):
     def space_group_number(self):
         return self.space_group_number
 
+    def space_group(self):
+        space_group=''
+        space_group_number=self.space_group_number()
+        for spg in self.translate_spg_to_number_dict:
+            if str(self.translate_spg_to_number_dict[spg]) == str(space_group_number):
+                space_group=str(spg)
+        return space_group
 

@@ -696,10 +696,16 @@ class convert_event_map_to_SF:
 
 
         ElectronDensityMap=XChemUtils.maptools(os.path.join(self.project_directory,self.xtalID,'2fofc.map'))
+
         self.gridElectronDensityMap=ElectronDensityMap.grid_sampling
         self.Logfile.insert('using '+str(self.gridElectronDensityMap)+' as grid')
+
         self.space_group_numberElectronDensityMap=ElectronDensityMap.space_group_number
         self.Logfile.insert('using '+str(self.space_group_numberElectronDensityMap)+' as space group')
+
+        self.space_group=ElectronDensityMap.space_group
+        self.Logfile.insert('using '+str(self.space_group)+' as space group')
+
         self.unit_cell=ElectronDensityMap.cell_dimensions
         self.Logfile.insert('using '+str(self.unit_cell)+' as cell dimensions')
 
