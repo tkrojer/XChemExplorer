@@ -696,12 +696,11 @@ class convert_event_map_to_SF:
 
 
         ElectronDensityMap=XChemUtils.maptools(os.path.join(self.project_directory,self.xtalID,'2fofc.map'))
-        print ElectronDensityMap.grid_sampling
-        self.gridElectronDensityMap=ElectronDensityMap.grid_sampling()
+        self.gridElectronDensityMap=ElectronDensityMap.grid_sampling
         self.Logfile.insert('using '+str(self.gridElectronDensityMap)+' as grid')
-        self.space_group_numberElectronDensityMap=ElectronDensityMap.space_group_number()
+        self.space_group_numberElectronDensityMap=ElectronDensityMap.space_group_number
         self.Logfile.insert('using '+str(self.space_group_numberElectronDensityMap)+' as space group')
-        self.unit_cell=ElectronDensityMap.cell_dimensions()
+        self.unit_cell=ElectronDensityMap.cell_dimensions
         self.Logfile.insert('using '+str(self.unit_cell)+' as cell dimensions')
 
         if not os.path.isfile(self.ligand_pdb):
@@ -710,7 +709,7 @@ class convert_event_map_to_SF:
             return None
 
         # prepare input script
-#        self.prepare_conversion_script()
+        self.prepare_conversion_script()
 #
 #        # run script
 #        self.run_conversion_script()
@@ -795,10 +794,11 @@ class convert_event_map_to_SF:
         )
 
         self.Logfile.insert('preparing script for conversion of Event map to SF')
-        f = open('eventMap2sf.sh','w')
-        f.write(cmd)
-        f.close()
-        os.system('chmod +x eventMap2sf.sh')
+#        f = open('eventMap2sf.sh','w')
+#        f.write(cmd)
+#        f.close()
+#        os.system('chmod +x eventMap2sf.sh')
+        print cmd
 
     def run_conversion_script(self):
         self.Logfile.insert('running conversion script...')
