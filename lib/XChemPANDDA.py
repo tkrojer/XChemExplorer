@@ -591,6 +591,7 @@ class convert_all_event_maps_in_database(QtCore.QThread):
 
     def __init__(self,initial_model_directory,xce_logfile,datasource):
         QtCore.QThread.__init__(self)
+        self.xce_logfile=xce_logfile
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.initial_model_directory=initial_model_directory
         self.datasource=datasource
@@ -647,7 +648,7 @@ class convert_all_event_maps_in_database(QtCore.QThread):
                 self.Logfile.insert('directory: '+os.path.join(self.initial_model_directory,xtalID)+' -> cannot find refine.mtz; trying next')
                 continue
 
-            convert_event_map_to_SF(self.initial_model_directory,xtalID,event_map,ligand_pdb,self.datasource,resolution)
+            convert_event_map_to_SF(self.initial_model_directory,xtalID,event_map,ligand_pdb,self.xce_logfile,self.datasource,resolution).run()
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
