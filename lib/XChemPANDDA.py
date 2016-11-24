@@ -377,15 +377,20 @@ class convert_all_event_maps_in_database(QtCore.QThread):
             'where PANDDA_site_event_map not like "event%"'
         )
 
-        print sqlite
         query=self.db.execute_statement(sqlite)
-        print 'hererrrrrrrrr'
         for item in query:
-            print item
-
-
-        print 'hallo'
-
+            xtalID=str(item[0])
+            even_map=str(item[1])
+            resname=str(item[2])
+            chain=str(item[3])
+            resseq=str(itme[4])
+            altLoc=str(item[5])
+            if os.path.isfile(os.path.join(self.initial_model_directory,xtalID,'refine.pdb')):
+                os.chdir(os.path.join(self.initial_model_directory,xtalID))
+                self.Logfile.insert('extracting ligand (%s,%s,%s,%s) from refine.pdb' %(str(resname),str(chainID),str(resseq),str(altLoc))
+                XChemUtils.pdbtools('refine.pdb').save_specific_ligands_to_pdb(resname,chain,resseq,altLoc)
+                if os.path.isfile('ligand_%s_%s_%s_%s.pdb' %(str(resname),str(chainID),str(resseq),str(altLoc))):
+                    print os.path.join(self.initial_model_directory,xtalID,'ligand_%s_%s_%s_%s.pdb' %(str(resname),str(chainID),str(resseq),str(altLoc)))
 
 class giant_cluster_datasets(QtCore.QThread):
 
