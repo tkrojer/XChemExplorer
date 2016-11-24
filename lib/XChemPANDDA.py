@@ -761,8 +761,15 @@ class convert_event_map_to_SF:
         # see also:
         # http://www.phaser.cimr.cam.ac.uk/index.php/Using_Electron_Density_as_a_Model
 
+        if os.getcwd().startswith('/dls'):
+            phenix_module'module_load_phenix\n'
+        else:
+            phenix_module=''
+
         cmd = (
             '#!'+os.getenv('SHELL')+'\n'
+            '\n'
+            +phenix_module+
             '\n'
             'pdbset XYZIN %s XYZOUT mask_targetcell.pdb << eof\n' %self.ligand_pdb+
             ' SPACEGROUP %s\n' %self.space_group+
@@ -793,11 +800,13 @@ class convert_event_map_to_SF:
             ' PAD 0.0\n'
             'eof\n'
             '\n'
-            'sfall HKLOUT masked_%s.mtz MAPIN masked_fullcell.map << eof\n' %self.event+
-            ' LABOUT FC=FC_event PHIC=PHIC_event\n'
-            ' MODE SFCALC MAPIN\n'
-            ' RESOLUTION %s\n' %self.resolution+
-            ' END\n'
+#            'sfall HKLOUT masked_%s.mtz MAPIN masked_fullcell.map << eof\n' %self.event+
+#            ' LABOUT FC=FC_event PHIC=PHIC_event\n'
+#            ' MODE SFCALC MAPIN\n'
+#            ' RESOLUTION %s\n' %self.resolution+
+#            ' END\n'
+            'phenix.map_to_structure_factors masked_fullcell.map\n'
+            '/bin/mv map_to_structure_factors.mtz %s.mtz\n' %self.event+
             'eof\n'
         )
 
