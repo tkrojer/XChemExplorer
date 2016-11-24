@@ -769,7 +769,7 @@ class convert_event_map_to_SF:
             'eof\n'
             '\n'
             'ncsmask XYZIN mask_targetcell.pdb MSKOUT mask_targetcell.msk << eof\n'
-            ' GRID %s\n' %self.gridElectronDensityMap+
+            ' GRID %s\n' %(' '.join(self.gridElectronDensityMap))+
             ' RADIUS 8\n'
             ' PEAK 1\n'
             'eof\n'
