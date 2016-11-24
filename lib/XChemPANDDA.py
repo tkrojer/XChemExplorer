@@ -678,8 +678,7 @@ class convert_event_map_to_SF:
     def run(self):
         os.chdir(os.path.join(self.project_directory,self.xtalID))
 
-#        if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,'2fofc.map')):
-        if not os.path.isfile(os.path.join(self.project_directory,'2fofc.map')):
+        if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,'2fofc.map')):
             self.Logfile.insert('cannot find 2fofc.map in '+os.path.join(self.project_directory,self.xtalID))
             self.Logfile.insert('--> need 2fofc.map to determine grid')
             mtzin=''
@@ -695,7 +694,9 @@ class convert_event_map_to_SF:
                 self.Logfile.insert('stopping')
                 return None
 
+
         ElectronDensityMap=XChemUtils.maptools(os.path.join(self.project_directory,self.xtalID,'2fofc.map'))
+        print ElectronDensityMap.grid_sampling
         self.gridElectronDensityMap=ElectronDensityMap.grid_sampling()
         self.Logfile.insert('using '+str(self.gridElectronDensityMap)+' as grid')
         self.space_group_numberElectronDensityMap=ElectronDensityMap.space_group_number()
