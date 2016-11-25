@@ -786,6 +786,7 @@ class convert_event_map_to_SF:
             '\n'
             'mapmask MAPIN %s MAPOUT onecell_event_map.map << eof\n' %self.event_map+
             ' XYZLIM CELL\n'
+            ' AXIS Z    X    Y\n'
             'eof\n'
             '\n'
             'maprot MAPIN onecell_event_map.map MSKIN mask_ligand.msk WRKOUT masked_event_map.map << eof\n'
