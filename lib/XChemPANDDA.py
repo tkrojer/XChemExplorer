@@ -799,6 +799,7 @@ class convert_event_map_to_SF:
             '\n'
             'mapmask MAPIN masked_event_map.map MAPOUT masked_event_map_fullcell.map << eof\n'
             ' XYZLIM CELL\n'
+            ' AXIS Z    X    Y\n'
             ' PAD 0.0\n'
             'eof\n'
             '\n'
