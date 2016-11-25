@@ -1,4 +1,4 @@
-# last edited: 24/11/2016, 15:00
+# last edited: 25/11/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -1478,7 +1478,8 @@ class XChemExplorer(QtGui.QApplication):
         deposit_tab_list = [ 'Contact',
                              'General',
                              'Authors',
-                             'Citation'
+                             'Citation',
+                             'Molecule'
                             ]
 
         deposit_tab_dict={}
@@ -1839,43 +1840,43 @@ class XChemExplorer(QtGui.QApplication):
         grid.addWidget(QtGui.QLabel('ID'), 1,0)
         self.primary_citation_id = QtGui.QLineEdit()
         self.primary_citation_id.setText('primary')
-        self.primary_citation_id.setFixedWidth(200)
+        self.primary_citation_id.setFixedWidth(500)
         grid.addWidget(self.Release_status_for_coordinates, 1,1)
 
         grid.addWidget(QtGui.QLabel('Journal'), 2,0)
         self.primary_citation_journal_abbrev = QtGui.QLineEdit()
         self.primary_citation_journal_abbrev.setText('To be published')
-        self.primary_citation_journal_abbrev.setFixedWidth(200)
+        self.primary_citation_journal_abbrev.setFixedWidth(500)
         grid.addWidget(self.primary_citation_journal_abbrev, 2,1)
 
         grid.addWidget(QtGui.QLabel('Title'), 3,0)
         self.primary_citation_title = QtGui.QLineEdit()
         self.primary_citation_title.setText('')
-        self.primary_citation_title.setFixedWidth(200)
+        self.primary_citation_title.setFixedWidth(500)
         grid.addWidget(self.primary_citation_title, 3,1)
 
         grid.addWidget(QtGui.QLabel('Year'), 4,0)
         self.primary_citation_year = QtGui.QLineEdit()
         self.primary_citation_year.setText('')
-        self.primary_citation_year.setFixedWidth(200)
+        self.primary_citation_year.setFixedWidth(500)
         grid.addWidget(self.primary_citation_year, 4,1)
 
         grid.addWidget(QtGui.QLabel('Volume'), 5,0)
         self.primary_citation_journal_volume = QtGui.QLineEdit()
         self.primary_citation_journal_volume.setText('')
-        self.primary_citation_journal_volume.setFixedWidth(200)
+        self.primary_citation_journal_volume.setFixedWidth(500)
         grid.addWidget(self.primary_citation_journal_volume, 5,1)
 
         grid.addWidget(QtGui.QLabel('Page, first'), 6,0)
         self.primary_citation_page_first = QtGui.QLineEdit()
         self.primary_citation_page_first.setText('')
-        self.primary_citation_page_first.setFixedWidth(200)
+        self.primary_citation_page_first.setFixedWidth(500)
         grid.addWidget(self.primary_citation_page_first, 6,1)
 
         grid.addWidget(QtGui.QLabel('Page, last'), 7,0)
         self.primary_citation_page_last = QtGui.QLineEdit()
         self.primary_citation_page_last.setText('')
-        self.primary_citation_page_last.setFixedWidth(200)
+        self.primary_citation_page_last.setFixedWidth(500)
         grid.addWidget(self.primary_citation_page_last, 7,1)
 
         frame.setLayout(grid)
@@ -1952,6 +1953,48 @@ class XChemExplorer(QtGui.QApplication):
 
         deposit_tab_dict['Citation'][1].addLayout(vb)
 
+        #
+        # Molecule Information
+        #
+
+        vb=QtGui.QVBoxLayout()
+
+        frame=QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+
+        grid = QtGui.QGridLayout()
+
+        grid.addWidget(QtGui.QLabel('Entity 1'), 1,0)
+
+        grid.addWidget(QtGui.QLabel('Fragment Name'), 2,0)
+        self.fragment_name_one = QtGui.QLineEdit()
+        self.fragment_name_one.setText('')
+        self.fragment_name_one.setFixedWidth(300)
+        grid.addWidget(self.fragment_name_one, 2,1)
+        grid.addWidget(QtGui.QLabel('(e.g. ligand binding domain, hairpin)'), 2,2)
+
+        grid.addWidget(QtGui.QLabel('Specific Mutation'), 3,0)
+        self.fragment_name_one_specific_mutation = QtGui.QLineEdit()
+        self.fragment_name_one_specific_mutation.setText('')
+        self.fragment_name_one_specific_mutation.setFixedWidth(300)
+        grid.addWidget(self.fragment_name_one_specific_mutation, 3,1)
+        grid.addWidget(QtGui.QLabel('(e.g. C280S)'), 3,2)
+
+        grid.addWidget(QtGui.QLabel('Enzyme Comission Number'), 4,0)
+        self.fragment_name_one_enzyme_comission_number = QtGui.QLineEdit()
+        self.fragment_name_one_enzyme_comission_number.setText('')
+        self.fragment_name_one_enzyme_comission_number.setFixedWidth(300)
+        grid.addWidget(self.fragment_name_one_enzyme_comission_number, 4,1)
+        grid.addWidget(QtGui.QLabel('(if known: e.g. 2.7.7.7)'), 4,2)
+
+        frame.setLayout(grid)
+        vb.addWidget(frame)
+
+        vb.addStretch(1)
+
+        deposit_tab_dict['Molecule'][1].addLayout(vb)
+
+
 
 
 
@@ -1964,6 +2007,12 @@ class XChemExplorer(QtGui.QApplication):
         button=QtGui.QPushButton('Save\nFile')
         button.clicked.connect(self.save_deposit_config_file)
         hbox.addWidget(button)
+        button=QtGui.QPushButton('Load from\nDatabase')
+        button.clicked.connect(self.load_deposit_config_file)
+        hbox.addWidget(button)
+        button=QtGui.QPushButton('Save to\nDatabase')
+        button.clicked.connect(self.save_deposit_to_database)
+        hbox.addWidget(button)
 
         vbox.addLayout(hbox)
         depositDataLayout.addLayout(vbox,0,0)
@@ -1971,7 +2020,11 @@ class XChemExplorer(QtGui.QApplication):
         depositData.exec_();
 
 
+    def load_deposit_config_file(self):
+        print 'hallo'
 
+    def save_deposit_to_database(self):
+        print 'hallo'
 
     def load_deposit_config_file(self):
         file_name_temp = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Open file', self.current_directory,'*.deposit')

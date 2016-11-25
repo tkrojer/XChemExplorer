@@ -1,4 +1,4 @@
-# last edited: 24/11/2016, 15:00
+# last edited: 25/11/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -678,42 +678,42 @@ class convert_event_map_to_SF:
     def run(self):
         os.chdir(os.path.join(self.project_directory,self.xtalID))
 
-        if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,'2fofc.map')):
-            self.Logfile.insert('cannot find 2fofc.map in '+os.path.join(self.project_directory,self.xtalID))
-            self.Logfile.insert('--> need 2fofc.map to determine grid')
-            mtzin=''
-            if os.path.isfile(os.path.join(self.project_directory,self.xtalID,'refine.mtz')):
-                mtzin='refine.mtz'
-            elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.mtz')):
-                mtzin='dimple.mtz'
-            if mtzin != '':
-                self.calculate_electron_density_map(mtzin)
-            else:
-                self.Logfile.insert('cannot find refine.mtz or dimple.mtz in '+os.path.join(self.project_directory,self.xtalID))
-                self.Logfile.insert('cannot calculate structure factors for '+self.event_map)
-                self.Logfile.insert('stopping')
-                return None
-
-
-        ElectronDensityMap=XChemUtils.maptools(os.path.join(self.project_directory,self.xtalID,'2fofc.map'))
-
-        self.gridElectronDensityMap=ElectronDensityMap.grid_sampling
-        self.Logfile.insert('using '+str(self.gridElectronDensityMap)+' as grid')
-
-        self.space_group_numberElectronDensityMap=ElectronDensityMap.space_group_number
-        self.Logfile.insert('using '+str(self.space_group_numberElectronDensityMap)+' as space group')
-
-        self.space_group=ElectronDensityMap.space_group()
-        self.Logfile.insert('using '+str(self.space_group)+' as space group')
-
-        self.unit_cell=ElectronDensityMap.cell_dimensions
-        self.Logfile.insert('using '+str(self.unit_cell)+' as cell dimensions')
-
-        if not os.path.isfile(self.ligand_pdb):
-            self.Logfile.insert('cannot find '+self.ligand_pdb)
-            self.Logfile.insert('stopping')
-            return None
-
+#        if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,'2fofc.map')):
+#            self.Logfile.insert('cannot find 2fofc.map in '+os.path.join(self.project_directory,self.xtalID))
+#            self.Logfile.insert('--> need 2fofc.map to determine grid')
+#            mtzin=''
+#            if os.path.isfile(os.path.join(self.project_directory,self.xtalID,'refine.mtz')):
+#                mtzin='refine.mtz'
+#            elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.mtz')):
+#                mtzin='dimple.mtz'
+#            if mtzin != '':
+#                self.calculate_electron_density_map(mtzin)
+#            else:
+#                self.Logfile.insert('cannot find refine.mtz or dimple.mtz in '+os.path.join(self.project_directory,self.xtalID))
+#                self.Logfile.insert('cannot calculate structure factors for '+self.event_map)
+#                self.Logfile.insert('stopping')
+#                return None
+#
+#
+#        ElectronDensityMap=XChemUtils.maptools(os.path.join(self.project_directory,self.xtalID,'2fofc.map'))
+#
+#        self.gridElectronDensityMap=ElectronDensityMap.grid_sampling
+#        self.Logfile.insert('using '+str(self.gridElectronDensityMap)+' as grid')
+#
+#        self.space_group_numberElectronDensityMap=ElectronDensityMap.space_group_number
+#        self.Logfile.insert('using '+str(self.space_group_numberElectronDensityMap)+' as space group')
+#
+#        self.space_group=ElectronDensityMap.space_group()
+#        self.Logfile.insert('using '+str(self.space_group)+' as space group')
+#
+#        self.unit_cell=ElectronDensityMap.cell_dimensions
+#        self.Logfile.insert('using '+str(self.unit_cell)+' as cell dimensions')
+#
+#        if not os.path.isfile(self.ligand_pdb):
+#            self.Logfile.insert('cannot find '+self.ligand_pdb)
+#            self.Logfile.insert('stopping')
+#            return None
+#
 #        # prepare input script
 #        self.prepare_conversion_script()
 #

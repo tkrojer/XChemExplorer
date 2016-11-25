@@ -1,4 +1,4 @@
-# last edited: 03/11/2016, 17:00
+# last edited: 25/11/2016, 17:00
 
 import sys
 import os
@@ -205,247 +205,248 @@ def data_template():
         '<Specific_mutation=  >         (e.g. C280S)\n'
         '<Enzyme_Comission_number=  >   (if known: e.g. 2.7.7.7)\n'
         '\n'
-2. For entity 2
-<Molecular_entity_id=  >       (e.g.  2 )
-<Fragment_name=  >
-<Specific_mutation=  >
-<Enzyme_Comission_number=  >
-
-...(add more group if needed)...
-
-================CATEGORY 8:   Genetically Manipulated Source=============
-Enter data in the genetically manipulated source category
-
-  If the biomolecule has been genetically manipulated, describe its
-  source and expression system here.
-
-1. For entity 1
-<Manipulated_entity_id= 1 >               !(e.g. 1 )
-<Source_organism_scientific_name=  >      !(e.g. Homo sapiens)
-<Source_organism_gene=  >                 (e.g. RPOD, ALKA...)
-<Source_organism_strain=  >               (e.g. BH10 ISOLATE, K-12...)
-<Expression_system_scientific_name=  >    (e.g. Escherichia coli)
-<Expression_system_strain=  >	          (e.g. BL21(DE3))
-<Expression_system_vector_type=  >	  (e.g. plasmid)
-<Expression_system_plasmid_name=  >       (e.g. pET26)
-<Manipulated_source_details=  >           (any other relevant information)
-
-2. For entity 2
-
-...(add more group if needed)...
-
-================CATEGORY 9:   Natural Source (optional) ===================
-Enter data in the natural source category  (if applicable)
-
-  If the biomolecule was derived from a natural source, describe it here.
-
-1. For entity 1
-<natural_source_entity_id=  >          (e.g. 1, 2..)
-<natural_source_scientific_name=  >    (e.g. Homo sapiens)
-<natural_source_organism_strain=  >    (e.g. DH5a , BMH 71-18)
-<natural_source_details=  >            (e.g. organ, tissue, cell ..)
-
-2. For entity 2
-
-...(add more group if needed)...
-
-================CATEGORY 10:  Synthetic Source (optional)==================
-If the biomolecule has not been genetically manipulated or synthesized,
-describe its source here.
-
-1. For entity 1
-<synthetic_source_entity_id=  >          (e.g. 1,2. )
-<synthetic_source_description=  >      (if known)
-
-
-2. For entity 2
-
-...(add more group if needed)...
-
-
-================CATEGORY 11:   Keywords===================================
-Enter a list of keywords that describe important features of the deposited
-structure.
-
-  Example: beta barrel, protein-DNA complex, double helix, hydrolase, etc.
-
-<structure_keywords=  >  !(e.g. beta barrel)
-
-================CATEGORY 12:   Biological Assembly ======================
-Enter data in the biological assembly category (if applicable)
-
-Enter the number of polymer chains that form the assembly in solution
-
-<biological_assembly_chain_number=  >  !(e.g.  1 for monomer, 2 for dimer ..)
-
-================CATEGORY 13:   Methods and Conditions=====================
-Enter the crystallization conditions for each crystal
-
-1. For crystal 1:
-<crystal_number= 1 >	            (e.g. 1, )
-<crystallization_method=  >      (e.g. BATCH MODE, EVAPORATION)
-<crystallization_pH=  >          (e.g. 7.5 ...)
-<crystallization_temperature=  > (e.g. 298) (in Kelvin)
-<crystallization_details=  >     (e.g. PEG 4000, NaCl etc.)
-
-...(add more crystal groups if needed)...
-
-================CATEGORY 14:   Radiation Source (experiment)============
-Enter the details of the source of radiation, the X-ray generator,
-and the wavelength for each diffraction.
-
-1. For experiment 1:
-<radiation_experiment= 1 >      !(e.g. 1, 2, ...)
-<radiation_source=  >           !(e.g. SYNCHROTRON, ROTATING ANODE ..)
-<radiation_source_type=  >      !(e.g. NSLS BEAMLINE X8C ..)
-<radiation_wavelengths=  >       !(e.g. 1.502, or a list 0.987,0.988 ..)
-<radiation_detector=  >         !(e.g. CCD, AREA DETECTOR, IMAGE PLATE ..)
-<radiation_detector_type=  >     !(e.g. ADSC QUANTUM 1,  ..)
-<radiation_detector_details=  >    (e.g. mirrors...)
-<data_collection_date=  >             !(e.g. 2004-01-07)
-<data_collection_temperature=  >      !(e.g. 100 for crystal  1:)
-<data_collection_protocol=  >          !(e.g. SINGLE WAVELENGTH, MAD, ...)
-<data_collection_monochromator=  >     (e.g. GRAPHITE, Ni FILTER ...)
-<data_collection_monochromatic_or_laue=  M >  !(default M, give L if Laue diffr.)
-
-
-....(add more experiment group if needed)....
-
-================CATEGORY 15:   refinement details (optional)============
-Enter the details of the structure refinement. (if applicable)
-
-<refinement_detail=   >
-<refinement_start_model=   >    (e.g. pdbid 100D)
-
-================CATEGORY 16:   database (optional)======================
-Enter the database name for each molecule (entity), (IF KNOWN).
-
-1. For entity 1
-<database_entity_id= 1  >  (e.g. 1 )
-<database_name=  >  (e.g. BMCD, BMRB, EMDB, PDB, NDB, TargetTrack )
-<database_code=  >  (e.g. 1ABC, 100D, TNKS2_HUMAN )
-<database_accession=   >  (e.g. 100D, Q9H2K2  )
-
-
-...(add more group if needed)...
-
-================CATEGORY 17:   Ligand binding (optional)==================
-
-<binding_assay_id=   >     !(A unique identifier such as 1,2,..)
-<binding_assay_target_sequence_one_letter_code=   >  (Chemical sequence if known)
-<binding_assay_ligand_descriptor_type=   >  (e.g. SMILES, SMILES_CANONICAL, InChI,InChIKey)
-<binding_assay_ligand_descriptor=   >   (e.g. Cc1cccc(c1)C1COc2cc(O)c(O)cc2C1 )
-<binding_assay_assay_type=   >        (Type of binding assay. e.g. 'competitive binding')
-<binding_assay_assay_value_type=   > (e.g. IC50, EC50,Ki,Kd)
-<binding_assay_assay_value=   >     (The value measured. e.g. 8300.0)
-<binding_assay_assay_pH=   >       (pH value at which the assay was performed. e.g. 6.4)
-<binding_assay_assay_temperature=   > (temperature (K) at which the assay was performed. e.g.273)
-<binding_assay_details=   >  (details of the measurement).
-
-
-
-================CATEGORY 18:   Structure Genomic (optional)==============
-If it is the structure genome's project, give the information
-
-<SG_project_id=  1>
-<SG_project_name=  >        (e.g. PSI, Protein Structure Initiative)
-<full_name_of_SG_center=  >   (e.g. Berkeley Structural Genomic Center)
-
-
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-+++ Categories below were extracted from the coordinate. Please check. +++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-================CATEGORY 19:   Crystallographic Data=======================
-Enter crystallographic data
-
-<space_group = P 43 21 2> (use International Table conventions)
-<unit_cell_a     =   71.467  >
-<unit_cell_b     =   71.467  >
-<unit_cell_c     =  150.264  >
-<unit_cell_alpha =  90.00  >
-<unit_cell_beta  =  90.00  >
-<unit_cell_gamma =  90.00  >
-
-
-================CATEGORY 20:   Sequence Information =======================
-Enter one letter sequence for each polymeric entity in asymmetric unit
-
---------------------------------------------------------------------------
-			  SOME DEFINITIONS
-     An ENTITY is defined as any unique molecule present in the asymmetric
-     unit. Each unique biological polymer (protein or nucleic acids) in the
-     structure is considered an entity. Thus, if there are five copies of
-     a single protein in the asymmetric unit, the molecular entity is still
-     only one. Water and non-polymers like ions, ligands and sugars are
-     also entities.
-
-     Here we only consider the sequences of polymeric entities (protein or
-     nucleic acid).
-
-	        GUIDELINES FOR COMPLETING THIS CATEGORY
-
-      * The unique chemical sequences are extract from the coordinate file.
-      Never give a TER cards in the pdb file inside of a complete entity.
-
-      * In a PDB or mmCIF format file, all residues of a single polymeric
-      entity should have one chain ID. Multiple copies of the same entity
-      should each be assigned a unique chain ID. The multiple chain IDs
-      should be separated by commas as 'A,B,C,...'.
-
-      * Four question marks '????' are used to denote a polymer chain breaks,
-      which may be caused by missing residues due to unobsered electron density
-      or linkage problem due to poor geometry. Replace these question marks
-      with the sequence of residues missing from the coordinates. Delete these
-      question marks if the break is due to the poor geometry. Also add any
-      residues missing from the N- and/or C-termini here.
-
-      * If there are non-standard residues in the coordinates, this program
-      lists them according to the three letter code used in the coordinate
-      file as (ABC).
-
-      * If any residue was modeled as Ala or Gly due to lack of the side-chain
-      density, the sequence extracted here will represent them as A or G
-      respectively. Correct this to the original sequence that was present in
-      the crystal.
-
-
-----------------------------------------------------------------------------
-
-  Below is the one letter chemical sequence extracted from your PDB coordinate
-  file. The molecular entities are grouped and listed together.
-
-  PLEASE CHECK THE SEQUENCE of each entity carefully and modify it, as necessary.
-  Make sure that you REVIEW THE FOLLOWING:
-   * chain breaks due to missing residues,
-   * missing residues in the N- and/or C-termini,
-   * non-standard residues and
-   * cases of residues modeled as Ala or Gly due to missing side-chain density.
-
-<molecule_entity_id=1 >
-<molecule_entity_type=polypeptide(L) >
-<molecule_one_letter_sequence=
-AQNPNCNIMIFHPTKEEFNDFDKYIAYMESQGAHRAGLAKIIPPKEWKARETYDNISEILIATPLQQVAS
-GRAGVFTQYHKKKKAMTVGEYRHLANSKKYQTPPHQNFEDLERKYWKNRIYNSPIYGADISGSLFDENTK
-QWNLGHLGTIQDLLEKECGVVIEGVNTPYLYFGMWKTTFAWHTEDMDLYSINYLHLGEPKTWYVVPPEHG
-QRLERLARELFPGSSRGCGAFLRHKVALISPTVLKENGIPFNRITQEAGEFMVTFPYGYHAGFNHGFNCA
-EAINFATPRWIDYGKMASQCSCGEARVTFSMDAFVRILQPERYDLWKRGQD >
-< molecule_chain_id=A >
-< target_DB_id=  > (if known)
-< sequence_database_id=  > (if known)
-< sequence_database_name=  > (if known)
-
-<molecule_entity_id=  >
-<molecule_entity_type=  >
-<molecule_one_letter_sequence= >
-<molecule_chain_id=  >
-<target_DB_id=  >  (if known)
-<sequence_database_id=   > (if known)
-<sequence_database_name=   > (if known)
-
-
-
-
-=====================================END==================================
+        '2. For entity 2\n'
+        '<Molecular_entity_id=  >       (e.g.  2 )\n'
+        '<Fragment_name=  >\n'
+        '<Specific_mutation=  >\n'
+        '<Enzyme_Comission_number=  >\n'
+        '\n'
+        '...(add more group if needed)...\n'
+        '\n'
+        '================CATEGORY 8:   Genetically Manipulated Source=============\n'
+        'Enter data in the genetically manipulated source category\n'
+        '\n'
+        '   If the biomolecule has been genetically manipulated, describe its\n'
+        '   source and expression system here.\n'
+        '\n'
+        '1. For entity 1\n'
+        '<Manipulated_entity_id= 1 >               !(e.g. 1 )\n'
+        '<Source_organism_scientific_name=  >      !(e.g. Homo sapiens)\n'
+        '<Source_organism_gene=  >                 (e.g. RPOD, ALKA...)\n'
+        '<Source_organism_strain=  >               (e.g. BH10 ISOLATE, K-12...)\n'
+        '<Expression_system_scientific_name=  >    (e.g. Escherichia coli)\n'
+        '<Expression_system_strain=  >	          (e.g. BL21(DE3))\n'
+        '<Expression_system_vector_type=  >	  (e.g. plasmid)\n'
+        '<Expression_system_plasmid_name=  >       (e.g. pET26)\n'
+        '<Manipulated_source_details=  >           (any other relevant information)\n'
+        '\n'
+        '2. For entity 2\n'
+        '\n'
+        '...(add more group if needed)...\n'
+        '\n'
+        '================CATEGORY 9:   Natural Source (optional) ===================\n'
+        'Enter data in the natural source category  (if applicable)\n'
+        '\n'
+        '   If the biomolecule was derived from a natural source, describe it here.\n'
+        '\n'
+        '1. For entity 1\n'
+        '<natural_source_entity_id=  >          (e.g. 1, 2..)\n'
+        '<natural_source_scientific_name=  >    (e.g. Homo sapiens)\n'
+        '<natural_source_organism_strain=  >    (e.g. DH5a , BMH 71-18)\n'
+        '<natural_source_details=  >            (e.g. organ, tissue, cell ..)\n'
+        '\n'
+        '2. For entity 2\n'
+        '\n'
+        '...(add more group if needed)...\n'
+        '\n'
+        '================CATEGORY 10:  Synthetic Source (optional)==================\n'
+        'If the biomolecule has not been genetically manipulated or synthesized,\n'
+        'describe its source here.\n'
+        '\n'
+        '1. For entity 1\n'
+        '<synthetic_source_entity_id=  >          (e.g. 1,2. )\n'
+        '<synthetic_source_description=  >      (if known)\n'
+        '\n'
+        '\n'
+        '2. For entity 2\n'
+        '\n'
+        '...(add more group if needed)...\n'
+        '\n'
+        '\n'
+        '================CATEGORY 11:   Keywords===================================\n'
+        'Enter a list of keywords that describe important features of the deposited\n'
+        'structure.\n'
+        '\n'
+        '   Example: beta barrel, protein-DNA complex, double helix, hydrolase, etc.\n'
+        '\n'
+        '<structure_keywords=  >  !(e.g. beta barrel)\n'
+        '\n'
+        '================CATEGORY 12:   Biological Assembly ======================\n'
+        'Enter data in the biological assembly category (if applicable)\n'
+        '\n'
+        'Enter the number of polymer chains that form the assembly in solution\n'
+        '\n'
+        '<biological_assembly_chain_number=  >  !(e.g.  1 for monomer, 2 for dimer ..)\n'
+        '\n'
+        '================CATEGORY 13:   Methods and Conditions=====================\n'
+        'Enter the crystallization conditions for each crystal\n'
+        '\n'
+        '1. For crystal 1:\n'
+        '<crystal_number= 1 >	            (e.g. 1, )\n'
+        '<crystallization_method=  >      (e.g. BATCH MODE, EVAPORATION)\n'
+        '<crystallization_pH=  >          (e.g. 7.5 ...)\n'
+        '<crystallization_temperature=  > (e.g. 298) (in Kelvin)\n'
+        '<crystallization_details=  >     (e.g. PEG 4000, NaCl etc.)\n'
+        '\n'
+        '...(add more crystal groups if needed)...\n'
+        '\n'
+        '================CATEGORY 14:   Radiation Source (experiment)============\n'
+        'Enter the details of the source of radiation, the X-ray generator,\n'
+        'and the wavelength for each diffraction.\n'
+        '\n'
+        '1. For experiment 1:\n'
+        '<radiation_experiment= 1 >      !(e.g. 1, 2, ...)\n'
+        '<radiation_source=  >           !(e.g. SYNCHROTRON, ROTATING ANODE ..)\n'
+        '<radiation_source_type=  >      !(e.g. NSLS BEAMLINE X8C ..)\n'
+        '<radiation_wavelengths=  >       !(e.g. 1.502, or a list 0.987,0.988 ..)\n'
+        '<radiation_detector=  >         !(e.g. CCD, AREA DETECTOR, IMAGE PLATE ..)\n'
+        '<radiation_detector_type=  >     !(e.g. ADSC QUANTUM 1,  ..)\n'
+        '<radiation_detector_details=  >    (e.g. mirrors...)\n'
+        '<data_collection_date=  >             !(e.g. 2004-01-07)\n'
+        '<data_collection_temperature=  >      !(e.g. 100 for crystal  1:)\n'
+        '<data_collection_protocol=  >          !(e.g. SINGLE WAVELENGTH, MAD, ...)\n'
+        '<data_collection_monochromator=  >     (e.g. GRAPHITE, Ni FILTER ...)\n'
+        '<data_collection_monochromatic_or_laue=  M >  !(default M, give L if Laue diffr.)\n'
+        '\n'
+        '\n'
+        '....(add more experiment group if needed)....\n'
+        '\n'
+        '================CATEGORY 15:   refinement details (optional)============\n'
+        'Enter the details of the structure refinement. (if applicable)\n'
+        '\n'
+        '<refinement_detail=   >\n'
+        '<refinement_start_model=   >    (e.g. pdbid 100D)\n'
+        '\n'
+        '================CATEGORY 16:   database (optional)======================\n'
+        'Enter the database name for each molecule (entity), (IF KNOWN).\n'
+        '\n'
+        '1. For entity 1\n'
+        '<database_entity_id= 1  >  (e.g. 1 )\n'
+        '<database_name=  >  (e.g. BMCD, BMRB, EMDB, PDB, NDB, TargetTrack )\n'
+        '<database_code=  >  (e.g. 1ABC, 100D, TNKS2_HUMAN )\n'
+        '<database_accession=   >  (e.g. 100D, Q9H2K2  )\n'
+        '\n'
+        '\n'
+        '...(add more group if needed)...\n'
+        '\n'
+        '================CATEGORY 17:   Ligand binding (optional)==================\n'
+        '\n'
+        '<binding_assay_id=   >     !(A unique identifier such as 1,2,..)\n'
+        '<binding_assay_target_sequence_one_letter_code=   >  (Chemical sequence if known)\n'
+        '<binding_assay_ligand_descriptor_type=   >  (e.g. SMILES, SMILES_CANONICAL, InChI,InChIKey)\n'
+        '<binding_assay_ligand_descriptor=   >   (e.g. Cc1cccc(c1)C1COc2cc(O)c(O)cc2C1 )\n'
+        "<binding_assay_assay_type=   >        (Type of binding assay. e.g. 'competitive binding')\n"
+        '<binding_assay_assay_value_type=   > (e.g. IC50, EC50,Ki,Kd)\n'
+        '<binding_assay_assay_value=   >     (The value measured. e.g. 8300.0)\n'
+        '<binding_assay_assay_pH=   >       (pH value at which the assay was performed. e.g. 6.4)\n'
+        '<binding_assay_assay_temperature=   > (temperature (K) at which the assay was performed. e.g.273)\n'
+        '<binding_assay_details=   >  (details of the measurement).\n'
+        '\n'
+        '\n'
+        '\n'
+        '================CATEGORY 18:   Structure Genomic (optional)==============\n'
+        "If it is the structure genome's project, give the information\n"
+        '\n'
+        '<SG_project_id=  1>\n'
+        '<SG_project_name=  >        (e.g. PSI, Protein Structure Initiative)\n'
+        '<full_name_of_SG_center=  >   (e.g. Berkeley Structural Genomic Center)\n'
+        '\n'
+        '\n'
+        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n'
+        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n'
+        '+++ Categories below were extracted from the coordinate. Please check. +++\n'
+        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n'
+        '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n'
+        '\n'
+        '================CATEGORY 19:   Crystallographic Data=======================\n'
+        'Enter crystallographic data\n'
+        '\n'
+        '<space_group = P 43 21 2> (use International Table conventions)\n'
+        '<unit_cell_a     =   71.467  >\n'
+        '<unit_cell_b     =   71.467  >\n'
+        '<unit_cell_c     =  150.264  >\n'
+        '<unit_cell_alpha =  90.00  >\n'
+        '<unit_cell_beta  =  90.00  >\n'
+        '<unit_cell_gamma =  90.00  >\n'
+        '\n'
+        '\n'
+        '================CATEGORY 20:   Sequence Information =======================\n'
+        'Enter one letter sequence for each polymeric entity in asymmetric unit\n'
+        '\n'
+        '--------------------------------------------------------------------------\n'
+        '			  SOME DEFINITIONS\n'
+        '     An ENTITY is defined as any unique molecule present in the asymmetric\n'
+        '     unit. Each unique biological polymer (protein or nucleic acids) in the\n'
+        '     structure is considered an entity. Thus, if there are five copies of\n'
+        '     a single protein in the asymmetric unit, the molecular entity is still\n'
+        '     only one. Water and non-polymers like ions, ligands and sugars are\n'
+        '     also entities.\n'
+        '\n'
+        '     Here we only consider the sequences of polymeric entities (protein or\n'
+        '     nucleic acid).\n'
+        '\n'
+        '	        GUIDELINES FOR COMPLETING THIS CATEGORY\n'
+        '\n'
+        '      * The unique chemical sequences are extract from the coordinate file.\n'
+        '      Never give a TER cards in the pdb file inside of a complete entity.\n'
+        '\n'
+        '      * In a PDB or mmCIF format file, all residues of a single polymeric\n'
+        '      entity should have one chain ID. Multiple copies of the same entity\n'
+        '      should each be assigned a unique chain ID. The multiple chain IDs\n'
+        "      should be separated by commas as 'A,B,C,...'.\n"
+        '\n'
+        "      * Four question marks '????' are used to denote a polymer chain breaks,\n"
+        '      which may be caused by missing residues due to unobsered electron density\n'
+        '      or linkage problem due to poor geometry. Replace these question marks\n'
+        '      with the sequence of residues missing from the coordinates. Delete these\n'
+        '      question marks if the break is due to the poor geometry. Also add any\n'
+        '      residues missing from the N- and/or C-termini here.\n'
+        '\n'
+        '      * If there are non-standard residues in the coordinates, this program\n'
+        '      lists them according to the three letter code used in the coordinate\n'
+        '      file as (ABC).\n'
+        '\n'
+        '      * If any residue was modeled as Ala or Gly due to lack of the side-chain\n'
+        '      density, the sequence extracted here will represent them as A or G\n'
+        '      respectively. Correct this to the original sequence that was present in\n'
+        '      the crystal.\n'
+        '\n'
+        '\n'
+        '----------------------------------------------------------------------------\n'
+        '\n'
+        '   Below is the one letter chemical sequence extracted from your PDB coordinate\n'
+        '   file. The molecular entities are grouped and listed together.\n'
+        '\n'
+        '   PLEASE CHECK THE SEQUENCE of each entity carefully and modify it, as necessary.\n'
+        '   Make sure that you REVIEW THE FOLLOWING:\n'
+        '    * chain breaks due to missing residues,\n'
+        '    * missing residues in the N- and/or C-termini,\n'
+        '    * non-standard residues and\n'
+        '    * cases of residues modeled as Ala or Gly due to missing side-chain density.\n'
+        '\n'
+        '<molecule_entity_id=1 >\n'
+        '<molecule_entity_type=polypeptide(L) >\n'
+        '<molecule_one_letter_sequence=\n'
+        'AQNPNCNIMIFHPTKEEFNDFDKYIAYMESQGAHRAGLAKIIPPKEWKARETYDNISEILIATPLQQVAS\n'
+        'GRAGVFTQYHKKKKAMTVGEYRHLANSKKYQTPPHQNFEDLERKYWKNRIYNSPIYGADISGSLFDENTK\n'
+        'QWNLGHLGTIQDLLEKECGVVIEGVNTPYLYFGMWKTTFAWHTEDMDLYSINYLHLGEPKTWYVVPPEHG\n'
+        'QRLERLARELFPGSSRGCGAFLRHKVALISPTVLKENGIPFNRITQEAGEFMVTFPYGYHAGFNHGFNCA\n'
+        'EAINFATPRWIDYGKMASQCSCGEARVTFSMDAFVRILQPERYDLWKRGQD >\n'
+        '< molecule_chain_id=A >\n'
+        '< target_DB_id=  > (if known)\n'
+        '< sequence_database_id=  > (if known)\n'
+        '< sequence_database_name=  > (if known)\n'
+        '\n'
+        '<molecule_entity_id=  >\n'
+        '<molecule_entity_type=  >\n'
+        '<molecule_one_letter_sequence= >\n'
+        '<molecule_chain_id=  >\n'
+        '<target_DB_id=  >  (if known)\n'
+        '<sequence_database_id=   > (if known)\n'
+        '<sequence_database_name=   > (if known)\n'
+        '\n'
+        '\n'
+        '\n'
+        '\n'
+        '=====================================END==================================\n'
+    )
