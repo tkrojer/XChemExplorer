@@ -714,11 +714,15 @@ class convert_event_map_to_SF:
             self.Logfile.insert('stopping')
             return None
 
-        # prepare input script
-        self.prepare_conversion_script()
+#        # prepare input script
+#        self.prepare_conversion_script()
+#
+#        # run script
+#        self.run_conversion_script()
 
-        # run script
-        self.run_conversion_script()
+        # run phenix.map_to_structure_factors
+        self.run_phenix_map_to_structure_factors()
+
 
         # check if output files exist
         if not os.path.isfile('%s.mtz' %self.event):
@@ -808,9 +812,6 @@ class convert_event_map_to_SF:
             ' MODE SFCALC MAPIN\n'
             ' RESOLUTION %s\n' %self.resolution+
             ' END\n'
-#            'phenix.map_to_structure_factors masked_fullcell.map\n'
-#            '/bin/mv map_to_structure_factors.mtz %s.mtz\n' %self.event+
-#            'eof\n'
         )
 
         self.Logfile.insert('preparing script for conversion of Event map to SF')
@@ -819,9 +820,16 @@ class convert_event_map_to_SF:
         f.close()
         os.system('chmod +x eventMap2sf.sh')
 
+
     def run_conversion_script(self):
         self.Logfile.insert('running conversion script...')
         os.system('./eventMap2sf.sh')
+
+    def run_phenix_map_to_structure_factors(self):
+        if float(self.resolution) < 1.21:   # program complains if resolution is 1.2 or higher
+            self.resolution='1.21'
+        self.Logfile.insert('running phenix.map_to_structure_factors %s d_min=%s output_file_name=%s.mtz' %(self.event_map,self.resolution,self.event))
+        os.system('phenix.map_to_structure_factors %s d_min=%s output_file_name=%s.mtz' %(self.event_map,self.resolution,self.event))
 
     def update_database(self):
         sqlite = ( "update panddaTable set "
