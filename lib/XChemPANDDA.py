@@ -771,23 +771,23 @@ class convert_event_map_to_SF:
             '\n'
             +phenix_module+
             '\n'
-            'pdbset XYZIN %s XYZOUT mask_targetcell.pdb << eof\n' %self.ligand_pdb+
+            'pdbset XYZIN %s XYZOUT mask_ligand.pdb << eof\n' %self.ligand_pdb+
             ' SPACEGROUP %s\n' %self.space_group+
             ' CELL %s\n' %(' '.join(self.unit_cell))+
             ' END\n'
             'eof\n'
             '\n'
-            'ncsmask XYZIN mask_targetcell.pdb MSKOUT mask_targetcell.msk << eof\n'
+            'ncsmask XYZIN mask_ligand.pdb MSKOUT mask_ligand.msk << eof\n'
             ' GRID %s\n' %(' '.join(self.gridElectronDensityMap))+
-            ' RADIUS 8\n'
+            ' RADIUS 10\n'
             ' PEAK 1\n'
             'eof\n'
             '\n'
-            'mapmask MAPIN %s MAPOUT onecell.map << eof\n' %self.event_map+
+            'mapmask MAPIN %s MAPOUT onecell_event_map.map << eof\n' %self.event_map+
             ' XYZLIM CELL\n'
             'eof\n'
             '\n'
-            'maprot MAPIN onecell.map MSKIN mask_targetcell.msk WRKOUT masked_targetcell.map << eof\n'
+            'maprot MAPIN onecell_event_map.map MSKIN mask_ligand.msk WRKOUT masked_event_map.map << eof\n'
             ' MODE FROM\n'
             ' SYMMETRY WORK %s\n' %self.space_group_numberElectronDensityMap+
             ' AVERAGE\n'
@@ -795,19 +795,19 @@ class convert_event_map_to_SF:
             ' TRANSLATE 0 0 0\n'
             'eof\n'
             '\n'
-            'mapmask MAPIN masked_targetcell.map MAPOUT masked_fullcell.map << eof\n'
+            'mapmask MAPIN masked_event_map.map MAPOUT masked_event_map_fullcell.map << eof\n'
             ' XYZLIM CELL\n'
             ' PAD 0.0\n'
             'eof\n'
             '\n'
-#            'sfall HKLOUT masked_%s.mtz MAPIN masked_fullcell.map << eof\n' %self.event+
-#            ' LABOUT FC=FC_event PHIC=PHIC_event\n'
-#            ' MODE SFCALC MAPIN\n'
-#            ' RESOLUTION %s\n' %self.resolution+
-#            ' END\n'
-            'phenix.map_to_structure_factors masked_fullcell.map\n'
-            '/bin/mv map_to_structure_factors.mtz %s.mtz\n' %self.event+
-            'eof\n'
+            'sfall HKLOUT %s.mtz MAPIN masked_event_map_fullcell.map << eof\n' %self.event+
+            ' LABOUT FC=FC_event PHIC=PHIC_event\n'
+            ' MODE SFCALC MAPIN\n'
+            ' RESOLUTION %s\n' %self.resolution+
+            ' END\n'
+#            'phenix.map_to_structure_factors masked_fullcell.map\n'
+#            '/bin/mv map_to_structure_factors.mtz %s.mtz\n' %self.event+
+#            'eof\n'
         )
 
         self.Logfile.insert('preparing script for conversion of Event map to SF')
