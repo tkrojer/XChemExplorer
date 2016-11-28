@@ -1,4 +1,4 @@
-# last edited: 25/11/2016, 17:00
+# last edited: 28/11/2016, 12:00
 
 import sys
 import os
@@ -11,9 +11,9 @@ import XChemLog
 deposition = {}
 
 
-def data_template():
+def data_template(depositDict):
 
-    data_tempplate = (
+    data_template_text = (
         '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n'
         '\n'
         '    THE DATA_TEMPLATE.TEXT FILE	FOR X-RAY STRUCTURE DEPOSITION           \n'
@@ -49,38 +49,38 @@ def data_template():
         '1.  Information about the Principal investigator (PI).\n'
         '\n'
         '<contact_author_PI_id= 1 >           !(must be given 1)\n'
-        '<contact_author_PI_salutation=  >    !(Dr./Prof./Mr./Mrs./Ms.)\n'
-        '<contact_author_PI_first_name=  >    !(e.g. John)\n'
-        '<contact_author_PI_last_name=  >     !(e.g. Rodgers)\n'
-        '<contact_author_PI_middle_name=  >\n'
-        '<contact_author_PI_role= principal investigator/group leader>  !(or responsible scientist)\n'
-        '<contact_author_PI_organization_type= academic>  !(or commercial, government, other)\n'
-        '<contact_author_PI_email=  >              !(e.g.   name@host.domain.country)\n'
-        '<contact_author_PI_address=  >            !(e.g. 610 Taylor road)\n'
-        '<contact_author_PI_city=  >               !(e.g. Piscataway)\n'
-        '<contact_author_PI_State_or_Province=  >  !(e.g.  New Jersey)\n'
-        '<contact_author_PI_Zip_Code=  >           !(e.g.  08864)\n'
-        '<contact_author_PI_Country=  >        !(e.g. United States, United Kindom, . )\n'
-        '<contact_author_PI_fax_number=  >\n'
-        '<contact_author_PI_phone_number=  >    !(e.g.  01(617) 555-1213 )\n'
+        '<contact_author_PI_salutation=  %s>    !(Dr./Prof./Mr./Mrs./Ms.)\n'                            %depositDict['contact_author_PI_salutation']+
+        '<contact_author_PI_first_name=  %s>    !(e.g. John)\n'                                         %depositDict['contact_author_PI_first_name']+
+        '<contact_author_PI_last_name=  %s>     !(e.g. Rodgers)\n'                                      %depositDict['contact_author_PI_last_name']+
+        '<contact_author_PI_middle_name=  %s>\n'                                                        %depositDict['contact_author_PI_middle_name']+
+        '<contact_author_PI_role= %s>  !(or responsible scientist)\n'                                   %depositDict['contact_author_PI_role']+
+        '<contact_author_PI_organization_type= %s>  !(or commercial, government, other)\n'              %depositDict['contact_author_PI_organization_type']+
+        '<contact_author_PI_email=  %s>              !(e.g.   name@host.domain.country)\n'              %depositDict['contact_author_PI_email']+
+        '<contact_author_PI_address=  %s>            !(e.g. 610 Taylor road)\n'                         %depositDict['contact_author_PI_address']+
+        '<contact_author_PI_city=  %s>               !(e.g. Piscataway)\n'                              %depositDict['contact_author_PI_city']+
+        '<contact_author_PI_State_or_Province=  %s>  !(e.g.  New Jersey)\n'                             %depositDict['contact_author_PI_State_or_Province']+
+        '<contact_author_PI_Zip_Code=  %s>           !(e.g.  08864)\n'                                  %depositDict['contact_author_PI_Zip_Code']+
+        '<contact_author_PI_Country=  %s>        !(e.g. United States, United Kindom, . )\n'            %depositDict['contact_author_PI_Country']+
+        '<contact_author_PI_fax_number=  %s>\n'                                                         %depositDict['contact_author_PI_fax_number']+
+        '<contact_author_PI_phone_number=  %s>    !(e.g.  01(617) 555-1213 )\n'                         %depositDict['contact_author_PI_phone_number']+
         '\n'
         '2. Information about other contact authors (responsible scientist, investigator)\n'
         '\n'
-        '<contact_author_id=  >              (e.g. 2)\n'
-        '<contact_author_salutation=  >\n'
-        '<contact_author_first_name=  >\n'
-        '<contact_author_last_name=  >\n'
-        '<contact_author_middle_name=  >\n'
-        '<contact_author_role=  >\n'
-        '<contact_author_organization_type=  >\n'
-        '<contact_author_email=  >\n'
-        '<contact_author_address=  >\n'
-        '<contact_author_city=  >\n'
-        '<contact_author_State_or_Province=  >\n'
-        '<contact_author_Zip_Code=  >\n'
-        '<contact_author_Country=  >\n'
-        '<contact_author_fax_number=  >\n'
-        '<contact_author_phone_number=  >\n'
+        '<contact_author_id=  2>              (e.g. 2)\n'
+        '<contact_author_salutation=  %s>\n'                                                            %depositDict['contact_author_salutation']+
+        '<contact_author_first_name=  %s>\n'                                                            %depositDict['contact_author_first_name']+
+        '<contact_author_last_name=  %s>\n'                                                             %depositDict['contact_author_last_name']+
+        '<contact_author_middle_name=  %s>\n'                                                           %depositDict['contact_author_middle_name']+
+        '<contact_author_role=  %s>\n'                                                                  %depositDict['contact_author_role']+
+        '<contact_author_organization_type=  %s>\n'                                                     %depositDict['contact_author_organization_type']+
+        '<contact_author_email=  %s>\n'                                                                 %depositDict['contact_author_email']+
+        '<contact_author_address=  %s>\n'                                                               %depositDict['contact_author_address']+
+        '<contact_author_city=  %s>\n'                                                                  %depositDict['contact_author_city']+
+        '<contact_author_State_or_Province=  %s>\n'                                                     %depositDict['contact_author_State_or_Province']+
+        '<contact_author_Zip_Code=  %s>\n'                                                              %depositDict['contact_author_Zip_Code']+
+        '<contact_author_Country=  %s>\n'                                                               %depositDict['contact_author_Country']+
+        '<contact_author_fax_number=  %s>\n'                                                            %depositDict['contact_author_fax_number']+
+        '<contact_author_phone_number=  %s>\n'                                                          %depositDict['contact_author_phone_number']+
         '\n'
         '...(add more groups if needed)...\n'
         '\n'
@@ -94,15 +94,15 @@ def data_template():
         '\n'
         '* for chemical sequence, give  RELEASE NOW  or  HOLD FOR RELEASE\n'
         '\n'
-        '<Release_status_for_coordinates=  >      !(e.g. HOLD FOR PUBLICATION)\n'
-        '<Release_status_for_structure_factor=  > !(e.g. HOLD FOR PUBLICATION)\n'
-        '<Release_status_for_sequence=  >         !(RELEASE NOW or  HOLD FOR RELEASE)\n'
+        '<Release_status_for_coordinates=  %s>      !(e.g. HOLD FOR PUBLICATION)\n'                     %depositDict['Release_status_for_coordinates']+
+        '<Release_status_for_structure_factor=  %s> !(e.g. HOLD FOR PUBLICATION)\n'                     %depositDict['Release_status_for_structure_factor']+
+        '<Release_status_for_sequence=  %s>         !(RELEASE NOW or  HOLD FOR RELEASE)\n'              %depositDict['Release_status_for_sequence']+
         '\n'
         '================CATEGORY 3:   Title=======================================\n'
         'Enter the title for the structure\n'
         '\n'
-        '<structure_title=  >     !(e.g. Crystal Structure Analysis of the B-DNA)\n'
-        '<structure_details=  >\n'
+        '<structure_title=  %s>     !(e.g. Crystal Structure Analysis of the B-DNA)\n'                  %depositDict['structure_title']+
+        '<structure_details=  %s>\n'                                                                    %depositDict['structure_details']+
         '\n'
         '================CATEGORY 4: Authors of Structure============================\n'
         'Enter authors of the deposited structures (at least one author)\n'
@@ -450,3 +450,29 @@ def data_template():
         '\n'
         '=====================================END==================================\n'
     )
+
+    return data_template_text
+
+def create_SF_mmcif(outDir,mtzList):
+    print 'hallo'
+
+def get_protein_sequence(database,xtalID):
+    print 'hallo'
+
+def check_depositDict(depositDict):
+    # check depositDict
+    for entry in depositDict:
+        if 'middle_name' in depositDict[entry]:
+            continue
+        elif 'State_or_Province' in depositDict[entry]:
+            continue
+        elif depositDict[entry] == '':
+            print 'ERROR'
+
+def create_data_template_text():
+
+    data_template_text=data_template(depositDict,sequence)
+
+def create_Model_mmcif(outDir,pdbList)
+    print 'hallo'
+
