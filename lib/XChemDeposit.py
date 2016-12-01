@@ -1,4 +1,4 @@
-# last edited: 28/11/2016, 12:00
+# last edited: 01/12/2016, 17:00
 
 import sys
 import os
@@ -6,12 +6,31 @@ import glob
 
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 import XChemLog
-
+import XChemDB
 
 deposition = {}
 
 
 def data_template(depositDict):
+
+    structure_author_name=''
+    for name in depositDict['structure_author_name'].split(';'):
+        structure_author_name+='<structure_author_name=  %s>\n' %name
+
+    primary_citation_author_name=''
+    for name in depositDict['primary_citation_author_name'].split(';'):
+        primary_citation_author_name+='<primary_citation_author_name=  %s>\n' %name
+
+    molecule_one_letter_sequence=''
+    counter=0
+    for aa in depositDict['molecule_one_letter_sequence']:
+        if counter < 70:
+            molecule_one_letter_sequence+=aa
+        if counter == 70:
+            molecule_one_letter_sequence+='\n'+aa
+            counter = 0
+        counter+=1
+
 
     data_template_text = (
         '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n'
@@ -107,15 +126,16 @@ def data_template(depositDict):
         '================CATEGORY 4: Authors of Structure============================\n'
         'Enter authors of the deposited structures (at least one author)\n'
         '\n'
-        '<structure_author_name=  >  !(e.g. Surname, F.M.)\n'
-        '<structure_author_name=  >\n'
-        '<structure_author_name=  >\n'
-        '<structure_author_name=  >\n'
-        '<structure_author_name=  >\n'
-        '<structure_author_name=  >\n'
-        '<structure_author_name=  >\n'
-        '<structure_author_name=  >\n'
-        '<structure_author_name=  >\n'
+        +structure_author_name+
+#        '<structure_author_name=  >  !(e.g. Surname, F.M.)\n'
+#        '<structure_author_name=  >\n'
+#        '<structure_author_name=  >\n'
+#        '<structure_author_name=  >\n'
+#        '<structure_author_name=  >\n'
+#        '<structure_author_name=  >\n'
+#        '<structure_author_name=  >\n'
+#        '<structure_author_name=  >\n'
+#        '<structure_author_name=  >\n'
         '\n'
         '...add more name if needed...\n'
         '\n'
@@ -128,25 +148,26 @@ def data_template(depositDict):
         "  'primary_citation_journal_abbrev' and leave pages, year, volume blank.\n"
         '\n'
         'Enter the author name of primary citation\n'
-        '<primary_citation_author_name=  >    !(e.g. Surname, F.M.)\n'
-        '<primary_citation_author_name=  >\n'
-        '<primary_citation_author_name=  >\n'
-        '<primary_citation_author_name=  >\n'
-        '<primary_citation_author_name=  >\n'
-        '<primary_citation_author_name=  >\n'
-        '<primary_citation_author_name=  >\n'
-        '<primary_citation_author_name=  >\n'
+        +primary_citation_author_name+
+#        '<primary_citation_author_name=  >    !(e.g. Surname, F.M.)\n'
+#        '<primary_citation_author_name=  >\n'
+#        '<primary_citation_author_name=  >\n'
+#        '<primary_citation_author_name=  >\n'
+#        '<primary_citation_author_name=  >\n'
+#        '<primary_citation_author_name=  >\n'
+#        '<primary_citation_author_name=  >\n'
+#        '<primary_citation_author_name=  >\n'
         '\n'
         '...add more name if needed...\n'
         '\n'
         'Enter journal information of the primary citation\n'
-        '<primary_citation_id= primary>\n'
-        '<primary_citation_journal_abbrev=  >     (e.g. To be published)\n'
-        '<primary_citation_title=  >\n'
-        '<primary_citation_year=  >\n'
-        '<primary_citation_journal_volume=  >\n'
-        '<primary_citation_page_first=  >\n'
-        '<primary_citation_page_last=  >\n'
+        '<primary_citation_id= %s>\n'                                                       %depositDict['primary_citation_id']+
+        '<primary_citation_journal_abbrev=  %s>     (e.g. To be published)\n'               %depositDict['primary_citation_journal_abbrev']+
+        '<primary_citation_title= %s>\n'                                                    %depositDict['primary_citation_title']+
+        '<primary_citation_year=  %s>\n'                                                    %depositDict['primary_citation_year']+
+        '<primary_citation_journal_volume=  %s>\n'                                          %depositDict['primary_citation_journal_volume']+
+        '<primary_citation_page_first=  %s>\n'                                              %depositDict['primary_citation_page_first']+
+        '<primary_citation_page_last=  %s>\n'                                               %depositDict['primary_citation_page_last']+
         '\n'
         '================CATEGORY 5b:  other citations (if applicable) ================\n'
         '\n'
@@ -184,9 +205,9 @@ def data_template(depositDict):
         '\n'
         '1. For entity 1\n'
         '<molecule_id= 1 >        (e.g. 1 )\n'
-        '<molecule_name=  >       (e.g.  RNA Hammerhead Ribozyme )\n'
+        '<molecule_name=  %s>       (e.g.  RNA Hammerhead Ribozyme )\n'                     %depositDict['molecule_name']+
         '<molecule_type= polymer >    (e.g. polymer , non-polymer, macrolide  )\n'
-        '<molecule_source_method= >   (e.g. man , nat, syn)\n'
+        '<molecule_source_method= man>   (e.g. man , nat, syn)\n'
         '\n'
         '2. For entity 2\n'
         '<molecule_id=  >     (e.g. 2 )\n'
@@ -201,9 +222,9 @@ def data_template(depositDict):
         '\n'
         '1. For entity 1\n'
         '<Molecular_entity_id= 1 >       (e.g. 1 )\n'
-        '<Fragment_name=  >             (e.g. ligand binding domain, hairpin)\n'
-        '<Specific_mutation=  >         (e.g. C280S)\n'
-        '<Enzyme_Comission_number=  >   (if known: e.g. 2.7.7.7)\n'
+        '<Fragment_name=  %s>             (e.g. ligand binding domain, hairpin)\n'          %depositDict['Fragment_name']+
+        '<Specific_mutation=  %s>         (e.g. C280S)\n'                                   %depositDict['Specific_mutation']+
+        '<Enzyme_Comission_number=  %s>   (if known: e.g. 2.7.7.7)\n'                       %depositDict['Enzyme_Comission_number']+
         '\n'
         '2. For entity 2\n'
         '<Molecular_entity_id=  >       (e.g.  2 )\n'
@@ -221,14 +242,14 @@ def data_template(depositDict):
         '\n'
         '1. For entity 1\n'
         '<Manipulated_entity_id= 1 >               !(e.g. 1 )\n'
-        '<Source_organism_scientific_name=  >      !(e.g. Homo sapiens)\n'
-        '<Source_organism_gene=  >                 (e.g. RPOD, ALKA...)\n'
-        '<Source_organism_strain=  >               (e.g. BH10 ISOLATE, K-12...)\n'
-        '<Expression_system_scientific_name=  >    (e.g. Escherichia coli)\n'
-        '<Expression_system_strain=  >	          (e.g. BL21(DE3))\n'
-        '<Expression_system_vector_type=  >	  (e.g. plasmid)\n'
-        '<Expression_system_plasmid_name=  >       (e.g. pET26)\n'
-        '<Manipulated_source_details=  >           (any other relevant information)\n'
+        '<Source_organism_scientific_name=  %s>      !(e.g. Homo sapiens)\n'                %depositDict['Source_organism_scientific_name']+
+        '<Source_organism_gene=  %s>                 (e.g. RPOD, ALKA...)\n'                %depositDict['Source_organism_gene']+
+        '<Source_organism_strain=  %s>               (e.g. BH10 ISOLATE, K-12...)\n'        %depositDict['Source_organism_strain']+
+        '<Expression_system_scientific_name=  %s>    (e.g. Escherichia coli)\n'             %depositDict['Expression_system_scientific_name']+
+        '<Expression_system_strain= %s >	          (e.g. BL21(DE3))\n'                   %depositDict['Expression_system_strain']+
+        '<Expression_system_vector_type=  %s>	  (e.g. plasmid)\n'                         %depositDict['Expression_system_vector_type']+
+        '<Expression_system_plasmid_name=  %s>       (e.g. pET26)\n'                        %depositDict['Expression_system_plasmid_name']+
+        '<Manipulated_source_details=  %s>           (any other relevant information)\n'    %depositDict['Manipulated_source_details']+
         '\n'
         '2. For entity 2\n'
         '\n'
@@ -269,24 +290,24 @@ def data_template(depositDict):
         '\n'
         '   Example: beta barrel, protein-DNA complex, double helix, hydrolase, etc.\n'
         '\n'
-        '<structure_keywords=  >  !(e.g. beta barrel)\n'
+        '<structure_keywords=  %s>  !(e.g. beta barrel)\n'                                      %depositDict['structure_keywords']+
         '\n'
         '================CATEGORY 12:   Biological Assembly ======================\n'
         'Enter data in the biological assembly category (if applicable)\n'
         '\n'
         'Enter the number of polymer chains that form the assembly in solution\n'
         '\n'
-        '<biological_assembly_chain_number=  >  !(e.g.  1 for monomer, 2 for dimer ..)\n'
+        '<biological_assembly_chain_number=  %s>  !(e.g.  1 for monomer, 2 for dimer ..)\n'     %depositDict['biological_assembly_chain_number']+
         '\n'
         '================CATEGORY 13:   Methods and Conditions=====================\n'
         'Enter the crystallization conditions for each crystal\n'
         '\n'
         '1. For crystal 1:\n'
         '<crystal_number= 1 >	            (e.g. 1, )\n'
-        '<crystallization_method=  >      (e.g. BATCH MODE, EVAPORATION)\n'
-        '<crystallization_pH=  >          (e.g. 7.5 ...)\n'
-        '<crystallization_temperature=  > (e.g. 298) (in Kelvin)\n'
-        '<crystallization_details=  >     (e.g. PEG 4000, NaCl etc.)\n'
+        '<crystallization_method=  %s>      (e.g. BATCH MODE, EVAPORATION)\n'                   %depositDict['crystallization_method']+
+        '<crystallization_pH=  %s>          (e.g. 7.5 ...)\n'                                   %depositDict['crystallization_pH']+
+        '<crystallization_temperature=  %s> (e.g. 298) (in Kelvin)\n'                           %depositDict['crystallization_temperature']+
+        '<crystallization_details=  %s>     (e.g. PEG 4000, NaCl etc.)\n'                       %depositDict['crystallization_details']+
         '\n'
         '...(add more crystal groups if needed)...\n'
         '\n'
@@ -296,15 +317,15 @@ def data_template(depositDict):
         '\n'
         '1. For experiment 1:\n'
         '<radiation_experiment= 1 >      !(e.g. 1, 2, ...)\n'
-        '<radiation_source=  >           !(e.g. SYNCHROTRON, ROTATING ANODE ..)\n'
-        '<radiation_source_type=  >      !(e.g. NSLS BEAMLINE X8C ..)\n'
-        '<radiation_wavelengths=  >       !(e.g. 1.502, or a list 0.987,0.988 ..)\n'
-        '<radiation_detector=  >         !(e.g. CCD, AREA DETECTOR, IMAGE PLATE ..)\n'
-        '<radiation_detector_type=  >     !(e.g. ADSC QUANTUM 1,  ..)\n'
+        '<radiation_source=  %s>           !(e.g. SYNCHROTRON, ROTATING ANODE ..)\n'            %depositDict['radiation_source']+
+        '<radiation_source_type=  %s>      !(e.g. NSLS BEAMLINE X8C ..)\n'                      %depositDict['radiation_source_type']+
+        '<radiation_wavelengths=  %s>       !(e.g. 1.502, or a list 0.987,0.988 ..)\n'          %depositDict['radiation_wavelengths']+
+        '<radiation_detector=  %s>         !(e.g. CCD, AREA DETECTOR, IMAGE PLATE ..)\n'        %depositDict['radiation_detector']+
+        '<radiation_detector_type=  %s>     !(e.g. ADSC QUANTUM 1,  ..)\n'                      %depositDict['radiation_detector_type']+
         '<radiation_detector_details=  >    (e.g. mirrors...)\n'
-        '<data_collection_date=  >             !(e.g. 2004-01-07)\n'
-        '<data_collection_temperature=  >      !(e.g. 100 for crystal  1:)\n'
-        '<data_collection_protocol=  >          !(e.g. SINGLE WAVELENGTH, MAD, ...)\n'
+        '<data_collection_date=  %s>             !(e.g. 2004-01-07)\n'                          %depositDict['data_collection_date']+
+        '<data_collection_temperature=  %s>      !(e.g. 100 for crystal  1:)\n'                 %depositDict['data_collection_temperature']+
+        '<data_collection_protocol=  %s>          !(e.g. SINGLE WAVELENGTH, MAD, ...)\n'        %depositDict['data_collection_protocol']+
         '<data_collection_monochromator=  >     (e.g. GRAPHITE, Ni FILTER ...)\n'
         '<data_collection_monochromatic_or_laue=  M >  !(default M, give L if Laue diffr.)\n'
         '\n'
@@ -348,8 +369,8 @@ def data_template(depositDict):
         "If it is the structure genome's project, give the information\n"
         '\n'
         '<SG_project_id=  1>\n'
-        '<SG_project_name=  >        (e.g. PSI, Protein Structure Initiative)\n'
-        '<full_name_of_SG_center=  >   (e.g. Berkeley Structural Genomic Center)\n'
+        '<SG_project_name=  %s>        (e.g. PSI, Protein Structure Initiative)\n'              %depositDict['SG_project_name']+
+        '<full_name_of_SG_center=  %s>   (e.g. Berkeley Structural Genomic Center)\n'           %depositDict['full_name_of_SG_center']+
         '\n'
         '\n'
         '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n'
@@ -427,11 +448,12 @@ def data_template(depositDict):
         '<molecule_entity_id=1 >\n'
         '<molecule_entity_type=polypeptide(L) >\n'
         '<molecule_one_letter_sequence=\n'
-        'AQNPNCNIMIFHPTKEEFNDFDKYIAYMESQGAHRAGLAKIIPPKEWKARETYDNISEILIATPLQQVAS\n'
-        'GRAGVFTQYHKKKKAMTVGEYRHLANSKKYQTPPHQNFEDLERKYWKNRIYNSPIYGADISGSLFDENTK\n'
-        'QWNLGHLGTIQDLLEKECGVVIEGVNTPYLYFGMWKTTFAWHTEDMDLYSINYLHLGEPKTWYVVPPEHG\n'
-        'QRLERLARELFPGSSRGCGAFLRHKVALISPTVLKENGIPFNRITQEAGEFMVTFPYGYHAGFNHGFNCA\n'
-        'EAINFATPRWIDYGKMASQCSCGEARVTFSMDAFVRILQPERYDLWKRGQD >\n'
+        +molecule_one_letter_sequence+
+#        'AQNPNCNIMIFHPTKEEFNDFDKYIAYMESQGAHRAGLAKIIPPKEWKARETYDNISEILIATPLQQVAS\n'
+#        'GRAGVFTQYHKKKKAMTVGEYRHLANSKKYQTPPHQNFEDLERKYWKNRIYNSPIYGADISGSLFDENTK\n'
+#        'QWNLGHLGTIQDLLEKECGVVIEGVNTPYLYFGMWKTTFAWHTEDMDLYSINYLHLGEPKTWYVVPPEHG\n'
+#        'QRLERLARELFPGSSRGCGAFLRHKVALISPTVLKENGIPFNRITQEAGEFMVTFPYGYHAGFNHGFNCA\n'
+#        'EAINFATPRWIDYGKMASQCSCGEARVTFSMDAFVRILQPERYDLWKRGQD >\n'
         '< molecule_chain_id=A >\n'
         '< target_DB_id=  > (if known)\n'
         '< sequence_database_id=  > (if known)\n'
@@ -469,10 +491,60 @@ def check_depositDict(depositDict):
         elif depositDict[entry] == '':
             print 'ERROR'
 
+def update_title(depositDict):
+
+    print 'hallo'
+
 def create_data_template_text():
 
     data_template_text=data_template(depositDict,sequence)
 
 def create_Model_mmcif(outDir,pdbList)
     print 'hallo'
+
+class update_depositTable(QtCore.QThread):
+    def __init__(self,deposit_dict,database,xce_logfile):
+        QtCore.QThread.__init__(self)
+        self.deposit_dict=deposit_dict
+        self.database=database
+        self.Logfile=XChemLog.updateLog(xce_logfile)
+        self.db=XChemDB.data_source(database)
+        self.header,self.data=self.db.load_samples_from_data_source()
+        self.xtal_db_dict={}
+        self.update_xtal_db_dict()
+
+    def update_xtal_db_dict(self):
+        sampleID_column=0
+        for n,entry in enumerate(self.header):
+            if entry=='CrystalName':
+                sampleID_column=n
+                break
+        for line in self.data:
+            if str(line[sampleID_column]) != '':
+                db_dict={}
+                for n,entry in enumerate(line):
+                    if n != sampleID_column:
+                        db_dict[str(self.header[n])]=str(entry)
+                self.xtal_db_dict[str(line[sampleID_column])]=db_dict
+        self.Logfile.insert('read all samples in mainTable')
+
+    def run(self):
+
+        # need a flag which connects apo structures and bound structures
+
+        ready_to_deposit=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%'")
+
+
+
+        print 'hallo'
+        progress_step=1
+        if len(self.sample_list) != 0:
+            progress_step=100/float(len(self.sample_list))
+        progress=0
+        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+
 

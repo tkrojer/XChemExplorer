@@ -1,4 +1,4 @@
-# last edited: 25/11/2016, 15:00
+# last edited: 01/12/2016, 17:00
 
 import os, sys, glob
 from datetime import datetime
@@ -25,6 +25,7 @@ import XChemMain
 import XChemPlots
 import XChemLog
 import XChemProcess
+import XChemDeposit
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -1479,7 +1480,9 @@ class XChemExplorer(QtGui.QApplication):
                              'General',
                              'Authors',
                              'Citation',
-                             'Molecule'
+                             'Molecule',
+                             'Misc',
+                             'Methods'
                             ]
 
         deposit_tab_dict={}
@@ -1734,20 +1737,39 @@ class XChemExplorer(QtGui.QApplication):
 
         grid = QtGui.QGridLayout()
         grid.addWidget(QtGui.QLabel('Title & Details'), 0,0)
+        note = (
+            'Note: supported wildcards: $CompoundName\n'
+            '      e.g.\n'
+            '      Crystal Structure of human JMJD2D in complex with $CompoundName\n'
+        )
+        grid.addWidget(QtGui.QLabel(note), 1,0)
 
-        grid.addWidget(QtGui.QLabel('Title'), 1,0)
+
+        grid.addWidget(QtGui.QLabel('Title'), 2,0)
         self.structure_title = QtGui.QLineEdit()
         self.structure_title.setText('')
         self.structure_title.setFixedWidth(600)
-        grid.addWidget(self.structure_title, 1,1)
+        grid.addWidget(self.structure_title, 2,1)
 #        grid.addWidget(QtGui.QLabel('(e.g. HOLD FOR PUBLICATION, RELEASE NOW)'), 1,2)
 
-        grid.addWidget(QtGui.QLabel('Details'), 2,0)
+        grid.addWidget(QtGui.QLabel('Details'), 3,0)
         self.structure_details = QtGui.QLineEdit()
         self.structure_details.setText('')
         self.structure_details.setFixedWidth(600)
-        grid.addWidget(self.structure_details, 2,1)
+        grid.addWidget(self.structure_details, 3,1)
 #        grid.addWidget(QtGui.QLabel('(e.g. HOLD FOR PUBLICATION, RELEASE NOW)'), 2,2)
+
+        note = (
+            '\n\nApo Structure:\nonly use if you want to deposit PanDDA models!'
+        )
+        grid.addWidget(QtGui.QLabel(note), 4,0)
+
+        grid.addWidget(QtGui.QLabel('Title Apo Structure'), 5,0)
+        self.structure_title_apo = QtGui.QLineEdit()
+        self.structure_title_apo.setText('')
+        self.structure_title_apo.setFixedWidth(600)
+        grid.addWidget(self.structure_title_apo, 5,1)
+
 
         frame.setLayout(grid)
         vb.addWidget(frame)
@@ -1768,54 +1790,64 @@ class XChemExplorer(QtGui.QApplication):
         grid = QtGui.QGridLayout()
         grid.addWidget(QtGui.QLabel('Deposition authors'), 0,0)
 
+        self.structure_author_name_List = []
+
         grid.addWidget(QtGui.QLabel('Name'), 1,0)
         self.structure_author_name_A = QtGui.QLineEdit()
         self.structure_author_name_A.setText('')
         self.structure_author_name_A.setFixedWidth(300)
         grid.addWidget(self.structure_author_name_A, 1,1)
         grid.addWidget(QtGui.QLabel('(e.g. Surname, F.M.)'), 1,2)
+        self.structure_author_name_List.append(self.structure_author_name_A)
 
         grid.addWidget(QtGui.QLabel('Name'), 2,0)
         self.structure_author_name_B = QtGui.QLineEdit()
         self.structure_author_name_B.setText('')
         self.structure_author_name_B.setFixedWidth(300)
         grid.addWidget(self.structure_author_name_B, 2,1)
+        self.structure_author_name_List.append(self.structure_author_name_B)
 
         grid.addWidget(QtGui.QLabel('Name'), 3,0)
         self.structure_author_name_C = QtGui.QLineEdit()
         self.structure_author_name_C.setText('')
         self.structure_author_name_C.setFixedWidth(300)
         grid.addWidget(self.structure_author_name_C, 3,1)
+        self.structure_author_name_List.append(self.structure_author_name_C)
 
         grid.addWidget(QtGui.QLabel('Name'), 4,0)
         self.structure_author_name_D = QtGui.QLineEdit()
         self.structure_author_name_D.setText('')
         self.structure_author_name_D.setFixedWidth(300)
         grid.addWidget(self.structure_author_name_D, 4,1)
+        self.structure_author_name_List.append(self.structure_author_name_D)
 
         grid.addWidget(QtGui.QLabel('Name'), 5,0)
         self.structure_author_name_E = QtGui.QLineEdit()
         self.structure_author_name_E.setText('')
         self.structure_author_name_E.setFixedWidth(300)
         grid.addWidget(self.structure_author_name_E, 5,1)
+        self.structure_author_name_List.append(self.structure_author_name_E)
 
         grid.addWidget(QtGui.QLabel('Name'), 6,0)
         self.structure_author_name_F = QtGui.QLineEdit()
         self.structure_author_name_F.setText('')
         self.structure_author_name_F.setFixedWidth(300)
         grid.addWidget(self.structure_author_name_F, 6,1)
+        self.structure_author_name_List.append(self.structure_author_name_F)
 
         grid.addWidget(QtGui.QLabel('Name'), 7,0)
         self.structure_author_name_G = QtGui.QLineEdit()
         self.structure_author_name_G.setText('')
         self.structure_author_name_G.setFixedWidth(300)
         grid.addWidget(self.structure_author_name_G, 7,1)
+        self.structure_author_name_List.append(self.structure_author_name_G)
 
         grid.addWidget(QtGui.QLabel('Name'), 8,0)
         self.structure_author_name_H = QtGui.QLineEdit()
         self.structure_author_name_H.setText('')
         self.structure_author_name_H.setFixedWidth(300)
         grid.addWidget(self.structure_author_name_H, 8,1)
+        self.structure_author_name_List.append(self.structure_author_name_H)
 
         frame.setLayout(grid)
         vb.addWidget(frame)
@@ -1897,54 +1929,64 @@ class XChemExplorer(QtGui.QApplication):
         set_primary_citation_authors.stateChanged.connect(self.set_primary_citation_as_structure_authors)
         grid.addWidget(set_primary_citation_authors, 0,0)
 
+        self.primary_citation_author_name_List=[]
+
         grid.addWidget(QtGui.QLabel('Name'), 1,0)
         self.primary_citation_author_name_A = QtGui.QLineEdit()
         self.primary_citation_author_name_A.setText('')
         self.primary_citation_author_name_A.setFixedWidth(300)
         grid.addWidget(self.primary_citation_author_name_A, 1,1)
         grid.addWidget(QtGui.QLabel('(e.g. Surname, F.M.)'), 1,2)
+        self.primary_citation_author_name_List.append(self.primary_citation_author_name_A)
 
         grid.addWidget(QtGui.QLabel('Name'), 2,0)
         self.primary_citation_author_name_B = QtGui.QLineEdit()
         self.primary_citation_author_name_B.setText('')
         self.primary_citation_author_name_B.setFixedWidth(300)
         grid.addWidget(self.primary_citation_author_name_B, 2,1)
+        self.primary_citation_author_name_List.append(self.primary_citation_author_name_B)
 
         grid.addWidget(QtGui.QLabel('Name'), 3,0)
         self.primary_citation_author_name_C = QtGui.QLineEdit()
         self.primary_citation_author_name_C.setText('')
         self.primary_citation_author_name_C.setFixedWidth(300)
         grid.addWidget(self.primary_citation_author_name_C, 3,1)
+        self.primary_citation_author_name_List.append(self.primary_citation_author_name_C)
 
         grid.addWidget(QtGui.QLabel('Name'), 4,0)
         self.primary_citation_author_name_D = QtGui.QLineEdit()
         self.primary_citation_author_name_D.setText('')
         self.primary_citation_author_name_D.setFixedWidth(300)
         grid.addWidget(self.primary_citation_author_name_D, 4,1)
+        self.primary_citation_author_name_List.append(self.primary_citation_author_name_D)
 
         grid.addWidget(QtGui.QLabel('Name'), 5,0)
         self.primary_citation_author_name_E = QtGui.QLineEdit()
         self.primary_citation_author_name_E.setText('')
         self.primary_citation_author_name_E.setFixedWidth(300)
         grid.addWidget(self.primary_citation_author_name_E, 5,1)
+        self.primary_citation_author_name_List.append(self.primary_citation_author_name_E)
 
         grid.addWidget(QtGui.QLabel('Name'), 6,0)
         self.primary_citation_author_name_F = QtGui.QLineEdit()
         self.primary_citation_author_name_F.setText('')
         self.primary_citation_author_name_F.setFixedWidth(300)
         grid.addWidget(self.primary_citation_author_name_F, 6,1)
+        self.primary_citation_author_name_List.append(self.primary_citation_author_name_F)
 
         grid.addWidget(QtGui.QLabel('Name'), 7,0)
         self.primary_citation_author_name_G = QtGui.QLineEdit()
         self.primary_citation_author_name_G.setText('')
         self.primary_citation_author_name_G.setFixedWidth(300)
         grid.addWidget(self.primary_citation_author_name_G, 7,1)
+        self.primary_citation_author_name_List.append(self.primary_citation_author_name_G)
 
         grid.addWidget(QtGui.QLabel('Name'), 8,0)
         self.primary_citation_author_name_H = QtGui.QLineEdit()
         self.primary_citation_author_name_H.setText('')
         self.primary_citation_author_name_H.setFixedWidth(300)
         grid.addWidget(self.primary_citation_author_name_H, 8,1)
+        self.primary_citation_author_name_List.append(self.primary_citation_author_name_H)
 
         frame.setLayout(grid)
         vb.addWidget(frame)
@@ -1966,26 +2008,91 @@ class XChemExplorer(QtGui.QApplication):
 
         grid.addWidget(QtGui.QLabel('Entity 1'), 1,0)
 
-        grid.addWidget(QtGui.QLabel('Fragment Name'), 2,0)
+        grid.addWidget(QtGui.QLabel('Molecule Name'), 2,0)
+        self.molecule_name = QtGui.QLineEdit()
+        self.molecule_name.setText('')
+        self.molecule_name.setFixedWidth(300)
+        grid.addWidget(self.molecule_name, 2,1)
+        grid.addWidget(QtGui.QLabel('(e.g. RNA Hammerhead Ribozyme)'), 2,2)
+
+        grid.addWidget(QtGui.QLabel('Fragment Name'), 3,0)
         self.fragment_name_one = QtGui.QLineEdit()
         self.fragment_name_one.setText('')
         self.fragment_name_one.setFixedWidth(300)
-        grid.addWidget(self.fragment_name_one, 2,1)
-        grid.addWidget(QtGui.QLabel('(e.g. ligand binding domain, hairpin)'), 2,2)
+        grid.addWidget(self.fragment_name_one, 3,1)
+        grid.addWidget(QtGui.QLabel('(e.g. ligand binding domain, hairpin)'), 3,2)
 
-        grid.addWidget(QtGui.QLabel('Specific Mutation'), 3,0)
+        grid.addWidget(QtGui.QLabel('Specific Mutation'), 4,0)
         self.fragment_name_one_specific_mutation = QtGui.QLineEdit()
         self.fragment_name_one_specific_mutation.setText('')
         self.fragment_name_one_specific_mutation.setFixedWidth(300)
-        grid.addWidget(self.fragment_name_one_specific_mutation, 3,1)
-        grid.addWidget(QtGui.QLabel('(e.g. C280S)'), 3,2)
+        grid.addWidget(self.fragment_name_one_specific_mutation, 4,1)
+        grid.addWidget(QtGui.QLabel('(e.g. C280S)'), 4,2)
 
-        grid.addWidget(QtGui.QLabel('Enzyme Comission Number'), 4,0)
+        grid.addWidget(QtGui.QLabel('Enzyme Comission Number'), 5,0)
         self.fragment_name_one_enzyme_comission_number = QtGui.QLineEdit()
         self.fragment_name_one_enzyme_comission_number.setText('')
         self.fragment_name_one_enzyme_comission_number.setFixedWidth(300)
-        grid.addWidget(self.fragment_name_one_enzyme_comission_number, 4,1)
-        grid.addWidget(QtGui.QLabel('(if known: e.g. 2.7.7.7)'), 4,2)
+        grid.addWidget(self.fragment_name_one_enzyme_comission_number, 5,1)
+        grid.addWidget(QtGui.QLabel('(if known: e.g. 2.7.7.7)'), 5,2)
+
+        grid.addWidget(QtGui.QLabel('Genetically Manipulated Source'), 6,0)
+
+        grid.addWidget(QtGui.QLabel('Source organism scientific name'), 7,0)
+        self.Source_organism_scientific_name = QtGui.QLineEdit()
+        self.Source_organism_scientific_name.setText('')
+        self.Source_organism_scientific_name.setFixedWidth(300)
+        grid.addWidget(self.Source_organism_scientific_name, 7,1)
+        grid.addWidget(QtGui.QLabel('(e.g. Homo sapiens)'), 7,2)
+
+        grid.addWidget(QtGui.QLabel('Source organism gene'), 8,0)
+        self.Source_organism_gene = QtGui.QLineEdit()
+        self.Source_organism_gene.setText('')
+        self.Source_organism_gene.setFixedWidth(300)
+        grid.addWidget(self.Source_organism_gene, 8,1)
+        grid.addWidget(QtGui.QLabel('(e.g. RPOD, ALKA...)'), 8,2)
+
+        grid.addWidget(QtGui.QLabel('Source organism strain'), 9,0)
+        self.Source_organism_strain = QtGui.QLineEdit()
+        self.Source_organism_strain.setText('')
+        self.Source_organism_strain.setFixedWidth(300)
+        grid.addWidget(self.Source_organism_strain, 9,1)
+        grid.addWidget(QtGui.QLabel('(e.g. BH10 ISOLATE, K-12...)'), 9,2)
+
+        grid.addWidget(QtGui.QLabel('Expression system scientific name'), 10,0)
+        self.Expression_system_scientific_name = QtGui.QLineEdit()
+        self.Expression_system_scientific_name.setText('')
+        self.Expression_system_scientific_name.setFixedWidth(300)
+        grid.addWidget(self.Expression_system_scientific_name, 10,1)
+        grid.addWidget(QtGui.QLabel('(e.g. Escherichia coli)'), 10,2)
+
+        grid.addWidget(QtGui.QLabel('Expression system strain'), 11,0)
+        self.Expression_system_strain = QtGui.QLineEdit()
+        self.Expression_system_strain.setText('')
+        self.Expression_system_strain.setFixedWidth(300)
+        grid.addWidget(self.Expression_system_strain, 11,1)
+        grid.addWidget(QtGui.QLabel('(e.g. BL21(DE3))'), 11,2)
+
+        grid.addWidget(QtGui.QLabel('Expression system vector type'), 12,0)
+        self.Expression_system_vector_type = QtGui.QLineEdit()
+        self.Expression_system_vector_type.setText('')
+        self.Expression_system_vector_type.setFixedWidth(300)
+        grid.addWidget(self.Expression_system_vector_type, 12,1)
+        grid.addWidget(QtGui.QLabel('(e.g. plasmid)'), 12,2)
+
+        grid.addWidget(QtGui.QLabel('Expression_system_plasmid_name'), 13,0)
+        self.Expression_system_plasmid_name = QtGui.QLineEdit()
+        self.Expression_system_plasmid_name.setText('')
+        self.Expression_system_plasmid_name.setFixedWidth(300)
+        grid.addWidget(self.Expression_system_plasmid_name, 13,1)
+        grid.addWidget(QtGui.QLabel('(e.g. pET26)'), 13,2)
+
+        grid.addWidget(QtGui.QLabel('Manipulated_source_details'), 14,0)
+        self.Manipulated_source_details = QtGui.QLineEdit()
+        self.Manipulated_source_details.setText('')
+        self.Manipulated_source_details.setFixedWidth(300)
+        grid.addWidget(self.Manipulated_source_details, 14,1)
+        grid.addWidget(QtGui.QLabel('(any other relevant information)'), 14,2)
 
         frame.setLayout(grid)
         vb.addWidget(frame)
@@ -1995,6 +2102,171 @@ class XChemExplorer(QtGui.QApplication):
         deposit_tab_dict['Molecule'][1].addLayout(vb)
 
 
+        #
+        # Misc
+        #
+
+        vb=QtGui.QVBoxLayout()
+
+        frame=QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+
+        grid = QtGui.QGridLayout()
+
+        grid.addWidget(QtGui.QLabel('Keywords'), 1,0)
+        self.structure_keywords = QtGui.QLineEdit()
+        self.structure_keywords.setText('')
+        self.structure_keywords.setFixedWidth(300)
+        grid.addWidget(self.structure_keywords, 1,1)
+        grid.addWidget(QtGui.QLabel('(e.g. beta barrel, protein-DNA complex)'), 1,2)
+
+        grid.addWidget(QtGui.QLabel('Biological Assembly'), 2,0)
+        self.biological_assembly_chain_number = QtGui.QLineEdit()
+        self.biological_assembly_chain_number.setText('')
+        self.biological_assembly_chain_number.setFixedWidth(300)
+        grid.addWidget(self.biological_assembly_chain_number, 2,1)
+        grid.addWidget(QtGui.QLabel('(e.g.  1 for monomer, 2 for dimer ..)'), 2,2)
+
+        grid.addWidget(QtGui.QLabel('Sequence'), 3,0)
+        self.molecule_one_letter_sequence = QtGui.QTextEdit()
+        self.molecule_one_letter_sequence.setText('')
+        self.molecule_one_letter_sequence.setFixedWidth(300)
+        grid.addWidget(self.molecule_one_letter_sequence, 3,1,6,2)
+
+        grid.addWidget(QtGui.QLabel('Structural Genomic (optional)'), 7,0)
+
+        grid.addWidget(QtGui.QLabel('Project Name'), 8,0)
+        self.SG_project_name = QtGui.QLineEdit()
+        self.SG_project_name.setText('')
+        self.SG_project_name.setFixedWidth(300)
+        grid.addWidget(self.SG_project_name, 8,1)
+        grid.addWidget(QtGui.QLabel('(e.g. PSI, Protein Structure Initiative)'), 8,2)
+
+        grid.addWidget(QtGui.QLabel('Full Name'), 9,0)
+        self.full_name_of_SG_center = QtGui.QLineEdit()
+        self.full_name_of_SG_center.setText('')
+        self.full_name_of_SG_center.setFixedWidth(300)
+        grid.addWidget(self.full_name_of_SG_center, 9,1)
+        grid.addWidget(QtGui.QLabel('(e.g. Berkeley Structural Genomic Center)'), 9,2)
+
+
+        frame.setLayout(grid)
+        vb.addWidget(frame)
+
+        vb.addStretch(1)
+
+        deposit_tab_dict['Misc'][1].addLayout(vb)
+
+
+        #
+        # Methods
+        #
+
+        vb=QtGui.QVBoxLayout()
+
+        frame=QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+
+        grid = QtGui.QGridLayout()
+
+        grid.addWidget(QtGui.QLabel('Crystallization'), 1,0)
+
+        grid.addWidget(QtGui.QLabel('Method'), 2,0)
+        self.crystallization_method = QtGui.QLineEdit()
+        self.crystallization_method.setText('')
+        self.crystallization_method.setFixedWidth(300)
+        grid.addWidget(self.crystallization_method, 2,1)
+        grid.addWidget(QtGui.QLabel('(e.g. VAPOUR DIFFUSION)'), 2,2)
+
+        grid.addWidget(QtGui.QLabel('pH'), 3,0)
+        self.crystallization_pH = QtGui.QLineEdit()
+        self.crystallization_pH.setText('')
+        self.crystallization_pH.setFixedWidth(300)
+        grid.addWidget(self.crystallization_pH, 3,1)
+        grid.addWidget(QtGui.QLabel('(e.g. 7.5 ...)'), 3,2)
+
+        grid.addWidget(QtGui.QLabel('Temperature'), 4,0)
+        self.crystallization_temperature = QtGui.QLineEdit()
+        self.crystallization_temperature.setText('')
+        self.crystallization_temperature.setFixedWidth(300)
+        grid.addWidget(self.crystallization_temperature, 4,1)
+        grid.addWidget(QtGui.QLabel('(e.g. 298) (in Kelvin)'), 4,2)
+
+        grid.addWidget(QtGui.QLabel('Condition'), 5,0)
+        self.crystallization_details = QtGui.QLineEdit()
+        self.crystallization_details.setText('')
+        self.crystallization_details.setFixedWidth(300)
+        grid.addWidget(self.crystallization_details, 5,1)
+        grid.addWidget(QtGui.QLabel('(e.g. PEG 4000, NaCl etc.)'), 5,2)
+
+        grid.addWidget(QtGui.QLabel('Diffraction Experiment'), 6,0)
+        note = ( 'Note: this information will only be used if it is\n'
+                 'not already available in the mainTable!\n'
+                 'Ignore if data were collected at DLS' )
+        grid.addWidget(QtGui.QLabel(note), 7,0)
+
+        grid.addWidget(QtGui.QLabel('Source'), 8,0)
+        self.radiation_source = QtGui.QLineEdit()
+        self.radiation_source.setText('')
+        self.radiation_source.setFixedWidth(300)
+        grid.addWidget(self.radiation_source, 8,1)
+        grid.addWidget(QtGui.QLabel('(e.g. SYNCHROTRON)'), 8,2)
+
+        grid.addWidget(QtGui.QLabel('Source Type'), 9,0)
+        self.radiation_source_type = QtGui.QLineEdit()
+        self.radiation_source_type.setText('')
+        self.radiation_source_type.setFixedWidth(300)
+        grid.addWidget(self.radiation_source_type, 9,1)
+        grid.addWidget(QtGui.QLabel('(e.g. NSLS BEAMLINE X8C ..)'), 9,2)
+
+        grid.addWidget(QtGui.QLabel('Wavelength'), 10,0)
+        self.radiation_wavelengths = QtGui.QLineEdit()
+        self.radiation_wavelengths.setText('')
+        self.radiation_wavelengths.setFixedWidth(300)
+        grid.addWidget(self.radiation_wavelengths, 10,1)
+        grid.addWidget(QtGui.QLabel('(e.g. 1.502)'), 10,2)
+
+        grid.addWidget(QtGui.QLabel('Detector'), 11,0)
+        self.radiation_detector = QtGui.QLineEdit()
+        self.radiation_detector.setText('')
+        self.radiation_detector.setFixedWidth(300)
+        grid.addWidget(self.radiation_detector, 11,1)
+        grid.addWidget(QtGui.QLabel('(e.g. CCD)'), 11,2)
+
+        grid.addWidget(QtGui.QLabel('Detector Type'), 12,0)
+        self.radiation_detector_type = QtGui.QLineEdit()
+        self.radiation_detector_type.setText('')
+        self.radiation_detector_type.setFixedWidth(300)
+        grid.addWidget(self.radiation_detector_type, 12,1)
+        grid.addWidget(QtGui.QLabel('(e.g. ADSC QUANTUM 1,  ..)'), 12,2)
+
+        grid.addWidget(QtGui.QLabel('Date'), 13,0)
+        self.data_collection_date = QtGui.QLineEdit()
+        self.data_collection_date.setText('')
+        self.data_collection_date.setFixedWidth(300)
+        grid.addWidget(self.data_collection_date, 13,1)
+        grid.addWidget(QtGui.QLabel('(e.g. 2004-01-07)'), 13,2)
+
+        grid.addWidget(QtGui.QLabel('Temperature'), 14,0)
+        self.data_collection_temperature = QtGui.QLineEdit()
+        self.data_collection_temperature.setText('')
+        self.data_collection_temperature.setFixedWidth(300)
+        grid.addWidget(self.data_collection_temperature, 14,1)
+        grid.addWidget(QtGui.QLabel('(e.g. 100) (in Kelvin)'), 14,2)
+
+        grid.addWidget(QtGui.QLabel('Protocol'), 15,0)
+        self.data_collection_protocol = QtGui.QLineEdit()
+        self.data_collection_protocol.setText('')
+        self.data_collection_protocol.setFixedWidth(300)
+        grid.addWidget(self.data_collection_protocol, 15,1)
+        grid.addWidget(QtGui.QLabel('(e.g. SINGLE WAVELENGTH, MAD, ...)'), 15,2)
+
+        frame.setLayout(grid)
+        vb.addWidget(frame)
+
+        vb.addStretch(1)
+
+        deposit_tab_dict['Methods'][1].addLayout(vb)
 
 
 
@@ -2024,7 +2296,25 @@ class XChemExplorer(QtGui.QApplication):
         print 'hallo'
 
     def save_deposit_to_database(self):
-        print 'hallo'
+        self.update_deposit_dict()
+        msgBox = QtGui.QMessageBox()
+        msgBox.setText("*** WARNING ***\nAre you sure you want to update the database?\nThis will overwrite previous entries!")
+        msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.YesRole)
+        msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.RejectRole)
+        reply = msgBox.exec_();
+        if reply == 0:
+            self.work_thread=XChemDeposit.update_depositTable(self.deposit_dict,
+                                                              os.path.join(self.database_directory,self.data_source_file),
+                                                              self.xce_logfile    )
+            self.explorer_active=1
+            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.connect(self.work_thread, QtCore.SIGNAL("create_widgets_for_autoprocessing_results_only"),
+                                                 self.create_widgets_for_autoprocessing_results_only)
+            self.work_thread.start()
+
+
 
     def load_deposit_config_file(self):
         file_name_temp = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Open file', self.current_directory,'*.deposit')
@@ -2070,15 +2360,10 @@ class XChemExplorer(QtGui.QApplication):
 
             self.structure_title.setText(self.deposit_dict['structure_title'])
             self.structure_details.setText(self.deposit_dict['structure_details'])
+            self.structure_title_apo.setText(self.deposit_dict['structure_title_apo'])
 
-            self.structure_author_name_A.setText(self.deposit_dict['structure_author_name_A'])
-            self.structure_author_name_B.setText(self.deposit_dict['structure_author_name_B'])
-            self.structure_author_name_C.setText(self.deposit_dict['structure_author_name_C'])
-            self.structure_author_name_D.setText(self.deposit_dict['structure_author_name_D'])
-            self.structure_author_name_E.setText(self.deposit_dict['structure_author_name_E'])
-            self.structure_author_name_F.setText(self.deposit_dict['structure_author_name_F'])
-            self.structure_author_name_G.setText(self.deposit_dict['structure_author_name_G'])
-            self.structure_author_name_H.setText(self.deposit_dict['structure_author_name_H'])
+            for n,name in enumerate(self.deposit_dict['structure_author_name'].split(';')):
+                self.structure_author_name_List[n].setText(name)
 
             self.primary_citation_id.setText(self.deposit_dict['primary_citation_id'])
             self.primary_citation_journal_abbrev.setText(self.deposit_dict['primary_citation_journal_abbrev'])
@@ -2088,15 +2373,40 @@ class XChemExplorer(QtGui.QApplication):
             self.primary_citation_page_first.setText(self.deposit_dict['primary_citation_page_first'])
             self.primary_citation_page_last.setText(self.deposit_dict['primary_citation_page_last'])
 
-            self.primary_citation_author_name_A.setText(self.deposit_dict['primary_citation_author_name_A'])
-            self.primary_citation_author_name_B.setText(self.deposit_dict['primary_citation_author_name_B'])
-            self.primary_citation_author_name_C.setText(self.deposit_dict['primary_citation_author_name_C'])
-            self.primary_citation_author_name_D.setText(self.deposit_dict['primary_citation_author_name_D'])
-            self.primary_citation_author_name_E.setText(self.deposit_dict['primary_citation_author_name_E'])
-            self.primary_citation_author_name_F.setText(self.deposit_dict['primary_citation_author_name_F'])
-            self.primary_citation_author_name_G.setText(self.deposit_dict['primary_citation_author_name_G'])
-            self.primary_citation_author_name_H.setText(self.deposit_dict['primary_citation_author_name_H'])
+            for n,name in enumerate(self.deposit_dict['primary_citation_author_name'].split(';')):
+                self.primary_citation_author_name_List[n].setText(name)
 
+            self.molecule_name.setText(self.deposit_dict['molecule_name'])
+            self.fragment_name_one.setText(self.deposit_dict['fragment_name_one'])
+            self.fragment_name_one_specific_mutation.setText(self.deposit_dict['fragment_name_one_specific_mutation'])
+            self.fragment_name_one_enzyme_comission_number.setText(self.deposit_dict['fragment_name_one_enzyme_comission_number'])
+            self.Source_organism_scientific_name.setText(self.deposit_dict['Source_organism_scientific_name'])
+            self.Source_organism_gene.setText(self.deposit_dict['Source_organism_gene'])
+            self.Source_organism_strain.setText(self.deposit_dict['Source_organism_strain'])
+            self.Expression_system_scientific_name.setText(self.deposit_dict['Expression_system_scientific_name'])
+            self.Expression_system_strain.setText(self.deposit_dict['Expression_system_strain'])
+            self.Expression_system_vector_type.setText(self.deposit_dict['Expression_system_vector_type'])
+            self.Expression_system_plasmid_name.setText(self.deposit_dict['Expression_system_plasmid_name'])
+            self.Manipulated_source_details.setText(self.deposit_dict['Manipulated_source_details'])
+
+            self.structure_keywords.setText(self.deposit_dict['structure_keywords'])
+            self.biological_assembly_chain_number.setText(self.deposit_dict['biological_assembly_chain_number'])
+            self.molecule_one_letter_sequence.setText(self.deposit_dict['molecule_one_letter_sequence'])
+            self.SG_project_name.setText(self.deposit_dict['SG_project_name'])
+            self.full_name_of_SG_center.setText(self.deposit_dict['full_name_of_SG_center'])
+
+            self.crystallization_method.setText(self.deposit_dict['crystallization_method'])
+            self.crystallization_pH.setText(self.deposit_dict['crystallization_pH'])
+            self.crystallization_temperature.setText(self.deposit_dict['crystallization_temperature'])
+            self.crystallization_details.setText(self.deposit_dict['crystallization_details'])
+            self.radiation_source.setText(self.deposit_dict['radiation_source'])
+            self.radiation_source_type.setText(self.deposit_dict['radiation_source_type'])
+            self.radiation_wavelengths.setText(self.deposit_dict['radiation_wavelengths'])
+            self.radiation_detector.setText(self.deposit_dict['radiation_detector'])
+            self.radiation_detector_type.setText(self.deposit_dict['radiation_detector_type'])
+            self.data_collection_date.setText(self.deposit_dict['data_collection_date'])
+            self.data_collection_temperature.setText(self.deposit_dict['data_collection_temperature'])
+            self.data_collection_protocol.setText(self.deposit_dict['data_collection_protocol'])
 
         except KeyError:
             self.update_status_bar('Sorry, this is not a XChemExplorer deposit file!')
@@ -2104,9 +2414,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
 
-
-
-    def save_deposit_config_file(self):
+    def update_deposit_dict(self):
         self.deposit_dict = {
             'contact_author_PI_salutation':         str(self.contact_author_PI_salutation.text()),
             'contact_author_PI_first_name':         str(self.contact_author_PI_first_name.text()),
@@ -2144,15 +2452,7 @@ class XChemExplorer(QtGui.QApplication):
 
             'structure_title':                      str(self.structure_title.text()),
             'structure_details':                    str(self.structure_details.text()),
-
-            'structure_author_name_A':              str(self.structure_author_name_A.text()),
-            'structure_author_name_B':              str(self.structure_author_name_B.text()),
-            'structure_author_name_C':              str(self.structure_author_name_C.text()),
-            'structure_author_name_D':              str(self.structure_author_name_D.text()),
-            'structure_author_name_E':              str(self.structure_author_name_E.text()),
-            'structure_author_name_F':              str(self.structure_author_name_F.text()),
-            'structure_author_name_G':              str(self.structure_author_name_G.text()),
-            'structure_author_name_H':              str(self.structure_author_name_H.text()),
+            'structure_title_apo':                  str(self.structure_title_apo.text()),
 
             'primary_citation_id':                  str(self.primary_citation_id.text()),
             'primary_citation_journal_abbrev':      str(self.primary_citation_journal_abbrev.text()),
@@ -2162,17 +2462,52 @@ class XChemExplorer(QtGui.QApplication):
             'primary_citation_page_first':          str(self.primary_citation_page_first.text()),
             'primary_citation_page_last':           str(self.primary_citation_page_last.text()),
 
-            'primary_citation_author_name_A':              str(self.primary_citation_author_name_A.text()),
-            'primary_citation_author_name_B':              str(self.primary_citation_author_name_B.text()),
-            'primary_citation_author_name_C':              str(self.primary_citation_author_name_C.text()),
-            'primary_citation_author_name_D':              str(self.primary_citation_author_name_D.text()),
-            'primary_citation_author_name_E':              str(self.primary_citation_author_name_E.text()),
-            'primary_citation_author_name_F':              str(self.primary_citation_author_name_F.text()),
-            'primary_citation_author_name_G':              str(self.primary_citation_author_name_G.text()),
-            'primary_citation_author_name_H':              str(self.primary_citation_author_name_H.text())
+            'molecule_name':                                str(self.molecule_name.text()),
+            'fragment_name_one':                            str(self.fragment_name_one.text()),
+            'fragment_name_one_specific_mutation':          str(self.fragment_name_one_specific_mutation.text()),
+            'fragment_name_one_enzyme_comission_number':    str(self.fragment_name_one_enzyme_comission_number.text()),
+            'Source_organism_scientific_name':              str(self.Source_organism_scientific_name.text()),
+            'Source_organism_gene':                         str(self.Source_organism_gene.text()),
+            'Source_organism_strain':                       str(self.Source_organism_strain.text()),
+            'Expression_system_scientific_name':            str(self.Expression_system_scientific_name.text()),
+            'Expression_system_strain':                     str(self.Expression_system_strain.text()),
+            'Expression_system_plasmid_name':               str(self.Expression_system_plasmid_name.text()),
+            'Manipulated_source_details':                   str(self.Manipulated_source_details.text()),
 
+            'structure_keywords':                           str(self.structure_keywords.text()),
+            'biological_assembly_chain_number':             str(self.biological_assembly_chain_number.text()),
+            'SG_project_name':                              str(self.SG_project_name.text()),
+            'full_name_of_SG_center':                       str(self.full_name_of_SG_center.text()),
+            'molecule_one_letter_sequence':                 str(self.molecule_one_letter_sequence.toPlainText()).replace(' ','').replace('\n','').replace('\r',''),
+
+            'crystallization_method':                       str(self.crystallization_method.text()),
+            'crystallization_pH':                           str(self.crystallization_pH.text()),
+            'crystallization_temperature':                  str(self.crystallization_temperature.text()),
+            'crystallization_details':                      str(self.crystallization_details.text()),
+
+            'radiation_source':                             str(self.radiation_source.text()),
+            'radiation_source_type':                        str(self.radiation_source_type.text()),
+            'radiation_wavelengths':                        str(self.radiation_wavelengths.text()),
+            'radiation_detector':                           str(self.radiation_detector.text()),
+            'radiation_detector_type':                      str(self.radiation_detector_type.text()),
+            'data_collection_date':                         str(self.data_collection_date.text()),
+            'data_collection_temperature':                  str(self.data_collection_temperature.text()),
+            'data_collection_protocol':                     str(self.data_collection_protocol.text())
 
         }
+
+        structure_author_name=''
+        for widget in self.structure_author_name_List:
+            structure_author_name+=str(widget.text())+';'
+        self.deposit_dict['structure_author_name']=structure_author_name[:-1]
+
+        primary_citation_author_name=''
+        for widget in self.primary_citation_author_name_List:
+            primary_citation_author_name+=str(widget.text())+';'
+        self.deposit_dict['primary_citation_author_name']=primary_citation_author_name[:-1]
+
+    def save_deposit_config_file(self):
+        self.update_deposit_dict()
 
         file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.current_directory))
         #make sure that the file always has .deposit extension

@@ -1,4 +1,4 @@
-# last edited: 18/11/2016, 15:00
+# last edited: 01/12/2016, 17:00
 
 import sqlite3
 import os,sys
@@ -238,71 +238,161 @@ class data_source:
             ['LastUpdated_by',                              'LastUpdated_by',                           'TEXT']
             ]
 
+        self.deposition_table_columns = [
+            ['ID',                                          'ID',                                       'INTEGER PRIMARY KEY'],
+            ['CrystalName',                                 'Sample ID',                                'TEXT'],
 
-        # this is the planned replacement for the PKL file, 18/11/2016
-        self.data_collection_columns = [
-            ['CrystalName',                          'Sample ID',                               'TEXT',                 0],
+            ['contact_author_PI_salutation',                'contact_author_PI_salutation',             'TEXT'],
+            ['contact_author_PI_first_name',                'contact_author_PI_first_name',             'TEXT'],
+            ['contact_author_PI_last_name',                 'contact_author_PI_last_name',              'TEXT'],
+            ['contact_author_PI_middle_name',               'contact_author_PI_middle_name',            'TEXT'],
+            ['contact_author_PI_role',                      'contact_author_PI_role',                   'TEXT'],
+            ['contact_author_PI_organization_type',         'contact_author_PI_organization_type',      'TEXT'],
+            ['contact_author_PI_email',                     'contact_author_PI_email',                  'TEXT'],
+            ['contact_author_PI_address',                   'contact_author_PI_address',                'TEXT'],
+            ['contact_author_PI_city',                      'contact_author_PI_city',                   'TEXT'],
+            ['contact_author_PI_State_or_Province',         'contact_author_PI_State_or_Province',      'TEXT'],
+            ['contact_author_PI_Zip_Code',                  'contact_author_PI_Zip_Code',               'TEXT'],
+            ['contact_author_PI_Country',                   'contact_author_PI_Country',                'TEXT'],
+            ['contact_author_PI_fax_number',                'contact_author_PI_fax_number',             'TEXT'],
+            ['contact_author_PI_phone_number',              'contact_author_PI_phone_number',           'TEXT'],
 
-            ['SelectedPipeline',                          'SelectedPipeline',                               'TEXT',                 0],
+            ['contact_author_salutation',                   'contact_author_salutation',                'TEXT'],
+            ['contact_author_first_name',                   'contact_author_first_name',                'TEXT'],
+            ['contact_author_last_name',                    'contact_author_last_name',                 'TEXT'],
+            ['contact_author_middle_name',                  'contact_author_middle_name',               'TEXT'],
+            ['contact_author_role',                         'contact_author_role',                      'TEXT'],
+            ['contact_author_organization_type',            'contact_author_organization_type',         'TEXT'],
+            ['contact_author_email',                        'contact_author_email',                     'TEXT'],
+            ['contact_author_address',                      'contact_author_address',                   'TEXT'],
+            ['contact_author_city',                         'contact_author_city',                      'TEXT'],
+            ['contact_author_State_or_Province',            'contact_author_State_or_Province',         'TEXT'],
+            ['contact_author_Zip_Code',                     'contact_author_Zip_Code',                  'TEXT'],
+            ['contact_author_Country',                      'contact_author_Country',                   'TEXT'],
+            ['contact_author_fax_number',                   'contact_author_fax_number',                'TEXT'],
+            ['contact_author_phone_number',                 'contact_author_phone_number',              'TEXT'],
 
-            ['DataCollectionRun',                    'Run',                                     'TEXT',                 0],
-            ['DataCollectionBeamline',               'Beamline',                                'TEXT',                 0],
-            ['DataCollectionDate',                   'Data Collection\nDate',                   'TEXT',                 1],
-            ['DataCollectionWavelength',             'Wavelength',                              'TEXT',                 0],
-            ['DataCollectionPinBarcode',             'GDA\nBarcode',                            'TEXT',                 1],
+            ['Release_status_for_coordinates',              'Release_status_for_coordinates',           'TEXT'],
+            ['Release_status_for_structure_factor',         'Release_status_for_structure_factor',      'TEXT'],
+            ['Release_status_for_sequence',                 'Release_status_for_sequence',              'TEXT'],
 
-            ['DataCollectionCrystalImage1',             'img1',                            'TEXT',                 1],
-            ['DataCollectionCrystalImage2',             'img2',                            'TEXT',                 1],
-            ['DataCollectionCrystalImage3',             'img3',                            'TEXT',                 1],
-            ['DataCollectionCrystalImage4',             'img4',                            'TEXT',                 1],
+            ['structure_title',                             'structure_title',                          'TEXT'],
+            ['structure_details',                           'structure_details',                        'TEXT'],
+            ['structure_title_apo',                         'structure_title_apo',                      'TEXT'],
 
-            ['DataProcessingPathToImageFiles',       'Path to diffraction\nimage files',        'TEXT',                 1],
-            ['DataProcessingProgram',                'Program',                                 'TEXT',                 1],
-            ['DataProcessingSpaceGroup',             'DataProcessing\nSpaceGroup',              'TEXT',                 1],
-            ['DataProcessingUnitCell',               'DataProcessing\nUnitCell',                'TEXT',                 0],
-            ['DataProcessingAutoAssigned',           'auto-assigned',                           'TEXT',                 0],
-            ['DataProcessingA',                      'DataProcessing\nA',                       'TEXT',                 0],
-            ['DataProcessingB',                      'DataProcessing\nB',                       'TEXT',                 0],
-            ['DataProcessingC',                      'DataProcessing\nC',                       'TEXT',                 0],
-            ['DataProcessingAlpha',                  'DataProcessing\nAlpha',                   'TEXT',                 0],
-            ['DataProcessingBeta',                   'DataProcessing\nBeta',                    'TEXT',                 0],
-            ['DataProcessingGamma',                  'DataProcessing\nGamma',                   'TEXT',                 0],
-            ['DataProcessingResolutionOverall',             'Resolution\nOverall',                          'TEXT',                 0],
-            ['DataProcessingResolutionLow',                 'Resolution\nLow',                              'TEXT',                 0],
-            ['DataProcessingResolutionLowInnerShell',       'Resolution\nLow (Inner Shell)',                'TEXT',                 0],
-            ['DataProcessingResolutionHigh',                'Resolution\nHigh',                             'TEXT',                 1],
-            ['DataProcessingResolutionHigh15sigma',         'Resolution\n[Mn<I/sig(I)> = 1.5]',             'TEXT',                 1],
-            ['DataProcessingResolutionHighOuterShell',      'Resolution\nHigh (Outer Shell)',               'TEXT',                 0],
-            ['DataProcessingRmergeOverall',                 'Rmerge\nOverall',                              'TEXT',                 1],
-            ['DataProcessingRmergeLow',                     'Rmerge\nLow',                                  'TEXT',                 1],
-            ['DataProcessingRmergeHigh',                    'Rmerge\nHigh',                                 'TEXT',                 1],
-            ['DataProcessingIsigOverall',                   'Mn<I/sig(I)>\nOverall',                        'TEXT',                 1],
-            ['DataProcessingIsigLow',                       'Mn<I/sig(I)>\nLow',                            'TEXT',                 1],
-            ['DataProcessingIsigHigh',                      'Mn<I/sig(I)>\nHigh',                           'TEXT',                 1],
-            ['DataProcessingCompletenessOverall',           'Completeness\nOverall',                        'TEXT',                 1],
-            ['DataProcessingCompletenessLow',               'Completeness\nLow',                            'TEXT',                 1],
-            ['DataProcessingCompletenessHigh',              'Completeness\nHigh',                           'TEXT',                 1],
-            ['DataProcessingMultiplicityOverall',           'Multiplicity\nOverall',                        'TEXT',                 1],
-            ['DataProcessingMultiplicityLow',               'Multiplicity\nLow',                            'TEXT',                 1],
-            ['DataProcessingMultiplicityHigh',              'Multiplicity\nHigh',                           'TEXT',                 1],
-            ['DataProcessingCChalfOverall',                 'CC(1/2)\nOverall',                             'TEXT',                 1],
-            ['DataProcessingCChalfLow',                     'CC(1/2)\nLow',                                 'TEXT',                 1],
-            ['DataProcessingCChalfHigh',                    'CC(1/2)\nHigh',                                'TEXT',                 1],
-            ['DataProcessingPathToLogfile',                 'DataProcessingPathToLogfile',                  'TEXT',                 1],
-            ['DataProcessingPathToMTZfile',                 'DataProcessingPathToMTZfile',                  'TEXT',                 1],
-            ['DataProcessingLOGfileName',                   'DataProcessingLOGfileName',                    'TEXT',                 0],
-            ['DataProcessingMTZfileName',                   'DataProcessingMTZfileName',                    'TEXT',                 0],
-            ['DataProcessingDirectoryOriginal',             'DataProcessingDirectoryOriginal',              'TEXT',                 0],
-            ['DataProcessingUniqueReflectionsOverall',      'Unique Reflections\nOverall',                  'TEXT',                 1],
-            ['DataProcessingLattice',                       'DataProcessing\nLattice',                      'TEXT',                 0],
-            ['DataProcessingPointGroup',                    'DataProcessing\nPointGroup',                   'TEXT',                 0],
-            ['DataProcessingUnitCellVolume',                'DataProcessing\nUnit Cell Volume',             'TEXT',                 0],
-            ['DataProcessingAlert',                         'DataProcessing\nAlert',                        'TEXT',                 0],
-            ['DataProcessingScore',                         'DataProcessing\nScore',                        'TEXT',                 1],
-            ['DataProcessingStatus',                        'DataProcessing\nStatus',                       'TEXT',                 1],
+            ['primary_citation_id',                         'primary_citation_id',                      'TEXT'],
+            ['primary_citation_journal_abbrev',             'primary_citation_journal_abbrev',          'TEXT'],
+            ['primary_citation_title',                      'primary_citation_title',                   'TEXT'],
+            ['primary_citation_year',                       'primary_citation_year',                    'TEXT'],
+            ['primary_citation_journal_volume',             'primary_citation_journal_volume',          'TEXT'],
+            ['primary_citation_page_first',                 'primary_citation_page_first',              'TEXT'],
+            ['primary_citation_page_last',                  'primary_citation_page_last',               'TEXT'],
 
+            ['molecule_name',                               'molecule_name',                            'TEXT'],
+            ['Fragment_name',                               'Fragment_name',                            'TEXT'],
+            ['Specific_mutation',                           'Specific_mutation',                        'TEXT'],
+            ['Enzyme_Comission_number',                     'Enzyme_Comission_number',                  'TEXT'],
 
+            ['Source_organism_scientific_name',             'Source_organism_scientific_name',          'TEXT'],
+            ['Source_organism_gene',                        'Source_organism_gene',                     'TEXT'],
+            ['Source_organism_strain',                      'Source_organism_strain',                   'TEXT'],
+            ['Expression_system_scientific_name',           'Expression_system_scientific_name',        'TEXT'],
+            ['Expression_system_strain',                    'Expression_system_strain',                 'TEXT'],
+            ['Expression_system_vector_type',               'Expression_system_vector_type',            'TEXT'],
+            ['Expression_system_plasmid_name',              'Expression_system_plasmid_name',           'TEXT'],
+            ['Manipulated_source_details',                  'Manipulated_source_details',               'TEXT'],
+
+            ['structure_keywords',                          'structure_keywords',                       'TEXT'],
+            ['biological_assembly_chain_number',            'biological_assembly_chain_number',         'TEXT'],
+
+            ['crystallization_method',                      'crystallization_method',                   'TEXT'],
+            ['crystallization_pH',                          'crystallization_pH',                       'TEXT'],
+            ['crystallization_temperature',                 'crystallization_temperature',              'TEXT'],
+            ['crystallization_details',                     'crystallization_details',                  'TEXT'],
+
+            ['radiation_source',                            'radiation_source',                         'TEXT'],
+            ['radiation_source_type',                       'radiation_source_type',                    'TEXT'],
+            ['radiation_wavelengths',                       'radiation_wavelengths',                    'TEXT'],
+            ['radiation_detector',                          'radiation_detector',                       'TEXT'],
+            ['radiation_detector_type',                     'radiation_detector_type',                  'TEXT'],
+            ['data_collection_date',                        'data_collection_date',                     'TEXT'],
+            ['data_collection_temperature',                 'data_collection_temperature',              'TEXT'],
+            ['data_collection_protocol',                    'data_collection_protocol',                 'TEXT'],
+
+            ['SG_project_name',                             'SG_project_name',                          'TEXT'],
+            ['full_name_of_SG_center',                      'full_name_of_SG_center',                   'TEXT'],
+
+            ['molecule_one_letter_sequence',                'molecule_one_letter_sequence',             'TEXT'],
+
+            ['LastUpdated',                                 'LastUpdated',                              'TEXT'],
+            ['LastUpdated_by',                              'LastUpdated_by',                           'TEXT']
             ]
+
+
+
+#        # this is the planned replacement for the PKL file, 18/11/2016
+#        self.data_collection_columns = [
+#            ['ID',                                          'ID',                                       'INTEGER PRIMARY KEY'],
+#            ['CrystalName',                          'Sample ID',                               'TEXT',                 0],
+#
+#            ['SelectedPipeline',                          'SelectedPipeline',                               'TEXT',                 0],
+#
+#            ['DataCollectionRun',                    'Run',                                     'TEXT',                 0],
+#            ['DataCollectionBeamline',               'Beamline',                                'TEXT',                 0],
+#            ['DataCollectionDate',                   'Data Collection\nDate',                   'TEXT',                 1],
+#            ['DataCollectionWavelength',             'Wavelength',                              'TEXT',                 0],
+#            ['DataCollectionPinBarcode',             'GDA\nBarcode',                            'TEXT',                 1],
+#
+#            ['DataCollectionCrystalImage1',             'img1',                            'TEXT',                 1],
+#            ['DataCollectionCrystalImage2',             'img2',                            'TEXT',                 1],
+#            ['DataCollectionCrystalImage3',             'img3',                            'TEXT',                 1],
+#            ['DataCollectionCrystalImage4',             'img4',                            'TEXT',                 1],
+#
+#            ['DataProcessingPathToImageFiles',       'Path to diffraction\nimage files',        'TEXT',                 1],
+#            ['DataProcessingProgram',                'Program',                                 'TEXT',                 1],
+#            ['DataProcessingSpaceGroup',             'DataProcessing\nSpaceGroup',              'TEXT',                 1],
+#            ['DataProcessingUnitCell',               'DataProcessing\nUnitCell',                'TEXT',                 0],
+#            ['DataProcessingAutoAssigned',           'auto-assigned',                           'TEXT',                 0],
+#            ['DataProcessingA',                      'DataProcessing\nA',                       'TEXT',                 0],
+#            ['DataProcessingB',                      'DataProcessing\nB',                       'TEXT',                 0],
+#            ['DataProcessingC',                      'DataProcessing\nC',                       'TEXT',                 0],
+#            ['DataProcessingAlpha',                  'DataProcessing\nAlpha',                   'TEXT',                 0],
+#            ['DataProcessingBeta',                   'DataProcessing\nBeta',                    'TEXT',                 0],
+#            ['DataProcessingGamma',                  'DataProcessing\nGamma',                   'TEXT',                 0],
+#            ['DataProcessingResolutionOverall',             'Resolution\nOverall',                          'TEXT',                 0],
+#            ['DataProcessingResolutionLow',                 'Resolution\nLow',                              'TEXT',                 0],
+#            ['DataProcessingResolutionLowInnerShell',       'Resolution\nLow (Inner Shell)',                'TEXT',                 0],
+#            ['DataProcessingResolutionHigh',                'Resolution\nHigh',                             'TEXT',                 1],
+#            ['DataProcessingResolutionHigh15sigma',         'Resolution\n[Mn<I/sig(I)> = 1.5]',             'TEXT',                 1],
+#            ['DataProcessingResolutionHighOuterShell',      'Resolution\nHigh (Outer Shell)',               'TEXT',                 0],
+#            ['DataProcessingRmergeOverall',                 'Rmerge\nOverall',                              'TEXT',                 1],
+#            ['DataProcessingRmergeLow',                     'Rmerge\nLow',                                  'TEXT',                 1],
+#            ['DataProcessingRmergeHigh',                    'Rmerge\nHigh',                                 'TEXT',                 1],
+#            ['DataProcessingIsigOverall',                   'Mn<I/sig(I)>\nOverall',                        'TEXT',                 1],
+#            ['DataProcessingIsigLow',                       'Mn<I/sig(I)>\nLow',                            'TEXT',                 1],
+#            ['DataProcessingIsigHigh',                      'Mn<I/sig(I)>\nHigh',                           'TEXT',                 1],
+#            ['DataProcessingCompletenessOverall',           'Completeness\nOverall',                        'TEXT',                 1],
+#            ['DataProcessingCompletenessLow',               'Completeness\nLow',                            'TEXT',                 1],
+#            ['DataProcessingCompletenessHigh',              'Completeness\nHigh',                           'TEXT',                 1],
+#            ['DataProcessingMultiplicityOverall',           'Multiplicity\nOverall',                        'TEXT',                 1],
+#            ['DataProcessingMultiplicityLow',               'Multiplicity\nLow',                            'TEXT',                 1],
+#            ['DataProcessingMultiplicityHigh',              'Multiplicity\nHigh',                           'TEXT',                 1],
+#            ['DataProcessingCChalfOverall',                 'CC(1/2)\nOverall',                             'TEXT',                 1],
+#            ['DataProcessingCChalfLow',                     'CC(1/2)\nLow',                                 'TEXT',                 1],
+#            ['DataProcessingCChalfHigh',                    'CC(1/2)\nHigh',                                'TEXT',                 1],
+#            ['DataProcessingPathToLogfile',                 'DataProcessingPathToLogfile',                  'TEXT',                 1],
+#            ['DataProcessingPathToMTZfile',                 'DataProcessingPathToMTZfile',                  'TEXT',                 1],
+#            ['DataProcessingLOGfileName',                   'DataProcessingLOGfileName',                    'TEXT',                 0],
+#            ['DataProcessingMTZfileName',                   'DataProcessingMTZfileName',                    'TEXT',                 0],
+#            ['DataProcessingDirectoryOriginal',             'DataProcessingDirectoryOriginal',              'TEXT',                 0],
+#            ['DataProcessingUniqueReflectionsOverall',      'Unique Reflections\nOverall',                  'TEXT',                 1],
+#            ['DataProcessingLattice',                       'DataProcessing\nLattice',                      'TEXT',                 0],
+#            ['DataProcessingPointGroup',                    'DataProcessing\nPointGroup',                   'TEXT',                 0],
+#            ['DataProcessingUnitCellVolume',                'DataProcessing\nUnit Cell Volume',             'TEXT',                 0],
+#            ['DataProcessingAlert',                         'DataProcessing\nAlert',                        'TEXT',                 0],
+#            ['DataProcessingScore',                         'DataProcessing\nScore',                        'TEXT',                 1],
+#            ['DataProcessingStatus',                        'DataProcessing\nStatus',                       'TEXT',                 1],
+#            ]
 
 
     def columns_not_to_display(self):
@@ -340,6 +430,16 @@ class data_source:
         for column in self.pandda_table_columns:
             if column[0] not in existing_columns:
                 cursor.execute("alter table panddaTable add column '"+column[0]+"' '"+column[2]+"'")
+                connect.commit()
+        # create DEPOSIT table if not exists
+        cursor.execute("create table if not exists depositTable (ID INTEGER);")
+        existing_columns=[]
+        cursor.execute("SELECT * FROM depositTable")
+        for column in cursor.description:
+            existing_columns.append(column[0])
+        for column in self.deposition_table_columns:
+            if column[0] not in existing_columns:
+                cursor.execute("alter table depositTable add column '"+column[0]+"' '"+column[2]+"'")
                 connect.commit()
 
 

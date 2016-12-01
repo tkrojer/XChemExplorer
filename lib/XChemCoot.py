@@ -1,4 +1,4 @@
-# last edited: 18/11/2016 - 15:00
+# last edited: 01/12/2016 - 17:00
 
 import gobject
 import sys
@@ -625,9 +625,17 @@ class GUI(object):
             print '==> XCE: setting Refinement Outcome for '+self.xtalID+' to '+str(data)+' in mainTable of datasource'
             self.db.update_data_source(self.xtalID,self.db_dict_mainTable)
         else:
-            self.db_dict_panddaTable['RefinementOutcome']=data
-            print '==> XCE: setting Refinement Outcome for '+self.xtalID+' (site='+str(self.selected_site)+') to '+str(data)+' in panddaTable of datasource'
-            self.db.update_panddaTable(self.xtalID,self.selected_site[0],self.db_dict_panddaTable)
+            if int(data.split()[0] >=5:
+                for i,button in enumerate(self.experiment_stage_button_list):
+                    if i==4:
+                        # currently it is not possible to set PanDDA models to deposit, 01/12/2016
+                        # soon one will be able to do so if all sites with good ligand confidence are ready
+                        button.set_active(True)
+                        break
+            else:
+                self.db_dict_panddaTable['RefinementOutcome']=data
+                print '==> XCE: setting Refinement Outcome for '+self.xtalID+' (site='+str(self.selected_site)+') to '+str(data)+' in panddaTable of datasource'
+                self.db.update_panddaTable(self.xtalID,self.selected_site[0],self.db_dict_panddaTable)
 
     def ligand_confidence_button_clicked(self,widget,data=None):
         if self.selected_site[0] == '0':
