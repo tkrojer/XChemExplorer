@@ -1,4 +1,4 @@
-# last edited: 21/11/2016, 17:00
+# last edited: 30/11/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -307,7 +307,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         found_logfile=self.find_file(xtal+'.log',xtal)
         if found_logfile:
-            db_dict['DataProcessingPathToLogfile']=os.path.realpath(xtal+'.log')
+            db_dict['DataProcessingPathToLogfile']=os.path.realpath(xtal+'.log').replace(os.getcwd()+'/','')
             db_dict['DataProcessingLOGfileName']=xtal+'.log'
             if db_dict['DataCollectionOutcome']=='None' or db_dict['DataCollectionOutcome']=='':
                 db_dict['DataCollectionOutcome']='success'
@@ -321,7 +321,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         found_mtzfile=self.find_file(xtal+'.mtz',xtal)
         if found_mtzfile:
-            db_dict['DataProcessingPathToMTZfile']=os.path.realpath(xtal+'.mtz')
+            db_dict['DataProcessingPathToMTZfile']=os.path.realpath(xtal+'.mtz').replace(os.getcwd()+'/','')
             db_dict['DataProcessingMTZfileName']=xtal+'.mtz'
             if not found_logfile:
                 mtz_info=mtztools(xtal+'.mtz').get_information_for_datasource()
@@ -340,7 +340,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         found_dimple_pdb=self.find_file('dimple.pdb',xtal)
         if found_dimple_pdb:
-            db_dict['DimplePathToPDB']=os.path.realpath('dimple.pdb')
+            db_dict['DimplePathToPDB']=os.path.realpath('dimple.pdb').replace(os.getcwd()+'/','')
             pdb_info=parse().PDBheader('dimple.pdb')
             db_dict['DimpleRcryst']=pdb_info['Rcryst']
             db_dict['DimpleRfree']=pdb_info['Rfree']
@@ -357,7 +357,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         dimple_path=''
         found_dimple_mtz=self.find_file('dimple.mtz',xtal)
         if found_dimple_mtz:
-            db_dict['DimplePathToMTZ']=os.path.realpath('dimple.mtz')
+            db_dict['DimplePathToMTZ']=os.path.realpath('dimple.mtz').replace(os.getcwd()+'/','')
             dimple_mtz=db_dict['DimplePathToMTZ']
             dimple_path=dimple_mtz[:dimple_mtz.rfind('/')]
         else:
@@ -370,15 +370,17 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         found_free_mtz=self.find_file(xtal+'.free.mtz',xtal)
         if found_free_mtz:
-            db_dict['RefinementMTZfree']=os.path.realpath(xtal+'.free.mtz')
+            db_dict['RefinementMTZfree']=os.path.realpath(xtal+'.free.mtz').replace(os.getcwd()+'/','')
         else:
             db_dict['RefinementMTZfree']=''
             if os.path.isfile(os.path.join(dimple_path,'prepared2.mtz')):
                 os.symlink(os.path.relpath(os.path.join(dimple_path,'prepared2.mtz')),xtal+'.free.mtz')
-                db_dict['RefinementMTZfree']=xtal+'.free.mtz'
+                db_dict['RefinementMTZfree']=os.path.realpath(xtal+'.free.mtz').replace(os.getcwd()+'/','')
+#                db_dict['RefinementMTZfree']=xtal+'.free.mtz'
             elif os.path.isfile(os.path.join(dimple_path,'prepared.mtz')):
                 os.symlink(os.path.relpath(os.path.join(dimple_path,'prepared.mtz')),xtal+'.free.mtz')
-                db_dict['RefinementMTZfree']=xtal+'.free.mtz'
+                db_dict['RefinementMTZfree']=os.path.realpath(xtal+'.free.mtz').replace(os.getcwd()+'/','')
+#               db_dict['RefinementMTZfree']=xtal+'.free.mtz'
 
         return db_dict
 
@@ -398,7 +400,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                                 break
 
         if os.path.isfile(compoundID+'.cif') and os.path.getsize(compoundID+'.cif') > 20:
-            db_dict['RefinementCIF']=os.path.realpath(compoundID+'.cif')
+            db_dict['RefinementCIF']=os.path.realpath(compoundID+'.cif').replace(os.getcwd()+'/','')
             db_dict['RefinementCIFStatus']='restraints generated'
         else:
             os.system('/bin/rm %s.cif 2> /dev/null' %compoundID)
@@ -442,7 +444,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         found_refine_pdb=self.find_file('refine.pdb',xtal)
         if found_refine_pdb and not 'dimple' in os.path.realpath('refine.pdb'):
-            db_dict['RefinementPDB_latest']=os.path.realpath('refine.pdb')
+            db_dict['RefinementPDB_latest']=os.path.realpath('refine.pdb').replace(os.getcwd()+'/','')
             db_dict['RefinementStatus']='finished'
             pdb_info=parse().dict_for_datasource_update('refine.pdb')
             db_dict.update(pdb_info)
@@ -476,7 +478,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         found_refine_mtz=self.find_file('refine.mtz',xtal)
         if found_refine_mtz and not 'dimple' in os.path.realpath('refine.mtz'):
-            db_dict['RefinementMTZ_latest']=os.path.realpath('refine.mtz')
+            db_dict['RefinementMTZ_latest']=os.path.realpath('refine.mtz').replace(os.getcwd()+'/','')
         else:
             db_dict['RefinementMTZ_latest']=''
             os.system('/bin/rm refine.mtz 2> /dev/null')
@@ -508,7 +510,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                     filename=file[file.rfind('/')+1:]
                     if filename.startswith(xtal+'-event_'+event_index) and filename.endswith('map.native.ccp4'):
                         event_map=file
-                        db_pandda_dict['PANDDA_site_event_map']=event_map
+                        db_pandda_dict['PANDDA_site_event_map']=os.path.realpath(event_map).replace(os.getcwd()+'/','')
                         found_event_map=True
                         break
                 if not found_event_map:
@@ -518,14 +520,14 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                 for file in glob.glob(os.path.join(self.initial_model_directory,xtal,'*pdb')):
                     filename=file[file.rfind('/')+1:]
                     if filename.endswith('-ensemble-model.pdb'):
-                        db_pandda_dict['PANDDA_site_initial_model']=file
+                        db_pandda_dict['PANDDA_site_initial_model']=os.path.realpath(file).replace(os.getcwd()+'/','')
                         break
 
                 db_pandda_dict['PANDDA_site_initial_mtz']=''
                 for file in glob.glob(os.path.join(self.initial_model_directory,xtal,'*mtz')):
                     filename=file[file.rfind('/')+1:]
                     if filename.endswith('pandda-input.mtz'):
-                        db_pandda_dict['PANDDA_site_initial_mtz']=file
+                        db_pandda_dict['PANDDA_site_initial_mtz']=os.path.realpath(file).replace(os.getcwd()+'/','')
                         break
 
 
@@ -560,7 +562,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                                 tmp=os.path.realpath(os.path.join(self.initial_model_directory,xtal,'refine.pdb'))
                                 spider_plot=os.path.join(tmp[:tmp.rfind('/')],'residue_plots',residue_name+'-'+residue_chain+'-'+residue_number+'.png')
                                 if os.path.isfile(spider_plot):
-                                    db_pandda_dict['PANDDA_site_spider_plot']=spider_plot
+                                    db_pandda_dict['PANDDA_site_spider_plot']=os.path.realpath(spider_plot).replace(os.getcwd()+'/','')
                             break
 
                 if db_pandda_dict != {}:
