@@ -516,7 +516,6 @@ class data_source:
         existing_samples_in_db=self.get_all_samples_in_data_source_as_list()
         if sampleID in existing_samples_in_db:
             sample_exists=True
-        if sampleID == 'SV3CP-x0209': print sampleID,sample_exists
         return sample_exists
 
     def import_csv_file(self,csv_file):
@@ -651,7 +650,6 @@ class data_source:
                 if not str(value).replace(' ','')=='':  # ignore if nothing in csv field
                     value_string+="'"+str(value)+"'"+','
                     column_string+=key+','
-            print "INSERT INTO mainTable ("+column_string[:-1]+") VALUES ("+value_string[:-1]+");"
             cursor.execute("INSERT INTO mainTable ("+column_string[:-1]+") VALUES ("+value_string[:-1]+");")
         connect.commit()
 

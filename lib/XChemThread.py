@@ -1593,10 +1593,10 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                     if entry[8]:        # the best auto-selected or user selected output
                         db_dict=entry[6]
                         logfile_found=True
-                        if sample == 'SV3CP-x0209': print db_dict['DataProcessingResolutionHigh']
+#                        if sample == 'SV3CP-x0209': print db_dict['DataProcessingResolutionHigh']
                         try:
                             if float(db_dict['DataProcessingResolutionHigh']) <= float(self.acceptable_low_resolution_limit_for_data):
-                                if sample == 'SV3CP-x0209': print 'here'
+#                                if sample == 'SV3CP-x0209': print 'here'
                                 db_dict['DataCollectionOutcome']='success'
                             else:
                                 db_dict['DataCollectionOutcome']='Failed - low resolution'
@@ -1645,7 +1645,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             elif user_changed_selection==False:     # if user changed the selection, then ignore
                 self.data_source.update_insert_data_source(sample,db_dict)
             elif sample not in existing_samples:
-                if sample == 'SV3CP-x0209': print 'hallo'
+#                if sample == 'SV3CP-x0209': print 'hallo'
                 self.data_source.update_insert_data_source(sample,db_dict)
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
