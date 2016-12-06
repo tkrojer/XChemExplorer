@@ -4,6 +4,8 @@ import sys
 import os
 import glob
 
+from PyQt4 import QtGui, QtCore, QtWebKit
+
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 import XChemLog
 import XChemDB
