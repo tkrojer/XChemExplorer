@@ -213,14 +213,23 @@ class helpers:
 
         software=''
         if restraints_program=='acedrg':
-            software='acedrg --res LIG -i "%s" -o %s\n' %(smiles,compoundID.replace(' ',''))
+            if os.path.isfile(os.path.join(initial_model_directory,sample,'old.cif')):
+                software='acedrg --res LIG -c ../old.cif -o %s\n' %(compoundID.replace(' ',''))
+            else:
+                software='acedrg --res LIG -i "%s" -o %s\n' %(smiles,compoundID.replace(' ',''))
         elif restraints_program=='phenix.elbow':
-            software='phenix.elbow --smiles="%s" --id LIG --output %s\n' %(smiles,compoundID.replace(' ',''))
+            if os.path.isfile(os.path.join(initial_model_directory,sample,'old.cif')):
+                software='phenix.elbow --file=../old.cif --id LIG --output %s\n' %(compoundID.replace(' ',''))
+            else:
+                software='phenix.elbow --smiles="%s" --id LIG --output %s\n' %(smiles,compoundID.replace(' ',''))
         elif restraints_program=='grade':
             if os.getcwd().startswith('/dls'):
                 software+='module load buster\n'
             software+="export BDG_TOOL_OBABEL='none'\n"
-            software+='grade -resname LIG -nomogul "%s" -ocif %s.cif -opdb %s.pdb\n' %(smiles,compoundID.replace(' ',''),compoundID.replace(' ',''))
+            if os.path.isfile(os.path.join(initial_model_directory,sample,'old.cif')):
+                software+='grade -resname LIG -nomogul -in ../old.cif -ocif %s.cif -opdb %s.pdb\n' %(compoundID.replace(' ',''),compoundID.replace(' ',''))
+            else:
+                software+='grade -resname LIG -nomogul "%s" -ocif %s.cif -opdb %s.pdb\n' %(smiles,compoundID.replace(' ',''),compoundID.replace(' ',''))
 
         Cmds = (
                     header+
