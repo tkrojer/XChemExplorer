@@ -4555,7 +4555,10 @@ class XChemExplorer(QtGui.QApplication):
 
 #            if not logfile_found:
 #                db_dict={}
-            outcome=str(self.db.get_value_from_field(xtal,'DataCollectionOutcome')[0])
+            try:
+                outcome=str(self.db.get_value_from_field(xtal,'DataCollectionOutcome')[0])
+            except TypeError:
+                print '==> xtal:',xtal
 #            if logfile_found and not too_low_resolution:
 #                outcome="success"
 #            elif logfile_found and too_low_resolution:
