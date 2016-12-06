@@ -499,7 +499,7 @@ def create_data_template_text():
 
     data_template_text=data_template(depositDict,sequence)
 
-def create_Model_mmcif(outDir,pdbList)
+def create_Model_mmcif(outDir,pdbList):
     print 'hallo'
 
 class update_depositTable(QtCore.QThread):
