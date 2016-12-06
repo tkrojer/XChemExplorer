@@ -1574,6 +1574,9 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             progress_step=1
         progress=0
 
+        # get all samples that are currently in DB
+        existing_samples=self.data_source.get_all_samples_in_data_source_as_list()
+
         for sample in sorted(self.data_collection_dict):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'updating data source for '+sample)
             logfile_found=False
@@ -1641,7 +1644,9 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                 self.data_source.update_insert_data_source(sample,db_dict)
             elif user_changed_selection==False:     # if user changed the selection, then ignore
                 self.data_source.update_insert_data_source(sample,db_dict)
-
+            elif sample not in existing_samples:
+                if sample == 'SV3CP-x0209': print 'hallo'
+                self.data_source.update_insert_data_source(sample,db_dict)
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
