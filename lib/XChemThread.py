@@ -1217,7 +1217,7 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
                 # so if we continue refining, then we do so against the correct file
                 # think that REFMAC does not tinker with F,SIGF as long as there is no twinning
                 #if os.path.isfile(sample+'.free.mtz'):
-                os.system('/bin/rm '+sample+'.free.mtz')
+                os.system('/bin/rm '+sample+'.free.mtz 2> /dev/null')
 #                os.symlink(os.path.join(dimple_destination,'final.mtz'),sample+'.free.mtz')
                 os.symlink(os.path.join(relative_dimple_destination,'final.mtz'),sample+'.free.mtz')
                 mtzfree=os.path.join(dimple_destination,'final.mtz')
@@ -1582,6 +1582,8 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             db_dict['DataCollectionOutcome']='Failed - unknown'
             tmpList=[]
             for entry in self.data_collection_dict[sample]:
+                if sample == 'SV3CP-x0209':
+                    print entry
                 if entry[0]=='user_changed_selection':
                     user_changed_selection=True
                 if entry[0]=='logfile':

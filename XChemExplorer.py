@@ -4559,6 +4559,7 @@ class XChemExplorer(QtGui.QApplication):
                 outcome=str(self.db.get_value_from_field(xtal,'DataCollectionOutcome')[0])
             except TypeError:
                 outcome='Failed - unknown'
+                self.update_log.insert('cannot find DataCollectionOutcome for %s' %xtal)
 #                print '==> xtal:',xtal
 #            if logfile_found and not too_low_resolution:
 #                outcome="success"
