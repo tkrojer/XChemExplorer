@@ -1636,7 +1636,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                         entry[6]=db_data_collection_dict
                         self.data_collection_dict[sample][n]=entry
 
-            if sample == 'SV3CP-x0209': print db_dict
+#            if sample == 'SV3CP-x0209': print db_dict
             if self.rescore_only:
                 self.data_source.update_insert_data_source(sample,db_dict)
             elif user_changed_selection==False:     # if user changed the selection, then ignore
