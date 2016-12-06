@@ -530,6 +530,7 @@ class update_depositTable(QtCore.QThread):
 
     def run(self):
 
+
         # need a flag which connects apo structures and bound structures
 
         ready_to_deposit=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%'")
@@ -537,14 +538,14 @@ class update_depositTable(QtCore.QThread):
 
 
         print 'hallo'
-        progress_step=1
-        if len(self.sample_list) != 0:
-            progress_step=100/float(len(self.sample_list))
-        progress=0
-        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-
-            progress += progress_step
-            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-
+#        progress_step=1
+#        if len(self.sample_list) != 0:
+#            progress_step=100/float(len(self.sample_list))
+#        progress=0
+#        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+#
+#            progress += progress_step
+#            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+#
 
 
