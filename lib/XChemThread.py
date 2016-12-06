@@ -1582,16 +1582,18 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             db_dict['DataCollectionOutcome']='Failed - unknown'
             tmpList=[]
             for entry in self.data_collection_dict[sample]:
-                if sample == 'SV3CP-x0209':
-                    print entry
+#                if sample == 'SV3CP-x0209':
+#                    print entry
                 if entry[0]=='user_changed_selection':
                     user_changed_selection=True
                 if entry[0]=='logfile':
                     if entry[8]:        # the best auto-selected or user selected output
                         db_dict=entry[6]
                         logfile_found=True
+                        if sample == 'SV3CP-x0209': print db_dict['DataProcessingResolutionHigh']
                         try:
                             if float(db_dict['DataProcessingResolutionHigh']) <= float(self.acceptable_low_resolution_limit_for_data):
+                                if sample == 'SV3CP-x0209': print 'here'
                                 db_dict['DataCollectionOutcome']='success'
                             else:
                                 db_dict['DataCollectionOutcome']='Failed - low resolution'
