@@ -1,4 +1,4 @@
-# last edited: 01/12/2016 - 17:00
+# last edited: 07/12/2016 - 22:00
 
 import gobject
 import sys
@@ -625,7 +625,9 @@ class GUI(object):
             print '==> XCE: setting Refinement Outcome for '+self.xtalID+' to '+str(data)+' in mainTable of datasource'
             self.db.update_data_source(self.xtalID,self.db_dict_mainTable)
         else:
-            if int(data.split()[0] >=5:
+            placeholder=False
+            if placeholder""
+#            if int(data.split()[0] >=5:
                 for i,button in enumerate(self.experiment_stage_button_list):
                     if i==4:
                         # currently it is not possible to set PanDDA models to deposit, 01/12/2016
