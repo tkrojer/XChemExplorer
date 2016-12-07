@@ -626,7 +626,7 @@ class GUI(object):
             self.db.update_data_source(self.xtalID,self.db_dict_mainTable)
         else:
             placeholder=False
-            if placeholder""
+            if placeholder:
 #            if int(data.split()[0] >=5:
                 for i,button in enumerate(self.experiment_stage_button_list):
                     if i==4:
