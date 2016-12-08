@@ -1482,8 +1482,8 @@ class XChemExplorer(QtGui.QApplication):
                              'Citation',
                              'Molecule',
                              'Misc',
-                             'Methods'
-                            ]
+                             'Methods',
+                             'Software' ]
 
         deposit_tab_dict={}
         for page in deposit_tab_list:
