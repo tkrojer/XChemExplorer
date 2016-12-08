@@ -1,4 +1,4 @@
-# last edited: 06/12/2016, 15:00
+# last edited: 08/12/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -3693,6 +3693,27 @@ class XChemExplorer(QtGui.QApplication):
                 start_thread=False
         else:
             start_thread=True
+
+
+        if start_thread:
+            if self.target=='=== SELECT TARGET ===':
+                msgBox = QtGui.QMessageBox()
+                warning = ( '*** WARNING ***\n'
+                            'You did not select a target!\n'
+                            'In this case we will only parse the project directory!\n'
+                            'Please note that this option is usually only useful in case you reprocessed your data.\n'
+                            'Do you want to continue?'  )
+                msgBox.setText(warning)
+                msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.YesRole)
+                msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.RejectRole)
+                reply = msgBox.exec_();
+                if reply == 0:
+                    start_thread=True
+                else:
+                    start_thread=False
+            else:
+                start_thread=True
+
         if start_thread:
             self.work_thread=XChemThread.read_autoprocessing_results_from_disc(self.visit_list,
                                                                                 self.target,
