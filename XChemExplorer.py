@@ -3651,8 +3651,8 @@ class XChemExplorer(QtGui.QApplication):
             db_dict=self.xtal_db_dict[xtal]
             pg_xtal=db_dict['DataProcessingPointGroup']
             ucVol_xtal=db_dict['DataProcessingUnitCellVolume']
-            print xtal,pg_xtal,ucVol_xtal
-
+            if pg_xtal==pg_ref and ucVol_xtal==ucVol_ref:
+                print xtal,pg_xtal,ucVol_xtal
             reference_file=self.find_suitable_reference_file(db_dict)
             smallest_uc_difference=min(reference_file,key=lambda x: x[1])
             if smallest_uc_difference[0][0]=='...':
