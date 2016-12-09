@@ -311,7 +311,11 @@ def change_links_to_selected_data_collection_outcome(sample,data_collection_dict
                 mtz_filename=db_dict['DataProcessingMTZfileName']
                 log_filename=db_dict['DataProcessingLOGfileName']
                 relative_path_to_mtzfile='./'+path_to_mtzfile.replace(initial_model_directory,'')
+                if relative_path_to_mtzfile.startswith('.//'):
+                    relative_path_to_mtzfile=relative_path_to_mtzfile.replace('.//','./')
                 relative_path_to_logfile='./'+path_to_logfile.replace(initial_model_directory,'')
+                if relative_path_to_logfile.startswith('.//'):
+                    relative_path_to_logfile=relative_path_to_logfile.replace('.//','./')
 
 
                 # first check if folders and files exist
