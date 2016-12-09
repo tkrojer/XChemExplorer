@@ -3652,6 +3652,7 @@ class XChemExplorer(QtGui.QApplication):
             pg_xtal=db_dict['DataProcessingPointGroup']
             ucVol_xtal=db_dict['DataProcessingUnitCellVolume']
             difference=math.fabs(1-(float(ucVol_xtal)/float(ucVol_ref)))*100
+            print xtal,difference
             if pg_xtal==pg_ref and difference < self.allowed_unitcell_difference_percent:
                 print xtal,pg_xtal,ucVol_xtal
 
