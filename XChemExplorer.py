@@ -3645,7 +3645,7 @@ class XChemExplorer(QtGui.QApplication):
                 pg_ref=reference[5]
                 ucVol_ref=reference[4]
                 break
-        if ucVol_ref=0.0:
+        if ucVol_ref==0.0:
             self.update_log.insert('cannot set reference file since unit cell volume of reference pdb is 0!')
             return
 
