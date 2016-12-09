@@ -3640,6 +3640,7 @@ class XChemExplorer(QtGui.QApplication):
         pg_ref=''
         ucVol_ref=0.0
         for reference in self.reference_file_list:
+            print reference,reference_root
             if reference==reference_root:
                 pg_ref=reference[5]
                 ucVol_ref=reference[4]
