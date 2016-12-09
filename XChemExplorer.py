@@ -3648,6 +3648,7 @@ class XChemExplorer(QtGui.QApplication):
         print reference_root,pg_ref,ucVol_ref
 
         for xtal in self.initial_model_dimple_dict:
+            reference_file_selection_combobox=self.initial_model_dimple_dict[xtal][1]
             db_dict=self.xtal_db_dict[xtal]
             pg_xtal=db_dict['DataProcessingPointGroup']
             ucVol_xtal=db_dict['DataProcessingUnitCellVolume']
@@ -3655,19 +3656,19 @@ class XChemExplorer(QtGui.QApplication):
 #           print xtal,difference,self.allowed_unitcell_difference_percent
             if pg_xtal==pg_ref and difference < self.allowed_unitcell_difference_percent:
                 print xtal,pg_xtal,ucVol_xtal
-
-
-
-            reference_file=self.find_suitable_reference_file(db_dict)
-            smallest_uc_difference=min(reference_file,key=lambda x: x[1])
-            if smallest_uc_difference[0][0]=='...':
-                continue
-            reference_file_selection_combobox=self.initial_model_dimple_dict[xtal][1]
-            if float(smallest_uc_difference[1]) < self.allowed_unitcell_difference_percent:
-                index = reference_file_selection_combobox.findText(str(smallest_uc_difference[0][0]), QtCore.Qt.MatchFixedString)
+                index = reference_file_selection_combobox.findText(reference_root, QtCore.Qt.MatchFixedString)
                 reference_file_selection_combobox.setCurrentIndex(index)
-            else:
-                reference_file_selection_combobox.setCurrentIndex(0)
+
+#            reference_file=self.find_suitable_reference_file(db_dict)
+#            smallest_uc_difference=min(reference_file,key=lambda x: x[1])
+#            if smallest_uc_difference[0][0]=='...':
+#                continue
+#            reference_file_selection_combobox=self.initial_model_dimple_dict[xtal][1]
+#            if float(smallest_uc_difference[1]) < self.allowed_unitcell_difference_percent:
+#                index = reference_file_selection_combobox.findText(str(smallest_uc_difference[0][0]), QtCore.Qt.MatchFixedString)
+#                reference_file_selection_combobox.setCurrentIndex(index)
+#            else:
+#                reference_file_selection_combobox.setCurrentIndex(0)
 
     def check_status_create_png_of_soaked_compound(self):
         number_of_samples=0
