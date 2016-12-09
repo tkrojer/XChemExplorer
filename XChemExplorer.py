@@ -4899,7 +4899,7 @@ class XChemExplorer(QtGui.QApplication):
                                     cell_text.setText(str( db_dict_current[ header[1] ]  ))
                                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                                     self.data_collection_summary_table.setItem(row, column, cell_text)
-                                except ValueError:
+                                except KeyError:
                                     pass
 
 
