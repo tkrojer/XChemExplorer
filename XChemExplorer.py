@@ -1,4 +1,4 @@
-# last edited: 08/12/2016, 15:00
+# last edited: 09/12/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -3658,6 +3658,7 @@ class XChemExplorer(QtGui.QApplication):
                 print xtal,pg_xtal,ucVol_xtal
                 index = reference_file_selection_combobox.findText(reference_root, QtCore.Qt.MatchFixedString)
                 reference_file_selection_combobox.setCurrentIndex(index)
+                self.update_log.insert(xtal+': setting '+reference_root+' as input PDB file for DIMPLE')
 
 #            reference_file=self.find_suitable_reference_file(db_dict)
 #            smallest_uc_difference=min(reference_file,key=lambda x: x[1])
