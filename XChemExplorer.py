@@ -3645,31 +3645,28 @@ class XChemExplorer(QtGui.QApplication):
                 pg_ref=reference[5]
                 ucVol_ref=reference[4]
                 break
-        print reference_root,pg_ref,ucVol_ref
+        if ucVol_ref=0.0:
+            self.update_log.insert('cannot set reference file since unit cell volume of reference pdb is 0!')
+            return
 
         for xtal in self.initial_model_dimple_dict:
             reference_file_selection_combobox=self.initial_model_dimple_dict[xtal][1]
             db_dict=self.xtal_db_dict[xtal]
             pg_xtal=db_dict['DataProcessingPointGroup']
             ucVol_xtal=db_dict['DataProcessingUnitCellVolume']
-            difference=math.fabs(1-(float(ucVol_xtal)/float(ucVol_ref)))*100
-#           print xtal,difference,self.allowed_unitcell_difference_percent
+
+            try:
+                difference=math.fabs(1-(float(ucVol_xtal)/float(ucVol_ref)))*100
+            except ValueError:
+                self.update_log.insert(xtal+' -> cannot calculate unit cell volume difference')
+                continue
+
             if pg_xtal==pg_ref and difference < self.allowed_unitcell_difference_percent:
                 print xtal,pg_xtal,ucVol_xtal
                 index = reference_file_selection_combobox.findText(reference_root, QtCore.Qt.MatchFixedString)
                 reference_file_selection_combobox.setCurrentIndex(index)
-                self.update_log.insert(xtal+': setting '+reference_root+' as input PDB file for DIMPLE')
+                self.update_log.insert(xtal+' -> setting '+reference_root+' as input PDB file for DIMPLE')
 
-#            reference_file=self.find_suitable_reference_file(db_dict)
-#            smallest_uc_difference=min(reference_file,key=lambda x: x[1])
-#            if smallest_uc_difference[0][0]=='...':
-#                continue
-#            reference_file_selection_combobox=self.initial_model_dimple_dict[xtal][1]
-#            if float(smallest_uc_difference[1]) < self.allowed_unitcell_difference_percent:
-#                index = reference_file_selection_combobox.findText(str(smallest_uc_difference[0][0]), QtCore.Qt.MatchFixedString)
-#                reference_file_selection_combobox.setCurrentIndex(index)
-#            else:
-#                reference_file_selection_combobox.setCurrentIndex(0)
 
     def check_status_create_png_of_soaked_compound(self):
         number_of_samples=0
