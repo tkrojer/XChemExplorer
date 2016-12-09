@@ -3649,6 +3649,9 @@ class XChemExplorer(QtGui.QApplication):
 
         for xtal in self.initial_model_dimple_dict:
             db_dict=self.xtal_db_dict[xtal]
+            pg_xtal=db_dict['DataProcessingPointGroup']
+            ucVol_xtal=db_dict['DataProcessingUnitCellVolume']
+            print xtal,pg_xtal,ucVol_xtal
 
             reference_file=self.find_suitable_reference_file(db_dict)
             smallest_uc_difference=min(reference_file,key=lambda x: x[1])
