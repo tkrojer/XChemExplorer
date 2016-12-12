@@ -2929,13 +2929,17 @@ class XChemExplorer(QtGui.QApplication):
                 db_dict=self.xtal_db_dict[xtal]
                 print 'x',os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])
                 print 'y',os.path.join(db_dict['DataProcessingPathToMTZfile'])
-                if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])) or \
-                    os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
+                print 'z',os.path.join(db_dict['ProjectDirectory'],xtal,db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])
+                if os.path.isfile(os.path.join(db_dict['ProjectDirectory'],xtal,db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])) or \
+                   os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])) or \
+                   os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
                     print 'one'
                     if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])):
                         mtzin=os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])
                     elif os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
                         mtzin=os.path.join(db_dict['DataProcessingPathToMTZfile'])
+                    elif os.path.isfile(os.path.join(db_dict['ProjectDirectory'],xtal,db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])):
+                        mtzin=os.path.join(db_dict['ProjectDirectory'],xtal,db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])
                     print 'mtzin',mtzin
 
                     reference_file=str(self.initial_model_dimple_dict[xtal][1].currentText())
