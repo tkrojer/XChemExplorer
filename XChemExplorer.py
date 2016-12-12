@@ -2924,6 +2924,7 @@ class XChemExplorer(QtGui.QApplication):
     def run_dimple_on_selected_autoprocessing_file(self):
         job_list=[]
         for xtal in sorted(self.initial_model_dimple_dict):
+            print 'here',xtal
             if self.initial_model_dimple_dict[xtal][0].isChecked():
                 db_dict=self.xtal_db_dict[xtal]
                 if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])) or \
