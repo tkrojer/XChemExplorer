@@ -2927,6 +2927,8 @@ class XChemExplorer(QtGui.QApplication):
             if self.initial_model_dimple_dict[xtal][0].isChecked():
                 print 'here',xtal
                 db_dict=self.xtal_db_dict[xtal]
+                print 'x',os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])
+                print 'y',os.path.join(db_dict['DataProcessingPathToMTZfile'])
                 if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])) or \
                     os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
                     print 'one'
