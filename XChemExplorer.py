@@ -2929,12 +2929,12 @@ class XChemExplorer(QtGui.QApplication):
                 db_dict=self.xtal_db_dict[xtal]
                 if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])) or \
                     os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
-
+                    print 'one'
                     if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])):
                         mtzin=os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])
                     elif os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
                         mtzin=os.path.join(db_dict['DataProcessingPathToMTZfile'])
-
+                    print 'mtzin',mtzin
 
                     reference_file=str(self.initial_model_dimple_dict[xtal][1].currentText())
 
