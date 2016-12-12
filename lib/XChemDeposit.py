@@ -1,4 +1,4 @@
-# last edited: 06/12/2016, 15:00
+# last edited: 12/12/2016, 15:00
 
 import sys
 import os
@@ -477,6 +477,123 @@ def data_template(depositDict):
 
     return data_template_text
 
+def data_template_cif(depositDict):
+
+    data_template_cif = (
+'''
+data_UNNAMED
+#
+_pdbx_database_status.entry_id                       UNNAMED
+_pdbx_database_status.dep_release_code_coordinates   'HOLD FOR PUBLICATION'
+_pdbx_database_status.dep_release_code_sequence      'HOLD FOR RELEASE'
+#
+_exptl_crystal_grow.crystal_id      1
+_exptl_crystal_grow.method          'VAPOR DIFFUSION, SITTING DROP'
+_exptl_crystal_grow.pH              6.5
+_exptl_crystal_grow.temp            277
+_exptl_crystal_grow.pdbx_details    "28 % PEG 2000 MMe, 100mM BisTris"
+#
+_diffrn.id                     1
+_diffrn.ambient_temp           100
+_diffrn.crystal_id             1
+#
+_diffrn_source.diffrn_id                       1
+_diffrn_source.source                          SYNCHROTRON
+_diffrn_source.type                            "APS BEAMLINE 17-ID"
+_diffrn_source.pdbx_wavelength_list            1.0
+#
+_diffrn_detector.detector               PIXEL
+_diffrn_detector.type                   'DECTRIS PILATUS 6M'
+_diffrn_detector.pdbx_collection_date   2013-11-13
+_diffrn_detector.diffrn_id              1
+#
+_diffrn_radiation.diffrn_id                        1
+_diffrn_radiation.wavelength_id                    1
+_diffrn_radiation.pdbx_diffrn_protocol             'SINGLE WAVELENGTH'
+#
+_diffrn_radiation_wavelength.id           1
+_diffrn_radiation_wavelength.wavelength   1.0
+#
+#
+loop_
+_entity.id
+_entity.type
+_entity.src_method
+_entity.pdbx_description
+1 polymer     man "NUDT22"
+#
+loop_
+_entity_poly.entity_id
+_entity_poly.type
+_entity_poly.pdbx_seq_one_letter_code
+_entity_poly.pdbx_strand_id
+_entity_poly.pdbx_seq_db_id
+_entity_poly.pdbx_seq_db_name
+1 "polypeptide(L)"
+;MDPEVTLLLQCPGGGLPQEQIQAELSPAHDRRPLPGGDEAITAIWETRLKAQPWLFDAPK
+FRLHSATLAPIGSRGPQLLLRLGLTSYRDFLGTNWSSSAAWLRQQGATDWGDTQAYLADP
+LGVGAALATADDFLVFLRRSRQVAEAPGLVDVPGGHPEPQALCPGGSPQHQDLAGQLVVH
+ELFSSVLQEICDEVNLPLLTLSQPLLLGIARNETSAGRASAEFYVQCSLTSEQVRKHYLS
+GGPEAHESTGIFFVETQNVQRLLETEMWAELCPSAKGAIILYNRVQGSPTGAALGSPALL
+PPL
+;
+A Q9BRQ3 UNP
+#
+loop_
+_entity_src_gen.entity_id
+_entity_src_gen.gene_src_strain
+_entity_src_gen.pdbx_gene_src_scientific_name
+_entity_src_gen.pdbx_gene_src_ncbi_taxonomy_id
+_entity_src_gen.pdbx_host_org_scientific_name
+_entity_src_gen.pdbx_host_org_ncbi_taxonomy_id
+1 ? "Homo sapiens" 9606  "Escherichia coli" 562
+#
+#
+_pdbx_contact_author.id                  1
+_pdbx_contact_author.address_1           '1 speedway rd'
+_pdbx_contact_author.address_2           "XXX Institute/Company"
+_pdbx_contact_author.city                piscataway
+_pdbx_contact_author.state_province      'new jersey'
+_pdbx_contact_author.postal_code         08854
+_pdbx_contact_author.email               john.doe@comercial.com
+_pdbx_contact_author.name_first          John
+_pdbx_contact_author.name_last           Doe
+_pdbx_contact_author.country             "United States"
+_pdbx_contact_author.phone               5551112222
+_pdbx_contact_author.role                "principal investigator/group leader"
+_pdbx_contact_author.organization_type   commercial
+#
+loop_
+_audit_author.name
+'Krojer, T.'
+'Von Delft, F.'
+#
+_citation.id                        primary
+_citation.title                     "your citation title"
+_citation.journal_abbrev            "To Be Published"
+#
+loop_
+_citation_author.citation_id
+_citation_author.name
+primary 'Krojer, T.'
+primary 'Von Delft, F.'
+#
+_struct.entry_id                     UNNAMED
+_struct.title
+;Your entry title
+;
+#
+_struct_keywords.entry_id        UNNAMED
+_struct_keywords.text            "your keyword"
+#
+_pdbx_struct_assembly_depositor_info.id                   1
+_pdbx_struct_assembly_depositor_info.method_details       'gel filtration'
+_pdbx_struct_assembly_depositor_info.oligomeric_count     3
+#
+#
+    '''
+    )
+
 def create_SF_mmcif(outDir,mtzList):
     print 'hallo'
 
@@ -551,3 +668,6 @@ class update_depositTable(QtCore.QThread):
 #
 
 
+    '''pdb_extract -r REFMAC -iLOG initial.log -iPDB initial.pdb -e MR -s AIMLESS -iLOG aimless.log -iENT data_template.cif -o NUDT22A-x0315-model.cif'''
+
+    '''./sf_convert -o mmcif -sf initial.mtz data.mtz -out NUDT22A-x0315-sf.cif'''

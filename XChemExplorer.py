@@ -1,4 +1,4 @@
-# last edited: 09/12/2016, 15:00
+# last edited: 12/12/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -2925,18 +2925,15 @@ class XChemExplorer(QtGui.QApplication):
         job_list=[]
         for xtal in sorted(self.initial_model_dimple_dict):
             if self.initial_model_dimple_dict[xtal][0].isChecked():
-                print 'here',xtal
                 db_dict=self.xtal_db_dict[xtal]
-                print 'x',os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])
-                print 'y',os.path.join(db_dict['DataProcessingPathToMTZfile'])
-                print 'z',os.path.join(db_dict['ProjectDirectory'],xtal,db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])
-                print 'u',os.path.join(db_dict['ProjectDirectory'],xtal,db_dict['DataProcessingPathToMTZfile'])
+
+                # the if statement below is so convoluted, so that it is compatible with older data source files
 
                 if os.path.isfile(os.path.join(db_dict['ProjectDirectory'],xtal,db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])) or \
                    os.path.isfile(os.path.join(db_dict['ProjectDirectory'],xtal,db_dict['DataProcessingPathToMTZfile'])) or \
                    os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])) or \
                    os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
-                    print 'one'
+
                     if os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])):
                         mtzin=os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])
                     elif os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
@@ -2945,7 +2942,7 @@ class XChemExplorer(QtGui.QApplication):
                         mtzin=os.path.join(db_dict['ProjectDirectory'],xtal,db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])
                     elif os.path.isfile(os.path.join(db_dict['ProjectDirectory'],xtal,db_dict['DataProcessingPathToMTZfile'])):
                         mtzin=os.path.join(db_dict['ProjectDirectory'],xtal,db_dict['DataProcessingPathToMTZfile'])
-                    print 'mtzin',mtzin
+
 
                     reference_file=str(self.initial_model_dimple_dict[xtal][1].currentText())
 

@@ -362,6 +362,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
             dimple_path=dimple_mtz[:dimple_mtz.rfind('/')]
         else:
             db_dict['DimplePathToMTZ']=''
+            db_dict['DimpleStatus']='pending'
 
         if os.path.isfile(os.path.join(dimple_path,'dimple','dimple_rerun_on_selected_file','dimple_run_in_progress')):
             db_dict['DimpleStatus']='running'

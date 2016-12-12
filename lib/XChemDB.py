@@ -1,4 +1,4 @@
-# last edited: 09/12/2016, 15:00
+# last edited: 12/12/2016, 15:00
 
 import sqlite3
 import os,sys
@@ -305,6 +305,8 @@ class data_source:
             ['structure_keywords',                          'structure_keywords',                       'TEXT'],
             ['biological_assembly_chain_number',            'biological_assembly_chain_number',         'TEXT'],
 
+
+            ['crystallization_id',                          'crystallization_id',                       'TEXT'],
             ['crystallization_method',                      'crystallization_method',                   'TEXT'],
             ['crystallization_pH',                          'crystallization_pH',                       'TEXT'],
             ['crystallization_temperature',                 'crystallization_temperature',              'TEXT'],
