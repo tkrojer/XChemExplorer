@@ -1,4 +1,4 @@
-# last edited: 12/12/2016, 15:00
+# last edited: 13/12/2016, 15:00
 
 import sys
 import os
@@ -480,119 +480,117 @@ def data_template(depositDict):
 def data_template_cif(depositDict):
 
     data_template_cif = (
-'''
-data_UNNAMED
-#
-_pdbx_database_status.entry_id                       UNNAMED
-_pdbx_database_status.dep_release_code_coordinates   'HOLD FOR PUBLICATION'
-_pdbx_database_status.dep_release_code_sequence      'HOLD FOR RELEASE'
-#
-_exptl_crystal_grow.crystal_id      1
-_exptl_crystal_grow.method          'VAPOR DIFFUSION, SITTING DROP'
-_exptl_crystal_grow.pH              6.5
-_exptl_crystal_grow.temp            277
-_exptl_crystal_grow.pdbx_details    "28 % PEG 2000 MMe, 100mM BisTris"
-#
-_diffrn.id                     1
-_diffrn.ambient_temp           100
-_diffrn.crystal_id             1
-#
-_diffrn_source.diffrn_id                       1
-_diffrn_source.source                          SYNCHROTRON
-_diffrn_source.type                            "APS BEAMLINE 17-ID"
-_diffrn_source.pdbx_wavelength_list            1.0
-#
-_diffrn_detector.detector               PIXEL
-_diffrn_detector.type                   'DECTRIS PILATUS 6M'
-_diffrn_detector.pdbx_collection_date   2013-11-13
-_diffrn_detector.diffrn_id              1
-#
-_diffrn_radiation.diffrn_id                        1
-_diffrn_radiation.wavelength_id                    1
-_diffrn_radiation.pdbx_diffrn_protocol             'SINGLE WAVELENGTH'
-#
-_diffrn_radiation_wavelength.id           1
-_diffrn_radiation_wavelength.wavelength   1.0
-#
-#
-loop_
-_entity.id
-_entity.type
-_entity.src_method
-_entity.pdbx_description
-1 polymer     man "NUDT22"
-#
-loop_
-_entity_poly.entity_id
-_entity_poly.type
-_entity_poly.pdbx_seq_one_letter_code
-_entity_poly.pdbx_strand_id
-_entity_poly.pdbx_seq_db_id
-_entity_poly.pdbx_seq_db_name
-1 "polypeptide(L)"
-;MDPEVTLLLQCPGGGLPQEQIQAELSPAHDRRPLPGGDEAITAIWETRLKAQPWLFDAPK
-FRLHSATLAPIGSRGPQLLLRLGLTSYRDFLGTNWSSSAAWLRQQGATDWGDTQAYLADP
-LGVGAALATADDFLVFLRRSRQVAEAPGLVDVPGGHPEPQALCPGGSPQHQDLAGQLVVH
-ELFSSVLQEICDEVNLPLLTLSQPLLLGIARNETSAGRASAEFYVQCSLTSEQVRKHYLS
-GGPEAHESTGIFFVETQNVQRLLETEMWAELCPSAKGAIILYNRVQGSPTGAALGSPALL
-PPL
-;
-A Q9BRQ3 UNP
-#
-loop_
-_entity_src_gen.entity_id
-_entity_src_gen.gene_src_strain
-_entity_src_gen.pdbx_gene_src_scientific_name
-_entity_src_gen.pdbx_gene_src_ncbi_taxonomy_id
-_entity_src_gen.pdbx_host_org_scientific_name
-_entity_src_gen.pdbx_host_org_ncbi_taxonomy_id
-1 ? "Homo sapiens" 9606  "Escherichia coli" 562
-#
-#
-_pdbx_contact_author.id                  1
-_pdbx_contact_author.address_1           '1 speedway rd'
-_pdbx_contact_author.address_2           "XXX Institute/Company"
-_pdbx_contact_author.city                piscataway
-_pdbx_contact_author.state_province      'new jersey'
-_pdbx_contact_author.postal_code         08854
-_pdbx_contact_author.email               john.doe@comercial.com
-_pdbx_contact_author.name_first          John
-_pdbx_contact_author.name_last           Doe
-_pdbx_contact_author.country             "United States"
-_pdbx_contact_author.phone               5551112222
-_pdbx_contact_author.role                "principal investigator/group leader"
-_pdbx_contact_author.organization_type   commercial
-#
-loop_
-_audit_author.name
-'Krojer, T.'
-'Von Delft, F.'
-#
-_citation.id                        primary
-_citation.title                     "your citation title"
-_citation.journal_abbrev            "To Be Published"
-#
-loop_
-_citation_author.citation_id
-_citation_author.name
-primary 'Krojer, T.'
-primary 'Von Delft, F.'
-#
-_struct.entry_id                     UNNAMED
-_struct.title
-;Your entry title
-;
-#
-_struct_keywords.entry_id        UNNAMED
-_struct_keywords.text            "your keyword"
-#
-_pdbx_struct_assembly_depositor_info.id                   1
-_pdbx_struct_assembly_depositor_info.method_details       'gel filtration'
-_pdbx_struct_assembly_depositor_info.oligomeric_count     3
-#
-#
-    '''
-    )
+        'data_UNNAMED\n'
+        '#\n'
+        '_pdbx_database_status.entry_id                       UNNAMED\n'
+        "_pdbx_database_status.dep_release_code_coordinates   'HOLD FOR PUBLICATION'\n"
+        "_pdbx_database_status.dep_release_code_sequence      'HOLD FOR RELEASE'\n"
+        '#\n'
+        '_exptl_crystal_grow.crystal_id      1\n'
+        "_exptl_crystal_grow.method          'VAPOR DIFFUSION, SITTING DROP'\n"
+        '_exptl_crystal_grow.pH              6.5\n'
+        '_exptl_crystal_grow.temp            277\n'
+        '_exptl_crystal_grow.pdbx_details    "28 % PEG 2000 MMe, 100mM BisTris"\n'
+        '#\n'
+        '_diffrn.id                     1\n'
+        '_diffrn.ambient_temp           100\n'
+        '_diffrn.crystal_id             1\n'
+        '#\n'
+        '_diffrn_source.diffrn_id                       1\n'
+        '_diffrn_source.source                          SYNCHROTRON\n'
+        '_diffrn_source.type                            "APS BEAMLINE 17-ID"\n'
+        '_diffrn_source.pdbx_wavelength_list            1.0\n'
+        '#\n'
+        '_diffrn_detector.detector               PIXEL\n'
+        "_diffrn_detector.type                   'DECTRIS PILATUS 6M'\n"
+        '_diffrn_detector.pdbx_collection_date   2013-11-13\n'
+        '_diffrn_detector.diffrn_id              1\n'
+        '#\n'
+        '_diffrn_radiation.diffrn_id                        1\n'
+        '_diffrn_radiation.wavelength_id                    1\n'
+        "_diffrn_radiation.pdbx_diffrn_protocol             'SINGLE WAVELENGTH'\n"
+        '#\n'
+        '_diffrn_radiation_wavelength.id           1\n'
+        '_diffrn_radiation_wavelength.wavelength   1.0\n'
+        '#\n'
+        '#\n'
+        'loop_\n'
+        '_entity.id\n'
+        '_entity.type\n'
+        '_entity.src_method\n'
+        '_entity.pdbx_description\n'
+        '1 polymer     man "NUDT22"\n'
+        '#\n'
+        'loop_\n'
+        '_entity_poly.entity_id\n'
+        '_entity_poly.type\n'
+        '_entity_poly.pdbx_seq_one_letter_code\n'
+        '_entity_poly.pdbx_strand_id\n'
+        '_entity_poly.pdbx_seq_db_id\n'
+        '_entity_poly.pdbx_seq_db_name\n'
+        '1 "polypeptide(L)"\n'
+        ';MDPEVTLLLQCPGGGLPQEQIQAELSPAHDRRPLPGGDEAITAIWETRLKAQPWLFDAPK\n'
+        'FRLHSATLAPIGSRGPQLLLRLGLTSYRDFLGTNWSSSAAWLRQQGATDWGDTQAYLADP\n'
+        'LGVGAALATADDFLVFLRRSRQVAEAPGLVDVPGGHPEPQALCPGGSPQHQDLAGQLVVH\n'
+        'ELFSSVLQEICDEVNLPLLTLSQPLLLGIARNETSAGRASAEFYVQCSLTSEQVRKHYLS\n'
+        'GGPEAHESTGIFFVETQNVQRLLETEMWAELCPSAKGAIILYNRVQGSPTGAALGSPALL\n'
+        'PPL\n'
+        ';\n'
+        'A Q9BRQ3 UNP\n'
+        '#\n'
+        'loop_\n'
+        '_entity_src_gen.entity_id\n'
+        '_entity_src_gen.gene_src_strain\n'
+        '_entity_src_gen.pdbx_gene_src_scientific_name\n'
+        '_entity_src_gen.pdbx_gene_src_ncbi_taxonomy_id\n'
+        '_entity_src_gen.pdbx_host_org_scientific_name\n'
+        '_entity_src_gen.pdbx_host_org_ncbi_taxonomy_id\n'
+        '1 ? "Homo sapiens" 9606  "Escherichia coli" 562\n'
+        '#\n'
+        '#\n'
+        '_pdbx_contact_author.id                  1\n'
+        "_pdbx_contact_author.address_1           '1 speedway rd'\n"
+        '_pdbx_contact_author.address_2           "XXX Institute/Company"\n'
+        '_pdbx_contact_author.city                piscataway\n'
+        "_pdbx_contact_author.state_province      'new jersey'\n"
+        '_pdbx_contact_author.postal_code         08854\n'
+        '_pdbx_contact_author.email               john.doe@comercial.com\n'
+        '_pdbx_contact_author.name_first          John\n'
+        '_pdbx_contact_author.name_last           Doe\n'
+        '_pdbx_contact_author.country             "United States"\n'
+        '_pdbx_contact_author.phone               5551112222\n'
+        '_pdbx_contact_author.role                "principal investigator/group leader"\n'
+        '_pdbx_contact_author.organization_type   commercial\n'
+        '#\n'
+        'loop_\n'
+        '_audit_author.name\n'
+        "'Krojer, T.'\n"
+        "'Von Delft, F.'\n"
+        '#\n'
+        '_citation.id                        primary\n'
+        '_citation.title                     "your citation title"\n'
+        '_citation.journal_abbrev            "To Be Published"\n'
+        '#\n'
+        'loop_\n'
+        '_citation_author.citation_id\n'
+        '_citation_author.name\n'
+        "primary 'Krojer, T.'\n"
+        "primary 'Von Delft, F.'\n"
+        '#\n'
+        '_struct.entry_id                     UNNAMED\n'
+        '_struct.title\n'
+        ';Your entry title\n'
+        ';\n'
+        '#\n'
+        '_struct_keywords.entry_id        UNNAMED\n'
+        '_struct_keywords.text            "your keyword"\n'
+        '#\n'
+        '_pdbx_struct_assembly_depositor_info.id                   1\n'
+        "_pdbx_struct_assembly_depositor_info.method_details       'gel filtration'\n"
+        '_pdbx_struct_assembly_depositor_info.oligomeric_count     3\n'
+        '#\n'
+        '#\n'
+        )
 
 def create_SF_mmcif(outDir,mtzList):
     print 'hallo'
@@ -621,53 +619,90 @@ def create_data_template_text():
 def create_Model_mmcif(outDir,pdbList):
     print 'hallo'
 
-class update_depositTable(QtCore.QThread):
-    def __init__(self,deposit_dict,database,xce_logfile):
-        QtCore.QThread.__init__(self)
-        self.deposit_dict=deposit_dict
-        self.database=database
-        self.Logfile=XChemLog.updateLog(xce_logfile)
+def find_apo_structures():
+    print 'hallo'
+
+
+#class update_depositTable(QtCore.QThread):
+#    def __init__(self,deposit_dict,database,xce_logfile):
+#        QtCore.QThread.__init__(self)
+#        self.deposit_dict=deposit_dict
+#        self.database=database
+#        self.Logfile=XChemLog.updateLog(xce_logfile)
+#        self.db=XChemDB.data_source(database)
+#        self.header,self.data=self.db.load_samples_from_data_source()
+#        self.xtal_db_dict={}
+#        self.update_xtal_db_dict()
+#
+#    def update_xtal_db_dict(self):
+#        sampleID_column=0
+#        for n,entry in enumerate(self.header):
+#            if entry=='CrystalName':
+#                sampleID_column=n
+#                break
+#        for line in self.data:
+#            if str(line[sampleID_column]) != '':
+#                db_dict={}
+#                for n,entry in enumerate(line):
+#                    if n != sampleID_column:
+#                        db_dict[str(self.header[n])]=str(entry)
+#                self.xtal_db_dict[str(line[sampleID_column])]=db_dict
+#        self.Logfile.insert('read all samples in mainTable')
+#
+#    def run(self):
+#
+#
+#        # need a flag which connects apo structures and bound structures
+#
+#        ready_to_deposit=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%'")
+#
+#
+#
+#        print 'hallo'
+##        progress_step=1
+##        if len(self.sample_list) != 0:
+##            progress_step=100/float(len(self.sample_list))
+##        progress=0
+##        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+##
+##            progress += progress_step
+##            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+##
+#
+#
+#    '''pdb_extract -r REFMAC -iLOG initial.log -iPDB initial.pdb -e MR -s AIMLESS -iLOG aimless.log -iENT data_template.cif -o NUDT22A-x0315-model.cif'''
+#
+#    '''./sf_convert -o mmcif -sf initial.mtz data.mtz -out NUDT22A-x0315-sf.cif'''
+
+class update_deposition_table:
+
+    def __init__(self,database):
         self.db=XChemDB.data_source(database)
-        self.header,self.data=self.db.load_samples_from_data_source()
-        self.xtal_db_dict={}
-        self.update_xtal_db_dict()
 
-    def update_xtal_db_dict(self):
-        sampleID_column=0
-        for n,entry in enumerate(self.header):
-            if entry=='CrystalName':
-                sampleID_column=n
-                break
-        for line in self.data:
-            if str(line[sampleID_column]) != '':
-                db_dict={}
-                for n,entry in enumerate(line):
-                    if n != sampleID_column:
-                        db_dict[str(self.header[n])]=str(entry)
-                self.xtal_db_dict[str(line[sampleID_column])]=db_dict
-        self.Logfile.insert('read all samples in mainTable')
+    def PanDDA_models_to_deposit(self):
+        panddaModels=self.db.execute_statement('select CrystalName,PANDDA_site_index,RefinementOutcome,PANDDA_site_ligand_placed,PANDDA_site_name from panddaTable')
+        toDeposit={}
+        mismatch={}
 
-    def run(self):
+        for item in panddaModels:
+            xtalID=str(item[0])
+            site_index=str(item[1])
+            RefinementStage=str(item[2])
+            ligand_placed=str(item[3])
+            siteName=str(item[4])
+            if ligand_placed.replace(' ','').lower()=='true':
+                if xtalID in toDeposit:
+                    if not RefinementStage.startswith('3'):
+                        if xtalID not in mismatch:
+                            mismatch[xtalID]=[]
+                        mismatch[xtalID].append([xtalID,site_index])
+                        continue
 
+                if RefinementStage.startswith('3'):
+                    if xtalID not in toDeposit:
+                        toDeposit[xtalID]=[]
+                    toDeposit[xtalID].append([xtalID,site_index,siteName,RefinementStage])
 
-        # need a flag which connects apo structures and bound structures
-
-        ready_to_deposit=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%'")
-
-
-
-        print 'hallo'
-#        progress_step=1
-#        if len(self.sample_list) != 0:
-#            progress_step=100/float(len(self.sample_list))
-#        progress=0
-#        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-#
-#            progress += progress_step
-#            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-#
+        return toDeposit,mismatch
 
 
-    '''pdb_extract -r REFMAC -iLOG initial.log -iPDB initial.pdb -e MR -s AIMLESS -iLOG aimless.log -iENT data_template.cif -o NUDT22A-x0315-model.cif'''
-
-    '''./sf_convert -o mmcif -sf initial.mtz data.mtz -out NUDT22A-x0315-sf.cif'''

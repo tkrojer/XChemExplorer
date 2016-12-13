@@ -1,4 +1,4 @@
-# last edited: 12/12/2016, 15:00
+# last edited: 13/12/2016, 15:00
 
 import sqlite3
 import os,sys
@@ -704,6 +704,57 @@ class data_source:
         connect.commit()
 
 
+    def update_insert_depositTable(self,sampleID,data_dict):
+        data_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
+        data_dict['LastUpdated_by']=getpass.getuser()
+        connect=sqlite3.connect(self.data_source_file)
+        cursor = connect.cursor()
+        available_columns=[]
+        cursor.execute("SELECT * FROM depositTable")
+        for column in cursor.description:           # only update existing columns in data source
+            available_columns.append(column[0])
+
+
+        cursor.execute('Select CrystalName FROM depositTable')
+        samples_in_table=[]
+        tmp=cursor.fetchall()
+        for item in tmp:
+            line=[x.encode('UTF8') for x in list(item)]
+#            print 'a',item
+#            print 'b',str(item)
+#            print 'c',line
+#            print 'd',line[0]
+#            print 'e',str(line[0])
+            if str(item) not in samples_in_table: samples_in_table.append(str(line[0]))
+#            samples_in_table.append(line)
+        print 'c',samples_in_table
+
+
+
+        if sampleID in samples_in_table:
+            for key in data_dict:
+                value=data_dict[key]
+                if key=='ID' or key=='CrystalName':
+                    continue
+                if not str(value).replace(' ','')=='':  # ignore empty fields
+                    update_string=str(key)+'='+"'"+str(value)+"'"
+                    print "UPDATE depositTable SET "+update_string+" WHERE CrystalName="+"'"+sampleID+"';"
+                    cursor.execute("UPDATE depositTable SET "+update_string+" WHERE CrystalName="+"'"+sampleID+"';")
+        else:
+            column_string='CrystalName'+','
+            value_string="'"+sampleID+"'"+','
+            for key in data_dict:
+                value=data_dict[key]
+                if key=='ID':
+                    continue
+                if key not in available_columns:
+                    continue
+                if not str(value).replace(' ','')=='':  # ignore if nothing in csv field
+                    value_string+="'"+str(value)+"'"+','
+                    column_string+=key+','
+            print "INSERT INTO depositTable ("+column_string[:-1]+") VALUES ("+value_string[:-1]+");"
+            cursor.execute("INSERT INTO depositTable ("+column_string[:-1]+") VALUES ("+value_string[:-1]+");")
+        connect.commit()
 
 
 

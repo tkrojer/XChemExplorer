@@ -1,4 +1,4 @@
-# last edited: 12/12/2016, 15:00
+# last edited: 13/12/2016, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -493,7 +493,9 @@ class XChemExplorer(QtGui.QApplication):
         # @ Refine ##########################################################################
         #
 
-        self.refine_file_tasks = [ 'Open COOT'     ]
+        self.refine_file_tasks = [ 'Open COOT',
+                                   'Update Deposition Table',
+                                   'Prepare Group Deposition'   ]
 
         frame_refine_file_task=QtGui.QFrame()
         frame_refine_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -2296,23 +2298,24 @@ class XChemExplorer(QtGui.QApplication):
         print 'hallo'
 
     def save_deposit_to_database(self):
-        self.update_deposit_dict()
-        msgBox = QtGui.QMessageBox()
-        msgBox.setText("*** WARNING ***\nAre you sure you want to update the database?\nThis will overwrite previous entries!")
-        msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.YesRole)
-        msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.RejectRole)
-        reply = msgBox.exec_();
-        if reply == 0:
-            self.work_thread=XChemDeposit.update_depositTable(self.deposit_dict,
-                                                              os.path.join(self.database_directory,self.data_source_file),
-                                                              self.xce_logfile    )
-            self.explorer_active=1
-            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-            self.connect(self.work_thread, QtCore.SIGNAL("create_widgets_for_autoprocessing_results_only"),
-                                                 self.create_widgets_for_autoprocessing_results_only)
-            self.work_thread.start()
+        print 'hallo'
+#        self.update_deposit_dict()
+#        msgBox = QtGui.QMessageBox()
+#        msgBox.setText("*** WARNING ***\nAre you sure you want to update the database?\nThis will overwrite previous entries!")
+#        msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.YesRole)
+#        msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.RejectRole)
+#        reply = msgBox.exec_();
+#        if reply == 0:
+#            self.work_thread=XChemDeposit.update_depositTable(self.deposit_dict,
+#                                                              os.path.join(self.database_directory,self.data_source_file),
+#                                                              self.xce_logfile    )
+#            self.explorer_active=1
+#            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+#            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+#            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#            self.connect(self.work_thread, QtCore.SIGNAL("create_widgets_for_autoprocessing_results_only"),
+#                                                 self.create_widgets_for_autoprocessing_results_only)
+#            self.work_thread.start()
 
 
 
@@ -3640,7 +3643,8 @@ class XChemExplorer(QtGui.QApplication):
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                 self.work_thread.start()
 
-
+        elif instruction=='Update Deposition Table':
+            self.update_deposition_table()
 
 
     def set_new_reference_if_applicable(self):
@@ -4067,6 +4071,37 @@ class XChemExplorer(QtGui.QApplication):
 ##        print '    * nr ACEDRG jobs finished'
 ##        print '    * time ACEDRG queue started'
 ##        print '    * expected time to finish'
+
+    def update_deposition_table(self):
+        # check if PanDDA models are ready for deposition
+
+        depositChecks=XChemDeposit.update_deposition_table(os.path.join(self.database_directory,self.data_source_file))
+
+        toDeposit,mismatch=depositChecks.PanDDA_models_to_deposit()
+
+        if mismatch != {}:
+            self.update_log.insert('The following samples contain ligand that are not ready for deposition:')
+            for entry in mismatch:
+                self.update_log.insert(entry[0]+' -> site: '+entry[1]+' @ '+entry[2]+' => '+entry[4])
+            self.update_log.insert('You need to change this before you can continue!')
+            return None
+
+        for xtal in toDeposit:
+            self.db.update_insert_depositTable(xtal,{})
+
+
+
+        # check if all sites in each model are set to deposit
+        # throw error if not
+
+        # then set RefinementOutcome in mainTable to 'ready for deposition'
+
+        # if not pandda models are set fpor deposition, check if stuff in mainTable it set for depostion
+
+
+
+
+
 
     def show_html_summary_and_diffraction_image(self):
         for key in self.albula_button_dict:
