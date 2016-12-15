@@ -2863,6 +2863,9 @@ class XChemExplorer(QtGui.QApplication):
                 self.reference_directory=reference_directory_temp
                 self.settings['reference_directory']=self.reference_directory
                 self.update_reference_files(' ')
+                for xtal in self.initial_model_dimple_dict:
+                    reference_file_selection_combobox=self.initial_model_dimple_dict[xtal][1]
+                    self.populate_reference_combobox(reference_file_selection_combobox)
 
             self.initial_model_directory_label.setText(self.initial_model_directory)
             self.panddas_directory_label.setText(self.panddas_directory)
