@@ -57,7 +57,7 @@ def create_ICM_input_file(html_export_directory,database):
         'write png "mapimages/"+s_eventID+"_large.png" window={800,600} GRAPHICS.quality=Max(image graphic)\n'
         'write png "mapimages/"+s_eventID+"_small.png" window={150,150} GRAPHICS.quality=Max(image graphic)\n'
         'delete star\n'
-        'writeProject "icbs\\"+s_eventID+".icb" no\n'
+        'writeProject "icbs\\\"+s_eventID+".icb" no\n'
         'delete maps\n'
         'delete a_*.\n'
         'delete grob\n'
@@ -79,6 +79,6 @@ def create_ICM_input_file(html_export_directory,database):
         'endfor\n'
         )
 
-    f=open('%s/icm.inp' %html_export_directory,'w')
+    f=open('%s/dsEvent_sqlite.icm' %html_export_directory,'w')
     f.write(icm_in)
     f.close()
