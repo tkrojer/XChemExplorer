@@ -265,9 +265,9 @@ def main (argv):
     os.makedirs(panddadir+"/js")
   if not os.path.exists(panddadir+"/css"):
     os.makedirs(panddadir+"/css")
-  shutil.copy(os.path.join(os.getenv('XChemExplorer_DIR'),"jscss/css/jquery.dataTables.min.css"),panddadir+"/css/jquery.dataTables.min.css")
-  shutil.copy(os.path.join(os.getenv('XChemExplorer_DIR'),"jscss/js/jquery-1.12.3.min.js"),panddadir+"/js/jquery-1.12.3.min.js")
-  shutil.copy(os.path.join(os.getenv('XChemExplorer_DIR'),"jscss/js/jquery.dataTables.min.js"),panddadir+"/js/jquery.dataTables.min.js")
+  shutil.copy(os.path.join(os.getenv('XChemExplorer_DIR'),"web/jscss/css/jquery.dataTables.min.css"),panddadir+"/css/jquery.dataTables.min.css")
+  shutil.copy(os.path.join(os.getenv('XChemExplorer_DIR'),"web/jscss/js/jquery-1.12.3.min.js"),panddadir+"/js/jquery-1.12.3.min.js")
+  shutil.copy(os.path.join(os.getenv('XChemExplorer_DIR'),"web/jscss/js/jquery.dataTables.min.js"),panddadir+"/js/jquery.dataTables.min.js")
 
   # Create zip files
   print "Creating zipfile of PDBs..."
