@@ -4,6 +4,7 @@
 #
 # handover date: 16/12/2016
 
+# panddaDir is equal to html_export_directory
 panddaDir="C:/users/bmarsden/desktop/PANNDA/NUDT22"
 
 set directory panddaDir
