@@ -14,6 +14,7 @@ import webbrowser
 import getpass
 
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
+sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'web'))
 from XChemUtils import parse
 from XChemUtils import external_software
 from XChemUtils import helpers
