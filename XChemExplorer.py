@@ -301,6 +301,7 @@ class XChemExplorer(QtGui.QApplication):
         deposition_menu = menu_bar.addMenu("&Deposition")
         edit_deposition_info=QtGui.QAction('Edit Information',self.window)
         edit_deposition_info.triggered.connect(self.deposition_data)
+        deposition_menu.addAction(edit_deposition_info)
         export_results_to_html=QtGui.QAction('Export to HTML',self.window)
         export_results_to_html.triggered.connect(self.export_to_html)
         deposition_menu.addAction(export_results_to_html)
@@ -1482,8 +1483,8 @@ class XChemExplorer(QtGui.QApplication):
         preferences.exec_();
 
     def export_to_html(self):
-        print 'ccp4-python '+os.getenv('')+'/web/process_sqlite.py -t TEST -s '+os.path.join(self.database_directory,self.data_source_file)+' -d '+self.html_export_directory
-        os.system('ccp4-python '+os.getenv('')+'/web/process_sqlite.py -t TEST -s '+os.path.join(self.database_directory,self.data_source_file)+' -d '+self.html_export_directory)
+        print 'ccp4-python '+os.getenv('XChemExplorer_DIR')+'/web/process_sqlite.py -t TEST -s '+os.path.join(self.database_directory,self.data_source_file)+' -d '+self.html_export_directory
+#        os.system('ccp4-python '+os.getenv('XChemExplorer_DIR')+'/web/process_sqlite.py -t TEST -s '+os.path.join(self.database_directory,self.data_source_file)+' -d '+self.html_export_directory)
 
 
     def deposition_data(self):
