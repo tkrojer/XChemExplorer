@@ -69,6 +69,7 @@ class XChemExplorer(QtGui.QApplication):
             self.panddas_directory=os.path.join(self.labxchem_directory,'processing','analysis','panddas')
             self.data_collection_summary_file=os.path.join(self.database_directory,str(os.getcwd().split('/')[5])+'_summary.pkl')
             self.data_source_file=''
+            self.html_export_directory=os.path.join(self.labxchem_directory,'processing','html')
             if os.path.isfile(os.path.join(self.labxchem_directory,'processing','database','soakDBDataFile.sqlite')):
                 self.data_source_file='soakDBDataFile.sqlite'
                 self.database_directory=os.path.join(self.labxchem_directory,'processing','database')
@@ -94,6 +95,8 @@ class XChemExplorer(QtGui.QApplication):
                 os.mkdir(self.database_directory)
             if not os.path.isdir(self.ccp4_scratch_directory):
                 os.mkdir(self.ccp4_scratch_directory)
+            if not os.path.isdir(self.html_export_directory):
+                os.mkdir(self.html_export_directory)
 
         else:
             self.beamline_directory=self.current_directory
@@ -1483,8 +1486,8 @@ class XChemExplorer(QtGui.QApplication):
         preferences.exec_();
 
     def export_to_html(self):
-        print 'ccp4-python '+os.getenv('XChemExplorer_DIR')+'/web/process_sqlite.py -t TEST -s '+os.path.join(self.database_directory,self.data_source_file)+' -d '+self.html_export_directory
-#        os.system('ccp4-python '+os.getenv('XChemExplorer_DIR')+'/web/process_sqlite.py -t TEST -s '+os.path.join(self.database_directory,self.data_source_file)+' -d '+self.html_export_directory)
+        self.update_log.insert('exporting contents of SQLite database into '+self.html_export_directory)
+        os.system('ccp4-python '+os.getenv('XChemExplorer_DIR')+'/web/process_sqlite.py -t TEST -s '+os.path.join(self.database_directory,self.data_source_file)+' -d '+self.html_export_directory)
 
 
     def deposition_data(self):
