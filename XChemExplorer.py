@@ -58,6 +58,7 @@ class XChemExplorer(QtGui.QApplication):
         self.diffraction_data_directory=self.current_directory
         self.diffraction_data_search_info='n/a'
         self.diffraction_data_reference_mtz='ignore'
+        self.html_export_directory=os.getcwd()
 
         if 'labxchem' in self.current_directory:
             self.labxchem_directory='/'+os.path.join(*self.current_directory.split('/')[1:6])    # need splat operator: *
@@ -141,7 +142,8 @@ class XChemExplorer(QtGui.QApplication):
                              'preferences':                     self.preferences,
                              'xce_logfile':                     self.xce_logfile,
                              'max_queue_jobs':                  self.max_queue_jobs,
-                             'diffraction_data_directory':      self.diffraction_data_directory }
+                             'diffraction_data_directory':      self.diffraction_data_directory,
+                             'html_export_directory':           self.html_export_directory           }
 
 
         #
@@ -299,7 +301,9 @@ class XChemExplorer(QtGui.QApplication):
         deposition_menu = menu_bar.addMenu("&Deposition")
         edit_deposition_info=QtGui.QAction('Edit Information',self.window)
         edit_deposition_info.triggered.connect(self.deposition_data)
-        deposition_menu.addAction(edit_deposition_info)
+        export_results_to_html=QtGui.QAction('Export to HTML',self.window)
+        export_results_to_html.triggered.connect(self.export_to_html)
+        deposition_menu.addAction(export_results_to_html)
 
         help = menu_bar.addMenu("&Help")
 
@@ -1304,6 +1308,15 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_panddas_directory.addWidget(settings_button_panddas_directory)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_panddas_directory)
 
+        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nHTML export directory: - OPTIONAL -'))
+        settings_hbox_html_export_directory=QtGui.QHBoxLayout()
+        self.html_export_directory_label=QtGui.QLabel(self.html_export_directory)
+        settings_hbox_html_export_directory.addWidget(self.html_export_directory_label)
+        settings_button_html_export_directory=QtGui.QPushButton('Select HTML Export Directory')
+        settings_button_html_export_directory.clicked.connect(self.settings_button_clicked)
+        settings_hbox_html_export_directory.addWidget(settings_button_html_export_directory)
+        self.data_collection_vbox_for_settings.addLayout(settings_hbox_html_export_directory)
+
         self.data_collection_vbox_for_settings.setSpacing(0)
         self.data_collection_vbox_for_settings.setMargin(0)
 
@@ -1467,6 +1480,10 @@ class XChemExplorer(QtGui.QApplication):
         preferencesLayout.addLayout(vbox,0,0)
 
         preferences.exec_();
+
+    def export_to_html(self):
+        print 'ccp4-python '+os.getenv('')+'/web/process_sqlite.py -t TEST -s '+os.path.join(self.database_directory,self.data_source_file)+' -d '+self.html_export_directory
+        os.system('ccp4-python '+os.getenv('')+'/web/process_sqlite.py -t TEST -s '+os.path.join(self.database_directory,self.data_source_file)+' -d '+self.html_export_directory)
 
 
     def deposition_data(self):
@@ -3427,9 +3444,10 @@ class XChemExplorer(QtGui.QApplication):
             self.pandda_analyse_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_analyse.html')
             self.pandda_inspect_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_inspect.html')
 
-#        if self.data_source_set:
-#            self.update_all_tables()
-
+        if self.sender().text()=='Select HTML Export Directory':
+            self.html_export_directory=str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
+            self.html_export_directory_label.setText(self.html_export_directory)
+            self.settings['html_export_directory']=self.html_export_directory
 
 
     def change_allowed_unitcell_difference_percent(self,text):
