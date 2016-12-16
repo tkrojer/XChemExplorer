@@ -1,0 +1,64 @@
+#!/usr/local/bin/icm
+
+# Author: Brian Marsden
+#
+# handover date: 16/12/2016
+
+panddaDir="C:/users/bmarsden/desktop/PANNDA/NUDT22"
+
+set directory panddaDir
+connect molcart filename="C:/Users/bmarsden/Desktop/PANNDA/NUDT22_soakDBDataFile.sqlite"
+query molcart "select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.PANDDA_site_confidence,p.CrystalName || '_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,m.RefinementPDB_latest,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (LigandConfidence like '1%' or LigandConfidence like '2%' or LigandConfidence like '3%' or LigandConfidence like '4%') order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index" name="T"
+numToDo=Nof(T)
+
+macro generateICB s_eventID s_pdb s_ligandSMILES s_eventMap R_coords
+l_confirm=no
+l_info=no
+l_commands=no
+l_warn=no
+print s_eventID s_pdb s_ligandSMILES s_eventMap R_coords
+# Read pdb
+read pdb s_pdb
+if Nof(a_1.?lig)==0 then
+  print "No ligand!"
+  delete a_*.*
+  return
+endif
+# Fix ligand topology
+set bond topology a_1.?lig s_ligandSMILES
+# Read event map
+read map s_eventMap
+contourEDS Name( map )[1] {2.0} {"cyan"} a_1.dlig | Sphere(a_1.?lig !a_1.dlig 7.5) yes yes
+assign sstructure
+cool a_ no 
+color background refresh rgb={0,0,0}
+display xstick Res(Sphere(a_1.?lig !a_1.?lig 7.5))
+read binary s_icmhome+"shapes" name="star"
+display star
+translate star R_coords
+center star margin=0.0
+undisplay star
+center a_1.?lig
+write png "mapimages/"+s_eventID+"_large.png" window={800,600} GRAPHICS.quality=Max(image graphic)
+write png "mapimages/"+s_eventID+"_small.png" window={150,150} GRAPHICS.quality=Max(image graphic)
+delete star
+writeProject "icbs\\"+s_eventID+".icb" no
+delete maps
+delete a_*.
+delete grob
+endmacro
+
+for i=1,numToDo
+  ligandSMILES=T.CompoundSMILES[i]
+  # PDB file path
+  pdbID="pdbs/"+T.ModelName[i]+".pdb"
+  if (T.PANDDA_site_name[i]!="" & T.PANDDA_site_confidence[i]!="None") then
+  # Get event ID
+  eventID=T.ModelName[i]+"_"+T.CompoundCode[i]
+  # Event map path
+  eventMap="maps/"+T.ModelName[i]+".ccp4"
+  # Ligand centre
+  ligR3={$T.PANDDA_site_x[i],$T.PANDDA_site_y[i],$T.PANDDA_site_z[i]}
+  generateICB eventID,pdbID,ligandSMILES,eventMap,ligR3
+  endif
+endfor

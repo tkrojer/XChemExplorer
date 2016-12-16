@@ -3895,6 +3895,7 @@ class XChemExplorer(QtGui.QApplication):
                 msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
                 reply = msgBox.exec_();
                 if reply == 0:
+                    # may need to find a better solution for that
                     pandda_checks.remove_dimple_files(mismatch)
                     # need to run cluster function again, because N_datasets could be too low now.
                     self.cluster_datasets_for_pandda(True)
