@@ -26,6 +26,7 @@ import XChemPlots
 import XChemLog
 import XChemProcess
 import XChemDeposit
+import XChemWeb
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -1489,6 +1490,7 @@ class XChemExplorer(QtGui.QApplication):
         self.update_log.insert('exporting contents of SQLite database into '+self.html_export_directory)
         os.system('ccp4-python '+os.getenv('XChemExplorer_DIR')+'/web/process_sqlite.py -t TEST -s '+os.path.join(self.database_directory,self.data_source_file)+' -d '+self.html_export_directory)
 
+        XChemWeb.create_ICM_input_file(self.html_export_directory)
 
     def deposition_data(self):
 
