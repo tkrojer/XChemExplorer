@@ -1,4 +1,4 @@
-# last edited: 16/12/2016, 15:00
+# last edited: 18/12/2016, 15:00
 
 #!/usr/local/anaconda/sgc_default/envs/sgc_default/bin/python
 
@@ -33,7 +33,8 @@ def writeTableRow (row,htmlfile):
   htmlfile.write("<td>"+row['LigandConfidence']+"</td>\n")
   htmlfile.write("<td>"+row['ModelStatus']+"</td>\n")
   htmlfile.write("<td><img src='residueplots/"+row['ModelName']+".png' width=150px></td>\n")
-  htmlfile.write("<td><div id='"+row['ModelName']+"'><a href='icbs/"+row['ModelName']+".html'><img src='mapImages/"+row['ModelName']+"_small.png'></a></div></td>\n")
+  htmlfile.write("<td><div id='"+row['ModelName']+"'><a href='icbs/"+row['ModelName']+".html'><img src='mapImages/"+row['ModelName']+"_"+row['CompoundCode']+"_small.png'></a></div></td>\n")
+#  htmlfile.write("<td><div id='"+row['ModelName']+"'><a href='icbs/"+row['ModelName']+".html'><img src='mapImages/"+row['ModelName']+"_small.png'></a></div></td>\n")
   htmlfile.write("<td>"+row['PANDDA_site_comment']+"</td>\n")
   htmlfile.write("<td>TBD</td>\n")
   htmlfile.write("<td>"+row['DataProcessingResolutionHigh']+"</td>\n")
@@ -233,6 +234,20 @@ def main (argv):
     with sqlite3.connect(sqlitefile) as c:
       c.row_factory=sqlite3.Row
       cur=c.cursor()
+
+      sql = ( "select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.CrystalName || '_event'|| p.PANDDA_site_event_index "
+              " as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence "
+              " as LigandConfidence,p.RefinementOutcome "
+              " as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, "
+              "                p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,"
+              "                m.DataProcessingUnitCell,m.RefinementPDB_latest,m.RefinementMTZ_latest,p.PANDDA_site_event_map "
+              " from panddaTable as p, mainTable as m "
+              " where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and "
+              "       (LigandConfidence like '1%' or LigandConfidence like '2%' or LigandConfidence like '3%' or LigandConfidence like '4%') "
+              " order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index"
+
+      )
+
       cur.execute("select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.CrystalName || '_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,m.RefinementPDB_latest,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (LigandConfidence like '1%' or LigandConfidence like '2%' or LigandConfidence like '3%' or LigandConfidence like '4%') order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index")
       rows=cur.fetchall()
       writer = csv.DictWriter(f, fieldnames=rows[1].keys())

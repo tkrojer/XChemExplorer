@@ -1,4 +1,4 @@
-# last edited: 17/12/2016, 01:10
+# last edited: 18/12/2016, 01:10
 
 import os,sys
 
@@ -69,8 +69,8 @@ def create_ICM_input_file(html_export_directory,database):
         '  pdbID="pdbs/"+T.ModelName[i]+".pdb"\n'
         '  if (T.PANDDA_site_name[i]!="" & T.PANDDA_site_confidence[i]!="None") then\n'
         '  # Get event ID\n'
-#        '  eventID=T.ModelName[i]+"_"+T.CompoundCode[i]\n'
-        '  eventID=T.ModelName[i]\n'
+        '  eventID=T.ModelName[i]+"_"+T.CompoundCode[i]\n'
+#        '  eventID=T.ModelName[i]\n'
         '  # Event map path\n'
         '  eventMap="maps/"+T.ModelName[i]+".ccp4"\n'
         '  # Ligand centre\n'
