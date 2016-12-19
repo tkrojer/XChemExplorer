@@ -500,9 +500,12 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                 xtal=entry[0]
                 site_index=entry[1]
                 event_index=entry[2]
-                event_x = float(str(entry[3]))
-                event_y = float(str(entry[4]))
-                event_z = float(str(entry[5]))
+                try:
+                    event_x = float(str(entry[3]))
+                    event_y = float(str(entry[4]))
+                    event_z = float(str(entry[5]))
+                except ValueError:
+                    print 'jjjj',xtal,site_index,event_index
 
                 db_pandda_dict['PANDDApath']=self.panddas_directory
 
