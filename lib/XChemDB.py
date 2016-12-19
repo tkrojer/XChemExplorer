@@ -572,6 +572,18 @@ class data_source:
     def update_data_source(self,sampleID,data_dict):
         data_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
         data_dict['LastUpdated_by']=getpass.getuser()
+
+        # need to do this since some older sqlite files contain a columnn called
+        # DataProcessingResolutionHigh1.5sigma
+        # and this does not go down well with the SQLite statement below
+        removeKey=''
+        for key in data_dict:
+            if '.5' in key:
+                removeKey=key
+                break
+        if removeKey != '':
+            del data_dict[removeKey]
+
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
         update_string=''
