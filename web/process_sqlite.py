@@ -250,7 +250,8 @@ def main (argv):
 
       )
 
-      cur.execute("select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.CrystalName || '_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,m.RefinementPDB_latest,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (LigandConfidence like '1%' or LigandConfidence like '2%' or LigandConfidence like '3%' or LigandConfidence like '4%') order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index")
+      cur.execute("select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.CrystalName || '_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,m.RefinementBoundConformation,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (LigandConfidence like '1%' or LigandConfidence like '2%' or LigandConfidence like '3%' or LigandConfidence like '4%') order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index")
+#      cur.execute("select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.CrystalName || '_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,m.RefinementPDB_latest,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (LigandConfidence like '1%' or LigandConfidence like '2%' or LigandConfidence like '3%' or LigandConfidence like '4%') order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index")
       rows=cur.fetchall()
       writer = csv.DictWriter(f, fieldnames=rows[1].keys())
       writer.writeheader()
@@ -264,7 +265,8 @@ def main (argv):
         actID=(row['ModelName']+row['CompoundCode']).replace(targetID+'-','')
         writeTableRow(row,htmlfile)
         writeICBPage(row,panddadir)
-        shutil.copy(row['RefinementPDB_latest'],panddadir+"/pdbs/"+row['ModelName']+".pdb")
+        shutil.copy(row['RefinementBoundConformation'],panddadir+"/pdbs/"+row['ModelName']+".pdb")
+#        shutil.copy(row['RefinementPDB_latest'],panddadir+"/pdbs/"+row['ModelName']+".pdb")
         shutil.copy(row['PANDDA_site_event_map'],panddadir+"/maps/"+row['ModelName']+".ccp4")
         shutil.copy(row['RefinementMTZ_latest'],panddadir+"/maps/"+row['ModelName']+".mtz")
         if row['PANDDA_site_spider_plot'] is not None:

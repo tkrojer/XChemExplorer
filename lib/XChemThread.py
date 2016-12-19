@@ -445,7 +445,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         found_refine_pdb=self.find_file('refine.pdb',xtal)
         if found_refine_pdb and not 'dimple' in os.path.realpath('refine.pdb'):
-            db_dict['RefinementPDB_latest']=os.path.realpath('refine.pdb').replace(os.getcwd()+'/','')
+            db_dict['RefinementPDB_latest']=os.path.realpath('refine.pdb')
+#            db_dict['RefinementPDB_latest']=os.path.realpath('refine.pdb').replace(os.getcwd()+'/','')
             db_dict['RefinementStatus']='finished'
             pdb_info=parse().dict_for_datasource_update('refine.pdb')
             db_dict.update(pdb_info)
@@ -469,7 +470,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         #
 
         if os.path.isfile('refine.bound.pdb'):
-            db_dict['RefinementBoundConformation']='refine.bound.pdb'
+            db_dict['RefinementBoundConformation']=os.path.realpath('refine.bound.pdb')
+#            db_dict['RefinementBoundConformation']='refine.bound.pdb'
         else:
             db_dict['RefinementBoundConformation']=''
 
@@ -479,7 +481,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         found_refine_mtz=self.find_file('refine.mtz',xtal)
         if found_refine_mtz and not 'dimple' in os.path.realpath('refine.mtz'):
-            db_dict['RefinementMTZ_latest']=os.path.realpath('refine.mtz').replace(os.getcwd()+'/','')
+            db_dict['RefinementMTZ_latest']=os.path.realpath('refine.mtz')
+#            db_dict['RefinementMTZ_latest']=os.path.realpath('refine.mtz').replace(os.getcwd()+'/','')
         else:
             db_dict['RefinementMTZ_latest']=''
             os.system('/bin/rm refine.mtz 2> /dev/null')
