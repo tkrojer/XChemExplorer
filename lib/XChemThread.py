@@ -473,7 +473,14 @@ class synchronise_db_and_filesystem(QtCore.QThread):
             db_dict['RefinementBoundConformation']=os.path.realpath('refine.bound.pdb')
 #            db_dict['RefinementBoundConformation']='refine.bound.pdb'
         else:
-            db_dict['RefinementBoundConformation']=''
+            if os.path.isfile('refine.pdb'):
+                os.system("giant.strip_conformations pdb=refine.pdb suffix='.bound.pdb'")
+                if os.path.isfile('refine.bound.pdb'):
+                    db_dict['RefinementBoundConformation']=os.path.realpath('refine.bound.pdb')
+                else:
+                    db_dict['RefinementBoundConformation']=''
+            else:
+                db_dict['RefinementBoundConformation']=''
 
         #
         # REFINE mtz
@@ -505,7 +512,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                     event_y = float(str(entry[4]))
                     event_z = float(str(entry[5]))
                 except ValueError:
-                    print 'jjjj',xtal,site_index,event_index
+                    pass
 
                 db_pandda_dict['PANDDApath']=self.panddas_directory
 
