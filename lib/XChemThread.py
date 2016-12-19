@@ -473,14 +473,15 @@ class synchronise_db_and_filesystem(QtCore.QThread):
             db_dict['RefinementBoundConformation']=os.path.realpath('refine.bound.pdb')
 #            db_dict['RefinementBoundConformation']='refine.bound.pdb'
         else:
-            if os.path.isfile('refine.pdb'):
-                os.system("giant.strip_conformations pdb=refine.pdb suffix='.bound.pdb'")
-                if os.path.isfile('refine.bound.pdb'):
-                    db_dict['RefinementBoundConformation']=os.path.realpath('refine.bound.pdb')
-                else:
-                    db_dict['RefinementBoundConformation']=''
-            else:
-                db_dict['RefinementBoundConformation']=''
+#            if os.path.isfile('refine.pdb'):
+#                os.system("giant.strip_conformations pdb=refine.pdb suffix='.bound.pdb'")
+#                if os.path.isfile('refine.bound.pdb'):
+#                    db_dict['RefinementBoundConformation']=os.path.realpath('refine.bound.pdb')
+#                else:
+#                    db_dict['RefinementBoundConformation']=''
+#            else:
+#                db_dict['RefinementBoundConformation']=''
+            db_dict['RefinementBoundConformation']=''
 
         #
         # REFINE mtz
