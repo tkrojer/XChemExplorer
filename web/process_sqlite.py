@@ -269,6 +269,7 @@ def main (argv):
           shutil.copy(row['RefinementBoundConformation'],panddadir+"/pdbs/"+row['ModelName']+".pdb")
           shutil.copy(row['RefinementMTZ_latest'],panddadir+"/maps/"+row['ModelName']+".mtz")
         except IOError:
+          print '*** WARNING: cannot find PDB and/or MTZ of '+row['ModelName']+' ***'
           pass
 #        shutil.copy(row['RefinementPDB_latest'],panddadir+"/pdbs/"+row['ModelName']+".pdb")
         shutil.copy(row['PANDDA_site_event_map'],panddadir+"/maps/"+row['ModelName']+".ccp4")
