@@ -268,13 +268,19 @@ def main (argv):
         try:
           shutil.copy(row['RefinementBoundConformation'],panddadir+"/pdbs/"+row['ModelName']+".pdb")
           shutil.copy(row['RefinementMTZ_latest'],panddadir+"/maps/"+row['ModelName']+".mtz")
-        except IOError:
+          shutil.copy(row['PANDDA_site_event_map'],panddadir+"/maps/"+row['ModelName']+".ccp4")
+          if row['PANDDA_site_spider_plot'] is not None:
+            shutil.copy(row['PANDDA_site_spider_plot'],panddadir+"/residueplots/"+row['ModelName']+".png")
+        except (IOError,TypeError):
           print '*** WARNING: cannot find PDB and/or MTZ of '+row['ModelName']+' ***'
+          print 'PDB bound  :', row['RefinementBoundConformation']
+          print 'MTZ        :', row['RefinementMTZ_latest']
+          print 'event map  :', row['PANDDA_site_event_map']
+          print 'spider plot:', row['PANDDA_site_spider_plot']
           pass
 #        shutil.copy(row['RefinementPDB_latest'],panddadir+"/pdbs/"+row['ModelName']+".pdb")
-        shutil.copy(row['PANDDA_site_event_map'],panddadir+"/maps/"+row['ModelName']+".ccp4")
-        if row['PANDDA_site_spider_plot'] is not None:
-          shutil.copy(row['PANDDA_site_spider_plot'],panddadir+"/residueplots/"+row['ModelName']+".png")
+#        if row['PANDDA_site_spider_plot'] is not None:
+#          shutil.copy(row['PANDDA_site_spider_plot'],panddadir+"/residueplots/"+row['ModelName']+".png")
         # Write row to CSV for ICM
         writer.writerow(dict(row))
   

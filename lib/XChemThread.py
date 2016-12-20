@@ -525,7 +525,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                     filename=file[file.rfind('/')+1:]
                     if filename.startswith(xtal+'-event_'+event_index) and filename.endswith('map.native.ccp4'):
                         event_map=file
-                        db_pandda_dict['PANDDA_site_event_map']=os.path.realpath(event_map).replace(os.getcwd()+'/','')
+                        db_pandda_dict['PANDDA_site_event_map']=os.path.realpath(event_map)
+#                        db_pandda_dict['PANDDA_site_event_map']=os.path.realpath(event_map).replace(os.getcwd()+'/','')
                         found_event_map=True
                         break
                 if not found_event_map:
@@ -577,7 +578,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                                 tmp=os.path.realpath(os.path.join(self.initial_model_directory,xtal,'refine.pdb'))
                                 spider_plot=os.path.join(tmp[:tmp.rfind('/')],'residue_plots',residue_name+'-'+residue_chain+'-'+residue_number+'.png')
                                 if os.path.isfile(spider_plot):
-                                    db_pandda_dict['PANDDA_site_spider_plot']=os.path.realpath(spider_plot).replace(os.getcwd()+'/','')
+                                    db_pandda_dict['PANDDA_site_spider_plot']=os.path.realpath(spider_plot)
+#                                    db_pandda_dict['PANDDA_site_spider_plot']=os.path.realpath(spider_plot).replace(os.getcwd()+'/','')
                             break
 
                 if db_pandda_dict != {}:
