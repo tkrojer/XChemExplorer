@@ -1489,6 +1489,9 @@ class XChemExplorer(QtGui.QApplication):
 
     def export_to_html(self):
         self.update_log.insert('exporting contents of SQLite database into '+self.html_export_directory)
+
+
+
         os.system('ccp4-python '+os.getenv('XChemExplorer_DIR')+'/web/process_sqlite.py -t TEST -s '+os.path.join(self.database_directory,self.data_source_file)+' -d '+self.html_export_directory)
         XChemWeb.create_ICM_input_file(self.html_export_directory,os.path.join(self.database_directory,self.data_source_file))
         self.update_log.insert('open ICMpro:')

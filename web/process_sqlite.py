@@ -1,4 +1,4 @@
-# last edited: 18/12/2016, 12:00
+# last edited: 19/12/2016, 12:00
 
 #!/usr/local/anaconda/sgc_default/envs/sgc_default/bin/python
 
@@ -265,10 +265,13 @@ def main (argv):
         actID=(row['ModelName']+row['CompoundCode']).replace(targetID+'-','')
         writeTableRow(row,htmlfile)
         writeICBPage(row,panddadir)
-        shutil.copy(row['RefinementBoundConformation'],panddadir+"/pdbs/"+row['ModelName']+".pdb")
+        try:
+          shutil.copy(row['RefinementBoundConformation'],panddadir+"/pdbs/"+row['ModelName']+".pdb")
+          shutil.copy(row['RefinementMTZ_latest'],panddadir+"/maps/"+row['ModelName']+".mtz")
+        except IOError:
+          pass
 #        shutil.copy(row['RefinementPDB_latest'],panddadir+"/pdbs/"+row['ModelName']+".pdb")
         shutil.copy(row['PANDDA_site_event_map'],panddadir+"/maps/"+row['ModelName']+".ccp4")
-        shutil.copy(row['RefinementMTZ_latest'],panddadir+"/maps/"+row['ModelName']+".mtz")
         if row['PANDDA_site_spider_plot'] is not None:
           shutil.copy(row['PANDDA_site_spider_plot'],panddadir+"/residueplots/"+row['ModelName']+".png")
         # Write row to CSV for ICM
