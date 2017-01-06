@@ -1,4 +1,4 @@
-# last edited: 20/12/2016, 15:00
+# last edited: 06/01/2017, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -1723,6 +1723,7 @@ class XChemExplorer(QtGui.QApplication):
         hbox.addWidget(frame)
 
         vb.addLayout(hbox)
+        vb.addWidget(QtGui.QLabel(XChemToolTips.deposition_interface_note()))
         vb.addStretch(1)
 
 

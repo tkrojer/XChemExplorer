@@ -1,4 +1,4 @@
-# last edited: 19/12/2016, 15:00
+# last edited: 06/01/2017, 15:00
 
 import sqlite3
 import os,sys
@@ -325,6 +325,8 @@ class data_source:
             ['full_name_of_SG_center',                      'full_name_of_SG_center',                   'TEXT'],
 
             ['molecule_one_letter_sequence',                'molecule_one_letter_sequence',             'TEXT'],
+
+            ['CrystalName_of_pandda_input',                 'CrystalName_of_pandda_input',              'TEXT'],
 
             ['LastUpdated',                                 'LastUpdated',                              'TEXT'],
             ['LastUpdated_by',                              'LastUpdated_by',                           'TEXT']

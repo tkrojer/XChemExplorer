@@ -1,4 +1,4 @@
-# last edited: 19/08/2016, 15:00
+# last edited: 06/01/2017, 15:00
 
 import getpass
 
@@ -132,3 +132,12 @@ def run_pandda_inspect_at_home(pandda_directory):
                         'Now proceed within XChemExplorer as before.\n' )
 
     print instruction
+
+def deposition_interface_note():
+
+    note = (    '\n\n'
+                'Note: you can use this mask to save identical information for ALL structures to be deposited.\n'
+                'However, this may not be suitable in cases where the information is different for certain samples.\n'
+                'In such cases, please use for example SQLiteBrowser to edit the relevant fields in the depositTable.'   )
+
+    return note

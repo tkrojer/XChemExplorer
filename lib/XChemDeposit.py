@@ -1,4 +1,4 @@
-# last edited: 13/12/2016, 15:00
+# last edited: 06/01/2017, 15:00
 
 import sys
 import os
@@ -479,31 +479,49 @@ def data_template(depositDict):
 
 def data_template_cif(depositDict):
 
+    structure_author_name=''
+    for name in depositDict['structure_author_name'].split(';'):
+        structure_author_name+='<structure_author_name=  %s>\n' %name
+
+    primary_citation_author_name=''
+    for name in depositDict['primary_citation_author_name'].split(';'):
+        primary_citation_author_name+="primary '%s'\n" %name
+
+    molecule_one_letter_sequence=';'
+    counter=1
+    for aa in depositDict['molecule_one_letter_sequence']:
+        if counter < 70:
+            molecule_one_letter_sequence+=aa
+        if counter == 70:
+            molecule_one_letter_sequence+='\n'+aa
+            counter = 0
+        counter+=1
+
     data_template_cif = (
         'data_UNNAMED\n'
         '#\n'
         '_pdbx_database_status.entry_id                       UNNAMED\n'
-        "_pdbx_database_status.dep_release_code_coordinates   'HOLD FOR PUBLICATION'\n"
-        "_pdbx_database_status.dep_release_code_sequence      'HOLD FOR RELEASE'\n"
+        "_pdbx_database_status.dep_release_code_coordinates   '%s'\n"                       %depositDict['Release_status_for_coordinates']+
+        "_pdbx_database_status.dep_release_code_sequence      '%s'\n"                       %depositDict['Release_status_for_sequence']+
         '#\n'
         '_exptl_crystal_grow.crystal_id      1\n'
-        "_exptl_crystal_grow.method          'VAPOR DIFFUSION, SITTING DROP'\n"
-        '_exptl_crystal_grow.pH              6.5\n'
-        '_exptl_crystal_grow.temp            277\n'
-        '_exptl_crystal_grow.pdbx_details    "28 % PEG 2000 MMe, 100mM BisTris"\n'
+        "_exptl_crystal_grow.method          '%s'\n"                                        %depositDict['crystallization_method']+
+        '_exptl_crystal_grow.pH              %s\n'                                          %depositDict['crystallization_pH']+
+        '_exptl_crystal_grow.temp            %s\n'                                          %depositDict['crystallization_temperature']+
+        '_exptl_crystal_grow.pdbx_details    "%s"\n'                                        %depositDict['crystallization_details']+
         '#\n'
         '_diffrn.id                     1\n'
-        '_diffrn.ambient_temp           100\n'
+        '_diffrn.ambient_temp           %s\n'                                               %depositDict['data_collection_temperature']+
         '_diffrn.crystal_id             1\n'
         '#\n'
         '_diffrn_source.diffrn_id                       1\n'
-        '_diffrn_source.source                          SYNCHROTRON\n'
-        '_diffrn_source.type                            "APS BEAMLINE 17-ID"\n'
-        '_diffrn_source.pdbx_wavelength_list            1.0\n'
+        '_diffrn_source.source                          %s\n'                               %depositDict['radiation_source']+
+        '_diffrn_source.type                            "%s"\n'                             %depositDict['radiation_source_type']+
+        '_diffrn_source.pdbx_wavelength_list            %s\n'                               %depositDict['radiation_wavelengths']+
         '#\n'
-        '_diffrn_detector.detector               PIXEL\n'
-        "_diffrn_detector.type                   'DECTRIS PILATUS 6M'\n"
-        '_diffrn_detector.pdbx_collection_date   2013-11-13\n'
+        '_diffrn_detector.detector               %s\n'                                      %depositDict['radiation_detector']+
+        "_diffrn_detector.type                   '%s'\n"                                    %depositDict['radiation_detector_type']+
+        '_diffrn_detector.pdbx_collection_date   %s\n'                                      %depositDict['data_collection_date']+
         '_diffrn_detector.diffrn_id              1\n'
         '#\n'
         '_diffrn_radiation.diffrn_id                        1\n'
@@ -511,7 +529,7 @@ def data_template_cif(depositDict):
         "_diffrn_radiation.pdbx_diffrn_protocol             'SINGLE WAVELENGTH'\n"
         '#\n'
         '_diffrn_radiation_wavelength.id           1\n'
-        '_diffrn_radiation_wavelength.wavelength   1.0\n'
+        '_diffrn_radiation_wavelength.wavelength   %s\n'                                    %depositDict['radiation_wavelengths']+
         '#\n'
         '#\n'
         'loop_\n'
@@ -529,12 +547,13 @@ def data_template_cif(depositDict):
         '_entity_poly.pdbx_seq_db_id\n'
         '_entity_poly.pdbx_seq_db_name\n'
         '1 "polypeptide(L)"\n'
-        ';MDPEVTLLLQCPGGGLPQEQIQAELSPAHDRRPLPGGDEAITAIWETRLKAQPWLFDAPK\n'
-        'FRLHSATLAPIGSRGPQLLLRLGLTSYRDFLGTNWSSSAAWLRQQGATDWGDTQAYLADP\n'
-        'LGVGAALATADDFLVFLRRSRQVAEAPGLVDVPGGHPEPQALCPGGSPQHQDLAGQLVVH\n'
-        'ELFSSVLQEICDEVNLPLLTLSQPLLLGIARNETSAGRASAEFYVQCSLTSEQVRKHYLS\n'
-        'GGPEAHESTGIFFVETQNVQRLLETEMWAELCPSAKGAIILYNRVQGSPTGAALGSPALL\n'
-        'PPL\n'
+        +molecule_one_letter_sequence+
+#        ';MDPEVTLLLQCPGGGLPQEQIQAELSPAHDRRPLPGGDEAITAIWETRLKAQPWLFDAPK\n'
+#        'FRLHSATLAPIGSRGPQLLLRLGLTSYRDFLGTNWSSSAAWLRQQGATDWGDTQAYLADP\n'
+#        'LGVGAALATADDFLVFLRRSRQVAEAPGLVDVPGGHPEPQALCPGGSPQHQDLAGQLVVH\n'
+#        'ELFSSVLQEICDEVNLPLLTLSQPLLLGIARNETSAGRASAEFYVQCSLTSEQVRKHYLS\n'
+#        'GGPEAHESTGIFFVETQNVQRLLETEMWAELCPSAKGAIILYNRVQGSPTGAALGSPALL\n'
+#        'PPL\n'
         ';\n'
         'A Q9BRQ3 UNP\n'
         '#\n'
@@ -545,22 +564,36 @@ def data_template_cif(depositDict):
         '_entity_src_gen.pdbx_gene_src_ncbi_taxonomy_id\n'
         '_entity_src_gen.pdbx_host_org_scientific_name\n'
         '_entity_src_gen.pdbx_host_org_ncbi_taxonomy_id\n'
-        '1 ? "Homo sapiens" 9606  "Escherichia coli" 562\n'
+        '1 ? "%s" %s  "%s" %s\n'                %(depositDict['Source_organism_scientific_name'],'?',depositDict['Expression_system_scientific_name'],'?')+
         '#\n'
         '#\n'
         '_pdbx_contact_author.id                  1\n'
-        "_pdbx_contact_author.address_1           '1 speedway rd'\n"
-        '_pdbx_contact_author.address_2           "XXX Institute/Company"\n'
-        '_pdbx_contact_author.city                piscataway\n'
-        "_pdbx_contact_author.state_province      'new jersey'\n"
-        '_pdbx_contact_author.postal_code         08854\n'
-        '_pdbx_contact_author.email               john.doe@comercial.com\n'
-        '_pdbx_contact_author.name_first          John\n'
-        '_pdbx_contact_author.name_last           Doe\n'
-        '_pdbx_contact_author.country             "United States"\n'
-        '_pdbx_contact_author.phone               5551112222\n'
-        '_pdbx_contact_author.role                "principal investigator/group leader"\n'
-        '_pdbx_contact_author.organization_type   commercial\n'
+        "_pdbx_contact_author.address_1           '%s'\n"                           %depositDict['contact_author_PI_address']+
+#        '_pdbx_contact_author.address_2           "XXX Institute/Company"\n'        XXX missing XXX
+        '_pdbx_contact_author.city                %s\n'                             %depositDict['contact_author_PI_city']+
+        "_pdbx_contact_author.state_province      '%s'\n"                           %depositDict['contact_author_PI_State_or_Province']+
+        '_pdbx_contact_author.postal_code         %s\n'                             %depositDict['contact_author_PI_Zip_Code']+
+        '_pdbx_contact_author.email               %s\n'                             %depositDict['contact_author_PI_email']+
+        '_pdbx_contact_author.name_first          %s\n'                             %depositDict['contact_author_PI_first_name']+
+        '_pdbx_contact_author.name_last           %s\n'                             %depositDict['contact_author_PI_last_name']+
+        '_pdbx_contact_author.country             "%s"\n'                           %depositDict['contact_author_PI_Country']+
+        '_pdbx_contact_author.phone               %s\n'                             %depositDict['contact_author_PI_phone_number']+
+        '_pdbx_contact_author.role                "%s"\n'                           %depositDict['contact_author_PI_role']+
+        '_pdbx_contact_author.organization_type   %s\n'                             %depositDict['contact_author_PI_organization_type']+
+        '#\n'
+        '_pdbx_contact_author.id                  2\n'
+        "_pdbx_contact_author.address_1           '%s'\n"                           %depositDict['contact_author_address']+
+#        '_pdbx_contact_author.address_2           "XXX Institute/Company"\n'        XXX missing XXX
+        '_pdbx_contact_author.city                %s\n'                             %depositDict['contact_author_city']+
+        "_pdbx_contact_author.state_province      '%s'\n"                           %depositDict['contact_author_State_or_Province']+
+        '_pdbx_contact_author.postal_code         %s\n'                             %depositDict['contact_author_Zip_Code']+
+        '_pdbx_contact_author.email               %s\n'                             %depositDict['contact_author_email']+
+        '_pdbx_contact_author.name_first          %s\n'                             %depositDict['contact_author_first_name']+
+        '_pdbx_contact_author.name_last           %s\n'                             %depositDict['contact_author_last_name']+
+        '_pdbx_contact_author.country             "%s"\n'                           %depositDict['contact_author_Country']+
+        '_pdbx_contact_author.phone               %s\n'                             %depositDict['contact_author_phone_number']+
+        '_pdbx_contact_author.role                "%s"\n'                           %depositDict['contact_author_role']+
+        '_pdbx_contact_author.organization_type   %s\n'                             %depositDict['contact_author_organization_type']+
         '#\n'
         'loop_\n'
         '_audit_author.name\n'
@@ -574,8 +607,9 @@ def data_template_cif(depositDict):
         'loop_\n'
         '_citation_author.citation_id\n'
         '_citation_author.name\n'
-        "primary 'Krojer, T.'\n"
-        "primary 'Von Delft, F.'\n"
+        +primary_citation_author_name+
+#        "primary 'Krojer, T.'\n"
+#        "primary 'Von Delft, F.'\n"
         '#\n'
         '_struct.entry_id                     UNNAMED\n'
         '_struct.title\n'
@@ -620,7 +654,14 @@ def create_Model_mmcif(outDir,pdbList):
     print 'hallo'
 
 def find_apo_structures():
+
+    # need to update pandda directory for every exported structure so that
+    # we know where to look for the pandda.log file that contains the relevant information
+
+    # update CrystalName_of_pandda_input in DB
+
     print 'hallo'
+
 
 
 #class update_depositTable(QtCore.QThread):
