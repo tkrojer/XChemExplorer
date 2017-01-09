@@ -1,4 +1,4 @@
-# last edited: 06/01/2017, 15:00
+# last edited: 09/01/2017, 15:00
 
 import sys
 import os
@@ -653,14 +653,24 @@ def create_data_template_text():
 def create_Model_mmcif(outDir,pdbList):
     print 'hallo'
 
-def find_apo_structures():
+def find_apo_structures(panddaDir):
+
+    # first check if structure is already present in DB and if so if all the
+    # information concur
 
     # need to update pandda directory for every exported structure so that
     # we know where to look for the pandda.log file that contains the relevant information
 
     # update CrystalName_of_pandda_input in DB
 
-    print 'hallo'
+    # in DB: update StructureType field accordingly
+
+    panddaVersion='unknown'
+    for line in open(os.path.join(panddaDir,'pandda.log')):
+        if line.startswith('-  Pandda Version'):
+            if len(line.split()) > = 4:
+                panddaVersion=line.split()[3]
+
 
 
 

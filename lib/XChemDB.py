@@ -1,4 +1,4 @@
-# last edited: 06/01/2017, 15:00
+# last edited: 09/01/2017, 15:00
 
 import sqlite3
 import os,sys
@@ -240,7 +240,10 @@ class data_source:
 
         self.deposition_table_columns = [
             ['ID',                                          'ID',                                       'INTEGER PRIMARY KEY'],
+
             ['CrystalName',                                 'Sample ID',                                'TEXT'],
+
+            ['StructureType',                               'StructureType',                            'TEXT'],
 
             ['contact_author_PI_salutation',                'contact_author_PI_salutation',             'TEXT'],
             ['contact_author_PI_first_name',                'contact_author_PI_first_name',             'TEXT'],
@@ -327,6 +330,11 @@ class data_source:
             ['molecule_one_letter_sequence',                'molecule_one_letter_sequence',             'TEXT'],
 
             ['CrystalName_of_pandda_input',                 'CrystalName_of_pandda_input',              'TEXT'],
+
+            ['mmCIF_model_file',                            'mmCIF_model_file',                         'TEXT'],
+            ['mmCIF_SG_file',                               'mmCIF_SF_file',                            'TEXT'],
+            ['label',                                       'label',                                    'TEXT'],    # for index.txt
+            ['description',                                 'description',                              'TEXT'],    # for index.txt
 
             ['LastUpdated',                                 'LastUpdated',                              'TEXT'],
             ['LastUpdated_by',                              'LastUpdated_by',                           'TEXT']

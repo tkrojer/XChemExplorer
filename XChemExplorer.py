@@ -1,4 +1,4 @@
-# last edited: 06/01/2017, 15:00
+# last edited: 09/01/2017, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -1791,7 +1791,7 @@ class XChemExplorer(QtGui.QApplication):
 
         grid.addWidget(QtGui.QLabel('Details'), 3,0)
         self.structure_details = QtGui.QLineEdit()
-        self.structure_details.setText('')
+        self.structure_details.setText('Fragment screening campaign for <replace with protein name> - Fragment Hit Structure $CompoundName')
         self.structure_details.setFixedWidth(600)
         grid.addWidget(self.structure_details, 3,1)
 #        grid.addWidget(QtGui.QLabel('(e.g. HOLD FOR PUBLICATION, RELEASE NOW)'), 2,2)
@@ -1803,7 +1803,7 @@ class XChemExplorer(QtGui.QApplication):
 
         grid.addWidget(QtGui.QLabel('Title Apo Structure'), 5,0)
         self.structure_title_apo = QtGui.QLineEdit()
-        self.structure_title_apo.setText('')
+        self.structure_title_apo.setText('Fragment screening campaign for <replace with protein name> - Empty Active Site Structure No. <will create automatically>')
         self.structure_title_apo.setFixedWidth(600)
         grid.addWidget(self.structure_title_apo, 5,1)
 
