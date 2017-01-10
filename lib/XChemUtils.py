@@ -863,7 +863,9 @@ class mtztools:
     def __init__(self,mtzfile):
         self.mtzfile=mtzfile
         self.space_group_dict=   {  'triclinic':    [1],
-                                    'monoclinic':   [3,4,5],
+#                                    'monoclinic':   [3,4,5],
+                                    'monoclinic_P': [3,4],
+                                    'monoclinic_C': [5],
                                     'orthorhombic': [16,17,18,19,20,21,22,23,24],
                                     'tetragonal':   [75,76,77,78,79,80,89,90,91,92,93,94,95,96,97,98],
                                     'hexagonal':    [143,144,145,149,150,151,152,153,154,168,169,170,
