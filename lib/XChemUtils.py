@@ -289,7 +289,9 @@ class parse:
 
     def __init__(self):
         self.space_group_dict=   {  'triclinic':    ['P1'],
-                                    'monoclinic':   ['P2','P21','C121','P1211','P121'],
+#                                    'monoclinic':   ['P2','P21','C121','P1211','P121'],
+                                    'monoclinic_P':   ['P2','P21','P1211','P121'],
+                                    'monoclinic_C':   ['C2','C121'],
                                     'orthorhombic': ['P222','P2122','P2212','P2221',
                                                      'P21212','P21221','P22121','P212121',
                                                      'C222','C2221',
