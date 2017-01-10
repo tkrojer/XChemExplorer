@@ -668,9 +668,14 @@ def find_apo_structures(panddaDir):
     panddaVersion='unknown'
     for line in open(os.path.join(panddaDir,'pandda.log')):
         if line.startswith('-  Pandda Version'):
-            if len(line.split()) > = 4:
+            if len(line.split()) >= 4:
                 panddaVersion=line.split()[3]
 
+'Pickling Object: processed_datasets'
+
+'No Statistical Maps Found:'
+
+'Pre-existing statistical maps (from previous runs) have been found and will be reused:'
 
 
 

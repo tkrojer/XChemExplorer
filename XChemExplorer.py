@@ -936,20 +936,21 @@ class XChemExplorer(QtGui.QApplication):
 
         self.tab_dict[self.workflow_dict['Maps']][1].addLayout(initial_model_checkbutton_hbox)
         self.initial_model_vbox_for_table=QtGui.QVBoxLayout()
-        self.inital_model_column_list=[   'Sample ID',
-                        'Select',
-                        'Compound ID',
-                        'Smiles',
-                        'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                        'Dimple\nRcryst',
-                        'Dimple\nRfree',
-                        'DataProcessing\nSpaceGroup',
-                        'Reference\nSpaceGroup',
-                        'Difference\nUC Volume (%)',
-                        'Reference File',
-                        'DataProcessing\nUnitCell',
-                        'Dimple\nStatus',
-                        'Compound\nStatus'                  ]
+        self.inital_model_column_list=[     'Sample ID',
+                                            'Select',
+                                            'Compound ID',
+                                            'Smiles',
+                                            'Resolution\n[Mn<I/sig(I)> = 1.5]',
+                                            'Dimple\nRcryst',
+                                            'Dimple\nRfree',
+                                            'DataProcessing\nSpaceGroup',
+                                            'Reference\nSpaceGroup',
+                                            'Difference\nUC Volume (%)',
+                                            'Reference File',
+                                            'DataProcessing\nUnitCell',
+                                            'Dimple\nStatus',
+                                            'Compound\nStatus',
+                                            'LastUpdated'                                ]
 
         self.initial_model_table=QtGui.QTableWidget()
         self.initial_model_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
