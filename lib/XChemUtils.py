@@ -653,7 +653,8 @@ class parse:
             unitcell_volume=a*b*c* \
                             math.sqrt((1-math.cos(alpha)**2-math.cos(beta)**2-math.cos(gamma)**2) \
                                       +2*(math.cos(alpha)*math.cos(beta)*math.cos(gamma)))
-        if lattice=='monoclinic':
+#        if lattice=='monoclinic':
+        if 'monoclinic' in lattice:
             unitcell_volume=round(a*b*c*math.sin(beta),1)
         if lattice=='orthorhombic' or lattice=='tetragonal' or lattice=='cubic':
             unitcell_volume=round(a*b*c,1)
@@ -1050,7 +1051,7 @@ class mtztools:
             unitcell_volume=a*b*c* \
                             math.sqrt((1-math.cos(alpha)**2-math.cos(beta)**2-math.cos(gamma)**2) \
                                       +2*(math.cos(alpha)*math.cos(beta)*math.cos(gamma)))
-        if lattice=='monoclinic':
+        if 'monoclinic' in lattice:
             unitcell_volume=round(a*b*c*math.sin(beta),1)
         if lattice=='orthorhombic' or lattice=='tetragonal' or lattice=='cubic':
             unitcell_volume=round(a*b*c,1)
@@ -1111,7 +1112,8 @@ class mtztools:
             mtz['unitcell_volume']=a*b*c* \
                             math.sqrt((1-math.cos(alpha_rad)**2-math.cos(beta_rad)**2-math.cos(gamma_rad)**2) \
                                       +2*(math.cos(alpha_rad)*math.cos(beta_rad)*math.cos(gamma_rad)))
-        elif mtz['bravais_lattice']=='monoclinic':
+#        elif mtz['bravais_lattice']=='monoclinic':
+        elif 'monoclinic' in mtz['bravais_lattice']:
             mtz['unitcell_volume']=round(a*b*c*math.sin(beta_rad),1)
         elif mtz['bravais_lattice']=='orthorhombic' or mtz['bravais_lattice']=='tetragonal' or mtz['bravais_lattice']=='cubic':
             mtz['unitcell_volume']=round(a*b*c,1)
@@ -1425,7 +1427,9 @@ class pdbtools(object):
         self.xce_ligands = ['LIG','DRG','FRS']
 
         self.space_group_dict=   {  'triclinic':    [1],
-                                    'monoclinic':   [3,4,5],
+#                                    'monoclinic':   [3,4,5],
+                                    'monoclinic_P': [3,4],
+                                    'monoclinic_C': [5],
                                     'orthorhombic': [16,17,18,19,20,21,22,23,24],
                                     'tetragonal':   [75,76,77,78,79,80,89,90,91,92,93,94,95,96,97,98],
                                     'hexagonal':    [143,144,145,149,150,151,152,153,154,168,169,170,
@@ -1575,7 +1579,8 @@ class pdbtools(object):
             unitcell_volume=a*b*c* \
                             math.sqrt((1-math.cos(alpha)**2-math.cos(beta)**2-math.cos(gamma)**2) \
                                       +2*(math.cos(alpha)*math.cos(beta)*math.cos(gamma)))
-        if lattice=='monoclinic':
+#        if lattice=='monoclinic':
+        if 'monoclinic' in lattice:
             unitcell_volume=round(a*b*c*math.sin(beta),1)
         if lattice=='orthorhombic' or lattice=='tetragonal' or lattice=='cubic':
             unitcell_volume=round(a*b*c,1)
