@@ -27,6 +27,10 @@ For questions, suggestions, hints, bug reports, please visit XCHEMBB@jiscmail.ac
 
 *** under construction ***
 
+# Manuals
+* Preparing an HTML summary file:
+ftp://ftp.sgc.ox.ac.uk/pub/tkrojer/XChemExplorer/Export_HTML_summary.pdf
+
 # Version History
 
 * 12/10/2016 - pre-release v1.0-beta.1
