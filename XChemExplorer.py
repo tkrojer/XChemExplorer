@@ -1493,7 +1493,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
 
-        os.system('ccp4-python '+os.getenv('XChemExplorer_DIR')+'/web/process_sqlite.py -t TEST -s '+os.path.join(self.database_directory,self.data_source_file)+' -d '+self.html_export_directory)
+        os.system('ccp4-python '+os.getenv('XChemExplorer_DIR')+'/web/process_sqlite.py -t Summary -s '+os.path.join(self.database_directory,self.data_source_file)+' -d '+self.html_export_directory)
         XChemWeb.create_ICM_input_file(self.html_export_directory,os.path.join(self.database_directory,self.data_source_file))
         self.update_log.insert('open ICMpro:')
         self.update_log.insert('/dls/science/groups/i04-1/software/icm-3.8-5/icm64 -g')

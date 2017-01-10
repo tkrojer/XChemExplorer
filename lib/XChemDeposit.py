@@ -665,18 +665,34 @@ def find_apo_structures(panddaDir):
 
     # in DB: update StructureType field accordingly
 
+    # newer pandda versions seem to have severl copies of pandda.log with names like
+    # pandda-2016-09-01-2139.log
+    panddaLog=glob.glob(os.path.join(panddaDir,'pandda*log'))
+    panddaLog.sort(key=os.path.getmtime)
+
     panddaVersion='unknown'
-    for line in open(os.path.join(panddaDir,'pandda.log')):
-        if line.startswith('-  Pandda Version'):
-            if len(line.split()) >= 4:
-                panddaVersion=line.split()[3]
+    readindApoStructures = False
+    apoStructures = []
+    apoStructureDict = {}
+    for files in panddaLog:
+        for line in open(files):
+            if line.startswith('-  Pandda Version'):
+                if len(line.split()) >= 4:
+                    panddaVersion=line.split()[3]
+            if 'No Statistical Maps Found:' in line:
+                readindApoStructures=True
+            if readindApoStructures:
+                if 'Pickling Object: processed_datasets' in line:
+                    if line.split() >= 2:
+                        # e.g. line.split() -> ['Pickling', 'Object:', 'processed_datasets/NUDT22A-x0055/pickles/dataset.pickle']
+                        xtal=line.split()[2].split('/')[1]
+                        if os.path.isfile(os.path.join(panddaDir,'processed_datasets',xtal,xtal+'-x0785-pandda-input.pdb')):
+                            apoStructures.append(xtal)
+            if 'Pre-existing statistical maps (from previous runs) have been found and will be reused:' in line:
+                readindApoStructures=False
+        apoStructureDict[panddaDir]=apoStructures
 
-'Pickling Object: processed_datasets'
-
-'No Statistical Maps Found:'
-
-'Pre-existing statistical maps (from previous runs) have been found and will be reused:'
-
+    return apoStructureDict
 
 
 #class update_depositTable(QtCore.QThread):
