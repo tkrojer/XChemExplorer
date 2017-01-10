@@ -1365,6 +1365,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
         select_stage_one_list = []
         tmp=[]
         for n,entry in enumerate(self.data_collection_dict[xtal]):
+            if xtal=='CAMK1DA-x0313': print entry
             found=False
             if entry[0]=='logfile':
                 index=self.data_collection_dict[xtal][n][7]
@@ -1374,11 +1375,15 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
                             for reference_file in self.reference_file_list:
                                 if not reference_file[4]==0:
                                     unitcell_difference=round((math.fabs(reference_file[4]-float(entry[6]['DataProcessingUnitCellVolume']))/reference_file[4])*100,1)
+                                    if xtal=='CAMK1DA-x0313': print 'uc diff',unitcell_difference
+                                    if xtal=='CAMK1DA-x0313': print 'lattice xtal',entry[6]['DataProcessingLattice']
+                                    if xtal=='CAMK1DA-x0313': print 'lattice ref',reference_file[3]
                                     if unitcell_difference < 5 and reference_file[3]==entry[6]['DataProcessingLattice']:
                                         select_stage_one_list.append(index)
                                         found=True
                     except ValueError:
                         pass
+                if xtal=='CAMK1DA-x0313': print 'FOUND?',found
                 if not found:
                     tmp.append(index)               # so that if no file passes criterion above
                                                     # or if no reference is given, we still carry over all existing files
