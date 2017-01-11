@@ -1,12 +1,13 @@
 # last edited: 10/01/2017, 15:00
 
 import os,sys
-sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
+#sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 
 
 def copy_files(htmlDir):
+        os.chdir(htmlDir)
         if not os.path.isdir('zenodo'):
-            os.mkdir('zenondo')
+            os.mkdir('zenodo')
         os.chdir(os.path.join(htmlDir,'zenodo'))
 
         print 'copying compoundImages'
@@ -33,17 +34,17 @@ def edit_index_html(htmlDir):
     out=''
     for line in open('../index.html'):
         if 'compoundImages/' in line:
-            line.replace('compoundImages/','')
+            line=line.replace('compoundImages/','')
         if 'pdbs/' in line:
-            line.replace('pdbs/','')
+            line=line.replace('pdbs/','')
         if 'maps/' in line:
-            line.replace('maps/','')
+            line=line.replace('maps/','')
         if 'residueplots/' in line:
-            line.replace('residueplots/','')
+            line=line.replace('residueplots/','')
         if 'mapImages/' in line:
-            line.replace('mapImages/','')
+            line=line.replace('mapImages/','')
         if 'icbs/' in line:
-            line.replace('icbs/','')
+            line=line.replace('icbs/','')
         out+=line
 
     print 'writing index.html to',os.path.join(htmlDir,'zenodo')
@@ -55,8 +56,7 @@ def edit_index_html(htmlDir):
 if __name__=='__main__':
     htmlDir=sys.argv[1]
 
-    if os.path.isfile(htmlDir):
-        os.chdir(htmlDir)
+    if os.path.isdir(htmlDir):
         copy_files(htmlDir)
         edit_index_html(htmlDir)
     else:
