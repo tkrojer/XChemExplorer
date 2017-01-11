@@ -1,4 +1,4 @@
-# last edited: 10/01/2017, 15:00
+# last edited: 11/01/2017, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -1493,6 +1493,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
 
+        print 'ccp4-python '+os.getenv('XChemExplorer_DIR')+'/web/process_sqlite.py -t Summary -s '+os.path.join(self.database_directory,self.data_source_file)+' -d '+self.html_export_directory
         os.system('ccp4-python '+os.getenv('XChemExplorer_DIR')+'/web/process_sqlite.py -t Summary -s '+os.path.join(self.database_directory,self.data_source_file)+' -d '+self.html_export_directory)
         XChemWeb.create_ICM_input_file(self.html_export_directory,os.path.join(self.database_directory,self.data_source_file))
         self.update_log.insert('open ICMpro:')

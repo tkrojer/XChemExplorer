@@ -1,4 +1,4 @@
-# last edited: 20/12/2016, 15:00
+# last edited: 11/01/2017, 15:00
 
 #!/usr/local/anaconda/sgc_default/envs/sgc_default/bin/python
 
@@ -41,8 +41,8 @@ def writeTableRow (row,htmlfile):
   htmlfile.write("<td>"+row['DataProcessingSpaceGroup']+"</td>\n")
   htmlfile.write("<td>"+row['DataProcessingUnitCell']+"</td>\n")
   htmlfile.write("<td><a href='pdbs/"+row['ModelName']+".pdb'>Save</a></td>\n")
-  htmlfile.write("<td><a href='maps/"+row['ModelName']+".ccp4'>Save</a></td>\n")
   htmlfile.write("<td><a href='maps/"+row['ModelName']+".mtz'>Save</a></td>\n")
+  htmlfile.write("<td><a href='maps/"+row['ModelName']+".ccp4'>Save</a></td>\n")
   htmlfile.write("</tr>\n")
   return
 
@@ -223,10 +223,8 @@ def main (argv):
   htmlfile.write("<th>Spacegroup</th>\n")
   htmlfile.write("<th>Cell</th>\n")
   htmlfile.write("<th>PDB</th>\n")
-  htmlfile.write("<th>Event Map</th>\n")
   htmlfile.write("<th>MTZ</th>\n")
-#  htmlfile.write("<th>MTZ</th>\n")
-#  htmlfile.write("<th>Event Map</th>\n")
+  htmlfile.write("<th>Event Map</th>\n")
   htmlfile.write("</tr>\n")
   htmlfile.write("</tfoot>\n")
   htmlfile.write("<tbody>\n")
