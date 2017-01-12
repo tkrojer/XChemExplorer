@@ -6,8 +6,10 @@ import csv
 from datetime import datetime
 import getpass
 
-#sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
+sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 #from XChemUtils import parse
+import XChemLog
+
 
 class data_source:
 
@@ -1124,7 +1126,8 @@ class data_source:
         csvWriter = csv.writer(open('for_wonka.csv', "w"))
         csvWriter.writerows([header]+rows)
 
-    def create_missing_apo_records_in_depositTable(self):
+    def create_missing_apo_records_in_depositTable(self,xce_logfile):
+        Logfile=XChemLog.updateLog(xce_logfile)
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
         cursor.execute("select panddaTable.ApoStructures from panddaTable where panddaTable.ApoStructures is not Null")
@@ -1134,4 +1137,19 @@ class data_source:
         for item in tmp:
             for xtal in str(item[0]).split(';'):
                 if xtal not in apoStructureList: apoStructureList.append(xtal)
-        print apoStructureList
+        if apoStructureList==[]:
+            Logfile.insert('no apo structures were assigned to your pandda models')
+        else:
+            Logfile.insert('the following datasets were at some point used as apo structures for pandda.analyse: '+str(apoStructureList))
+            apoInDB=[]
+            cursor.execute("select CrystalName from depositTable where StructureType is 'apo'")
+            tmp = cursor.fetchall()
+            print 'tmp',tmp
+            for xtal in tmp:
+                print 'x',str(xtal[0])
+
+
+
+
+
+
