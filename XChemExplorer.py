@@ -1586,64 +1586,77 @@ class XChemExplorer(QtGui.QApplication):
         grid.addWidget(self.contact_author_PI_middle_name, 4,1)
 
         grid.addWidget(QtGui.QLabel('PI role'), 5,0)
-        self.contact_author_PI_role = QtGui.QLineEdit()
-        self.contact_author_PI_role.setText('group leader')
-        self.contact_author_PI_role.setFixedWidth(200)
+#        self.contact_author_PI_role = QtGui.QLineEdit()
+        self.contact_author_PI_role = QtGui.QComboBox()
+        PIroles = ['group leader','principal investigator']
+        for item in PIroles: self.contact_author_PI_role.addItem(item)
+#        self.contact_author_PI_role.setText('group leader')
+#        self.contact_author_PI_role.setFixedWidth(200)
         grid.addWidget(self.contact_author_PI_role, 5,1)
 
         grid.addWidget(QtGui.QLabel('Organization type'), 6,0)
-        self.contact_author_PI_organization_type = QtGui.QLineEdit()
-        self.contact_author_PI_organization_type.setText('academic')
-        self.contact_author_PI_organization_type.setFixedWidth(200)
+#        self.contact_author_PI_organization_type = QtGui.QLineEdit()
+#        self.contact_author_PI_organization_type.setText('academic')
+#        self.contact_author_PI_organization_type.setFixedWidth(200)
+        self.contact_author_PI_organization_type = QtGui.QComboBox()
+        Organizations = ['academic','commercial','government']
+        for item in Organizations: self.contact_author_PI_organization_type.addItem(item)
         grid.addWidget(self.contact_author_PI_organization_type, 6,1)
 
-        grid.addWidget(QtGui.QLabel('Email'), 7,0)
+        grid.addWidget(QtGui.QLabel('Organization Name'), 7,0)
+        self.contact_author_PI_organization_name = QtGui.QLineEdit()
+        self.contact_author_PI_organization_name.setText('')
+        self.contact_author_PI_organization_name.setFixedWidth(200)
+        grid.addWidget(self.contact_author_PI_organization_name, 7,1)
+
+
+        grid.addWidget(QtGui.QLabel('Email'), 8,0)
         self.contact_author_PI_email = QtGui.QLineEdit()
         self.contact_author_PI_email.setText('')
         self.contact_author_PI_email.setFixedWidth(200)
-        grid.addWidget(self.contact_author_PI_email, 7,1)
+        grid.addWidget(self.contact_author_PI_email, 8,1)
 
-        grid.addWidget(QtGui.QLabel('Street'), 8,0)
+        grid.addWidget(QtGui.QLabel('Street'), 9,0)
         self.contact_author_PI_address = QtGui.QLineEdit()
         self.contact_author_PI_address.setText('')
         self.contact_author_PI_address.setFixedWidth(200)
-        grid.addWidget(self.contact_author_PI_address, 8,1)
+        grid.addWidget(self.contact_author_PI_address, 9,1)
 
-        grid.addWidget(QtGui.QLabel('City'), 9,0)
+        grid.addWidget(QtGui.QLabel('City'), 10,0)
         self.contact_author_PI_city = QtGui.QLineEdit()
         self.contact_author_PI_city.setText('')
         self.contact_author_PI_city.setFixedWidth(200)
-        grid.addWidget(self.contact_author_PI_city, 9,1)
+        grid.addWidget(self.contact_author_PI_city, 10,1)
 
-        grid.addWidget(QtGui.QLabel('State'), 10,0)
+        grid.addWidget(QtGui.QLabel('State'), 11,0)
         self.contact_author_PI_State_or_Province = QtGui.QLineEdit()
         self.contact_author_PI_State_or_Province.setText('')
         self.contact_author_PI_State_or_Province.setFixedWidth(200)
-        grid.addWidget(self.contact_author_PI_State_or_Province, 10,1)
+        grid.addWidget(self.contact_author_PI_State_or_Province, 11,1)
 
-        grid.addWidget(QtGui.QLabel('ZIP code'), 11,0)
+        grid.addWidget(QtGui.QLabel('ZIP code'), 12,0)
         self.contact_author_PI_Zip_Code = QtGui.QLineEdit()
         self.contact_author_PI_Zip_Code.setText('')
         self.contact_author_PI_Zip_Code.setFixedWidth(200)
-        grid.addWidget(self.contact_author_PI_Zip_Code, 11,1)
+        grid.addWidget(self.contact_author_PI_Zip_Code, 12,1)
 
-        grid.addWidget(QtGui.QLabel('Country'), 12,0)
+        grid.addWidget(QtGui.QLabel('Country'), 13,0)
         self.contact_author_PI_Country = QtGui.QLineEdit()
         self.contact_author_PI_Country.setText('')
         self.contact_author_PI_Country.setFixedWidth(200)
-        grid.addWidget(self.contact_author_PI_Country, 12,1)
+        grid.addWidget(self.contact_author_PI_Country, 13,1)
 
-        grid.addWidget(QtGui.QLabel('Fax'), 13,0)
-        self.contact_author_PI_fax_number = QtGui.QLineEdit()
-        self.contact_author_PI_fax_number.setText('')
-        self.contact_author_PI_fax_number.setFixedWidth(200)
-        grid.addWidget(self.contact_author_PI_fax_number, 13,1)
-
-        grid.addWidget(QtGui.QLabel('Fax'), 14,0)
+        grid.addWidget(QtGui.QLabel('Phone'), 14,0)
         self.contact_author_PI_phone_number = QtGui.QLineEdit()
         self.contact_author_PI_phone_number.setText('')
         self.contact_author_PI_phone_number.setFixedWidth(200)
         grid.addWidget(self.contact_author_PI_phone_number, 14,1)
+
+#        grid.addWidget(QtGui.QLabel('Fax'), 15,0)
+#        self.contact_author_PI_fax_number = QtGui.QLineEdit()
+#        self.contact_author_PI_fax_number.setText('')
+#        self.contact_author_PI_fax_number.setFixedWidth(200)
+#        grid.addWidget(self.contact_author_PI_fax_number, 15,1)
 
         frame.setLayout(grid)
         hbox.addWidget(frame)
@@ -1679,64 +1692,75 @@ class XChemExplorer(QtGui.QApplication):
         grid.addWidget(self.contact_author_middle_name, 4,1)
 
         grid.addWidget(QtGui.QLabel('Role'), 5,0)
-        self.contact_author_role = QtGui.QLineEdit()
-        self.contact_author_role.setText('scientist')
-        self.contact_author_role.setFixedWidth(200)
+#        self.contact_author_role = QtGui.QLineEdit()
+#        self.contact_author_role.setText('scientist')
+#        self.contact_author_role.setFixedWidth(200)
+        self.contact_author_role = QtGui.QComboBox()
+        ScientistRoles = ['responsible scientist','investigator']
+        for item in ScientistRoles: self.contact_author_role.addItem(item)
         grid.addWidget(self.contact_author_role, 5,1)
 
         grid.addWidget(QtGui.QLabel('Organization type'), 6,0)
-        self.contact_author_organization_type = QtGui.QLineEdit()
-        self.contact_author_organization_type.setText('academic')
-        self.contact_author_organization_type.setFixedWidth(200)
+#        self.contact_author_organization_type = QtGui.QLineEdit()
+#        self.contact_author_organization_type.setText('academic')
+#        self.contact_author_organization_type.setFixedWidth(200)
+        self.contact_author_organization_type = QtGui.QComboBox()
+        for item in Organizations: self.contact_author_organization_type.addItem(item)
         grid.addWidget(self.contact_author_organization_type, 6,1)
 
-        grid.addWidget(QtGui.QLabel('Email'), 7,0)
+        grid.addWidget(QtGui.QLabel('Organization Name'), 7,0)
+        self.contact_author_organization_name = QtGui.QLineEdit()
+        self.contact_author_organization_name.setText('')
+        self.contact_author_organization_name.setFixedWidth(200)
+        grid.addWidget(self.contact_author_organization_name, 7,1)
+
+        grid.addWidget(QtGui.QLabel('Email'), 8,0)
         self.contact_author_email = QtGui.QLineEdit()
         self.contact_author_email.setText('')
         self.contact_author_email.setFixedWidth(200)
-        grid.addWidget(self.contact_author_email, 7,1)
+        grid.addWidget(self.contact_author_email, 8,1)
 
-        grid.addWidget(QtGui.QLabel('Street'), 8,0)
+        grid.addWidget(QtGui.QLabel('Street'), 9,0)
         self.contact_author_address = QtGui.QLineEdit()
         self.contact_author_address.setText('')
         self.contact_author_address.setFixedWidth(200)
-        grid.addWidget(self.contact_author_address, 8,1)
+        grid.addWidget(self.contact_author_address, 9,1)
 
-        grid.addWidget(QtGui.QLabel('City'), 9,0)
+        grid.addWidget(QtGui.QLabel('City'), 10,0)
         self.contact_author_city = QtGui.QLineEdit()
         self.contact_author_city.setText('')
         self.contact_author_city.setFixedWidth(200)
-        grid.addWidget(self.contact_author_city, 9,1)
+        grid.addWidget(self.contact_author_city, 10,1)
 
-        grid.addWidget(QtGui.QLabel('State'), 10,0)
+        grid.addWidget(QtGui.QLabel('State'), 11,0)
         self.contact_author_State_or_Province = QtGui.QLineEdit()
         self.contact_author_State_or_Province.setText('')
         self.contact_author_State_or_Province.setFixedWidth(200)
-        grid.addWidget(self.contact_author_State_or_Province, 10,1)
+        grid.addWidget(self.contact_author_State_or_Province, 11,1)
 
-        grid.addWidget(QtGui.QLabel('ZIP code'), 11,0)
+        grid.addWidget(QtGui.QLabel('ZIP code'), 12,0)
         self.contact_author_Zip_Code = QtGui.QLineEdit()
         self.contact_author_Zip_Code.setText('')
         self.contact_author_Zip_Code.setFixedWidth(200)
-        grid.addWidget(self.contact_author_Zip_Code, 11,1)
+        grid.addWidget(self.contact_author_Zip_Code, 12,1)
 
-        grid.addWidget(QtGui.QLabel('Country'), 12,0)
+        grid.addWidget(QtGui.QLabel('Country'), 13,0)
         self.contact_author_Country = QtGui.QLineEdit()
         self.contact_author_Country.setText('')
         self.contact_author_Country.setFixedWidth(200)
-        grid.addWidget(self.contact_author_Country, 12,1)
+        grid.addWidget(self.contact_author_Country, 13,1)
 
-        grid.addWidget(QtGui.QLabel('Fax'), 13,0)
-        self.contact_author_fax_number = QtGui.QLineEdit()
-        self.contact_author_fax_number.setText('')
-        self.contact_author_fax_number.setFixedWidth(200)
-        grid.addWidget(self.contact_author_fax_number, 13,1)
-
-        grid.addWidget(QtGui.QLabel('Fax'), 14,0)
+        grid.addWidget(QtGui.QLabel('Phone'), 14,0)
         self.contact_author_phone_number = QtGui.QLineEdit()
         self.contact_author_phone_number.setText('')
         self.contact_author_phone_number.setFixedWidth(200)
         grid.addWidget(self.contact_author_phone_number, 14,1)
+
+#        grid.addWidget(QtGui.QLabel('Fax'), 15,0)
+#        self.contact_author_fax_number = QtGui.QLineEdit()
+#        self.contact_author_fax_number.setText('')
+#        self.contact_author_fax_number.setFixedWidth(200)
+#        grid.addWidget(self.contact_author_fax_number, 15,1)
 
         frame.setLayout(grid)
         hbox.addWidget(frame)
@@ -2336,7 +2360,7 @@ class XChemExplorer(QtGui.QApplication):
         button.clicked.connect(self.save_deposit_config_file)
         hbox.addWidget(button)
         button=QtGui.QPushButton('Load from\nDatabase')
-        button.clicked.connect(self.load_deposit_config_file)
+        button.clicked.connect(self.load_deposit_from_database)
         hbox.addWidget(button)
         button=QtGui.QPushButton('Save to\nDatabase')
         button.clicked.connect(self.save_deposit_to_database)
@@ -2348,7 +2372,24 @@ class XChemExplorer(QtGui.QApplication):
         depositData.exec_();
 
 
+    def save_deposit_config_file(self):
+        self.update_deposit_dict()
+        file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.current_directory))
+        #make sure that the file always has .deposit extension
+        if str(file_name).rfind('.') != -1:
+            file_name=file_name[:file_name.rfind('.')]+'.deposit'
+        else:
+            file_name=file_name+'.deposit'
+        pickle.dump(self.deposit_dict,open(file_name,'wb'))
+
+
     def load_deposit_config_file(self):
+        file_name_temp = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Open file', self.current_directory,'*.deposit')
+        file_name=tuple(file_name_temp)[0]
+        self.deposit_dict = pickle.load(open(file_name,"rb"))
+        self.update_deposit_input()
+
+    def load_deposit_from_database(self):
         print 'hallo'
 
     def save_deposit_to_database(self):
@@ -2372,35 +2413,39 @@ class XChemExplorer(QtGui.QApplication):
 
 
 
-    def load_deposit_config_file(self):
-        file_name_temp = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Open file', self.current_directory,'*.deposit')
-        file_name=tuple(file_name_temp)[0]
-        self.deposit_dict = pickle.load(open(file_name,"rb"))
-        self.update_deposit_input()
-
     def update_deposit_input(self):
         try:
             self.contact_author_PI_salutation.setText(self.deposit_dict['contact_author_PI_salutation'])
             self.contact_author_PI_first_name.setText(self.deposit_dict['contact_author_PI_first_name'])
             self.contact_author_PI_last_name.setText(self.deposit_dict['contact_author_PI_last_name'])
             self.contact_author_PI_middle_name.setText(self.deposit_dict['contact_author_PI_middle_name'])
-            self.contact_author_PI_role.setText(self.deposit_dict['contact_author_PI_role'])
-            self.contact_author_PI_organization_type.setText(self.deposit_dict['contact_author_PI_organization_type'])
+#            self.contact_author_PI_role.setText(self.deposit_dict['contact_author_PI_role'])
+            index = contact_author_PI_role.findText(self.deposit_dict['contact_author_PI_role'], QtCore.Qt.MatchFixedString)
+            self.contact_author_PI_role.setCurrentIndex(index)
+#            self.contact_author_PI_organization_type.setText(self.deposit_dict['contact_author_PI_organization_type'])
+            index = contact_author_PI_organization_type.findText(self.deposit_dict['contact_author_PI_organization_type'], QtCore.Qt.MatchFixedString)
+            self.contact_author_PI_organization_name.setText(self.deposit_dict['contact_author_PI_organization_name'])
+            self.contact_author_PI_organization_type.setCurrentIndex(index)
             self.contact_author_PI_email.setText(self.deposit_dict['contact_author_PI_email'])
             self.contact_author_PI_address.setText(self.deposit_dict['contact_author_PI_address'])
             self.contact_author_PI_city.setText(self.deposit_dict['contact_author_PI_city'])
             self.contact_author_PI_State_or_Province.setText(self.deposit_dict['contact_author_PI_State_or_Province'])
             self.contact_author_PI_Zip_Code.setText(self.deposit_dict['contact_author_PI_Zip_Code'])
             self.contact_author_PI_Country.setText(self.deposit_dict['contact_author_PI_Country'])
-            self.contact_author_PI_fax_number.setText(self.deposit_dict['contact_author_PI_fax_number'])
+#            self.contact_author_PI_fax_number.setText(self.deposit_dict['contact_author_PI_fax_number'])
             self.contact_author_PI_phone_number.setText(self.deposit_dict['contact_author_PI_phone_number'])
 
             self.contact_author_salutation.setText(self.deposit_dict['contact_author_salutation'])
             self.contact_author_first_name.setText(self.deposit_dict['contact_author_first_name'])
             self.contact_author_last_name.setText(self.deposit_dict['contact_author_last_name'])
             self.contact_author_middle_name.setText(self.deposit_dict['contact_author_middle_name'])
-            self.contact_author_role.setText(self.deposit_dict['contact_author_role'])
-            self.contact_author_organization_type.setText(self.deposit_dict['contact_author_organization_type'])
+#            self.contact_author_role.setText(self.deposit_dict['contact_author_role'])
+            index = contact_author_role.findText(self.deposit_dict['contact_author_role'], QtCore.Qt.MatchFixedString)
+            self.contact_author_role.setCurrentIndex(index)
+#            self.contact_author_organization_type.setText(self.deposit_dict['contact_author_organization_type'])
+            index = contact_author_organization_type.findText(self.deposit_dict['contact_author_organization_type'], QtCore.Qt.MatchFixedString)
+            self.contact_author_organization_type.setCurrentIndex(index)
+            self.contact_author_organization_name.setText(self.deposit_dict['contact_author_organization_name'])
             self.contact_author_email.setText(self.deposit_dict['contact_author_email'])
             self.contact_author_address.setText(self.deposit_dict['contact_author_address'])
             self.contact_author_city.setText(self.deposit_dict['contact_author_city'])
@@ -2476,30 +2521,36 @@ class XChemExplorer(QtGui.QApplication):
             'contact_author_PI_first_name':         str(self.contact_author_PI_first_name.text()),
             'contact_author_PI_last_name':          str(self.contact_author_PI_last_name.text()),
             'contact_author_PI_middle_name':        str(self.contact_author_PI_middle_name.text()),
-            'contact_author_PI_role':               str(self.contact_author_PI_role.text()),
-            'contact_author_PI_organization_type':  str(self.contact_author_PI_organization_type.text()),
+#            'contact_author_PI_role':               str(self.contact_author_PI_role.text()),
+            'contact_author_PI_role':               str(self.contact_author_PI_role.currentText()),
+#            'contact_author_PI_organization_type':  str(self.contact_author_PI_organization_type.text()),
+            'contact_author_PI_organization_type':  str(self.contact_author_PI_organization_type.currentText()),
+            'contact_author_PI_organization_name':  str(self.contact_author_PI_organization_name.text()),
             'contact_author_PI_email':              str(self.contact_author_PI_email.text()),
             'contact_author_PI_address':            str(self.contact_author_PI_address.text()),
             'contact_author_PI_city':               str(self.contact_author_PI_city.text()),
             'contact_author_PI_State_or_Province':  str(self.contact_author_PI_State_or_Province.text()),
             'contact_author_PI_Zip_Code':           str(self.contact_author_PI_Zip_Code.text()),
             'contact_author_PI_Country':            str(self.contact_author_PI_Country.text()),
-            'contact_author_PI_fax_number':         str(self.contact_author_PI_fax_number.text()),
+#            'contact_author_PI_fax_number':         str(self.contact_author_PI_fax_number.text()),
             'contact_author_PI_phone_number':       str(self.contact_author_PI_phone_number.text()),
 
             'contact_author_salutation':            str(self.contact_author_salutation.text()),
             'contact_author_first_name':            str(self.contact_author_first_name.text()),
             'contact_author_last_name':             str(self.contact_author_last_name.text()),
             'contact_author_middle_name':           str(self.contact_author_middle_name.text()),
-            'contact_author_role':                  str(self.contact_author_role.text()),
-            'contact_author_organization_type':     str(self.contact_author_organization_type.text()),
+#            'contact_author_role':                  str(self.contact_author_role.text()),
+            'contact_author_role':                  str(self.contact_author_role.currentText()),
+#            'contact_author_organization_type':     str(self.contact_author_organization_type.text()),
+            'contact_author_organization_type':     str(self.contact_author_organization_type.currentText()),
+            'contact_author_organization_name':     str(self.contact_author_organization_name.text()),
             'contact_author_email':                 str(self.contact_author_email.text()),
             'contact_author_address':               str(self.contact_author_address.text()),
             'contact_author_city':                  str(self.contact_author_city.text()),
             'contact_author_State_or_Province':     str(self.contact_author_State_or_Province.text()),
             'contact_author_Zip_Code':              str(self.contact_author_Zip_Code.text()),
             'contact_author_Country':               str(self.contact_author_Country.text()),
-            'contact_author_fax_number':            str(self.contact_author_fax_number.text()),
+#            'contact_author_fax_number':            str(self.contact_author_fax_number.text()),
             'contact_author_phone_number':          str(self.contact_author_phone_number.text()),
 
             'Release_status_for_coordinates':       str(self.Release_status_for_coordinates.text()),
@@ -2562,16 +2613,6 @@ class XChemExplorer(QtGui.QApplication):
             primary_citation_author_name+=str(widget.text())+';'
         self.deposit_dict['primary_citation_author_name']=primary_citation_author_name[:-1]
 
-    def save_deposit_config_file(self):
-        self.update_deposit_dict()
-
-        file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.current_directory))
-        #make sure that the file always has .deposit extension
-        if str(file_name).rfind('.') != -1:
-            file_name=file_name[:file_name.rfind('.')]+'.deposit'
-        else:
-            file_name=file_name+'.deposit'
-        pickle.dump(self.deposit_dict,open(file_name,'wb'))
 
 
     def set_primary_citation_as_structure_authors(self,state):
