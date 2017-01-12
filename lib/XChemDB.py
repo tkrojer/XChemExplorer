@@ -1156,6 +1156,6 @@ class data_source:
                 sqlite='insert into depositTable (CrystalName,StructureType) values %s;' %newEntries[:-1]
                 Logfile.insert('creating new entries with the following SQLite command:\n'+sqlite)
                 cursor.execute(sqlite)
-                cursor.commit()
+                connect.commit()
 
 
