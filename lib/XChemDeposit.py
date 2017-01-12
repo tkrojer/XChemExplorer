@@ -659,9 +659,18 @@ def update_file_locations_of_apo_structuresin_DB(database,projectDir,xce_logfile
     db=XChemDB.data_source(database)
     apo=db.execute_statement("select CrystalName from depositTable where StructureType is 'apo';")
     for item in apo:
-        print item
-        if os.path.isfile(os.path.join(projectDir,str(item[0]),'dimple.pdb')):
-            print os.path.realpath(os.path.join(projectDir,str(item[0]),'dimple.pdb'))
+        xtal=str(item[0])
+        db_dict={}
+        db_dict['label']=xtal+'-apo'
+        db_dict['description']='apo structure for pandda.analyse'
+        if os.path.isfile(os.path.join(projectDir,xtal,'dimple.pdb')):
+            db_dict['PDB_file']=os.path.realpath(os.path.join(projectDir,xtal,'dimple.pdb'))
+            if os.path.isfile(os.path.join(projectDir,xtal,'dimple.mtz')):
+                db_dict['PDB_file']=os.path.realpath(os.path.join(projectDir,xtal,'dimple.mtz'))
+                Logfile.insert('updating depositTable for apo structure '+xtal)
+                db.update_depositTable(xtal,'apo',db_dict)
+
+
 
 
 #def find_apo_structures(panddaDir,projectDir,database):
