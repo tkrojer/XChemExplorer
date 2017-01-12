@@ -210,6 +210,18 @@ class run_pandda_export(QtCore.QThread):
 
 
     def export_models(self):
+
+        # first find which samples are in interesting datasets and have a model
+        # and determine the timestamp
+        for model in glob.glob(os.path.join(self.panddas_directory,'processed_datasets','*','modelled_structures','*-pandda-model.pdb')):
+            sample=model[model.rfind('/')+1:].replace('-pandda-model.pdb','')
+            timestamp=datetime.fromtimestamp(os.path.getmtime(model)).strftime('%Y-%m-%d %H:%M:%S')
+            print 'XXXXXXXXXXXXXXXXXXXXXXXXXXX'
+            print model
+            print sample
+            print timestamp
+            print 'XXXXXXXXXXXXXXXXXXXXXXXXXXX'
+
         Cmds = (
                 'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
                 '\n'

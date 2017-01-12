@@ -569,7 +569,7 @@ def data_template_cif(depositDict):
         '#\n'
         '_pdbx_contact_author.id                  1\n'
         "_pdbx_contact_author.address_1           '%s'\n"                           %depositDict['contact_author_PI_address']+
-#        '_pdbx_contact_author.address_2           "XXX Institute/Company"\n'        XXX missing XXX
+        '_pdbx_contact_author.address_2           "%s"\n'                           %depositDict['contact_author_PI_organization_name']+
         '_pdbx_contact_author.city                %s\n'                             %depositDict['contact_author_PI_city']+
         "_pdbx_contact_author.state_province      '%s'\n"                           %depositDict['contact_author_PI_State_or_Province']+
         '_pdbx_contact_author.postal_code         %s\n'                             %depositDict['contact_author_PI_Zip_Code']+
@@ -583,7 +583,7 @@ def data_template_cif(depositDict):
         '#\n'
         '_pdbx_contact_author.id                  2\n'
         "_pdbx_contact_author.address_1           '%s'\n"                           %depositDict['contact_author_address']+
-#        '_pdbx_contact_author.address_2           "XXX Institute/Company"\n'        XXX missing XXX
+        '_pdbx_contact_author.address_2           "%s"\n'                           %depositDict['contact_author_organization_name']+
         '_pdbx_contact_author.city                %s\n'                             %depositDict['contact_author_city']+
         "_pdbx_contact_author.state_province      '%s'\n"                           %depositDict['contact_author_State_or_Province']+
         '_pdbx_contact_author.postal_code         %s\n'                             %depositDict['contact_author_Zip_Code']+

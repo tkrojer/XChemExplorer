@@ -156,6 +156,8 @@ class data_source:
             ['DimplePANDDApath',                            'PanDDA\npath?',                                'TEXT',                 1],
             ['PANDDAStatus',                                'PanDDA\nStatus',                               'TEXT',                 1],
 
+            ['DatePanDDAModelCreated',                      'DatePanDDAModelCreated',                       'TEXT',                 0],
+
             ['RefinementResolution',                        'Refinement\nResolution',                       'TEXT',                 1],
             ['RefinementResolutionTL',                      'RefinementResolutionTL',                       'TEXT',                 0],
             ['RefinementRcryst',                            'Refinement\nRcryst',                           'TEXT',                 1],
@@ -221,7 +223,6 @@ class data_source:
             ['PANDDA_site_ligand_chain',                    'PANDDA_site_ligand_chain',                 'TEXT'],
             ['PANDDA_site_ligand_sequence_number',          'PANDDA_site_ligand_sequence_number',       'TEXT'],
             ['PANDDA_site_ligand_altLoc',                   'PANDDA_site_ligand_altLoc',                'TEXT'],
-
 
             ['PANDDA_site_event_map',                       'PANDDA_site_event_map',                    'TEXT'],
             ['PANDDA_site_event_map_mtz',                   'PANDDA_site_event_map_mtz',                'TEXT'],
@@ -1184,3 +1185,4 @@ class data_source:
                 cursor.execute(sqlite)
                 connect.commit()
 
+    def get_deposit_dict_for_xtal(self,sampleID,structure_type):
