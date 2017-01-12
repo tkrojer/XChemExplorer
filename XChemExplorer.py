@@ -284,6 +284,8 @@ class XChemExplorer(QtGui.QApplication):
         select_columns_to_show.triggered.connect(self.select_datasource_columns_to_display)
         create_new_data_source=QtGui.QAction('Create New Data Source (SQLite)',self.window)
         create_new_data_source.triggered.connect(self.create_new_data_source)
+        export_csv_for_WONKA=QtGui.QAction('export CSV for WONKA',self.window)
+        export_csv_for_WONKA.triggered.connect(self.export_data_for_WONKA)
 
         datasource_menu.addAction(reload_samples_from_datasource)
         datasource_menu.addAction(save_samples_to_datasource)
@@ -2778,8 +2780,9 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
         self.work_thread.start()
 
-
-
+    def export_data_for_WONKA(self):
+        self.update_log.insert('exporting CSV file for input into WONKA')
+        self.db.export_csv_for_WONKA()
 
 
     def on_context_menu(self, point):

@@ -1096,4 +1096,30 @@ class data_source:
 
         return site_list
 
+    def export_csv_for_WONKA(self):
+        SQLite =    (   "select"
+                        " panddaTable.PANDDA_site_ligand_resname,"
+                        " panddaTable.PANDDA_site_ligand_sequence_number,"
+                        " panddaTable.PANDDA_site_ligand_chain,"
+                        " mainTable.CompoundSMILES,"
+                        " mainTable.RefinementBoundConformation,"
+                        " panddaTable.PANDDA_site_initial_mtz,"
+                        " panddaTable.PANDDA_site_event_map,"
+                        " panddaTable.CrystalName,"
+                        " mainTable.CompoundCode "
+                        "from"
+                        " mainTable inner join panddaTable on mainTable.CrystalName = panddaTable.CrystalName "
+                        "where"
+                        " (panddaTable.RefinementOutcome like '4%' or panddaTable.RefinementOutcome like '5%')"
+                        " and panddaTable.PANDDA_site_confidence like '4%'"     )
+
+        connect=sqlite3.connect(self.data_source_file)
+        cursor = connect.cursor()
+        cursor.execute(SQLite)
+        header=()
+        for column in cursor.description:
+            header+=(column[0],)
+        rows = cursor.fetchall()
+        csvWriter = csv.writer(open('for_wonka.csv', "w"))
+        csvWriter.writerows([header]+rows)
 
