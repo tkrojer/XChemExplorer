@@ -315,7 +315,7 @@ class XChemExplorer(QtGui.QApplication):
         deposition_menu.addAction(export_results_to_html)
 
         find_apo_structures=QtGui.QAction('find PanDDA apo structures',self.window)
-        find_apo_structures.triggered.connect(self.db.create_missing_apo_records_in_depositTable())
+        find_apo_structures.triggered.connect(self.create_missing_apo_records_in_depositTable)
         deposition_menu.addAction(find_apo_structures)
 
         help = menu_bar.addMenu("&Help")
@@ -1511,6 +1511,9 @@ class XChemExplorer(QtGui.QApplication):
         self.update_log.insert('right click on the script and select RUN')
         self.update_log.insert('be patient, this may take a while, depending on the number of events')
         self.status_bar.showMessage('please check terminal window for further information')
+
+    def create_missing_apo_records_in_depositTable(self):
+        self.db.create_missing_apo_records_in_depositTable()
 
     def deposition_data(self):
 
