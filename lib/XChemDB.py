@@ -1185,4 +1185,4 @@ class data_source:
                 cursor.execute(sqlite)
                 connect.commit()
 
-    def get_deposit_dict_for_xtal(self,sampleID,structure_type):
+#    def get_deposit_dict_for_xtal(self,sampleID,structure_type):
