@@ -1144,9 +1144,9 @@ class data_source:
             apoInDB=[]
             cursor.execute("select CrystalName from depositTable where StructureType is 'apo'")
             tmp = cursor.fetchall()
-            print 'tmp',tmp
             for xtal in tmp:
-                print 'x',str(xtal[0])
+                Logfile.insert(str(xtal[0])+' exists as entry for apo structure in database')
+                apoInDB.append(str(xtal[0]))
             newEntries=''
             for xtal in apoStructureList:
                 if xtal not in apoInDB:
