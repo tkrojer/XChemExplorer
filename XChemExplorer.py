@@ -1513,7 +1513,7 @@ class XChemExplorer(QtGui.QApplication):
         self.status_bar.showMessage('please check terminal window for further information')
 
     def create_missing_apo_records_in_depositTable(self):
-        self.db.create_missing_apo_records_in_depositTable()
+        self.db.create_missing_apo_records_in_depositTable(self.xce_logfile)
 
     def deposition_data(self):
 
