@@ -724,7 +724,7 @@ class update_depositTable(QtCore.QThread):
         self.db=XChemDB.data_source(database)
 
     def run(self):
-        dbEntries=db.execute_statement("select CrystalName,StructureType from depositTable;")
+        dbEntries=self.db.execute_statement("select CrystalName,StructureType from depositTable;")
         for item in dbEntries:
             print str(item[0]),str(item[1])
 
