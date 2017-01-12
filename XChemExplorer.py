@@ -2452,7 +2452,7 @@ class XChemExplorer(QtGui.QApplication):
             self.contact_author_State_or_Province.setText(self.deposit_dict['contact_author_State_or_Province'])
             self.contact_author_Zip_Code.setText(self.deposit_dict['contact_author_Zip_Code'])
             self.contact_author_Country.setText(self.deposit_dict['contact_author_Country'])
-            self.contact_author_fax_number.setText(self.deposit_dict['contact_author_fax_number'])
+#            self.contact_author_fax_number.setText(self.deposit_dict['contact_author_fax_number'])
             self.contact_author_phone_number.setText(self.deposit_dict['contact_author_phone_number'])
 
             self.Release_status_for_coordinates.setText(self.deposit_dict['Release_status_for_coordinates'])
