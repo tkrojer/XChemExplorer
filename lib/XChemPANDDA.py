@@ -1,4 +1,4 @@
-# last edited: 25/11/2016, 15:00
+# last edited: 12/01/2017, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -213,14 +213,31 @@ class run_pandda_export(QtCore.QThread):
 
         # first find which samples are in interesting datasets and have a model
         # and determine the timestamp
+        queryModels=''
         for model in glob.glob(os.path.join(self.panddas_directory,'processed_datasets','*','modelled_structures','*-pandda-model.pdb')):
             sample=model[model.rfind('/')+1:].replace('-pandda-model.pdb','')
             timestamp=datetime.fromtimestamp(os.path.getmtime(model)).strftime('%Y-%m-%d %H:%M:%S')
-            print 'XXXXXXXXXXXXXXXXXXXXXXXXXXX'
+            queryModels+="'"+sample+"',"
+
             print model
             print sample
             print timestamp
-            print 'XXXXXXXXXXXXXXXXXXXXXXXXXXX'
+
+        # now get these models from the database and compare the datestamps
+        if queryModels != ''
+            self.db.execute_statement("select CrystalName,DatePanDDAModelCreated from mainTable where CrystalName in (%s)") %queryModels[:-1]
+
+        # compare timestamps and only export the ones where the timestamp of the file is newer than the one in the DB
+
+
+        difference=(datetime.strptime(timestampFile,'%Y-%m-%d %H:%M:%S') - datetime.strptime(timestampDB,'%Y-%m-%d %H:%M:%S')  )
+
+        samples_to_export=[]
+        if difference.seconds != 0:
+            samples_to_export
+
+        # update the DB:
+        # set timestamp to current timestamp of file and set RefinementOutcome to '2-pandda...'
 
         Cmds = (
                 'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
