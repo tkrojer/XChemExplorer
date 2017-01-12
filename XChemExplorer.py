@@ -2433,9 +2433,9 @@ class XChemExplorer(QtGui.QApplication):
                 self.primary_citation_author_name_List[n].setText(name)
 
             self.molecule_name.setText(self.deposit_dict['molecule_name'])
-            self.fragment_name_one.setText(self.deposit_dict['fragment_name_one'])
-            self.fragment_name_one_specific_mutation.setText(self.deposit_dict['fragment_name_one_specific_mutation'])
-            self.fragment_name_one_enzyme_comission_number.setText(self.deposit_dict['fragment_name_one_enzyme_comission_number'])
+#            self.fragment_name_one.setText(self.deposit_dict['fragment_name_one'])
+#            self.fragment_name_one_specific_mutation.setText(self.deposit_dict['fragment_name_one_specific_mutation'])
+#            self.fragment_name_one_enzyme_comission_number.setText(self.deposit_dict['fragment_name_one_enzyme_comission_number'])
             self.Source_organism_scientific_name.setText(self.deposit_dict['Source_organism_scientific_name'])
             self.Source_organism_gene.setText(self.deposit_dict['Source_organism_gene'])
             self.Source_organism_strain.setText(self.deposit_dict['Source_organism_strain'])
@@ -2519,9 +2519,9 @@ class XChemExplorer(QtGui.QApplication):
             'primary_citation_page_last':           str(self.primary_citation_page_last.text()),
 
             'molecule_name':                                str(self.molecule_name.text()),
-            'fragment_name_one':                            str(self.fragment_name_one.text()),
-            'fragment_name_one_specific_mutation':          str(self.fragment_name_one_specific_mutation.text()),
-            'fragment_name_one_enzyme_comission_number':    str(self.fragment_name_one_enzyme_comission_number.text()),
+#            'fragment_name_one':                            str(self.fragment_name_one.text()),
+#            'fragment_name_one_specific_mutation':          str(self.fragment_name_one_specific_mutation.text()),
+#            'fragment_name_one_enzyme_comission_number':    str(self.fragment_name_one_enzyme_comission_number.text()),
             'Source_organism_scientific_name':              str(self.Source_organism_scientific_name.text()),
             'Source_organism_gene':                         str(self.Source_organism_gene.text()),
             'Source_organism_strain':                       str(self.Source_organism_strain.text()),
