@@ -498,7 +498,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         return db_dict
 
 
-    def find_apo_structures_for_PanDDA(self):
+    def find_apo_structures_for_PanDDA(self,panddaPATH):
 
         # first check if structure is already present in DB and if so if all the
         # information concur
@@ -512,13 +512,14 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         # newer pandda versions seem to have severl copies of pandda.log with names like
         # pandda-2016-09-01-2139.log
-        panddaLog=glob.glob(os.path.join(self.panddas_directory,'pandda*log'))
+        panddaLog=glob.glob(os.path.join(panddaPATH,'pandda*log'))
         panddaLog.sort(key=os.path.getmtime)
 
         panddaVersion='unknown'
         readindApoStructures = False
         apoStructures = []
         apoStructureDict = {}
+        apoString=''
         for files in panddaLog:
             for line in open(files):
                 if line.startswith('-  Pandda Version'):
@@ -531,13 +532,14 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                         if line.split() >= 2:
                             # e.g. line.split() -> ['Pickling', 'Object:', 'processed_datasets/NUDT22A-x0055/pickles/dataset.pickle']
                             xtal=line.split()[2].split('/')[1]
-                            if os.path.isfile(os.path.join(self.panddas_directory,'processed_datasets',xtal,xtal+'-pandda-input.pdb')):
+                            if os.path.isfile(os.path.join(panddaPATH,'processed_datasets',xtal,xtal+'-pandda-input.pdb')):
                                 apoStructures.append(xtal)
+                                apoString+=xtal+';'
                 if 'Pre-existing statistical maps (from previous runs) have been found and will be reused:' in line:
                     readindApoStructures=False
-            apoStructureDict[self.panddas_directory]=apoStructures
+            apoStructureDict[panddaPATH]=apoStructures
 
-        return apoStructureDict
+        return apoString[:-1]
 
     def sync_pandda_table(self):
 
@@ -562,6 +564,14 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                 # instead try to get apo semi-colon separated list of apo structures that were used to
                 # calculate event maps; but only if field is blank!
 #                db_pandda_dict['PANDDApath']=self.panddas_directory
+                if apoStructures=='None' or apoStructures=='':
+                    if panddaPATH != 'None' or panddaPATH != '':
+                        self.Logfile.insert('trying to find which apo structures were used to calculate the event maps in '+panddaPATH)
+                        db_pandda_dict['ApoStructures']=self.find_apo_structures_for_PanDDA(panddaPATH)
+                        print xtal,db_pandda_dict['ApoStructures']
+                    else:
+                        self.Logfile.insert('pandda path for '+xtal+' is empty in database')
+
                 print 'apostructures',apoStructures
 
                 # event map
