@@ -1130,5 +1130,8 @@ class data_source:
         cursor.execute("select panddaTable.ApoStructures from panddaTable where panddaTable.ApoStructures is not Null")
         tmp = cursor.fetchall()
 #        print str(tmp)
+        apoStructureList=[]
         for item in tmp:
-            print item[0]
+            for xtal in str(item[0]).split(';'):
+                if xtal not in apoStructureList: apoStructureList.append(xtal)
+        print apoStructureList
