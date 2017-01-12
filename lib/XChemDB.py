@@ -453,7 +453,9 @@ class data_source:
         for column in cursor.description:
             existing_columns.append(column[0])
         for column in self.deposition_table_columns:
+            print column
             if column[0] not in existing_columns:
+                print 'xxx'
                 cursor.execute("alter table depositTable add column '"+column[0]+"' '"+column[2]+"'")
                 connect.commit()
 
