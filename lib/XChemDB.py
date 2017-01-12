@@ -1129,4 +1129,4 @@ class data_source:
         cursor = connect.cursor()
         cursor.execute("select panddaTable.ApoStructures from panddaTable where panddaTable.ApoStructures is not Null")
         tmp = cursor.fetchall()
-        print 'hallo',tmp
+        print str(tmp)[0]
