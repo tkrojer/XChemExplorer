@@ -732,6 +732,7 @@ class update_depositTable(QtCore.QThread):
             xtal=str(item[0])
             type=str(item[1])
             self.Logfile.insert('updating depositTable for '+xtal+' @ '+type)
+            self.db.update_depositTable(xtal,'apo',self.deposit_dict)
         self.Logfile.insert('Note: use DBbrowser to edit individual entries')
 
 
