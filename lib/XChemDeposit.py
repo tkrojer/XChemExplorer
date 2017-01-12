@@ -724,13 +724,15 @@ class update_depositTable(QtCore.QThread):
         self.db=XChemDB.data_source(database)
 
     def run(self):
-        print self.deposit_dict
+        self.Logfile.insert('all entries in the depositTable will be updated with the following values:')
+        for key in self.deposit_dict:
+            self.Logfile.insert(key+': '+self.deposit_dict[key])
         dbEntries=self.db.execute_statement("select CrystalName,StructureType from depositTable;")
         for item in dbEntries:
-            self.Logfile.insert('updating depositTable ')
-            print str(item[0]),str(item[1])
-            print
-
+            xtal=str(item[0])
+            type=str(item[1])
+            self.Logfile.insert('updating depositTable for '+xtal+' @ '+type)
+        self.Logfile.insert('Note: use DBbrowser to edit individual entries')
 
 
 
