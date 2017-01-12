@@ -715,33 +715,22 @@ def update_file_locations_of_apo_structuresin_DB(database,projectDir,xce_logfile
 #    return apoStructureDict
 
 
-#class update_depositTable(QtCore.QThread):
-#    def __init__(self,deposit_dict,database,xce_logfile):
-#        QtCore.QThread.__init__(self)
-#        self.deposit_dict=deposit_dict
-#        self.database=database
-#        self.Logfile=XChemLog.updateLog(xce_logfile)
-#        self.db=XChemDB.data_source(database)
-#        self.header,self.data=self.db.load_samples_from_data_source()
-#        self.xtal_db_dict={}
-#        self.update_xtal_db_dict()
-#
-#    def update_xtal_db_dict(self):
-#        sampleID_column=0
-#        for n,entry in enumerate(self.header):
-#            if entry=='CrystalName':
-#                sampleID_column=n
-#                break
-#        for line in self.data:
-#            if str(line[sampleID_column]) != '':
-#                db_dict={}
-#                for n,entry in enumerate(line):
-#                    if n != sampleID_column:
-#                        db_dict[str(self.header[n])]=str(entry)
-#                self.xtal_db_dict[str(line[sampleID_column])]=db_dict
-#        self.Logfile.insert('read all samples in mainTable')
-#
-#    def run(self):
+class update_depositTable(QtCore.QThread):
+    def __init__(self,deposit_dict,database,xce_logfile):
+        QtCore.QThread.__init__(self)
+        self.deposit_dict=deposit_dict
+        self.database=database
+        self.Logfile=XChemLog.updateLog(xce_logfile)
+        self.db=XChemDB.data_source(database)
+
+    def run(self):
+        dbEntries=db.execute_statement("select CrystalName,StructureType from depositTable;")
+        for item in dbEntries:
+            print str(item[0]),str(item[1])
+
+
+
+
 #
 #
 #        # need a flag which connects apo structures and bound structures

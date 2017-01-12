@@ -2352,24 +2352,23 @@ class XChemExplorer(QtGui.QApplication):
         print 'hallo'
 
     def save_deposit_to_database(self):
-        print 'hallo'
-#        self.update_deposit_dict()
-#        msgBox = QtGui.QMessageBox()
-#        msgBox.setText("*** WARNING ***\nAre you sure you want to update the database?\nThis will overwrite previous entries!")
-#        msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.YesRole)
-#        msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.RejectRole)
-#        reply = msgBox.exec_();
-#        if reply == 0:
-#            self.work_thread=XChemDeposit.update_depositTable(self.deposit_dict,
-#                                                              os.path.join(self.database_directory,self.data_source_file),
-#                                                              self.xce_logfile    )
-#            self.explorer_active=1
-#            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-#            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-#            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-#            self.connect(self.work_thread, QtCore.SIGNAL("create_widgets_for_autoprocessing_results_only"),
-#                                                 self.create_widgets_for_autoprocessing_results_only)
-#            self.work_thread.start()
+        self.update_deposit_dict()
+        msgBox = QtGui.QMessageBox()
+        msgBox.setText("*** WARNING ***\nAre you sure you want to update the database?\nThis will overwrite previous entries!")
+        msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.YesRole)
+        msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.RejectRole)
+        reply = msgBox.exec_();
+        if reply == 0:
+            self.work_thread=XChemDeposit.update_depositTable(self.deposit_dict,
+                                                              os.path.join(self.database_directory,self.data_source_file),
+                                                              self.xce_logfile    )
+            self.explorer_active=1
+            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.connect(self.work_thread, QtCore.SIGNAL("create_widgets_for_autoprocessing_results_only"),
+                                                 self.create_widgets_for_autoprocessing_results_only)
+            self.work_thread.start()
 
 
 
