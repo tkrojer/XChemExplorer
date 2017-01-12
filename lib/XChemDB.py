@@ -293,6 +293,9 @@ class data_source:
             ['structure_details',                           'structure_details',                        'TEXT'],
             ['structure_title_apo',                         'structure_title_apo',                      'TEXT'],
 
+            ['structure_author_name',                       'structure_author_name',                    'TEXT'],
+            ['primary_citation_author_name',                'primary_citation_author_name',             'TEXT'],
+
             ['primary_citation_id',                         'primary_citation_id',                      'TEXT'],
             ['primary_citation_journal_abbrev',             'primary_citation_journal_abbrev',          'TEXT'],
             ['primary_citation_title',                      'primary_citation_title',                   'TEXT'],
