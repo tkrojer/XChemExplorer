@@ -1147,7 +1147,10 @@ class data_source:
             print 'tmp',tmp
             for xtal in tmp:
                 print 'x',str(xtal[0])
-
+            for xtal in apoStructureList:
+                if xtal not in apoInDB:
+                    Logfile.insert('no entry for '+xtal+' in depositTable')
+                    Logfile.insert('creating entry for '+xtal)
 
 
 
