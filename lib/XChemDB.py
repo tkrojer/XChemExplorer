@@ -1153,8 +1153,9 @@ class data_source:
                     Logfile.insert('no entry for '+xtal+' in depositTable')
                     newEntries+="('%s','apo')," %xtal
             if newEntries != '':
-                sqlite='insert into depositTable (CrystalName,label) values %s' %newEntries[:-1]
-                print sqlite    
+                sqlite='insert into depositTable (CrystalName,StructureType) values %s' %newEntries[:-1]
+                Logfile.insert('creating new entries with the following SQLite command:\n'+sqlite)
+                cursor.execute(sqlite)
 
 
 
