@@ -653,7 +653,7 @@ def create_data_template_text():
 def create_Model_mmcif(outDir,pdbList):
     print 'hallo'
 
-def find_apo_structures(panddaDir):
+def find_apo_structures(panddaDir,projectDir,database):
 
     # first check if structure is already present in DB and if so if all the
     # information concur
@@ -686,7 +686,7 @@ def find_apo_structures(panddaDir):
                     if line.split() >= 2:
                         # e.g. line.split() -> ['Pickling', 'Object:', 'processed_datasets/NUDT22A-x0055/pickles/dataset.pickle']
                         xtal=line.split()[2].split('/')[1]
-                        if os.path.isfile(os.path.join(panddaDir,'processed_datasets',xtal,xtal+'-x0785-pandda-input.pdb')):
+                        if os.path.isfile(os.path.join(panddaDir,'processed_datasets',xtal,xtal+'-pandda-input.pdb')):
                             apoStructures.append(xtal)
             if 'Pre-existing statistical maps (from previous runs) have been found and will be reused:' in line:
                 readindApoStructures=False

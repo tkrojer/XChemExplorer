@@ -234,6 +234,7 @@ class data_source:
             ['PANDDA_site_RSZD',                            'PANDDA_site_RSZD',                         'TEXT'],
             ['PANDDA_site_rmsd',                            'PANDDA_site_rmsd',                         'TEXT'],
             ['RefinementOutcome',                           'RefinementOutcome',                        'TEXT'],
+            ['ApoStructures',                               'ApoStructures',                            'TEXT'],
             ['LastUpdated',                                 'LastUpdated',                              'TEXT'],
             ['LastUpdated_by',                              'LastUpdated_by',                           'TEXT']
             ]

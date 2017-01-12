@@ -314,6 +314,10 @@ class XChemExplorer(QtGui.QApplication):
         export_results_to_html.triggered.connect(self.export_to_html)
         deposition_menu.addAction(export_results_to_html)
 
+#        find_apo_structures=QtGui.QAction('find PanDDA apo structures',self.window)
+#        find_apo_structures.triggered.connect(XChemDeposit.find_apo_structures(self.panddas_directory,self.initial_model_directory,os.path.join(self.database_directory,self.data_source_file)))
+#        deposition_menu.addAction(find_apo_structures)
+
         help = menu_bar.addMenu("&Help")
 
 
