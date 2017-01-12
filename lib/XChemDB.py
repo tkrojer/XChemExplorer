@@ -1131,4 +1131,4 @@ class data_source:
         tmp = cursor.fetchall()
 #        print str(tmp)
         for item in tmp:
-            print item
+            print item[0]
