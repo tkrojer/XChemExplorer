@@ -571,7 +571,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                         print xtal,db_pandda_dict['ApoStructures']
                     else:
                         self.Logfile.insert('pandda path for '+xtal+' is empty in database')
-
+                print 'panddapath',panddaPATH
                 print 'apostructures',apoStructures
 
                 # event map
