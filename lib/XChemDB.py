@@ -1154,8 +1154,8 @@ class data_source:
                     newEntries+="('%s','apo')," %xtal
             if newEntries != '':
                 sqlite='insert into depositTable (CrystalName,StructureType) values %s;' %newEntries[:-1]
-                cursor.execute(sqlite)
                 Logfile.insert('creating new entries with the following SQLite command:\n'+sqlite)
-
+                cursor.execute(sqlite)
+                print 'hallo'
 
 
