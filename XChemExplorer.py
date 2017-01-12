@@ -294,6 +294,7 @@ class XChemExplorer(QtGui.QApplication):
         datasource_menu.addAction(update_datasource)
         datasource_menu.addAction(select_columns_to_show)
         datasource_menu.addAction(create_new_data_source)
+        datasource_menu.addAction(export_csv_for_WONKA)
 
 #        data_processing_menu = menu_bar.addMenu("&Data Processing")
 #        run_xia2=QtGui.QAction('Run XIA2',self.window)
