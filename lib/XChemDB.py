@@ -1147,12 +1147,14 @@ class data_source:
             print 'tmp',tmp
             for xtal in tmp:
                 print 'x',str(xtal[0])
+            newEntries=''
             for xtal in apoStructureList:
                 if xtal not in apoInDB:
                     Logfile.insert('no entry for '+xtal+' in depositTable')
-                    Logfile.insert('creating entry for '+xtal)
-
-
+                    newEntries+="('%s','apo')," %xtal
+            if newEntries != '':
+                sqlite='insert into depositTable (CrystalName,label) values %s' %newEntries[:-1]
+                print sqlite    
 
 
 
