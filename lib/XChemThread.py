@@ -564,7 +564,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                 # instead try to get apo semi-colon separated list of apo structures that were used to
                 # calculate event maps; but only if field is blank!
 #                db_pandda_dict['PANDDApath']=self.panddas_directory
-                if apoStructures=='None' or apoStructures=='':
+                if str(apoStructures)=='None' or apoStructures=='':
+                    print 'hallo'
                     if panddaPATH != 'None' or panddaPATH != '':
                         self.Logfile.insert('trying to find which apo structures were used to calculate the event maps in '+panddaPATH)
                         db_pandda_dict['ApoStructures']=self.find_apo_structures_for_PanDDA(panddaPATH)
