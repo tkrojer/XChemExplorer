@@ -245,8 +245,15 @@ class data_source:
             ['ID',                                          'ID',                                       'INTEGER PRIMARY KEY'],
 
             ['CrystalName',                                 'Sample ID',                                'TEXT'],
+            ['StructureType',                               'StructureType',                            'TEXT'],    # apo/model
 
-            ['StructureType',                               'StructureType',                            'TEXT'],
+            ['PDB_file',                                    'PDB_file',                                 'TEXT'],
+            ['MTZ_file',                                    'MTZ_file',                                 'TEXT'],
+
+            ['mmCIF_model_file',                            'mmCIF_model_file',                         'TEXT'],
+            ['mmCIF_SG_file',                               'mmCIF_SF_file',                            'TEXT'],
+            ['label',                                       'label',                                    'TEXT'],    # for index.txt
+            ['description',                                 'description',                              'TEXT'],    # for index.txt
 
             ['contact_author_PI_salutation',                'contact_author_PI_salutation',             'TEXT'],
             ['contact_author_PI_first_name',                'contact_author_PI_first_name',             'TEXT'],
@@ -333,11 +340,6 @@ class data_source:
             ['molecule_one_letter_sequence',                'molecule_one_letter_sequence',             'TEXT'],
 
             ['CrystalName_of_pandda_input',                 'CrystalName_of_pandda_input',              'TEXT'],
-
-            ['mmCIF_model_file',                            'mmCIF_model_file',                         'TEXT'],
-            ['mmCIF_SG_file',                               'mmCIF_SF_file',                            'TEXT'],
-            ['label',                                       'label',                                    'TEXT'],    # for index.txt
-            ['description',                                 'description',                              'TEXT'],    # for index.txt
 
             ['LastUpdated',                                 'LastUpdated',                              'TEXT'],
             ['LastUpdated_by',                              'LastUpdated_by',                           'TEXT']
@@ -1157,5 +1159,4 @@ class data_source:
                 Logfile.insert('creating new entries with the following SQLite command:\n'+sqlite)
                 cursor.execute(sqlite)
                 connect.commit()
-
 

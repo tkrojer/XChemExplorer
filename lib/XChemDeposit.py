@@ -653,7 +653,15 @@ def create_data_template_text():
 def create_Model_mmcif(outDir,pdbList):
     print 'hallo'
 
-
+def update_file_locations_of_apo_structuresin_DB(database,projectDir,xce_logfile):
+    Logfile=XChemLog.updateLog(xce_logfile)
+    Logfile.insert('updating file information for apo structures')
+    db=XChemDB.data_source(database)
+    apo=db.execute_statement("select CrystalName from depositTable where StructureType is 'apo")
+    for item in apo:
+        print item
+        if os.path.isfile(os.path.join(projectDir,str(item[0]),'dimple.pdb')):
+            print os.path.realpath(os.path.join(projectDir,str(item[0]),'dimple.pdb'))
 
 
 #def find_apo_structures(panddaDir,projectDir,database):

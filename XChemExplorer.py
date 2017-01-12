@@ -318,6 +318,10 @@ class XChemExplorer(QtGui.QApplication):
         find_apo_structures.triggered.connect(self.create_missing_apo_records_in_depositTable)
         deposition_menu.addAction(find_apo_structures)
 
+        update_file_information_of_apo_records=QtGui.QAction('update file info of apo structures',self.window)
+        update_file_information_of_apo_records.triggered.connect(self.update_file_information_of_apo_records)
+        deposition_menu.addAction(update_file_information_of_apo_records)
+
         help = menu_bar.addMenu("&Help")
 
 
@@ -1514,6 +1518,9 @@ class XChemExplorer(QtGui.QApplication):
 
     def create_missing_apo_records_in_depositTable(self):
         self.db.create_missing_apo_records_in_depositTable(self.xce_logfile)
+
+    def update_file_information_of_apo_records(self):
+        XChemDeposit.update_file_locations_of_apo_structuresin_DB(os.path.join(self.database_directory,self.data_source_file),self.initial_model_directory,self.xce_logfile)
 
     def deposition_data(self):
 
