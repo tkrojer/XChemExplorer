@@ -1124,3 +1124,9 @@ class data_source:
         csvWriter = csv.writer(open('for_wonka.csv', "w"))
         csvWriter.writerows([header]+rows)
 
+    def create_missing_apo_records_in_depositTable(self):
+        connect=sqlite3.connect(self.data_source_file)
+        cursor = connect.cursor()
+        cursor.execute("select panddaTable.ApoStructures from panddaTable where panddaTable.ApoStructures is not Null")
+        tmp = cursor.fetchall()
+        print 'hallo',tmp

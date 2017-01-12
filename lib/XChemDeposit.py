@@ -653,46 +653,49 @@ def create_data_template_text():
 def create_Model_mmcif(outDir,pdbList):
     print 'hallo'
 
-def find_apo_structures(panddaDir,projectDir,database):
 
-    # first check if structure is already present in DB and if so if all the
-    # information concur
 
-    # need to update pandda directory for every exported structure so that
-    # we know where to look for the pandda.log file that contains the relevant information
 
-    # update CrystalName_of_pandda_input in DB
-
-    # in DB: update StructureType field accordingly
-
-    # newer pandda versions seem to have severl copies of pandda.log with names like
-    # pandda-2016-09-01-2139.log
-    panddaLog=glob.glob(os.path.join(panddaDir,'pandda*log'))
-    panddaLog.sort(key=os.path.getmtime)
-
-    panddaVersion='unknown'
-    readindApoStructures = False
-    apoStructures = []
-    apoStructureDict = {}
-    for files in panddaLog:
-        for line in open(files):
-            if line.startswith('-  Pandda Version'):
-                if len(line.split()) >= 4:
-                    panddaVersion=line.split()[3]
-            if 'No Statistical Maps Found:' in line:
-                readindApoStructures=True
-            if readindApoStructures:
-                if 'Pickling Object: processed_datasets' in line:
-                    if line.split() >= 2:
-                        # e.g. line.split() -> ['Pickling', 'Object:', 'processed_datasets/NUDT22A-x0055/pickles/dataset.pickle']
-                        xtal=line.split()[2].split('/')[1]
-                        if os.path.isfile(os.path.join(panddaDir,'processed_datasets',xtal,xtal+'-pandda-input.pdb')):
-                            apoStructures.append(xtal)
-            if 'Pre-existing statistical maps (from previous runs) have been found and will be reused:' in line:
-                readindApoStructures=False
-        apoStructureDict[panddaDir]=apoStructures
-
-    return apoStructureDict
+#def find_apo_structures(panddaDir,projectDir,database):
+#
+#    # first check if structure is already present in DB and if so if all the
+#    # information concur
+#
+#    # need to update pandda directory for every exported structure so that
+#    # we know where to look for the pandda.log file that contains the relevant information
+#
+#    # update CrystalName_of_pandda_input in DB
+#
+#    # in DB: update StructureType field accordingly
+#
+#    # newer pandda versions seem to have severl copies of pandda.log with names like
+#    # pandda-2016-09-01-2139.log
+#    panddaLog=glob.glob(os.path.join(panddaDir,'pandda*log'))
+#    panddaLog.sort(key=os.path.getmtime)
+#
+#    panddaVersion='unknown'
+#    readindApoStructures = False
+#    apoStructures = []
+#    apoStructureDict = {}
+#    for files in panddaLog:
+#        for line in open(files):
+#            if line.startswith('-  Pandda Version'):
+#                if len(line.split()) >= 4:
+#                    panddaVersion=line.split()[3]
+#            if 'No Statistical Maps Found:' in line:
+#                readindApoStructures=True
+#            if readindApoStructures:
+#                if 'Pickling Object: processed_datasets' in line:
+#                    if line.split() >= 2:
+#                        # e.g. line.split() -> ['Pickling', 'Object:', 'processed_datasets/NUDT22A-x0055/pickles/dataset.pickle']
+#                        xtal=line.split()[2].split('/')[1]
+#                        if os.path.isfile(os.path.join(panddaDir,'processed_datasets',xtal,xtal+'-pandda-input.pdb')):
+#                            apoStructures.append(xtal)
+#            if 'Pre-existing statistical maps (from previous runs) have been found and will be reused:' in line:
+#                readindApoStructures=False
+#        apoStructureDict[panddaDir]=apoStructures
+#
+#    return apoStructureDict
 
 
 #class update_depositTable(QtCore.QThread):

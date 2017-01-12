@@ -565,15 +565,11 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                 # calculate event maps; but only if field is blank!
 #                db_pandda_dict['PANDDApath']=self.panddas_directory
                 if str(apoStructures)=='None' or apoStructures=='':
-                    print 'hallo'
                     if panddaPATH != 'None' or panddaPATH != '':
                         self.Logfile.insert('trying to find which apo structures were used to calculate the event maps in '+panddaPATH)
                         db_pandda_dict['ApoStructures']=self.find_apo_structures_for_PanDDA(panddaPATH)
-                        print xtal,db_pandda_dict['ApoStructures']
                     else:
                         self.Logfile.insert('pandda path for '+xtal+' is empty in database')
-                print 'panddapath',panddaPATH
-                print 'apostructures',apoStructures
 
                 # event map
 

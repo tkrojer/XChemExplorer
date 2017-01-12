@@ -191,6 +191,9 @@ class run_pandda_export(QtCore.QThread):
                 db_dict['PANDDA_site_spider_plot']      =   ''
 #                db_dict['RefinementOutcome']            =   '2 - PANDDA model'
 
+                # find apo structures which were used
+                # XXX missing XXX
+
                 self.db.update_insert_panddaTable(sampleID,db_dict)
                 # this is necessary, otherwise RefinementOutcome will be reset for samples that are actually already in refinement
                 self.db.execute_statement("update panddaTable set RefinementOutcome = '2 - PANDDA model' where CrystalName is '%s' and RefinementOutcome is null" %sampleID)
