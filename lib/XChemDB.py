@@ -453,9 +453,7 @@ class data_source:
         for column in cursor.description:
             existing_columns.append(column[0])
         for column in self.deposition_table_columns:
-            print column
             if column[0] not in existing_columns:
-                print 'xxx'
                 cursor.execute("alter table depositTable add column '"+column[0]+"' '"+column[2]+"'")
                 connect.commit()
 
@@ -1156,8 +1154,8 @@ class data_source:
                     newEntries+="('%s','apo')," %xtal
             if newEntries != '':
                 sqlite='insert into depositTable (CrystalName,StructureType) values %s;' %newEntries[:-1]
-                Logfile.insert('creating new entries with the following SQLite command:\n'+sqlite)
                 cursor.execute(sqlite)
+                Logfile.insert('creating new entries with the following SQLite command:\n'+sqlite)
 
 
 
