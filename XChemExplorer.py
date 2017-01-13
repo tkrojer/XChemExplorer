@@ -37,6 +37,8 @@ class XChemExplorer(QtGui.QApplication):
     def __init__(self,args):
         QtGui.QApplication.__init__(self,args)
 
+        self.xce_version='0.1'
+
         # general settings
         self.allowed_unitcell_difference_percent=12
         self.acceptable_low_resolution_limit_for_data=3.5
@@ -51,10 +53,10 @@ class XChemExplorer(QtGui.QApplication):
         self.current_directory=os.getcwd()
         self.xce_logfile=os.path.join(self.current_directory,'xce.log')
         try:
-            XChemLog.startLog(self.xce_logfile).create_logfile()
+            XChemLog.startLog(self.xce_logfile).create_logfile(self.xce_version)
         except IOError:
             self.xce_logfile=os.path.join(self.current_directory,'xce_'+getpass.getuser()+'.log')
-            XChemLog.startLog(self.xce_logfile).create_logfile()
+            XChemLog.startLog(self.xce_logfile).create_logfile(self.xce_version)
         self.update_log=XChemLog.updateLog(self.xce_logfile)
         self.update_log.insert('new session started')
         self.diffraction_data_directory=self.current_directory
@@ -2716,7 +2718,7 @@ class XChemExplorer(QtGui.QApplication):
         if self.xce_logfile=='' or self.xce_logfile[self.xce_logfile.rfind('/')+1:]=='':
            print '==> XCE: invalid file format'
         else:
-            XChemLog.startLog(self.xce_logfile).create_logfile()
+            XChemLog.startLog(self.xce_logfile).create_logfile(self.xce_version)
             self.update_log=XChemLog.updateLog(self.xce_logfile)
 
 

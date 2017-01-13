@@ -64,10 +64,12 @@ class run_pandda_export(QtCore.QThread):
 
     def run(self):
 
+        self.import_samples_into_datasouce()
+
         if not self.update_datasource_only:
             self.export_models()
 
-        self.import_samples_into_datasouce()
+#        self.import_samples_into_datasouce()
 
         if not self.update_datasource_only:
             self.refine_exported_models()
@@ -211,43 +213,81 @@ class run_pandda_export(QtCore.QThread):
 
     def export_models(self):
 
+        self.Logfile.insert('finding out which PanDDA models need to be exported')
+
         # first find which samples are in interesting datasets and have a model
         # and determine the timestamp
+        fileModelsDict={}
         queryModels=''
         for model in glob.glob(os.path.join(self.panddas_directory,'processed_datasets','*','modelled_structures','*-pandda-model.pdb')):
             sample=model[model.rfind('/')+1:].replace('-pandda-model.pdb','')
             timestamp=datetime.fromtimestamp(os.path.getmtime(model)).strftime('%Y-%m-%d %H:%M:%S')
+            self.Logfile.insert(xtal+'-pandda-model.pdb was created on '+str(timestamp))
             queryModels+="'"+sample+"',"
-
-            print model
-            print sample
-            print timestamp
+            fileModelsDict[xtal]=timestamp
 
         # now get these models from the database and compare the datestamps
-        if queryModels != ''
-            self.db.execute_statement("select CrystalName,DatePanDDAModelCreated from mainTable where CrystalName in (%s)") %queryModels[:-1]
+        # Note: only get the models that underwent some form of refinement,
+        #       because only if the model was updated in pandda.inspect will it be exported and refined
+        dbModelsDict={}
+        if queryModels != '':
+            dbEntries=self.db.execute_statement("select CrystalName,DatePanDDAModelCreated from mainTable where CrystalName in (%s) and (RefinementOutcome like '3%' or RefinementOutcome like '4%' or RefinementOutcome like '5%')") %queryModels[:-1]
+            for item in dbEntries:
+                xtal=str(item[0])
+                timestamp=str(item[1])
+                dbModelsDict[xtal]=timestamp
+                self.Logfile.insert('PanDDA model for '+xtal+' is in database and was created on '+str(timestamp))
 
         # compare timestamps and only export the ones where the timestamp of the file is newer than the one in the DB
-
-
-        difference=(datetime.strptime(timestampFile,'%Y-%m-%d %H:%M:%S') - datetime.strptime(timestampDB,'%Y-%m-%d %H:%M:%S')  )
-
-        samples_to_export=[]
-        if difference.seconds != 0:
-            samples_to_export
+        samples_to_export={}
+        self.Logfile.insert('checking which PanDDA models were newly created or updated')
+        for sample in fileModelsDict:
+            if sample in dbModelsDict:
+                try:
+                    difference=(datetime.strptime(fileModelsDict[sample],'%Y-%m-%d %H:%M:%S') - datetime.strptime(dbModelsDict[sample],'%Y-%m-%d %H:%M:%S')  )
+                    if difference.seconds != 0:
+                        samples_to_export[sample]=fileModelsDict[sample]
+                except ValueError:
+                    # this will be raised if timestamp is not properly formatted;
+                    # which will usually be the case when respective field in database is blank
+                    # these are hopefully legacy cases which are from before this extensive check was introduced (13/01/2017)
+                    advice = (  'The pandda model of '+xtal+' was changed, but it was already refined! '
+                                'This is most likely because this was done with an older version of XCE. '
+                                'If you really want to export and refine this model, you need to open the database '
+                                'with DBbroweser (http://sqlitebrowser.org/); then change the RefinementOutcome field '
+                                'of the respective sample to "2 - PANDDA model", save the database and repeat the export prodedure.'
+                                )
+                    self.Logfile.insert(advice)
+            else:
+                samples_to_export[sample]=fileModelsDict[sample]
 
         # update the DB:
         # set timestamp to current timestamp of file and set RefinementOutcome to '2-pandda...'
 
-        Cmds = (
+        if samples_to_export != {}:
+            select_dir_string=''
+            for sample in samples_to_export:
+                db_dict={}
+                db_dict['RefinementOutcome']='2 - PANDDA model'
+                db_dict['DatePanDDAModelCreated']=samples_to_export[sample]
+                select_dir_string+="select_dir=%s " %sample
+                self.Logfile.insert('updating database for '+sample+' setting time model was created to '+db_dict['DatePanDDAModelCreated']+' and RefinementOutcome to '+db_dict['RefinementOutcome'])
+                self.db.update_data_source(sample,db_dict)
+
+            Cmds = (
                 'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
                 '\n'
                 '/dls/science/groups/i04-1/software/pandda-install/ccp4-pandda/bin/pandda.export'
                 ' pandda_dir=%s' %self.panddas_directory+
                 ' export_dir=%s' %self.initial_model_directory+
+                ' %s' %select_dir_string+
                 ' export_ligands=False'
                 ' generate_occupancy_groupings=True\n'
                 )
+
+            self.Logfile.insert('running pandda.export with the following settings:\n'+Cmds)
+            os.system(Cmds)
+
 #        Cmds = (
 #                '#!'+os.getenv('SHELL')+'\n'
 #                'unset PYTHONPATH\n'
@@ -258,7 +298,7 @@ class run_pandda_export(QtCore.QThread):
 #                ' export_ligands=False'
 #                ' generate_occupancy_groupings=True\n'
 #                )
-        os.system(Cmds)
+#        os.system(Cmds)
 #        os.system('pandda.export pandda_dir=%s export_dir=%s export_ligands=False generate_occupancy_groupings=True' %(self.panddas_directory,self.initial_model_directory))
 #        self.Logfile.insert('ran pandda.export with the following command:\n'+Cmds)
 #        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running pandda.export: check terminal for details')
