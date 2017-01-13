@@ -13,10 +13,10 @@ class startLog:
     def create_logfile(self,version):
         if not os.path.isfile(self.logfile):
             os.system('touch '+self.logfile)
-            message='creating new logfile for the current XChemExplorer('+version+') session: '+self.logfile
+            message='creating new logfile for the current XChemExplorer ('+version+') session: '+self.logfile
 
         else:
-            message='writing into existing logfile for current XChemExplorer('+version+') session: '+self.logfile
+            message='writing into existing logfile for current XChemExplorer ('+version+') session: '+self.logfile
         updateLog(self.logfile).insert(message)
 
 class updateLog:

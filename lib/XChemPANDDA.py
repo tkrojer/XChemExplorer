@@ -222,9 +222,9 @@ class run_pandda_export(QtCore.QThread):
         for model in glob.glob(os.path.join(self.panddas_directory,'processed_datasets','*','modelled_structures','*-pandda-model.pdb')):
             sample=model[model.rfind('/')+1:].replace('-pandda-model.pdb','')
             timestamp=datetime.fromtimestamp(os.path.getmtime(model)).strftime('%Y-%m-%d %H:%M:%S')
-            self.Logfile.insert(xtal+'-pandda-model.pdb was created on '+str(timestamp))
+            self.Logfile.insert(sample+'-pandda-model.pdb was created on '+str(timestamp))
             queryModels+="'"+sample+"',"
-            fileModelsDict[xtal]=timestamp
+            fileModelsDict[sample]=timestamp
 
         # now get these models from the database and compare the datestamps
         # Note: only get the models that underwent some form of refinement,
