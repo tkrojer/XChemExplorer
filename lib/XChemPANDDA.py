@@ -231,7 +231,7 @@ class run_pandda_export(QtCore.QThread):
         #       because only if the model was updated in pandda.inspect will it be exported and refined
         dbModelsDict={}
         if queryModels != '':
-                print "select CrystalName,DatePanDDAModelCreated from mainTable where CrystalName in (%s) and (RefinementOutcome like '3%' or RefinementOutcome like '4%' or RefinementOutcome like '5%')" %queryModels[:-1]
+            print "select CrystalName,DatePanDDAModelCreated from mainTable where CrystalName in (%s) and (RefinementOutcome like '3%' or RefinementOutcome like '4%' or RefinementOutcome like '5%')" %queryModels[:-1]
             dbEntries=self.db.execute_statement("select CrystalName,DatePanDDAModelCreated from mainTable where CrystalName in (%s) and (RefinementOutcome like '3%' or RefinementOutcome like '4%' or RefinementOutcome like '5%')") %queryModels[:-1]
             for item in dbEntries:
                 xtal=str(item[0])
