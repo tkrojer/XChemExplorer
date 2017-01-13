@@ -37,7 +37,7 @@ class XChemExplorer(QtGui.QApplication):
     def __init__(self,args):
         QtGui.QApplication.__init__(self,args)
 
-        self.xce_version='0.1'
+        self.xce_version='v1.0-beta.3'
 
         # general settings
         self.allowed_unitcell_difference_percent=12
@@ -5372,7 +5372,7 @@ if __name__ == "__main__":
     print '     #                                                                    #'
     print '     # XCHEMEXPLORER - multi dataset analysis                             #'
     print '     #                                                                    #'
-    print '     # Version: 0.1                                                       #'
+    print '     # Version: v1.0-beta.3                                               #'
     print '     #                                                                    #'
     print '     # Date:                                                              #'
     print '     #                                                                    #'

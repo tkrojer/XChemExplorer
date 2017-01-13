@@ -1,9 +1,7 @@
-# last edited: 11/01/2017, 15:00
+# last edited: 13/01/2017, 15:00
 
 import os,sys
 import glob
-#sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
-
 
 def copy_files(htmlDir):
         os.chdir(htmlDir)
@@ -85,18 +83,20 @@ def edit_icb_html_files(htmlDir,uploadID):
 
 
 if __name__=='__main__':
-    htmlDir=sys.argv[1]
-    uploadID=sys.argv[2]
 
-    if os.path.isdir(htmlDir):
-#        copy_files(htmlDir)
+    print len(sys.argv)
 
-        # MISSING: copy .cif files!!!
+    if len(sys.argv) == 2:
+        htmlDir=sys.argv[1]
+        if os.path.isdir(htmlDir):
+            copy_files(htmlDir)
 
-        edit_index_html(htmlDir,uploadID)
-        edit_icb_html_files(htmlDir,uploadID)
+    elif len(sys.argv) == 3:
+        htmlDir=sys.argv[1]
+        uploadID=sys.argv[2]
+        if os.path.isdir(htmlDir):
+            edit_index_html(htmlDir,uploadID)
+            edit_icb_html_files(htmlDir,uploadID)
+
     else:
-        print 'sorry, no html export directory'
-
-
-
+        print 'wrong input!'
