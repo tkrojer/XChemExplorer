@@ -77,10 +77,12 @@ class run_pandda_export(QtCore.QThread):
 
     def refine_exported_models(self):
 
-        if self.which_models=='new':
-            sample_list=self.db.execute_statement("select CrystalName,CompoundCode from mainTable where RefinementOutcome='2 - PANDDA model';")
-        elif self.which_models=='all':
-            sample_list=self.db.execute_statement("select CrystalName,CompoundCode from mainTable where RefinementOutcome='2 - PANDDA model' or RefinementOutcome='3 - In Refinement';")
+        # obselete since RefinementOutcome field is set to 2-... for all the relevant structures during the export_models() function
+#        if self.which_models=='new':
+#            sample_list=self.db.execute_statement("select CrystalName,CompoundCode from mainTable where RefinementOutcome='2 - PANDDA model';")
+#        elif self.which_models=='all':
+#            sample_list=self.db.execute_statement("select CrystalName,CompoundCode from mainTable where RefinementOutcome='2 - PANDDA model' or RefinementOutcome='3 - In Refinement';")
+        sample_list=self.db.execute_statement("select CrystalName,CompoundCode from mainTable where RefinementOutcome='2 - PANDDA model';")
         for item in sample_list:
             xtal=str(item[0])
             compoundID=str(item[1])
@@ -231,7 +233,7 @@ class run_pandda_export(QtCore.QThread):
         #       because only if the model was updated in pandda.inspect will it be exported and refined
         dbModelsDict={}
         if queryModels != '':
-            print "select CrystalName,DatePanDDAModelCreated from mainTable where CrystalName in ("+queryModels[:-1]+") and (RefinementOutcome like '3%' or RefinementOutcome like '4%' or RefinementOutcome like '5%')"
+#            print "select CrystalName,DatePanDDAModelCreated from mainTable where CrystalName in ("+queryModels[:-1]+") and (RefinementOutcome like '3%' or RefinementOutcome like '4%' or RefinementOutcome like '5%')"
             dbEntries=self.db.execute_statement("select CrystalName,DatePanDDAModelCreated from mainTable where CrystalName in ("+queryModels[:-1]+") and (RefinementOutcome like '3%' or RefinementOutcome like '4%' or RefinementOutcome like '5%')")
             for item in dbEntries:
                 xtal=str(item[0])
@@ -242,25 +244,30 @@ class run_pandda_export(QtCore.QThread):
         # compare timestamps and only export the ones where the timestamp of the file is newer than the one in the DB
         samples_to_export={}
         self.Logfile.insert('checking which PanDDA models were newly created or updated')
+        if self.which_models=='all':
+            self.Logfile.insert('ALL available PanDDA models will exported and refined.')
+
         for sample in fileModelsDict:
-            if sample in dbModelsDict:
-                try:
-                    difference=(datetime.strptime(fileModelsDict[sample],'%Y-%m-%d %H:%M:%S') - datetime.strptime(dbModelsDict[sample],'%Y-%m-%d %H:%M:%S')  )
-                    if difference.seconds != 0:
-                        samples_to_export[sample]=fileModelsDict[sample]
-                except ValueError:
-                    # this will be raised if timestamp is not properly formatted;
-                    # which will usually be the case when respective field in database is blank
-                    # these are hopefully legacy cases which are from before this extensive check was introduced (13/01/2017)
-                    advice = (  'The pandda model of '+xtal+' was changed, but it was already refined! '
-                                'This is most likely because this was done with an older version of XCE. '
-                                'If you really want to export and refine this model, you need to open the database '
-                                'with DBbroweser (http://sqlitebrowser.org/); then change the RefinementOutcome field '
-                                'of the respective sample to "2 - PANDDA model", save the database and repeat the export prodedure.'
-                                )
-                    self.Logfile.insert(advice)
-            else:
+            if self.which_models=='all':
                 samples_to_export[sample]=fileModelsDict[sample]
+            else:
+                if sample in dbModelsDict:
+                    try:
+                        difference=(datetime.strptime(fileModelsDict[sample],'%Y-%m-%d %H:%M:%S') - datetime.strptime(dbModelsDict[sample],'%Y-%m-%d %H:%M:%S')  )
+                        if difference.seconds != 0:
+                            samples_to_export[sample]=fileModelsDict[sample]
+                    except ValueError:
+                        # this will be raised if timestamp is not properly formatted;
+                        # which will usually be the case when respective field in database is blank
+                        # these are hopefully legacy cases which are from before this extensive check was introduced (13/01/2017)
+                        advice = (  'The pandda model of '+xtal+' was changed, but it was already refined! '
+                                    'This is most likely because this was done with an older version of XCE. '
+                                    'If you really want to export and refine this model, you need to open the database '
+                                    'with DBbroweser (sqlitebrowser.org); then change the RefinementOutcome field '
+                                    'of the respective sample to "2 - PANDDA model", save the database and repeat the export prodedure.'        )
+                        self.Logfile.insert(advice)
+                else:
+                    samples_to_export[sample]=fileModelsDict[sample]
 
         # update the DB:
         # set timestamp to current timestamp of file and set RefinementOutcome to '2-pandda...'
