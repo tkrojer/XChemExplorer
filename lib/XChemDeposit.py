@@ -1,4 +1,4 @@
-# last edited: 13/01/2017, 15:00
+# last edited: 16/01/2017, 17:00
 
 import sys
 import os
@@ -737,11 +737,12 @@ class update_depositTable(QtCore.QThread):
         self.Logfile.insert('Note: use DBbrowser to edit individual entries')
 
 class prepare_bound_models_for_deposition(QtCore.QThread):
-    def __init__(self,database,xce_logfile):
+    def __init__(self,database,xce_logfile,overwrite_existing_mmcif):
         QtCore.QThread.__init__(self)
         self.database=database
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.db=XChemDB.data_source(database)
+        self.overwrite_existing_mmcif=overwrite_existing_mmcif
     def run(self):
         self.Logfile.insert('checking for models in mainTable that are ready for deposition')
         toDeposit=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%';")
@@ -764,6 +765,27 @@ class prepare_bound_models_for_deposition(QtCore.QThread):
                 self.Logfile.insert('Please make sure that all Ligands in '+xtal+' are ready for deposition.')
 
 
+    def make_model_mmcif(self,xtal,pdb,log,data_template):
+        if os.path.isfile(pdb) and os.path.isfile(log):
+            Cmd = ( 'pdb_extract'
+                    ' -r REFMAC'
+                    ' -iLOG initial.log'
+                    ' -iPDB initial.pdb'
+                    ' -e MR'
+                    ' -s AIMLESS'
+                    ' -iLOG aimless.log'
+                    ' -iENT data_template.cif'
+                    ' -o %s.mmcif' %xtal    )
+
+            # can we add here the ligand.cif?
+
+            print Cmd
+#    '''pdb_extract -r REFMAC -iLOG initial.log -iPDB initial.pdb -e MR -s AIMLESS -iLOG aimless.log -iENT data_template.cif -o NUDT22A-x0315-model.cif'''
+
+        print 'hallo'
+
+    def make_sf_mmcif(self):
+        print 'hallo'
 
 #
 #
