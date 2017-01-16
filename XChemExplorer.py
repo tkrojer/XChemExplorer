@@ -337,6 +337,7 @@ class XChemExplorer(QtGui.QApplication):
                                 'Maps',             # 2
                                 'PANDDAs',          # 3
                                 'Refinement',       # 4
+                                'Deposition',       # 6
                                 'Settings'   ]      # 5
 
         self.workflow_dict = {  self.workflow[0]:       'Overview',
@@ -344,7 +345,8 @@ class XChemExplorer(QtGui.QApplication):
                                 self.workflow[2]:       'Maps',
                                 self.workflow[3]:       'PANDDAs',
                                 self.workflow[4]:       'Refinement',
-                                self.workflow[5]:       'Settings'   }
+                                self.workflow[6]:       'Settings',
+                                self.workflow[5]:       'Deposition'        }
 
         self.workflow_widget_dict = {}
 
@@ -1005,6 +1007,135 @@ class XChemExplorer(QtGui.QApplication):
 
         ######################################################################################
 
+        #
+        # @ DEPOSITION Tab ###################################################################
+        #
+
+        self.deposition_vbox=QtGui.QVBoxLayout()
+
+        scroll = QtGui.QScrollArea()
+        self.deposition_vbox.addWidget(scroll)
+        scroll.setWidgetResizable(True)
+        scrollContent = QtGui.QWidget(scroll)
+
+        scrollLayout = QtGui.QVBoxLayout(scrollContent)
+        scrollContent.setLayout(scrollLayout)
+
+        label_title=QtGui.QLabel('HTML export & ZENODO upload')
+        label_title.setStyleSheet("font: 30pt Comic Sans MS")
+        scrollLayout.addWidget(label_title)
+        scrollLayout.addWidget(QtGui.QLabel(''))
+#        label_link=QtGui.QLabel('''<a href='ftp://ftp.sgc.ox.ac.uk/pub/tkrojer/XChemExplorer/Export_HTML_summary.pdf'>Click here for more information!</a>''')
+#        label_link.setOpenExternalLinks(True)
+#        scrollLayout.addWidget(label_link)
+#        scrollLayout.addWidget(QtGui.QLabel(''))
+        label_heading=QtGui.QLabel('1. Specify HTML export directory in the settings tab')
+        label_heading.setStyleSheet("font: bold 20pt Arial")
+        scrollLayout.addWidget(label_heading)
+        if os.getcwd().startswith('/dls'):
+            label_text=QtGui.QLabel('Note: default for labxchem project at DLS is <labxchem_directory>/processing/html.')
+            label_text.setStyleSheet("font: 17pt Arial")
+            scrollLayout.addWidget(label_text)
+            label_text=QtGui.QLabel('In your case: '+self.html_export_directory)
+            label_text.setStyleSheet("font: 17pt Arial")
+            scrollLayout.addWidget(label_text)
+        scrollLayout.addWidget(QtGui.QLabel('\n'))
+        label_heading=QtGui.QLabel("2. Prepare files for HTML export")
+        label_heading.setStyleSheet("font: bold 20pt Arial")
+        scrollLayout.addWidget(label_heading)
+        button=QtGui.QPushButton('Export to HTML')
+        button.clicked.connect(self.export_to_html)
+        button.setMaximumWidth(200)
+        scrollLayout.addWidget(button)
+        scrollLayout.addWidget(QtGui.QLabel('\n'))
+        label_heading=QtGui.QLabel("3. Prepare ICB files")
+        label_heading.setStyleSheet("font: bold 20pt Arial")
+        scrollLayout.addWidget(label_heading)
+        label_text=QtGui.QLabel(XChemToolTips.prepare_ICB_files())
+        label_text.setStyleSheet("font: 17pt Arial")
+        scrollLayout.addWidget(label_text)
+        button=QtGui.QPushButton('Open ICM-pro')
+        button.clicked.connect(self.open_icm)
+        button.setMaximumWidth(200)
+        scrollLayout.addWidget(button)
+        scrollLayout.addWidget(QtGui.QLabel(''))
+        image=QtGui.QLabel()
+        pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'),'image','drag_and_drop_icb_file.png'))
+        image.setPixmap(pixmap)
+        scrollLayout.addWidget(image)
+        scrollLayout.addWidget(QtGui.QLabel(''))
+        image=QtGui.QLabel()
+        pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'),'image','run_icm_script.png'))
+        image.setPixmap(pixmap)
+        scrollLayout.addWidget(image)
+        scrollLayout.addWidget(QtGui.QLabel('\n'))
+        label_heading=QtGui.QLabel("4. Prepare files for ZENODO upload")
+        label_heading.setStyleSheet("font: bold 20pt Arial")
+        scrollLayout.addWidget(label_heading)
+        label_text=QtGui.QLabel(XChemToolTips.zenodo_upload_start(self.html_export_directory))
+        label_text.setStyleSheet("font: 17pt Arial")
+        scrollLayout.addWidget(label_text)
+        button=QtGui.QPushButton('prepare files')
+        button.clicked.connect(self.prepare_files_for_zenodo_upload)
+        button.setMaximumWidth(200)
+        scrollLayout.addWidget(button)
+        scrollLayout.addWidget(QtGui.QLabel('\n'))
+        label_heading=QtGui.QLabel("5. ZENODO")
+        label_heading.setStyleSheet("font: bold 20pt Arial")
+        scrollLayout.addWidget(label_heading)
+        label_text=QtGui.QLabel(XChemToolTips.zenodo_upload_part_one(self.html_export_directory))
+        label_text.setStyleSheet("font: 17pt Arial")
+        scrollLayout.addWidget(label_text)
+        image=QtGui.QLabel()
+        pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'),'image','new_zenodo_upload.png'))
+        image.setPixmap(pixmap)
+        scrollLayout.addWidget(image)
+        scrollLayout.addWidget(QtGui.QLabel('\n'))
+        label_heading=QtGui.QLabel("5. ZENODO upload ID")
+        label_heading.setStyleSheet("font: bold 20pt Arial")
+        scrollLayout.addWidget(label_heading)
+        label_text=QtGui.QLabel(XChemToolTips.zenodo_upload_part_two())
+        label_text.setStyleSheet("font: 17pt Arial")
+        scrollLayout.addWidget(label_text)
+        image=QtGui.QLabel()
+        pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'),'image','zenodo_upload_id.png'))
+        image.setPixmap(pixmap)
+        scrollLayout.addWidget(image)
+        label_text=QtGui.QLabel(XChemToolTips.zenodo_upload_part_three())
+        label_text.setStyleSheet("font: 17pt Arial")
+        scrollLayout.addWidget(label_text)
+        hbox_zenodo_upload_id=QtGui.QHBoxLayout()
+        hbox_zenodo_upload_id.addWidget(QtGui.QLabel('upload ID:'))
+        self.zenodo_upload_id_entry = QtGui.QLineEdit()
+        self.zenodo_upload_id_entry.setFixedWidth(200)
+        hbox_zenodo_upload_id.addWidget(self.zenodo_upload_id_entry)
+        hbox_zenodo_upload_id.addStretch(1)
+        scrollLayout.addLayout(hbox_zenodo_upload_id)
+        button=QtGui.QPushButton('update html files with upload ID')
+        button.clicked.connect(self.update_html_for_zenodo_upload)
+        button.setMaximumWidth(300)
+        scrollLayout.addWidget(button)
+        scrollLayout.addWidget(QtGui.QLabel('\n'))
+        label_heading=QtGui.QLabel("6. ZENODO upload HTML files")
+        label_heading.setStyleSheet("font: bold 20pt Arial")
+        scrollLayout.addWidget(label_heading)
+        label_text=QtGui.QLabel(XChemToolTips.zenodo_upload_part_four(self.html_export_directory))
+        label_text.setStyleSheet("font: 17pt Arial")
+        scrollLayout.addWidget(label_text)
+        scrollLayout.addWidget(QtGui.QLabel('\n'))
+
+
+        scrollLayout.addStretch(1)
+#        label_title.setStyleSheet("font: 30pt Comic Sans MS")
+#        label_heading.setStyleSheet("font: bold 20pt Arial")
+#        label_text.setStyleSheet("font: 17pt Arial")
+
+        scroll.setWidget(scrollContent)
+
+        self.tab_dict[self.workflow_dict['Deposition']][1].addLayout(self.deposition_vbox)
+
+        ######################################################################################
+
 
         #
         # @ PANDDAs Tab ######################################################################
@@ -1506,7 +1637,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
 
-        print 'ccp4-python '+os.getenv('XChemExplorer_DIR')+'/web/process_sqlite.py -t Summary -s '+os.path.join(self.database_directory,self.data_source_file)+' -d '+self.html_export_directory
+#        print 'ccp4-python '+os.getenv('XChemExplorer_DIR')+'/web/process_sqlite.py -t Summary -s '+os.path.join(self.database_directory,self.data_source_file)+' -d '+self.html_export_directory
         os.system('ccp4-python '+os.getenv('XChemExplorer_DIR')+'/web/process_sqlite.py -t Summary -s '+os.path.join(self.database_directory,self.data_source_file)+' -d '+self.html_export_directory)
         XChemWeb.create_ICM_input_file(self.html_export_directory,os.path.join(self.database_directory,self.data_source_file))
         self.update_log.insert('open ICMpro:')
@@ -1517,6 +1648,27 @@ class XChemExplorer(QtGui.QApplication):
         self.update_log.insert('right click on the script and select RUN')
         self.update_log.insert('be patient, this may take a while, depending on the number of events')
         self.status_bar.showMessage('please check terminal window for further information')
+
+    def open_icm(self):
+        self.update_log.insert('starting ICM...')
+        self.work_thread=XChemThread.start_ICM()
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.work_thread.start()
+
+    def prepare_files_for_zenodo_upload(self):
+        self.update_log.insert('preparing files for ZENODO upload...')
+        os.system('ccp4-python '+os.getenv('XChemExplorer_DIR')+'helpers/prepare_for_zenodo_upload.py '+self.html_export_directory)
+
+    def update_html_for_zenodo_upload(self):
+        try:
+            uploadID=int(self.zenodo_upload_id_entry.text())
+            self.update_log.insert('updating html files for ZENODO upload,...')
+            self.update_log.insert('ZENODO upload = '+str(uploadID))
+            os.system('ccp4-python '+os.getenv('XChemExplorer_DIR')+'helpers/prepare_for_zenodo_upload.py %s %s' %(self.html_export_directory,uploadID))
+        except ValueError:
+            self.update_log.insert('zenodo upload ID must be an integer!')
+
+
 
     def create_missing_apo_records_in_depositTable(self):
         self.db.create_missing_apo_records_in_depositTable(self.xce_logfile)

@@ -1021,6 +1021,16 @@ class start_COOT(QtCore.QThread):
         pickle.dump(self.settings,open(os.path.join(os.getenv('HOME'),'.xce_settings.pkl'),'wb'))
         os.system('cd %s\ncoot --no-guano --no-state-script --script %s' %(os.getenv('HOME'),os.path.join(os.getenv('XChemExplorer_DIR'),'lib','XChemCoot.py')))
 
+class start_ICM(QtCore.QThread):
+
+    def __init__(self):
+        QtCore.QThread.__init__(self)
+
+    def run(self):
+        cwd=os.getcwd()
+        if cwd.startswith('/dls'):
+            os.system('dls/science/groups/i04-1/software/icm-3.8-5/icm64 -g')
+
 class start_pandda_inspect(QtCore.QThread):
 
     def __init__(self,settings,xce_logfile):

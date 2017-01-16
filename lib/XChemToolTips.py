@@ -1,5 +1,6 @@
 # last edited: 06/01/2017, 15:00
 
+import os
 import getpass
 
 def dataset_task_tip():
@@ -141,3 +142,42 @@ def deposition_interface_note():
                 'In such cases, please use for example SQLiteBrowser to edit the relevant fields in the depositTable.'   )
 
     return note
+
+def prepare_ICB_files():
+
+    instruction = (     '- Open file browser and navigate to HTML export directory.\n'
+                        '- Open ICM (Note: when you open it first time at DLS, select SERVER and enter diamvicmpro.diamond.ac.uk)\n'
+                        '- Drag-and-drop dsEvent_sqlite.icm file into ICM main window\n'
+                        '- In ICM workspace panel: right-click on sEvent_sqlite.icm and select "RUN"')
+    return instruction
+
+def zenodo_upload_start(html_export_directory):
+
+    instruction = (     'This will copy all files required for ZENODO upload to\n'
+                        '%s'   %os.path.join(html_export_directory,'zenodo')    )
+    return instruction
+
+def zenodo_upload_part_one(html_export_directory):
+
+    instruction = (     '- Register with ZENODO (www.zenodo.org)\n'
+                        '- Select Upload -> New Upload\n'
+                        '- upload all files from %s/zenodo, BUT NOT any of the .html files!!!' %html_export_directory  )
+    return instruction
+
+def zenodo_upload_part_two():
+
+    instruction = (     'You might have noticed that once you started uploading files, the address bar in your browser will change to something like this:')
+
+    return instruction
+
+def zenodo_upload_part_three():
+
+    instruction = (     'Please enter the upload ID, i.e. the number at the end of the line, into the field below')
+
+    return instruction
+
+def zenodo_upload_part_four(html_export_directory):
+
+    instruction = (     'Upload ALL html files in %s to ZENODO and publish the page.' %os.path.join(html_export_directory,'zenodo'))
+
+    return instruction
