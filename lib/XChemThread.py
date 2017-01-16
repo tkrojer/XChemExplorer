@@ -1029,7 +1029,7 @@ class start_ICM(QtCore.QThread):
     def run(self):
         cwd=os.getcwd()
         if cwd.startswith('/dls'):
-            os.system('dls/science/groups/i04-1/software/icm-3.8-5/icm64 -g')
+            os.system('/dls/science/groups/i04-1/software/icm-3.8-5/icm64 -g')
 
 class start_pandda_inspect(QtCore.QThread):
 

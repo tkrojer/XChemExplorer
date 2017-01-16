@@ -1197,12 +1197,19 @@ class external_software:
 #            subprocess.call(['qstat'], stdout=FNULL, stderr=subprocess.STDOUT)
             p = subprocess.Popen('qstat', shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
             status='found'
-            for line in p.stdout:
-                if 'symbol lookup error:' in line or 'command not found' in line or 'error' in line:
-                    self.available_programs['qsub']=False
-                    self.available_programs['qsub_array']=False
-                    status='not found'
-                    array_status='not found'
+            try:
+                for line in p.stdout:
+                    if 'symbol lookup error:' in line or 'command not found' in line or 'error' in line:
+                        self.available_programs['qsub']=False
+                        self.available_programs['qsub_array']=False
+                        status='not found'
+                        array_status='not found'
+            except IOError:
+                self.available_programs['qsub']=False
+                self.available_programs['qsub_array']=False
+                status='not found'
+                array_status='not found'
+
             if status == 'found':
                 self.available_programs['qsub']=True
 #                if os.getcwd().startswith('/dls'):

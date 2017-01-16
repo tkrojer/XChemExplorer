@@ -219,6 +219,14 @@ class XChemExplorer(QtGui.QApplication):
                                     "Failed - no X-rays",
                                     "Failed - unknown"  ]
 
+        self.refinement_stage = [       '0 - All Datasets',
+                                        '1 - Analysis Pending',
+                                        '2 - PANDDA model',
+                                        '3 - In Refinement',
+                                        '4 - CompChem ready',
+                                        '5 - Deposition ready',
+                                        '6 - Deposited'         ]
+
         #
         # checking for external software packages
         #
@@ -1978,25 +1986,30 @@ class XChemExplorer(QtGui.QApplication):
         )
         grid.addWidget(QtGui.QLabel(note), 1,0)
 
+        grid.addWidget(QtGui.QLabel('Group deposition title'), 2,0)
+        self.group_deposition_title = QtGui.QLineEdit()
+        self.group_deposition_title.setText('')
+        self.group_deposition_title.setFixedWidth(600)
+        grid.addWidget(self.group_deposition_title, 2,1)
 
-        grid.addWidget(QtGui.QLabel('Title'), 2,0)
+        grid.addWidget(QtGui.QLabel('Title'), 3,0)
         self.structure_title = QtGui.QLineEdit()
         self.structure_title.setText('')
         self.structure_title.setFixedWidth(600)
-        grid.addWidget(self.structure_title, 2,1)
+        grid.addWidget(self.structure_title, 3,1)
 #        grid.addWidget(QtGui.QLabel('(e.g. HOLD FOR PUBLICATION, RELEASE NOW)'), 1,2)
 
-        grid.addWidget(QtGui.QLabel('Details'), 3,0)
+        grid.addWidget(QtGui.QLabel('Details'), 4,0)
         self.structure_details = QtGui.QLineEdit()
         self.structure_details.setText('Fragment screening campaign for <replace with protein name> - Fragment Hit Structure $CompoundName')
         self.structure_details.setFixedWidth(600)
-        grid.addWidget(self.structure_details, 3,1)
+        grid.addWidget(self.structure_details, 4,1)
 #        grid.addWidget(QtGui.QLabel('(e.g. HOLD FOR PUBLICATION, RELEASE NOW)'), 2,2)
 
         note = (
             '\n\nApo Structure:\nonly use if you want to deposit PanDDA models!'
         )
-        grid.addWidget(QtGui.QLabel(note), 4,0)
+        grid.addWidget(QtGui.QLabel(note), 5,0)
 
         grid.addWidget(QtGui.QLabel('Title Apo Structure'), 5,0)
         self.structure_title_apo = QtGui.QLineEdit()
@@ -2613,6 +2626,7 @@ class XChemExplorer(QtGui.QApplication):
             self.Release_status_for_structure_factor.setText(self.deposit_dict['Release_status_for_structure_factor'])
             self.Release_status_for_sequence.setText(self.deposit_dict['Release_status_for_sequence'])
 
+            self.group_deposition_title.setText(self.deposit_dict['group_deposition_title'])
             self.structure_title.setText(self.deposit_dict['structure_title'])
             self.structure_details.setText(self.deposit_dict['structure_details'])
             self.structure_title_apo.setText(self.deposit_dict['structure_title_apo'])
@@ -2711,6 +2725,7 @@ class XChemExplorer(QtGui.QApplication):
             'Release_status_for_structure_factor':  str(self.Release_status_for_structure_factor.text()),
             'Release_status_for_sequence':          str(self.Release_status_for_sequence.text()),
 
+            'group_deposition_title':               str(self.group_deposition_title.text()),
             'structure_title':                      str(self.structure_title.text()),
             'structure_details':                    str(self.structure_details.text()),
             'structure_title_apo':                  str(self.structure_title_apo.text()),
@@ -3038,6 +3053,11 @@ class XChemExplorer(QtGui.QApplication):
 #        combobox.addItem('...')
         for reference_file in self.reference_file_list:
             combobox.addItem(reference_file[0])
+
+    def populate_refinement_outcome_combobox(self,combobox):
+        combobox.clear()
+        for stage in self.refinement_stage:
+            combobox.addItem(stage)
 
     def change_pandda_spg_label(self):
         combo_text=str(self.pandda_reference_file_selection_combobox.currentText())
@@ -4720,6 +4740,14 @@ class XChemExplorer(QtGui.QApplication):
         self.restraints_program=text
         self.update_log.insert('will use %s for generation of ligand coordinates and restraints' %text)
 
+    def refinement_outcome_combobox_changed(self):
+        for xtal in self.summary_table_dict:
+            if self.sender() == self.summary_table_dict[xtal]:
+                self.update_log.insert('setting RefinementOutcome field to "'+str(self.sender().currentText())+'" for '+xtal)
+                db_dict={}
+                db_dict['RefinementOutcome']=str(self.sender().currentText())
+                self.db.update_insert_data_source(xtal,db_dict)
+
     def get_reference_file_list(self,reference_root):
         # check available reference files
         reference_file_list=[]
@@ -5327,26 +5355,26 @@ class XChemExplorer(QtGui.QApplication):
         self.mounted_crystal_table.setHorizontalHeaderLabels(self.data_source_columns_to_display)
 
 
-    def populate_summary_table(self,header,data):
-        self.summary_table.setColumnCount(len(self.summary_column_name))
-        self.summary_table.setRowCount(0)
-        self.summary_table.setRowCount(len(data))
-
-        columns_to_show=self.get_columns_to_show(self.summary_column_name,header)
-        for x,row in enumerate(data):
-            for y,item in enumerate(columns_to_show):
-                cell_text=QtGui.QTableWidgetItem()
-#                if item=='Image':
+#    def populate_summary_table(self,header,data):
+#        self.summary_table.setColumnCount(len(self.summary_column_name))
+#        self.summary_table.setRowCount(0)
+#        self.summary_table.setRowCount(len(data))
+#
+#        columns_to_show=self.get_columns_to_show(self.summary_column_name,header)
+#        for x,row in enumerate(data):
+#            for y,item in enumerate(columns_to_show):
+#                cell_text=QtGui.QTableWidgetItem()
+##                if item=='Image':
+##                    cell_text.setText('')
+#                if row[item]==None:
 #                    cell_text.setText('')
-                if row[item]==None:
-                    cell_text.setText('')
-                else:
-                    cell_text.setText(str(row[item]))
-                if self.summary_column_name[y]=='Sample ID':     # assumption is that column 0 is always sampleID
-                    cell_text.setFlags(QtCore.Qt.ItemIsEnabled)             # and this field cannot be changed
-                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                self.summary_table.setItem(x, y, cell_text)
-        self.summary_table.setHorizontalHeaderLabels(self.summary_column_name)
+#                else:
+#                    cell_text.setText(str(row[item]))
+#                if self.summary_column_name[y]=='Sample ID':     # assumption is that column 0 is always sampleID
+#                    cell_text.setFlags(QtCore.Qt.ItemIsEnabled)             # and this field cannot be changed
+#                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+#                self.summary_table.setItem(x, y, cell_text)
+#        self.summary_table.setHorizontalHeaderLabels(self.summary_column_name)
 
 
     def populate_pandda_analyse_input_table(self):
@@ -5400,12 +5428,19 @@ class XChemExplorer(QtGui.QApplication):
                 panddaDict[str(item[0])]=[]
             panddaDict[str(item[0])].append([str(item[1]),str(item[2]),str(item[3])])
 
+#        refinementList = self.db.execute_statement("select CrystalName,RefinementOutcome from mainTable where CrystalName is not '';")
+#        refinementDict={}
+#        for item in refinementList:
+#            if str(item[0]) not in refinementDict:
+#                refinementDict[str(item[0])]=str(item[1])
+
         column_name=self.db.translate_xce_column_list_to_sqlite(self.summary_column_name)
         for xtal in sorted(self.xtal_db_dict):
             new_xtal=False
             db_dict=self.xtal_db_dict[xtal]
             try:
                 stage = int(str(db_dict['RefinementOutcome']).split()[0])
+                refinementStage=db_dict['RefinementOutcome']
             except ValueError:
                 stage = 0
             except IndexError:
@@ -5428,6 +5463,20 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text.setText(str(xtal))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.summary_table.setItem(current_row, column, cell_text)
+
+                    elif header[0]=='Refinement\nOutcome':
+                        if new_xtal:
+                            refinement_outcome_combobox = QtGui.QComboBox()
+                            self.populate_refinement_outcome_combobox(refinement_outcome_combobox)
+                            self.summary_table.setCellWidget(current_row, column, refinement_outcome_combobox)
+                        else:
+                            refinement_outcome_combobox=self.summary_table_dict[xtal]
+                        index = refinement_outcome_combobox.findText(refinementStage, QtCore.Qt.MatchFixedString)
+                        refinement_outcome_combobox.setCurrentIndex(index)
+                        refinement_outcome_combobox.currentIndexChanged.connect(self.refinement_outcome_combobox_changed)
+
+
+
                     elif header[0]=='PanDDA site details':
                         try:
                             panddaDict[xtal].insert(0,['Index','Name','Status'])
@@ -5467,7 +5516,7 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.summary_table.setItem(current_row, column, cell_text)
             if new_xtal:
-                self.summary_table_dict[xtal]=[]
+                self.summary_table_dict[xtal]=refinement_outcome_combobox
 
         self.summary_table.resizeColumnsToContents()
         self.summary_table.resizeRowsToContents()

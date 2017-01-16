@@ -673,6 +673,7 @@ def update_file_locations_of_apo_structuresin_DB(database,projectDir,xce_logfile
 
 
 
+
 #def find_apo_structures(panddaDir,projectDir,database):
 #
 #    # first check if structure is already present in DB and if so if all the
@@ -735,6 +736,33 @@ class update_depositTable(QtCore.QThread):
             self.db.update_depositTable(xtal,'apo',self.deposit_dict)
         self.Logfile.insert('Note: use DBbrowser to edit individual entries')
 
+class prepare_bound_models_for_deposition(QtCore.QThread):
+    def __init__(self,database,xce_logfile):
+        QtCore.QThread.__init__(self)
+        self.database=database
+        self.Logfile=XChemLog.updateLog(xce_logfile)
+        self.db=XChemDB.data_source(database)
+    def run(self):
+        self.Logfile.insert('checking for models in mainTable that are ready for deposition')
+        toDeposit=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%';")
+        self.Logfile.insert('checking refinement stage of respective PanDDA sites...')
+        for item in toDeposit:
+            preparation_can_go_ahead=True
+            xtal=str(item[0])
+            panddaSites=self.db.execute_statement("select CrystalName,RefinementOutcome from panddaTable where CrystalName is '%s' and PANDDA_site_ligand_placed is 'True'" %xtal)
+            self.Logfile.insert('found '+str(len(panddaSites))+' ligands')
+            for site in panddaSites:
+                if str(site[1]).startswith('5'):
+                    self.Logfile.insert('site is ready for deposition')
+                else:
+                    self.Logfile.insert('site is NOT ready for deposition')
+                    preparation_can_go_ahead=False
+            if preparation_can_go_ahead:
+
+
+            else:
+                self.Logfile.insert('Please make sure that all Ligands in '+xtal+' are ready for deposition.')
+
 
 
 #
@@ -761,35 +789,35 @@ class update_depositTable(QtCore.QThread):
 #
 #    '''./sf_convert -o mmcif -sf initial.mtz data.mtz -out NUDT22A-x0315-sf.cif'''
 
-class update_deposition_table:
-
-    def __init__(self,database):
-        self.db=XChemDB.data_source(database)
-
-    def PanDDA_models_to_deposit(self):
-        panddaModels=self.db.execute_statement('select CrystalName,PANDDA_site_index,RefinementOutcome,PANDDA_site_ligand_placed,PANDDA_site_name from panddaTable')
-        toDeposit={}
-        mismatch={}
-
-        for item in panddaModels:
-            xtalID=str(item[0])
-            site_index=str(item[1])
-            RefinementStage=str(item[2])
-            ligand_placed=str(item[3])
-            siteName=str(item[4])
-            if ligand_placed.replace(' ','').lower()=='true':
-                if xtalID in toDeposit:
-                    if not RefinementStage.startswith('3'):
-                        if xtalID not in mismatch:
-                            mismatch[xtalID]=[]
-                        mismatch[xtalID].append([xtalID,site_index])
-                        continue
-
-                if RefinementStage.startswith('3'):
-                    if xtalID not in toDeposit:
-                        toDeposit[xtalID]=[]
-                    toDeposit[xtalID].append([xtalID,site_index,siteName,RefinementStage])
-
-        return toDeposit,mismatch
+#class update_deposition_table:
+#
+#    def __init__(self,database):
+#        self.db=XChemDB.data_source(database)
+#
+#    def PanDDA_models_to_deposit(self):
+#        panddaModels=self.db.execute_statement('select CrystalName,PANDDA_site_index,RefinementOutcome,PANDDA_site_ligand_placed,PANDDA_site_name from panddaTable')
+#        toDeposit={}
+#        mismatch={}
+#
+#        for item in panddaModels:
+#            xtalID=str(item[0])
+#            site_index=str(item[1])
+#            RefinementStage=str(item[2])
+#            ligand_placed=str(item[3])
+#            siteName=str(item[4])
+#            if ligand_placed.replace(' ','').lower()=='true':
+#                if xtalID in toDeposit:
+#                    if not RefinementStage.startswith('3'):
+#                        if xtalID not in mismatch:
+#                            mismatch[xtalID]=[]
+#                        mismatch[xtalID].append([xtalID,site_index])
+#                        continue
+#
+#                if RefinementStage.startswith('3'):
+#                    if xtalID not in toDeposit:
+#                        toDeposit[xtalID]=[]
+#                    toDeposit[xtalID].append([xtalID,site_index,siteName,RefinementStage])
+#
+#        return toDeposit,mismatch
 
 
