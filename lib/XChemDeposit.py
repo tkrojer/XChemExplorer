@@ -758,7 +758,7 @@ class prepare_bound_models_for_deposition(QtCore.QThread):
                     self.Logfile.insert('site is NOT ready for deposition')
                     preparation_can_go_ahead=False
             if preparation_can_go_ahead:
-
+                print 'hallo'
 
             else:
                 self.Logfile.insert('Please make sure that all Ligands in '+xtal+' are ready for deposition.')
