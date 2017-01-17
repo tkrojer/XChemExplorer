@@ -1,4 +1,4 @@
-# last edited: 16/01/2017, 17:00
+# last edited: 17/01/2017, 17:00
 
 import os
 import getpass
@@ -145,21 +145,28 @@ def deposition_interface_note():
 
 def html_summary_introduction():
 
-    text = (    'This section describes how to generate an HTML summary page of the current experiment and '
-                'how to share it with the scientific community via the ZENODO data repository.' )
+    text = (    'This section describes how to generate an HTML summary page of the current experiment and \n'
+                'how to share it with the scientific community via the ZENODO data repository.\n'
+                'For example:')
 
     return text
 
+def html_export_directory_background():
+
+    text = (    'The HTML export directory will contain all files necessary to generate the summary file.\n'
+                'It is also makes it easy to share the results with collaborators.')
+
 def html_export_step():
 
-    text = (    'This step will create a index.html file and copy pdb, mtz, cif and Event maps into the html export directory.')
+    text = (    'This step will create an index.html file and it will copy pdb, mtz and cif files\n'
+                'as well as PanDDA event maps into the html export directory.'  )
 
     return text
 
 
 def icb_file_background():
 
-    text = (    'The structure thumbnails on the html file are interactive and we create the res with http://www.molsoft.com/activeicmjs.html')
+    text = (    'This step will use ICM-pro to create interactive structure thumbnails in the html file (http://www.molsoft.com/activeicmjs.html)')
 
     return text
 

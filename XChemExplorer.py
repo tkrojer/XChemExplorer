@@ -1,4 +1,4 @@
-# last edited: 16/01/2017, 17:00
+# last edited: 17/01/2017, 17:00
 
 import os, sys, glob
 from datetime import datetime
@@ -1049,7 +1049,7 @@ class XChemExplorer(QtGui.QApplication):
         label_heading=QtGui.QLabel('1. Specify HTML export directory in the settings tab')
         label_heading.setStyleSheet("font: bold 20pt Arial")
         scrollLayout.addWidget(label_heading)
-        label_text=QtGui.QLabel(XChemToolTips.html_export_step())
+        label_text=QtGui.QLabel(XChemToolTips.html_export_directory_background())
         label_text.setStyleSheet("font: 17pt Arial")
         scrollLayout.addWidget(label_text)
         if os.getcwd().startswith('/dls'):
@@ -1074,6 +1074,12 @@ class XChemExplorer(QtGui.QApplication):
         label_heading=QtGui.QLabel("3. Prepare ICB files")
         label_heading.setStyleSheet("font: bold 20pt Arial")
         scrollLayout.addWidget(label_heading)
+
+        label_text=QtGui.QLabel(XChemToolTips.icb_file_background())
+        label_text.setStyleSheet("font: 17pt Arial")
+        scrollLayout.addWidget(label_text)
+
+
         label_text=QtGui.QLabel(XChemToolTips.prepare_ICB_files())
         label_text.setStyleSheet("font: 17pt Arial")
         scrollLayout.addWidget(label_text)

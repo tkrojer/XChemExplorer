@@ -1,4 +1,4 @@
-# last edited: 12/01/2017, 15:00
+# last edited: 17/01/2017, 15:00
 
 import sqlite3
 import os,sys
@@ -189,6 +189,7 @@ class data_source:
             ['RefinementRamachandranOutliersTL',            'RefinementRamachandranOutliersTL',             'TEXT',                 0],
             ['RefinementRamachandranFavored',               'Ramachandran\nFavored',                        'TEXT',                 1],
             ['RefinementRamachandranFavoredTL',             'RefinementRamachandranFavoredTL',              'TEXT',                 0],
+            ['RefinementProgram',                           'RefinementProgram',                            'TEXT',                 1],
             ['RefinementStatus',                            'Refinement\nStatus',                           'TEXT',                 1],
 
             ['Deposition_PDB_ID',                           'Deposition_PDB_ID',                            'TEXT',                 1],
@@ -513,6 +514,20 @@ class data_source:
         connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
         cursor = connect.cursor()
         cursor.execute("select * from mainTable where CrystalName='%s';" %sampleID)
+        for column in cursor.description:
+            header.append(column[0])
+        data = cursor.fetchall()
+        for n,item in enumerate(data[0]):
+            db_dict[header[n]]=str(item)
+        return db_dict
+
+    def get_deposit_dict_for_sample(self,sampleID):
+        db_dict={}
+        header=[]
+        data=[]
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+        cursor.execute("select * from depositTable where CrystalName='%s';" %sampleID)
         for column in cursor.description:
             header.append(column[0])
         data = cursor.fetchall()

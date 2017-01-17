@@ -1,4 +1,4 @@
-# last edited: 16/01/2017, 17:00
+# last edited: 17/01/2017, 17:00
 
 import sys
 import os
@@ -626,6 +626,8 @@ def data_template_cif(depositDict):
         '#\n'
         )
 
+    return data_template_cif
+
 def create_SF_mmcif(outDir,mtzList):
     print 'hallo'
 
@@ -737,12 +739,15 @@ class update_depositTable(QtCore.QThread):
         self.Logfile.insert('Note: use DBbrowser to edit individual entries')
 
 class prepare_bound_models_for_deposition(QtCore.QThread):
-    def __init__(self,database,xce_logfile,overwrite_existing_mmcif):
+
+    def __init__(self,database,xce_logfile,overwrite_existing_mmcif,projectDir):
         QtCore.QThread.__init__(self)
         self.database=database
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.db=XChemDB.data_source(database)
         self.overwrite_existing_mmcif=overwrite_existing_mmcif
+        self.projectDir=projectDir
+
     def run(self):
         self.Logfile.insert('checking for models in mainTable that are ready for deposition')
         toDeposit=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%';")
@@ -750,32 +755,64 @@ class prepare_bound_models_for_deposition(QtCore.QThread):
         for item in toDeposit:
             preparation_can_go_ahead=True
             xtal=str(item[0])
-            panddaSites=self.db.execute_statement("select CrystalName,RefinementOutcome from panddaTable where CrystalName is '%s' and PANDDA_site_ligand_placed is 'True'" %xtal)
+            panddaSites=self.db.execute_statement("select CrystalName,RefinementOutcome,PANDDA_site_event_map_mtz from panddaTable where CrystalName is '%s' and PANDDA_site_ligand_placed is 'True'" %xtal)
             self.Logfile.insert('found '+str(len(panddaSites))+' ligands')
+            eventMtz=[]
             for site in panddaSites:
                 if str(site[1]).startswith('5'):
                     self.Logfile.insert('site is ready for deposition')
+                    eventMtz.append(str(site[2]))
                 else:
                     self.Logfile.insert('site is NOT ready for deposition')
                     preparation_can_go_ahead=False
             if preparation_can_go_ahead:
+                ModelData=self.db.execute_statement("select RefinementPDB_latest,RefinementMTZ_latest,RefinementCIF,DataProcessingPathToLogfile from mainTable where CrystalName is '%s'" %xtal)
+                for item in ModelData:
+                    pdb=str(item[0])
+                    mtz=str(item[1])
+                    cif=str(item[2])
+                    log=str(item[3])
+
+                # if all modelled ligands are ready for deposition, we can continue
+
+                # first get all meta-data for deposition, i.e. data_template file
+                self.prepare_data_template_for_xtal(xtal)
+
+                # make model mmcif
+                self.make_model_mmcif(xtal,pdb,log)
+
+                # make SF mmcif
+
+                # report any problems that came up
+
                 print 'hallo'
 
             else:
                 self.Logfile.insert('Please make sure that all Ligands in '+xtal+' are ready for deposition.')
 
+    def prepare_data_template_for_xtal(self,xtal):
+        # check if file exists
+        if self.overwrite_existing_mmcif:
+            self.Logfile.insert('creating data_template.cif file for '+xtal)
+            data_template_dict=self.db.get_deposit_dict_for_sample(xtal)
+            data_template_cif=data_template_cif(data_template_dict)
+            f=open(os.path.join(self.projectDir,xtal,'data_template_cif'))
+            f.write(data_template_cif)
+            f.close()
+
 
     def make_model_mmcif(self,xtal,pdb,log,data_template):
         if os.path.isfile(pdb) and os.path.isfile(log):
+            os.chdir(os.path.join(self.projectDir,xtal))
             Cmd = ( 'pdb_extract'
                     ' -r REFMAC'
-                    ' -iLOG initial.log'
-                    ' -iPDB initial.pdb'
+#                    ' -iLOG initial.log'
+                    ' -iPDB %s'         %pdb+
                     ' -e MR'
                     ' -s AIMLESS'
-                    ' -iLOG aimless.log'
-                    ' -iENT data_template.cif'
-                    ' -o %s.mmcif' %xtal    )
+                    ' -iLOG %s'         %log+
+                    ' -iENT %s'         %data_template+
+                    ' -o %s.mmcif'      %xtal       )
 
             # can we add here the ligand.cif?
 
