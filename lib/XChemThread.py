@@ -1031,11 +1031,11 @@ class start_ICM(QtCore.QThread):
     def run(self):
         cwd=os.getcwd()
         if cwd.startswith('/dls'):
-            if not os.path.isfile(os.path.join('/home',getpass.getuser(),'.flexlmrc')):
-                os.system('touch '+os.path.join('/home',getpass.getuser(),'.flexlmrc'))
-                f=open(os.path.join('/home',getpass.getuser(),'.flexlmrc'),'w')
-                f.write('MOLSOFTD_LICENSE_FILE=@diamvicmpro.diamond.ac.uk')
-                f.close()
+#            if not os.path.isfile(os.path.join('/home',getpass.getuser(),'.flexlmrc')):
+#                os.system('touch '+os.path.join('/home',getpass.getuser(),'.flexlmrc'))
+#                f=open(os.path.join('/home',getpass.getuser(),'.flexlmrc'),'w')
+#                f.write('MOLSOFTD_LICENSE_FILE=@diamvicmpro.diamond.ac.uk')
+#                f.close()
             os.system('nautilus %s &' %self.html_export_directory)
             os.system('/dls/science/groups/i04-1/software/icm-3.8-5/icm64 -g')
 
