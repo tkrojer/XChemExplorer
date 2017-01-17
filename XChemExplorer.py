@@ -1659,7 +1659,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def open_icm(self):
         self.update_log.insert('starting ICM...')
-        self.work_thread=XChemThread.start_ICM()
+        self.work_thread=XChemThread.start_ICM(self.html_export_directory)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 

@@ -1026,9 +1026,10 @@ class start_ICM(QtCore.QThread):
     def __init__(self):
         QtCore.QThread.__init__(self)
 
-    def run(self):
+    def run(self,html_export_directory):
         cwd=os.getcwd()
         if cwd.startswith('/dls'):
+            os.system('nautilus %s &' %html_export_directory)
             os.system('/dls/science/groups/i04-1/software/icm-3.8-5/icm64 -g')
 
 class start_pandda_inspect(QtCore.QThread):
