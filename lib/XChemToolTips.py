@@ -143,12 +143,34 @@ def deposition_interface_note():
 
     return note
 
+def html_summary_introduction():
+
+    text = (    'This section describes how to generate an HTML summary page of the current experiment and '
+                'how to share it with the scientific community via the ZENODO data repository.' )
+
+    return text
+
+def html_export_step():
+
+    text = (    'This step will create a index.html file and copy pdb, mtz, cif and Event maps into the html export directory.')
+
+    return text
+
+
+def icb_file_background():
+
+    text = (    'The structure thumbnails on the html file are interactive and we create the res with http://www.molsoft.com/activeicmjs.html')
+
+    return text
+
+
+
 def prepare_ICB_files():
 
     instruction = (     '- Open file browser and navigate to HTML export directory.\n'
-                        '- Open ICM (Note: when you open it first time at DLS, select SERVER and enter diamvicmpro.diamond.ac.uk)\n'
-                        '- Drag-and-drop dsEvent_sqlite.icm file into ICM main window\n'
-                        '- In ICM workspace panel: right-click on sEvent_sqlite.icm and select "RUN"')
+                        '- Open ICM (at DLS: select SERVER and enter diamvicmpro.diamond.ac.uk in case ICM asks).\n'
+                        '- Drag-and-drop dsEvent_sqlite.icm file into ICM main window.\n'
+                        '- In ICM workspace panel: right-click on dsEvent_sqlite.icm and select "RUN".')
     return instruction
 
 def zenodo_upload_start(html_export_directory):
