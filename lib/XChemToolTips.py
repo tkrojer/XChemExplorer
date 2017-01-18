@@ -210,3 +210,9 @@ def zenodo_upload_part_four(html_export_directory):
     instruction = (     'Upload ALL html files in %s to ZENODO and publish the page.' %os.path.join(html_export_directory,'zenodo'))
 
     return instruction
+
+def deposition_pandda_site_not_ready(xtal):
+    msg = (     'Please make sure that all placed ligands in '+xtal+' are ready for deposition.\n'
+                'Go to the Refinement tab -> Open COOT and either delete the ligand or set the site '
+                ' to "5 - Deposition ready"'    )
+    return msg

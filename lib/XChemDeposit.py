@@ -9,6 +9,7 @@ from PyQt4 import QtGui, QtCore, QtWebKit
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 import XChemLog
 import XChemDB
+import XChemToolTips
 
 deposition = {}
 
@@ -751,10 +752,11 @@ class prepare_bound_models_for_deposition(QtCore.QThread):
     def run(self):
         self.Logfile.insert('checking for models in mainTable that are ready for deposition')
         toDeposit=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%';")
-        self.Logfile.insert('checking refinement stage of respective PanDDA sites...')
         for item in toDeposit:
-            preparation_can_go_ahead=True
             xtal=str(item[0])
+            self.Logfile.insert(xtal+'is ready for deposition')
+            preparation_can_go_ahead=True
+            self.Logfile.insert('checking refinement stage of respective PanDDA sites...')
             panddaSites=self.db.execute_statement("select CrystalName,RefinementOutcome,PANDDA_site_event_map_mtz from panddaTable where CrystalName is '%s' and PANDDA_site_ligand_placed is 'True'" %xtal)
             self.Logfile.insert('found '+str(len(panddaSites))+' ligands')
             eventMtz=[]
@@ -788,7 +790,7 @@ class prepare_bound_models_for_deposition(QtCore.QThread):
                 print 'hallo'
 
             else:
-                self.Logfile.insert('Please make sure that all Ligands in '+xtal+' are ready for deposition.')
+                self.Logfile.insert(XChemToolTips.deposition_pandda_site_not_ready(xtal))
 
     def prepare_data_template_for_xtal(self,xtal):
         # check if file exists

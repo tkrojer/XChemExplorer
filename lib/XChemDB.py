@@ -293,6 +293,7 @@ class data_source:
             ['Release_status_for_structure_factor',         'Release_status_for_structure_factor',      'TEXT'],
             ['Release_status_for_sequence',                 'Release_status_for_sequence',              'TEXT'],
 
+            ['group_deposition_title',                      'group_deposition_title',                   'TEXT'],
             ['structure_title',                             'structure_title',                          'TEXT'],
             ['structure_details',                           'structure_details',                        'TEXT'],
             ['structure_title_apo',                         'structure_title_apo',                      'TEXT'],
