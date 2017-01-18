@@ -332,6 +332,10 @@ class XChemExplorer(QtGui.QApplication):
         update_file_information_of_apo_records.triggered.connect(self.update_file_information_of_apo_records)
         deposition_menu.addAction(update_file_information_of_apo_records)
 
+        prepare_bound_models_for_deposition=QtGui.QAction('prepare_bound_models_for_deposition',self.window)
+        prepare_bound_models_for_deposition.triggered.connect(self.prepare_bound_models_for_deposition)
+        deposition_menu.addAction(prepare_bound_models_for_deposition)
+
         help = menu_bar.addMenu("&Help")
 
 
@@ -1705,6 +1709,19 @@ class XChemExplorer(QtGui.QApplication):
     def update_file_information_of_apo_records(self):
         XChemDeposit.update_file_locations_of_apo_structuresin_DB(os.path.join(self.database_directory,self.data_source_file),self.initial_model_directory,self.xce_logfile)
 
+    def prepare_bound_models_for_deposition(self):
+        overwrite_existing_mmcif=True
+        self.work_thread=XChemDeposit.prepare_bound_models_for_deposition(  os.path.join(self.database_directory,self.data_source_file),
+                                                                            self.xce_logfile,
+                                                                            overwrite_existing_mmcif,
+                                                                            self.initial_model_directory    )
+        self.explorer_active=1
+        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.work_thread.start()
+
+
     def deposition_data(self):
 
         depositData = QtGui.QMessageBox()
@@ -2595,8 +2612,6 @@ class XChemExplorer(QtGui.QApplication):
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-            self.connect(self.work_thread, QtCore.SIGNAL("create_widgets_for_autoprocessing_results_only"),
-                                                 self.create_widgets_for_autoprocessing_results_only)
             self.work_thread.start()
 
 
@@ -2698,7 +2713,10 @@ class XChemExplorer(QtGui.QApplication):
             self.data_collection_temperature.setText(self.deposit_dict['data_collection_temperature'])
             self.data_collection_protocol.setText(self.deposit_dict['data_collection_protocol'])
 
-        except KeyError:
+#        except KeyError:
+#            self.update_status_bar('Sorry, this is not a XChemExplorer deposit file!')
+#            self.update_log.insert('Sorry, this is not a XChemExplorer deposit file!')
+        except ValueError:
             self.update_status_bar('Sorry, this is not a XChemExplorer deposit file!')
             self.update_log.insert('Sorry, this is not a XChemExplorer deposit file!')
 
@@ -2739,7 +2757,6 @@ class XChemExplorer(QtGui.QApplication):
             'contact_author_State_or_Province':     str(self.contact_author_State_or_Province.text()),
             'contact_author_Zip_Code':              str(self.contact_author_Zip_Code.text()),
             'contact_author_Country':               str(self.contact_author_Country.text()),
-#            'contact_author_fax_number':            str(self.contact_author_fax_number.text()),
             'contact_author_phone_number':          str(self.contact_author_phone_number.text()),
 
             'Release_status_for_coordinates':       str(self.Release_status_for_coordinates.text()),
@@ -2760,9 +2777,6 @@ class XChemExplorer(QtGui.QApplication):
             'primary_citation_page_last':           str(self.primary_citation_page_last.text()),
 
             'molecule_name':                                str(self.molecule_name.text()),
-#            'fragment_name_one':                            str(self.fragment_name_one.text()),
-#            'fragment_name_one_specific_mutation':          str(self.fragment_name_one_specific_mutation.text()),
-#            'fragment_name_one_enzyme_comission_number':    str(self.fragment_name_one_enzyme_comission_number.text()),
             'Source_organism_scientific_name':              str(self.Source_organism_scientific_name.text()),
             'Source_organism_gene':                         str(self.Source_organism_gene.text()),
             'Source_organism_strain':                       str(self.Source_organism_strain.text()),
