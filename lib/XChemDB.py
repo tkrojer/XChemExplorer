@@ -1,4 +1,4 @@
-# last edited: 17/01/2017, 15:00
+# last edited: 18/01/2017, 15:00
 
 import sqlite3
 import os,sys
@@ -795,7 +795,6 @@ class data_source:
 #            print 'e',str(line[0])
             if str(item) not in samples_in_table: samples_in_table.append(str(line[0]))
 #            samples_in_table.append(line)
-        print 'c',samples_in_table
 
 
 
@@ -1202,3 +1201,55 @@ class data_source:
                 connect.commit()
 
 #    def get_deposit_dict_for_xtal(self,sampleID,structure_type):
+
+    def create_or_remove_missing_records_in_depositTable(self,xce_logfile,xtal,type,db_dict):
+        connect=sqlite3.connect(self.data_source_file)
+        cursor = connect.cursor()
+        cursor.execute("select RefinementOutcome from mainTable where CrystalName is '%s'" %xtal)
+        tmp = cursor.fetchall()
+        oldRefiStage=str(tmp[0][0])
+
+        Logfile=XChemLog.updateLog(xce_logfile)
+        Logfile.insert('setting RefinementOutcome field to "'+db_dict['RefinementOutcome']+'" for '+xtal)
+        self.update_insert_data_source(xtal,db_dict)
+
+        cursor.execute("select CrystalName,StructureType from depositTable where CrystalName is '%s' and StructureType is '%s'" %(xtal,type))
+        tmp = cursor.fetchall()
+        if tmp == [] and int(db_dict['RefinementOutcome'].split()[0]) == 5:
+            sqlite="insert into depositTable (CrystalName,StructureType) values ('%s','%s');" %(xtal,type)
+            Logfile.insert('creating new entry for '+str(type)+' structure of '+xtal+' in depositTable')
+            cursor.execute(sqlite)
+            connect.commit()
+        else:
+            if int(db_dict['RefinementOutcome'].split()[0]) < 5:
+                sqlite="delete from depositTable where CrystalName is '%s' and StructureType is '%s'" %(xtal,type)
+                Logfile.insert('removing entry for '+str(type)+' structure of '+xtal+' from depositTable')
+                cursor.execute(sqlite)
+                connect.commit()
+
+
+#        for item in tmp:
+#            print item
+#            for xtal in str(item[0]).split(';'):
+#                if xtal not in apoStructureList: apoStructureList.append(xtal)
+#        if apoStructureList==[]:
+#            Logfile.insert('no apo structures were assigned to your pandda models')
+#        else:
+#            Logfile.insert('the following datasets were at some point used as apo structures for pandda.analyse: '+str(apoStructureList))
+#            apoInDB=[]
+#            cursor.execute("select CrystalName from depositTable where StructureType is 'apo'")
+#            tmp = cursor.fetchall()
+#            for xtal in tmp:
+#                Logfile.insert(str(xtal[0])+' exists as entry for apo structure in database')
+#                apoInDB.append(str(xtal[0]))
+#            newEntries=''
+#            for xtal in apoStructureList:
+#                if xtal not in apoInDB:
+#                    Logfile.insert('no entry for '+xtal+' in depositTable')
+#                    newEntries+="('%s','apo')," %xtal
+#            if newEntries != '':
+#                sqlite='insert into depositTable (CrystalName,StructureType) values %s;' %newEntries[:-1]
+#                Logfile.insert('creating new entries with the following SQLite command:\n'+sqlite)
+#                cursor.execute(sqlite)
+#                connect.commit()
+#

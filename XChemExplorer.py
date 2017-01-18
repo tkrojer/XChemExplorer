@@ -1,4 +1,4 @@
-# last edited: 17/01/2017, 17:00
+# last edited: 18/01/2017, 17:00
 
 import os, sys, glob
 from datetime import datetime
@@ -4779,10 +4779,10 @@ class XChemExplorer(QtGui.QApplication):
     def refinement_outcome_combobox_changed(self):
         for xtal in self.summary_table_dict:
             if self.sender() == self.summary_table_dict[xtal]:
-                self.update_log.insert('setting RefinementOutcome field to "'+str(self.sender().currentText())+'" for '+xtal)
                 db_dict={}
                 db_dict['RefinementOutcome']=str(self.sender().currentText())
-                self.db.update_insert_data_source(xtal,db_dict)
+                self.db.create_or_remove_missing_records_in_depositTable(self.xce_logfile,xtal,'ligand_bound',db_dict)
+
 
     def get_reference_file_list(self,reference_root):
         # check available reference files
