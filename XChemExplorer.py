@@ -2783,6 +2783,7 @@ class XChemExplorer(QtGui.QApplication):
             'Expression_system_scientific_name':            str(self.Expression_system_scientific_name.text()),
             'Expression_system_strain':                     str(self.Expression_system_strain.text()),
             'Expression_system_plasmid_name':               str(self.Expression_system_plasmid_name.text()),
+            'Expression_system_vector_type':                str(self.Expression_system_vector_type.text()),
             'Manipulated_source_details':                   str(self.Manipulated_source_details.text()),
 
             'structure_keywords':                           str(self.structure_keywords.text()),
