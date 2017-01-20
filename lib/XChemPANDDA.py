@@ -454,6 +454,19 @@ class giant_cluster_datasets(QtCore.QThread):
 
         self.emit(QtCore.SIGNAL('update_progress_bar'), 0)
 
+        if self.pdb_style.replace(' ','') == '':
+            self.Logfile.insert('PDB style is not set in pandda.analyse!')
+            self.Logfile.insert('cannot start pandda.analyse')
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'PDB style is not set in pandda.analyse!')
+            return None
+
+        if self.mtz_style.replace(' ','') == '':
+            self.Logfile.insert('MTZ style is not set in pandda.analyse!')
+            self.Logfile.insert('cannot start pandda.analyse')
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'MTZ style is not set in pandda.analyse!')
+            return None
+
+
         # 1.) prepare output directory
         os.chdir(self.panddas_directory)
         if os.path.isdir('cluster_analysis'):
