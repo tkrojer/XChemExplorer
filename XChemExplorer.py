@@ -1690,14 +1690,14 @@ class XChemExplorer(QtGui.QApplication):
 
     def prepare_files_for_zenodo_upload(self):
         self.update_log.insert('preparing files for ZENODO upload...')
-        os.system('ccp4-python '+os.getenv('XChemExplorer_DIR')+'helpers/prepare_for_zenodo_upload.py '+self.html_export_directory)
+        os.system('ccp4-python '+os.getenv('XChemExplorer_DIR')+'/helpers/prepare_for_zenodo_upload.py '+self.html_export_directory)
 
     def update_html_for_zenodo_upload(self):
         try:
             uploadID=int(self.zenodo_upload_id_entry.text())
             self.update_log.insert('updating html files for ZENODO upload,...')
             self.update_log.insert('ZENODO upload = '+str(uploadID))
-            os.system('ccp4-python '+os.getenv('XChemExplorer_DIR')+'helpers/prepare_for_zenodo_upload.py %s %s' %(self.html_export_directory,uploadID))
+            os.system('ccp4-python '+os.getenv('XChemExplorer_DIR')+'/helpers/prepare_for_zenodo_upload.py %s %s' %(self.html_export_directory,uploadID))
         except ValueError:
             self.update_log.insert('zenodo upload ID must be an integer!')
 
@@ -4106,11 +4106,21 @@ class XChemExplorer(QtGui.QApplication):
 
         added_new_reference_files=False
         # copy first pdb file in each cluster into reference directory
-        for cluster in cluster_dict:
-            if not os.path.isfile(os.path.join(self.reference_directory,cluster+'.pdb')):
-                added_new_reference_files=True
-                os.system('/bin/cp %s %s' %(cluster_dict[cluster][0],os.path.join(self.reference_directory,cluster+'.pdb')))
-                self.update_log.insert('copying %s as reference file for cluster %s in reference directory as %s.pdb' %(cluster_dict[cluster][0],cluster,cluster))
+        # 20/01/2017:
+        # take this step out; turned out not to be ideal since it the presence of these files
+        # in the refererence folder interferes with map calculation and in general confuses userss
+#        for cluster in cluster_dict:
+#            if not os.path.isfile(os.path.join(self.reference_directory,cluster+'.pdb')):
+#                added_new_reference_files=True
+#                os.system('/bin/cp %s %s' %(cluster_dict[cluster][0],os.path.join(self.reference_directory,cluster+'.pdb')))
+#                self.update_log.insert('copying %s as reference file for cluster %s in reference directory as %s.pdb' %(cluster_dict[cluster][0],cluster,cluster))
+
+#        if added_new_reference_files:
+#            currentRef = str(self.pandda_reference_file_selection_combobox.currentText())
+#            self.update_log.insert('updating combobox')
+#            self.update_reference_files(' ')
+#            index = self.pandda_reference_file_selection_combobox.findText(currentRef)
+#            self.pandda_reference_file_selection_combobox.setCurrentIndex(index)
 
         # now need to check for the other reference files in the reference file folder
         for item in self.reference_file_list:
@@ -4119,13 +4129,6 @@ class XChemExplorer(QtGui.QApplication):
 
         for key in cluster_dict:
             self.update_log.insert('cluster %s:   %s datasets' %(str(key),str(len(cluster_dict[key])-1)))
-
-        if added_new_reference_files:
-            currentRef = str(self.pandda_reference_file_selection_combobox.currentText())
-            self.update_log.insert('updating combobox')
-            self.update_reference_files(' ')
-            index = self.pandda_reference_file_selection_combobox.findText(currentRef)
-            self.pandda_reference_file_selection_combobox.setCurrentIndex(index)
 
         reference_ID=str(self.pandda_reference_file_selection_combobox.currentText())
         if len(cluster_dict) > 1 and not os.path.isfile(os.path.join(self.reference_directory,reference_ID+'.pdb')):

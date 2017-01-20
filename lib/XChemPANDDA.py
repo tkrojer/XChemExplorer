@@ -466,7 +466,6 @@ class giant_cluster_datasets(QtCore.QThread):
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'MTZ style is not set in pandda.analyse!')
             return None
 
-
         # 1.) prepare output directory
         os.chdir(self.panddas_directory)
         if os.path.isdir('cluster_analysis'):
@@ -533,6 +532,8 @@ class giant_cluster_datasets(QtCore.QThread):
                     db_dict={}
                     db_dict['CrystalFormName']=key
                     self.db.update_data_source(xtal,db_dict)
+
+        # 6.) finish
         self.emit(QtCore.SIGNAL('update_progress_bar'), 100)
         self.Logfile.insert('finished giant.cluster_mtzs_and_pdbs')
         self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
