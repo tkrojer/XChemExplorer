@@ -37,7 +37,7 @@ def create_ICM_input_file(html_export_directory,database):
         "as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, "
         "p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,"
         "m.RefinementBoundConformation,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m "
-        "where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and and p.RefinementOutcome like '4%' "
+        "where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and p.RefinementOutcome like '4%' "
         'order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index" name="T"\n'
 
 
