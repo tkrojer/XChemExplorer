@@ -533,7 +533,10 @@ class parse:
 
         resolution_at_sigma_line_overall_found=False
         for line_number,line in enumerate(open(logfile)):
-            if 'Wavelength' in line and len(line.split())==2:
+#            if 'Wavelength' in line:
+#                print 'here'
+#                print line.split()
+            if 'Wavelength' in line and len(line.split())==3:
                 self.aimless['DataCollectionWavelength']=line.split()[1]
             if line.startswith('Low resolution limit') and len(line.split())==6:
                 self.aimless['DataProcessingResolutionLow'] = line.split()[3]

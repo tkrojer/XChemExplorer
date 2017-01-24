@@ -742,6 +742,7 @@ class convert_all_event_maps_in_database(QtCore.QThread):
                 self.Logfile.insert('directory: '+os.path.join(self.initial_model_directory,xtalID)+' -> cannot find refine.mtz; trying next')
                 continue
 
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'eventMap -> SF for '+event_map)
             convert_event_map_to_SF(self.initial_model_directory,xtalID,event_map,ligand_pdb,self.xce_logfile,self.datasource,resolution).run()
 
             progress += progress_step

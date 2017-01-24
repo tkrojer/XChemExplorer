@@ -1984,24 +1984,30 @@ class XChemExplorer(QtGui.QApplication):
         grid = QtGui.QGridLayout()
         grid.addWidget(QtGui.QLabel('Release status'), 0,0)
 
-        grid.addWidget(QtGui.QLabel('Release Status for coordinates'), 1,0)
-        self.Release_status_for_coordinates = QtGui.QLineEdit()
-        self.Release_status_for_coordinates.setText('')
-        self.Release_status_for_coordinates.setFixedWidth(200)
+        grid.addWidget(QtGui.QLabel('Release Status for coordinates/ SF'), 1,0)
+#        self.Release_status_for_coordinates = QtGui.QLineEdit()
+#        self.Release_status_for_coordinates.setText('')
+#        self.Release_status_for_coordinates.setFixedWidth(200)
+        self.Release_status_for_coordinates = QtGui.QComboBox()
+        coordStatus = ['RELEASE NOW','HOLD FOR PUBLICATION','HOLD FOR 4 WEEKS','HOLD FOR 6 MONTHS','HOLD FOR 1 YEAR']
+        for item in coordStatus: self.Release_status_for_coordinates.addItem(item)
         grid.addWidget(self.Release_status_for_coordinates, 1,1)
-        grid.addWidget(QtGui.QLabel('(e.g. HOLD FOR PUBLICATION, RELEASE NOW)'), 1,2)
+#        grid.addWidget(QtGui.QLabel('(e.g. HOLD FOR PUBLICATION, RELEASE NOW)'), 1,2)
 
-        grid.addWidget(QtGui.QLabel('Release Status for structure factors'), 2,0)
-        self.Release_status_for_structure_factor = QtGui.QLineEdit()
-        self.Release_status_for_structure_factor.setText('')
-        self.Release_status_for_structure_factor.setFixedWidth(200)
-        grid.addWidget(self.Release_status_for_structure_factor, 2,1)
-        grid.addWidget(QtGui.QLabel('(e.g. HOLD FOR PUBLICATION, RELEASE NOW)'), 2,2)
+#        grid.addWidget(QtGui.QLabel('Release Status for structure factors'), 2,0)
+#        self.Release_status_for_structure_factor = QtGui.QLineEdit()
+#        self.Release_status_for_structure_factor.setText('')
+#        self.Release_status_for_structure_factor.setFixedWidth(200)
+#        grid.addWidget(self.Release_status_for_structure_factor, 2,1)
+#        grid.addWidget(QtGui.QLabel('(e.g. HOLD FOR PUBLICATION, RELEASE NOW)'), 2,2)
 
         grid.addWidget(QtGui.QLabel('Release Status for sequence'), 3,0)
-        self.Release_status_for_sequence = QtGui.QLineEdit()
-        self.Release_status_for_sequence.setText('')
-        self.Release_status_for_sequence.setFixedWidth(200)
+#        self.Release_status_for_sequence = QtGui.QLineEdit()
+#        self.Release_status_for_sequence.setText('')
+#        self.Release_status_for_sequence.setFixedWidth(200)
+        self.Release_status_for_sequence = QtGui.QComboBox()
+        codeStatus = ['RELEASE NOW','HOLD FOR RELEASE']
+        for item in codeStatus: self.Release_status_for_sequence.addItem(item)
         grid.addWidget(self.Release_status_for_sequence, 3,1)
         grid.addWidget(QtGui.QLabel('(e.g. RELEASE NOW, HOLD FOR RELEASE)'), 3,2)
 
@@ -2566,6 +2572,7 @@ class XChemExplorer(QtGui.QApplication):
         hbox.addWidget(button)
         button=QtGui.QPushButton('Load from\nDatabase')
         button.clicked.connect(self.load_deposit_from_database)
+        button.setEnabled(False)
         hbox.addWidget(button)
         button=QtGui.QPushButton('Save to\nDatabase')
         button.clicked.connect(self.save_deposit_to_database)
@@ -2657,10 +2664,13 @@ class XChemExplorer(QtGui.QApplication):
             self.contact_author_Country.setText(self.deposit_dict['contact_author_Country'])
 #            self.contact_author_fax_number.setText(self.deposit_dict['contact_author_fax_number'])
             self.contact_author_phone_number.setText(self.deposit_dict['contact_author_phone_number'])
-
-            self.Release_status_for_coordinates.setText(self.deposit_dict['Release_status_for_coordinates'])
-            self.Release_status_for_structure_factor.setText(self.deposit_dict['Release_status_for_structure_factor'])
-            self.Release_status_for_sequence.setText(self.deposit_dict['Release_status_for_sequence'])
+#            self.Release_status_for_coordinates.setText(self.deposit_dict['Release_status_for_coordinates'])
+            index = self.Release_status_for_coordinates.findText(self.deposit_dict['Release_status_for_coordinates'], QtCore.Qt.MatchFixedString)
+            self.Release_status_for_coordinates.setCurrentIndex(index)
+#            self.Release_status_for_structure_factor.setText(self.deposit_dict['Release_status_for_structure_factor'])
+#            self.Release_status_for_sequence.setText(self.deposit_dict['Release_status_for_sequence'])
+            index = self.Release_status_for_sequence.findText(self.deposit_dict['Release_status_for_sequence'], QtCore.Qt.MatchFixedString)
+            self.Release_status_for_sequence.setCurrentIndex(index)
 
             self.group_deposition_title.setText(self.deposit_dict['group_deposition_title'])
             self.structure_title.setText(self.deposit_dict['structure_title'])
@@ -2759,9 +2769,9 @@ class XChemExplorer(QtGui.QApplication):
             'contact_author_Country':               str(self.contact_author_Country.text()),
             'contact_author_phone_number':          str(self.contact_author_phone_number.text()),
 
-            'Release_status_for_coordinates':       str(self.Release_status_for_coordinates.text()),
-            'Release_status_for_structure_factor':  str(self.Release_status_for_structure_factor.text()),
-            'Release_status_for_sequence':          str(self.Release_status_for_sequence.text()),
+            'Release_status_for_coordinates':       str(self.Release_status_for_coordinates.currentText()),
+#            'Release_status_for_structure_factor':  str(self.Release_status_for_structure_factor.text()),
+            'Release_status_for_sequence':          str(self.Release_status_for_sequence.currentText()),
 
             'group_deposition_title':               str(self.group_deposition_title.text()),
             'structure_title':                      str(self.structure_title.text()),

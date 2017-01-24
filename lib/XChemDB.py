@@ -253,7 +253,7 @@ class data_source:
             ['MTZ_file',                                    'MTZ_file',                                 'TEXT'],
 
             ['mmCIF_model_file',                            'mmCIF_model_file',                         'TEXT'],
-            ['mmCIF_SG_file',                               'mmCIF_SF_file',                            'TEXT'],
+            ['mmCIF_SF_file',                               'mmCIF_SF_file',                            'TEXT'],
             ['label',                                       'label',                                    'TEXT'],    # for index.txt
             ['description',                                 'description',                              'TEXT'],    # for index.txt
 
