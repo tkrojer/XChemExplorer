@@ -1,4 +1,4 @@
-# last edited: 20/01/2017, 17:00
+# last edited: 24/01/2017, 17:00
 
 import os, sys, glob
 from datetime import datetime
@@ -1984,15 +1984,15 @@ class XChemExplorer(QtGui.QApplication):
         grid = QtGui.QGridLayout()
         grid.addWidget(QtGui.QLabel('Release status'), 0,0)
 
-        grid.addWidget(QtGui.QLabel('Release Status for coordinates/ SF'), 1,0)
-#        self.Release_status_for_coordinates = QtGui.QLineEdit()
-#        self.Release_status_for_coordinates.setText('')
-#        self.Release_status_for_coordinates.setFixedWidth(200)
-        self.Release_status_for_coordinates = QtGui.QComboBox()
-        coordStatus = ['RELEASE NOW','HOLD FOR PUBLICATION','HOLD FOR 4 WEEKS','HOLD FOR 6 MONTHS','HOLD FOR 1 YEAR']
-        for item in coordStatus: self.Release_status_for_coordinates.addItem(item)
-        grid.addWidget(self.Release_status_for_coordinates, 1,1)
-#        grid.addWidget(QtGui.QLabel('(e.g. HOLD FOR PUBLICATION, RELEASE NOW)'), 1,2)
+#        grid.addWidget(QtGui.QLabel('Release Status for coordinates/ SF'), 2,0)
+##        self.Release_status_for_coordinates = QtGui.QLineEdit()
+##        self.Release_status_for_coordinates.setText('')
+##        self.Release_status_for_coordinates.setFixedWidth(200)
+#        self.Release_status_for_coordinates = QtGui.QComboBox()
+#        coordStatus = ['RELEASE NOW','HOLD FOR PUBLICATION','HOLD FOR 4 WEEKS','HOLD FOR 6 MONTHS','HOLD FOR 1 YEAR']
+#        for item in coordStatus: self.Release_status_for_coordinates.addItem(item)
+#        grid.addWidget(self.Release_status_for_coordinates, 2,1)
+##        grid.addWidget(QtGui.QLabel('(e.g. HOLD FOR PUBLICATION, RELEASE NOW)'), 1,2)
 
 #        grid.addWidget(QtGui.QLabel('Release Status for structure factors'), 2,0)
 #        self.Release_status_for_structure_factor = QtGui.QLineEdit()
@@ -2001,15 +2001,24 @@ class XChemExplorer(QtGui.QApplication):
 #        grid.addWidget(self.Release_status_for_structure_factor, 2,1)
 #        grid.addWidget(QtGui.QLabel('(e.g. HOLD FOR PUBLICATION, RELEASE NOW)'), 2,2)
 
-        grid.addWidget(QtGui.QLabel('Release Status for sequence'), 3,0)
+        grid.addWidget(QtGui.QLabel('Release Status for sequence'), 4,0)
 #        self.Release_status_for_sequence = QtGui.QLineEdit()
 #        self.Release_status_for_sequence.setText('')
 #        self.Release_status_for_sequence.setFixedWidth(200)
         self.Release_status_for_sequence = QtGui.QComboBox()
         codeStatus = ['RELEASE NOW','HOLD FOR RELEASE']
         for item in codeStatus: self.Release_status_for_sequence.addItem(item)
-        grid.addWidget(self.Release_status_for_sequence, 3,1)
-        grid.addWidget(QtGui.QLabel('(e.g. RELEASE NOW, HOLD FOR RELEASE)'), 3,2)
+        grid.addWidget(self.Release_status_for_sequence, 4,1)
+#        grid.addWidget(QtGui.QLabel('(e.g. RELEASE NOW, HOLD FOR RELEASE)'), 3,2)
+
+        grid.addWidget(QtGui.QLabel('Release Status for coordinates/ SF'), 8,0)
+#        self.Release_status_for_coordinates = QtGui.QLineEdit()
+#        self.Release_status_for_coordinates.setText('')
+#        self.Release_status_for_coordinates.setFixedWidth(200)
+        self.Release_status_for_coordinates = QtGui.QComboBox()
+        coordStatus = ['RELEASE NOW','HOLD FOR PUBLICATION','HOLD FOR 4 WEEKS','HOLD FOR 6 MONTHS','HOLD FOR 1 YEAR']
+        for item in coordStatus: self.Release_status_for_coordinates.addItem(item)
+        grid.addWidget(self.Release_status_for_coordinates,                                        8,1)
 
         frame.setLayout(grid)
         vb.addWidget(frame)
@@ -2164,7 +2173,7 @@ class XChemExplorer(QtGui.QApplication):
         self.primary_citation_id = QtGui.QLineEdit()
         self.primary_citation_id.setText('primary')
         self.primary_citation_id.setFixedWidth(500)
-        grid.addWidget(self.Release_status_for_coordinates, 1,1)
+        grid.addWidget(self.primary_citation_id, 1,1)
 
         grid.addWidget(QtGui.QLabel('Journal'), 2,0)
         self.primary_citation_journal_abbrev = QtGui.QLineEdit()
