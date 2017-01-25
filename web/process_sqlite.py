@@ -318,6 +318,9 @@ def main (argv):
     zf.write(pdb)
   zf.close()
 
+  # change folder permissions
+  os.system('chmod -R 775 %s' %panddadir)
+
   return
 
 if __name__ == "__main__":
