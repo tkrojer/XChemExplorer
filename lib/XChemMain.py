@@ -1,4 +1,4 @@
-# last edited: 10/01/2017, 15:00
+# last edited: 25/01/2017, 15:00
 
 import os,glob
 import sys
@@ -432,6 +432,61 @@ def append_dict_of_gda_barcodes(out_dict,files,xce_logfile):
 
     return out_dict
 
+
+def crystal_growth_methods():
+
+    methods = [ 'VAPOR DIFFUSION, SITTING DROP',
+                'VAPOR DIFFUSION, HANGING DROP',
+                'BATCH MODE',
+                'LIPIDIC CUBIC PHASE',
+                'MICROBATCH',
+                'MICROFLUIDIC'  ]
+
+    return methods
+
+def wwBeamlines():
+
+    beamlines = [   'DIAMOND BEAMLINE I02',
+                    'DIAMOND BEAMLINE I03',
+                    'DIAMOND BEAMLINE I04',
+                    'DIAMOND BEAMLINE I04-1',
+                    'DIAMOND BEAMLINE I23',
+                    'DIAMOND BEAMLINE I24'  ]
+
+    return beamlines
+
+def radiationSource():
+
+    source =    [   'SYNCHROTRON',
+                    'ROTATING ANODE',
+                    'SEALED TUBE'   ]
+
+    return source
+
+def detector():
+
+    detectorPrinciple =  [  'PIXEL',
+                            'CCD',
+                            'IMAGE PLATE',
+                            'CMOS'      ]
+
+    return detectorPrinciple
+
+def detectorType():
+
+    detector =  [   'DECTRIS PILATUS 2M',
+                    'DECTRIS PILATUS 2M-F',
+                    'DECTRIS PILATUS 6M',
+                    'DECTRIS PILATUS 6M-F',
+                    'DECTRIS PILATUS 12M',
+                    'DECTRIS PILATUS3 2M',
+                    'DECTRIS PILATUS3 6M',
+                    'DECTRIS EIGER X 9M',
+                    'DECTRIS EIGER X 16M',
+                    'ADSC QUANTUM 315',
+                    'ADSC QUANTUM 315r'     ]
+
+    return detector
 
 class find_diffraction_image_directory(QtCore.QThread):
     def __init__(self,diffraction_data_directory):

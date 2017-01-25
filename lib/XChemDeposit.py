@@ -1,4 +1,4 @@
-# last edited: 24/01/2017, 17:00
+# last edited: 25/01/2017, 17:00
 
 import sys
 import os
@@ -676,7 +676,7 @@ class templates:
             '_pdbx_contact_author.address_2           "%s"\n'                           %depositDict['contact_author_organization_name']+
             '_pdbx_contact_author.city                %s\n'                             %depositDict['contact_author_city']+
             "_pdbx_contact_author.state_province      '%s'\n"                           %depositDict['contact_author_State_or_Province']+
-            '_pdbx_contact_author.postal_code         %s\n'                             %depositDict['contact_author_Zip_Code']+
+            '_pdbx_contact_author.postal_code         %s\n'                             %depositDict['contact_author_Zip_Code'].replace(' ','')+
             '_pdbx_contact_author.email               %s\n'                             %depositDict['contact_author_email']+
             '_pdbx_contact_author.name_first          %s\n'                             %depositDict['contact_author_first_name']+
             '_pdbx_contact_author.name_last           %s\n'                             %depositDict['contact_author_last_name']+
@@ -737,9 +737,38 @@ class update_depositTable(QtCore.QThread):
         for item in dbEntries:
             xtal=str(item[0])
             type=str(item[1])
+            db_dict=self.deposit_dict   # need to do this because individual fields might need updating for some xtals
+
+            # try to get information about the diffraction experiment
+            diffractionExperiment=self.db.execute_statement("select DataCollectionBeamline,DataCollectionDate from mainTable where CrystalName is '%s'" %xtal)
+            beamline=str(diffractionExperiment[0][0])
+            date=str(diffractionExperiment[0][1])
+            if beamline.lower() != 'none':
+                db_dict=self.tweak_deposit_dict(xtal,db_dict)
+            if date.lower() != 'none':
+                db_dict['data_collection_date']=date.split()[0]
+
             self.Logfile.insert('updating depositTable for '+xtal+' @ '+type)
-            self.db.update_depositTable(xtal,type,self.deposit_dict)
+            self.db.update_depositTable(xtal,type,db_dict)
         self.Logfile.insert('Note: use DBbrowser to edit individual entries')
+
+    def tweak_deposit_dict(self,xtal,db_dict):
+        dls_beamlines=['i02','i03','i04','i04-1','i23','i24']
+        dls_beamline_dict = {   'i02':      ['DIAMOND BEAMLINE I02',    'DECTRIS PILATUS 6M'],
+                                'i03':      ['DIAMOND BEAMLINE I03',    'DECTRIS PILATUS 6M'],
+                                'i04':      ['DIAMOND BEAMLINE I04',    'DECTRIS PILATUS 6M'],
+                                'i04-1':    ['DIAMOND BEAMLINE I04-1',  'DECTRIS PILATUS 6M'],
+                                'i23':      ['DIAMOND BEAMLINE I23',    'DECTRIS PILATUS 12M'],
+                                'i24':      ['DIAMOND BEAMLINE I24',    'DECTRIS PILATUS 6M'] ,     }
+
+        if db_dict['radiation_source_type'] in dls_beamlines:
+            db_dict['radiation_source_type']=    dls_beamline_dict[db_dict['radiation_source_type']][0]
+            db_dict['radiation_detector_type']=  dls_beamline_dict[db_dict['radiation_source_type']][1]
+            db_dict['radiation_detector']=       'PIXEL'
+            db_dict['radiation_source']=         'SYNCHROTRON'
+
+        return db_dict
+
 
 class prepare_bound_models_for_deposition(QtCore.QThread):
 
@@ -757,7 +786,7 @@ class prepare_bound_models_for_deposition(QtCore.QThread):
         toDeposit=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%';")
         for item in toDeposit:
             xtal=str(item[0])
-            self.Logfile.insert(xtal+'is ready for deposition')
+            self.Logfile.insert(xtal+' is ready for deposition')
             preparation_can_go_ahead=True
             self.Logfile.insert('checking refinement stage of respective PanDDA sites...')
             panddaSites=self.db.execute_statement("select CrystalName,RefinementOutcome,PANDDA_site_event_map_mtz from panddaTable where CrystalName is '%s' and PANDDA_site_ligand_placed is 'True'" %xtal)
@@ -771,27 +800,36 @@ class prepare_bound_models_for_deposition(QtCore.QThread):
                     self.Logfile.insert('site is NOT ready for deposition')
                     preparation_can_go_ahead=False
             if preparation_can_go_ahead:
-                ModelData=self.db.execute_statement("select RefinementPDB_latest,RefinementMTZ_latest,RefinementCIF,DataProcessingPathToLogfile,RefinementProgram from mainTable where CrystalName is '%s'" %xtal)
-                for item in ModelData:
-                    pdb=str(item[0])
-                    mtz=str(item[1])
-                    cif=str(item[2])
-                    log=str(item[3])
-                    refSoft=str(item[4])
+                ModelData=self.db.execute_statement("select RefinementPDB_latest,RefinementMTZ_latest,RefinementCIF,DataProcessingPathToLogfile,RefinementProgram,CompoundCode from mainTable where CrystalName is '%s'" %xtal)
+                pdb=str(ModelData[0][0])
+                mtz=str(ModelData[0][1])
+                cif=str(ModelData[0][2])
+                if not os.path.isfile(cif):
+                    if not os.path.isfile(os.path.join(self.projectDir,xtal,cif)):
+                        self.Logfile.insert('cannot find ligand CIF file! Please check %s and the database!' %(os.path.join(self.projectDir,xtal)))
+                        self.Logfile.insert('cannot prepare mmcif files for %s; skipping...' %xtal)
+                        continue
+                log=str(ModelData[0][3])
+                refSoft=str(ModelData[0][4])
+                compoundID=str(ModelData[0][5])
 
                 # if all modelled ligands are ready for deposition, we can continue
 
                 # first get all meta-data for deposition, i.e. data_template file
-                self.prepare_data_template_for_xtal(xtal)
+#                self.prepare_data_template_for_xtal(xtal)
 
                 # make model mmcif
-                self.make_model_mmcif(xtal,pdb,log,refSoft)
+#                self.make_model_mmcif(xtal,pdb,log,refSoft)
 
                 # make SF mmcif
-                self.make_sf_mmcif(xtal,mtz,eventMtz)
+#                self.make_sf_mmcif(xtal,mtz,eventMtz)
 
                 # report any problems that came up
 #                self.check_mmcif_files_and_update_db(xtal)
+
+                # add ligand cif file to mmcif
+                print xtal,cif
+
 
             else:
                 self.Logfile.insert(XChemToolTips.deposition_pandda_site_not_ready(xtal))
@@ -809,6 +847,7 @@ class prepare_bound_models_for_deposition(QtCore.QThread):
             f=open(os.path.join(self.projectDir,xtal,self.data_template),'w')
             f.write(data_template)
             f.close()
+
 
 
     def make_model_mmcif(self,xtal,pdb,log,refSoft):
