@@ -1,4 +1,4 @@
-# last edited: 25/01/2017, 17:00
+# last edited: 26/01/2017, 17:00
 
 import sys
 import os
@@ -10,6 +10,7 @@ sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 import XChemLog
 import XChemDB
 import XChemToolTips
+from XChemUtils import pdbtools
 
 
 def create_SF_mmcif(outDir,mtzList):
@@ -60,46 +61,463 @@ def update_file_locations_of_apo_structuresin_DB(database,projectDir,xce_logfile
 
 
 
-#def find_apo_structures(panddaDir,projectDir,database):
+class templates:
+
+    def data_template_cif(self,depositDict):
+
+        structure_author_name=''
+        for name in depositDict['structure_author_name'].split(';'):
+            structure_author_name+='<structure_author_name=  %s>\n' %name
+
+        primary_citation_author_name=''
+        for name in depositDict['primary_citation_author_name'].split(';'):
+            primary_citation_author_name+="primary '%s'\n" %name
+
+        molecule_one_letter_sequence=';'
+        counter=1
+        for aa in depositDict['molecule_one_letter_sequence']:
+            if counter < 70:
+                molecule_one_letter_sequence+=aa
+            if counter == 70:
+                molecule_one_letter_sequence+='\n'+aa
+                counter = 0
+            counter+=1
+
+        data_template_cif = (
+            'data_UNNAMED\n'
+            '#\n'
+            '_pdbx_database_status.entry_id                       UNNAMED\n'
+            "_pdbx_database_status.dep_release_code_coordinates   '%s'\n"                       %depositDict['Release_status_for_coordinates']+
+            "_pdbx_database_status.dep_release_code_sequence      '%s'\n"                       %depositDict['Release_status_for_sequence']+
+            '#\n'
+            '_exptl_crystal_grow.crystal_id      1\n'
+            "_exptl_crystal_grow.method          '%s'\n"                                        %depositDict['crystallization_method']+
+            '_exptl_crystal_grow.pH              %s\n'                                          %depositDict['crystallization_pH']+
+            '_exptl_crystal_grow.temp            %s\n'                                          %depositDict['crystallization_temperature']+
+            '_exptl_crystal_grow.pdbx_details    "%s"\n'                                        %depositDict['crystallization_details']+
+            '#\n'
+            '_diffrn.id                     1\n'
+            '_diffrn.ambient_temp           %s\n'                                               %depositDict['data_collection_temperature']+
+            '_diffrn.crystal_id             1\n'
+            '#\n'
+            '_diffrn_source.diffrn_id                       1\n'
+            '_diffrn_source.source                          %s\n'                               %depositDict['radiation_source']+
+            '_diffrn_source.type                            "%s"\n'                             %depositDict['radiation_source_type']+
+            '_diffrn_source.pdbx_wavelength_list            %s\n'                               %depositDict['radiation_wavelengths']+
+            '#\n'
+            '_diffrn_detector.detector               %s\n'                                      %depositDict['radiation_detector']+
+            "_diffrn_detector.type                   '%s'\n"                                    %depositDict['radiation_detector_type']+
+            '_diffrn_detector.pdbx_collection_date   %s\n'                                      %depositDict['data_collection_date']+
+            '_diffrn_detector.diffrn_id              1\n'
+            '#\n'
+            '_diffrn_radiation.diffrn_id                        1\n'
+            '_diffrn_radiation.wavelength_id                    1\n'
+            "_diffrn_radiation.pdbx_diffrn_protocol             'SINGLE WAVELENGTH'\n"
+            '#\n'
+            '_diffrn_radiation_wavelength.id           1\n'
+            '_diffrn_radiation_wavelength.wavelength   %s\n'                                    %depositDict['radiation_wavelengths']+
+            '#\n'
+            '#\n'
+            'loop_\n'
+            '_entity.id\n'
+            '_entity.type\n'
+            '_entity.src_method\n'
+            '_entity.pdbx_description\n'
+            '1 polymer     man "%s"\n'                                                          %depositDict['molecule_name']+
+            '#\n'
+            'loop_\n'
+            '_entity_poly.entity_id\n'
+            '_entity_poly.type\n'
+            '_entity_poly.pdbx_seq_one_letter_code\n'
+            '_entity_poly.pdbx_strand_id\n'
+#            '_entity_poly.pdbx_seq_db_id\n'
+#            '_entity_poly.pdbx_seq_db_name\n'
+            '1 "polypeptide(L)"\n'
+            +molecule_one_letter_sequence+'\n'
+#        ';MDPEVTLLLQCPGGGLPQEQIQAELSPAHDRRPLPGGDEAITAIWETRLKAQPWLFDAPK\n'
+#        'FRLHSATLAPIGSRGPQLLLRLGLTSYRDFLGTNWSSSAAWLRQQGATDWGDTQAYLADP\n'
+#        'LGVGAALATADDFLVFLRRSRQVAEAPGLVDVPGGHPEPQALCPGGSPQHQDLAGQLVVH\n'
+#        'ELFSSVLQEICDEVNLPLLTLSQPLLLGIARNETSAGRASAEFYVQCSLTSEQVRKHYLS\n'
+#        'GGPEAHESTGIFFVETQNVQRLLETEMWAELCPSAKGAIILYNRVQGSPTGAALGSPALL\n'
+#        'PPL\n'
+            ';\n'
+#            'A Q9BRQ3 UNP\n'
+            '%s\n'                                                                   %depositDict['protein_chains']+
+            '#\n'
+            'loop_\n'
+            '_entity_src_gen.entity_id\n'
+            '_entity_src_gen.gene_src_strain\n'
+            '_entity_src_gen.pdbx_gene_src_scientific_name\n'
+            '_entity_src_gen.pdbx_gene_src_ncbi_taxonomy_id\n'
+            '_entity_src_gen.pdbx_host_org_scientific_name\n'
+            '_entity_src_gen.pdbx_host_org_ncbi_taxonomy_id\n'
+            '1 ? "%s" %s  "%s" %s\n'                %(depositDict['Source_organism_scientific_name'],'?',depositDict['Expression_system_scientific_name'],'?')+
+            '#\n'
+#            '#\n'
+##            '_pdbx_contact_author.id                  1\n'
+##            "_pdbx_contact_author.address_1           '%s'\n"                           %depositDict['contact_author_PI_address']+
+##            '_pdbx_contact_author.address_2           "%s"\n'                           %depositDict['contact_author_PI_organization_name']+
+##            '_pdbx_contact_author.city                %s\n'                             %depositDict['contact_author_PI_city']+
+##            "_pdbx_contact_author.state_province      '%s'\n"                           %depositDict['contact_author_PI_State_or_Province']+
+##            '_pdbx_contact_author.postal_code         %s\n'                             %depositDict['contact_author_PI_Zip_Code']+
+##            '_pdbx_contact_author.email               %s\n'                             %depositDict['contact_author_PI_email']+
+##            '_pdbx_contact_author.name_first          %s\n'                             %depositDict['contact_author_PI_first_name']+
+##            '_pdbx_contact_author.name_last           %s\n'                             %depositDict['contact_author_PI_last_name']+
+##            '_pdbx_contact_author.country             "%s"\n'                           %depositDict['contact_author_PI_Country']+
+##            '_pdbx_contact_author.phone               %s\n'                             %depositDict['contact_author_PI_phone_number']+
+##            '_pdbx_contact_author.role                "%s"\n'                           %depositDict['contact_author_PI_role']+
+##            '_pdbx_contact_author.organization_type   %s\n'                             %depositDict['contact_author_PI_organization_type']+
+##            '#\n'
+#            '_pdbx_contact_author.id                  2\n'
+#            "_pdbx_contact_author.address_1           '%s'\n"                           %depositDict['contact_author_address']+
+#            '_pdbx_contact_author.address_2           "%s"\n'                           %depositDict['contact_author_organization_name']+
+#            '_pdbx_contact_author.city                %s\n'                             %depositDict['contact_author_city']+
+#            "_pdbx_contact_author.state_province      '%s'\n"                           %depositDict['contact_author_State_or_Province']+
+#            '_pdbx_contact_author.postal_code         %s\n'                             %depositDict['contact_author_Zip_Code'].replace(' ','')+
+#            '_pdbx_contact_author.email               %s\n'                             %depositDict['contact_author_email']+
+#            '_pdbx_contact_author.name_first          %s\n'                             %depositDict['contact_author_first_name']+
+#            '_pdbx_contact_author.name_last           %s\n'                             %depositDict['contact_author_last_name']+
+#            '_pdbx_contact_author.country             "%s"\n'                           %depositDict['contact_author_Country']+
+#            '_pdbx_contact_author.phone               %s\n'                             %depositDict['contact_author_phone_number']+
+#            '_pdbx_contact_author.role                "%s"\n'                           %depositDict['contact_author_role']+
+#            '_pdbx_contact_author.organization_type   %s\n'                             %depositDict['contact_author_organization_type']+
+            'loop_\n'
+            '_pdbx_contact_author.id                  \n'
+            "_pdbx_contact_author.address_1           \n"
+            '_pdbx_contact_author.address_2           \n'
+            '_pdbx_contact_author.city                \n'
+            "_pdbx_contact_author.state_province      \n"
+            '_pdbx_contact_author.postal_code         \n'
+            '_pdbx_contact_author.email               \n'
+            '_pdbx_contact_author.name_first          \n'
+            '_pdbx_contact_author.name_last           \n'
+            '_pdbx_contact_author.country             \n'
+            '_pdbx_contact_author.phone               \n'
+            '_pdbx_contact_author.role                \n'
+            '_pdbx_contact_author.organization_type   \n'
+            "1 '%s' '%s' '%s' '%s' '%s' %s %s '%s' '%s' '%s' '%s' %s\n" %(depositDict['contact_author_PI_address'],depositDict['contact_author_PI_organization_name'],depositDict['contact_author_PI_city'],depositDict['contact_author_PI_State_or_Province'],depositDict['contact_author_PI_Zip_Code'],depositDict['contact_author_PI_email'],depositDict['contact_author_PI_first_name'],depositDict['contact_author_PI_last_name'],depositDict['contact_author_PI_Country'],depositDict['contact_author_PI_phone_number'],depositDict['contact_author_PI_role'],depositDict['contact_author_PI_organization_type'])+
+            "2 '%s' '%s' '%s' '%s' '%s' %s %s '%s' '%s' '%s' '%s' %s\n" %(depositDict['contact_author_address'],depositDict['contact_author_organization_name'],depositDict['contact_author_city'],depositDict['contact_author_State_or_Province'],depositDict['contact_author_Zip_Code'].replace(' ',''),depositDict['contact_author_email'],depositDict['contact_author_first_name'],depositDict['contact_author_last_name'],depositDict['contact_author_Country'],depositDict['contact_author_phone_number'],depositDict['contact_author_role'],depositDict['contact_author_organization_type'])+
+            '#\n'
+            'loop_\n'
+            '_audit_author.name\n'
+            "'%s, %s'.\n" %(depositDict['contact_author_last_name'],depositDict['contact_author_first_name'][0])+
+#            "'Krojer, T.'\n"
+#            "'Von Delft, F.'\n"
+            '#\n'
+            '_citation.id                        primary\n'
+            '_citation.title                     "your citation title"\n'
+            '_citation.journal_abbrev            "To Be Published"\n'
+            '#\n'
+            'loop_\n'
+            '_citation_author.citation_id\n'
+            '_citation_author.name\n'
+            +primary_citation_author_name+
+#        "primary 'Krojer, T.'\n"
+#        "primary 'Von Delft, F.'\n"
+            '#\n'
+            '_struct.entry_id                     UNNAMED\n'
+            '_struct.title\n'
+            ';%s\n'                                                         %depositDict['title']+
+            ';\n'
+            '#\n'
+            '_struct_keywords.entry_id        UNNAMED\n'
+            '_struct_keywords.text            "%s"\n'                       %depositDict['structure_keywords']+
+            '#\n'
+            '_pdbx_struct_assembly_depositor_info.id                   1\n'
+            "_pdbx_struct_assembly_depositor_info.method_details       'gel filtration'\n"
+            '_pdbx_struct_assembly_depositor_info.oligomeric_count     3\n'
+            '#\n'
+            '#\n'
+            )
+
+        return data_template_cif
+
+
+
+class update_depositTable(QtCore.QThread):
+    def __init__(self,deposit_dict,database,xce_logfile):
+        QtCore.QThread.__init__(self)
+        self.deposit_dict=deposit_dict
+        self.database=database
+        self.Logfile=XChemLog.updateLog(xce_logfile)
+        self.db=XChemDB.data_source(database)
+
+    def run(self):
+        self.Logfile.insert('all entries in the depositTable will be updated with the following values:')
+        for key in self.deposit_dict:
+            self.Logfile.insert(key+': '+self.deposit_dict[key])
+        dbEntries=self.db.execute_statement("select CrystalName,StructureType from depositTable;")
+        for item in dbEntries:
+            xtal=str(item[0])
+            type=str(item[1])
+            db_dict=self.deposit_dict   # need to do this because individual fields might need updating for some xtals
+
+            # try to get information about the diffraction experiment
+            diffractionExperiment=self.db.execute_statement("select DataCollectionBeamline,DataCollectionDate from mainTable where CrystalName is '%s'" %xtal)
+            beamline=str(diffractionExperiment[0][0])
+            date=str(diffractionExperiment[0][1])
+            if beamline.lower() != 'none':
+                db_dict=self.tweak_deposit_dict(xtal,db_dict)
+            if date.lower() != 'none':
+                db_dict['data_collection_date']=date.split()[0]
+
+            self.Logfile.insert('updating depositTable for '+xtal+' @ '+type)
+            self.db.update_depositTable(xtal,type,db_dict)
+        self.Logfile.insert('Note: use DBbrowser to edit individual entries')
+
+    def tweak_deposit_dict(self,xtal,db_dict):
+        dls_beamlines=['i02','i03','i04','i04-1','i23','i24']
+        dls_beamline_dict = {   'i02':      ['DIAMOND BEAMLINE I02',    'DECTRIS PILATUS 6M'],
+                                'i03':      ['DIAMOND BEAMLINE I03',    'DECTRIS PILATUS 6M'],
+                                'i04':      ['DIAMOND BEAMLINE I04',    'DECTRIS PILATUS 6M'],
+                                'i04-1':    ['DIAMOND BEAMLINE I04-1',  'DECTRIS PILATUS 6M'],
+                                'i23':      ['DIAMOND BEAMLINE I23',    'DECTRIS PILATUS 12M'],
+                                'i24':      ['DIAMOND BEAMLINE I24',    'DECTRIS PILATUS 6M'] ,     }
+
+        if db_dict['radiation_source_type'] in dls_beamlines:
+            db_dict['radiation_source_type']=    dls_beamline_dict[db_dict['radiation_source_type']][0]
+            db_dict['radiation_detector_type']=  dls_beamline_dict[db_dict['radiation_source_type']][1]
+            db_dict['radiation_detector']=       'PIXEL'
+            db_dict['radiation_source']=         'SYNCHROTRON'
+
+        return db_dict
+
+
+class prepare_bound_models_for_deposition(QtCore.QThread):
+
+    def __init__(self,database,xce_logfile,overwrite_existing_mmcif,projectDir):
+        QtCore.QThread.__init__(self)
+        self.database=database
+        self.Logfile=XChemLog.updateLog(xce_logfile)
+        self.db=XChemDB.data_source(database)
+        self.overwrite_existing_mmcif=overwrite_existing_mmcif
+        self.projectDir=projectDir
+        self.data_template='data_template.cif'
+
+    def run(self):
+        self.Logfile.insert('checking for models in mainTable that are ready for deposition')
+        toDeposit=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%';")
+        for item in toDeposit:
+            xtal=str(item[0])
+            self.Logfile.insert(xtal+' is ready for deposition')
+            preparation_can_go_ahead=True
+            self.Logfile.insert('checking refinement stage of respective PanDDA sites...')
+            panddaSites=self.db.execute_statement("select CrystalName,RefinementOutcome,PANDDA_site_event_map_mtz from panddaTable where CrystalName is '%s' and PANDDA_site_ligand_placed is 'True'" %xtal)
+            self.Logfile.insert('found '+str(len(panddaSites))+' ligands')
+            eventMtz=[]
+            for site in panddaSites:
+                if str(site[1]).startswith('5'):
+                    self.Logfile.insert('site is ready for deposition')
+                    eventMtz.append(str(site[2]))
+                else:
+                    self.Logfile.insert('site is NOT ready for deposition')
+                    preparation_can_go_ahead=False
+            if preparation_can_go_ahead:
+                ModelData=self.db.execute_statement("select RefinementPDB_latest,RefinementMTZ_latest,RefinementCIF,DataProcessingPathToLogfile,RefinementProgram,CompoundCode from mainTable where CrystalName is '%s'" %xtal)
+                pdb=str(ModelData[0][0])
+                mtz=str(ModelData[0][1])
+                cif=str(ModelData[0][2])
+                if not os.path.isfile(cif):
+                    if not os.path.isfile(os.path.join(self.projectDir,xtal,cif)):
+                        self.Logfile.insert('cannot find ligand CIF file! Please check %s and the database!' %(os.path.join(self.projectDir,xtal)))
+                        self.Logfile.insert('cannot prepare mmcif files for %s; skipping...' %xtal)
+                        continue
+                log=str(ModelData[0][3])
+                refSoft=str(ModelData[0][4])
+                compoundID=str(ModelData[0][5])
+
+                # if all modelled ligands are ready for deposition, we can continue
+
+                # first get all meta-data for deposition, i.e. data_template file
+                self.prepare_data_template_for_xtal(xtal,compoundID,pdb)
+
+                # make model mmcif
+#                self.make_model_mmcif(xtal,pdb,log,refSoft)
+
+                # make SF mmcif
+#                self.make_sf_mmcif(xtal,mtz,eventMtz)
+
+                # report any problems that came up
+#                self.check_mmcif_files_and_update_db(xtal)
+
+                # add ligand cif file to mmcif
+                print xtal,cif
+
+
+            else:
+                self.Logfile.insert(XChemToolTips.deposition_pandda_site_not_ready(xtal))
+
+    def prepare_data_template_for_xtal(self,xtal,compoundID,pdb):
+        # check if file exists
+        if self.overwrite_existing_mmcif:
+            os.chdir(os.path.join(self.projectDir,xtal))
+            data_template_dict=self.db.get_deposit_dict_for_sample(xtal)
+
+            # edit title
+            data_template_dict['title']=data_template_dict['structure_title'].replace('$ProteinName',data_template_dict['molecule_name']).replace('$CompoundName',compoundID)
+
+            # get protein chains
+            data_template_dict['protein_chains']=''
+            chains=pdbtools(pdb).GetProteinChains()
+            for item in chains:
+                data_template_dict['protein_chains']+=item+','
+            data_template_dict['protein_chains']=data_template_dict['protein_chains'][:-1]
+
+            self.Logfile.insert('creating %s file for %s' %(self.data_template,xtal))
+            if self.data_template.endswith('cif'):
+                data_template=templates().data_template_cif(data_template_dict)
+            else:
+                data_template=templates().data_template_text(data_template_dict)
+            f=open(os.path.join(self.projectDir,xtal,self.data_template),'w')
+            f.write(data_template)
+            f.close()
+
+
+
+    def make_model_mmcif(self,xtal,pdb,log,refSoft):
+        if os.path.isfile(pdb) and os.path.isfile(log):
+            os.chdir(os.path.join(self.projectDir,xtal))
+            Cmd = ( 'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/setup.sh')+'\n'
+                    +os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/bin/pdb_extract')+
+                    ' -r REFMAC'
+#                    ' -r %s'            %refSoft+
+#                    ' -iLOG initial.log'
+                    ' -iPDB %s'         %pdb+
+                    ' -e MR'
+                    ' -s AIMLESS'
+                    ' -iLOG %s'         %log+
+                    ' -iENT %s'         %self.data_template+
+                    ' -o %s.mmcif'      %xtal       )
+
+            self.Logfile.insert('running pdb_extract: '+Cmd)
+            os.system(Cmd)
+
+            # can we add here the ligand.cif?
+#    '''pdb_extract -r REFMAC -iLOG initial.log -iPDB initial.pdb -e MR -s AIMLESS -iLOG aimless.log -iENT data_template.cif -o NUDT22A-x0315-model.cif'''
+
+
+    def make_sf_mmcif(self,xtal,mtz,eventMtz):
+        if os.path.isfile(mtz):
+            os.chdir(os.path.join(self.projectDir,xtal))
+            mtzin = mtz+' '
+            for event in eventMtz:
+                mtzin+=event+' '
+
+            Cmd = ( 'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/setup.sh')+'\n'
+                    +os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/bin/sf_convert')+
+                    ' -o mmcif'
+                    ' -sf %s' %mtzin+
+                    ' -out %s_sf.mmcif\n' %xtal )
+
+            self.Logfile.insert('running sf_convert: '+Cmd)
+            os.system(Cmd)
+            os.system('/bin/rm sf_format_guess.text mtzdmp.log SF_4_validate.cif sf_information.cif')
+
+
+    def check_mmcif_files_and_update_db(self,xtal):
+        os.chdir(os.path.join(self.projectDir,xtal))
+        foundFiles=True
+
+        if os.path.isfile(xtal+'.mmcif') and os.path.getsize(xtal+'.mmcif') > 20 :
+            self.Logfile.insert('found '+xtal+'.mmcif')
+            mmcif=os.path.join(self.projectDir,xtal,xtal+'.mmcif')
+        else:
+            self.Logfile.insert('cannot find '+xtal+'.mmcif; something went wrong!')
+            foundFiles=False
+
+        if os.path.isfile(xtal+'_sf.mmcif') and os.path.getsize(xtal+'_sf.mmcif') > 20 :
+            self.Logfile.insert('found '+xtal+'_sf.mmcif')
+            mmcif_sf=os.path.join(self.projectDir,xtal,xtal+'_sf.mmcif')
+        else:
+            self.Logfile.insert('cannot find '+xtal+'_sf.mmcif; something went wrong!')
+            foundFiles=False
+
+        if foundFiles:
+            self.Logfile.insert('updating database with file locations for %s.mmcif and %s_sf.mmcif' %(xtal,xtal))
+            self.db.execute_statement("update depositTable set mmCIF_model_file='%s',mmCIF_SF_file='%s' where CrystalName is '%s'" %(mmcif,mmcif_sf,xtal))
+        else:
+            self.Logfile.insert('could not find %s.mmcif and/or %s_sf.mmcif; removing empty files...')
+            os.system('/bin/rm %s.mmcif 2> /dev/null' %xtal)
+            os.system('/bin/rm %s_sf.mmcif 2> /dev/null' %xtal)
+
+    def make_site_description(self):
+        print 'hallo'
+
+#        from lxml import etree
 #
-#    # first check if structure is already present in DB and if so if all the
-#    # information concur
+#        # create XML
+#        root = etree.Element('root')
+#        root.append(etree.Element('child'))
+#        # another child with text
+#        child = etree.Element('child')
+#        child.text = 'some text'
+#        root.append(child)
 #
-#    # need to update pandda directory for every exported structure so that
-#    # we know where to look for the pandda.log file that contains the relevant information
+#        # pretty string
+#        s = etree.tostring(root, pretty_print=True)
+#        print s
+
+
+
+
+
+
+
+
 #
-#    # update CrystalName_of_pandda_input in DB
 #
-#    # in DB: update StructureType field accordingly
+#        # need a flag which connects apo structures and bound structures
 #
-#    # newer pandda versions seem to have severl copies of pandda.log with names like
-#    # pandda-2016-09-01-2139.log
-#    panddaLog=glob.glob(os.path.join(panddaDir,'pandda*log'))
-#    panddaLog.sort(key=os.path.getmtime)
+#        ready_to_deposit=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%'")
 #
-#    panddaVersion='unknown'
-#    readindApoStructures = False
-#    apoStructures = []
-#    apoStructureDict = {}
-#    for files in panddaLog:
-#        for line in open(files):
-#            if line.startswith('-  Pandda Version'):
-#                if len(line.split()) >= 4:
-#                    panddaVersion=line.split()[3]
-#            if 'No Statistical Maps Found:' in line:
-#                readindApoStructures=True
-#            if readindApoStructures:
-#                if 'Pickling Object: processed_datasets' in line:
-#                    if line.split() >= 2:
-#                        # e.g. line.split() -> ['Pickling', 'Object:', 'processed_datasets/NUDT22A-x0055/pickles/dataset.pickle']
-#                        xtal=line.split()[2].split('/')[1]
-#                        if os.path.isfile(os.path.join(panddaDir,'processed_datasets',xtal,xtal+'-pandda-input.pdb')):
-#                            apoStructures.append(xtal)
-#            if 'Pre-existing statistical maps (from previous runs) have been found and will be reused:' in line:
-#                readindApoStructures=False
-#        apoStructureDict[panddaDir]=apoStructures
 #
-#    return apoStructureDict
+#
+#        print 'hallo'
+##        progress_step=1
+##        if len(self.sample_list) != 0:
+##            progress_step=100/float(len(self.sample_list))
+##        progress=0
+##        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+##
+##            progress += progress_step
+##            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+##
+#
+#
+#    '''pdb_extract -r REFMAC -iLOG initial.log -iPDB initial.pdb -e MR -s AIMLESS -iLOG aimless.log -iENT data_template.cif -o NUDT22A-x0315-model.cif'''
+#
+#    '''./sf_convert -o mmcif -sf initial.mtz data.mtz -out NUDT22A-x0315-sf.cif'''
+
+#class update_deposition_table:
+#
+#    def __init__(self,database):
+#        self.db=XChemDB.data_source(database)
+#
+#    def PanDDA_models_to_deposit(self):
+#        panddaModels=self.db.execute_statement('select CrystalName,PANDDA_site_index,RefinementOutcome,PANDDA_site_ligand_placed,PANDDA_site_name from panddaTable')
+#        toDeposit={}
+#        mismatch={}
+#
+#        for item in panddaModels:
+#            xtalID=str(item[0])
+#            site_index=str(item[1])
+#            RefinementStage=str(item[2])
+#            ligand_placed=str(item[3])
+#            siteName=str(item[4])
+#            if ligand_placed.replace(' ','').lower()=='true':
+#                if xtalID in toDeposit:
+#                    if not RefinementStage.startswith('3'):
+#                        if xtalID not in mismatch:
+#                            mismatch[xtalID]=[]
+#                        mismatch[xtalID].append([xtalID,site_index])
+#                        continue
+#
+#                if RefinementStage.startswith('3'):
+#                    if xtalID not in toDeposit:
+#                        toDeposit[xtalID]=[]
+#                    toDeposit[xtalID].append([xtalID,site_index,siteName,RefinementStage])
+#
+#        return toDeposit,mismatch
 
 class templates:
     def data_template_text(self,depositDict):
@@ -567,409 +985,46 @@ class templates:
         return data_template_text
 
 
-    def data_template_cif(self,depositDict):
 
-        structure_author_name=''
-        for name in depositDict['structure_author_name'].split(';'):
-            structure_author_name+='<structure_author_name=  %s>\n' %name
-
-        primary_citation_author_name=''
-        for name in depositDict['primary_citation_author_name'].split(';'):
-            primary_citation_author_name+="primary '%s'\n" %name
-
-        molecule_one_letter_sequence=';'
-        counter=1
-        for aa in depositDict['molecule_one_letter_sequence']:
-            if counter < 70:
-                molecule_one_letter_sequence+=aa
-            if counter == 70:
-                molecule_one_letter_sequence+='\n'+aa
-                counter = 0
-            counter+=1
-
-        data_template_cif = (
-            'data_UNNAMED\n'
-            '#\n'
-            '_pdbx_database_status.entry_id                       UNNAMED\n'
-            "_pdbx_database_status.dep_release_code_coordinates   '%s'\n"                       %depositDict['Release_status_for_coordinates']+
-            "_pdbx_database_status.dep_release_code_sequence      '%s'\n"                       %depositDict['Release_status_for_sequence']+
-            '#\n'
-            '_exptl_crystal_grow.crystal_id      1\n'
-            "_exptl_crystal_grow.method          '%s'\n"                                        %depositDict['crystallization_method']+
-            '_exptl_crystal_grow.pH              %s\n'                                          %depositDict['crystallization_pH']+
-            '_exptl_crystal_grow.temp            %s\n'                                          %depositDict['crystallization_temperature']+
-            '_exptl_crystal_grow.pdbx_details    "%s"\n'                                        %depositDict['crystallization_details']+
-            '#\n'
-            '_diffrn.id                     1\n'
-            '_diffrn.ambient_temp           %s\n'                                               %depositDict['data_collection_temperature']+
-            '_diffrn.crystal_id             1\n'
-            '#\n'
-            '_diffrn_source.diffrn_id                       1\n'
-            '_diffrn_source.source                          %s\n'                               %depositDict['radiation_source']+
-            '_diffrn_source.type                            "%s"\n'                             %depositDict['radiation_source_type']+
-            '_diffrn_source.pdbx_wavelength_list            %s\n'                               %depositDict['radiation_wavelengths']+
-            '#\n'
-            '_diffrn_detector.detector               %s\n'                                      %depositDict['radiation_detector']+
-            "_diffrn_detector.type                   '%s'\n"                                    %depositDict['radiation_detector_type']+
-            '_diffrn_detector.pdbx_collection_date   %s\n'                                      %depositDict['data_collection_date']+
-            '_diffrn_detector.diffrn_id              1\n'
-            '#\n'
-            '_diffrn_radiation.diffrn_id                        1\n'
-            '_diffrn_radiation.wavelength_id                    1\n'
-            "_diffrn_radiation.pdbx_diffrn_protocol             'SINGLE WAVELENGTH'\n"
-            '#\n'
-            '_diffrn_radiation_wavelength.id           1\n'
-            '_diffrn_radiation_wavelength.wavelength   %s\n'                                    %depositDict['radiation_wavelengths']+
-            '#\n'
-            '#\n'
-            'loop_\n'
-            '_entity.id\n'
-            '_entity.type\n'
-            '_entity.src_method\n'
-            '_entity.pdbx_description\n'
-            '1 polymer     man "NUDT22"\n'
-            '#\n'
-            'loop_\n'
-            '_entity_poly.entity_id\n'
-            '_entity_poly.type\n'
-            '_entity_poly.pdbx_seq_one_letter_code\n'
-            '_entity_poly.pdbx_strand_id\n'
-            '_entity_poly.pdbx_seq_db_id\n'
-            '_entity_poly.pdbx_seq_db_name\n'
-            '1 "polypeptide(L)"\n'
-            +molecule_one_letter_sequence+'\n'
-#        ';MDPEVTLLLQCPGGGLPQEQIQAELSPAHDRRPLPGGDEAITAIWETRLKAQPWLFDAPK\n'
-#        'FRLHSATLAPIGSRGPQLLLRLGLTSYRDFLGTNWSSSAAWLRQQGATDWGDTQAYLADP\n'
-#        'LGVGAALATADDFLVFLRRSRQVAEAPGLVDVPGGHPEPQALCPGGSPQHQDLAGQLVVH\n'
-#        'ELFSSVLQEICDEVNLPLLTLSQPLLLGIARNETSAGRASAEFYVQCSLTSEQVRKHYLS\n'
-#        'GGPEAHESTGIFFVETQNVQRLLETEMWAELCPSAKGAIILYNRVQGSPTGAALGSPALL\n'
-#        'PPL\n'
-            ';\n'
-            'A Q9BRQ3 UNP\n'
-            '#\n'
-            'loop_\n'
-            '_entity_src_gen.entity_id\n'
-            '_entity_src_gen.gene_src_strain\n'
-            '_entity_src_gen.pdbx_gene_src_scientific_name\n'
-            '_entity_src_gen.pdbx_gene_src_ncbi_taxonomy_id\n'
-            '_entity_src_gen.pdbx_host_org_scientific_name\n'
-            '_entity_src_gen.pdbx_host_org_ncbi_taxonomy_id\n'
-            '1 ? "%s" %s  "%s" %s\n'                %(depositDict['Source_organism_scientific_name'],'?',depositDict['Expression_system_scientific_name'],'?')+
-            '#\n'
-            '#\n'
-            '_pdbx_contact_author.id                  1\n'
-#            "_pdbx_contact_author.address_1           '%s'\n"                           %depositDict['contact_author_PI_address']+
-#            '_pdbx_contact_author.address_2           "%s"\n'                           %depositDict['contact_author_PI_organization_name']+
-#            '_pdbx_contact_author.city                %s\n'                             %depositDict['contact_author_PI_city']+
-#            "_pdbx_contact_author.state_province      '%s'\n"                           %depositDict['contact_author_PI_State_or_Province']+
-#            '_pdbx_contact_author.postal_code         %s\n'                             %depositDict['contact_author_PI_Zip_Code']+
-#            '_pdbx_contact_author.email               %s\n'                             %depositDict['contact_author_PI_email']+
-#            '_pdbx_contact_author.name_first          %s\n'                             %depositDict['contact_author_PI_first_name']+
-#            '_pdbx_contact_author.name_last           %s\n'                             %depositDict['contact_author_PI_last_name']+
-#            '_pdbx_contact_author.country             "%s"\n'                           %depositDict['contact_author_PI_Country']+
-#            '_pdbx_contact_author.phone               %s\n'                             %depositDict['contact_author_PI_phone_number']+
-#            '_pdbx_contact_author.role                "%s"\n'                           %depositDict['contact_author_PI_role']+
-#            '_pdbx_contact_author.organization_type   %s\n'                             %depositDict['contact_author_PI_organization_type']+
-#            '#\n'
-            '_pdbx_contact_author.id                  2\n'
-            "_pdbx_contact_author.address_1           '%s'\n"                           %depositDict['contact_author_address']+
-            '_pdbx_contact_author.address_2           "%s"\n'                           %depositDict['contact_author_organization_name']+
-            '_pdbx_contact_author.city                %s\n'                             %depositDict['contact_author_city']+
-            "_pdbx_contact_author.state_province      '%s'\n"                           %depositDict['contact_author_State_or_Province']+
-            '_pdbx_contact_author.postal_code         %s\n'                             %depositDict['contact_author_Zip_Code'].replace(' ','')+
-            '_pdbx_contact_author.email               %s\n'                             %depositDict['contact_author_email']+
-            '_pdbx_contact_author.name_first          %s\n'                             %depositDict['contact_author_first_name']+
-            '_pdbx_contact_author.name_last           %s\n'                             %depositDict['contact_author_last_name']+
-            '_pdbx_contact_author.country             "%s"\n'                           %depositDict['contact_author_Country']+
-            '_pdbx_contact_author.phone               %s\n'                             %depositDict['contact_author_phone_number']+
-            '_pdbx_contact_author.role                "%s"\n'                           %depositDict['contact_author_role']+
-            '_pdbx_contact_author.organization_type   %s\n'                             %depositDict['contact_author_organization_type']+
-            '#\n'
-            'loop_\n'
-            '_audit_author.name\n'
-            "'%s, %s'.\n" %(depositDict['contact_author_last_name'],depositDict['contact_author_first_name'][0])+
-#            "'Krojer, T.'\n"
-#            "'Von Delft, F.'\n"
-            '#\n'
-            '_citation.id                        primary\n'
-            '_citation.title                     "your citation title"\n'
-            '_citation.journal_abbrev            "To Be Published"\n'
-            '#\n'
-            'loop_\n'
-            '_citation_author.citation_id\n'
-            '_citation_author.name\n'
-            +primary_citation_author_name+
-#        "primary 'Krojer, T.'\n"
-#        "primary 'Von Delft, F.'\n"
-            '#\n'
-            '_struct.entry_id                     UNNAMED\n'
-            '_struct.title\n'
-            ';Your entry title\n'
-            ';\n'
-            '#\n'
-            '_struct_keywords.entry_id        UNNAMED\n'
-            '_struct_keywords.text            "your keyword"\n'
-            '#\n'
-            '_pdbx_struct_assembly_depositor_info.id                   1\n'
-            "_pdbx_struct_assembly_depositor_info.method_details       'gel filtration'\n"
-            '_pdbx_struct_assembly_depositor_info.oligomeric_count     3\n'
-            '#\n'
-            '#\n'
-            )
-
-        return data_template_cif
-
-
-
-class update_depositTable(QtCore.QThread):
-    def __init__(self,deposit_dict,database,xce_logfile):
-        QtCore.QThread.__init__(self)
-        self.deposit_dict=deposit_dict
-        self.database=database
-        self.Logfile=XChemLog.updateLog(xce_logfile)
-        self.db=XChemDB.data_source(database)
-
-    def run(self):
-        self.Logfile.insert('all entries in the depositTable will be updated with the following values:')
-        for key in self.deposit_dict:
-            self.Logfile.insert(key+': '+self.deposit_dict[key])
-        dbEntries=self.db.execute_statement("select CrystalName,StructureType from depositTable;")
-        for item in dbEntries:
-            xtal=str(item[0])
-            type=str(item[1])
-            db_dict=self.deposit_dict   # need to do this because individual fields might need updating for some xtals
-
-            # try to get information about the diffraction experiment
-            diffractionExperiment=self.db.execute_statement("select DataCollectionBeamline,DataCollectionDate from mainTable where CrystalName is '%s'" %xtal)
-            beamline=str(diffractionExperiment[0][0])
-            date=str(diffractionExperiment[0][1])
-            if beamline.lower() != 'none':
-                db_dict=self.tweak_deposit_dict(xtal,db_dict)
-            if date.lower() != 'none':
-                db_dict['data_collection_date']=date.split()[0]
-
-            self.Logfile.insert('updating depositTable for '+xtal+' @ '+type)
-            self.db.update_depositTable(xtal,type,db_dict)
-        self.Logfile.insert('Note: use DBbrowser to edit individual entries')
-
-    def tweak_deposit_dict(self,xtal,db_dict):
-        dls_beamlines=['i02','i03','i04','i04-1','i23','i24']
-        dls_beamline_dict = {   'i02':      ['DIAMOND BEAMLINE I02',    'DECTRIS PILATUS 6M'],
-                                'i03':      ['DIAMOND BEAMLINE I03',    'DECTRIS PILATUS 6M'],
-                                'i04':      ['DIAMOND BEAMLINE I04',    'DECTRIS PILATUS 6M'],
-                                'i04-1':    ['DIAMOND BEAMLINE I04-1',  'DECTRIS PILATUS 6M'],
-                                'i23':      ['DIAMOND BEAMLINE I23',    'DECTRIS PILATUS 12M'],
-                                'i24':      ['DIAMOND BEAMLINE I24',    'DECTRIS PILATUS 6M'] ,     }
-
-        if db_dict['radiation_source_type'] in dls_beamlines:
-            db_dict['radiation_source_type']=    dls_beamline_dict[db_dict['radiation_source_type']][0]
-            db_dict['radiation_detector_type']=  dls_beamline_dict[db_dict['radiation_source_type']][1]
-            db_dict['radiation_detector']=       'PIXEL'
-            db_dict['radiation_source']=         'SYNCHROTRON'
-
-        return db_dict
-
-
-class prepare_bound_models_for_deposition(QtCore.QThread):
-
-    def __init__(self,database,xce_logfile,overwrite_existing_mmcif,projectDir):
-        QtCore.QThread.__init__(self)
-        self.database=database
-        self.Logfile=XChemLog.updateLog(xce_logfile)
-        self.db=XChemDB.data_source(database)
-        self.overwrite_existing_mmcif=overwrite_existing_mmcif
-        self.projectDir=projectDir
-        self.data_template='data_template.cif'
-
-    def run(self):
-        self.Logfile.insert('checking for models in mainTable that are ready for deposition')
-        toDeposit=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%';")
-        for item in toDeposit:
-            xtal=str(item[0])
-            self.Logfile.insert(xtal+' is ready for deposition')
-            preparation_can_go_ahead=True
-            self.Logfile.insert('checking refinement stage of respective PanDDA sites...')
-            panddaSites=self.db.execute_statement("select CrystalName,RefinementOutcome,PANDDA_site_event_map_mtz from panddaTable where CrystalName is '%s' and PANDDA_site_ligand_placed is 'True'" %xtal)
-            self.Logfile.insert('found '+str(len(panddaSites))+' ligands')
-            eventMtz=[]
-            for site in panddaSites:
-                if str(site[1]).startswith('5'):
-                    self.Logfile.insert('site is ready for deposition')
-                    eventMtz.append(str(site[2]))
-                else:
-                    self.Logfile.insert('site is NOT ready for deposition')
-                    preparation_can_go_ahead=False
-            if preparation_can_go_ahead:
-                ModelData=self.db.execute_statement("select RefinementPDB_latest,RefinementMTZ_latest,RefinementCIF,DataProcessingPathToLogfile,RefinementProgram,CompoundCode from mainTable where CrystalName is '%s'" %xtal)
-                pdb=str(ModelData[0][0])
-                mtz=str(ModelData[0][1])
-                cif=str(ModelData[0][2])
-                if not os.path.isfile(cif):
-                    if not os.path.isfile(os.path.join(self.projectDir,xtal,cif)):
-                        self.Logfile.insert('cannot find ligand CIF file! Please check %s and the database!' %(os.path.join(self.projectDir,xtal)))
-                        self.Logfile.insert('cannot prepare mmcif files for %s; skipping...' %xtal)
-                        continue
-                log=str(ModelData[0][3])
-                refSoft=str(ModelData[0][4])
-                compoundID=str(ModelData[0][5])
-
-                # if all modelled ligands are ready for deposition, we can continue
-
-                # first get all meta-data for deposition, i.e. data_template file
-#                self.prepare_data_template_for_xtal(xtal)
-
-                # make model mmcif
-#                self.make_model_mmcif(xtal,pdb,log,refSoft)
-
-                # make SF mmcif
-#                self.make_sf_mmcif(xtal,mtz,eventMtz)
-
-                # report any problems that came up
-#                self.check_mmcif_files_and_update_db(xtal)
-
-                # add ligand cif file to mmcif
-                print xtal,cif
-
-
-            else:
-                self.Logfile.insert(XChemToolTips.deposition_pandda_site_not_ready(xtal))
-
-    def prepare_data_template_for_xtal(self,xtal):
-        # check if file exists
-        if self.overwrite_existing_mmcif:
-            os.chdir(os.path.join(self.projectDir,xtal))
-            data_template_dict=self.db.get_deposit_dict_for_sample(xtal)
-            self.Logfile.insert('creating %s file for %s' %(self.data_template,xtal))
-            if self.data_template.endswith('cif'):
-                data_template=templates().data_template_cif(data_template_dict)
-            else:
-                data_template=templates().data_template_text(data_template_dict)
-            f=open(os.path.join(self.projectDir,xtal,self.data_template),'w')
-            f.write(data_template)
-            f.close()
-
-
-
-    def make_model_mmcif(self,xtal,pdb,log,refSoft):
-        if os.path.isfile(pdb) and os.path.isfile(log):
-            os.chdir(os.path.join(self.projectDir,xtal))
-            Cmd = ( 'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/setup.sh')+'\n'
-                    +os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/bin/pdb_extract')+
-                    ' -r REFMAC'
-#                    ' -r %s'            %refSoft+
-#                    ' -iLOG initial.log'
-                    ' -iPDB %s'         %pdb+
-                    ' -e MR'
-                    ' -s AIMLESS'
-                    ' -iLOG %s'         %log+
-                    ' -iENT %s'         %self.data_template+
-                    ' -o %s.mmcif'      %xtal       )
-
-            self.Logfile.insert('running pdb_extract: '+Cmd)
-            os.system(Cmd)
-
-            # can we add here the ligand.cif?
-#    '''pdb_extract -r REFMAC -iLOG initial.log -iPDB initial.pdb -e MR -s AIMLESS -iLOG aimless.log -iENT data_template.cif -o NUDT22A-x0315-model.cif'''
-
-
-    def make_sf_mmcif(self,xtal,mtz,eventMtz):
-        if os.path.isfile(mtz):
-            os.chdir(os.path.join(self.projectDir,xtal))
-            mtzin = mtz+' '
-            for event in eventMtz:
-                mtzin+=event+' '
-
-            Cmd = ( 'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/setup.sh')+'\n'
-                    +os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/bin/sf_convert')+
-                    ' -o mmcif'
-                    ' -sf %s' %mtzin+
-                    ' -out %s_sf.mmcif\n' %xtal )
-
-            self.Logfile.insert('running sf_convert: '+Cmd)
-            os.system(Cmd)
-            os.system('/bin/rm sf_format_guess.text mtzdmp.log SF_4_validate.cif sf_information.cif')
-
-
-    def check_mmcif_files_and_update_db(self,xtal):
-        os.chdir(os.path.join(self.projectDir,xtal))
-        foundFiles=True
-
-        if os.path.isfile(xtal+'.mmcif') and os.path.getsize(xtal+'.mmcif') > 20 :
-            self.Logfile.insert('found '+xtal+'.mmcif')
-            mmcif=os.path.join(self.projectDir,xtal,xtal+'.mmcif')
-        else:
-            self.Logfile.insert('cannot find '+xtal+'.mmcif; something went wrong!')
-            foundFiles=False
-
-        if os.path.isfile(xtal+'_sf.mmcif') and os.path.getsize(xtal+'_sf.mmcif') > 20 :
-            self.Logfile.insert('found '+xtal+'_sf.mmcif')
-            mmcif_sf=os.path.join(self.projectDir,xtal,xtal+'_sf.mmcif')
-        else:
-            self.Logfile.insert('cannot find '+xtal+'_sf.mmcif; something went wrong!')
-            foundFiles=False
-
-        if foundFiles:
-            self.Logfile.insert('updating database with file locations for %s.mmcif and %s_sf.mmcif' %(xtal,xtal))
-            self.db.execute_statement("update depositTable set mmCIF_model_file='%s',mmCIF_SF_file='%s' where CrystalName is '%s'" %(mmcif,mmcif_sf,xtal))
-        else:
-            self.Logfile.insert('could not find %s.mmcif and/or %s_sf.mmcif; removing empty files...')
-            os.system('/bin/rm %s.mmcif 2> /dev/null' %xtal)
-            os.system('/bin/rm %s_sf.mmcif 2> /dev/null' %xtal)
-
-
+#def find_apo_structures(panddaDir,projectDir,database):
 #
+#    # first check if structure is already present in DB and if so if all the
+#    # information concur
 #
-#        # need a flag which connects apo structures and bound structures
+#    # need to update pandda directory for every exported structure so that
+#    # we know where to look for the pandda.log file that contains the relevant information
 #
-#        ready_to_deposit=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%'")
+#    # update CrystalName_of_pandda_input in DB
 #
+#    # in DB: update StructureType field accordingly
 #
+#    # newer pandda versions seem to have severl copies of pandda.log with names like
+#    # pandda-2016-09-01-2139.log
+#    panddaLog=glob.glob(os.path.join(panddaDir,'pandda*log'))
+#    panddaLog.sort(key=os.path.getmtime)
 #
-#        print 'hallo'
-##        progress_step=1
-##        if len(self.sample_list) != 0:
-##            progress_step=100/float(len(self.sample_list))
-##        progress=0
-##        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-##
-##            progress += progress_step
-##            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
-##
+#    panddaVersion='unknown'
+#    readindApoStructures = False
+#    apoStructures = []
+#    apoStructureDict = {}
+#    for files in panddaLog:
+#        for line in open(files):
+#            if line.startswith('-  Pandda Version'):
+#                if len(line.split()) >= 4:
+#                    panddaVersion=line.split()[3]
+#            if 'No Statistical Maps Found:' in line:
+#                readindApoStructures=True
+#            if readindApoStructures:
+#                if 'Pickling Object: processed_datasets' in line:
+#                    if line.split() >= 2:
+#                        # e.g. line.split() -> ['Pickling', 'Object:', 'processed_datasets/NUDT22A-x0055/pickles/dataset.pickle']
+#                        xtal=line.split()[2].split('/')[1]
+#                        if os.path.isfile(os.path.join(panddaDir,'processed_datasets',xtal,xtal+'-pandda-input.pdb')):
+#                            apoStructures.append(xtal)
+#            if 'Pre-existing statistical maps (from previous runs) have been found and will be reused:' in line:
+#                readindApoStructures=False
+#        apoStructureDict[panddaDir]=apoStructures
 #
-#
-#    '''pdb_extract -r REFMAC -iLOG initial.log -iPDB initial.pdb -e MR -s AIMLESS -iLOG aimless.log -iENT data_template.cif -o NUDT22A-x0315-model.cif'''
-#
-#    '''./sf_convert -o mmcif -sf initial.mtz data.mtz -out NUDT22A-x0315-sf.cif'''
-
-#class update_deposition_table:
-#
-#    def __init__(self,database):
-#        self.db=XChemDB.data_source(database)
-#
-#    def PanDDA_models_to_deposit(self):
-#        panddaModels=self.db.execute_statement('select CrystalName,PANDDA_site_index,RefinementOutcome,PANDDA_site_ligand_placed,PANDDA_site_name from panddaTable')
-#        toDeposit={}
-#        mismatch={}
-#
-#        for item in panddaModels:
-#            xtalID=str(item[0])
-#            site_index=str(item[1])
-#            RefinementStage=str(item[2])
-#            ligand_placed=str(item[3])
-#            siteName=str(item[4])
-#            if ligand_placed.replace(' ','').lower()=='true':
-#                if xtalID in toDeposit:
-#                    if not RefinementStage.startswith('3'):
-#                        if xtalID not in mismatch:
-#                            mismatch[xtalID]=[]
-#                        mismatch[xtalID].append([xtalID,site_index])
-#                        continue
-#
-#                if RefinementStage.startswith('3'):
-#                    if xtalID not in toDeposit:
-#                        toDeposit[xtalID]=[]
-#                    toDeposit[xtalID].append([xtalID,site_index,siteName,RefinementStage])
-#
-#        return toDeposit,mismatch
+#    return apoStructureDict
 
 

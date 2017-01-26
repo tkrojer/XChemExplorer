@@ -1,4 +1,4 @@
-# last edited: 25/01/2017, 15:00
+# last edited: 26/01/2017, 15:00
 
 import os,glob
 import sys
@@ -16,7 +16,7 @@ import XChemLog
 
 def space_group_list():
     space_group_list =   [      'P1',
-                                'P2','P21','C121','P1211','P121',
+                                'P2','P21','C121','P1211','P121','I2','I121',
                                 'P222','P2122','P2212','P2221',
                                 'P21212','P21221','P22121','P212121',
                                 'C222','C2221','F222', 'I222', 'I212121',

@@ -1,4 +1,4 @@
-# last edited: 25/01/2017, 17:00
+# last edited: 26/01/2017, 17:00
 
 import os, sys, glob
 from datetime import datetime
@@ -37,7 +37,7 @@ class XChemExplorer(QtGui.QApplication):
     def __init__(self,args):
         QtGui.QApplication.__init__(self,args)
 
-        self.xce_version='v1.0-beta.3'
+        self.xce_version='v1.0-beta.3.1'
 
         # general settings
         self.allowed_unitcell_difference_percent=12
@@ -1832,6 +1832,7 @@ class XChemExplorer(QtGui.QApplication):
         self.contact_author_PI_State_or_Province = QtGui.QLineEdit()
         self.contact_author_PI_State_or_Province.setText('')
         self.contact_author_PI_State_or_Province.setFixedWidth(200)
+        self.contact_author_PI_State_or_Province.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.contact_author_PI_State_or_Province, 11,1)
 
         grid.addWidget(QtGui.QLabel('ZIP code'), 12,0)
@@ -1936,6 +1937,7 @@ class XChemExplorer(QtGui.QApplication):
         self.contact_author_State_or_Province = QtGui.QLineEdit()
         self.contact_author_State_or_Province.setText('')
         self.contact_author_State_or_Province.setFixedWidth(200)
+        self.contact_author_State_or_Province.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.contact_author_State_or_Province, 11,1)
 
         grid.addWidget(QtGui.QLabel('ZIP code'), 12,0)
@@ -2032,7 +2034,7 @@ class XChemExplorer(QtGui.QApplication):
 
         grid = QtGui.QGridLayout()
         grid.addWidget(QtGui.QLabel('Title & Details'), 0,0)
-        note = ( 'Note: supported wildcards: $CompoundName; e.g. "Crystal Structure of human JMJD2D in complex with $CompoundName"' )
+        note = ( 'Note: supported wildcards: $ProteinName,$CompoundName; e.g. "Crystal Structure of human JMJD2D in complex with N2317a"' )
         grid.addWidget(QtGui.QLabel(note), 1,0)
 
         grid.addWidget(QtGui.QLabel('Group deposition title'), 2,0)
@@ -2043,28 +2045,26 @@ class XChemExplorer(QtGui.QApplication):
 
         grid.addWidget(QtGui.QLabel('Title'), 3,0)
         self.structure_title = QtGui.QLineEdit()
-        self.structure_title.setText('')
+        self.structure_title.setText('Fragment screening campaign for $ProteinName - Fragment Hit Structure $CompoundName')
         self.structure_title.setFixedWidth(600)
         grid.addWidget(self.structure_title, 3,1)
-#        grid.addWidget(QtGui.QLabel('(e.g. HOLD FOR PUBLICATION, RELEASE NOW)'), 1,2)
 
-        grid.addWidget(QtGui.QLabel('Details'), 4,0)
-        self.structure_details = QtGui.QLineEdit()
-        self.structure_details.setText('Fragment screening campaign for <replace with protein name> - Fragment Hit Structure $CompoundName')
-        self.structure_details.setFixedWidth(600)
-        grid.addWidget(self.structure_details, 4,1)
-#        grid.addWidget(QtGui.QLabel('(e.g. HOLD FOR PUBLICATION, RELEASE NOW)'), 2,2)
+#        grid.addWidget(QtGui.QLabel('Details'), 4,0)
+#        self.structure_details = QtGui.QLineEdit()
+#        self.structure_details.setText('')
+#        self.structure_details.setFixedWidth(600)
+#        grid.addWidget(self.structure_details, 4,1)
 
         note = (
             '\n\nApo Structure:\nonly use if you want to deposit PanDDA models!'
         )
-        grid.addWidget(QtGui.QLabel(note), 5,0)
+        grid.addWidget(QtGui.QLabel(note), 4,0)
 
-        grid.addWidget(QtGui.QLabel('Title Apo Structure'), 6,0)
+        grid.addWidget(QtGui.QLabel('Title Apo Structure'), 5,0)
         self.structure_title_apo = QtGui.QLineEdit()
-        self.structure_title_apo.setText('Fragment screening campaign for <replace with protein name> - Empty Active Site Structure No. <will create automatically>')
+        self.structure_title_apo.setText('Fragment screening campaign for $ProteinName - Empty Active Site Structure No. <will create automatically>')
         self.structure_title_apo.setFixedWidth(600)
-        grid.addWidget(self.structure_title_apo, 6,1)
+        grid.addWidget(self.structure_title_apo, 5,1)
 
 
         frame.setLayout(grid)
@@ -2599,7 +2599,7 @@ class XChemExplorer(QtGui.QApplication):
 
             self.group_deposition_title.setText(self.deposit_dict['group_deposition_title'])
             self.structure_title.setText(self.deposit_dict['structure_title'])
-            self.structure_details.setText(self.deposit_dict['structure_details'])
+#            self.structure_details.setText(self.deposit_dict['structure_details'])
             self.structure_title_apo.setText(self.deposit_dict['structure_title_apo'])
 
             for n,name in enumerate(self.deposit_dict['structure_author_name'].split(';')):
@@ -2715,7 +2715,7 @@ class XChemExplorer(QtGui.QApplication):
 
             'group_deposition_title':               str(self.group_deposition_title.text()),
             'structure_title':                      str(self.structure_title.text()),
-            'structure_details':                    str(self.structure_details.text()),
+#            'structure_details':                    str(self.structure_details.text()),
             'structure_title_apo':                  str(self.structure_title_apo.text()),
 
             'primary_citation_id':                  str(self.primary_citation_id.text()),
@@ -5482,20 +5482,5 @@ class XChemExplorer(QtGui.QApplication):
 
 
 if __name__ == "__main__":
-    print '\n\n\n'
-    print '     ######################################################################'
-    print '     #                                                                    #'
-    print '     # XCHEMEXPLORER - multi dataset analysis                             #'
-    print '     #                                                                    #'
-    print '     # Version: v1.0-beta.3                                               #'
-    print '     #                                                                    #'
-    print '     # Date:                                                              #'
-    print '     #                                                                    #'
-    print '     # Author: Tobias Krojer, Structural Genomics Consortium, Oxford, UK  #'
-    print '     #         tobias.krojer@sgc.ox.ac.uk                                 #'
-    print '     #                                                                    #'
-    print '     ######################################################################'
-    print '\n\n\n'
-
     app=XChemExplorer(sys.argv[1:])
 

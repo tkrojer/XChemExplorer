@@ -1,4 +1,4 @@
-# last edited: 13/01/2017, 15:00
+# last edited: 26/01/2017, 15:00
 
 from __future__ import print_function
 import os,glob
@@ -13,12 +13,34 @@ class startLog:
         self.logfile=logfile
 
     def create_logfile(self,version):
+
+        pasteVersion=version
+        for i in range(0,20-len(version)):
+            pasteVersion+=' '
+
+        message = (
+            '\n\n'
+            '     ######################################################################\n'
+            '     #                                                                    #\n'
+            '     # XCHEMEXPLORER - multi dataset analysis                             #\n'
+            '     #                                                                    #\n'
+            '     # Version: %s                                      #\n' %pasteVersion+
+            '     #                                                                    #\n'
+            '     # Date:                                                              #\n'
+            '     #                                                                    #\n'
+            '     # Author: Tobias Krojer, Structural Genomics Consortium, Oxford, UK  #\n'
+            '     #         tobias.krojer@sgc.ox.ac.uk                                 #\n'
+            '     #                                                                    #\n'
+            '     ######################################################################\n'
+            '\n'
+        )
+
         if not os.path.isfile(self.logfile):
             os.system('touch '+self.logfile)
-            message='creating new logfile for the current XChemExplorer ('+version+') session: '+self.logfile
+            message+='creating new logfile for the current XChemExplorer ('+version+') session:\n'+self.logfile+'\n'
 
         else:
-            message='writing into existing logfile for current XChemExplorer ('+version+') session: '+self.logfile
+            message+='writing into existing logfile for current XChemExplorer ('+version+') session:\n'+self.logfile+'\n'
         updateLog(self.logfile).insert(message)
 
 class updateLog:
