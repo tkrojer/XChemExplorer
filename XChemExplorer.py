@@ -1,4 +1,4 @@
-# last edited: 26/01/2017, 17:00
+# last edited: 27/01/2017, 17:00
 
 import os, sys, glob
 from datetime import datetime
@@ -111,7 +111,7 @@ class XChemExplorer(QtGui.QApplication):
             self.ccp4_scratch_directory=os.getenv('CCP4_SCR')
             self.panddas_directory=self.current_directory
             self.data_collection_summary_file=''
-
+            self.group_deposit_directory='/work/JMJD2DA/tmp/group_deposit'
 
         #
         # Preferences
@@ -332,9 +332,26 @@ class XChemExplorer(QtGui.QApplication):
         update_file_information_of_apo_records.triggered.connect(self.update_file_information_of_apo_records)
         deposition_menu.addAction(update_file_information_of_apo_records)
 
-        prepare_bound_models_for_deposition=QtGui.QAction('prepare_bound_models_for_deposition',self.window)
-        prepare_bound_models_for_deposition.triggered.connect(self.prepare_bound_models_for_deposition)
-        deposition_menu.addAction(prepare_bound_models_for_deposition)
+        self.prepare_mmcif_files_dict={}
+
+        prepare_mmcif_files_for_apo_structures=QtGui.QAction('prepare mmcif for apo structures',self.window)
+        prepare_mmcif_files_for_apo_structures.triggered.connect(self.prepare_models_for_deposition)
+        deposition_menu.addAction(prepare_mmcif_files_for_apo_structures)
+        self.prepare_mmcif_files_dict['apo']=prepare_mmcif_files_for_apo_structures
+
+        prepare_mmcif_files_for_ligand_bound_structures=QtGui.QAction('prepare mmcif for ligand bound structures',self.window)
+        prepare_mmcif_files_for_ligand_bound_structures.triggered.connect(self.prepare_models_for_deposition)
+        deposition_menu.addAction(prepare_mmcif_files_for_ligand_bound_structures)
+        self.prepare_mmcif_files_dict['ligand_bound']=prepare_mmcif_files_for_ligand_bound_structures
+
+        prepare_for_group_deposition_upload=QtGui.QAction('copy files to group deposition directory',self.window)
+        prepare_for_group_deposition_upload.triggered.connect(self.prepare_for_group_deposition_upload)
+        deposition_menu.addAction(prepare_for_group_deposition_upload)
+
+
+#        prepare_bound_models_for_deposition=QtGui.QAction('prepare_bound_models_for_deposition',self.window)
+#        prepare_bound_models_for_deposition.triggered.connect(self.prepare_bound_models_for_deposition)
+#        deposition_menu.addAction(prepare_bound_models_for_deposition)
 
         help = menu_bar.addMenu("&Help")
 
@@ -1704,22 +1721,53 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def create_missing_apo_records_in_depositTable(self):
-        self.db.create_missing_apo_records_in_depositTable(self.xce_logfile)
+#        self.db.create_missing_apo_records_in_depositTable(self.xce_logfile)
+        self.db.create_missing_apo_records_for_all_structures_in_depositTable(self.initial_model_directory,self.xce_logfile)
 
     def update_file_information_of_apo_records(self):
         XChemDeposit.update_file_locations_of_apo_structuresin_DB(os.path.join(self.database_directory,self.data_source_file),self.initial_model_directory,self.xce_logfile)
 
-    def prepare_bound_models_for_deposition(self):
+    def prepare_models_for_deposition(self):
+
+        for key in self.prepare_mmcif_files_dict:
+            if self.sender() == self.prepare_mmcif_files_dict[key]:
+                structureType=key
+
         overwrite_existing_mmcif=True
-        self.work_thread=XChemDeposit.prepare_bound_models_for_deposition(  os.path.join(self.database_directory,self.data_source_file),
+        self.work_thread=XChemDeposit.prepare_mmcif_files_for_deposition(   os.path.join(self.database_directory,self.data_source_file),
                                                                             self.xce_logfile,
                                                                             overwrite_existing_mmcif,
-                                                                            self.initial_model_directory    )
+                                                                            self.initial_model_directory,
+                                                                            structureType   )
         self.explorer_active=1
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
+
+    def prepare_for_group_deposition_upload(self):
+
+        self.work_thread=XChemDeposit.prepare_for_group_deposition_upload(  os.path.join(self.database_directory,self.data_source_file),
+                                                                            self.xce_logfile,
+                                                                            self.group_deposit_directory   )
+        self.explorer_active=1
+        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.work_thread.start()
+
+
+#    def prepare_bound_models_for_deposition(self):
+#        overwrite_existing_mmcif=True
+#        self.work_thread=XChemDeposit.prepare_bound_models_for_deposition(  os.path.join(self.database_directory,self.data_source_file),
+#                                                                            self.xce_logfile,
+#                                                                            overwrite_existing_mmcif,
+#                                                                            self.initial_model_directory    )
+#        self.explorer_active=1
+#        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+#        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+#        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#        self.work_thread.start()
 
 
     def deposition_data(self):
@@ -1783,12 +1831,13 @@ class XChemExplorer(QtGui.QApplication):
         self.contact_author_PI_middle_name = QtGui.QLineEdit()
         self.contact_author_PI_middle_name.setText('')
         self.contact_author_PI_middle_name.setFixedWidth(200)
+        self.contact_author_PI_middle_name.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.contact_author_PI_middle_name, 4,1)
 
         grid.addWidget(QtGui.QLabel('PI role'), 5,0)
 #        self.contact_author_PI_role = QtGui.QLineEdit()
         self.contact_author_PI_role = QtGui.QComboBox()
-        PIroles = ['group leader','principal investigator']
+        PIroles = ['group leader','principal investigator','investigator']
         for item in PIroles: self.contact_author_PI_role.addItem(item)
 #        self.contact_author_PI_role.setText('group leader')
 #        self.contact_author_PI_role.setFixedWidth(200)
@@ -1890,6 +1939,7 @@ class XChemExplorer(QtGui.QApplication):
         self.contact_author_middle_name = QtGui.QLineEdit()
         self.contact_author_middle_name.setText('')
         self.contact_author_middle_name.setFixedWidth(200)
+        self.contact_author_middle_name.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.contact_author_middle_name, 4,1)
 
         grid.addWidget(QtGui.QLabel('Role'), 5,0)
@@ -2041,11 +2091,12 @@ class XChemExplorer(QtGui.QApplication):
         self.group_deposition_title = QtGui.QLineEdit()
         self.group_deposition_title.setText('')
         self.group_deposition_title.setFixedWidth(600)
+        self.group_deposition_title.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.group_deposition_title, 2,1)
 
         grid.addWidget(QtGui.QLabel('Title'), 3,0)
         self.structure_title = QtGui.QLineEdit()
-        self.structure_title.setText('Fragment screening campaign for $ProteinName - Fragment Hit Structure $CompoundName')
+        self.structure_title.setText('Fragment screening campaign for $ProteinName -- Crystal Structure of $ProteinName with ligand $CompoundName bound (SGC - Diamond I04-1 fragment screening)')
         self.structure_title.setFixedWidth(600)
         grid.addWidget(self.structure_title, 3,1)
 
@@ -2055,14 +2106,12 @@ class XChemExplorer(QtGui.QApplication):
 #        self.structure_details.setFixedWidth(600)
 #        grid.addWidget(self.structure_details, 4,1)
 
-        note = (
-            '\n\nApo Structure:\nonly use if you want to deposit PanDDA models!'
-        )
+        note = ( '\n\nApo Structure:\nonly use if you want to deposit PanDDA models!'        )
         grid.addWidget(QtGui.QLabel(note), 4,0)
 
         grid.addWidget(QtGui.QLabel('Title Apo Structure'), 5,0)
         self.structure_title_apo = QtGui.QLineEdit()
-        self.structure_title_apo.setText('Fragment screening campaign for $ProteinName - Empty Active Site Structure No. <will create automatically>')
+        self.structure_title_apo.setText('Fragment screening campaign for $ProteinName -- Crystal Structure of $ProteinName (structure <n>) after inial refinement (SGC - Diamond I04-1 fragment screening)')
         self.structure_title_apo.setFixedWidth(600)
         grid.addWidget(self.structure_title_apo, 5,1)
 
@@ -2133,30 +2182,35 @@ class XChemExplorer(QtGui.QApplication):
         self.primary_citation_title = QtGui.QLineEdit()
         self.primary_citation_title.setText('')
         self.primary_citation_title.setFixedWidth(500)
+        self.primary_citation_title.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.primary_citation_title, 3,1)
 
         grid.addWidget(QtGui.QLabel('Year'), 4,0)
         self.primary_citation_year = QtGui.QLineEdit()
         self.primary_citation_year.setText('')
         self.primary_citation_year.setFixedWidth(500)
+        self.primary_citation_year.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.primary_citation_year, 4,1)
 
         grid.addWidget(QtGui.QLabel('Volume'), 5,0)
         self.primary_citation_journal_volume = QtGui.QLineEdit()
         self.primary_citation_journal_volume.setText('')
         self.primary_citation_journal_volume.setFixedWidth(500)
+        self.primary_citation_journal_volume.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.primary_citation_journal_volume, 5,1)
 
         grid.addWidget(QtGui.QLabel('Page, first'), 6,0)
         self.primary_citation_page_first = QtGui.QLineEdit()
         self.primary_citation_page_first.setText('')
         self.primary_citation_page_first.setFixedWidth(500)
+        self.primary_citation_page_first.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.primary_citation_page_first, 6,1)
 
         grid.addWidget(QtGui.QLabel('Page, last'), 7,0)
         self.primary_citation_page_last = QtGui.QLineEdit()
         self.primary_citation_page_last.setText('')
         self.primary_citation_page_last.setFixedWidth(500)
+        self.primary_citation_page_last.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.primary_citation_page_last, 7,1)
 
         frame.setLayout(grid)
@@ -2211,6 +2265,7 @@ class XChemExplorer(QtGui.QApplication):
         self.molecule_name = QtGui.QLineEdit()
         self.molecule_name.setText('')
         self.molecule_name.setFixedWidth(300)
+        self.molecule_name.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.molecule_name, 2,1)
         grid.addWidget(QtGui.QLabel('(e.g. RNA Hammerhead Ribozyme)'), 2,2)
 
@@ -2218,6 +2273,7 @@ class XChemExplorer(QtGui.QApplication):
         self.fragment_name_one = QtGui.QLineEdit()
         self.fragment_name_one.setText('')
         self.fragment_name_one.setFixedWidth(300)
+        self.fragment_name_one.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.fragment_name_one, 3,1)
         grid.addWidget(QtGui.QLabel('(e.g. ligand binding domain, hairpin)'), 3,2)
 
@@ -2225,6 +2281,7 @@ class XChemExplorer(QtGui.QApplication):
         self.fragment_name_one_specific_mutation = QtGui.QLineEdit()
         self.fragment_name_one_specific_mutation.setText('')
         self.fragment_name_one_specific_mutation.setFixedWidth(300)
+        self.fragment_name_one_specific_mutation.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.fragment_name_one_specific_mutation, 4,1)
         grid.addWidget(QtGui.QLabel('(e.g. C280S)'), 4,2)
 
@@ -2232,6 +2289,7 @@ class XChemExplorer(QtGui.QApplication):
         self.fragment_name_one_enzyme_comission_number = QtGui.QLineEdit()
         self.fragment_name_one_enzyme_comission_number.setText('')
         self.fragment_name_one_enzyme_comission_number.setFixedWidth(300)
+        self.fragment_name_one_enzyme_comission_number.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.fragment_name_one_enzyme_comission_number, 5,1)
         grid.addWidget(QtGui.QLabel('(if known: e.g. 2.7.7.7)'), 5,2)
 
@@ -2255,6 +2313,7 @@ class XChemExplorer(QtGui.QApplication):
         self.Source_organism_strain = QtGui.QLineEdit()
         self.Source_organism_strain.setText('')
         self.Source_organism_strain.setFixedWidth(300)
+        self.Source_organism_strain.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.Source_organism_strain, 9,1)
         grid.addWidget(QtGui.QLabel('(e.g. BH10 ISOLATE, K-12...)'), 9,2)
 
@@ -2269,6 +2328,7 @@ class XChemExplorer(QtGui.QApplication):
         self.Expression_system_strain = QtGui.QLineEdit()
         self.Expression_system_strain.setText('')
         self.Expression_system_strain.setFixedWidth(300)
+        self.Expression_system_strain.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.Expression_system_strain, 11,1)
         grid.addWidget(QtGui.QLabel('(e.g. BL21(DE3))'), 11,2)
 
@@ -2276,6 +2336,7 @@ class XChemExplorer(QtGui.QApplication):
         self.Expression_system_vector_type = QtGui.QLineEdit()
         self.Expression_system_vector_type.setText('')
         self.Expression_system_vector_type.setFixedWidth(300)
+        self.Expression_system_vector_type.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.Expression_system_vector_type, 12,1)
         grid.addWidget(QtGui.QLabel('(e.g. plasmid)'), 12,2)
 
@@ -2283,6 +2344,7 @@ class XChemExplorer(QtGui.QApplication):
         self.Expression_system_plasmid_name = QtGui.QLineEdit()
         self.Expression_system_plasmid_name.setText('')
         self.Expression_system_plasmid_name.setFixedWidth(300)
+        self.Expression_system_plasmid_name.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.Expression_system_plasmid_name, 13,1)
         grid.addWidget(QtGui.QLabel('(e.g. pET26)'), 13,2)
 
@@ -2290,6 +2352,7 @@ class XChemExplorer(QtGui.QApplication):
         self.Manipulated_source_details = QtGui.QLineEdit()
         self.Manipulated_source_details.setText('')
         self.Manipulated_source_details.setFixedWidth(300)
+        self.Manipulated_source_details.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.Manipulated_source_details, 14,1)
         grid.addWidget(QtGui.QLabel('(any other relevant information)'), 14,2)
 

@@ -1,4 +1,4 @@
-# last edited: 24/01/2016, 17:00
+# last edited: 27/01/2016, 17:00
 
 import os, sys, glob
 from datetime import datetime
@@ -284,6 +284,9 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                             target=link.replace(link[:link.find(xtal)],self.initial_model_directory+'/')
                             found_file=True
                             self.change_absolute_to_relative_links(target,filename)
+                        elif os.path.isfile(files):
+                            # this will leave the absolute path
+                            found_file=True
                         else:
                             self.Logfile.insert('removing broken link: '+filename)
                             os.system('/bin/rm %s 2> /dev/null' %filename)

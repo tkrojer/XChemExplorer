@@ -1,4 +1,4 @@
-# last edited: 24/01/2017, 15:00
+# last edited: 27/01/2017, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -928,7 +928,7 @@ class convert_event_map_to_SF:
 
     def update_database(self):
         sqlite = ( "update panddaTable set "
-                   " PANDDA_site_event_map_mtz = '%s' " %os.path.join(self.project_directory,self.event+'.mtz')+
+                   " PANDDA_site_event_map_mtz = '%s' " %os.path.join(self.project_directory,self.xtalID,self.event+'.mtz')+
                    " where PANDDA_site_event_map is '%s' " %self.event_map
                     )
         self.db.execute_statement(sqlite)

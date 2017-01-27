@@ -1,7 +1,7 @@
-# last edited: 24/01/2017, 15:00
+# last edited: 27/01/2017, 15:00
 
 import sqlite3
-import os,sys
+import os,sys,glob
 import csv
 from datetime import datetime
 import getpass
@@ -1199,6 +1199,65 @@ class data_source:
                 Logfile.insert('creating new entries with the following SQLite command:\n'+sqlite)
                 cursor.execute(sqlite)
                 connect.commit()
+
+    def create_missing_apo_records_for_all_structures_in_depositTable(self,projectDir,xce_logfile):
+        Logfile=XChemLog.updateLog(xce_logfile)
+        connect=sqlite3.connect(self.data_source_file)
+        cursor = connect.cursor()
+        cursor.execute("select CrystalName from depositTable where StructureType is 'apo'")
+        tmp = cursor.fetchall()
+#        print str(tmp)
+        apoStructureList=[]
+        for item in tmp:
+            apoStructureList.append(str(item[0]))
+
+        newEntries=''
+        for files in glob.glob(os.path.join(projectDir,'*')):
+            xtal=files[files.rfind('/')+1:]
+            if xtal not in apoStructureList:
+                dimple_pdb=False
+                dimple_mtz=False
+                aimless_log=False
+                if os.path.isfile(os.path.join(files,'dimple.pdb')):
+                    dimple_pdb=True
+                if os.path.isfile(os.path.join(files,'dimple.mtz')):
+                    dimple_mtz=True
+                if os.path.isfile(os.path.join(files,xtal+'.log')) or os.path.isfile(os.path.join('aimless.log')):
+                    aimless_log=True
+
+                if dimple_mtz==False or dimple_pdb==False or aimless_log==False:
+                    Logfile.insert('%s: missing files -> dimple.pdb: %s, dimple.mtz: %s, %s.log: %s' %(xtal,str(dimple_pdb),str(dimple_mtz),xtal,str(aimless_log)))
+                else:
+                    newEntries+="('%s','apo')," %xtal
+
+        if newEntries != '':
+            sqlite='insert into depositTable (CrystalName,StructureType) values %s;' %newEntries[:-1]
+            Logfile.insert('creating new entries with the following SQLite command:\n'+sqlite)
+            cursor.execute(sqlite)
+            connect.commit()
+        else:
+            Logfile.insert('did not find any new apo structures')
+
+#        if apoStructureList==[]:
+#            Logfile.insert('no apo structures were assigned to your pandda models')
+#        else:
+#            Logfile.insert('the following datasets were at some point used as apo structures for pandda.analyse: '+str(apoStructureList))
+#            apoInDB=[]
+#            cursor.execute("select CrystalName from depositTable where StructureType is 'apo'")
+#            tmp = cursor.fetchall()
+#            for xtal in tmp:
+#                Logfile.insert(str(xtal[0])+' exists as entry for apo structure in database')
+#                apoInDB.append(str(xtal[0]))
+#            newEntries=''
+#            for xtal in apoStructureList:
+#                if xtal not in apoInDB:
+#                    Logfile.insert('no entry for '+xtal+' in depositTable')
+#                    newEntries+="('%s','apo')," %xtal
+#            if newEntries != '':
+#                sqlite='insert into depositTable (CrystalName,StructureType) values %s;' %newEntries[:-1]
+#                Logfile.insert('creating new entries with the following SQLite command:\n'+sqlite)
+#                cursor.execute(sqlite)
+#                connect.commit()
 
 #    def get_deposit_dict_for_xtal(self,sampleID,structure_type):
 
