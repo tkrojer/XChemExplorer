@@ -1,4 +1,4 @@
-# last edited: 27/01/2017, 15:00
+# last edited: 30/01/2017, 15:00
 
 import sqlite3
 import os,sys,glob
@@ -1040,6 +1040,19 @@ class data_source:
                 " and panddaTable.PANDDA_site_ligand_placed is 'True'"
                 " and panddaTable.RefinementOutcome like "+outcome.split()[0]+"%';"
                 )
+            sqlite = (
+                "select"
+                " mainTable.CrystalName,"
+                " mainTable.CompoundCode,"
+                " mainTable.RefinementCIF,"
+                " mainTable.RefinementMTZfree,"
+                " mainTable.RefinementPathToRefinementFolder,"
+                " panddaTable.RefinementOutcome, "
+                " panddaTable.PANDDA_site_confidence "
+                "from mainTable inner join panddaTable on mainTable.CrystalName = panddaTable.CrystalName "
+                "where panddaTable.PANDDA_site_index is '%s'" %pandda_site+
+                " and panddaTable.RefinementOutcome like "+outcome.split()[0]+"%';"
+                )
         else:
             sqlite = (
                 "select"
@@ -1285,6 +1298,27 @@ class data_source:
                 Logfile.insert('removing entry for '+str(type)+' structure of '+xtal+' from depositTable')
                 cursor.execute(sqlite)
                 connect.commit()
+
+
+    def remove_selected_apo_structures_from_depositTable(self,xce_logfile,xtalList):
+        connect=sqlite3.connect(self.data_source_file)
+        cursor = connect.cursor()
+
+        Logfile=XChemLog.updateLog(xce_logfile)
+
+        Logfile.insert('removing the following apo structures from depositTable')
+        deleteStrg = "("
+        for xtal in xtalList:
+            Logfile.insert(xtal)
+            deleteStrg+="'"+xtal+"' or"
+        deleteStrg=deleteStrg[:-3]+")"
+
+        sqlite="delete from depositTable where CrystalName is (%s) and StructureType is 'apo'" %deleteStrg
+        Logfile.insert('executing the following SQLite command:\n'+sqlite)
+        cursor.execute(sqlite)
+        connect.commit()
+
+
 
 
 #        for item in tmp:

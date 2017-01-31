@@ -1,4 +1,4 @@
-# last edited: 07/12/2016 - 22:00
+# last edited: 30/01/2017 - 15:00
 
 import gobject
 import sys
@@ -920,7 +920,7 @@ class GUI(object):
         self.Todo=[]
         self.Todo=self.db.get_todo_list_for_coot(self.selection_mode,self.selected_site[0])
         self.status_label.set_text('found %s samples' %len(self.Todo))
-        for item in self.Todo:
+        for item in sorted(self.Todo):
             self.cb.append_text('%s' %item[0])
 
 

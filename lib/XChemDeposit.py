@@ -1,4 +1,4 @@
-# last edited: 27/01/2017, 17:00
+# last edited: 30/01/2017, 15:00
 
 import sys
 import os
@@ -285,221 +285,6 @@ class update_depositTable(QtCore.QThread):
         return db_dict
 
 
-class prepare_bound_models_for_deposition(QtCore.QThread):
-
-    def __init__(self,database,xce_logfile,overwrite_existing_mmcif,projectDir):
-        QtCore.QThread.__init__(self)
-        self.database=database
-        self.Logfile=XChemLog.updateLog(xce_logfile)
-        self.db=XChemDB.data_source(database)
-        self.overwrite_existing_mmcif=overwrite_existing_mmcif
-        self.projectDir=projectDir
-        self.data_template='data_template.cif'
-
-    def run(self):
-        self.Logfile.insert('checking for models in mainTable that are ready for deposition')
-        toDeposit=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%';")
-        for item in toDeposit:
-            xtal=str(item[0])
-            self.Logfile.insert(xtal+' is ready for deposition')
-            preparation_can_go_ahead=True
-            self.Logfile.insert('checking refinement stage of respective PanDDA sites...')
-            panddaSites=self.db.execute_statement("select CrystalName,RefinementOutcome,PANDDA_site_event_map_mtz from panddaTable where CrystalName is '%s' and PANDDA_site_ligand_placed is 'True'" %xtal)
-            self.Logfile.insert('found '+str(len(panddaSites))+' ligands')
-            eventMtz=[]
-            for site in panddaSites:
-                if str(site[1]).startswith('5'):
-                    self.Logfile.insert('site is ready for deposition')
-                    eventMtz.append(str(site[2]))
-                else:
-                    self.Logfile.insert('site is NOT ready for deposition')
-                    preparation_can_go_ahead=False
-
-            n_eventMtz = len(eventMtz)
-            if preparation_can_go_ahead:
-                ModelData=self.db.execute_statement("select RefinementPDB_latest,RefinementMTZ_latest,RefinementCIF,DataProcessingPathToLogfile,RefinementProgram,CompoundCode from mainTable where CrystalName is '%s'" %xtal)
-                pdb=str(ModelData[0][0])
-                mtz=str(ModelData[0][1])
-                cif=str(ModelData[0][2])
-                if not os.path.isfile(cif):
-                    if not os.path.isfile(os.path.join(self.projectDir,xtal,cif)):
-                        self.Logfile.insert('cannot find ligand CIF file! Please check %s and the database!' %(os.path.join(self.projectDir,xtal)))
-                        self.Logfile.insert('cannot prepare mmcif files for %s; skipping... => ERROR' %xtal)
-                        continue
-                log=str(ModelData[0][3])
-                refSoft=str(ModelData[0][4])
-                compoundID=str(ModelData[0][5])
-
-                # if all modelled ligands are ready for deposition, we can continue
-
-                # first get all meta-data for deposition, i.e. data_template file
-                wavelength=self.prepare_data_template_for_xtal(xtal,compoundID,pdb)
-
-                # make model mmcif
-                self.make_model_mmcif(xtal,pdb,log,refSoft)
-
-                # make SF mmcif
-                self.make_sf_mmcif(xtal,mtz,eventMtz)
-
-                # report any problems that came up
-                mmcif=self.check_mmcif_files_and_update_db(xtal,n_eventMtz,wavelength)
-
-                # add ligand cif file to mmcif
-                self.add_ligand_cif_file(mmcif,cif)
-
-                self.Logfile.insert('finished preparation of mmcif files')
-
-
-            else:
-                self.Logfile.insert(XChemToolTips.deposition_pandda_site_not_ready(xtal))
-
-    def prepare_data_template_for_xtal(self,xtal,compoundID,pdb):
-        # check if file exists
-        if self.overwrite_existing_mmcif:
-            os.chdir(os.path.join(self.projectDir,xtal))
-            data_template_dict=self.db.get_deposit_dict_for_sample(xtal)
-
-            # edit title
-            data_template_dict['title']=data_template_dict['structure_title'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID)
-            self.Logfile.insert('deposition title for '+xtal+': '+data_template_dict['title'])
-
-            # get protein chains
-            data_template_dict['protein_chains']=''
-            chains=pdbtools(pdb).GetProteinChains()
-            for item in chains:
-                data_template_dict['protein_chains']+=item+','
-            data_template_dict['protein_chains']=data_template_dict['protein_chains'][:-1]
-
-            self.Logfile.insert('creating %s file for %s' %(self.data_template,xtal))
-            if self.data_template.endswith('cif'):
-                data_template=templates().data_template_cif(data_template_dict)
-            else:
-                data_template=templates().data_template_text(data_template_dict)
-            f=open(os.path.join(self.projectDir,xtal,self.data_template),'w')
-            f.write(data_template)
-            f.close()
-
-            wavelength=data_template_dict['radiation_wavelengths']
-            return wavelength
-
-
-
-    def make_model_mmcif(self,xtal,pdb,log,refSoft):
-        if os.path.isfile(pdb) and os.path.isfile(log):
-            os.chdir(os.path.join(self.projectDir,xtal))
-            Cmd = ( 'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/setup.sh')+'\n'
-                    +os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/bin/pdb_extract')+
-                    ' -r PHENIX'
-#                    ' -r %s'            %refSoft+
-#                    ' -iLOG initial.log'
-                    ' -iPDB %s'         %pdb+
-                    ' -e MR'
-                    ' -s AIMLESS'
-                    ' -iLOG %s'         %log+
-                    ' -iENT %s'         %self.data_template+
-                    ' -o %s.mmcif > %s.mmcif.log'      %(xtal,xtal)       )
-
-            self.Logfile.insert('running pdb_extract: '+Cmd)
-            os.system(Cmd)
-
-            # can we add here the ligand.cif?
-#    '''pdb_extract -r REFMAC -iLOG initial.log -iPDB initial.pdb -e MR -s AIMLESS -iLOG aimless.log -iENT data_template.cif -o NUDT22A-x0315-model.cif'''
-
-
-    def make_sf_mmcif(self,xtal,mtz,eventMtz):
-        if os.path.isfile(mtz):
-            os.chdir(os.path.join(self.projectDir,xtal))
-            mtzin = mtz+' '
-            for event in eventMtz:
-                mtzin+=event+' '
-
-            Cmd = ( 'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/setup.sh')+'\n'
-                    +os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/bin/sf_convert')+
-                    ' -o mmcif'
-                    ' -sf %s' %mtzin+
-                    ' -out %s_sf.mmcif  > %s.sf_mmcif.log' %(xtal,xtal) )
-
-#            Cmd = ( os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/sf-convert-v1.204-prod-src/bin/sf_convert')+
-#                    ' -o mmcif'
-#                    ' -sf %s' %mtzin+
-#                    ' -out %s_sf.mmcif > %s.sf_mmcif.log' %(xtal,xtal) )
-
-            self.Logfile.insert('running sf_convert: '+Cmd)
-            os.system(Cmd)
-            os.system('/bin/rm sf_format_guess.text mtzdmp.log SF_4_validate.cif sf_information.cif')
-
-
-    def check_mmcif_files_and_update_db(self,xtal,n_eventMtz,wavelength):
-        os.chdir(os.path.join(self.projectDir,xtal))
-        foundFiles=True
-
-        mmcif=''
-        if os.path.isfile(xtal+'.mmcif') and os.path.getsize(xtal+'.mmcif') > 20 :
-            self.Logfile.insert('found '+xtal+'.mmcif')
-            mmcif=os.path.join(self.projectDir,xtal,xtal+'.mmcif')
-        else:
-            self.Logfile.insert('cannot find '+xtal+'.mmcif; something went wrong! => ERROR')
-            foundFiles=False
-
-        if os.path.isfile(xtal+'_sf.mmcif') and os.path.getsize(xtal+'_sf.mmcif') > 20 :
-            self.Logfile.insert('found '+xtal+'_sf.mmcif')
-            mmcif_sf=os.path.join(self.projectDir,xtal,xtal+'_sf.mmcif')
-
-            # now check if really all event maps are in mmcif file
-            n_eventMTZ_found=-1     # set to -1 since first data block should be measured data
-            for line in open(mmcif_sf):
-                if line.startswith('_refln.crystal_id'):
-                    n_eventMTZ_found+=1
-            if n_eventMTZ_found != n_eventMtz:
-                self.Logfile.insert('%s event map mtz files were specified as input, but only %s ended up in the mmcif file => ERROR' %(str(n_eventMtz),str(n_eventMTZ_found)))
-                foundFiles=False
-            else:
-                self.Logfile.insert('%s event map mtz files were specified as input, %s ended up in the mmcif file, all well so far...' %(str(n_eventMtz),str(n_eventMTZ_found)))
-
-            self.Logfile.insert('editing wavelength information in SF mmcif file; changing wavelength to %s' %wavelength)
-            tmpText=''
-            for line in open(mmcif_sf):
-                if line.startswith('_diffrn_radiation_wavelength.wavelength'):
-                    tmpText+='_diffrn_radiation_wavelength.wavelength   %s\n' %wavelength
-                else:
-                    tmpText+=line
-            f=open(mmcif_sf,'w')
-            f.write(tmpText)
-            f.close()
-            if os.path.isfile(mmcif_sf):
-                self.Logfile.insert('mmcif SF file successfully update')
-            else:
-                self.Logfile.insert('something went wrong during the update => ERROR')
-                foundFiles=False
-
-        else:
-            self.Logfile.insert('cannot find '+xtal+'_sf.mmcif; something went wrong! => ERROR')
-            foundFiles=False
-
-        if foundFiles:
-            self.Logfile.insert('updating database with file locations for %s.mmcif and %s_sf.mmcif' %(xtal,xtal))
-            self.db.execute_statement("update depositTable set mmCIF_model_file='%s',mmCIF_SF_file='%s' where CrystalName is '%s'" %(mmcif,mmcif_sf,xtal))
-        else:
-            self.Logfile.insert('could not find %s.mmcif and/or %s_sf.mmcif; removing empty files...')
-            os.system('/bin/rm %s.mmcif 2> /dev/null' %xtal)
-            os.system('/bin/rm %s_sf.mmcif 2> /dev/null' %xtal)
-
-        return mmcif
-
-
-    def add_ligand_cif_file(self,mmcif,ligand_cif):
-        self.Logfile.insert('adding ligand cif file to %s' %mmcif)
-        tmpText=''
-        for line in open(mmcif):
-            tmpText+=line
-        for line in open(ligand_cif):
-            tmpText+=line
-        f=open(mmcif,'w')
-        f.write(tmpText)
-        f.close()
-
-    def make_site_description(self):
-        print 'hallo'
 
 
 class prepare_mmcif_files_for_deposition(QtCore.QThread):
@@ -507,6 +292,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
     def __init__(self,database,xce_logfile,overwrite_existing_mmcif,projectDir,structureType):
         QtCore.QThread.__init__(self)
         self.database=database
+        self.xce_logfile=xce_logfile
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.db=XChemDB.data_source(database)
         self.overwrite_existing_mmcif=overwrite_existing_mmcif
@@ -514,21 +300,34 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         self.data_template_apo='data_template_apo.cif'
         self.data_template_bound='data_template_bound.cif'
         self.structureType=structureType
-
-#        if self.structureType=='ligand_bound':
-#            self.out=xtal+'-bound'
-#        elif self.structureType=='apo':
-#            self.out=xtal+'-apo'
+        self.depositLog=XChemLog.depositLog('deposit.log')
+        self.depositLog.text('starting preparation of mmcif files for deposition')
+        self.success=0
+        self.successDict={}
+        self.failureDict={}
+        self.n_toDeposit=0
 
 
     def run(self):
 
         if self.structureType=='apo':
+            # remove apo entries for structures to be deposited
+            self.Logfile.insert('removing apo structures from depositTable which have a ligand bound structure ready for deposition')
+            toDelete=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%';")
+            toDeleteList=[]
+            for xtal in toDelete:
+                toDeleteList.append(str(item[0]))
+            if toDeleteList != []:
+                self.db.remove_selected_apo_structures_from_depositTable(self.xce_logfile,toDeleteList)
             self.Logfile.insert('checking for apo structures in depositTable')
             toDeposit=self.db.execute_statement("select CrystalName from depositTable where StructureType is 'apo';")
+
         elif self.structureType=='ligand_bound':
             self.Logfile.insert('checking for models in mainTable that are ready for deposition')
             toDeposit=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%';")
+
+        self.n_toDeposit=len(toDeposit)
+        self.depositLog.text('trying to prepare mmcif files for '+str(len(toDeposit))+' structures')
 
         progress_step=1
         if len(toDeposit) != 0:
@@ -545,6 +344,8 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             eventMtz=[]
             preparation_can_go_ahead=True
 
+            self.depositLog.modelInfo(xtal,self.structureType)
+
             if self.structureType=='apo':
                 self.out=xtal+'-apo'
             elif self.structureType=='ligand_bound':
@@ -560,17 +361,14 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                         self.Logfile.insert('site is ready for deposition')
                         eventMtz.append(str(site[2]))
                     else:
-#
-#
-# ------------------------ took the break out for now!!!
-#
-#
                         self.Logfile.insert('site is NOT ready for deposition')
+                        self.updateFailureDict(xtal,'at least one PanDDA site is not ready for deposition')
                         eventMtz.append(str(site[2]))
-#                        preparation_can_go_ahead=False
+                        preparation_can_go_ahead=False
 
             n_eventMtz = len(eventMtz)
             if preparation_can_go_ahead:
+                self.depositLog.nEvents(xtal,n_eventMtz)
                 if self.structureType=='ligand_bound':
                     ModelData=self.db.execute_statement("select RefinementPDB_latest,RefinementMTZ_latest,RefinementCIF,DataProcessingPathToLogfile,RefinementProgram,CompoundCode,CompoundSMILES from mainTable where CrystalName is '%s'" %xtal)
                     pdb=str(ModelData[0][0])
@@ -584,6 +382,8 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                         pdb=str(ModelData[0][0])
                     else:
                         self.Logfile.insert('cannot find PDB file for apo structure of '+xtal+'; skipping => ERROR')
+                        self.depositLog.text('cannot find PDB file for apo structure of '+xtal+'; skipping => ERROR')
+                        self.updateFailureDict(xtal,'cannot find PDB file')
                         continue
 
                     if os.path.isfile(os.path.join(str(ModelData[0][7]),xtal,str(ModelData[0][1]))):
@@ -592,6 +392,8 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                         mtz=str(ModelData[0][1])
                     else:
                         self.Logfile.insert('cannot find MTZ file for apo structure of '+xtal+'; skipping => ERROR')
+                        self.depositLog.text('cannot find MTZ file for apo structure of '+xtal+'; skipping => ERROR')
+                        self.updateFailureDict(xtal,'cannot find MTZ file')
                         continue
 
 #                    if os.path.isfile(os.path.join(str(ModelData[0][7]),xtal,str(ModelData[0][1]))):
@@ -603,7 +405,9 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                     if not os.path.isfile(cif):
                         if not os.path.isfile(os.path.join(self.projectDir,xtal,cif)):
                             self.Logfile.insert('cannot find ligand CIF file! Please check %s and the database!' %(os.path.join(self.projectDir,xtal)))
+                            self.depositLog.text('cannot find ligand CIF file for %s; skipping... => ERROR' %xtal)
                             self.Logfile.insert('cannot prepare mmcif files for %s; skipping... => ERROR' %xtal)
+                            self.updateFailureDict(xtal,'cannot find CIF file for ligand')
                             continue
                 log=str(ModelData[0][3])
                 refSoft=str(ModelData[0][4])
@@ -637,6 +441,17 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
+        self.summary()
+
+
+    def updateFailureDict(self,xtal,error):
+        if xtal not in self.failureDict:
+            self.failureDict[xtal]=[]
+        self.failureDict[xtal].append(error)
+
+
+    def summary(self):
+        self.depositLog.summary(self.n_toDeposit,self.success,self.failureDict,self.structureType,self.successDict)
 
 
     def prepare_data_template_for_xtal(self,xtal,compoundID,pdb):
@@ -651,6 +466,9 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             if self.structureType=='apo':
                 data_template_dict['title']=data_template_dict['structure_title_apo'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID)
             self.Logfile.insert('deposition title for '+xtal+': '+data_template_dict['title'])
+            self.depositLog.text('title: '+data_template_dict['title'])
+            if ('$ProteinName' or '$CompoundName') in data_template_dict['title']:
+                self.updateFailureDict(xtal,'title not correctly formatted')
 
             # get protein chains
             data_template_dict['protein_chains']=''
@@ -749,6 +567,8 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             mmcif=os.path.join(self.projectDir,xtal,self.out+'.mmcif')
         else:
             self.Logfile.insert('cannot find '+self.out+'.mmcif; something went wrong! => ERROR')
+            self.depositLog.text('cannot find '+self.out+'.mmcif; something went wrong! => ERROR')
+            self.updateFailureDict(xtal,'cannot find '+self.out+'.mmcif')
             foundFiles=False
 
         if os.path.isfile(self.out+'_sf.mmcif') and os.path.getsize(self.out+'_sf.mmcif') > 20000 :
@@ -763,6 +583,8 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                         n_eventMTZ_found+=1
                 if n_eventMTZ_found != n_eventMtz:
                     self.Logfile.insert('%s event map mtz files were specified as input, but only %s ended up in the mmcif file => ERROR' %(str(n_eventMtz),str(n_eventMTZ_found)))
+                    self.depositLog.text('%s event map mtz files were specified as input, but only %s ended up in the mmcif file => ERROR' %(str(n_eventMtz),str(n_eventMTZ_found)))
+                    self.updateFailureDict(xtal,'%s event mtz in input; only %s in mmcif SF file' %(str(n_eventMtz),str(n_eventMTZ_found)))
                     foundFiles=False
                 else:
                     self.Logfile.insert('%s event map mtz files were specified as input, %s ended up in the mmcif file, all well so far...' %(str(n_eventMtz),str(n_eventMTZ_found)))
@@ -781,14 +603,20 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 self.Logfile.insert('mmcif SF file successfully update')
             else:
                 self.Logfile.insert('something went wrong during the update => ERROR')
+                self.depositLog.text('something went wrong during the update => ERROR')
+                self.updateFailureDict(xtal,'error during mmcif SF update')
                 foundFiles=False
 
         else:
             self.Logfile.insert('cannot find '+self.out+'_sf.mmcif; something went wrong! => ERROR')
+            self.depositLog.text('cannot find '+self.out+'_sf.mmcif; something went wrong! => ERROR')
+            self.updateFailureDict(xtal,'cannot find '+self.out+'_sf.mmcif')
             foundFiles=False
 
         if foundFiles:
             self.Logfile.insert('updating database with file locations for %s.mmcif and %s_sf.mmcif' %(self.out,self.out))
+            self.successDict[xtal]=[self.out+'mmcif',os.path.getsize(self.out+'.mmcif'),self.out+'_sf.mmcif',os.path.getsize(self.out+'_sf.mmcif')]
+            self.success+=1
             self.db.execute_statement("update depositTable set mmCIF_model_file='%s',mmCIF_SF_file='%s' where CrystalName is '%s' and StructureType is '%s'" %(mmcif,mmcif_sf,xtal,self.structureType))
         else:
             self.Logfile.insert('could not find %s.mmcif and/or %s_sf.mmcif; removing empty files...')
@@ -815,20 +643,55 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         general=self.db.execute_statement("select CompoundSMILES from mainTable where CrystalName is '%s'" %xtal)
         smiles=str(general[0][0])
 
-        panddaSites=self.db.execute_statement("select PANDDA_site_index,PANDDA_site_x,PANDDA_site_y,PANDDA_site_y,PANDDA_site_name,PANDDA_site_confidence from panddaTable where CrystalName is '%s' and PANDDA_site_ligand_placed is 'True' order by PANDDA_site_index ASC" %xtal)
+
+
+        sqlite = (  "select "
+                    " PANDDA_site_index,"
+                    " PANDDA_site_x,"
+                    " PANDDA_site_y,"
+                    " PANDDA_site_y,"
+                    " PANDDA_site_name,"
+                    " PANDDA_site_confidence, "
+                    " PANDDA_site_comment,"
+                    " PANDDA_site_occupancy,"
+                    " PANDDA_site_B_average,"
+                    " PANDDA_site_B_ratio_residue_surroundings,"
+                    " PANDDA_site_RSCC,"
+                    " PANDDA_site_RSR,"
+                    " PANDDA_site_RSZD,"
+                    " PANDDA_site_rmsd "
+                    "from panddaTable "
+                    "where CrystalName is '%s' and PANDDA_site_ligand_placed is 'True' order by PANDDA_site_index ASC" %xtal)
+        print sqlite
+#        panddaSites=self.db.execute_statement("select PANDDA_site_index,PANDDA_site_x,PANDDA_site_y,PANDDA_site_y,PANDDA_site_name,PANDDA_site_confidence from panddaTable where CrystalName is '%s' and PANDDA_site_ligand_placed is 'True' order by PANDDA_site_index ASC" %xtal)
+        panddaSites=self.db.execute_statement(sqlite)
 
         root = etree.Element(xtal)
         child1 = etree.SubElement(root, "used_for_statistical_map")
         child1.text = 'yes'
         child2 = etree.SubElement(root, "smiles_of_compound_added")
         child2.text = '%s' %smiles
+
+        site_descpription_complete=True
         for site in panddaSites:
-            SiteIndex=str(site[0]).replace(' ','')
-            x_coord=str(site[1])
-            y_coord=str(site[2])
-            z_coord=str(site[3])
-            label=str(site[4])
-            confidence=str(site[5])
+            SiteIndex=  str(site[0]).replace(' ','')
+            x_coord=    str(site[1])
+            y_coord=    str(site[2])
+            z_coord=    str(site[3])
+            label=      str(site[4])
+            confidence= str(site[5])
+            comment=    str(site[6])
+            occupancy=  str(site[7])
+            Baverage=   str(site[8])
+            Bratio=     str(site[9])
+            RSCC=       str(site[10])
+            RSR=        str(site[11])
+            RSZD=       str(site[12])
+            RMSD=       str(site[13])
+
+            if 'none' in (SiteIndex.lower() or x_coord.lower() or y_coord.lower() or z_coord.lower() or confidence.lower() or occupancy.lower() or Bratio.lower() or Baverage.lower() or RSZD.lower() or RMSD.lower() or RSCC.lower() or RSR.lower()):
+                site_descpription_complete=False
+
             child = etree.SubElement(root, "site"+SiteIndex)
             childa = etree.SubElement(child, "label")
             childa.text = '%s' %label
@@ -838,10 +701,33 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             childy.text = '%s' %smiles
             childz = etree.SubElement(child, "confidence")
             childz.text = '%s' %confidence
+            childb = etree.SubElement(child, "comment")
+            childb.text = '%s' %comment
+            childc = etree.SubElement(child, "occupancy")
+            childc.text = '%s' %occupancy
+            childd = etree.SubElement(child, "B_average")
+            childd.text = '%s' %Baverage
+            childe = etree.SubElement(child, "B_ratio")
+            childe.text = '%s' %Bratio
+            childf = etree.SubElement(child, "RSCC")
+            childf.text = '%s' %RSCC
+            childg = etree.SubElement(child, "RSR")
+            childg.text = '%s' %RSR
+            childh = etree.SubElement(child, "RSZD")
+            childh.text = '%s' %RSZD
+            childi = etree.SubElement(child, "RMSD")
+            childi.text = '%s' %RMSD
+
+
 
 #        # pretty string
         s = etree.tostring(root, pretty_print=True)
         mmcif_text+=s+';\n'
+
+        self.depositLog.site_xml(xtal,s)
+
+        if not site_descpription_complete:
+            self.updateFailureDict(xtal,'site description incomplete')
 
         return mmcif_text
 
@@ -1486,3 +1372,218 @@ class templates_old:
 #    return apoStructureDict
 
 
+class prepare_bound_models_for_deposition(QtCore.QThread):
+
+    def __init__(self,database,xce_logfile,overwrite_existing_mmcif,projectDir):
+        QtCore.QThread.__init__(self)
+        self.database=database
+        self.Logfile=XChemLog.updateLog(xce_logfile)
+        self.db=XChemDB.data_source(database)
+        self.overwrite_existing_mmcif=overwrite_existing_mmcif
+        self.projectDir=projectDir
+        self.data_template='data_template.cif'
+
+    def run(self):
+        self.Logfile.insert('checking for models in mainTable that are ready for deposition')
+        toDeposit=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%';")
+        for item in toDeposit:
+            xtal=str(item[0])
+            self.Logfile.insert(xtal+' is ready for deposition')
+            preparation_can_go_ahead=True
+            self.Logfile.insert('checking refinement stage of respective PanDDA sites...')
+            panddaSites=self.db.execute_statement("select CrystalName,RefinementOutcome,PANDDA_site_event_map_mtz from panddaTable where CrystalName is '%s' and PANDDA_site_ligand_placed is 'True'" %xtal)
+            self.Logfile.insert('found '+str(len(panddaSites))+' ligands')
+            eventMtz=[]
+            for site in panddaSites:
+                if str(site[1]).startswith('5'):
+                    self.Logfile.insert('site is ready for deposition')
+                    eventMtz.append(str(site[2]))
+                else:
+                    self.Logfile.insert('site is NOT ready for deposition')
+                    preparation_can_go_ahead=False
+
+            n_eventMtz = len(eventMtz)
+            if preparation_can_go_ahead:
+                ModelData=self.db.execute_statement("select RefinementPDB_latest,RefinementMTZ_latest,RefinementCIF,DataProcessingPathToLogfile,RefinementProgram,CompoundCode from mainTable where CrystalName is '%s'" %xtal)
+                pdb=str(ModelData[0][0])
+                mtz=str(ModelData[0][1])
+                cif=str(ModelData[0][2])
+                if not os.path.isfile(cif):
+                    if not os.path.isfile(os.path.join(self.projectDir,xtal,cif)):
+                        self.Logfile.insert('cannot find ligand CIF file! Please check %s and the database!' %(os.path.join(self.projectDir,xtal)))
+                        self.Logfile.insert('cannot prepare mmcif files for %s; skipping... => ERROR' %xtal)
+                        continue
+                log=str(ModelData[0][3])
+                refSoft=str(ModelData[0][4])
+                compoundID=str(ModelData[0][5])
+
+                # if all modelled ligands are ready for deposition, we can continue
+
+                # first get all meta-data for deposition, i.e. data_template file
+                wavelength=self.prepare_data_template_for_xtal(xtal,compoundID,pdb)
+
+                # make model mmcif
+                self.make_model_mmcif(xtal,pdb,log,refSoft)
+
+                # make SF mmcif
+                self.make_sf_mmcif(xtal,mtz,eventMtz)
+
+                # report any problems that came up
+                mmcif=self.check_mmcif_files_and_update_db(xtal,n_eventMtz,wavelength)
+
+                # add ligand cif file to mmcif
+                self.add_ligand_cif_file(mmcif,cif)
+
+                self.Logfile.insert('finished preparation of mmcif files')
+
+
+            else:
+                self.Logfile.insert(XChemToolTips.deposition_pandda_site_not_ready(xtal))
+
+    def prepare_data_template_for_xtal(self,xtal,compoundID,pdb):
+        # check if file exists
+        if self.overwrite_existing_mmcif:
+            os.chdir(os.path.join(self.projectDir,xtal))
+            data_template_dict=self.db.get_deposit_dict_for_sample(xtal)
+
+            # edit title
+            data_template_dict['title']=data_template_dict['structure_title'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID)
+            self.Logfile.insert('deposition title for '+xtal+': '+data_template_dict['title'])
+
+            # get protein chains
+            data_template_dict['protein_chains']=''
+            chains=pdbtools(pdb).GetProteinChains()
+            for item in chains:
+                data_template_dict['protein_chains']+=item+','
+            data_template_dict['protein_chains']=data_template_dict['protein_chains'][:-1]
+
+            self.Logfile.insert('creating %s file for %s' %(self.data_template,xtal))
+            if self.data_template.endswith('cif'):
+                data_template=templates().data_template_cif(data_template_dict)
+            else:
+                data_template=templates().data_template_text(data_template_dict)
+            f=open(os.path.join(self.projectDir,xtal,self.data_template),'w')
+            f.write(data_template)
+            f.close()
+
+            wavelength=data_template_dict['radiation_wavelengths']
+            return wavelength
+
+
+
+    def make_model_mmcif(self,xtal,pdb,log,refSoft):
+        if os.path.isfile(pdb) and os.path.isfile(log):
+            os.chdir(os.path.join(self.projectDir,xtal))
+            Cmd = ( 'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/setup.sh')+'\n'
+                    +os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/bin/pdb_extract')+
+                    ' -r PHENIX'
+#                    ' -r %s'            %refSoft+
+#                    ' -iLOG initial.log'
+                    ' -iPDB %s'         %pdb+
+                    ' -e MR'
+                    ' -s AIMLESS'
+                    ' -iLOG %s'         %log+
+                    ' -iENT %s'         %self.data_template+
+                    ' -o %s.mmcif > %s.mmcif.log'      %(xtal,xtal)       )
+
+            self.Logfile.insert('running pdb_extract: '+Cmd)
+            os.system(Cmd)
+
+            # can we add here the ligand.cif?
+#    '''pdb_extract -r REFMAC -iLOG initial.log -iPDB initial.pdb -e MR -s AIMLESS -iLOG aimless.log -iENT data_template.cif -o NUDT22A-x0315-model.cif'''
+
+
+    def make_sf_mmcif(self,xtal,mtz,eventMtz):
+        if os.path.isfile(mtz):
+            os.chdir(os.path.join(self.projectDir,xtal))
+            mtzin = mtz+' '
+            for event in eventMtz:
+                mtzin+=event+' '
+
+            Cmd = ( 'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/setup.sh')+'\n'
+                    +os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/bin/sf_convert')+
+                    ' -o mmcif'
+                    ' -sf %s' %mtzin+
+                    ' -out %s_sf.mmcif  > %s.sf_mmcif.log' %(xtal,xtal) )
+
+#            Cmd = ( os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/sf-convert-v1.204-prod-src/bin/sf_convert')+
+#                    ' -o mmcif'
+#                    ' -sf %s' %mtzin+
+#                    ' -out %s_sf.mmcif > %s.sf_mmcif.log' %(xtal,xtal) )
+
+            self.Logfile.insert('running sf_convert: '+Cmd)
+            os.system(Cmd)
+            os.system('/bin/rm sf_format_guess.text mtzdmp.log SF_4_validate.cif sf_information.cif')
+
+
+    def check_mmcif_files_and_update_db(self,xtal,n_eventMtz,wavelength):
+        os.chdir(os.path.join(self.projectDir,xtal))
+        foundFiles=True
+
+        mmcif=''
+        if os.path.isfile(xtal+'.mmcif') and os.path.getsize(xtal+'.mmcif') > 20 :
+            self.Logfile.insert('found '+xtal+'.mmcif')
+            mmcif=os.path.join(self.projectDir,xtal,xtal+'.mmcif')
+        else:
+            self.Logfile.insert('cannot find '+xtal+'.mmcif; something went wrong! => ERROR')
+            foundFiles=False
+
+        if os.path.isfile(xtal+'_sf.mmcif') and os.path.getsize(xtal+'_sf.mmcif') > 20 :
+            self.Logfile.insert('found '+xtal+'_sf.mmcif')
+            mmcif_sf=os.path.join(self.projectDir,xtal,xtal+'_sf.mmcif')
+
+            # now check if really all event maps are in mmcif file
+            n_eventMTZ_found=-1     # set to -1 since first data block should be measured data
+            for line in open(mmcif_sf):
+                if line.startswith('_refln.crystal_id'):
+                    n_eventMTZ_found+=1
+            if n_eventMTZ_found != n_eventMtz:
+                self.Logfile.insert('%s event map mtz files were specified as input, but only %s ended up in the mmcif file => ERROR' %(str(n_eventMtz),str(n_eventMTZ_found)))
+                foundFiles=False
+            else:
+                self.Logfile.insert('%s event map mtz files were specified as input, %s ended up in the mmcif file, all well so far...' %(str(n_eventMtz),str(n_eventMTZ_found)))
+
+            self.Logfile.insert('editing wavelength information in SF mmcif file; changing wavelength to %s' %wavelength)
+            tmpText=''
+            for line in open(mmcif_sf):
+                if line.startswith('_diffrn_radiation_wavelength.wavelength'):
+                    tmpText+='_diffrn_radiation_wavelength.wavelength   %s\n' %wavelength
+                else:
+                    tmpText+=line
+            f=open(mmcif_sf,'w')
+            f.write(tmpText)
+            f.close()
+            if os.path.isfile(mmcif_sf):
+                self.Logfile.insert('mmcif SF file successfully update')
+            else:
+                self.Logfile.insert('something went wrong during the update => ERROR')
+                foundFiles=False
+
+        else:
+            self.Logfile.insert('cannot find '+xtal+'_sf.mmcif; something went wrong! => ERROR')
+            foundFiles=False
+
+        if foundFiles:
+            self.Logfile.insert('updating database with file locations for %s.mmcif and %s_sf.mmcif' %(xtal,xtal))
+            self.db.execute_statement("update depositTable set mmCIF_model_file='%s',mmCIF_SF_file='%s' where CrystalName is '%s'" %(mmcif,mmcif_sf,xtal))
+        else:
+            self.Logfile.insert('could not find %s.mmcif and/or %s_sf.mmcif; removing empty files...')
+            os.system('/bin/rm %s.mmcif 2> /dev/null' %xtal)
+            os.system('/bin/rm %s_sf.mmcif 2> /dev/null' %xtal)
+
+        return mmcif
+
+
+    def add_ligand_cif_file(self,mmcif,ligand_cif):
+        self.Logfile.insert('adding ligand cif file to %s' %mmcif)
+        tmpText=''
+        for line in open(mmcif):
+            tmpText+=line
+        for line in open(ligand_cif):
+            tmpText+=line
+        f=open(mmcif,'w')
+        f.write(tmpText)
+        f.close()
+
+    def make_site_description(self):
+        print 'hallo'
