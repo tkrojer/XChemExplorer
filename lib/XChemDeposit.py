@@ -1,4 +1,4 @@
-# last edited: 30/01/2017, 15:00
+# last edited: 31/01/2017, 15:00
 
 import sys
 import os
@@ -306,6 +306,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         self.successDict={}
         self.failureDict={}
         self.n_toDeposit=0
+        self.counter=1
 
 
     def run(self):
@@ -316,7 +317,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             toDelete=self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%';")
             toDeleteList=[]
             for xtal in toDelete:
-                toDeleteList.append(str(item[0]))
+                toDeleteList.append(str(xtal[0]))
             if toDeleteList != []:
                 self.db.remove_selected_apo_structures_from_depositTable(self.xce_logfile,toDeleteList)
             self.Logfile.insert('checking for apo structures in depositTable')
@@ -464,7 +465,8 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             if self.structureType=='ligand_bound':
                 data_template_dict['title']=data_template_dict['structure_title'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID)
             if self.structureType=='apo':
-                data_template_dict['title']=data_template_dict['structure_title_apo'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID)
+                data_template_dict['title']=data_template_dict['structure_title_apo'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID).replace('$n',str(self.counter))
+                self.counter+=1
             self.Logfile.insert('deposition title for '+xtal+': '+data_template_dict['title'])
             self.depositLog.text('title: '+data_template_dict['title'])
             if ('$ProteinName' or '$CompoundName') in data_template_dict['title']:
@@ -797,7 +799,11 @@ class prepare_for_group_deposition_upload(QtCore.QThread):
         f.write(TextIndex)
         f.close()
 
-
+        self.Logfile.insert('preparing tar archive...')
+        os.system('tar -cvf group_deposition.tar *')
+        self.Logfile.insert('bzipping archive...')
+        os.system('bzip2 group_deposition.tar')
+        self.Logfile.insert('done!')
 
 
 

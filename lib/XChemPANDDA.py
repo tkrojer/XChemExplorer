@@ -1,4 +1,4 @@
-# last edited: 27/01/2017, 15:00
+# last edited: 31/01/2017, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -397,7 +397,7 @@ class run_pandda_analyse(QtCore.QThread):
                 '\n'
                 'cd '+self.panddas_directory+'\n'
                 '\n'
-                '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_pandda_status_flag.py %s %s %s\n' %(self.datasource,crystalString[:-1],'running') +
+                '$CCP4/bin/ccp4-python %s %s %s %s\n' %(  os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_pandda_status_flag.py'), self.datasource,crystalString[:-1],'running') +
                 '\n'
                 )
 
@@ -419,7 +419,7 @@ class run_pandda_analyse(QtCore.QThread):
                     '\n'
                     )
 
-            Cmds += '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_pandda_status_flag.py %s %s %s\n' %(self.datasource,crystalString[:-1],'finished')
+            Cmds += '$CCP4/bin/ccp4-python %s %s %s %s\n' %(  os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_pandda_status_flag.py'),    self.datasource,crystalString[:-1],'finished')
 
             self.Logfile.insert('running pandda.analyse with the following command:\n'+Cmds)
 

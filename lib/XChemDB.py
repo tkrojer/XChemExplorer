@@ -1,4 +1,4 @@
-# last edited: 30/01/2017, 15:00
+# last edited: 31/01/2017, 15:00
 
 import sqlite3
 import os,sys,glob
@@ -1040,19 +1040,19 @@ class data_source:
                 " and panddaTable.PANDDA_site_ligand_placed is 'True'"
                 " and panddaTable.RefinementOutcome like "+outcome.split()[0]+"%';"
                 )
-            sqlite = (
-                "select"
-                " mainTable.CrystalName,"
-                " mainTable.CompoundCode,"
-                " mainTable.RefinementCIF,"
-                " mainTable.RefinementMTZfree,"
-                " mainTable.RefinementPathToRefinementFolder,"
-                " panddaTable.RefinementOutcome, "
-                " panddaTable.PANDDA_site_confidence "
-                "from mainTable inner join panddaTable on mainTable.CrystalName = panddaTable.CrystalName "
-                "where panddaTable.PANDDA_site_index is '%s'" %pandda_site+
-                " and panddaTable.RefinementOutcome like "+outcome.split()[0]+"%';"
-                )
+#            sqlite = (
+#                "select"
+#                " mainTable.CrystalName,"
+#                " mainTable.CompoundCode,"
+#                " mainTable.RefinementCIF,"
+#                " mainTable.RefinementMTZfree,"
+#                " mainTable.RefinementPathToRefinementFolder,"
+#                " panddaTable.RefinementOutcome, "
+#                " panddaTable.PANDDA_site_confidence "
+#                "from mainTable inner join panddaTable on mainTable.CrystalName = panddaTable.CrystalName "
+#                "where panddaTable.PANDDA_site_index is '%s'" %pandda_site+
+#                " and panddaTable.RefinementOutcome like "+outcome.split()[0]+"%';"
+#                )
         else:
             sqlite = (
                 "select"
@@ -1144,6 +1144,7 @@ class data_source:
             'order by cast (panddaTable.PANDDA_site_index as integer) ASC;'
                   )
 
+        print 'data source',self.data_source_file
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
         cursor.execute(sqlite)
@@ -1310,10 +1311,10 @@ class data_source:
         deleteStrg = "("
         for xtal in xtalList:
             Logfile.insert(xtal)
-            deleteStrg+="'"+xtal+"' or"
-        deleteStrg=deleteStrg[:-3]+")"
+            deleteStrg+="Crystalname is '"+xtal+"' or "
+        deleteStrg=deleteStrg[:-4]+")"
 
-        sqlite="delete from depositTable where CrystalName is (%s) and StructureType is 'apo'" %deleteStrg
+        sqlite="delete from depositTable where %s and StructureType is 'apo'" %deleteStrg
         Logfile.insert('executing the following SQLite command:\n'+sqlite)
         cursor.execute(sqlite)
         connect.commit()

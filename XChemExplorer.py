@@ -1,4 +1,4 @@
-# last edited: 27/01/2017, 17:00
+# last edited: 31/01/2017, 17:00
 
 import os, sys, glob
 from datetime import datetime
@@ -111,7 +111,7 @@ class XChemExplorer(QtGui.QApplication):
             self.ccp4_scratch_directory=os.getenv('CCP4_SCR')
             self.panddas_directory=self.current_directory
             self.data_collection_summary_file=''
-            self.group_deposit_directory='/work/JMJD2DA/tmp/group_deposit'
+            self.group_deposit_directory='/work/BRD1A/33-FSP-3D-fragments-lib/group_deposit'
 
         #
         # Preferences
@@ -2111,7 +2111,7 @@ class XChemExplorer(QtGui.QApplication):
 
         grid.addWidget(QtGui.QLabel('Title Apo Structure'), 5,0)
         self.structure_title_apo = QtGui.QLineEdit()
-        self.structure_title_apo.setText('Fragment screening campaign for $ProteinName -- Crystal Structure of $ProteinName (structure <n>) after inial refinement (SGC - Diamond I04-1 fragment screening)')
+        self.structure_title_apo.setText('Fragment screening campaign for $ProteinName -- Crystal Structure of $ProteinName (structure $n) after inial refinement (SGC - Diamond I04-1 fragment screening)')
         self.structure_title_apo.setFixedWidth(600)
         grid.addWidget(self.structure_title_apo, 5,1)
 
@@ -5398,7 +5398,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def populate_and_update_refinement_table(self):
 
-        panddaList = self.db.execute_statement("select CrystalName,PANDDA_site_index,PANDDA_site_name,RefinementOutcome from panddaTable where CrystalName is not '';")
+        panddaList = self.db.execute_statement("select CrystalName,PANDDA_site_index,PANDDA_site_name,RefinementOutcome from panddaTable where CrystalName is not '' and PANDDA_site_ligand_placed is 'True';")
         panddaDict={}
         for item in panddaList:
             if str(item[0]) not in panddaDict:
