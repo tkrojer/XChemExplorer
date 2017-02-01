@@ -1,4 +1,4 @@
-# last edited: 31/01/2017, 17:00
+# last edited: 01/02/2017, 17:00
 
 import os, sys, glob
 from datetime import datetime
@@ -2296,11 +2296,16 @@ class XChemExplorer(QtGui.QApplication):
         grid.addWidget(QtGui.QLabel('Genetically Manipulated Source'), 6,0)
 
         grid.addWidget(QtGui.QLabel('Source organism scientific name'), 7,0)
-        self.Source_organism_scientific_name = QtGui.QLineEdit()
-        self.Source_organism_scientific_name.setText('')
-        self.Source_organism_scientific_name.setFixedWidth(300)
+#        self.Source_organism_scientific_name = QtGui.QLineEdit()
+#        self.Source_organism_scientific_name.setText('')
+#        self.Source_organism_scientific_name.setFixedWidth(300)
+#        grid.addWidget(self.Source_organism_scientific_name, 7,1)
+        self.Source_organism_scientific_name = QtGui.QComboBox()
+        taxonomy_dict=XChemMain.NCBI_taxonomy_ID()
+        for item in taxonomy_dict:
+            self.Source_organism_scientific_name.addItem(taxonomy_dict[item])
         grid.addWidget(self.Source_organism_scientific_name, 7,1)
-        grid.addWidget(QtGui.QLabel('(e.g. Homo sapiens)'), 7,2)
+#        grid.addWidget(QtGui.QLabel('(e.g. Homo sapiens)'), 7,2)
 
         grid.addWidget(QtGui.QLabel('Source organism gene'), 8,0)
         self.Source_organism_gene = QtGui.QLineEdit()
@@ -2318,11 +2323,16 @@ class XChemExplorer(QtGui.QApplication):
         grid.addWidget(QtGui.QLabel('(e.g. BH10 ISOLATE, K-12...)'), 9,2)
 
         grid.addWidget(QtGui.QLabel('Expression system scientific name'), 10,0)
-        self.Expression_system_scientific_name = QtGui.QLineEdit()
-        self.Expression_system_scientific_name.setText('')
-        self.Expression_system_scientific_name.setFixedWidth(300)
+#        self.Expression_system_scientific_name = QtGui.QLineEdit()
+#        self.Expression_system_scientific_name.setText('')
+#        self.Expression_system_scientific_name.setFixedWidth(300)
+#        grid.addWidget(self.Expression_system_scientific_name, 10,1)
+#        grid.addWidget(QtGui.QLabel('(e.g. Escherichia coli)'), 10,2)
+        self.Expression_system_scientific_name = QtGui.QComboBox()
+        for item in taxonomy_dict:
+            self.Expression_system_scientific_name.addItem(taxonomy_dict[item])
         grid.addWidget(self.Expression_system_scientific_name, 10,1)
-        grid.addWidget(QtGui.QLabel('(e.g. Escherichia coli)'), 10,2)
+
 
         grid.addWidget(QtGui.QLabel('Expression system strain'), 11,0)
         self.Expression_system_strain = QtGui.QLineEdit()
@@ -2389,27 +2399,34 @@ class XChemExplorer(QtGui.QApplication):
         grid.addWidget(self.biological_assembly_chain_number, 2,1)
         grid.addWidget(QtGui.QLabel('(e.g.  1 for monomer, 2 for dimer ..)'), 2,2)
 
-        grid.addWidget(QtGui.QLabel('Sequence'), 3,0)
+        grid.addWidget(QtGui.QLabel('Sequence UNIPROT ID'), 3,0)
+        self.molecule_one_letter_sequence_uniprot_id = QtGui.QLineEdit()
+        self.molecule_one_letter_sequence_uniprot_id.setText('')
+        self.molecule_one_letter_sequence_uniprot_id.setFixedWidth(300)
+        grid.addWidget(self.molecule_one_letter_sequence_uniprot_id, 3,1)
+        grid.addWidget(QtGui.QLabel('(e.g.  Q6B0I6)'), 3,2)
+
+        grid.addWidget(QtGui.QLabel('Sequence'), 4,0)
         self.molecule_one_letter_sequence = QtGui.QTextEdit()
         self.molecule_one_letter_sequence.setText('')
         self.molecule_one_letter_sequence.setFixedWidth(300)
-        grid.addWidget(self.molecule_one_letter_sequence, 3,1,6,2)
+        grid.addWidget(self.molecule_one_letter_sequence, 4,1,7,2)
 
-        grid.addWidget(QtGui.QLabel('Structural Genomic (optional)'), 7,0)
+        grid.addWidget(QtGui.QLabel('Structural Genomic (optional)'), 8,0)
 
-        grid.addWidget(QtGui.QLabel('Project Name'), 8,0)
+        grid.addWidget(QtGui.QLabel('Project Name'), 9,0)
         self.SG_project_name = QtGui.QLineEdit()
         self.SG_project_name.setText('')
         self.SG_project_name.setFixedWidth(300)
-        grid.addWidget(self.SG_project_name, 8,1)
-        grid.addWidget(QtGui.QLabel('(e.g. PSI, Protein Structure Initiative)'), 8,2)
+        grid.addWidget(self.SG_project_name, 9,1)
+        grid.addWidget(QtGui.QLabel('(e.g. PSI, Protein Structure Initiative)'), 9,2)
 
-        grid.addWidget(QtGui.QLabel('Full Name'), 9,0)
+        grid.addWidget(QtGui.QLabel('Full Name'), 10,0)
         self.full_name_of_SG_center = QtGui.QLineEdit()
         self.full_name_of_SG_center.setText('')
         self.full_name_of_SG_center.setFixedWidth(300)
-        grid.addWidget(self.full_name_of_SG_center, 9,1)
-        grid.addWidget(QtGui.QLabel('(e.g. Berkeley Structural Genomic Center)'), 9,2)
+        grid.addWidget(self.full_name_of_SG_center, 10,1)
+        grid.addWidget(QtGui.QLabel('(e.g. Berkeley Structural Genomic Center)'), 10,2)
 
 
         frame.setLayout(grid)
@@ -2548,6 +2565,48 @@ class XChemExplorer(QtGui.QApplication):
         deposit_tab_dict['Methods'][1].addLayout(vb)
 
 
+        #
+        # Software
+        #
+
+        vb=QtGui.QVBoxLayout()
+
+        frame=QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+
+        grid = QtGui.QGridLayout()
+
+#        grid.addWidget(QtGui.QLabel('Method'), 2,0)
+#        self.crystallization_method = QtGui.QComboBox()
+#        for item in XChemMain.crystal_growth_methods(): self.crystallization_method.addItem(item)
+#        grid.addWidget(self.crystallization_method, 2,1)
+
+        grid.addWidget(QtGui.QLabel('PDB starting model'), 1,0)
+        self.pdbx_starting_model = QtGui.QLineEdit()
+        self.pdbx_starting_model.setText('')
+        self.pdbx_starting_model.setFixedWidth(300)
+        grid.addWidget(self.pdbx_starting_model, 1,1)
+        grid.addWidget(QtGui.QLabel('(e.g. 7.5 ...)'), 1,2)
+
+        grid.addWidget(QtGui.QLabel('Data reduction'), 2,0)
+        self.data_integration_software = QtGui.QComboBox()
+        for item in XChemMain.data_integration_software(): self.data_integration_software.addItem(item)
+        grid.addWidget(self.data_integration_software, 2,1)
+
+        grid.addWidget(QtGui.QLabel('Phasing'), 3,0)
+        self.phasing_software = QtGui.QComboBox()
+        for item in XChemMain.phasing_software(): self.phasing_software.addItem(item)
+        grid.addWidget(self.phasing_software, 3,1)
+
+
+        frame.setLayout(grid)
+        vb.addWidget(frame)
+
+        vb.addStretch(1)
+
+        deposit_tab_dict['Software'][1].addLayout(vb)
+
+
 
         vbox.addWidget(deposit_tab_widget)
 
@@ -2683,10 +2742,17 @@ class XChemExplorer(QtGui.QApplication):
 #            self.fragment_name_one.setText(self.deposit_dict['fragment_name_one'])
 #            self.fragment_name_one_specific_mutation.setText(self.deposit_dict['fragment_name_one_specific_mutation'])
 #            self.fragment_name_one_enzyme_comission_number.setText(self.deposit_dict['fragment_name_one_enzyme_comission_number'])
-            self.Source_organism_scientific_name.setText(self.deposit_dict['Source_organism_scientific_name'])
+#            self.Source_organism_scientific_name.setText(self.deposit_dict['Source_organism_scientific_name'])
+            index = self.Source_organism_scientific_name.findText(self.deposit_dict['Source_organism_scientific_name'], QtCore.Qt.MatchFixedString)
+            self.Source_organism_scientific_name.setCurrentIndex(index)
+
             self.Source_organism_gene.setText(self.deposit_dict['Source_organism_gene'])
             self.Source_organism_strain.setText(self.deposit_dict['Source_organism_strain'])
-            self.Expression_system_scientific_name.setText(self.deposit_dict['Expression_system_scientific_name'])
+#            self.Expression_system_scientific_name.setText(self.deposit_dict['Expression_system_scientific_name'])
+            index = self.Expression_system_scientific_name.findText(self.deposit_dict['Expression_system_scientific_name'], QtCore.Qt.MatchFixedString)
+            self.Expression_system_scientific_name.setCurrentIndex(index)
+
+
             self.Expression_system_strain.setText(self.deposit_dict['Expression_system_strain'])
             self.Expression_system_vector_type.setText(self.deposit_dict['Expression_system_vector_type'])
             self.Expression_system_plasmid_name.setText(self.deposit_dict['Expression_system_plasmid_name'])
@@ -2694,6 +2760,7 @@ class XChemExplorer(QtGui.QApplication):
 
             self.structure_keywords.setText(self.deposit_dict['structure_keywords'])
             self.biological_assembly_chain_number.setText(self.deposit_dict['biological_assembly_chain_number'])
+            self.molecule_one_letter_sequence_uniprot_id.setText(self.deposit_dict['molecule_one_letter_sequence_uniprot_id'])
             self.molecule_one_letter_sequence.setText(self.deposit_dict['molecule_one_letter_sequence'])
             self.SG_project_name.setText(self.deposit_dict['SG_project_name'])
             self.full_name_of_SG_center.setText(self.deposit_dict['full_name_of_SG_center'])
@@ -2725,6 +2792,12 @@ class XChemExplorer(QtGui.QApplication):
             self.data_collection_date.setText(self.deposit_dict['data_collection_date'])
             self.data_collection_temperature.setText(self.deposit_dict['data_collection_temperature'])
             self.data_collection_protocol.setText(self.deposit_dict['data_collection_protocol'])
+
+            self.pdbx_starting_model.setText(self.deposit_dict['pdbx_starting_model'])
+            index = self.data_integration_software.findText(self.deposit_dict['data_integration_software'], QtCore.Qt.MatchFixedString)
+            self.data_integration_software.setCurrentIndex(index)
+            index = self.phasing_software.findText(self.deposit_dict['phasing_software'], QtCore.Qt.MatchFixedString)
+            self.phasing_software.setCurrentIndex(index)
 
 #        except KeyError:
 #            self.update_status_bar('Sorry, this is not a XChemExplorer deposit file!')
@@ -2790,10 +2863,10 @@ class XChemExplorer(QtGui.QApplication):
             'primary_citation_page_last':           str(self.primary_citation_page_last.text()),
 
             'molecule_name':                                str(self.molecule_name.text()),
-            'Source_organism_scientific_name':              str(self.Source_organism_scientific_name.text()),
+            'Source_organism_scientific_name':              str(self.Source_organism_scientific_name.currentText()),
             'Source_organism_gene':                         str(self.Source_organism_gene.text()),
             'Source_organism_strain':                       str(self.Source_organism_strain.text()),
-            'Expression_system_scientific_name':            str(self.Expression_system_scientific_name.text()),
+            'Expression_system_scientific_name':            str(self.Expression_system_scientific_name.currentText()),
             'Expression_system_strain':                     str(self.Expression_system_strain.text()),
             'Expression_system_plasmid_name':               str(self.Expression_system_plasmid_name.text()),
             'Expression_system_vector_type':                str(self.Expression_system_vector_type.text()),
@@ -2801,6 +2874,7 @@ class XChemExplorer(QtGui.QApplication):
 
             'structure_keywords':                           str(self.structure_keywords.text()),
             'biological_assembly_chain_number':             str(self.biological_assembly_chain_number.text()),
+            'molecule_one_letter_sequence_uniprot_id':      str(self.molecule_one_letter_sequence_uniprot_id.text()),
             'SG_project_name':                              str(self.SG_project_name.text()),
             'full_name_of_SG_center':                       str(self.full_name_of_SG_center.text()),
             'molecule_one_letter_sequence':                 str(self.molecule_one_letter_sequence.toPlainText()).replace(' ','').replace('\n','').replace('\r',''),
@@ -2822,8 +2896,10 @@ class XChemExplorer(QtGui.QApplication):
             'radiation_detector_type':                      str(self.radiation_detector_type.currentText()),
             'data_collection_date':                         str(self.data_collection_date.text()),
             'data_collection_temperature':                  str(self.data_collection_temperature.text()),
-            'data_collection_protocol':                     str(self.data_collection_protocol.text())
-
+            'data_collection_protocol':                     str(self.data_collection_protocol.text()),
+            'pdbx_starting_model':                          str(self.pdbx_starting_model.text()),
+            'data_integration_software':                    str(self.data_integration_software.currentText()),
+            'phasing_software':                             str(self.phasing_software.currentText())
         }
 
         structure_author_name=''

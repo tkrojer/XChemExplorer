@@ -1,4 +1,4 @@
-# last edited: 26/01/2017, 15:00
+# last edited: 01/02/2017, 15:00
 
 import os,glob
 import sys
@@ -487,6 +487,45 @@ def detectorType():
                     'ADSC QUANTUM 315r'     ]
 
     return detector
+
+def NCBI_taxonomy_ID():
+
+    taxonomy_dict = {   '9606':     'homo sapiens',
+                        '562':    'escherichia coli'    }
+
+    return taxonomy_dict
+
+
+def data_integration_software():
+
+    software = [    'XDS',
+                    'HKL',
+                    'DENZO',
+                    'DTREK',
+                    'MOSFLM'        ]
+
+    return software
+
+
+def phasing_software():
+
+    software = [    'REFMAC',
+                    'PHENIX',
+                    'SOLVE',
+                    'PHASER',
+                    'CNS',
+                    'XPLOR',
+                    'MLPHARE',
+                    'SHELX',
+                    'SNB',
+                    'BnP',
+                    'BP3',
+                    'SHARP',
+                    'PHASES',
+                    'WARP'      ]
+
+    return software
+
 
 class find_diffraction_image_directory(QtCore.QThread):
     def __init__(self,diffraction_data_directory):

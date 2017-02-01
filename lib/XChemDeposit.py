@@ -1,4 +1,4 @@
-# last edited: 31/01/2017, 15:00
+# last edited: 01/02/2017, 15:00
 
 import sys
 import os
@@ -12,6 +12,7 @@ sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 import XChemLog
 import XChemDB
 import XChemToolTips
+import XChemMain
 from XChemUtils import pdbtools
 
 
@@ -67,12 +68,24 @@ class templates:
 
     def data_template_cif(self,depositDict):
 
+        taxonomy_dict=XChemMain.NCBI_taxonomy_ID()
+        for key in taxonomy_dict:
+            if taxonomy_dict[key]==depositDict['Source_organism_scientific_name']:
+                pdbx_gene_src_ncbi_taxonomy_id=key
+            if taxonomy_dict[key]==depositDict['Expression_system_scientific_name']:
+                pdbx_host_org_ncbi_taxonomy_id=key
+
         structure_author_name=''
         for name in depositDict['structure_author_name'].split(';'):
             structure_author_name+='<structure_author_name=  %s>\n' %name
 
         primary_citation_author_name=''
+        # one name must be within quotation, last name and first initial must be separated by comma and space
         for name in depositDict['primary_citation_author_name'].split(';'):
+            if name.replace(' ','') == '':
+                continue
+            if name[name.find(',')+1:name.find(',')+2] != ' ':
+                name=name.replace(',',', ')
             primary_citation_author_name+="primary '%s'\n" %name
 
         molecule_one_letter_sequence=';'
@@ -132,8 +145,8 @@ class templates:
             '_entity_poly.type\n'
             '_entity_poly.pdbx_seq_one_letter_code\n'
             '_entity_poly.pdbx_strand_id\n'
-#            '_entity_poly.pdbx_seq_db_id\n'
-#            '_entity_poly.pdbx_seq_db_name\n'
+            '_entity_poly.pdbx_seq_db_id\n'
+            '_entity_poly.pdbx_seq_db_name\n'
             '1 "polypeptide(L)"\n'
             +molecule_one_letter_sequence+'\n'
 #        ';MDPEVTLLLQCPGGGLPQEQIQAELSPAHDRRPLPGGDEAITAIWETRLKAQPWLFDAPK\n'
@@ -143,8 +156,7 @@ class templates:
 #        'GGPEAHESTGIFFVETQNVQRLLETEMWAELCPSAKGAIILYNRVQGSPTGAALGSPALL\n'
 #        'PPL\n'
             ';\n'
-#            'A Q9BRQ3 UNP\n'
-            '%s\n'                                                                   %depositDict['protein_chains']+
+            '%s %s UNP\n'                                        %(depositDict['protein_chains'],depositDict['molecule_one_letter_sequence_uniprot_id'])+
             '#\n'
             'loop_\n'
             '_entity_src_gen.entity_id\n'
@@ -153,7 +165,7 @@ class templates:
             '_entity_src_gen.pdbx_gene_src_ncbi_taxonomy_id\n'
             '_entity_src_gen.pdbx_host_org_scientific_name\n'
             '_entity_src_gen.pdbx_host_org_ncbi_taxonomy_id\n'
-            '1 ? "%s" %s  "%s" %s\n'                %(depositDict['Source_organism_scientific_name'],'?',depositDict['Expression_system_scientific_name'],'?')+
+            '1 ? "%s" %s  "%s" %s\n'                %(depositDict['Source_organism_scientific_name'],pdbx_gene_src_ncbi_taxonomy_id,depositDict['Expression_system_scientific_name'],pdbx_host_org_ncbi_taxonomy_id)+
             '#\n'
 #            '#\n'
 ##            '_pdbx_contact_author.id                  1\n'
@@ -202,13 +214,13 @@ class templates:
             '#\n'
             'loop_\n'
             '_audit_author.name\n'
-            '"%s, %s".\n' %(depositDict['contact_author_last_name'],depositDict['contact_author_first_name'][0])+
+            "'%s, %s.'\n" %(depositDict['contact_author_last_name'],depositDict['contact_author_first_name'][0])+
 #            "'Krojer, T.'\n"
 #            "'Von Delft, F.'\n"
             '#\n'
             '_citation.id                        primary\n'
-            '_citation.title                     "your citation title"\n'
-            '_citation.journal_abbrev            "To Be Published"\n'
+            "_citation.title                     '%s'\n"   %depositDict['title']+
+            "_citation.journal_abbrev            'To Be Published'\n"
             '#\n'
             'loop_\n'
             '_citation_author.citation_id\n'
@@ -226,8 +238,8 @@ class templates:
             '_struct_keywords.text            "%s"\n'                       %depositDict['structure_keywords']+
             '#\n'
             '_pdbx_struct_assembly_depositor_info.id                   1\n'
-            "_pdbx_struct_assembly_depositor_info.method_details       'gel filtration'\n"
-            '_pdbx_struct_assembly_depositor_info.oligomeric_count     3\n'
+            "_pdbx_struct_assembly_depositor_info.method_details       PISA\n"
+            '_pdbx_struct_assembly_depositor_info.oligomeric_count     %s\n'        %depositDict['biological_assembly_chain_number']+
             '#\n'
             '#\n'
             )
@@ -297,6 +309,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         self.db=XChemDB.data_source(database)
         self.overwrite_existing_mmcif=overwrite_existing_mmcif
         self.projectDir=projectDir
+        self.data_template_dict={}
         self.data_template_apo='data_template_apo.cif'
         self.data_template_bound='data_template_bound.cif'
         self.structureType=structureType
@@ -344,6 +357,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             xtal=str(item[0])
             eventMtz=[]
             preparation_can_go_ahead=True
+            self.data_template_dict={}
 
             self.depositLog.modelInfo(xtal,self.structureType)
 
@@ -371,11 +385,23 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             if preparation_can_go_ahead:
                 self.depositLog.nEvents(xtal,n_eventMtz)
                 if self.structureType=='ligand_bound':
-                    ModelData=self.db.execute_statement("select RefinementPDB_latest,RefinementMTZ_latest,RefinementCIF,DataProcessingPathToLogfile,RefinementProgram,CompoundCode,CompoundSMILES from mainTable where CrystalName is '%s'" %xtal)
+                    ModelData=self.db.execute_statement("select RefinementPDB_latest,RefinementMTZ_latest,RefinementCIF,DataProcessingPathToLogfile,RefinementProgram,CompoundCode,CompoundSMILES,RefinementMTZfree from mainTable where CrystalName is '%s'" %xtal)
                     pdb=str(ModelData[0][0])
-                    mtz=str(ModelData[0][1])
+                    mtzFinal=str(ModelData[0][1])
+                    if not os.path.isfile(mtzFinal):
+                        self.Logfile.insert('cannot find refine.mtz for bound structure of '+xtal+'; skipping => ERROR')
+                        self.depositLog.text('cannot find refine.mtz for bound structure of '+xtal+'; skipping => ERROR')
+                        self.updateFailureDict(xtal,'cannot find refine.mtz')
+                        continue
+                    mtzData=str(ModelData[0][7])
+                    if not os.path.isfile(mtzData):
+                        self.Logfile.insert('cannot find data.mtz for bound structure of '+xtal+'; skipping => ERROR')
+                        self.depositLog.text('cannot find data.mtz for bound structure of '+xtal+'; skipping => ERROR')
+                        self.updateFailureDict(xtal,'cannot find data.mtz')
+                        continue
+
                 if self.structureType=='apo':
-                    ModelData=self.db.execute_statement("select DimplePathToPDB,DimplePathToMTZ,RefinementCIF,DataProcessingPathToLogfile,RefinementProgram,CompoundCode,CompoundSMILES,ProjectDirectory from mainTable where CrystalName is '%s'" %xtal)
+                    ModelData=self.db.execute_statement("select DimplePathToPDB,DimplePathToMTZ,RefinementCIF,DataProcessingPathToLogfile,RefinementProgram,CompoundCode,CompoundSMILES,ProjectDirectory,RefinementMTZfree from mainTable where CrystalName is '%s'" %xtal)
 
                     if os.path.isfile(os.path.join(str(ModelData[0][7]),xtal,str(ModelData[0][0]))):
                         pdb=os.path.join(str(ModelData[0][7]),xtal,str(ModelData[0][0]))
@@ -388,13 +414,23 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                         continue
 
                     if os.path.isfile(os.path.join(str(ModelData[0][7]),xtal,str(ModelData[0][1]))):
-                        mtz=os.path.join(str(ModelData[0][7]),xtal,str(ModelData[0][1]))
+                        mtzFinal=os.path.join(str(ModelData[0][7]),xtal,str(ModelData[0][1]))
                     elif os.path.isfile(str(ModelData[0][1])):
-                        mtz=str(ModelData[0][1])
+                        mtzFinal=str(ModelData[0][1])
                     else:
-                        self.Logfile.insert('cannot find MTZ file for apo structure of '+xtal+'; skipping => ERROR')
-                        self.depositLog.text('cannot find MTZ file for apo structure of '+xtal+'; skipping => ERROR')
-                        self.updateFailureDict(xtal,'cannot find MTZ file')
+                        self.Logfile.insert('cannot find dimple.mtz for apo structure of '+xtal+'; skipping => ERROR')
+                        self.depositLog.text('cannot find dimple.mtz for apo structure of '+xtal+'; skipping => ERROR')
+                        self.updateFailureDict(xtal,'cannot find dimple.mtz file')
+                        continue
+
+                    if os.path.isfile(os.path.join(str(ModelData[0][7]),xtal,str(ModelData[0][8]))):
+                        mtzData=os.path.join(str(ModelData[0][7]),xtal,str(ModelData[0][8]))
+                    elif os.path.isfile(str(ModelData[0][8])):
+                        mtzData=str(ModelData[0][8])
+                    else:
+                        self.Logfile.insert('cannot find data.mtz for apo structure of '+xtal+'; skipping => ERROR')
+                        self.depositLog.text('cannot find data.mtz for apo structure of '+xtal+'; skipping => ERROR')
+                        self.updateFailureDict(xtal,'cannot find data.mtz file')
                         continue
 
 #                    if os.path.isfile(os.path.join(str(ModelData[0][7]),xtal,str(ModelData[0][1]))):
@@ -417,6 +453,9 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
                 # if all modelled ligands are ready for deposition, we can continue
 
+                # remove existing mmcif files and change DB accordingly
+                self.remove_existing_mmcif_files(xtal)
+
                 # first get all meta-data for deposition, i.e. data_template file
                 wavelength=self.prepare_data_template_for_xtal(xtal,compoundID,pdb)
 
@@ -424,7 +463,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 self.make_model_mmcif(xtal,pdb,log,refSoft)
 
                 # make SF mmcif
-                self.make_sf_mmcif(xtal,mtz,eventMtz)
+                self.make_sf_mmcif(xtal,mtzFinal,mtzData,eventMtz)
 
                 # report any problems that came up
                 mmcif=self.check_mmcif_files_and_update_db(xtal,n_eventMtz,wavelength)
@@ -444,6 +483,13 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
         self.summary()
 
+    def remove_existing_mmcif_files(self,xtal):
+        if self.overwrite_existing_mmcif:
+            os.chdir(os.path.join(self.projectDir,xtal))
+            for mmcif in glob.glob('*.mmcif'):
+                self.Logfile.insert(xtal+' -> removing exisiting file: '+mmcif)
+                os.system('/bin/rm '+mmcif)
+                self.db.execute_statement("update depositTable set mmCIF_model_file='',mmCIF_SF_file='' where CrystalName is '%s' and StructureType is '%s'" %(xtal,self.structureType))
 
     def updateFailureDict(self,xtal,error):
         if xtal not in self.failureDict:
@@ -490,6 +536,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 data_template=templates().data_template_cif(data_template_dict)
                 f=open(os.path.join(self.projectDir,xtal,self.data_template_apo),'w')
 
+            self.data_template_dict=data_template_dict
             f.write(data_template)
             f.close()
 
@@ -511,12 +558,16 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 data_template=self.data_template_apo
                 refSoft='REFMAC'
 
+            refSoft=pdbtools(pdb).GetRefinementProgram()
+
             Cmd = ( 'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/setup.sh')+'\n'
                     +os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/bin/pdb_extract')+
 #                    ' -r PHENIX'
                     ' -r %s'            %refSoft+
 #                    ' -iLOG initial.log'
                     ' -iPDB %s'         %pdb+
+#                    ' -i %s'            %self.data_template_dict['data_integration_software']+
+#                    ' -p %s'            %self.data_template_dict['phasing_software']+
                     ' -e MR'
                     ' -s AIMLESS'
                     ' -iLOG %s'         %log+
@@ -530,11 +581,11 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 #    '''pdb_extract -r REFMAC -iLOG initial.log -iPDB initial.pdb -e MR -s AIMLESS -iLOG aimless.log -iENT data_template.cif -o NUDT22A-x0315-model.cif'''
 
 
-    def make_sf_mmcif(self,xtal,mtz,eventMtz):
-        if os.path.isfile(mtz):
+    def make_sf_mmcif(self,xtal,mtzFinal,mtzData,eventMtz):
+        if os.path.isfile(mtzFinal):
             os.chdir(os.path.join(self.projectDir,xtal))
 
-            mtzin = mtz+' '
+            mtzin = mtzFinal+' '+mtzData+' '
             if self.structureType=='ligand_bound':
                 out=xtal+'-bound'
                 for event in eventMtz:
@@ -567,6 +618,66 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         if os.path.isfile(self.out+'.mmcif') and os.path.getsize(self.out+'.mmcif') > 20000 :
             self.Logfile.insert('found '+self.out+'.mmcif')
             mmcif=os.path.join(self.projectDir,xtal,self.out+'.mmcif')
+            cross_validation='?'
+            starting_model='?'
+            low_reso_list=[]
+            softwareLine = 100000000
+            foundSoftware=False
+            softwareEntry=[]
+            for n,line in enumerate(open(mmcif)):
+                if foundSoftware:
+                    if line.split()[0] == '#':
+                        softwareLine=n
+                        foundSoftware=False
+
+                    try:
+                        softwareEntry.append(int(line.split()[0]))
+                    except ValueError:
+                        pass
+
+                elif '_refine.pdbx_ls_cross_valid_method' in line and len(line.split()) == 2:
+                    cross_validation=line.split()[1]
+                elif '_refine.pdbx_starting_model' in line and len(line.split()) == 2:
+                    starting_model=line.split()[1]
+                elif '_reflns.d_resolution_low' in line and len(line.split()) == 2:
+                    low_reso_list.append(line.split()[1])
+                elif '_refine.ls_d_res_low' in line and len(line.split()) == 2:
+                    low_reso_list.append(line.split()[1])
+                elif '_software.language' in line:
+                    foundSoftware=True
+
+            tmpText=''
+            for n,line in enumerate(open(mmcif)):
+                if '_refine.pdbx_ls_cross_valid_method' in line and cross_validation == '?':
+                    tmpText+='_refine.pdbx_ls_cross_valid_method               THROUGHOUT \n'
+
+                elif '_refine.pdbx_starting_model' in line and starting_model == '?':
+                    tmpText+='_refine.pdbx_starting_model                      %s \n' %self.data_template_dict['pdbx_starting_model']
+
+                elif '_refine.pdbx_method_to_determine_struct' in line:
+                    tmpText+="_refine.pdbx_method_to_determine_struct          'FOURIER SYNTHESIS'\n"
+
+                elif '_reflns.d_resolution_low' in line and len(line.split()) == 2:
+                    tmpText+='_reflns.d_resolution_low             %s\n' %min(low_reso_list)
+
+                elif '_refine.ls_d_res_low' in line and len(line.split()) == 2:
+                    tmpText+='_refine.ls_d_res_low                             %s\n' %min(low_reso_list)
+
+                elif n == softwareLine:
+                    print 'software',softwareEntry
+                    tmpText+=   (   "%s %s ? ? ? 'data reduction' ? ? ? ? ?\n"      %(str(max(softwareEntry)+1),self.data_template_dict['data_integration_software'])+
+                                    '%s %s ? ? ? phasing ? ? ? ? ?\n'                %(str(max(softwareEntry)+2),self.data_template_dict['phasing_software'])+
+                                    '#\n'   )
+
+                else:
+                    tmpText+=line
+
+            f=open(mmcif,'w')
+            f.write(tmpText)
+            f.close()
+            if os.path.isfile(mmcif):
+                self.Logfile.insert('mmcif file successfully updated')
+
         else:
             self.Logfile.insert('cannot find '+self.out+'.mmcif; something went wrong! => ERROR')
             self.depositLog.text('cannot find '+self.out+'.mmcif; something went wrong! => ERROR')
@@ -579,7 +690,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
             # now check if really all event maps are in mmcif file
             if self.structureType=='ligand_bound':
-                n_eventMTZ_found=-1     # set to -1 since first data block should be measured data
+                n_eventMTZ_found=-2     # set to -2 since first two data blocks are initial/final.mtz and data.mtz
                 for line in open(mmcif_sf):
                     if line.startswith('_refln.crystal_id'):
                         n_eventMTZ_found+=1
@@ -602,7 +713,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             f.write(tmpText)
             f.close()
             if os.path.isfile(mmcif_sf):
-                self.Logfile.insert('mmcif SF file successfully update')
+                self.Logfile.insert('mmcif SF file successfully updated')
             else:
                 self.Logfile.insert('something went wrong during the update => ERROR')
                 self.depositLog.text('something went wrong during the update => ERROR')

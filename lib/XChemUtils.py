@@ -1,4 +1,4 @@
-# last edited: 26/01/2017, 17:00
+# last edited: 01/02/2017, 17:00
 
 import sys
 import os
@@ -1490,6 +1490,22 @@ class pdbtools(object):
                                                         '622':          12,
                                                         '23':           12,
                                                         '432':          24  }
+
+
+    def GetRefinementProgram(self):
+        program=''
+        for line in open(self.pdb):
+            if line.startswith('REMARK') and 'REFMAC' in line:
+                program='REFMAC'
+                break
+            if line.startswith('REMARK') and 'PHENIX' in line:
+                program='PHENIX'
+                break
+            if line.startswith('REMARK') and 'BUSTER' in line:
+                program='BUSTER'
+                break
+
+        return program
 
 
     def GetSequence(self):

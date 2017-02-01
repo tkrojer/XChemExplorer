@@ -1,4 +1,4 @@
-# last edited: 31/01/2017, 15:00
+# last edited: 01/02/2017, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -138,6 +138,8 @@ class run_pandda_export(QtCore.QThread):
             for i,line in enumerate(csv_dict):
                 db_dict={}
                 sampleID=line['dtag']
+                if sampleID == 'JMJD2DA-x393':
+                    print line
                 if sampleID not in pandda_hit_list:
                     pandda_hit_list.append(sampleID)
                 site_index=line['site_idx']
@@ -815,9 +817,15 @@ class convert_event_map_to_SF:
 #        # run script
 #        self.run_conversion_script()
 
+        # remove exisiting mtz file
+        if os.path.isfile(self.event+'.mtz'):
+            self.Logfile.insert('removing existing '+self.event+'.mtz')
+            os.system('/bin/rm '+self.event+'.mtz')
+
         # run phenix.map_to_structure_factors
         self.run_phenix_map_to_structure_factors()
 
+        self.remove_and_rename_column_labels()
 
         # check if output files exist
         if not os.path.isfile('%s.mtz' %self.event):
@@ -924,7 +932,21 @@ class convert_event_map_to_SF:
         if float(self.resolution) < 1.21:   # program complains if resolution is 1.2 or higher
             self.resolution='1.21'
         self.Logfile.insert('running phenix.map_to_structure_factors %s d_min=%s output_file_name=%s.mtz' %(self.event_map,self.resolution,self.event))
-        os.system('phenix.map_to_structure_factors %s d_min=%s output_file_name=%s.mtz' %(self.event_map,self.resolution,self.event))
+        os.system('phenix.map_to_structure_factors %s d_min=%s output_file_name=%s_tmp.mtz' %(self.event_map,self.resolution,self.event))
+
+    def remove_and_rename_column_labels(self):
+
+        cmd = (     '#!'+os.getenv('SHELL')+'\n'
+                    '\n'
+                    'cad hklin1 %s_tmp.mtz hklout %s.mtz << eof\n' %(self.event,self.event)+
+                    ' labin file_number 1 E1=F-obs E2=PHIF\n'
+                    ' labout file_number 1 E1=F_ampl E2=PHIF\n'
+                    'eof\n'
+                    '\n' )
+        self.Logfile.insert('running CAD: new column labels F_ampl,PHIF')
+        os.system(cmd)
+
+
 
     def update_database(self):
         sqlite = ( "update panddaTable set "
