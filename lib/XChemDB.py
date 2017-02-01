@@ -349,6 +349,10 @@ class data_source:
 
             ['CrystalName_of_pandda_input',                 'CrystalName_of_pandda_input',              'TEXT'],
 
+            ['pdbx_starting_model',                         'pdbx_starting_model',                      'TEXT'],
+            ['data_integration_software',                   'data_integration_software',                'TEXT'],
+            ['phasing_software',                            'phasing_software',                         'TEXT'],
+
             ['LastUpdated',                                 'LastUpdated',                              'TEXT'],
             ['LastUpdated_by',                              'LastUpdated_by',                           'TEXT']
             ]
@@ -1170,7 +1174,7 @@ class data_source:
                         " mainTable inner join panddaTable on mainTable.CrystalName = panddaTable.CrystalName "
                         "where"
                         " (panddaTable.RefinementOutcome like '4%' or panddaTable.RefinementOutcome like '5%')"
-                        " and panddaTable.PANDDA_site_confidence like '4%'"     )
+                        " and (panddaTable.PANDDA_site_confidence like '4%' or panddaTable.PANDDA_site_confidence is 'High')"     )
 
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
