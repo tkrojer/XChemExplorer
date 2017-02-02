@@ -1779,7 +1779,7 @@ class pdbtools(object):
         if os.path.isfile(os.path.join(os.getenv('CCP4'),'lib','data','symop.lib')):
             print 'a',os.path.join(os.getenv('CCP4'),'lib','data','symop.lib')
             for line in open(os.path.join(os.getenv('CCP4'),'lib','data','symop.lib')):
-
+                print line.split()
                 if line.split()[0] == spg_number:
                     if line.startswith(' '):
                         print line.split(',')
