@@ -1024,16 +1024,14 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                     foundLigand=False
                     if xtal in dbDict:
                         for entry in dbDict[xtal]:
-#                            print 'UUU',xtal,item[0],entry[4],item[1],entry[6],item[2],entry[7]
-#                            print 'UUU',xtal,item,entry
                             if item[0] == entry[4] and item[1] == entry[5] and item[2] == entry[6]:
                                 foundLigand=True
-                                print entry
                     else:
                         self.Logfile.insert('ligand in PDB file, but dataset not listed in panddaTable: %s -> %s %s %s' %(xtal,item[0],item[1],item[2]))
 
                     if not foundLigand:
                         self.Logfile.insert('%s: refine.pdb contains a ligand that is not assigned in panddaTable: %s %s %s' %(xtal,item[0],item[1],item[2]))
+                        XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).get_symmetry_operators()
                     else:
                         self.Logfile.insert('%s: found ligand in refine.pdb and panddaTable: %s %s %s' %(xtal,item[0],item[1],item[2]))
 

@@ -1772,6 +1772,19 @@ class pdbtools(object):
 #            if line.startswith
 
 
+    def get_symmetry_operators(self):
+        symop = []
+        spg_number=self.get_spg_number_from_pdb()
+        if os.path.isfile(os.path.join(os.getenv('CCP4'),'lib','data','symop.lib')):
+            for line in open(os.path.isfile(os.path.join(os.getenv('CCP4'),'lib','data','symop.lib'))):
+                if line.split()[0] == spg_number:
+                    if line.startswith(' '):
+                        print line.split(',')
+#                        symop.append([])
+
+        else:
+            print "CCP4 environmental variable is not set"
+
 class reference:
 
     def __init__(self,sample_mtz,reference_file_list):
