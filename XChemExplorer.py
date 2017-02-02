@@ -1524,7 +1524,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nGroup deposition directory: - OPTIONAL -'))
         settings_hbox_group_deposition_directory=QtGui.QHBoxLayout()
-        self.group_deposition_directory_label=QtGui.QLabel(self.group_deposition_directory)
+        self.group_deposition_directory_label=QtGui.QLabel(self.group_deposit_directory)
         settings_hbox_group_deposition_directory.addWidget(self.group_deposition_directory_label)
         settings_button_group_deposition_directory=QtGui.QPushButton('Select Group deposition Directory')
         settings_button_group_deposition_directory.clicked.connect(self.settings_button_clicked)
