@@ -1703,6 +1703,17 @@ class pdbtools(object):
                         Ligands.append([resname,chainID,resseq,altLoc])
         return Ligands
 
+    def ligand_details_as_list(self):
+        Ligands = []
+        for line in open(self.pdb):
+            if line.startswith('ATOM') or line.startswith('HETATM'):
+                resname=str(line[17:20]).replace(' ','')
+                if resname in self.xce_ligands:
+                    chainID=str(line[21:23]).replace(' ','')
+                    resseq=str(line[23:26]).replace(' ','')
+                    if [resname,chainID,resseq] not in Ligands:
+                        Ligands.append([resname,chainID,resseq])
+        return Ligands
 
 
 

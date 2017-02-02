@@ -974,16 +974,48 @@ class check_number_of_modelled_ligands:
     def run(self):
         self.Logfile.insert('reading modelled ligands from panddaTable')
         dbDict={}
-        dbEntries=self.db.execute_statement("select CrystalName,PANDDA_site_index from panddaTable where PANDDA_site_ligand_placed is 'True';")
+
+        sqlite = (  "select "
+                    " CrystalName,"
+                    " PANDDA_site_index,"
+                    " PANDDA_site_x,"
+                    " PANDDA_site_y,"
+                    " PANDDA_site_z,"
+                    " PANDDA_site_ligand_resname,"
+                    " PANDDA_site_ligand_chain,"
+                    " PANDDA_site_ligand_sequence_number "
+                    "from panddaTable "
+                    "where PANDDA_site_ligand_placed is 'True';"    )
+
+
+        dbEntries=self.db.execute_statement(sqlite)
         for item in dbEntries:
-            xtal=str(item[0])
-            site=str(item[1])
+            xtal=   str(item[0])
+            site=   str(item[1])
+            x=      str(item[2])
+            y=      str(item[3])
+            z=      str(item[4])
+            resname=str(item[5])
+            chain=  str(item[6])
+            seqnum= str(item[7])
             if xtal not in dbDict:
                 dbDict[xtal]=[]
-            dbDict[xtal].append(site)
+            dbDict[xtal].append([site,x,y,z,resname,chain,seqnum])
 
         os.chdir(self.project_directory)
         for xtal in glob.glob('*'):
-            is os.path.isfile(os.path.join(xtal,'refine.pdb')):
+            if os.path.isfile(os.path.join(xtal,'refine.pdb')):
+                ligands=XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).ligand_details_as_list()
+                for item in ligands:
+                    foundLigand=False
+                    if xtal in dbDict:
+                        for entry in dbDict[xtal]:
+                            if item[0] == entry[4] and item[1] == entry[6] and item[2] == entry[7]:
+                                foundLigand=True
+                                print entry
+                    else:
+                        self.Logfile.insert('ligand in PDB file, but dataset not listed in panddaTable: %s -> %s %s %s' %(xtal,item[0],item[1],item[2]))
+                    if not foundLigand:
+                        self.Logfile.insert('%s: refine.pdb contains a ligand that is not assigned in panddaTable: %s %s %s' %(xtal,item[0],item[1],item[2]))
 
 
