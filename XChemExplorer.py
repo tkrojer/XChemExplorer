@@ -74,6 +74,7 @@ class XChemExplorer(QtGui.QApplication):
             self.data_collection_summary_file=os.path.join(self.database_directory,str(os.getcwd().split('/')[5])+'_summary.pkl')
             self.data_source_file=''
             self.html_export_directory=os.path.join(self.labxchem_directory,'processing','html')
+            self.group_deposit_directory=os.path.join(self.labxchem_directory,'processing','group_deposition')
             if os.path.isfile(os.path.join(self.labxchem_directory,'processing','database','soakDBDataFile.sqlite')):
                 self.data_source_file='soakDBDataFile.sqlite'
                 self.database_directory=os.path.join(self.labxchem_directory,'processing','database')
@@ -101,6 +102,8 @@ class XChemExplorer(QtGui.QApplication):
                 os.mkdir(self.ccp4_scratch_directory)
             if not os.path.isdir(self.html_export_directory):
                 os.mkdir(self.html_export_directory)
+            if not os.path.isdir(self.group_deposit_directory):
+                os.mkdir(self.group_deposit_directory)
 
         else:
             self.beamline_directory=self.current_directory
@@ -111,7 +114,7 @@ class XChemExplorer(QtGui.QApplication):
             self.ccp4_scratch_directory=os.getenv('CCP4_SCR')
             self.panddas_directory=self.current_directory
             self.data_collection_summary_file=''
-            self.group_deposit_directory='/work/BRD1A/33-FSP-3D-fragments-lib/group_deposit'
+            self.group_deposit_directory=self.current_directory
 
         #
         # Preferences
@@ -150,7 +153,8 @@ class XChemExplorer(QtGui.QApplication):
                              'xce_logfile':                     self.xce_logfile,
                              'max_queue_jobs':                  self.max_queue_jobs,
                              'diffraction_data_directory':      self.diffraction_data_directory,
-                             'html_export_directory':           self.html_export_directory           }
+                             'html_export_directory':           self.html_export_directory,
+                             'group_deposit_directory':         self.group_deposit_directory        }
 
 
         #
@@ -1518,6 +1522,15 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_html_export_directory.addWidget(settings_button_html_export_directory)
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_html_export_directory)
 
+        self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nGroup deposition directory: - OPTIONAL -'))
+        settings_hbox_group_deposition_directory=QtGui.QHBoxLayout()
+        self.group_deposition_directory_label=QtGui.QLabel(self.group_deposition_directory)
+        settings_hbox_group_deposition_directory.addWidget(self.group_deposition_directory_label)
+        settings_button_group_deposition_directory=QtGui.QPushButton('Select Group deposition Directory')
+        settings_button_group_deposition_directory.clicked.connect(self.settings_button_clicked)
+        settings_hbox_group_deposition_directory.addWidget(settings_button_group_deposition_directory)
+        self.data_collection_vbox_for_settings.addLayout(settings_hbox_group_deposition_directory)
+
         self.data_collection_vbox_for_settings.setSpacing(0)
         self.data_collection_vbox_for_settings.setMargin(0)
 
@@ -2089,7 +2102,7 @@ class XChemExplorer(QtGui.QApplication):
 
         grid.addWidget(QtGui.QLabel('Group deposition title'), 2,0)
         self.group_deposition_title = QtGui.QLineEdit()
-        self.group_deposition_title.setText('')
+        self.group_deposition_title.setText('Fragment screening campaign for $ProteinName - ligand bound structures')
         self.group_deposition_title.setFixedWidth(600)
         self.group_deposition_title.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.group_deposition_title, 2,1)
@@ -2109,11 +2122,18 @@ class XChemExplorer(QtGui.QApplication):
         note = ( '\n\nApo Structure:\nonly use if you want to deposit PanDDA models!'        )
         grid.addWidget(QtGui.QLabel(note), 4,0)
 
-        grid.addWidget(QtGui.QLabel('Title Apo Structure'), 5,0)
+        grid.addWidget(QtGui.QLabel('Group deposition title'), 5,0)
+        self.group_deposition_title_apo = QtGui.QLineEdit()
+        self.group_deposition_title_apo.setText('Fragment screening campaign for $ProteinName - apo structures for PanDDA analysis')
+        self.group_deposition_title_apo.setFixedWidth(600)
+        self.group_deposition_title_apo.setStyleSheet("background-color: rgb(192, 192, 192);")
+        grid.addWidget(self.group_deposition_title_apo, 5,1)
+
+        grid.addWidget(QtGui.QLabel('Title Apo Structure'), 6,0)
         self.structure_title_apo = QtGui.QLineEdit()
         self.structure_title_apo.setText('Fragment screening campaign for $ProteinName -- Crystal Structure of $ProteinName (structure $n) after inial refinement (SGC - Diamond I04-1 fragment screening)')
         self.structure_title_apo.setFixedWidth(600)
-        grid.addWidget(self.structure_title_apo, 5,1)
+        grid.addWidget(self.structure_title_apo, 6,1)
 
 
         frame.setLayout(grid)
@@ -2720,6 +2740,7 @@ class XChemExplorer(QtGui.QApplication):
             self.Release_status_for_sequence.setCurrentIndex(index)
 
             self.group_deposition_title.setText(self.deposit_dict['group_deposition_title'])
+            self.group_deposition_title_apo.setText(self.deposit_dict['group_deposition_title_apo'])
             self.structure_title.setText(self.deposit_dict['structure_title'])
 #            self.structure_details.setText(self.deposit_dict['structure_details'])
             self.structure_title_apo.setText(self.deposit_dict['structure_title_apo'])
@@ -2852,6 +2873,7 @@ class XChemExplorer(QtGui.QApplication):
             'group_deposition_title':               str(self.group_deposition_title.text()),
             'structure_title':                      str(self.structure_title.text()),
 #            'structure_details':                    str(self.structure_details.text()),
+            'group_deposition_title_apo':           str(self.group_deposition_title_apo.text()),
             'structure_title_apo':                  str(self.structure_title_apo.text()),
 
             'primary_citation_id':                  str(self.primary_citation_id.text()),
@@ -3143,6 +3165,13 @@ class XChemExplorer(QtGui.QApplication):
             self.pandda_analyse_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_analyse.html')
             self.pandda_inspect_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_inspect.html')
             self.show_pandda_html_summary()
+
+            self.html_export_directory=pickled_settings['html_export_directory']
+            self.html_export_directory_label.setText(self.html_export_directory)
+            self.settings['html_export_directory']=self.html_export_directory
+            self.group_deposit_directory=pickled_settings['group_deposit_directory']
+            self.group_deposition_directory_label.setText(self.group_deposit_directory)
+            self.settings['group_deposit_directory']=self.group_deposit_directory
 
             self.database_directory=pickled_settings['database_directory']
             self.settings['database_directory']=self.database_directory
@@ -3750,6 +3779,11 @@ class XChemExplorer(QtGui.QApplication):
             self.html_export_directory=str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.html_export_directory_label.setText(self.html_export_directory)
             self.settings['html_export_directory']=self.html_export_directory
+
+        if self.sender().text()=='Select Group deposition Directory':
+            self.group_deposit_directory=str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
+            self.group_deposition_directory_label.setText(self.group_deposit_directory)
+            self.settings['group_deposit_directory']=self.group_deposit_directory
 
 
     def change_allowed_unitcell_difference_percent(self,text):

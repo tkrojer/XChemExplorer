@@ -219,7 +219,7 @@ class templates:
 #            "'Von Delft, F.'\n"
             '#\n'
             '_citation.id                        primary\n'
-            "_citation.title                     '%s'\n"   %depositDict['title']+
+            "_citation.title                     '%s'\n"   %depositDict['group_title']+
             "_citation.journal_abbrev            'To Be Published'\n"
             '#\n'
             'loop_\n'
@@ -510,8 +510,10 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             # edit title
             if self.structureType=='ligand_bound':
                 data_template_dict['title']=data_template_dict['structure_title'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID)
+                data_template_dict['group_title']=data_template_dict['group_deposition_title'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID)
             if self.structureType=='apo':
                 data_template_dict['title']=data_template_dict['structure_title_apo'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID).replace('$n',str(self.counter))
+                data_template_dict['group_title']=data_template_dict['group_deposition_title_apo'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID)
                 self.counter+=1
             self.Logfile.insert('deposition title for '+xtal+': '+data_template_dict['title'])
             self.depositLog.text('title: '+data_template_dict['title'])
@@ -534,6 +536,8 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             elif self.structureType=='apo':
                 self.Logfile.insert('creating %s file for apo structure of %s' %(self.data_template_apo,xtal))
                 data_template=templates().data_template_cif(data_template_dict)
+                site_details=self.make_site_description(xtal)
+                data_template+=site_details
                 f=open(os.path.join(self.projectDir,xtal,self.data_template_apo),'w')
 
             self.data_template_dict=data_template_dict
@@ -665,8 +669,8 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
                 elif n == softwareLine:
                     print 'software',softwareEntry
-                    tmpText+=   (   "%s %s ? ? ? 'data reduction' ? ? ? ? ?\n"      %(str(max(softwareEntry)+1),self.data_template_dict['data_integration_software'])+
-                                    '%s %s ? ? ? phasing ? ? ? ? ?\n'                %(str(max(softwareEntry)+2),self.data_template_dict['phasing_software'])+
+                    tmpText+=   (   "%s %s ? ? program ? ? 'data reduction' ? ?\n"      %(str(max(softwareEntry)+1),self.data_template_dict['data_integration_software'])+
+                                    '%s %s ? ? program ? ? phasing ? ?\n'                %(str(max(softwareEntry)+2),self.data_template_dict['phasing_software'])+
                                     '#\n'   )
 
                 else:
@@ -703,8 +707,46 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                     self.Logfile.insert('%s event map mtz files were specified as input, %s ended up in the mmcif file, all well so far...' %(str(n_eventMtz),str(n_eventMTZ_found)))
 
             self.Logfile.insert('editing wavelength information in SF mmcif file; changing wavelength to %s' %wavelength)
+
+            apo = [     "data from inital refinement with DIMPLE, initial.mtz",
+                        "data from original reflection, data.mtz"]
+            bound = [   "data from final refinement with ligand, final.mtz",
+                        "data from original reflection, data.mtz",
+                        "data for ligand evidence map (PanDDA event map), event_map1.mtz",
+                        "data for ligand evidence map (PanDDA event map), event_map2.mtz",
+                        "data for ligand evidence map (PanDDA event map), event_map3.mtz",
+                        "data for ligand evidence map (PanDDA event map), event_map4.mtz",
+                        "data for ligand evidence map (PanDDA event map), event_map5.mtz",
+                        "data for ligand evidence map (PanDDA event map), event_map6.mtz",
+                        "data for ligand evidence map (PanDDA event map), event_map7.mtz"       ]
+
             tmpText=''
+            block=-1
+            cif_block_found=0
             for line in open(mmcif_sf):
+                if line.startswith('_cell.length_a'):
+                    block+=1
+                # need to do this because the data.mtz block could have missing screw axis
+                if line.startswith('_symmetry.space_group_name_H-M') and cif_block_found == 1:
+                    tmpText+=symmLine
+                    cif_block_found+=1
+                    continue
+                if line.startswith('_symmetry.space_group_name_H-M') and cif_block_found == 0:
+                    symmLine=line
+                    cif_block_found+=1
+
+                if line.startswith('_cell.angle_gamma'):
+                    tmpText+=line
+                    if self.structureType == 'apo':
+                        addLines = (    '#\n'
+                                        '_diffrn.id                  1\n'
+                                        '_diffrn.details             "%s"\n' %apo[block]    )
+                    if self.structureType == 'ligand_bound':
+                        addLines = (    '#\n'
+                                        '_diffrn.id                  1\n'
+                                        '_diffrn.details             "%s"\n' %bound[block]    )
+                    tmpText+=addLines
+                    continue
                 if line.startswith('_diffrn_radiation_wavelength.wavelength'):
                     tmpText+='_diffrn_radiation_wavelength.wavelength   %s\n' %wavelength
                 else:
@@ -756,91 +798,94 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         general=self.db.execute_statement("select CompoundSMILES from mainTable where CrystalName is '%s'" %xtal)
         smiles=str(general[0][0])
 
+        if self.structureType=='apo':
+            if smiles.lower() != 'none' or smiles.lower() != "null":
+                mmcif_text+='smiles string of soaked compound: %s;\n' %smiles
+            else:
+                mmcif_text=''
 
+        if self.structureType=='ligand_bound':
 
-        sqlite = (  "select "
-                    " PANDDA_site_index,"
-                    " PANDDA_site_x,"
-                    " PANDDA_site_y,"
-                    " PANDDA_site_y,"
-                    " PANDDA_site_name,"
-                    " PANDDA_site_confidence, "
-                    " PANDDA_site_comment,"
-                    " PANDDA_site_occupancy,"
-                    " PANDDA_site_B_average,"
-                    " PANDDA_site_B_ratio_residue_surroundings,"
-                    " PANDDA_site_RSCC,"
-                    " PANDDA_site_RSR,"
-                    " PANDDA_site_RSZD,"
-                    " PANDDA_site_rmsd "
-                    "from panddaTable "
-                    "where CrystalName is '%s' and PANDDA_site_ligand_placed is 'True' order by PANDDA_site_index ASC" %xtal)
-        print sqlite
+            sqlite = (  "select "
+                        " PANDDA_site_index,"
+                        " PANDDA_site_x,"
+                        " PANDDA_site_y,"
+                        " PANDDA_site_y,"
+                        " PANDDA_site_name,"
+                        " PANDDA_site_confidence, "
+                        " PANDDA_site_comment,"
+                        " PANDDA_site_occupancy,"
+                        " PANDDA_site_B_average,"
+                        " PANDDA_site_B_ratio_residue_surroundings,"
+                        " PANDDA_site_RSCC,"
+                        " PANDDA_site_RSR,"
+                        " PANDDA_site_RSZD,"
+                        " PANDDA_site_rmsd "
+                        "from panddaTable "
+                        "where CrystalName is '%s' and PANDDA_site_ligand_placed is 'True' order by PANDDA_site_index ASC" %xtal)
 #        panddaSites=self.db.execute_statement("select PANDDA_site_index,PANDDA_site_x,PANDDA_site_y,PANDDA_site_y,PANDDA_site_name,PANDDA_site_confidence from panddaTable where CrystalName is '%s' and PANDDA_site_ligand_placed is 'True' order by PANDDA_site_index ASC" %xtal)
-        panddaSites=self.db.execute_statement(sqlite)
+            panddaSites=self.db.execute_statement(sqlite)
 
-        root = etree.Element(xtal)
-        child1 = etree.SubElement(root, "used_for_statistical_map")
-        child1.text = 'yes'
-        child2 = etree.SubElement(root, "smiles_of_compound_added")
-        child2.text = '%s' %smiles
+            root = etree.Element(xtal)
+            child1 = etree.SubElement(root, "used_for_statistical_map")
+            child1.text = 'yes'
+            child2 = etree.SubElement(root, "smiles_of_compound_added")
+            child2.text = '%s' %smiles
 
-        site_descpription_complete=True
-        for site in panddaSites:
-            SiteIndex=  str(site[0]).replace(' ','')
-            x_coord=    str(site[1])
-            y_coord=    str(site[2])
-            z_coord=    str(site[3])
-            label=      str(site[4])
-            confidence= str(site[5])
-            comment=    str(site[6])
-            occupancy=  str(site[7])
-            Baverage=   str(site[8])
-            Bratio=     str(site[9])
-            RSCC=       str(site[10])
-            RSR=        str(site[11])
-            RSZD=       str(site[12])
-            RMSD=       str(site[13])
+            site_descpription_complete=True
+            for site in panddaSites:
+                SiteIndex=  str(site[0]).replace(' ','')
+                x_coord=    str(site[1])
+                y_coord=    str(site[2])
+                z_coord=    str(site[3])
+                label=      str(site[4])
+                confidence= str(site[5])
+                comment=    str(site[6])
+                occupancy=  str(site[7])
+                Baverage=   str(site[8])
+                Bratio=     str(site[9])
+                RSCC=       str(site[10])
+                RSR=        str(site[11])
+                RSZD=       str(site[12])
+                RMSD=       str(site[13])
 
-            if 'none' in (SiteIndex.lower() or x_coord.lower() or y_coord.lower() or z_coord.lower() or confidence.lower() or occupancy.lower() or Bratio.lower() or Baverage.lower() or RSZD.lower() or RMSD.lower() or RSCC.lower() or RSR.lower()):
-                site_descpription_complete=False
+                if 'none' in (SiteIndex.lower() or x_coord.lower() or y_coord.lower() or z_coord.lower() or confidence.lower() or occupancy.lower() or Bratio.lower() or Baverage.lower() or RSZD.lower() or RMSD.lower() or RSCC.lower() or RSR.lower()):
+                    site_descpription_complete=False
 
-            child = etree.SubElement(root, "site"+SiteIndex)
-            childa = etree.SubElement(child, "label")
-            childa.text = '%s' %label
-            childx = etree.SubElement(child, "coordinate")
-            childx.text = '%s %s %s' %(x_coord,y_coord,z_coord)
-            childy = etree.SubElement(child, "smiles")
-            childy.text = '%s' %smiles
-            childz = etree.SubElement(child, "confidence")
-            childz.text = '%s' %confidence
-            childb = etree.SubElement(child, "comment")
-            childb.text = '%s' %comment
-            childc = etree.SubElement(child, "occupancy")
-            childc.text = '%s' %occupancy
-            childd = etree.SubElement(child, "B_average")
-            childd.text = '%s' %Baverage
-            childe = etree.SubElement(child, "B_ratio")
-            childe.text = '%s' %Bratio
-            childf = etree.SubElement(child, "RSCC")
-            childf.text = '%s' %RSCC
-            childg = etree.SubElement(child, "RSR")
-            childg.text = '%s' %RSR
-            childh = etree.SubElement(child, "RSZD")
-            childh.text = '%s' %RSZD
-            childi = etree.SubElement(child, "RMSD")
-            childi.text = '%s' %RMSD
-
-
+                child = etree.SubElement(root, "site"+SiteIndex)
+                childa = etree.SubElement(child, "label")
+                childa.text = '%s' %label
+                childx = etree.SubElement(child, "coordinate")
+                childx.text = '%s %s %s' %(x_coord,y_coord,z_coord)
+                childy = etree.SubElement(child, "smiles")
+                childy.text = '%s' %smiles
+                childz = etree.SubElement(child, "confidence")
+                childz.text = '%s' %confidence
+                childb = etree.SubElement(child, "comment")
+                childb.text = '%s' %comment
+                childc = etree.SubElement(child, "occupancy")
+                childc.text = '%s' %occupancy
+                childd = etree.SubElement(child, "B_average")
+                childd.text = '%s' %Baverage
+                childe = etree.SubElement(child, "B_ratio")
+                childe.text = '%s' %Bratio
+                childf = etree.SubElement(child, "RSCC")
+                childf.text = '%s' %RSCC
+                childg = etree.SubElement(child, "RSR")
+                childg.text = '%s' %RSR
+                childh = etree.SubElement(child, "RSZD")
+                childh.text = '%s' %RSZD
+                childi = etree.SubElement(child, "RMSD")
+                childi.text = '%s' %RMSD
 
 #        # pretty string
-        s = etree.tostring(root, pretty_print=True)
-        mmcif_text+=s+';\n'
+            s = etree.tostring(root, pretty_print=True)
+            mmcif_text+=s+';\n'
 
-        self.depositLog.site_xml(xtal,s)
+            self.depositLog.site_xml(xtal,s)
 
-        if not site_descpription_complete:
-            self.updateFailureDict(xtal,'site description incomplete')
+            if not site_descpription_complete:
+                self.updateFailureDict(xtal,'site description incomplete')
 
         return mmcif_text
 
@@ -884,9 +929,22 @@ class prepare_for_group_deposition_upload(QtCore.QThread):
                         'sf: %s\n\n'                                    %mmcif_sf[mmcif_sf.rfind('/')+1:]          )
             TextIndex+=text
 
+        f = open('index.txt','w')
+        f.write(TextIndex)
+        f.close()
+
+        self.Logfile.insert('preparing tar archive...')
+        os.system('tar -cvf ligand_bound_structures.tar *bound* index.txt')
+        self.Logfile.insert('bzipping archive...')
+        os.system('bzip2 ligand_bound_structures.tar')
+        self.Logfile.insert('removing all bound mmcif files and index.txt file from '+self.depositDir)
+        os.system('/bin/rm -f *bound* index.txt')
+        self.Logfile.insert('done!')
+
 
 
         # apo structures
+        TextIndex=''
         toDeposit=self.db.execute_statement("select CrystalName,mmCIF_model_file,mmCIF_SF_file from depositTable where StructureType is 'apo';")
         for item in sorted(toDeposit):
             xtal=str(item[0])
@@ -911,9 +969,11 @@ class prepare_for_group_deposition_upload(QtCore.QThread):
         f.close()
 
         self.Logfile.insert('preparing tar archive...')
-        os.system('tar -cvf group_deposition.tar *')
+        os.system('tar -cvf apo_structures.tar *apo* index.txt')
         self.Logfile.insert('bzipping archive...')
-        os.system('bzip2 group_deposition.tar')
+        os.system('bzip2 apo_structures.tar')
+        self.Logfile.insert('removing all apo mmcif files and index.txt file from '+self.depositDir)
+        os.system('/bin/rm -f *apo* index.txt')
         self.Logfile.insert('done!')
 
 

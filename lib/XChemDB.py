@@ -296,6 +296,7 @@ class data_source:
             ['group_deposition_title',                      'group_deposition_title',                   'TEXT'],
             ['structure_title',                             'structure_title',                          'TEXT'],
             ['structure_details',                           'structure_details',                        'TEXT'],
+            ['group_deposition_title_apo',                  'group_deposition_title_apo',               'TEXT'],
             ['structure_title_apo',                         'structure_title_apo',                      'TEXT'],
 
             ['structure_author_name',                       'structure_author_name',                    'TEXT'],
