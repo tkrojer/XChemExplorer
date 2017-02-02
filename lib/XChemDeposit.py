@@ -938,7 +938,7 @@ class prepare_for_group_deposition_upload(QtCore.QThread):
         self.Logfile.insert('bzipping archive...')
         os.system('bzip2 ligand_bound_structures.tar')
         self.Logfile.insert('removing all bound mmcif files and index.txt file from '+self.depositDir)
-        os.system('/bin/rm -f *bound* index.txt')
+        os.system('/bin/rm -f *bound*mmcif index.txt')
         self.Logfile.insert('done!')
 
 
@@ -973,7 +973,7 @@ class prepare_for_group_deposition_upload(QtCore.QThread):
         self.Logfile.insert('bzipping archive...')
         os.system('bzip2 apo_structures.tar')
         self.Logfile.insert('removing all apo mmcif files and index.txt file from '+self.depositDir)
-        os.system('/bin/rm -f *apo* index.txt')
+        os.system('/bin/rm -f *apo*mmcif index.txt')
         self.Logfile.insert('done!')
 
 
