@@ -1,4 +1,4 @@
-# last edited: 01/02/2017, 15:00
+# last edited: 02/02/2017, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -964,4 +964,26 @@ class convert_event_map_to_SF:
         os.system('/bin/rm masked_fullcell.map')
         os.system('/bin/rm eventMap2sf.sh')
         os.system('/bin/rm '+self.ligand_pdb)
+
+class check_number_of_modelled_ligands:
+    def __init__(self,project_directory,xce_logfile,db_file):
+        self.Logfile=XChemLog.updateLog(xce_logfile)
+        self.project_directory=project_directory
+        self.db=XChemDB.data_source(db_file)
+
+    def run(self):
+        self.Logfile.insert('reading modelled ligands from panddaTable')
+        dbDict={}
+        dbEntries=self.db.execute_statement("select CrystalName,PANDDA_site_index from panddaTable where PANDDA_site_ligand_placed is 'True';")
+        for item in dbEntries:
+            xtal=str(item[0])
+            site=str(item[1])
+            if xtal not in dbDict:
+                dbDict[xtal]=[]
+            dbDict[xtal].append(site)
+
+        os.chdir(self.project_directory)
+        for xtal in glob.glob('*'):
+            is os.path.isfile(os.path.join(xtal,'refine.pdb')):
+
 
