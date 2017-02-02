@@ -1783,7 +1783,8 @@ class pdbtools(object):
 #                print line.split()[0]
                 if foundSPG:
                     if line.startswith(' '):
-                        symop.append(line.split(','))
+                        tmp=line.replace('\n','')
+                        symop.append(tmp.split(','))
                     else:
                         break
                 if line.split()[0] == spg_number:
