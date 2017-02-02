@@ -507,7 +507,8 @@ class XChemExplorer(QtGui.QApplication):
                                     'Show HTML summary',
                                     'Update datasource with results from pandda.inspect',
                                     'cluster datasets',
-                                    'Event Map -> SF'   ]
+                                    'Event Map -> SF',
+                                    'check modelled ligands'    ]
 
         frame_panddas_file_task=QtGui.QFrame()
         frame_panddas_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -3993,6 +3994,9 @@ class XChemExplorer(QtGui.QApplication):
         elif instruction=='Event Map -> SF':
             self.convert_event_maps_to_SF()
 
+        elif instruction=='check modelled ligands':
+            self.compare_modelled_ligands_and_panddaTable()
+
         elif instruction=="Open COOT":
             if not self.coot_running:
                 self.update_log.insert('starting coot...')
@@ -4317,6 +4321,16 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
+    def compare_modelled_ligands_and_panddaTable(self):
+        self.update_log.insert('checking agreement of ligands in refine.pdb and entries in panddaTable')
+        self.work_thread=XChemPANDDA.check_number_of_modelled_ligands(self.initial_model_directory,
+                                                                        self.xce_logfile,
+                                                                        os.path.join(self.database_directory,self.data_source_file))
+        self.explorer_active=1
+        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.work_thread.start()
 
 
     def run_pandda_export(self,update_datasource_only,which_models):

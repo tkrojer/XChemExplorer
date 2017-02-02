@@ -965,13 +965,17 @@ class convert_event_map_to_SF:
         os.system('/bin/rm eventMap2sf.sh')
         os.system('/bin/rm '+self.ligand_pdb)
 
-class check_number_of_modelled_ligands:
+
+class check_number_of_modelled_ligands(QtCore.QThread):
+
     def __init__(self,project_directory,xce_logfile,db_file):
+        QtCore.QThread.__init__(self)
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.project_directory=project_directory
         self.db=XChemDB.data_source(db_file)
 
     def run(self):
+
         self.Logfile.insert('reading modelled ligands from panddaTable')
         dbDict={}
 
@@ -1002,7 +1006,17 @@ class check_number_of_modelled_ligands:
                 dbDict[xtal]=[]
             dbDict[xtal].append([site,x,y,z,resname,chain,seqnum])
 
+
         os.chdir(self.project_directory)
+
+        progress_step=1
+        if len(glob.glob('*')) != 0:
+            progress_step=100/float(len(glob.glob('*')))
+        else:
+            progress_step=1
+        progress=0
+        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
         for xtal in glob.glob('*'):
             if os.path.isfile(os.path.join(xtal,'refine.pdb')):
                 ligands=XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).ligand_details_as_list()
@@ -1019,3 +1033,5 @@ class check_number_of_modelled_ligands:
                         self.Logfile.insert('%s: refine.pdb contains a ligand that is not assigned in panddaTable: %s %s %s' %(xtal,item[0],item[1],item[2]))
 
 
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
