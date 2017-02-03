@@ -1804,7 +1804,7 @@ class pdbtools(object):
         outPDB=os.path.join(outDir,root+'_sym.pdb')
         pdbset = (  '#!'+os.getenv('SHELL')+'\n'
                     'pdbset xyzin %s xyzout %s << eof\n' %(self.pdb,outPDB)+
-                    'cell %s\n'    %(str(','+unit_cell))+
+                    'cell %s\n'    %(str(','.join(unit_cell)))+
                     'spacegroup %s\n' %spg  )
         for op in symop:
             pdbset+='SYMGEN '+','.join(op)+'\n'
