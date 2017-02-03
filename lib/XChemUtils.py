@@ -1792,7 +1792,7 @@ class pdbtools(object):
         else:
             print "CCP4 environmental variable is not set"
 
-        print symop
+        return symop
 
 
     def save_sym_equivalents(self):
