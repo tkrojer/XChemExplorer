@@ -1,4 +1,4 @@
-# last edited: 02/02/2017, 15:00
+# last edited: 03/02/2017, 15:00
 
 import sys
 import os
@@ -142,7 +142,8 @@ class templates:
             '_entity.type\n'
             '_entity.src_method\n'
             '_entity.pdbx_description\n'
-            '1 polymer     man "%s"\n'                                                          %depositDict['Source_organism_gene']+
+            '_entity.pdbx_mutation\n'
+            '1 polymer     man "%s" %s\n'                                                          %(depositDict['Source_organism_gene'],depositDict['fragment_name_one_specific_mutation'])+
             '#\n'
             'loop_\n'
             '_entity_poly.entity_id\n'
@@ -490,6 +491,9 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
     def remove_existing_mmcif_files(self,xtal):
         if self.overwrite_existing_mmcif:
             os.chdir(os.path.join(self.projectDir,xtal))
+            for cif in glob.glob('data_template*'):
+                self.Logfile.insert(xtal+' -> removing exisiting file: '+cif)
+                os.system('/bin/rm '+cif)
             for mmcif in glob.glob('*.mmcif'):
                 self.Logfile.insert(xtal+' -> removing exisiting file: '+mmcif)
                 os.system('/bin/rm '+mmcif)
@@ -520,11 +524,19 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             if self.structureType=='apo':
                 title=data_template_dict['structure_title_apo'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID).replace('$n',str(self.counter))
                 self.counter+=1
+            data_template_dict['group_description']=data_template_dict['group_description'].replace('$ProteinName',data_template_dict['Source_organism_gene'])
             data_template_dict['title']=data_template_dict['group_title']+' -- '+title
             self.Logfile.insert('deposition title for '+xtal+': '+data_template_dict['title'])
             self.depositLog.text('title: '+data_template_dict['title'])
             if ('$ProteinName' or '$CompoundName') in data_template_dict['title']:
                 self.updateFailureDict(xtal,'title not correctly formatted')
+
+            # mutations
+            mutations=data_template_dict['fragment_name_one_specific_mutation']
+            if mutations.lower().replace(' ','').replace('none','').replace('null','') == '':
+                data_template_dict['fragment_name_one_specific_mutation']='?'
+            else:
+                data_template_dict['fragment_name_one_specific_mutation']='"'+mutations.replace(' ','')+'"'
 
             # get protein chains
             data_template_dict['protein_chains']=''
@@ -956,6 +968,8 @@ class prepare_for_group_deposition_upload(QtCore.QThread):
             xtal=str(item[0])
             mmcif=str(item[1])
             mmcif_sf=str(item[2])
+            if 'x513' in xtal: continue
+            if 'x562' in xtal: continue
             if os.path.isfile(mmcif) and os.path.isfile(mmcif_sf):
                 self.Logfile.insert('copying %s to %s' %(mmcif,self.depositDir))
                 os.system('/bin/cp %s .' %mmcif)

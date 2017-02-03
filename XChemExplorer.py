@@ -1,4 +1,4 @@
-# last edited: 02/02/2017, 17:00
+# last edited: 03/02/2017, 17:00
 
 import os, sys, glob
 from datetime import datetime
@@ -2103,14 +2103,14 @@ class XChemExplorer(QtGui.QApplication):
 
         grid.addWidget(QtGui.QLabel('Group deposition title'), 2,0)
         self.group_deposition_title = QtGui.QLineEdit()
-        self.group_deposition_title.setText('SGC - Diamond I04-1 fragment screening campaign of $ProteinName')
+        self.group_deposition_title.setText('PanDDA analysis group deposition')
         self.group_deposition_title.setFixedWidth(600)
 #        self.group_deposition_title.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.group_deposition_title, 2,1)
 
         grid.addWidget(QtGui.QLabel('Description'), 3,0)
         self.group_description = QtGui.QLineEdit()
-        self.group_description.setText('')
+        self.group_description.setText('XDomainX of XOrganismX $ProteinName screened against the XXX Fragment Library by X-ray Crystallography at the XChem facility of Diamond Light Source beamline I04-1')
         self.group_description.setFixedWidth(600)
         grid.addWidget(self.group_description, 3,1)
 
@@ -2141,7 +2141,7 @@ class XChemExplorer(QtGui.QApplication):
 
         grid.addWidget(QtGui.QLabel('Structure Title (apo)'), 7,0)
         self.structure_title_apo = QtGui.QLineEdit()
-        self.structure_title_apo.setText('Crystal Structure of $ProteinName (structure $n) after inial refinement')
+        self.structure_title_apo.setText('Crystal Structure of $ProteinName after initial refinement with no ligand modelled (structure $n)')
         self.structure_title_apo.setFixedWidth(600)
         grid.addWidget(self.structure_title_apo, 7,1)
 
@@ -2773,7 +2773,7 @@ class XChemExplorer(QtGui.QApplication):
 
             self.molecule_name.setText(self.deposit_dict['molecule_name'])
 #            self.fragment_name_one.setText(self.deposit_dict['fragment_name_one'])
-#            self.fragment_name_one_specific_mutation.setText(self.deposit_dict['fragment_name_one_specific_mutation'])
+            self.fragment_name_one_specific_mutation.setText(self.deposit_dict['fragment_name_one_specific_mutation'])
 #            self.fragment_name_one_enzyme_comission_number.setText(self.deposit_dict['fragment_name_one_enzyme_comission_number'])
 #            self.Source_organism_scientific_name.setText(self.deposit_dict['Source_organism_scientific_name'])
             index = self.Source_organism_scientific_name.findText(self.deposit_dict['Source_organism_scientific_name'], QtCore.Qt.MatchFixedString)
@@ -2907,6 +2907,7 @@ class XChemExplorer(QtGui.QApplication):
             'Expression_system_plasmid_name':               str(self.Expression_system_plasmid_name.text()),
             'Expression_system_vector_type':                str(self.Expression_system_vector_type.text()),
             'Manipulated_source_details':                   str(self.Manipulated_source_details.text()),
+            'fragment_name_one_specific_mutation':          str(self.fragment_name_one_specific_mutation.text()),
 
             'structure_keywords':                           str(self.structure_keywords.text()),
             'biological_assembly_chain_number':             str(self.biological_assembly_chain_number.text()),

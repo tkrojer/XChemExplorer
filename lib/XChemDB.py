@@ -1,4 +1,4 @@
-# last edited: 02/02/2017, 15:00
+# last edited: 03/02/2017, 15:00
 
 import sqlite3
 import os,sys,glob
@@ -294,6 +294,7 @@ class data_source:
             ['Release_status_for_sequence',                 'Release_status_for_sequence',              'TEXT'],
 
             ['group_deposition_title',                      'group_deposition_title',                   'TEXT'],
+            ['group_description',                           'group_description',                        'TEXT'],
             ['structure_title',                             'structure_title',                          'TEXT'],
             ['structure_details',                           'structure_details',                        'TEXT'],
             ['group_deposition_title_apo',                  'group_deposition_title_apo',               'TEXT'],
@@ -323,6 +324,9 @@ class data_source:
             ['Expression_system_vector_type',               'Expression_system_vector_type',            'TEXT'],
             ['Expression_system_plasmid_name',              'Expression_system_plasmid_name',           'TEXT'],
             ['Manipulated_source_details',                  'Manipulated_source_details',               'TEXT'],
+
+
+            ['fragment_name_one_specific_mutation',         'fragment_name_one_specific_mutation',      'TEXT'],
 
             ['structure_keywords',                          'structure_keywords',                       'TEXT'],
             ['biological_assembly_chain_number',            'biological_assembly_chain_number',         'TEXT'],
