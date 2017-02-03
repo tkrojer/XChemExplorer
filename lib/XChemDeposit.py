@@ -105,6 +105,10 @@ class templates:
             "_pdbx_database_status.dep_release_code_coordinates   '%s'\n"                       %depositDict['Release_status_for_coordinates']+
             "_pdbx_database_status.dep_release_code_sequence      '%s'\n"                       %depositDict['Release_status_for_sequence']+
             '#\n'
+            '_pdbx_deposit_group.group_id	   UNNAMED\n'
+            '_pdbx_deposit_group.group_description  "%s"\n'                                     %depositDict['group_description']+
+            '_pdbx_deposit_group.group_title        "%s"\n'                                     %depositDict['group_title']+
+            '#\n'
             '_exptl_crystal_grow.crystal_id      1\n'
             "_exptl_crystal_grow.method          '%s'\n"                                        %depositDict['crystallization_method']+
             '_exptl_crystal_grow.pH              %s\n'                                          %depositDict['crystallization_pH']+
@@ -508,13 +512,15 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             data_template_dict=self.db.get_deposit_dict_for_sample(xtal)
 
             # edit title
+            data_template_dict['group_title']=data_template_dict['group_deposition_title'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID)
+            self.Logfile.insert('group deposition title for '+xtal+': '+data_template_dict['group_title'])
+            self.depositLog.text('group title: '+data_template_dict['group_title'])
             if self.structureType=='ligand_bound':
-                data_template_dict['title']=data_template_dict['structure_title'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID)
-                data_template_dict['group_title']=data_template_dict['group_deposition_title'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID)
+                title=data_template_dict['structure_title'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID)
             if self.structureType=='apo':
-                data_template_dict['title']=data_template_dict['structure_title_apo'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID).replace('$n',str(self.counter))
-                data_template_dict['group_title']=data_template_dict['group_deposition_title_apo'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID)
+                title=data_template_dict['structure_title_apo'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID).replace('$n',str(self.counter))
                 self.counter+=1
+            data_template_dict['title']=data_template_dict['group_title']+' -- '+title
             self.Logfile.insert('deposition title for '+xtal+': '+data_template_dict['title'])
             self.depositLog.text('title: '+data_template_dict['title'])
             if ('$ProteinName' or '$CompoundName') in data_template_dict['title']:

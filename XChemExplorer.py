@@ -2103,16 +2103,25 @@ class XChemExplorer(QtGui.QApplication):
 
         grid.addWidget(QtGui.QLabel('Group deposition title'), 2,0)
         self.group_deposition_title = QtGui.QLineEdit()
-        self.group_deposition_title.setText('Fragment screening campaign for $ProteinName - ligand bound structures')
+        self.group_deposition_title.setText('SGC - Diamond I04-1 fragment screening campaign of $ProteinName')
         self.group_deposition_title.setFixedWidth(600)
-        self.group_deposition_title.setStyleSheet("background-color: rgb(192, 192, 192);")
+#        self.group_deposition_title.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.group_deposition_title, 2,1)
 
-        grid.addWidget(QtGui.QLabel('Title'), 3,0)
+        grid.addWidget(QtGui.QLabel('Description'), 3,0)
+        self.group_description = QtGui.QLineEdit()
+        self.group_description.setText('')
+        self.group_description.setFixedWidth(600)
+        grid.addWidget(self.group_description, 3,1)
+
+        grid.addWidget(QtGui.QLabel('Structure Title (ligand bound)'), 4,0)
         self.structure_title = QtGui.QLineEdit()
-        self.structure_title.setText('Fragment screening campaign for $ProteinName -- Crystal Structure of $ProteinName with ligand $CompoundName bound (SGC - Diamond I04-1 fragment screening)')
+        self.structure_title.setText('Crystal Structure of $ProteinName in complex with $CompoundName')
         self.structure_title.setFixedWidth(600)
-        grid.addWidget(self.structure_title, 3,1)
+        grid.addWidget(self.structure_title, 4,1)
+
+
+
 
 #        grid.addWidget(QtGui.QLabel('Details'), 4,0)
 #        self.structure_details = QtGui.QLineEdit()
@@ -2121,20 +2130,20 @@ class XChemExplorer(QtGui.QApplication):
 #        grid.addWidget(self.structure_details, 4,1)
 
         note = ( '\n\nApo Structure:\nonly use if you want to deposit PanDDA models!'        )
-        grid.addWidget(QtGui.QLabel(note), 4,0)
+        grid.addWidget(QtGui.QLabel(note), 6,0)
 
-        grid.addWidget(QtGui.QLabel('Group deposition title'), 5,0)
-        self.group_deposition_title_apo = QtGui.QLineEdit()
-        self.group_deposition_title_apo.setText('Fragment screening campaign for $ProteinName - apo structures for PanDDA analysis')
-        self.group_deposition_title_apo.setFixedWidth(600)
-        self.group_deposition_title_apo.setStyleSheet("background-color: rgb(192, 192, 192);")
-        grid.addWidget(self.group_deposition_title_apo, 5,1)
+#        grid.addWidget(QtGui.QLabel('Group deposition title'), 5,0)
+#        self.group_deposition_title_apo = QtGui.QLineEdit()
+#        self.group_deposition_title_apo.setText('Fragment screening campaign for $ProteinName - apo structures for PanDDA analysis')
+#        self.group_deposition_title_apo.setFixedWidth(600)
+#        self.group_deposition_title_apo.setStyleSheet("background-color: rgb(192, 192, 192);")
+#        grid.addWidget(self.group_deposition_title_apo, 5,1)
 
-        grid.addWidget(QtGui.QLabel('Title Apo Structure'), 6,0)
+        grid.addWidget(QtGui.QLabel('Structure Title (apo)'), 7,0)
         self.structure_title_apo = QtGui.QLineEdit()
-        self.structure_title_apo.setText('Fragment screening campaign for $ProteinName -- Crystal Structure of $ProteinName (structure $n) after inial refinement (SGC - Diamond I04-1 fragment screening)')
+        self.structure_title_apo.setText('Crystal Structure of $ProteinName (structure $n) after inial refinement')
         self.structure_title_apo.setFixedWidth(600)
-        grid.addWidget(self.structure_title_apo, 6,1)
+        grid.addWidget(self.structure_title_apo, 7,1)
 
 
         frame.setLayout(grid)
@@ -2408,7 +2417,7 @@ class XChemExplorer(QtGui.QApplication):
 
         grid.addWidget(QtGui.QLabel('Keywords'), 1,0)
         self.structure_keywords = QtGui.QLineEdit()
-        self.structure_keywords.setText('')
+        self.structure_keywords.setText('SGC - Diamond I04-1 fragment screening, PanDDA')
         self.structure_keywords.setFixedWidth(300)
         grid.addWidget(self.structure_keywords, 1,1)
         grid.addWidget(QtGui.QLabel('(e.g. beta barrel, protein-DNA complex)'), 1,2)
@@ -2741,7 +2750,9 @@ class XChemExplorer(QtGui.QApplication):
             self.Release_status_for_sequence.setCurrentIndex(index)
 
             self.group_deposition_title.setText(self.deposit_dict['group_deposition_title'])
-            self.group_deposition_title_apo.setText(self.deposit_dict['group_deposition_title_apo'])
+            self.group_description.setText(self.deposit_dict['group_description'])
+
+#            self.group_deposition_title_apo.setText(self.deposit_dict['group_deposition_title_apo'])
             self.structure_title.setText(self.deposit_dict['structure_title'])
 #            self.structure_details.setText(self.deposit_dict['structure_details'])
             self.structure_title_apo.setText(self.deposit_dict['structure_title_apo'])
@@ -2872,9 +2883,11 @@ class XChemExplorer(QtGui.QApplication):
             'Release_status_for_sequence':          str(self.Release_status_for_sequence.currentText()),
 
             'group_deposition_title':               str(self.group_deposition_title.text()),
+            'group_description':                    str(self.group_description.text()),
+
             'structure_title':                      str(self.structure_title.text()),
 #            'structure_details':                    str(self.structure_details.text()),
-            'group_deposition_title_apo':           str(self.group_deposition_title_apo.text()),
+#            'group_deposition_title_apo':           str(self.group_deposition_title_apo.text()),
             'structure_title_apo':                  str(self.structure_title_apo.text()),
 
             'primary_citation_id':                  str(self.primary_citation_id.text()),

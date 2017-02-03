@@ -1794,6 +1794,26 @@ class pdbtools(object):
 
         print symop
 
+
+    def save_sym_equivalents(self):
+        unit_cell=self.get_unit_cell_from_pdb()
+        spg=self.get_spg_from_pdb()
+        symop=self.get_symmetry_operators()
+        outDir=self.pdb[:self.pdb.rfind('/')]
+        root=self.pdb[self.pdb.rfind('/')+1:self.pdb.rfind('.')]
+        outPDB=os.path.join(outDir,root+'_sym.pdb')
+        pdbset = (  '#!'+os.getenv('SHELL')+'\n'
+                    'pdbset xyzin %s xyzout %s << eof\n' %(self.pdb,outPDB)+
+                    'cell %s\n'    %unit_cell+
+                    'spacegroup %s\n' %spg  )
+        for op in symop:
+            pdbset+='SYMGEN '+','.join(op)+'\n'
+        pdbset+='eof\n'
+        print pdbset
+
+
+
+
 class reference:
 
     def __init__(self,sample_mtz,reference_file_list):
