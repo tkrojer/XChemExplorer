@@ -1809,7 +1809,7 @@ class pdbtools(object):
         for op in symop:
             pdbset+='SYMGEN '+','.join(op)+'\n'
         pdbset+='eof\n'
-        print pdbset
+        os.system(pdbset)
 
 
 
