@@ -1047,18 +1047,18 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                                 symEquivalents+=pdbList
                             for files in symEquivalents:
                                 XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_surounding_unit_cells(files)
-#                            for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*_*_*.pdb')):
-#                                mol_xyz = XChemUtils.pdbtools(files).get_center_of_gravity_of_molecule_ish()
-#                                print files,mol_xyz
-#                                for site in dbDict[xtal]:
-#                                    site_x=site[1]
-#                                    site_y=site[2]
-#                                    site_z=site[3]
-##                                    print site_x,site_y,site_z,mol_xyz
-#                                    distance = XChemUtils.misc().calculate_distance_between_coordinates(mol_xyz[0], mol_xyz[1],mol_xyz[2],site_x, site_y,site_z)
-#                                    if distance < 7:
-#                                        self.Logfile.insert(xtal+' found site with distance '+str(distance))
-#                                        print 'FOINDFHUIEFGFFFFFFFFFFFFFF',xtal,distance
+                            for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*_*.pdb')):
+                                mol_xyz = XChemUtils.pdbtools(files).get_center_of_gravity_of_molecule_ish()
+                                print files,mol_xyz
+                                for site in dbDict[xtal]:
+                                    site_x=site[1]
+                                    site_y=site[2]
+                                    site_z=site[3]
+#                                    print site_x,site_y,site_z,mol_xyz
+                                    distance = XChemUtils.misc().calculate_distance_between_coordinates(mol_xyz[0], mol_xyz[1],mol_xyz[2],site_x, site_y,site_z)
+                                    if distance < 7:
+                                        self.Logfile.insert(xtal+' found site with distance '+str(distance))
+                                        print 'FOINDFHUIEFGFFFFFFFFFFFFFF',xtal,distance
                             made_sym_copies=True
 
                         self.Logfile.insert('%s: refine.pdb contains a ligand that is not assigned in panddaTable: %s %s %s' %(xtal,item[0],item[1],item[2]))
