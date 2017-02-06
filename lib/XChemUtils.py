@@ -1898,6 +1898,9 @@ class pdbtools(object):
         spg=self.get_spg_from_pdb()
         outDir=pdbIN[pdbIN.rfind('/'):]
         root=pdbIN[pdbIN.rfind('/')+1:pdbIN.rfind('_')]
+        print 'pdinin',pdbIN
+        print 'outdir',outDir
+        print 'root',root
 
         for n,shift in enumerate(translations):
             pdbset = (  '#!'+os.getenv('SHELL')+'\n'
