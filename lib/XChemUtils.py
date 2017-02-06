@@ -1898,9 +1898,6 @@ class pdbtools(object):
         spg=self.get_spg_from_pdb()
         outDir=pdbIN[pdbIN.rfind('/'):]
         root=pdbIN[pdbIN.rfind('/')+1:pdbIN.rfind('_')]
-        print 'pdinin',pdbIN
-        print 'outdir',outDir
-        print 'root',root
 
         for n,shift in enumerate(translations):
             pdbset = (  '#!'+os.getenv('SHELL')+'\n'
@@ -1909,6 +1906,9 @@ class pdbtools(object):
                         'spacegroup %s\n' %spg+
                         'shift fractional %s\n' %str(shift).replace('[','').replace(']','')+
                         'eof\n'            )
+            print 'pdinin',pdbIN
+            print 'outdir',outDir
+            print 'root',root
             print pdbset
             os.system(pdbset)
 
