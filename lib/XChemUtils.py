@@ -1676,6 +1676,22 @@ class pdbtools(object):
                 f.close()
         return Ligands
 
+    def save_ligands_to_pdb_to_directory(self,outDir):
+        Ligands=self.find_ligands()
+        if not Ligands == []:
+            for n,item in enumerate(Ligands):
+                pdb=''
+                for line in open(self.pdb):
+                    if line.startswith('CRYST'):
+                        pdb+=line
+                    if (line.startswith('ATOM') or line.startswith('HETATM')) and line[17:20]==item[0] and line[21:22]==item[1] and line[23:26]==item[2]:
+                        pdb=pdb+line
+                f=open(os.path.join(outDir,'ligand_%s.pdb' %n),'w')
+                f.write(pdb)
+                f.close()
+        return Ligands
+
+
     def save_all_ligands_to_pdb(self,outDir):
         Ligands=self.find_ligands()
         if not Ligands == []:
@@ -1828,27 +1844,23 @@ class pdbtools(object):
         pdbset+='eof\n'
         os.system(pdbset)
 
-    def save_sym_equivalents_of_ligands_in_pdb(self):
+    def save_sym_equivalents_of_ligands_in_pdb(self,pdbIN):
         unit_cell=self.get_unit_cell_from_pdb()
         spg=self.get_spg_from_pdb()
         symop=self.get_symmetry_operators()
-        outDir=self.pdb[:self.pdb.rfind('/')]
-        self.save_all_ligands_to_pdb(outDir)
-
+        outDir=pdbIN[:pdbIN.rfind('/')]
+        root=pdbIN[pdbIN.rfind('/')+1:pdbIN.rfind('.')]
         pdbset = (  '#!'+os.getenv('SHELL')+'\n'
-                    'pdbset xyzin %s/all_ligands.pdb xyzout %s/all_ligands_sym_0.pdb << eof\n' %(outDir,outDir)+
+                    'pdbset xyzin %s xyzout %s/%s_0.pdb << eof\n' %(pdbIN,outDir,root)+
                     'cell %s\n'    %(str(','.join(unit_cell)))+
                     'spacegroup %s\n' %spg  )
         for op in symop:
             pdbset+='SYMGEN '+','.join(op)+'\n'
         pdbset+='eof\n'
         os.system(pdbset)
+        return root+'_0.pdb'
 
-
-    def insert_TER_cards_after_chain(self):
-        print 'hallo'
-
-    def save_surounding_unit_cells(self):
+    def save_surounding_unit_cells(self,pdbIN):
         translations = [
 
                     [   0,  1,  0   ],
@@ -1884,11 +1896,12 @@ class pdbtools(object):
 
         unit_cell=self.get_unit_cell_from_pdb()
         spg=self.get_spg_from_pdb()
-        outDir=self.pdb[:self.pdb.rfind('/')]
+        outDir=pdbIN[:pdbIN.rfind('/')]
+        root=pdbIN[pdbIN.rfind('/')+1:pdbIN.rfind('_')]
 
         for n,shift in enumerate(translations):
             pdbset = (  '#!'+os.getenv('SHELL')+'\n'
-                        'pdbset xyzin %s/all_ligands_sym_0.pdb xyzout %s/all_ligands_sym_%s.pdb << eof\n' %(outDir,outDir,str(n+1))+
+                        'pdbset xyzin %s/%s_0.pdb xyzout %s/%s_%s.pdb << eof\n' %(outDir,root,outDir,root,str(n+1))+
                         'cell %s\n'    %(str(','.join(unit_cell)))+
                         'spacegroup %s\n' %spg+
                         'shift fractional %s\n' %str(shift).replace('[','').replace(']','')+

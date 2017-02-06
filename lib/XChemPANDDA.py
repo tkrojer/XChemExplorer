@@ -1020,7 +1020,13 @@ class check_number_of_modelled_ligands(QtCore.QThread):
         for xtal in glob.glob('*'):
             if os.path.isfile(os.path.join(xtal,'refine.pdb')):
                 ligands=XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).ligand_details_as_list()
+                if ligands != []:
+                    if os.path.isdir(os.path.join(xtal,'xceTmp')):
+                        print 'uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu'
+                        print '/bin/rm -fr %s' %os.path.join(xtal,'xceTmp')
+                    os.mkdir(os.path.join(xtal,'xceTmp'))
                 for item in ligands:
+
                     foundLigand=False
                     if xtal in dbDict:
                         for entry in dbDict[xtal]:
@@ -1031,8 +1037,18 @@ class check_number_of_modelled_ligands(QtCore.QThread):
 
                     if not foundLigand:
                         self.Logfile.insert('%s: refine.pdb contains a ligand that is not assigned in panddaTable: %s %s %s' %(xtal,item[0],item[1],item[2]))
-                        XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_sym_equivalents_of_ligands_in_pdb()
-                        XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_surounding_unit_cells()
+                        XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_ligands_to_pdb_to_directory(os.path.join(self.project_directory,xtal,'xceTmp'))
+                        ligandFiles=[]
+                        # seems redundant, but want to avoid that glob includes newly generated sym equivalents
+                        for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*.pdb')):
+                            ligandFiles.append(files)
+                        symEquivalents=[]
+                        for files in ligandFiles:
+                            root=XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_sym_equivalents_of_ligands_in_pdb(files)
+                            symEquivalents.append(root)
+                        for files in symEquivalents:
+                            XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_surounding_unit_cells(files)
+
                     else:
                         self.Logfile.insert('%s: found ligand in refine.pdb and panddaTable: %s %s %s' %(xtal,item[0],item[1],item[2]))
 
