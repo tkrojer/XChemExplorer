@@ -1056,6 +1056,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
 #                                    print site_x,site_y,site_z,mol_xyz
                                     distance = XChemUtils.misc().calculate_distance_between_coordinates(mol_xyz[0], mol_xyz[1],mol_xyz[2],site_x, site_y,site_z)
                                     if distance < 7:
+                                        self.Logfile.insert(xtal+' found site with distance '+str(distance))
                                         print 'FOINDFHUIEFGFFFFFFFFFFFFFF',xtal,distance
                             made_sym_copies=True
 
