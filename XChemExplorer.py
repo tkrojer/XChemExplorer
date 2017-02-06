@@ -2417,7 +2417,7 @@ class XChemExplorer(QtGui.QApplication):
 
         grid.addWidget(QtGui.QLabel('Keywords'), 1,0)
         self.structure_keywords = QtGui.QLineEdit()
-        self.structure_keywords.setText('SGC - Diamond I04-1 fragment screening, PanDDA')
+        self.structure_keywords.setText('SGC - Diamond I04-1 fragment screening, PanDDA, XChemExplorer')
         self.structure_keywords.setFixedWidth(300)
         grid.addWidget(self.structure_keywords, 1,1)
         grid.addWidget(QtGui.QLabel('(e.g. beta barrel, protein-DNA complex)'), 1,2)

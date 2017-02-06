@@ -1667,12 +1667,29 @@ class pdbtools(object):
             for n,item in enumerate(Ligands):
                 pdb=''
                 for line in open(self.pdb):
+                    if line.startswith('CRYST'):
+                        pdb+=line
                     if (line.startswith('ATOM') or line.startswith('HETATM')) and line[17:20]==item[0] and line[21:22]==item[1] and line[23:26]==item[2]:
                         pdb=pdb+line
                 f=open('ligand_%s.pdb' %n,'w')
                 f.write(pdb)
                 f.close()
         return Ligands
+
+    def save_all_ligands_to_pdb(self,outDir):
+        Ligands=self.find_ligands()
+        if not Ligands == []:
+            pdb=''
+            for line in open(self.pdb):
+                if line.startswith('CRYST'):
+                    pdb+=line
+            for n,item in enumerate(Ligands):
+                for line in open(self.pdb):
+                    if (line.startswith('ATOM') or line.startswith('HETATM')) and line[17:20]==item[0] and line[21:22]==item[1] and line[23:26]==item[2]:
+                        pdb+=line
+            f=open(os.path.join(outDir,'all_ligands.pdb'),'w')
+            f.write(pdb)
+            f.close()
 
     def save_specific_ligands_to_pdb(self,resname,chainID,resseq,altLoc):
         pdb=''
@@ -1811,7 +1828,30 @@ class pdbtools(object):
         pdbset+='eof\n'
         os.system(pdbset)
 
+    def save_sym_equivalents_of_ligands_in_pdb(self):
+        unit_cell=self.get_unit_cell_from_pdb()
+        spg=self.get_spg_from_pdb()
+        symop=self.get_symmetry_operators()
+        outDir=self.pdb[:self.pdb.rfind('/')]
+        self.save_all_ligands_to_pdb(outDir)
 
+        root=self.pdb[self.pdb.rfind('/')+1:self.pdb.rfind('.')]
+        outPDB=os.path.join(outDir,root+'_sym.pdb')
+        pdbset = (  '#!'+os.getenv('SHELL')+'\n'
+                    'pdbset xyzin %s/all_ligands.pdb xyzout %s << eof\n' %(outDir,outPDB)+
+                    'cell %s\n'    %(str(','.join(unit_cell)))+
+                    'spacegroup %s\n' %spg  )
+        for op in symop:
+            pdbset+='SYMGEN '+','.join(op)+'\n'
+        pdbset+='eof\n'
+        os.system(pdbset)
+
+
+    def insert_TER_cards_after_chain(self):
+        print 'hallo'
+
+    def save_surounding_unit_cells(self):
+        print 'hallo'
 
 
 class reference:
