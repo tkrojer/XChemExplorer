@@ -1882,6 +1882,50 @@ class pdbtools(object):
         os.system(pdbset)
         return os.path.join(outDir,root+'_0.pdb')
 
+    def save_sym_equivalents_of_ligands_in_pdb_as_one_file_per_ligand(self,pdbIN):
+        nres=0
+        for line in open(pdbIN):
+            if line.startswith('ATOM') or line.startswith('HETATM'):
+                nres+=1
+        unit_cell=self.get_unit_cell_from_pdb()
+        spg=self.get_spg_from_pdb()
+        symop=self.get_symmetry_operators()
+        outDir=pdbIN[:pdbIN.rfind('/')]
+        root=pdbIN[pdbIN.rfind('/')+1:pdbIN.rfind('.')]
+        pdbset = (  '#!'+os.getenv('SHELL')+'\n'
+                    'pdbset xyzin %s xyzout %s/out.pdb << eof\n' %(pdbIN,outDir)+
+                    'cell %s\n'    %(str(','.join(unit_cell)))+
+                    'spacegroup %s\n' %spg  )
+        for op in symop:
+            pdbset+='SYMGEN '+','.join(op)+'\n'
+        pdbset+='eof\n'
+        os.system(pdbset)
+
+        pdbList=[]
+        counter=0
+        nres=0
+        out=''
+        Cryst=''
+        for n,line in enumerate(open(os.path.join(outDir,'out.pdb'))):
+            if line.startswith('CRYST'):
+                Cryst=line
+            if line.startswith('ATOM') or line.startswith('HETATM'):
+                if counter < nres:
+                    if counter == 0:
+                        out=Cryst
+                    out+=line
+                    counter+=1
+                else:
+                    out+=line
+                    pdbList.append(os.path.join(outDir,root+'_'+str(nres)+'.pdb'))
+                    f=open(os.path.join(outDir,root+'_'+str(nres)+'.pdb'),'w')
+                    f.write(out)
+                    f.close()
+                    counter=0
+                    nres+=1
+
+        return pdbList
+
     def save_surounding_unit_cells(self,pdbIN):
         translations = [
 
