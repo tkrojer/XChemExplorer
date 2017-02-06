@@ -1926,8 +1926,6 @@ class pdbtools(object):
                     counter=0
                     n+=1
 
-
-
         return pdbList
 
     def save_surounding_unit_cells(self,pdbIN):

@@ -1045,9 +1045,8 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                             for files in ligandFiles:
                                 pdbList=XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_sym_equivalents_of_ligands_in_pdb_as_one_file_per_ligand(files)
                                 symEquivalents+=pdbList
-                            print symEquivalents
-#                            for files in symEquivalents:
-#                                XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_surounding_unit_cells(files)
+                            for files in symEquivalents:
+                                XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_surounding_unit_cells(files)
 #                            for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*_*_*.pdb')):
 #                                mol_xyz = XChemUtils.pdbtools(files).get_center_of_gravity_of_molecule_ish()
 #                                print files,mol_xyz
