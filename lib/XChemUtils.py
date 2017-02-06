@@ -1887,7 +1887,7 @@ class pdbtools(object):
             pdbset = (  '#!'+os.getenv('SHELL')+'\n'
                         'pdbset xyzin %s/all_ligands_sym_0.pdb xyzout %s/all_ligands_sym_%s.pdb << eof\n' %(outDir,outDir,str(n+1))+
                         'cell %s\n'    %(str(','.join(unit_cell)))+
-                        'spacegroup %s\n' %spg
+                        'spacegroup %s\n' %spg+
                         'shift fractional %s\n' %str(shift)+
                         'eof\n'            )
 #            os.system(pdbset)
