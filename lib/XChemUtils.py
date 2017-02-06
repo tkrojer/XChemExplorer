@@ -1785,6 +1785,28 @@ class pdbtools(object):
         Z=((max(z_list)-min(z_list))/2)+min(z_list)
         return X,Y,Z
 
+    def get_center_of_gravity_of_molecule_ish(self):
+        X=0.0
+        Y=0.0
+        Z=0.0
+        x_list=[]
+        y_list=[]
+        z_list=[]
+        # pdb definition see: http://www.wwpdb.org/documentation/file-format-content/format33/sect9.html#ATOM
+        for line in open(self.pdb):
+            if (line.startswith('ATOM') or line.startswith('HETATM')):
+                X=float(line[30:38])
+                x_list.append(X)
+                Y=float(line[38:46])
+                y_list.append(Y)
+                Z=float(line[46:54])
+                z_list.append(Z)
+        # 'ish' because it's not really the centre of gravity, but the the middle of the min/max of each x,y,z
+        X=((max(x_list)-min(x_list))/2)+min(x_list)
+        Y=((max(y_list)-min(y_list))/2)+min(y_list)
+        Z=((max(z_list)-min(z_list))/2)+min(z_list)
+        return X,Y,Z
+
     def get_init_pdb_as_list(self):
         return self.get_pdb_as_list(self.pdb)
 
