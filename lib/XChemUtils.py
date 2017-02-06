@@ -1896,7 +1896,7 @@ class pdbtools(object):
 
         unit_cell=self.get_unit_cell_from_pdb()
         spg=self.get_spg_from_pdb()
-        outDir=pdbIN[:pdbIN.rfind('/')]
+        outDir=pdbIN[pdbIN.rfind('/'):]
         root=pdbIN[pdbIN.rfind('/')+1:pdbIN.rfind('_')]
 
         for n,shift in enumerate(translations):
