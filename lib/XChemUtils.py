@@ -1911,7 +1911,7 @@ class pdbtools(object):
             if line.startswith('CRYST'):
                 Cryst=line
             if line.startswith('ATOM') or line.startswith('HETATM'):
-                if counter < nres+1:
+                if counter < nres-1:
                     if counter == 0:
                         out=Cryst
                     out+=line
@@ -1925,11 +1925,7 @@ class pdbtools(object):
                     out=''
                     counter=0
                     n+=1
-        if out != '':
-            pdbList.append(os.path.join(outDir,root+'_'+str(n+1)+'.pdb'))
-            f=open(os.path.join(outDir,root+'_'+str(n+1)+'.pdb'),'w')
-            f.write(out)
-            f.close()
+
 
 
         return pdbList
