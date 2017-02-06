@@ -1858,7 +1858,7 @@ class pdbtools(object):
             pdbset+='SYMGEN '+','.join(op)+'\n'
         pdbset+='eof\n'
         os.system(pdbset)
-        return root+'_0.pdb'
+        return os.path.join(outDir,root+'_0.pdb')
 
     def save_surounding_unit_cells(self,pdbIN):
         translations = [
