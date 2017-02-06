@@ -1047,9 +1047,6 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                             symEquivalents.append(root)
                         for files in symEquivalents:
                             XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_surounding_unit_cells(files)
-                        for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*.pdb')):
-                            print '1',files
-
                         for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*_*.pdb')):
                             print '2',files
 
