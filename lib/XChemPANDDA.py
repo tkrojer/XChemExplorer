@@ -1022,8 +1022,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                 ligands=XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).ligand_details_as_list()
                 if ligands != []:
                     if os.path.isdir(os.path.join(xtal,'xceTmp')):
-                        print 'uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu'
-                        print '/bin/rm -fr %s' %os.path.join(xtal,'xceTmp')
+                        os.system('/bin/rm -fr %s' %os.path.join(xtal,'xceTmp'))
                     os.mkdir(os.path.join(xtal,'xceTmp'))
                 for item in ligands:
 
