@@ -1032,6 +1032,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                     if not foundLigand:
                         self.Logfile.insert('%s: refine.pdb contains a ligand that is not assigned in panddaTable: %s %s %s' %(xtal,item[0],item[1],item[2]))
                         XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_sym_equivalents_of_ligands_in_pdb()
+                        XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_surounding_unit_cells()
                     else:
                         self.Logfile.insert('%s: found ligand in refine.pdb and panddaTable: %s %s %s' %(xtal,item[0],item[1],item[2]))
 

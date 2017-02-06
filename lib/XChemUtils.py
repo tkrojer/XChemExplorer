@@ -1835,10 +1835,8 @@ class pdbtools(object):
         outDir=self.pdb[:self.pdb.rfind('/')]
         self.save_all_ligands_to_pdb(outDir)
 
-        root=self.pdb[self.pdb.rfind('/')+1:self.pdb.rfind('.')]
-        outPDB=os.path.join(outDir,root+'_sym.pdb')
         pdbset = (  '#!'+os.getenv('SHELL')+'\n'
-                    'pdbset xyzin %s/all_ligands.pdb xyzout %s << eof\n' %(outDir,outPDB)+
+                    'pdbset xyzin %s/all_ligands.pdb xyzout %s/all_ligands_sym_0.pdb << eof\n' %(outDir,outDir)+
                     'cell %s\n'    %(str(','.join(unit_cell)))+
                     'spacegroup %s\n' %spg  )
         for op in symop:
@@ -1851,7 +1849,52 @@ class pdbtools(object):
         print 'hallo'
 
     def save_surounding_unit_cells(self):
-        print 'hallo'
+        translations = [
+
+                    [   0,  1,  0   ],
+                    [   0,  1,  1   ],
+                    [   0,  0,  1   ],
+                    [   0,  -1, 1   ],
+                    [   0,  -1, 0   ],
+                    [   0,  -1, -1  ],
+                    [   0,  0,  -1  ],
+                    [   0,  1,  -1  ],
+
+                    [   1,  0,  0   ],
+                    [   1,  1,  0   ],
+                    [   1,  1,  1   ],
+                    [   1,  0,  1   ],
+                    [   1,  -1, 1   ],
+                    [   1,  -1, 0   ],
+                    [   1,  -1, -1  ],
+                    [   1,  0,  -1  ],
+                    [   1,  1,  -1  ],
+
+                    [   -1, 0,  0   ] ,
+                    [   -1, 1,  0   ],
+                    [   -1, 1,  1   ],
+                    [   -1, 0,  1   ],
+                    [   -1, -1, 1   ],
+                    [   -1, -1, 0   ],
+                    [   -1, -1, -1  ],
+                    [   -1, 0,  -1  ],
+                    [   -1, 1,  -1  ],
+
+            ]
+
+
+        for n,shift in enumerate(translations):
+            pdbset = (  '#!'+os.getenv('SHELL')+'\n'
+                        'pdbset xyzin %s/all_ligands_sym_0.pdb xyzout %s/all_ligands_sym_%s.pdb << eof\n' %(outDir,outDir,str(n+1))+
+                        'cell %s\n'    %(str(','.join(unit_cell)))+
+                        'spacegroup %s\n' %spg
+                        'shift fractional %s\n' %str(shift)+
+                        'eof\n'            )
+#            os.system(pdbset)
+            print pdbset
+
+
+
 
 
 class reference:
