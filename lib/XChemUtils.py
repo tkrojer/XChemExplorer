@@ -1882,6 +1882,9 @@ class pdbtools(object):
 
             ]
 
+        unit_cell=self.get_unit_cell_from_pdb()
+        spg=self.get_spg_from_pdb()
+        outDir=self.pdb[:self.pdb.rfind('/')]
 
         for n,shift in enumerate(translations):
             pdbset = (  '#!'+os.getenv('SHELL')+'\n'
