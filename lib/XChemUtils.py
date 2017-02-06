@@ -1917,8 +1917,8 @@ class pdbtools(object):
                     counter+=1
                 else:
                     out+=line
-                    pdbList.append(os.path.join(outDir,root+'_'+str(nres)+'.pdb'))
-                    f=open(os.path.join(outDir,root+'_'+str(nres)+'.pdb'),'w')
+                    pdbList.append(os.path.join(outDir,root+'_'+str(counter)+'.pdb'))
+                    f=open(os.path.join(outDir,root+'_'+str(counter)+'.pdb'),'w')
                     f.write(out)
                     f.close()
                     counter=0
