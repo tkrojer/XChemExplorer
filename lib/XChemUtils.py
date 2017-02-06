@@ -1925,7 +1925,7 @@ class pdbtools(object):
                     out=''
                     counter=0
                     n+=1
-        if out != ''
+        if out != '':
             pdbList.append(os.path.join(outDir,root+'_'+str(n+1)+'.pdb'))
             f=open(os.path.join(outDir,root+'_'+str(n+1)+'.pdb'),'w')
             f.write(out)
