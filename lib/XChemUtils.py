@@ -1906,8 +1906,7 @@ class pdbtools(object):
                         'spacegroup %s\n' %spg+
                         'shift fractional %s\n' %str(shift).replace('[','').replace(']','')+
                         'eof\n'            )
-#            os.system(pdbset)
-            print pdbset
+            os.system(pdbset)
 
 
 
