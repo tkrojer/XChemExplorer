@@ -1986,7 +1986,7 @@ class misc:
     def calculate_distance_between_coordinates(self,x1,y1,z1,x2,y2,z2):
         print '==> XCE: calculating distance between two coordinates'
         distance=0.0
-        distance=math.sqrt(math.pow(x1-x2,2)+math.pow(y1-y2,2)+math.pow(z1-z2,2))
+        distance=math.sqrt(math.pow(float(x1)-float(x2),2)+math.pow(float(y1)-float(y2),2)+math.pow(float(z1)-float(z2),2))
         return distance
 
 class maptools(object):
