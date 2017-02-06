@@ -1906,6 +1906,7 @@ class pdbtools(object):
         counter=0
         out=''
         Cryst=''
+        n=0
         for line in open(os.path.join(outDir,'out.pdb')):
             if line.startswith('CRYST'):
                 Cryst=line
@@ -1917,12 +1918,12 @@ class pdbtools(object):
                     counter+=1
                 else:
                     out+=line
-                    pdbList.append(os.path.join(outDir,root+'_'+str(counter)+'.pdb'))
-                    f=open(os.path.join(outDir,root+'_'+str(counter)+'.pdb'),'w')
+                    pdbList.append(os.path.join(outDir,root+'_'+str(n)+'.pdb'))
+                    f=open(os.path.join(outDir,root+'_'+str(n)+'.pdb'),'w')
                     f.write(out)
                     f.close()
                     counter=0
-                    nres+=1
+                    n+=1
 
         return pdbList
 
