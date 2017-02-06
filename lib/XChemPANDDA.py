@@ -1029,6 +1029,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                     foundLigand=False
                     if xtal in dbDict:
                         for entry in dbDict[xtal]:
+                            print item,entry
                             if item[0] == entry[4] and item[1] == entry[5] and item[2] == entry[6]:
                                 foundLigand=True
                     else:

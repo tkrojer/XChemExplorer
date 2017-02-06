@@ -1894,7 +1894,7 @@ class pdbtools(object):
         outDir=pdbIN[:pdbIN.rfind('/')]
         root=pdbIN[pdbIN.rfind('/')+1:pdbIN.rfind('.')]
         pdbset = (  '#!'+os.getenv('SHELL')+'\n'
-                    'pdbset xyzin %s xyzout %s/out.pdb << eof\n' %(pdbIN,outDir)+
+                    'pdbset xyzin %s xyzout %s/out.pdb << eof  2> /dev/null\n' %(pdbIN,outDir)+
                     'cell %s\n'    %(str(','.join(unit_cell)))+
                     'spacegroup %s\n' %spg  )
         for op in symop:
@@ -1969,7 +1969,7 @@ class pdbtools(object):
 
         for n,shift in enumerate(translations):
             pdbset = (  '#!'+os.getenv('SHELL')+'\n'
-                        'pdbset xyzin %s/%s.pdb xyzout %s/%s_%s.pdb << eof\n' %(outDir,root,outDir,root,str(n+1))+
+                        'pdbset xyzin %s/%s.pdb xyzout %s/%s_%s.pdb << eof  2> /dev/null\n' %(outDir,root,outDir,root,str(n+1))+
                         'cell %s\n'    %(str(','.join(unit_cell)))+
                         'spacegroup %s\n' %spg+
                         'shift fractional %s\n' %str(shift).replace('[','').replace(']','')+
