@@ -1026,7 +1026,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                     os.mkdir(os.path.join(xtal,'xceTmp'))
                 made_sym_copies=False
                 for item in ligands:
-                    residue_xyz = pdbtools(os.path.join(self.initial_model_directory,xtal,'refine.pdb')).get_center_of_gravity_of_residue_ish(item[1],item[2])
+                    residue_xyz = XChemUtils.pdbtools(os.path.join(self.initial_model_directory,xtal,'refine.pdb')).get_center_of_gravity_of_residue_ish(item[1],item[2])
                     foundLigand=False
                     if xtal in dbDict:
                         for entry in dbDict[xtal]:
@@ -1049,7 +1049,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                             for files in symEquivalents:
                                 XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_surounding_unit_cells(files)
                             for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*_*.pdb')):
-                                mol_xyz = pdbtools(files).get_center_of_gravity_of_molecule_ish()
+                                mol_xyz = XChemUtils.pdbtools(files).get_center_of_gravity_of_molecule_ish()
                                 print residue_xyz,mol_xyz
                             made_sym_copies=True
 
