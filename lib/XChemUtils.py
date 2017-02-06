@@ -1887,6 +1887,7 @@ class pdbtools(object):
         for line in open(pdbIN):
             if line.startswith('ATOM') or line.startswith('HETATM'):
                 nres+=1
+        print 'NRES',nres
         unit_cell=self.get_unit_cell_from_pdb()
         spg=self.get_spg_from_pdb()
         symop=self.get_symmetry_operators()
@@ -1903,10 +1904,9 @@ class pdbtools(object):
 
         pdbList=[]
         counter=0
-        nres=0
         out=''
         Cryst=''
-        for n,line in enumerate(open(os.path.join(outDir,'out.pdb'))):
+        for line in open(os.path.join(outDir,'out.pdb')):
             if line.startswith('CRYST'):
                 Cryst=line
             if line.startswith('ATOM') or line.startswith('HETATM'):
