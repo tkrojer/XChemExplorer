@@ -1911,7 +1911,7 @@ class pdbtools(object):
             if line.startswith('CRYST'):
                 Cryst=line
             if line.startswith('ATOM') or line.startswith('HETATM'):
-                if counter < nres:
+                if counter < nres+1:
                     if counter == 0:
                         out=Cryst
                     out+=line
