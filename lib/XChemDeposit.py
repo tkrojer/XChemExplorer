@@ -1,4 +1,4 @@
-# last edited: 03/02/2017, 15:00
+# last edited: 08/02/2017, 15:00
 
 import sys
 import os
@@ -999,7 +999,23 @@ class prepare_for_group_deposition_upload(QtCore.QThread):
 
 
 
+class import_PDB_IDs(QtCore.QThread):
+    def __init__(self,pdbCodes,database,xce_logfile):
+        QtCore.QThread.__init__(self)
+        self.pdbCodes=pdbCodes
+        self.database=database
+        self.Logfile=XChemLog.updateLog(xce_logfile)
+        self.db=XChemDB.data_source(database)
 
+    def run(self):
+
+        for line in self.pdbCodes.split('\n'):
+            if len(line.split('/')) == 2 and '-ligand_bound' in line:
+                xtal=line[:line.rfind('-ligand_bound')].replace(' ','')
+                pdbID=line.split('/')[1].replace(' ','')
+                self.Logfile.insert('setting PDB ID for '+xtal+' to '+pdbID)
+                sqlite="UPDATE mainTable SET Deposition_PDB_ID='%s',RefinementOutcome='6 - Deposited' where CrystalName is '%s';" %(pdbID,xtal)
+                self.db.execute_statement(sqlite)
 
 
 

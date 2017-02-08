@@ -1,4 +1,4 @@
-# last edited: 06/02/2017, 15:00
+# last edited: 08/02/2017, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -37,7 +37,7 @@ class XChemExplorer(QtGui.QApplication):
     def __init__(self,args):
         QtGui.QApplication.__init__(self,args)
 
-        self.xce_version='v1.0-beta.3.1'
+        self.xce_version='v1.0-beta.3.2'
 
         # general settings
         self.allowed_unitcell_difference_percent=12
@@ -352,6 +352,9 @@ class XChemExplorer(QtGui.QApplication):
         prepare_for_group_deposition_upload.triggered.connect(self.prepare_for_group_deposition_upload)
         deposition_menu.addAction(prepare_for_group_deposition_upload)
 
+        enter_pdb_codes=QtGui.QAction('Update DB with PDB codes',self.window)
+        enter_pdb_codes.triggered.connect(self.enter_pdb_codes)
+        deposition_menu.addAction(enter_pdb_codes)
 
 #        prepare_bound_models_for_deposition=QtGui.QAction('prepare_bound_models_for_deposition',self.window)
 #        prepare_bound_models_for_deposition.triggered.connect(self.prepare_bound_models_for_deposition)
@@ -1696,6 +1699,52 @@ class XChemExplorer(QtGui.QApplication):
 
         preferences.exec_();
 
+
+    def enter_pdb_codes(self):
+        pdbID_entry = QtGui.QMessageBox()
+        pdbID_entryLayout = pdbID_entry.layout()
+
+        vbox = QtGui.QVBoxLayout()
+#        settings_hbox_filename_root=QtGui.QHBoxLayout()
+#        filename_root_label=QtGui.QLabel('filename root:')
+#        settings_hbox_filename_root.addWidget(filename_root_label)
+#        filename_root_input = QtGui.QLineEdit()
+#        filename_root_input.setFixedWidth(400)
+#        filename_root_input.setText(str(self.filename_root))
+#        filename_root_input.textChanged[str].connect(self.change_filename_root)
+#        settings_hbox_filename_root.addWidget(filename_root_input)
+#        vbox.addLayout(settings_hbox_filename_root)
+
+        frame=QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+
+        grid = QtGui.QGridLayout()
+
+        grid.addWidget(QtGui.QLabel('Text from PDB email'), 0,0)
+        self.pdb_code_entry = QtGui.QTextEdit()
+        self.pdb_code_entry.setText('')
+        self.pdb_code_entry.setFixedWidth(500)
+        grid.addWidget(self.pdb_code_entry, 1,0,20,1)
+
+
+        frame.setLayout(grid)
+        vbox.addWidget(frame)
+
+
+        hbox=QtGui.QHBoxLayout()
+        button=QtGui.QPushButton('Update Database')
+        button.clicked.connect(self.update_database_with_pdb_codes)
+        hbox.addWidget(button)
+
+        vbox.addLayout(hbox)
+
+
+        pdbID_entryLayout.addLayout(vbox,0,0)
+        pdbID_entry.exec_();
+
+
+
+
     def export_to_html(self):
         self.update_log.insert('exporting contents of SQLite database into '+self.html_export_directory)
 
@@ -2670,6 +2719,17 @@ class XChemExplorer(QtGui.QApplication):
         else:
             file_name=file_name+'.deposit'
         pickle.dump(self.deposit_dict,open(file_name,'wb'))
+
+    def update_database_with_pdb_codes(self):
+        self.work_thread=XChemDeposit.import_PDB_IDs(   str(self.pdb_code_entry.toPlainText()),
+                                                        os.path.join(self.database_directory,self.data_source_file),
+                                                        self.xce_logfile   )
+        self.explorer_active=1
+        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.work_thread.start()
+
 
 
     def load_deposit_config_file(self):
