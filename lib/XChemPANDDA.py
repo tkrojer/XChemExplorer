@@ -1168,7 +1168,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                                         XChemUtils.pdbtools(os.path.join(xtal,xtal+'-ensemble-model.pdb')).merge_pdb_file('%s/ligand_%s_%s_%s_%s.pdb' %(xtal,site[0],site[1],site[2],'D'))
 
                                         self.Logfile.warning(xtal+': inserting %s %s %s in panddaTable' %(site[0],site[1],site[2]))
-                                        self.insert_new_row_in_panddaTable(xtal,ligand,site,dbEntries)
+                                        self.insert_new_row_in_panddaTable(xtal,ligand,site,dbDict)
 
 
                                         break
