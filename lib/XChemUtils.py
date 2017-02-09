@@ -1745,7 +1745,7 @@ class pdbtools(object):
                     chainID=str(line[21:23]).replace(' ','')
                     resseq=str(line[23:26]).replace(' ','')
                     altLoc=str(line[16:17]).replace(' ','')
-                    if [resname,chainID,resseq] not in Ligands:
+                    if [resname,chainID,resseq,altLoc] not in Ligands:
                         Ligands.append([resname,chainID,resseq,altLoc])
         return Ligands
 
