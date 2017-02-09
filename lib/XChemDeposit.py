@@ -1018,7 +1018,45 @@ class import_PDB_IDs(QtCore.QThread):
                 self.db.execute_statement(sqlite)
 
 
+class compare_smiles_in_db_with_ligand_in_pdb(QtCore.QThread):
+    def __init__(self,projectDir,database,xce_logfile):
+        QtCore.QThread.__init__(self)
+        self.projectDir=projectDir
+        self.database=database
+        self.Logfile=XChemLog.updateLog(xce_logfile)
+        self.db=XChemDB.data_source(database)
 
+    def run(self):
+
+        os.chdir(self.projectDir)
+
+        progress_step=1
+        if len(glob.glob('*')) != 0:
+            progress_step=100/float(len(glob.glob('*')))
+        else:
+            progress_step=1
+        progress=0
+        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+
+        for xtal in glob.glob('*'):
+            if os.path.isfile(os.path.join(xtal,'refine.pdb')):
+                smiles=self.db.execute_statement("select CompoundCode from mainTable where CrystalName is '%s'" %xtal)
+                LigandSmiles=smiles[0]
+                print 'ligand smiles',LigandSmiles
+
+                pdb=pdbtools(os.path.join(xtal,'refine.pdb'))
+                ligandList=pdb.ligand_details_as_list()
+                for ligand in ligandList:
+                    resname     = ligand[0]
+                    chainID     = ligand[1]
+                    resseq      = ligand[2]
+                    altLoc      = ligand[3]
+                    print ligand
+
+
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
 
 #

@@ -356,6 +356,10 @@ class XChemExplorer(QtGui.QApplication):
         enter_pdb_codes.triggered.connect(self.enter_pdb_codes)
         deposition_menu.addAction(enter_pdb_codes)
 
+        check_smiles=QtGui.QAction('Check SMILES',self.window)
+        check_smiles.triggered.connect(self.check_smiles_in_db_and_pdb)
+        deposition_menu.addAction(check_smiles)
+
 #        prepare_bound_models_for_deposition=QtGui.QAction('prepare_bound_models_for_deposition',self.window)
 #        prepare_bound_models_for_deposition.triggered.connect(self.prepare_bound_models_for_deposition)
 #        deposition_menu.addAction(prepare_bound_models_for_deposition)
@@ -1818,6 +1822,18 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
+
+    def check_smiles_in_db_and_pdb(self):
+
+        self.work_thread=XChemDeposit.compare_smiles_in_db_with_ligand_in_pdb(  self.initial_model_directory,
+                                                                                os.path.join(self.database_directory,self.data_source_file),
+                                                                                self.xce_logfile   )
+        self.explorer_active=1
+        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.work_thread.start()
+
 
 
 #    def prepare_bound_models_for_deposition(self):
