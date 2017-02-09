@@ -1891,8 +1891,8 @@ class pdbtools(object):
 
                     NewOccupany=occupancy_line.replace(occupancy_old,occupancy_new)
 
-                    outPDB+=atom_line+serial_line+atomName_line+NewAltloc+NewResname+NewChain+NewResseq+insert_line+x_line+y_line+z_line+NewOccupany+Bfac_line+element_line+charge_line+'\n'
-                    print atom_line+serial_line+atomName_line+NewAltloc+NewResname+NewChain+NewResseq+insert_line+x_line+y_line+z_line+NewOccupany+Bfac_line+element_line+charge_line+'\n'
+                    outPDB+=atom_line+serial_line+atomName_line+NewAltloc+NewResname+NewChain+NewResseq+insert_line+x_line+y_line+z_line+NewOccupany+Bfac_line+element_line+charge_line
+                    print atom_line+serial_line+atomName_line+NewAltloc+NewResname+NewChain+NewResseq+insert_line+x_line+y_line+z_line+NewOccupany+Bfac_line+element_line+charge_line
             else:
                 outPDB+=line
 
