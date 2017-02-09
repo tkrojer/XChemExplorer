@@ -1905,11 +1905,11 @@ class pdbtools(object):
     def merge_pdb_file(self,pdbin):
         outPDB=''
 
-        for line in open(self.pdb)
+        for line in open(self.pdb):
             if not line.startswith('END'):
                 outPDB+=line
 
-        for line in open(pdbin)
+        for line in open(pdbin):
             if not line.startswith('END'):
                 outPDB+=line
 
