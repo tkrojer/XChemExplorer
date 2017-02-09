@@ -1054,10 +1054,10 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                         if not foundLigand:
                             ligands_not_in_panddaTable.append([resnameLIG,chainLIG,seqnumLIG,altLocLIG,occupancyLig,residue_xyz])
                     else:
-                        self.Logfile.insert('ligand in PDB file, but dataset not listed in panddaTable: %s -> %s %s %s' %(xtal,item[0],item[1],item[2]))
+                        self.Logfile.warning('ligand in PDB file, but dataset not listed in panddaTable: %s -> %s %s %s' %(xtal,item[0],item[1],item[2]))
 
                 for entry in ligands_not_in_panddaTable:
-                    self.Logfile.insert('%s: refine.pdb contains a ligand that is not assigned in the panddaTable: %s %s %s %s' %(xtal,entry[0],entry[1],entry[2],entry[3]))
+                    self.Logfile.warning('%s: refine.pdb contains a ligand that is not assigned in the panddaTable: %s %s %s %s' %(xtal,entry[0],entry[1],entry[2],entry[3]))
 
                 for site in ligands_not_in_panddaTable:
                     if not made_sym_copies:
@@ -1079,9 +1079,9 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                         mol_xyz = XChemUtils.pdbtools(files).get_center_of_gravity_of_molecule_ish()
                         distance = XChemUtils.misc().calculate_distance_between_coordinates(mol_xyz[0], mol_xyz[1],mol_xyz[2],site[5][0], site[5][1],site[5][2])
                         if distance == 0 and site[3] != 'D':
-                            self.Logfile.insert(xtal+': ligand was not modelled with pandda.inspect -> %s %s %s' %(str(site[0]),str(site[1]),str(site[2])))
+                            self.Logfile.warning(xtal+': ligand was not modelled with pandda.inspect -> %s %s %s' %(str(site[0]),str(site[1]),str(site[2])))
                             self.update_errorDict(xtal,'%s %s %s was not modelled with pandda.inpect' %(str(site[0]),str(site[1]),str(site[2])))
-                            self.Logfile.insert('seraching for ligands in refine.pdb which are within 10A of this ligand')
+                            self.Logfile.insert('searching for ligands in refine.pdb which are within 10A of this ligand')
                             for ligand in ligands:
                                 if ligand[3] == 'D':
                                     ligand_xyz=ligand[5]

@@ -1059,10 +1059,8 @@ class compare_smiles_in_db_with_ligand_in_pdb(QtCore.QThread):
                     chainID     = ligand[1]
                     resseq      = ligand[2]
                     altLoc      = ligand[3]
-                    print ligand
                     elementDict_ligand=pdb.ElementDict(resname,chainID,resseq,altLoc)
                     for element in elementDict_ligand:
-                        print elementDict_ligand,elementDict_smiles
                         if elementDict_ligand[element] != elementDict_smiles[element]:
                             self.update_ErrorDict(xtal, '%s %s %s %s contains different number of atoms than smiles in DB' %(resname,chainID,resseq,altLoc))
                             break
