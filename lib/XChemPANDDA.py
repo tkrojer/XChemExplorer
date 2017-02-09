@@ -1047,24 +1047,27 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                 for entry in ligands_not_in_panddaTable:
                     self.Logfile.insert('%s: refine.pdb contains a ligand that is not assigned in the panddaTable: %s %s %s %s' %(xtal,entry[0],entry[1],entry[2],entry[3]))
 
-#                for entry in ligands_not_in_panddaTable:
-#                    if not made_sym_copies:
-#                        XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_ligands_to_pdb_to_directory(os.path.join(self.project_directory,xtal,'xceTmp'))
-#                        ligandFiles=[]
-#                        # seems redundant, but want to avoid that glob includes newly generated sym equivalents
-#                        for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*.pdb')):
-#                            ligandFiles.append(files)
-#                        symEquivalents=[]
-#                        for files in ligandFiles:
-#                            pdbList=XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_sym_equivalents_of_ligands_in_pdb_as_one_file_per_ligand(files)
-#                            symEquivalents+=pdbList
-#                        for files in symEquivalents:
-#                            XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_surounding_unit_cells(files)
-#                        made_sym_copies=True
+                for site in ligands_not_in_panddaTable:
+                    if not made_sym_copies:
+                        XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_ligands_to_pdb_to_directory(os.path.join(self.project_directory,xtal,'xceTmp'))
+                        ligandFiles=[]
+                        # seems redundant, but want to avoid that glob includes newly generated sym equivalents
+                        for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*.pdb')):
+                            ligandFiles.append(files)
+                        symEquivalents=[]
+                        for files in ligandFiles:
+                            pdbList=XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_sym_equivalents_of_ligands_in_pdb_as_one_file_per_ligand(files)
+                            symEquivalents+=pdbList
+                        for files in symEquivalents:
+                            XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_surounding_unit_cells(files)
+                        made_sym_copies=True
 
-#                    for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*_*.pdb')):
-#                        mol_xyz = XChemUtils.pdbtools(files).get_center_of_gravity_of_molecule_ish()
-#                        distance = XChemUtils.misc().calculate_distance_between_coordinates(mol_xyz[0], mol_xyz[1],mol_xyz[2],site_x, site_y,site_z)
+                    for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*_*.pdb')):
+                        mol_xyz = XChemUtils.pdbtools(files).get_center_of_gravity_of_molecule_ish()
+                        distance = XChemUtils.misc().calculate_distance_between_coordinates(mol_xyz[0], mol_xyz[1],mol_xyz[2],site[3][0], site[3][1],site[3][2])
+                        if distance < 7:
+                            self.Logfile.insert(xtal+' found site with distance '+str(distance))
+                            print 'FOINDFHUIEFGFFFFFFFFFFFFFF',xtal,distance,site
 
 
 #                        for site in dbDict[xtal]:
@@ -1073,9 +1076,6 @@ class check_number_of_modelled_ligands(QtCore.QThread):
 #                            site_y=site[2]
 #                            site_z=site[3]
 ##                                   print site_x,site_y,site_z,mol_xyz
-#                            if distance < 7:
-#                                self.Logfile.insert(xtal+' found site with distance '+str(distance))
-#                                print 'FOINDFHUIEFGFFFFFFFFFFFFFF',xtal,distance,site
 
 
 
