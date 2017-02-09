@@ -1,4 +1,4 @@
-# last edited: 06/02/2017, 17:00
+# last edited: 09/02/2017, 17:00
 
 import sys
 import os
@@ -1904,6 +1904,8 @@ class pdbtools(object):
 
     def merge_pdb_file(self,pdbin):
         outPDB=''
+
+        # only merge if residue with same resname, chain and resnumber not already in self.pdb!!!
 
         for line in open(self.pdb):
             if not line.startswith('END'):

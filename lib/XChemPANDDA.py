@@ -1,4 +1,4 @@
-# last edited: 06/02/2017, 15:00
+# last edited: 09/02/2017, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -1004,9 +1004,6 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                 event_id=       str(entry[12])
                 PanDDApath=     str(entry[13])
 
-        print 'SiteList',siteList
-        print 'Max(SiteList)',max(siteList)
-
         db_dict={
             'PANDDA_site_index':                    str(int(max(siteList))+1),
             'PANDDApath':                           PanDDApath,
@@ -1175,6 +1172,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                                         self.Logfile.warning(xtal+': inserting %s %s %s in panddaTable' %(site[0],site[1],site[2]))
                                         self.insert_new_row_in_panddaTable(xtal,ligand,site,dbDict)
 
+                                        self.update_errorDict(xtal,'Please check current model')
 
                                         break
                             break
