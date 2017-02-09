@@ -1034,10 +1034,11 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                 made_sym_copies=False
                 ligands_not_in_panddaTable=[]
                 for n,item in enumerate(ligands):
-                    resnameLIG= item[0]
-                    chainLIG=   item[1]
-                    seqnumLIG=  item[2]
-                    altLocLIG=  item[3]
+                    resnameLIG=     item[0]
+                    chainLIG=       item[1]
+                    seqnumLIG=      item[2]
+                    altLocLIG=      item[3]
+                    occupancyLig=   item[4]
                     if altLocLIG != 'D':
                         self.Logfile.insert(xtal+': found a ligand not modelled with pandda.inspect -> '+str(item))
                     residue_xyz = XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).get_center_of_gravity_of_residue_ish(item[1],item[2])
@@ -1051,7 +1052,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                             if resnameLIG == resnameTable and chainLIG == chainTable and seqnumLIG == seqnumTable:
                                 foundLigand=True
                         if not foundLigand:
-                            ligands_not_in_panddaTable.append([resnameLIG,chainLIG,seqnumLIG,altLocLIG,residue_xyz])
+                            ligands_not_in_panddaTable.append([resnameLIG,chainLIG,seqnumLIG,altLocLIG,occupancyLig,residue_xyz])
                     else:
                         self.Logfile.insert('ligand in PDB file, but dataset not listed in panddaTable: %s -> %s %s %s' %(xtal,item[0],item[1],item[2]))
 
@@ -1076,7 +1077,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
 
                     for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*_*.pdb')):
                         mol_xyz = XChemUtils.pdbtools(files).get_center_of_gravity_of_molecule_ish()
-                        distance = XChemUtils.misc().calculate_distance_between_coordinates(mol_xyz[0], mol_xyz[1],mol_xyz[2],site[4][0], site[4][1],site[4][2])
+                        distance = XChemUtils.misc().calculate_distance_between_coordinates(mol_xyz[0], mol_xyz[1],mol_xyz[2],site[5][0], site[5][1],site[5][2])
                         if distance == 0 and site[3] != 'D':
                             self.Logfile.insert(xtal+': ligand was not modelled with pandda.inspect -> %s %s %s' %(str(site[0]),str(site[1]),str(site[2])))
                             self.update_errorDict(xtal,'%s %s %s was not modelled with pandda.inpect' %(str(site[0]),str(site[1]),str(site[2])))
@@ -1090,6 +1091,8 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                                         self.Logfile.insert('ligand %s %s %s is within 15A' %(str(ligand[0]),str(ligand[1]),str(ligand[2])))
                                         self.Logfile.insert('using occupancy: '+str(ligand[4]))
                                         self.Logfile.insert(xtal+': updating refine.pdb -> setting altLoc to D and occupancy to %s' %(str(ligand[4])))
+                                        XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).update_residue(site[0],site[1],site[2],site[3],site[4],site[0],site[1],site[2],'D',ligand[4])
+
                                         break
                             break
                         elif distance > 0 and distance < 7:

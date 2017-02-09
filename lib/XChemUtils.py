@@ -1824,10 +1824,54 @@ class pdbtools(object):
                 pdb_list.append([atom_line,altLoc_line,resname_line,chainID_line,resseq_line])
         return pdb_list
 
-#    def compare_pdb_to_init_pdb(self,pdbin):
-#        for line in open(self.pdb):
-#            if line.startswith
 
+    def update_residue(self,resname_old,chainID_old,resseq_old,altLoc_old,occupancy_old,resname_new,chainID_new,resseq_new,altLoc_new,occupancy_new):
+        outPDB=''
+        for line in open(self.pdb):
+            if line.startswith('ATOM') or line.startswith('HETATM'):
+                atom_line=      str(line[0:6])
+                serial_line=    str(line[6:11])
+                atomName_line=  str(line[11:16])
+                altLoc_line=    str(line[16:17])
+                resname_line=   str(line[17:20])
+                chainID_line=   str(line[20:23])
+                resseq_line=    str(line[23:26])
+                insert_line=    str(line[17:20])
+                x_line=         str(line[30:38])
+                y_line=         str(line[38:46])
+                z_line=         str(line[46:54])
+                occupancy_line= str(line[54:60])
+                Bfac_line=      str(line[60:66])
+                element_line=   str(line[66:78])
+                charge_line=    str(line[78:80])
+                if resname_line.replace(' ','')==resname_old and chainID_line.replace(' ','')==chainID_old and resseq_line.replace(' ','')==resseq_old and altLoc_line.replace(' ','')==altLoc_old:
+
+                    NewResname=resname_line.replace(resname_old,resname_new)
+
+                    NewChain    = charge_line.replace(chainID_old,chainID_new)
+
+                    if len(resseq_old) < len(resseq_new):
+                        NewResseq=resseq_line.replace(resseq_old,' '*(len(resseq_old)-len(resseq_new))+resseq_new)
+                    elif len(resseq_old) == len(resseq_new):
+                        NewResseq=resseq_line.replace(resseq_old,resseq_new)
+                    else:
+                        NewResseq=resseq_line[len(resseq_new)-len(resseq_old):].replace(resseq_old,resseq_new)
+
+                    if altLoc_line == ' ':
+                        NewAltloc=altLoc_line.replace(' ',altLoc_new)
+                    else:
+                        NewAltloc=altLoc_line.replace(altLoc_old,altLoc_new)
+
+                    NewOccupany=occupancy_line.replace(occupancy_old,occupancy_new)
+
+                    outPDB+=atom_line+serial_line+atomName_line+NewAltloc+NewResname+NewChain+NewResseq+insert_line+x_line+y_line+z_line+NewOccupany+Bfac_line+element_line+charge_line+'\n'
+                    print atom_line+serial_line+atomName_line+NewAltloc+NewResname+NewChain+NewResseq+insert_line+x_line+y_line+z_line+NewOccupany+Bfac_line+element_line+charge_line+'\n'
+            else:
+                outPDB+=line
+
+#        f=open(self.pdb,'w')
+#        f.write(outPDB)
+#        f.close()
 
     def get_symmetry_operators(self):
         symop = []
