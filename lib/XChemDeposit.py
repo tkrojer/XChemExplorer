@@ -14,6 +14,7 @@ import XChemDB
 import XChemToolTips
 import XChemMain
 from XChemUtils import pdbtools
+from XChemUtils import smilestools
 
 
 def create_SF_mmcif(outDir,mtzList):
@@ -1025,6 +1026,12 @@ class compare_smiles_in_db_with_ligand_in_pdb(QtCore.QThread):
         self.database=database
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.db=XChemDB.data_source(database)
+        self.ErrorDict={}
+
+    def update_ErrorDict(self,xtal,message):
+        if xtal not in self.ErrorDict:
+            self.ErrorDict[xtal]=[]
+        self.ErrorDict[xtal].append(message)
 
     def run(self):
 
@@ -1041,9 +1048,11 @@ class compare_smiles_in_db_with_ligand_in_pdb(QtCore.QThread):
 
         for xtal in glob.glob('*'):
             if os.path.isfile(os.path.join(xtal,'refine.pdb')):
-                smiles=self.db.execute_statement("select CompoundCode from mainTable where CrystalName is '%s'" %xtal)
-                LigandSmiles=smiles[0]
+                smiles=self.db.execute_statement("select CompoundSmiles from mainTable where CrystalName is '%s'" %xtal)
+                LigandSmiles=str(smiles[0][0])
                 print 'ligand smiles',LigandSmiles
+                elementDict_smiles=smilestools(LigandSmiles).ElementDict()
+
 
                 pdb=pdbtools(os.path.join(xtal,'refine.pdb'))
                 ligandList=pdb.ligand_details_as_list()
@@ -1053,6 +1062,11 @@ class compare_smiles_in_db_with_ligand_in_pdb(QtCore.QThread):
                     resseq      = ligand[2]
                     altLoc      = ligand[3]
                     print ligand
+                    elementDict_ligand=pdb.ElementDict(resname,chainID,resseq,altLoc)
+                    for element in elementDict_ligand:
+                        if elementDict_ligand[element] != elementDict_smiles[element]:
+                            self.update_ErrorDict(xtal, '%s %s %s %s contains different number of atoms than smiles in DB' %(resname,chainID,resseq,altLoc))
+                            break
 
 
             progress += progress_step
