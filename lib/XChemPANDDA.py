@@ -1068,6 +1068,9 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                         if distance < 7:
                             self.Logfile.insert(xtal+' found site with distance '+str(distance))
                             print 'FOINDFHUIEFGFFFFFFFFFFFFFF',xtal,distance,site
+                            print files
+                            print 'stop'
+                            break
 
 
 #                        for site in dbDict[xtal]:
