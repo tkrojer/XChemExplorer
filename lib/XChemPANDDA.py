@@ -980,6 +980,52 @@ class check_number_of_modelled_ligands(QtCore.QThread):
             self.errorDict[xtal]=[]
         self.errorDict[xtal].append(message)
 
+    def insert_new_row_in_panddaTable(self,xtal,ligand,site,dbEntries):
+        resname=    site[0]
+        chain=      site[1]
+        seqnum=     site[2]
+        altLoc=     site[3]
+        x_site=     site[5][0]
+        y_site=     site[5][1]
+        z_site=     site[5][2]
+
+        resnameSimilarSite= ligand[0]
+        chainSimilarSite=   ligand[1]
+        seqnumSimilarSite=  ligand[2]
+
+        siteList=[]
+        for entry in dbEntries[xtal]:
+            siteList.append(str(entry[0]))
+            if entry[4] == resnameSimilarSite and entry[5] == chainSimilarSite and entry[6] == seqnumSimilarSite:
+                eventMap=       str(entry[7])
+                eventMap_mtz=   str(entry[8])
+                initialPDB=     str(entry[9])
+                initialMTZ=     str(entry[10])
+                PanDDApath=     str(entry[14])
+
+        db_dict={
+            'PANDDA_site_index':                    str(max(siteList)+1),
+            'PANDDApath':                           PanDDApath,
+            'PANDDA_site_ligand_id':                resname+'-'+chain+'-'+seqnum,
+            'PANDDA_site_ligand_resname':           resname,
+            'PANDDA_site_ligand_chain':             chain,
+            'PANDDA_site_ligand_sequence_number':   seqnum,
+            'PANDDA_site_ligand_altLoc':            'D',
+            'PANDDA_site_event_map':                eventMap,
+            'PANDDA_site_event_map_mtz':            eventMap_mtz,
+            'PANDDA_site_initial_model':            initialPDB,
+            'PANDDA_site_initial_mtz':              initialMTZ,
+            'PANDDA_site_ligand_placed':            'True',
+            'PANDDA_site_x':                        x_site,
+            'PANDDA_site_y':                        y_site,
+            'PANDDA_site_z':                        z_site          }
+
+        print xtal,db_dict
+
+
+
+
+
     def run(self):
 
         self.Logfile.insert('reading modelled ligands from panddaTable')
@@ -993,23 +1039,38 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                     " PANDDA_site_z,"
                     " PANDDA_site_ligand_resname,"
                     " PANDDA_site_ligand_chain,"
-                    " PANDDA_site_ligand_sequence_number "
+                    " PANDDA_site_ligand_sequence_number,"
+                    " PANDDA_site_event_map,"
+                    " PANDDA_site_event_map_mtz,"
+                    " PANDDA_site_initial_model,"
+                    " PANDDA_site_initial_mtz,"
+                    " RefinementOutcome,"
+                    " PANDDA_site_event_index,"
+                    " PANDDApath "
                     "from panddaTable "    )
 
 
         dbEntries=self.db.execute_statement(sqlite)
         for item in dbEntries:
-            xtal=   str(item[0])
-            site=   str(item[1])
-            x=      str(item[2])
-            y=      str(item[3])
-            z=      str(item[4])
-            resname=str(item[5])
-            chain=  str(item[6])
-            seqnum= str(item[7])
+            xtal=           str(item[0])
+            site=           str(item[1])
+            x=              str(item[2])
+            y=              str(item[3])
+            z=              str(item[4])
+            resname=        str(item[5])
+            chain=          str(item[6])
+            seqnum=         str(item[7])
+            eventMap=       str(item[8])
+            eventMap_mtz=   str(item[9])
+            initialPDB=     str(item[10])
+            initialMTZ=     str(item[11])
+            outcome=        str(item[12])
+            event=          str(item[13])
+            PanDDApath=     str(item[14])
+
             if xtal not in dbDict:
                 dbDict[xtal]=[]
-            dbDict[xtal].append([site,x,y,z,resname,chain,seqnum])
+            dbDict[xtal].append([site,x,y,z,resname,chain,seqnum,eventMap,eventMap_mtz,initialPDB,initialMTZ,outcome,event,PanDDApath])
 
 
         os.chdir(self.project_directory)
@@ -1094,6 +1155,9 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                                         self.Logfile.insert('using occupancy: '+str(ligand[4]))
                                         self.Logfile.insert(xtal+': updating refine.pdb -> setting altLoc to D and occupancy to %s' %(str(ligand[4])))
                                         XChemUtils.pdbtools(os.path.join(xtal,'tmp.pdb')).update_residue(site[0],site[1],site[2],site[3],site[4], site[0],site[1],site[2],'D',ligand[4])
+                                        self.Logfile.warning(xtal+': inserting %s %s %s in panddaTable' %(site[0],site[1],site[2]))
+                                        self.insert_new_row_in_panddaTable(xtal,ligand,site,dbEntries)
+
 
                                         break
                             break
