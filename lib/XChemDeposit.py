@@ -702,7 +702,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 self.Logfile.insert('mmcif file successfully updated')
 
         else:
-            self.Logfile.insert('cannot find '+self.out+'.mmcif; something went wrong! => ERROR')
+            self.Logfile.error('cannot find '+self.out+'.mmcif; something went wrong!')
             self.depositLog.text('cannot find '+self.out+'.mmcif; something went wrong! => ERROR')
             self.updateFailureDict(xtal,'cannot find '+self.out+'.mmcif')
             foundFiles=False
@@ -718,7 +718,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                     if line.startswith('_refln.crystal_id'):
                         n_eventMTZ_found+=1
                 if n_eventMTZ_found != n_eventMtz:
-                    self.Logfile.insert('%s event map mtz files were specified as input, but only %s ended up in the mmcif file => ERROR' %(str(n_eventMtz),str(n_eventMTZ_found)))
+                    self.Logfile.error('%s event map mtz files were specified as input, but only %s ended up in the mmcif file' %(str(n_eventMtz),str(n_eventMTZ_found)))
                     self.depositLog.text('%s event map mtz files were specified as input, but only %s ended up in the mmcif file => ERROR' %(str(n_eventMtz),str(n_eventMTZ_found)))
                     self.updateFailureDict(xtal,'%s event mtz in input; only %s in mmcif SF file' %(str(n_eventMtz),str(n_eventMTZ_found)))
                     foundFiles=False
@@ -776,13 +776,13 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             if os.path.isfile(mmcif_sf):
                 self.Logfile.insert('mmcif SF file successfully updated')
             else:
-                self.Logfile.insert('something went wrong during the update => ERROR')
+                self.Logfile.error('something went wrong during the update')
                 self.depositLog.text('something went wrong during the update => ERROR')
                 self.updateFailureDict(xtal,'error during mmcif SF update')
                 foundFiles=False
 
         else:
-            self.Logfile.insert('cannot find '+self.out+'_sf.mmcif; something went wrong! => ERROR')
+            self.Logfile.error('cannot find '+self.out+'_sf.mmcif; something went wrong!')
             self.depositLog.text('cannot find '+self.out+'_sf.mmcif; something went wrong! => ERROR')
             self.updateFailureDict(xtal,'cannot find '+self.out+'_sf.mmcif')
             foundFiles=False
@@ -969,8 +969,6 @@ class prepare_for_group_deposition_upload(QtCore.QThread):
             xtal=str(item[0])
             mmcif=str(item[1])
             mmcif_sf=str(item[2])
-            if 'x513' in xtal: continue
-            if 'x562' in xtal: continue
             if os.path.isfile(mmcif) and os.path.isfile(mmcif_sf):
                 self.Logfile.insert('copying %s to %s' %(mmcif,self.depositDir))
                 os.system('/bin/cp %s .' %mmcif)

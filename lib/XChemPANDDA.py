@@ -1001,7 +1001,9 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                 eventMap_mtz=   str(entry[8])
                 initialPDB=     str(entry[9])
                 initialMTZ=     str(entry[10])
-                PanDDApath=     str(entry[14])
+                event_id=       str(entry[12])
+                PanDDApath=     str(entry[13])
+
 
         db_dict={
             'PANDDA_site_index':                    str(max(siteList)+1),
@@ -1011,6 +1013,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
             'PANDDA_site_ligand_chain':             chain,
             'PANDDA_site_ligand_sequence_number':   seqnum,
             'PANDDA_site_ligand_altLoc':            'D',
+            'PANDDA_site_event_index':              event_id,
             'PANDDA_site_event_map':                eventMap,
             'PANDDA_site_event_map_mtz':            eventMap_mtz,
             'PANDDA_site_initial_model':            initialPDB,
