@@ -1085,7 +1085,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                             for ligand in ligands:
                                 if ligand[3] == 'D':
                                     ligand_xyz=ligand[5]
-                                    distance = XChemUtils.misc().calculate_distance_between_coordinates(ligand_xyz[0], ligand_xyz[1],ligand_xyz[2],site[4][0], site[4][1],site[4][2])
+                                    distance = XChemUtils.misc().calculate_distance_between_coordinates(ligand_xyz[0], ligand_xyz[1],ligand_xyz[2],site[5][0], site[5][1],site[5][2])
                                     self.Logfile.insert('distance to %s %s %s: %s' %(str(ligand[0]),str(ligand[1]),str(ligand[2]),distance)  )
                                     if distance < 15:
                                         self.Logfile.insert('ligand %s %s %s is within 15A' %(str(ligand[0]),str(ligand[1]),str(ligand[2])))
