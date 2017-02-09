@@ -1124,7 +1124,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                     self.Logfile.insert('making copy of refine.pdb')
                     os.system('/bin/cp %s/refine.pdb %s/tmp.pdb' %(xtal,xtal))
                     if not os.path.isfile(os.path.join(xtal,xtal+'-ensemble-model.pdb.original')):
-                        self.Logfile.insert(xtal+': making copy of original pandda ensemble model: '+xtal+'-ensemble-model.pdb.original')
+                        self.Logfile.warning(xtal+': making copy of original pandda ensemble model: '+xtal+'-ensemble-model.pdb.original')
                         os.system('/bin/cp %s %s' %(os.path.join(xtal,xtal+'-ensemble-model.pdb'),os.path.join(xtal,xtal+'-ensemble-model.pdb.original')))
 
                     if not made_sym_copies:
@@ -1165,7 +1165,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                                         XChemUtils.pdbtools(os.path.join(xtal,'tmp.pdb')).save_specific_ligands_to_pdb(site[0],site[1],site[2],'D')
 
                                         self.Logfile.insert('meriging modified ligand into ensemble model')
-                                        XChemUtils.pdbtools(os.path.join(xtal,xtal+'-ensemble-model.pdb')).merge_pdb_file('ligand_%s_%s_%s_%s.pdb' %(site[0],site[1],site[2],'D'))
+                                        XChemUtils.pdbtools(os.path.join(xtal,xtal+'-ensemble-model.pdb')).merge_pdb_file('%s/ligand_%s_%s_%s_%s.pdb' %(xtal,site[0],site[1],site[2],'D'))
 
                                         self.Logfile.warning(xtal+': inserting %s %s %s in panddaTable' %(site[0],site[1],site[2]))
                                         self.insert_new_row_in_panddaTable(xtal,ligand,site,dbEntries)
