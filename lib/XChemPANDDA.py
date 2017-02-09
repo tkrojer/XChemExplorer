@@ -1153,8 +1153,13 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                                     if distance < 15:
                                         self.Logfile.insert('ligand %s %s %s is within 15A' %(str(ligand[0]),str(ligand[1]),str(ligand[2])))
                                         self.Logfile.insert('using occupancy: '+str(ligand[4]))
+
                                         self.Logfile.insert(xtal+': updating refine.pdb -> setting altLoc to D and occupancy to %s' %(str(ligand[4])))
                                         XChemUtils.pdbtools(os.path.join(xtal,'tmp.pdb')).update_residue(site[0],site[1],site[2],site[3],site[4], site[0],site[1],site[2],'D',ligand[4])
+
+                                        self.Logfile.insert('saving modifies ligand into pdb file: ligand_%s_%s_%s_%s.pdb' %(site[0],site[1],site[2],'D'))
+                                        XChemUtils.pdbtools(os.path.join(xtal,'tmp.pdb')).save_specific_ligands_to_pdb(site[0],site[1],site[2],'D')
+
                                         self.Logfile.warning(xtal+': inserting %s %s %s in panddaTable' %(site[0],site[1],site[2]))
                                         self.insert_new_row_in_panddaTable(xtal,ligand,site,dbEntries)
 

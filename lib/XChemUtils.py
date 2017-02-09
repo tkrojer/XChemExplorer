@@ -1709,6 +1709,7 @@ class pdbtools(object):
 
     def save_specific_ligands_to_pdb(self,resname,chainID,resseq,altLoc):
         pdb=''
+        outDir=self.pdb[:self.pdb.rfind('/')]
         for line in open(self.pdb):
             if line.startswith('ATOM') or line.startswith('HETATM'):
                 resname_line=str(line[17:20]).replace(' ','')
@@ -1719,7 +1720,7 @@ class pdbtools(object):
                     pdb=pdb+line
 
         if pdb != '':
-            f=open('ligand_%s_%s_%s_%s.pdb' %(str(resname),str(chainID),str(resseq),str(altLoc)),'w')
+            f=open('%s/ligand_%s_%s_%s_%s.pdb' %(outDir,str(resname),str(chainID),str(resseq),str(altLoc)),'w')
             f.write(pdb)
             f.close()
 
@@ -1900,6 +1901,7 @@ class pdbtools(object):
         f=open(self.pdb,'w')
         f.write(outPDB)
         f.close()
+
 
     def get_symmetry_operators(self):
         symop = []
