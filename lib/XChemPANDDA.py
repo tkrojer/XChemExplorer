@@ -1004,6 +1004,8 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                 event_id=       str(entry[12])
                 PanDDApath=     str(entry[13])
 
+        print 'SiteList',siteList
+        print 'Max(SiteList)',max(siteList)
 
         db_dict={
             'PANDDA_site_index':                    str(max(siteList)+1),
