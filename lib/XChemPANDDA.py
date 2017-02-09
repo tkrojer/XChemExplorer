@@ -980,7 +980,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
             self.errorDict[xtal]=[]
         self.errorDict[xtal].append(message)
 
-    def insert_new_row_in_panddaTable(self,xtal,ligand,site,dbEntries):
+    def insert_new_row_in_panddaTable(self,xtal,ligand,site,dbDict):
         resname=    site[0]
         chain=      site[1]
         seqnum=     site[2]
@@ -994,7 +994,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
         seqnumSimilarSite=  ligand[2]
 
         siteList=[]
-        for entry in dbEntries[xtal]:
+        for entry in dbDict[xtal]:
             siteList.append(str(entry[0]))
             if entry[4] == resnameSimilarSite and entry[5] == chainSimilarSite and entry[6] == seqnumSimilarSite:
                 eventMap=       str(entry[7])
