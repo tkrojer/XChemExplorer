@@ -1023,50 +1023,63 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                     if os.path.isdir(os.path.join(xtal,'xceTmp')):
                         os.system('/bin/rm -fr %s' %os.path.join(xtal,'xceTmp'))
                     os.mkdir(os.path.join(xtal,'xceTmp'))
+
                 made_sym_copies=False
+                ligands_not_in_panddaTable=[]
                 for item in ligands:
+                    resnameLIG= item[0]
+                    chainLIG=   item[1]
+                    seqnumLIG=  item[2]
                     residue_xyz = XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).get_center_of_gravity_of_residue_ish(item[1],item[2])
                     foundLigand=False
                     if xtal in dbDict:
+                        resnameTable=entry[4]
+                        chainTable=entry[5]
+                        seqnumTable=entry[6]
                         for entry in dbDict[xtal]:
                             print item,entry
-                            if item[0] == entry[4] and item[1] == entry[5] and item[2] == entry[6]:
+                            if resnameLIG == resnameTable and chainLIG == chainTable and seqnumLIG == seqnumTable:
                                 foundLigand=True
+                        if not foundLigand:
+                            ligands_not_in_panddaTable.append([resnameLIG,chainLIG,seqnumLIG,residue_xyz])
                     else:
                         self.Logfile.insert('ligand in PDB file, but dataset not listed in panddaTable: %s -> %s %s %s' %(xtal,item[0],item[1],item[2]))
 
-                    if not foundLigand:
-                        if not made_sym_copies:
-                            XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_ligands_to_pdb_to_directory(os.path.join(self.project_directory,xtal,'xceTmp'))
-                            ligandFiles=[]
-                            # seems redundant, but want to avoid that glob includes newly generated sym equivalents
-                            for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*.pdb')):
-                                ligandFiles.append(files)
-                            symEquivalents=[]
-                            for files in ligandFiles:
-                                pdbList=XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_sym_equivalents_of_ligands_in_pdb_as_one_file_per_ligand(files)
-                                symEquivalents+=pdbList
-                            for files in symEquivalents:
-                                XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_surounding_unit_cells(files)
-                            for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*_*.pdb')):
-                                mol_xyz = XChemUtils.pdbtools(files).get_center_of_gravity_of_molecule_ish()
-                                for site in dbDict[xtal]:
-                                    n_site=site[1]
-                                    site_x=site[1]
-                                    site_y=site[2]
-                                    site_z=site[3]
-#                                    print site_x,site_y,site_z,mol_xyz
-                                    distance = XChemUtils.misc().calculate_distance_between_coordinates(mol_xyz[0], mol_xyz[1],mol_xyz[2],site_x, site_y,site_z)
-                                    if distance < 7:
-                                        self.Logfile.insert(xtal+' found site with distance '+str(distance))
-                                        print 'FOINDFHUIEFGFFFFFFFFFFFFFF',xtal,distance,site
+                for entry in ligands_not_in_panddaTable:
+                    self.Logfile.insert('%s: refine.pdb contains a ligand that is not assigned in the panddaTable: %s %s %s' %(xtal,entry[0],entry[1],entry[2]))
 
-                            made_sym_copies=True
-
-                        self.Logfile.insert('%s: refine.pdb contains a ligand that is not assigned in panddaTable: %s %s %s' %(xtal,item[0],item[1],item[2]))
-
-                    else:
-                        self.Logfile.insert('%s: found ligand in refine.pdb and panddaTable: %s %s %s' %(xtal,item[0],item[1],item[2]))
+#                    if not foundLigand:
+#                        if not made_sym_copies:
+#                            XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_ligands_to_pdb_to_directory(os.path.join(self.project_directory,xtal,'xceTmp'))
+#                            ligandFiles=[]
+#                            # seems redundant, but want to avoid that glob includes newly generated sym equivalents
+#                            for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*.pdb')):
+#                                ligandFiles.append(files)
+#                            symEquivalents=[]
+#                            for files in ligandFiles:
+#                                pdbList=XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_sym_equivalents_of_ligands_in_pdb_as_one_file_per_ligand(files)
+#                                symEquivalents+=pdbList
+#                            for files in symEquivalents:
+#                                XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_surounding_unit_cells(files)
+#                            for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*_*.pdb')):
+#                                mol_xyz = XChemUtils.pdbtools(files).get_center_of_gravity_of_molecule_ish()
+#                                for site in dbDict[xtal]:
+#                                    n_site=site[1]
+#                                    site_x=site[1]
+#                                    site_y=site[2]
+#                                    site_z=site[3]
+##                                    print site_x,site_y,site_z,mol_xyz
+#                                    distance = XChemUtils.misc().calculate_distance_between_coordinates(mol_xyz[0], mol_xyz[1],mol_xyz[2],site_x, site_y,site_z)
+#                                    if distance < 7:
+#                                        self.Logfile.insert(xtal+' found site with distance '+str(distance))
+#                                        print 'FOINDFHUIEFGFFFFFFFFFFFFFF',xtal,distance,site
+#
+#                            made_sym_copies=True
+#
+#                        self.Logfile.insert('%s: refine.pdb contains a ligand that is not assigned in panddaTable: %s %s %s' %(xtal,item[0],item[1],item[2]))
+#
+#                    else:
+#                        self.Logfile.insert('%s: found ligand in refine.pdb and panddaTable: %s %s %s' %(xtal,item[0],item[1],item[2]))
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
