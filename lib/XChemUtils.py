@@ -1824,6 +1824,33 @@ class pdbtools(object):
                 pdb_list.append([atom_line,altLoc_line,resname_line,chainID_line,resseq_line])
         return pdb_list
 
+    def ElementDict(self,resname,chainID,resseq,altLoc):
+
+        ElementDict = {
+            'C':    0,
+            'N':    0,
+            'O':    0,
+            'P':    0,
+            'S':    0,
+            'BR':   0,
+            'CL':   0,
+            'I':    0,
+            'F':    0   }
+
+        for line in open(pdbin):
+            if line.startswith('ATOM') or line.startswith('HETATM'):
+                atom_line=str(line[12:16]).replace(' ','')
+                resname_line=str(line[17:20]).replace(' ','')
+                chainID_line=str(line[21:23]).replace(' ','')
+                resseq_line=str(line[23:26]).replace(' ','')
+                altLoc_line=str(line[16:17]).replace(' ','')
+                element_line=   str(line[66:78]).replace(' ','')
+                if resname_line==resname and chainID_line==chainID and resseq_line==resseq and altLoc_line==altLoc:
+                    if element_line.upper() in ElementDict:
+                        ElementDict[element_line.upper()] += 1
+
+        return ElementDict
+
 
     def update_residue(self,resname_old,chainID_old,resseq_old,altLoc_old,occupancy_old,resname_new,chainID_new,resseq_new,altLoc_new,occupancy_new):
         outPDB=''
@@ -1848,7 +1875,7 @@ class pdbtools(object):
 
                     NewResname=resname_line.replace(resname_old,resname_new)
 
-                    NewChain    = charge_line.replace(chainID_old,chainID_new)
+                    NewChain    = chainID_line.replace(chainID_old,chainID_new)
 
                     if len(resseq_old) < len(resseq_new):
                         NewResseq=resseq_line.replace(resseq_old,' '*(len(resseq_old)-len(resseq_new))+resseq_new)
@@ -2080,6 +2107,29 @@ class misc:
         distance=0.0
         distance=math.sqrt(math.pow(float(x1)-float(x2),2)+math.pow(float(y1)-float(y2),2)+math.pow(float(z1)-float(z2),2))
         return distance
+
+class smilestools(object):
+    def __init__(self,smiles):
+        self.smiles=smiles
+
+    def ElementDict(self):
+        ElementDict = {
+            'C':    0,
+            'N':    0,
+            'O':    0,
+            'P':    0,
+            'S':    0,
+            'BR':   0,
+            'CL':   0,
+            'I':    0,
+            'F':    0   }
+
+        m = Chem.MolFromSmiles(self.smiles)
+        for atom in m.GetAtoms():
+            if str(atom.GetSymbol()).upper() in ElementDict:
+                ElementDict[str(atom.GetSymbol()).upper()] += 1
+
+        return ElementDict
 
 class maptools(object):
     def __init__(self,map):
