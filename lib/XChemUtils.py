@@ -1744,8 +1744,9 @@ class pdbtools(object):
                 if resname in self.xce_ligands:
                     chainID=str(line[21:23]).replace(' ','')
                     resseq=str(line[23:26]).replace(' ','')
+                    altLoc=str(line[16:17]).replace(' ','')
                     if [resname,chainID,resseq] not in Ligands:
-                        Ligands.append([resname,chainID,resseq])
+                        Ligands.append([resname,chainID,resseq,altLoc])
         return Ligands
 
 
@@ -2030,7 +2031,7 @@ class reference:
 class misc:
 
     def calculate_distance_between_coordinates(self,x1,y1,z1,x2,y2,z2):
-        print '==> XCE: calculating distance between two coordinates'
+#        print '==> XCE: calculating distance between two coordinates'
         distance=0.0
         distance=math.sqrt(math.pow(float(x1)-float(x2),2)+math.pow(float(y1)-float(y2),2)+math.pow(float(z1)-float(z2),2))
         return distance

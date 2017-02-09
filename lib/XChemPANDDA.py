@@ -1030,6 +1030,9 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                     resnameLIG= item[0]
                     chainLIG=   item[1]
                     seqnumLIG=  item[2]
+                    altLocLIG=  item[3]
+                    if altLocLIG != 'D':
+                        self.Logfile.insert(xtal+': found a ligand not modelled with pandda.inspect -> '+str(item))
                     residue_xyz = XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).get_center_of_gravity_of_residue_ish(item[1],item[2])
                     foundLigand=False
                     if xtal in dbDict:
@@ -1049,6 +1052,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
 
                 for site in ligands_not_in_panddaTable:
                     if not made_sym_copies:
+                        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), xtal+': generating symmetry equivalent PDB files for ligand')
                         XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_ligands_to_pdb_to_directory(os.path.join(self.project_directory,xtal,'xceTmp'))
                         ligandFiles=[]
                         # seems redundant, but want to avoid that glob includes newly generated sym equivalents
@@ -1065,11 +1069,10 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                     for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*_*.pdb')):
                         mol_xyz = XChemUtils.pdbtools(files).get_center_of_gravity_of_molecule_ish()
                         distance = XChemUtils.misc().calculate_distance_between_coordinates(mol_xyz[0], mol_xyz[1],mol_xyz[2],site[3][0], site[3][1],site[3][2])
-                        if distance < 7:
-                            self.Logfile.insert(xtal+' found site with distance '+str(distance))
-                            print 'FOINDFHUIEFGFFFFFFFFFFFFFF',xtal,distance,site
-                            print files
-                            print 'stop'
+                        if distance == 0:
+                            self.Logfile.insert(xtal+': ')
+                        elif distance > 0 and distance < 7:
+                            self.Logfile.insert(xtal+' found site with distance '+str(distance)+' -> '+str(site))
                             break
 
 
