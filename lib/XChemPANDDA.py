@@ -1086,8 +1086,8 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                                     ligand_xyz=ligand[5]
                                     distance = XChemUtils.misc().calculate_distance_between_coordinates(ligand_xyz[0], ligand_xyz[1],ligand_xyz[2],site[4][0], site[4][1],site[4][2])
                                     self.Logfile.insert('distance to %s %s %s: %s' %(str(ligand[0]),str(ligand[1]),str(ligand[2]),distance)  )
-                                    if distance < 10:
-                                        self.Logfile.insert('ligand %s %s %s is within 10A' %(str(ligand[0]),str(ligand[1]),str(ligand[2])))
+                                    if distance < 15:
+                                        self.Logfile.insert('ligand %s %s %s is within 15A' %(str(ligand[0]),str(ligand[1]),str(ligand[2])))
                                         self.Logfile.insert('using occupancy: '+str(ligand[4]))
                                         self.Logfile.insert(xtal+': updating refine.pdb -> setting altLoc to D and occupancy to %s' %(str(ligand[4])))
                                         break
