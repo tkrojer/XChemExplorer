@@ -1863,7 +1863,7 @@ class pdbtools(object):
                 resname_line=   str(line[17:20])
                 chainID_line=   str(line[20:23])
                 resseq_line=    str(line[23:26])
-                insert_line=    str(line[17:20])
+                insert_line=    str(line[26:30])
                 x_line=         str(line[30:38])
                 y_line=         str(line[38:46])
                 z_line=         str(line[46:54])

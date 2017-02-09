@@ -1048,8 +1048,9 @@ class compare_smiles_in_db_with_ligand_in_pdb(QtCore.QThread):
 
         for xtal in glob.glob('*'):
             if os.path.isfile(os.path.join(xtal,'refine.pdb')):
-                smiles=self.db.execute_statement("select CompoundSmiles from mainTable where CrystalName is '%s'" %xtal)
+                smiles=self.db.execute_statement("select CompoundSmiles,CompoundCode from mainTable where CrystalName is '%s'" %xtal)
                 LigandSmiles=str(smiles[0][0])
+                LigandCode=str(smiles[0][1])
                 elementDict_smiles=smilestools(LigandSmiles).ElementDict()
 
                 pdb=pdbtools(os.path.join(xtal,'refine.pdb'))
@@ -1062,6 +1063,7 @@ class compare_smiles_in_db_with_ligand_in_pdb(QtCore.QThread):
                     elementDict_ligand=pdb.ElementDict(resname,chainID,resseq,altLoc)
                     for element in elementDict_ligand:
                         if elementDict_ligand[element] != elementDict_smiles[element]:
+                            self.Logfile.error('%s %s %s %s contains different number of atoms than smiles in DB: %s -> %s' %(resname,chainID,resseq,altLoc,LigandSmiles,LigandCode))
                             self.update_ErrorDict(xtal, '%s %s %s %s contains different number of atoms than smiles in DB' %(resname,chainID,resseq,altLoc))
                             break
 
