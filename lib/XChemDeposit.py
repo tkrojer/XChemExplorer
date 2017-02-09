@@ -1050,9 +1050,7 @@ class compare_smiles_in_db_with_ligand_in_pdb(QtCore.QThread):
             if os.path.isfile(os.path.join(xtal,'refine.pdb')):
                 smiles=self.db.execute_statement("select CompoundSmiles from mainTable where CrystalName is '%s'" %xtal)
                 LigandSmiles=str(smiles[0][0])
-                print 'ligand smiles',LigandSmiles
                 elementDict_smiles=smilestools(LigandSmiles).ElementDict()
-
 
                 pdb=pdbtools(os.path.join(xtal,'refine.pdb'))
                 ligandList=pdb.ligand_details_as_list()

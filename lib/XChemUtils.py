@@ -1837,7 +1837,7 @@ class pdbtools(object):
             'I':    0,
             'F':    0   }
 
-        for line in open(pdbin):
+        for line in open(self.pdb):
             if line.startswith('ATOM') or line.startswith('HETATM'):
                 atom_line=str(line[12:16]).replace(' ','')
                 resname_line=str(line[17:20]).replace(' ','')
