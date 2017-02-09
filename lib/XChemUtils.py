@@ -1898,9 +1898,9 @@ class pdbtools(object):
             else:
                 outPDB+=line
 
-#        f=open(self.pdb,'w')
-#        f.write(outPDB)
-#        f.close()
+        f=open(self.pdb,'w')
+        f.write(outPDB)
+        f.close()
 
     def get_symmetry_operators(self):
         symop = []

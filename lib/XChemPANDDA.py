@@ -1060,6 +1060,8 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                     self.Logfile.warning('%s: refine.pdb contains a ligand that is not assigned in the panddaTable: %s %s %s %s' %(xtal,entry[0],entry[1],entry[2],entry[3]))
 
                 for site in ligands_not_in_panddaTable:
+                    self.Logfile.insert('making copy of refine.pdb')
+                    os.system('/bin/cp %s/refine.pdb %s/tmp.pdb' %(xtal,xtal))
                     if not made_sym_copies:
                         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), xtal+': generating symmetry equivalent PDB files for ligand')
                         XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_ligands_to_pdb_to_directory(os.path.join(self.project_directory,xtal,'xceTmp'))
@@ -1091,7 +1093,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                                         self.Logfile.insert('ligand %s %s %s is within 15A' %(str(ligand[0]),str(ligand[1]),str(ligand[2])))
                                         self.Logfile.insert('using occupancy: '+str(ligand[4]))
                                         self.Logfile.insert(xtal+': updating refine.pdb -> setting altLoc to D and occupancy to %s' %(str(ligand[4])))
-                                        XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).update_residue(site[0],site[1],site[2],site[3],site[4], site[0],site[1],site[2],'D',ligand[4])
+                                        XChemUtils.pdbtools(os.path.join(xtal,'tmp.pdb')).update_residue(site[0],site[1],site[2],site[3],site[4], site[0],site[1],site[2],'D',ligand[4])
 
                                         break
                             break
