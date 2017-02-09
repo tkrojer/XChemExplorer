@@ -1082,13 +1082,14 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                             self.update_errorDict(xtal,'%s %s %s was not modelled with pandda.inpect' %(str(site[0]),str(site[1]),str(site[2])))
                             self.Logfile.insert('seraching for ligands in refine.pdb which are within 10A of this ligand')
                             for ligand in ligands:
-                                ligand_xyz=ligand[5]
-                                distance = XChemUtils.misc().calculate_distance_between_coordinates(ligand_xyz[0], ligand_xyz[1],ligand_xyz[2],site[4][0], site[4][1],site[4][2])
-                                if distance < 10:
-                                    self.Logfile.insert('ligand %s %s %s is within 10A' %(str(ligand[0]),str(ligand[1]),str(ligand[2])))
-                                    self.Logfile.insert('using occupancy: '+str(ligand[4]))
-                                    break
-                            self.Logfile.insert(xtal+': updating refine.pdb -> setting altLoc to D and occupancy to %s' %(occupancy))
+                                if ligand[3] == 'D':
+                                    ligand_xyz=ligand[5]
+                                    distance = XChemUtils.misc().calculate_distance_between_coordinates(ligand_xyz[0], ligand_xyz[1],ligand_xyz[2],site[4][0], site[4][1],site[4][2])
+                                    if distance < 10:
+                                        self.Logfile.insert('ligand %s %s %s is within 10A' %(str(ligand[0]),str(ligand[1]),str(ligand[2])))
+                                        self.Logfile.insert('using occupancy: '+str(ligand[4]))
+                                        self.Logfile.insert(xtal+': updating refine.pdb -> setting altLoc to D and occupancy to %s' %(str(ligand[4])))
+                                        break
                             break
                         elif distance > 0 and distance < 7:
                             self.Logfile.insert(xtal+' found site with distance '+str(distance)+' -> '+str(site))
