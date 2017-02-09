@@ -1033,11 +1033,10 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                     residue_xyz = XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).get_center_of_gravity_of_residue_ish(item[1],item[2])
                     foundLigand=False
                     if xtal in dbDict:
-                        resnameTable=entry[4]
-                        chainTable=entry[5]
-                        seqnumTable=entry[6]
                         for entry in dbDict[xtal]:
-                            print item,entry
+                            resnameTable=entry[4]
+                            chainTable=entry[5]
+                            seqnumTable=entry[6]
                             if resnameLIG == resnameTable and chainLIG == chainTable and seqnumLIG == seqnumTable:
                                 foundLigand=True
                         if not foundLigand:
