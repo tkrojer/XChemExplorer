@@ -1902,6 +1902,23 @@ class pdbtools(object):
         f.write(outPDB)
         f.close()
 
+    def merge_pdb_file(self,pdbin):
+        outPDB=''
+
+        for line in open(self.pdb)
+            if not line.startswith('END'):
+                outPDB+=line
+
+        for line in open(pdbin)
+            if not line.startswith('END'):
+                outPDB+=line
+
+        outPDB+='END\n'
+
+        f=open(self.pdb,'w')
+        f.write(outPDB)
+        f.close()
+
 
     def get_symmetry_operators(self):
         symop = []
