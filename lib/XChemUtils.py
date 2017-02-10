@@ -1751,6 +1751,18 @@ class pdbtools(object):
                         Ligands.append([resname,chainID,resseq,altLoc,occupancy])
         return Ligands
 
+    def residue_details_as_list(self,pdbin):
+        residueList = []
+        for line in open(pdbin):
+            if line.startswith('ATOM') or line.startswith('HETATM'):
+                resname=str(line[17:20]).replace(' ','')
+                chainID=str(line[21:23]).replace(' ','')
+                resseq=str(line[23:26]).replace(' ','')
+                altLoc=str(line[16:17]).replace(' ','')
+                occupancy=str(line[56:60]).replace(' ','')
+                if [resname,chainID,resseq,altLoc,occupancy] not in residueList:
+                    residueList.append([resname,chainID,resseq,altLoc,occupancy])
+        return residueList
 
 
     def get_xyz_coordinated_of_residue(self,chain,number):
@@ -1906,20 +1918,31 @@ class pdbtools(object):
         outPDB=''
 
         # only merge if residue with same resname, chain and resnumber not already in self.pdb!!!
+        residueListReference=   self.residue_details_as_list(self.pdb)
+        residueListPDBin=       self.residue_details_as_list(pdbin)
+        DuplicateResidue=False
+        for entry in residueListPDBin:
+            if entry in residueListReference:
+                print 'residue already exisits in '+self.pdb+':'
+                print str(entry)
+                DuplicateResidue=True
 
-        for line in open(self.pdb):
-            if not line.startswith('END'):
-                outPDB+=line
+        if not DuplicateResidue:
+            for line in open(self.pdb):
+                if not line.startswith('END'):
+                    outPDB+=line
 
-        for line in open(pdbin):
-            if not line.startswith('END'):
-                outPDB+=line
+            for line in open(pdbin):
+                if not line.startswith('END'):
+                    outPDB+=line
 
-        outPDB+='END\n'
+            outPDB+='END\n'
 
-        f=open(self.pdb,'w')
-        f.write(outPDB)
-        f.close()
+            f=open(self.pdb,'w')
+            f.write(outPDB)
+            f.close()
+        else:
+            print 'cannot merge pdb files!'
 
 
     def get_symmetry_operators(self):

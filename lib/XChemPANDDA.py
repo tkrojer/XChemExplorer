@@ -1085,7 +1085,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
         progress=0
         self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
-        for xtal in glob.glob('*'):
+        for xtal in sorted(glob.glob('*')):
             if os.path.isfile(os.path.join(xtal,'refine.pdb')):
                 ligands=XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).ligand_details_as_list()
                 self.Logfile.insert(xtal+' '+str(ligands))
@@ -1102,7 +1102,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                     seqnumLIG=      item[2]
                     altLocLIG=      item[3]
                     occupancyLig=   item[4]
-                    if altLocLIG != 'D':
+                    if altLocLIG.replace(' ','') == '':
                         self.Logfile.insert(xtal+': found a ligand not modelled with pandda.inspect -> '+str(item))
                     residue_xyz = XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).get_center_of_gravity_of_residue_ish(item[1],item[2])
                     ligands[n].append(residue_xyz)
@@ -1112,6 +1112,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                             resnameTable=entry[4]
                             chainTable=entry[5]
                             seqnumTable=entry[6]
+                            self.Logfile.insert('panddaTable: %s %s %s %s' %(xtal,resnameTable,chainTable,seqnumTable))
                             if resnameLIG == resnameTable and chainLIG == chainTable and seqnumLIG == seqnumTable:
                                 foundLigand=True
                         if not foundLigand:
@@ -1123,13 +1124,17 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                     self.Logfile.warning('%s: refine.pdb contains a ligand that is not assigned in the panddaTable: %s %s %s %s' %(xtal,entry[0],entry[1],entry[2],entry[3]))
 
                 for site in ligands_not_in_panddaTable:
-                    self.Logfile.insert('making copy of refine.pdb')
+                    self.Logfile.insert('%s: making copy of refine.pdb' %xtal)
                     os.system('/bin/cp %s/refine.pdb %s/tmp.pdb' %(xtal,xtal))
-                    if not os.path.isfile(os.path.join(xtal,xtal+'-ensemble-model.pdb.original')):
-                        self.Logfile.warning(xtal+': making copy of original pandda ensemble model: '+xtal+'-ensemble-model.pdb.original')
-                        os.system('/bin/cp %s %s' %(os.path.join(xtal,xtal+'-ensemble-model.pdb'),os.path.join(xtal,xtal+'-ensemble-model.pdb.original')))
+
+                    if os.path.isfile(os.path.join(xtal,xtal+'-ensemble-model.pdb.original')):
+                        os.system('/bin/cp %s %s' %(os.path.join(xtal,xtal+'-ensemble-model.pdb.original'),os.path.join(xtal,xtal+'-ensemble-model.pdb')))
+#                    if not os.path.isfile(os.path.join(xtal,xtal+'-ensemble-model.pdb.original')):
+#                        self.Logfile.warning(xtal+': making copy of original pandda ensemble model: '+xtal+'-ensemble-model.pdb.original')
+#                        os.system('/bin/cp %s %s' %(os.path.join(xtal,xtal+'-ensemble-model.pdb'),os.path.join(xtal,xtal+'-ensemble-model.pdb.original')))
 
                     if not made_sym_copies:
+                        self.Logfile.insert('%s: making symmetry equivalent copies of ligand molecules' %xtal)
                         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), xtal+': generating symmetry equivalent PDB files for ligand')
                         XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_ligands_to_pdb_to_directory(os.path.join(self.project_directory,xtal,'xceTmp'))
                         ligandFiles=[]
@@ -1146,39 +1151,53 @@ class check_number_of_modelled_ligands(QtCore.QThread):
 
                     for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*_*.pdb')):
                         mol_xyz = XChemUtils.pdbtools(files).get_center_of_gravity_of_molecule_ish()
-                        distance = XChemUtils.misc().calculate_distance_between_coordinates(mol_xyz[0], mol_xyz[1],mol_xyz[2],site[5][0], site[5][1],site[5][2])
-                        if distance == 0 and site[3] != 'D':
-                            self.Logfile.warning(xtal+': ligand was not modelled with pandda.inspect -> %s %s %s' %(str(site[0]),str(site[1]),str(site[2])))
-                            self.update_errorDict(xtal,'%s %s %s was not modelled with pandda.inpect' %(str(site[0]),str(site[1]),str(site[2])))
-                            self.Logfile.insert('searching for ligands in refine.pdb which are within 10A of this ligand')
-                            for ligand in ligands:
-                                if ligand[3] == 'D':
-                                    ligand_xyz=ligand[5]
-                                    distance = XChemUtils.misc().calculate_distance_between_coordinates(ligand_xyz[0], ligand_xyz[1],ligand_xyz[2],site[5][0], site[5][1],site[5][2])
-                                    self.Logfile.insert('distance to %s %s %s: %s' %(str(ligand[0]),str(ligand[1]),str(ligand[2]),distance)  )
-                                    if distance < 15:
-                                        self.Logfile.insert('ligand %s %s %s is within 15A' %(str(ligand[0]),str(ligand[1]),str(ligand[2])))
-                                        self.Logfile.insert('using occupancy: '+str(ligand[4]))
+                        # now need to check if there is a unassigned entry in panddaTable that is close
+                        for entry in dbDict[xtal]:
+                            distance = XChemUtils.misc().calculate_distance_between_coordinates(mol_xyz[0], mol_xyz[1],mol_xyz[2],entry[1],entry[2], entry[3])
+                            self.Logfile.insert('%s: %s %s %s <---> %s %s %s' %(xtal,mol_xyz[0], mol_xyz[1],mol_xyz[2],entry[1],entry[2], entry[3]))
+                            self.Logfile.insert('%s: symm equivalent molecule: %s' %(xtal,files))
+                            self.Logfile.insert('%s: distance: %s' %(xtal,str(distance)))
 
-                                        self.Logfile.insert(xtal+': updating refine.pdb -> setting altLoc to D and occupancy to %s' %(str(ligand[4])))
-                                        XChemUtils.pdbtools(os.path.join(xtal,'tmp.pdb')).update_residue(site[0],site[1],site[2],site[3],site[4], site[0],site[1],site[2],'D',ligand[4])
 
-                                        self.Logfile.insert('saving modifies ligand into pdb file: ligand_%s_%s_%s_%s.pdb' %(site[0],site[1],site[2],'D'))
-                                        XChemUtils.pdbtools(os.path.join(xtal,'tmp.pdb')).save_specific_ligands_to_pdb(site[0],site[1],site[2],'D')
-
-                                        self.Logfile.insert('meriging modified ligand into ensemble model')
-                                        XChemUtils.pdbtools(os.path.join(xtal,xtal+'-ensemble-model.pdb')).merge_pdb_file('%s/ligand_%s_%s_%s_%s.pdb' %(xtal,site[0],site[1],site[2],'D'))
-
-                                        self.Logfile.warning(xtal+': inserting %s %s %s in panddaTable' %(site[0],site[1],site[2]))
-                                        self.insert_new_row_in_panddaTable(xtal,ligand,site,dbDict)
-
-                                        self.update_errorDict(xtal,'Please check current model')
-
-                                        break
-                            break
-                        elif distance > 0 and distance < 7:
-                            self.Logfile.insert(xtal+' found site with distance '+str(distance)+' -> '+str(site))
-                            break
+#                        distance = XChemUtils.misc().calculate_distance_between_coordinates(mol_xyz[0], mol_xyz[1],mol_xyz[2],site[5][0], site[5][1],site[5][2])
+#                        self.Logfile.insert('%s: symm equivalent molecule: %s' %(xtal,files))
+#                        self.Logfile.insert('%s: distance: %s' %(xtal,str(distance)))
+#                        if distance == 0 and site[3] == '':
+#                            self.Logfile.warning(xtal+': ligand was not modelled with pandda.inspect -> %s %s %s' %(str(site[0]),str(site[1]),str(site[2])))
+#                            self.update_errorDict(xtal,'%s %s %s was not modelled with pandda.inpect' %(str(site[0]),str(site[1]),str(site[2])))
+#                            self.Logfile.insert('searching for ligands in refine.pdb which are within 10A of this ligand')
+#                            for ligand in ligands:
+#                                if ligand[3] == 'D':
+#                                    ligand_xyz=ligand[5]
+#                                    distance = XChemUtils.misc().calculate_distance_between_coordinates(ligand_xyz[0], ligand_xyz[1],ligand_xyz[2],site[5][0], site[5][1],site[5][2])
+#                                    self.Logfile.insert('distance to %s %s %s: %s' %(str(ligand[0]),str(ligand[1]),str(ligand[2]),distance)  )
+#                                    if distance < 15:
+#                                        self.Logfile.insert('ligand %s %s %s is within 15A' %(str(ligand[0]),str(ligand[1]),str(ligand[2])))
+#                                        self.Logfile.insert('using occupancy: '+str(ligand[4]))
+#
+#                                        self.Logfile.insert(xtal+': updating refine.pdb -> setting altLoc to D and occupancy to %s' %(str(ligand[4])))
+#                                        XChemUtils.pdbtools(os.path.join(xtal,'tmp.pdb')).update_residue(site[0],site[1],site[2],site[3],site[4], site[0],site[1],site[2],'D',ligand[4])
+#
+#                                        self.Logfile.insert('saving modifies ligand into pdb file: ligand_%s_%s_%s_%s.pdb' %(site[0],site[1],site[2],'D'))
+#                                        XChemUtils.pdbtools(os.path.join(xtal,'tmp.pdb')).save_specific_ligands_to_pdb(site[0],site[1],site[2],'D')
+#
+#                                        self.Logfile.insert('merging modified ligand into ensemble model')
+#                                        XChemUtils.pdbtools(os.path.join(xtal,xtal+'-ensemble-model.pdb')).merge_pdb_file('%s/ligand_%s_%s_%s_%s.pdb' %(xtal,site[0],site[1],site[2],'D'))
+#
+#                                        self.Logfile.warning(xtal+': inserting %s %s %s in panddaTable' %(site[0],site[1],site[2]))
+#                                        self.insert_new_row_in_panddaTable(xtal,ligand,site,dbDict)
+#
+#                                        self.update_errorDict(xtal,'Please check current model')
+#
+#                                        break
+#                            break
+#                        elif distance == 0 and site[3] != '':
+#                            self.update_errorDict(xtal,'found site')
+#                            self.Logfile.insert(xtal+' found site with distance '+str(distance)+' -> '+str(site))
+#
+#
+#
+#                            break
 
 
 #                        for site in dbDict[xtal]:
@@ -1197,3 +1216,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+        if self.errorDict != {}:
+            self.update_errorDict('General','The aforementioned PDB files were automatically changed by XCE!\nPlease check and refine them!!!')
+        self.emit(QtCore.SIGNAL('show_error_dict'), self.errorDict)

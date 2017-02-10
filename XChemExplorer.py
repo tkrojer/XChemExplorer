@@ -1832,6 +1832,7 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.connect(self.work_thread, QtCore.SIGNAL("show_error_dict"), self.show_error_dict)
         self.work_thread.start()
 
 
@@ -4420,6 +4421,7 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.connect(self.work_thread, QtCore.SIGNAL("show_error_dict"), self.show_error_dict)
         self.work_thread.start()
 
 
@@ -4629,6 +4631,15 @@ class XChemExplorer(QtGui.QApplication):
         self.update_progress_bar(0)
         self.update_status_bar('idle')
 
+    def show_error_dict(self,errorDict):
+        text=''
+        for key in errorDict:
+            text+='%s:\n' %key
+            for entry in errorDict[key]:
+                text+='  - '+entry+'\n'
+        msgBox = QtGui.QMessageBox()
+        msgBox.setText(text)
+        msgBox.exec_();
 
 
 
