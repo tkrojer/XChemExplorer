@@ -772,6 +772,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                         residue_xyz = pdbtools(os.path.join(self.initial_model_directory,xtal,'refine.pdb')).get_center_of_gravity_of_residue_ish(residue_chain, residue_number)
                         distance = misc().calculate_distance_between_coordinates(residue_xyz[0], residue_xyz[1],residue_xyz[2],event_x, event_y,event_z)
                         distanceList.append([distance,residue_name,residue_chain,residue_number,residue_altLoc])
+                        self.Logfile.insert('%s: calculating distance between event and ligand (%s %s %s): %s' %(xtal,residue_name,residue_chain,residue_number,str(distance)))
 
                     # now take the ligand that is closest to the event
                     smallestDistance = min(distanceList, key=lambda x: x[0])
