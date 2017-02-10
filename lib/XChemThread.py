@@ -775,10 +775,12 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
                     # now take the ligand that is closest to the event
                     smallestDistance = min(distanceList, key=lambda x: x[0])
+                    distance =          smallestDistance[0]
                     residue_name =      smallestDistance[1]
                     residue_chain =     smallestDistance[2]
                     residue_number =    smallestDistance[3]
                     residue_altLoc =    smallestDistance[4]
+                    self.Logfile.insert('%s: ligand with the shorted distance (%sA) to the current event (id: %s): %s %s %s %s' %(xtal,str(distance),event_index,residue_name,residue_chain,residue_number,residue_altLoc))
                     db_pandda_dict['PANDDA_site_ligand_resname'] = residue_name
                     db_pandda_dict['PANDDA_site_ligand_chain'] = residue_chain
                     db_pandda_dict['PANDDA_site_ligand_sequence_number'] = residue_number
