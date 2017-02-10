@@ -1114,8 +1114,10 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                             seqnumTable=entry[6]
                             self.Logfile.insert('panddaTable: %s %s %s %s' %(xtal,resnameTable,chainTable,seqnumTable))
                             if resnameLIG == resnameTable and chainLIG == chainTable and seqnumLIG == seqnumTable:
+                                self.Logfile.insert('%s: found ligand in database -> %s %s %s' %(xtal,resnameLIG,chainLIG,seqnumLIG))
                                 foundLigand=True
                         if not foundLigand:
+                            self.Logfile.warning('%s: did NOT find ligand in database -> %s %s %s' % (xtal, resnameLIG, chainLIG, seqnumLIG))
                             ligands_not_in_panddaTable.append([resnameLIG,chainLIG,seqnumLIG,altLocLIG,occupancyLig,residue_xyz])
                     else:
                         self.Logfile.warning('ligand in PDB file, but dataset not listed in panddaTable: %s -> %s %s %s' %(xtal,item[0],item[1],item[2]))
