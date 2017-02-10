@@ -1114,51 +1114,53 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                             seqnumTable=entry[6]
                             self.Logfile.insert('panddaTable: %s %s %s %s' %(xtal,resnameTable,chainTable,seqnumTable))
                             if resnameLIG == resnameTable and chainLIG == chainTable and seqnumLIG == seqnumTable:
-                                self.Logfile.insert('%s: found ligand in database -> %s %s %s' %(xtal,resnameLIG,chainLIG,seqnumLIG))
+                                self.Logfile.insert('%s: found ligand in database -> %s %s %s' %(xtal,resnameTable,chainTable,seqnumTable))
                                 foundLigand=True
                         if not foundLigand:
-                            self.Logfile.warning('%s: did NOT find ligand in database -> %s %s %s' % (xtal, resnameLIG, chainLIG, seqnumLIG))
-                            ligands_not_in_panddaTable.append([resnameLIG,chainLIG,seqnumLIG,altLocLIG,occupancyLig,residue_xyz])
+                            self.Logfile.warning('%s: did NOT find ligand in database -> %s %s %s' % (xtal, resnameTable, chainTable, seqnumTable))
+                            ligands_not_in_panddaTable.append([resnameLIG,chainLIG,seqnumLIG,altLoc,occupancyLig,residue_xyz])
                     else:
                         self.Logfile.warning('ligand in PDB file, but dataset not listed in panddaTable: %s -> %s %s %s' %(xtal,item[0],item[1],item[2]))
 
                 for entry in ligands_not_in_panddaTable:
                     self.Logfile.warning('%s: refine.pdb contains a ligand that is not assigned in the panddaTable: %s %s %s %s' %(xtal,entry[0],entry[1],entry[2],entry[3]))
 
-                for site in ligands_not_in_panddaTable:
-                    self.Logfile.insert('%s: making copy of refine.pdb' %xtal)
-                    os.system('/bin/cp %s/refine.pdb %s/tmp.pdb' %(xtal,xtal))
+#                for site in ligands_not_in_panddaTable:
+#                    self.Logfile.insert('%s: making copy of refine.pdb' %xtal)
+#                    os.system('/bin/cp %s/refine.pdb %s/tmp.pdb' %(xtal,xtal))
+#
+#                    if os.path.isfile(os.path.join(xtal,xtal+'-ensemble-model.pdb.original')):
+#                        os.system('/bin/cp %s %s' %(os.path.join(xtal,xtal+'-ensemble-model.pdb.original'),os.path.join(xtal,xtal+'-ensemble-model.pdb')))
+##                    if not os.path.isfile(os.path.join(xtal,xtal+'-ensemble-model.pdb.original')):
+##                        self.Logfile.warning(xtal+': making copy of original pandda ensemble model: '+xtal+'-ensemble-model.pdb.original')
+##                        os.system('/bin/cp %s %s' %(os.path.join(xtal,xtal+'-ensemble-model.pdb'),os.path.join(xtal,xtal+'-ensemble-model.pdb.original')))
+#
+#                    if not made_sym_copies:
+#                        self.Logfile.insert('%s: making symmetry equivalent copies of ligand molecules' %xtal)
+#                        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), xtal+': generating symmetry equivalent PDB files for ligand')
+#                        XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_ligands_to_pdb_to_directory(os.path.join(self.project_directory,xtal,'xceTmp'))
+#                        ligandFiles=[]
+#                        # seems redundant, but want to avoid that glob includes newly generated sym equivalents
+#                        for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*.pdb')):
+#                            ligandFiles.append(files)
+#                        symEquivalents=[]
+#                        for files in ligandFiles:
+#                            pdbList=XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_sym_equivalents_of_ligands_in_pdb_as_one_file_per_ligand(files)
+#                            symEquivalents+=pdbList
+#                        for files in symEquivalents:
+#                            XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_surounding_unit_cells(files)
+#                        made_sym_copies=True
+#
+#                    for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*_*.pdb')):
+#                        mol_xyz = XChemUtils.pdbtools(files).get_center_of_gravity_of_molecule_ish()
+#                        # now need to check if there is a unassigned entry in panddaTable that is close
+#                        for entry in dbDict[xtal]:
+#                            distance = XChemUtils.misc().calculate_distance_between_coordinates(mol_xyz[0], mol_xyz[1],mol_xyz[2],entry[1],entry[2], entry[3])
+#                            self.Logfile.insert('%s: %s %s %s <---> %s %s %s' %(xtal,mol_xyz[0], mol_xyz[1],mol_xyz[2],entry[1],entry[2], entry[3]))
+#                            self.Logfile.insert('%s: symm equivalent molecule: %s' %(xtal,files))
+#                            self.Logfile.insert('%s: distance: %s' %(xtal,str(distance)))
 
-                    if os.path.isfile(os.path.join(xtal,xtal+'-ensemble-model.pdb.original')):
-                        os.system('/bin/cp %s %s' %(os.path.join(xtal,xtal+'-ensemble-model.pdb.original'),os.path.join(xtal,xtal+'-ensemble-model.pdb')))
-#                    if not os.path.isfile(os.path.join(xtal,xtal+'-ensemble-model.pdb.original')):
-#                        self.Logfile.warning(xtal+': making copy of original pandda ensemble model: '+xtal+'-ensemble-model.pdb.original')
-#                        os.system('/bin/cp %s %s' %(os.path.join(xtal,xtal+'-ensemble-model.pdb'),os.path.join(xtal,xtal+'-ensemble-model.pdb.original')))
 
-                    if not made_sym_copies:
-                        self.Logfile.insert('%s: making symmetry equivalent copies of ligand molecules' %xtal)
-                        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), xtal+': generating symmetry equivalent PDB files for ligand')
-                        XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_ligands_to_pdb_to_directory(os.path.join(self.project_directory,xtal,'xceTmp'))
-                        ligandFiles=[]
-                        # seems redundant, but want to avoid that glob includes newly generated sym equivalents
-                        for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*.pdb')):
-                            ligandFiles.append(files)
-                        symEquivalents=[]
-                        for files in ligandFiles:
-                            pdbList=XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_sym_equivalents_of_ligands_in_pdb_as_one_file_per_ligand(files)
-                            symEquivalents+=pdbList
-                        for files in symEquivalents:
-                            XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_surounding_unit_cells(files)
-                        made_sym_copies=True
-
-                    for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*_*.pdb')):
-                        mol_xyz = XChemUtils.pdbtools(files).get_center_of_gravity_of_molecule_ish()
-                        # now need to check if there is a unassigned entry in panddaTable that is close
-                        for entry in dbDict[xtal]:
-                            distance = XChemUtils.misc().calculate_distance_between_coordinates(mol_xyz[0], mol_xyz[1],mol_xyz[2],entry[1],entry[2], entry[3])
-                            self.Logfile.insert('%s: %s %s %s <---> %s %s %s' %(xtal,mol_xyz[0], mol_xyz[1],mol_xyz[2],entry[1],entry[2], entry[3]))
-                            self.Logfile.insert('%s: symm equivalent molecule: %s' %(xtal,files))
-                            self.Logfile.insert('%s: distance: %s' %(xtal,str(distance)))
 
 
 #                        distance = XChemUtils.misc().calculate_distance_between_coordinates(mol_xyz[0], mol_xyz[1],mol_xyz[2],site[5][0], site[5][1],site[5][2])

@@ -262,7 +262,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         self.Logfile.insert('database mainTable update finished')
         self.Logfile.insert('updating panddaTable')
-        self.sync_pandda_table()
+#        self.sync_pandda_table()
+        self.sync_pandda_table_NEW()
         self.Logfile.insert('database panddaTable update finished')
 
         self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
@@ -682,6 +683,132 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                 if db_pandda_dict != {}:
                     self.db.update_panddaTable(xtal, site_index, db_pandda_dict)
                     self.Logfile.insert('updating panddaTable for xtal: %s, site: %s' %(xtal,site_index))
+
+    def sync_pandda_table_NEW(self):
+
+        # also need to update PANDDA table...
+        pandda_models=self.db.execute_statement("select CrystalName,PANDDA_site_index,PANDDA_site_event_index,PANDDA_site_x,PANDDA_site_y,PANDDA_site_z,PANDDApath,ApoStructures from panddaTable")
+        if pandda_models != []:
+            for entry in pandda_models:
+                db_pandda_dict={}
+                xtal=entry[0]
+                site_index=entry[1]
+                event_index=entry[2]
+                panddaPATH=entry[6]
+                apoStructures=entry[7]
+                try:
+                    event_x = float(str(entry[3]))
+                    event_y = float(str(entry[4]))
+                    event_z = float(str(entry[5]))
+                except ValueError:
+                    pass
+
+                # do not update pandda path since this one is updated during pandda export!
+                # instead try to get apo semi-colon separated list of apo structures that were used to
+                # calculate event maps; but only if field is blank!
+#                db_pandda_dict['PANDDApath']=self.panddas_directory
+                if str(apoStructures)=='None' or apoStructures=='':
+                    if panddaPATH != 'None' or panddaPATH != '':
+                        self.Logfile.insert('trying to find which apo structures were used to calculate the event maps in '+panddaPATH)
+                        db_pandda_dict['ApoStructures']=self.find_apo_structures_for_PanDDA(panddaPATH)
+                    else:
+                        self.Logfile.insert('pandda path for '+xtal+' is empty in database')
+
+                # event map
+
+                found_event_map=False
+                db_pandda_dict['PANDDA_site_event_map']=''
+                for file in glob.glob(os.path.join(self.initial_model_directory,xtal,'*ccp4')):
+                    filename=file[file.rfind('/')+1:]
+                    if filename.startswith(xtal+'-event_'+event_index) and filename.endswith('map.native.ccp4'):
+                        event_map=file
+                        db_pandda_dict['PANDDA_site_event_map']=os.path.realpath(event_map)
+#                        db_pandda_dict['PANDDA_site_event_map']=os.path.realpath(event_map).replace(os.getcwd()+'/','')
+                        found_event_map=True
+                        break
+                if not found_event_map:
+                    db_pandda_dict['PANDDA_site_event_map']=''
+
+                db_pandda_dict['PANDDA_site_initial_model']=''
+                for file in glob.glob(os.path.join(self.initial_model_directory,xtal,'*pdb')):
+                    filename=file[file.rfind('/')+1:]
+                    if filename.endswith('-ensemble-model.pdb'):
+                        db_pandda_dict['PANDDA_site_initial_model']=os.path.realpath(file).replace(os.getcwd()+'/','')
+                        break
+
+                db_pandda_dict['PANDDA_site_initial_mtz']=''
+                for file in glob.glob(os.path.join(self.initial_model_directory,xtal,'*mtz')):
+                    filename=file[file.rfind('/')+1:]
+                    if filename.endswith('pandda-input.mtz'):
+                        db_pandda_dict['PANDDA_site_initial_mtz']=os.path.realpath(file).replace(os.getcwd()+'/','')
+                        break
+
+
+                db_pandda_dict['PANDDA_site_ligand_resname'] = ''
+                db_pandda_dict['PANDDA_site_ligand_chain'] = ''
+                db_pandda_dict['PANDDA_site_ligand_sequence_number'] = ''
+                db_pandda_dict['PANDDA_site_ligand_altLoc'] = ''
+                db_pandda_dict['PANDDA_site_ligand_placed'] = 'False'
+                db_pandda_dict['PANDDA_site_spider_plot'] = ''
+                db_pandda_dict['PANDDA_site_ligand_id'] = ''
+
+                db_pandda_dict['PANDDA_site_occupancy'] = ''
+                db_pandda_dict['PANDDA_site_B_average'] = ''
+                db_pandda_dict['PANDDA_site_B_ratio_residue_surroundings'] = ''
+                db_pandda_dict['PANDDA_site_rmsd'] = ''
+                db_pandda_dict['PANDDA_site_RSCC'] = ''
+                db_pandda_dict['PANDDA_site_RSR'] = ''
+                db_pandda_dict['PANDDA_site_RSZD'] = ''
+
+                if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'refine.pdb')):
+                    ligands_in_file=pdbtools(os.path.join(self.initial_model_directory,xtal,'refine.pdb')).find_xce_ligand_details()
+
+                    distanceList=[]
+                    for ligand in ligands_in_file:
+                        residue_name=   ligand[0]
+                        residue_chain=  ligand[1]
+                        residue_number= ligand[2]
+                        residue_altLoc= ligand[3]
+                        residue_xyz = pdbtools(os.path.join(self.initial_model_directory,xtal,'refine.pdb')).get_center_of_gravity_of_residue_ish(residue_chain, residue_number)
+                        distance = misc().calculate_distance_between_coordinates(residue_xyz[0], residue_xyz[1],residue_xyz[2],event_x, event_y,event_z)
+                        distanceList.append([distance,residue_name,residue_chain,residue_number,residue_altLoc])
+
+                    # now take the ligand that is closest to the event
+                    smallestDistance = min(distanceList, key=lambda x: x[0])
+                    residue_name =      smallestDistance[1]
+                    residue_chain =     smallestDistance[2]
+                    residue_number =    smallestDistance[3]
+                    residue_altLoc =    smallestDistance[4]
+                    db_pandda_dict['PANDDA_site_ligand_resname'] = residue_name
+                    db_pandda_dict['PANDDA_site_ligand_chain'] = residue_chain
+                    db_pandda_dict['PANDDA_site_ligand_sequence_number'] = residue_number
+                    db_pandda_dict['PANDDA_site_ligand_altLoc'] = residue_altLoc
+                    db_pandda_dict['PANDDA_site_ligand_placed'] = 'True'
+                    db_pandda_dict['PANDDA_site_ligand_id']=residue_name+'-'+residue_chain+'-'+residue_number
+
+                    if xtal+'/Refine_' in os.path.realpath(os.path.join(self.initial_model_directory,xtal,'refine.pdb')):
+                        tmp=os.path.realpath(os.path.join(self.initial_model_directory,xtal,'refine.pdb'))
+                        spider_plot=os.path.join(tmp[:tmp.rfind('/')],'residue_plots',residue_name+'-'+residue_chain+'-'+residue_number+'.png')
+                        if os.path.isfile(spider_plot):
+                            db_pandda_dict['PANDDA_site_spider_plot']=os.path.realpath(spider_plot)
+                        if os.path.isfile(os.path.join(tmp[:tmp.rfind('/')],'residue_scores.csv')):
+                            with open(os.path.join(tmp[:tmp.rfind('/')],'residue_scores.csv'), 'rb') as csv_import:
+                                csv_dict = csv.DictReader(csv_import)
+                                for i, line in enumerate(csv_dict):
+                                    residueNameChainNumber = line['']
+                                    if residueNameChainNumber == residue_name+'-'+residue_chain+'-'+residue_number:
+                                        db_pandda_dict['PANDDA_site_occupancy'] = line['Occupancy']
+                                        db_pandda_dict['PANDDA_site_B_average'] = line['Average B-factor (Residue)']
+                                        db_pandda_dict['PANDDA_site_B_ratio_residue_surroundings'] = line['Surroundings B-factor Ratio']
+                                        db_pandda_dict['PANDDA_site_rmsd'] = line['Model RMSD']
+                                        db_pandda_dict['PANDDA_site_RSCC'] = line['RSCC']
+                                        db_pandda_dict['PANDDA_site_RSR'] = line['RSR']
+                                        db_pandda_dict['PANDDA_site_RSZD'] = line['RSZD']
+                    break
+
+        if db_pandda_dict != {}:
+            self.db.update_panddaTable(xtal, site_index, db_pandda_dict)
+            self.Logfile.insert('updating panddaTable for xtal: %s, site: %s' %(xtal,site_index))
 
 
 
