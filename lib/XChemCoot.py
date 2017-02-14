@@ -1,4 +1,4 @@
-# last edited: 30/01/2017 - 15:00
+# last edited: 14/02/2017 - 15:00
 
 import gobject
 import sys
@@ -898,6 +898,12 @@ class GUI(object):
 
     def set_site(self,widget):
         for site in self.ligand_site_information:
+            if str(site[0])=='0':
+                self.merge_ligand_button.set_sensitive(True)
+                self.place_ligand_here_button.set_sensitive(True)
+            else:
+                self.merge_ligand_button.set_sensitive(False)
+                self.place_ligand_here_button.set_sensitive(False)
             if str(site[0])==str(widget.get_active_text()).split()[0]:
                 self.selected_site=site
                 break
