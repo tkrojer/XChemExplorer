@@ -1118,7 +1118,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                                 self.Logfile.insert('%s: found ligand in database -> %s %s %s' %(xtal,resnameTable,chainTable,seqnumTable))
                                 foundLigand=True
                         if not foundLigand:
-                            self.Logfile.warning('%s: did NOT find ligand in database -> %s %s %s' % (xtal, resnameTable, chainTable, seqnumTable))
+                            self.Logfile.warning('%s: did NOT find ligand in database -> %s %s %s' % (xtal, resnameLIG, chainLIG, seqnumLIG))
                             ligands_not_in_panddaTable.append([resnameLIG,chainLIG,seqnumLIG,altLocLIG,occupancyLig,residue_xyz])
                     else:
                         self.Logfile.warning('ligand in PDB file, but dataset not listed in panddaTable: %s -> %s %s %s' %(xtal,item[0],item[1],item[2]))
@@ -1126,7 +1126,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                 for entry in ligands_not_in_panddaTable:
                     self.Logfile.warning('%s: refine.pdb contains a ligand that is not assigned in the panddaTable: %s %s %s %s' %(xtal,entry[0],entry[1],entry[2],entry[3]))
 
-#                for site in ligands_not_in_panddaTable:
+                for site in ligands_not_in_panddaTable:
 #                    self.Logfile.insert('%s: making copy of refine.pdb' %xtal)
 #                    os.system('/bin/cp %s/refine.pdb %s/tmp.pdb' %(xtal,xtal))
 #
@@ -1152,14 +1152,14 @@ class check_number_of_modelled_ligands(QtCore.QThread):
 #                            XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_surounding_unit_cells(files)
 #                        made_sym_copies=True
 #
-#                    for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*_*.pdb')):
-#                        mol_xyz = XChemUtils.pdbtools(files).get_center_of_gravity_of_molecule_ish()
-#                        # now need to check if there is a unassigned entry in panddaTable that is close
-#                        for entry in dbDict[xtal]:
-#                            distance = XChemUtils.misc().calculate_distance_between_coordinates(mol_xyz[0], mol_xyz[1],mol_xyz[2],entry[1],entry[2], entry[3])
-#                            self.Logfile.insert('%s: %s %s %s <---> %s %s %s' %(xtal,mol_xyz[0], mol_xyz[1],mol_xyz[2],entry[1],entry[2], entry[3]))
-#                            self.Logfile.insert('%s: symm equivalent molecule: %s' %(xtal,files))
-#                            self.Logfile.insert('%s: distance: %s' %(xtal,str(distance)))
+                    for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*_*.pdb')):
+                        mol_xyz = XChemUtils.pdbtools(files).get_center_of_gravity_of_molecule_ish()
+                        # now need to check if there is a unassigned entry in panddaTable that is close
+                        for entry in dbDict[xtal]:
+                            distance = XChemUtils.misc().calculate_distance_between_coordinates(mol_xyz[0], mol_xyz[1],mol_xyz[2],entry[1],entry[2], entry[3])
+                            self.Logfile.insert('%s: %s %s %s <---> %s %s %s' %(xtal,mol_xyz[0], mol_xyz[1],mol_xyz[2],entry[1],entry[2], entry[3]))
+                            self.Logfile.insert('%s: symm equivalent molecule: %s' %(xtal,files))
+                            self.Logfile.insert('%s: distance: %s' %(xtal,str(distance)))
 
 
 
