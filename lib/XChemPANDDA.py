@@ -1108,6 +1108,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                     ligands[n].append(residue_xyz)
                     foundLigand=False
                     if xtal in dbDict:
+                        self.Logfile.insert(str(dbDict[xtal]))
                         for entry in dbDict[xtal]:
                             resnameTable=entry[4]
                             chainTable=entry[5]
