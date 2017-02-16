@@ -202,7 +202,9 @@ class run_pandda_export(QtCore.QThread):
                 # find apo structures which were used
                 # XXX missing XXX
 
-                self.db.update_insert_panddaTable(sampleID,db_dict)
+#                self.db.update_insert_panddaTable(sampleID,db_dict)
+                self.db.update_insert_site_event_panddaTable(sampleID,db_dict)
+
                 # this is necessary, otherwise RefinementOutcome will be reset for samples that are actually already in refinement
                 self.db.execute_statement("update panddaTable set RefinementOutcome = '2 - PANDDA model' where CrystalName is '%s' and RefinementOutcome is null" %sampleID)
                 self.db.execute_statement("update mainTable set RefinementOutcome = '2 - PANDDA model' where CrystalName is '%s' and (RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending')" %sampleID)

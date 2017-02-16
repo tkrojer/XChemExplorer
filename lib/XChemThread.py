@@ -681,7 +681,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                             break
 
                 if db_pandda_dict != {}:
-                    self.db.update_panddaTable(xtal, site_index, db_pandda_dict)
+#                    self.db.update_panddaTable(xtal, site_index, db_pandda_dict)
+                    self.db.update_site_event_panddaTable(xtal, site_index, event_index, db_pandda_dict)
                     self.Logfile.insert('updating panddaTable for xtal: %s, site: %s' %(xtal,site_index))
 
     def sync_pandda_table_NEW(self):

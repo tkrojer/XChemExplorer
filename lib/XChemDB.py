@@ -665,6 +665,24 @@ class data_source:
             cursor.execute("UPDATE panddaTable SET "+update_string[:-1]+" WHERE CrystalName='%s' and PANDDA_site_index='%s'" %(sampleID,site_index))
             connect.commit()
 
+    def update_site_event_panddaTable(self,sampleID,site_index,event_index,data_dict):
+        data_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
+        data_dict['LastUpdated_by']=getpass.getuser()
+        connect=sqlite3.connect(self.data_source_file)
+        cursor = connect.cursor()
+        update_string=''
+        for key in data_dict:
+            value=data_dict[key]
+            if key=='ID' or key=='CrystalName' or key=='PANDDA_site_index' or key=='PANDDA_site_event_index':
+                continue
+            if not str(value).replace(' ','')=='':  # ignore empty fields
+                update_string+=str(key)+'='+"'"+str(value)+"'"+','
+            else:
+                update_string+=str(key)+' = null,'
+        if update_string != '':
+            cursor.execute("UPDATE panddaTable SET "+update_string[:-1]+" WHERE CrystalName='%s' and PANDDA_site_index='%s' and PANDDA_site_event_index='%s'" %(sampleID,site_index,event_index))
+            connect.commit()
+
     def update_depositTable(self,sampleID,structure_type,data_dict):
         data_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
         data_dict['LastUpdated_by']=getpass.getuser()
@@ -780,6 +798,54 @@ class data_source:
             print "INSERT INTO panddaTable ("+column_string[:-1]+") VALUES ("+value_string[:-1]+");"
             cursor.execute("INSERT INTO panddaTable ("+column_string[:-1]+") VALUES ("+value_string[:-1]+");")
         connect.commit()
+
+
+    def update_insert_site_event_panddaTable(self,sampleID,data_dict):
+        data_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
+        data_dict['LastUpdated_by']=getpass.getuser()
+        connect=sqlite3.connect(self.data_source_file)
+        cursor = connect.cursor()
+        cursor.execute('Select CrystalName,PANDDA_site_index,PANDDA_site_event_index FROM panddaTable')
+#        available_columns=[]
+#        cursor.execute("SELECT * FROM panddaTable")
+#        for column in cursor.description:           # only update existing columns in data source
+#            available_columns.append(column[0])
+        samples_sites_in_table=[]
+        tmp=cursor.fetchall()
+        for item in tmp:
+            line=[x.encode('UTF8') for x in list(item)]
+            samples_sites_in_table.append(line)
+
+        found_sample_site=False
+        for entry in samples_sites_in_table:
+            if entry[0]==sampleID and entry[1]==data_dict['PANDDA_site_index'] and entry[2]==data_dict['PANDDA_site_event_index']:
+                found_sample_site=True
+
+        if found_sample_site:
+            for key in data_dict:
+                value=data_dict[key]
+                if key=='ID' or key=='CrystalName' or key=='PANDDA_site_index' or key=='PANDDA_site_event_index':
+                    continue
+                if not str(value).replace(' ','')=='':  # ignore empty fields
+                    update_string=str(key)+'='+"'"+str(value)+"'"
+#                    print "UPDATE panddaTable SET "+update_string+" WHERE CrystalName="+"'"+sampleID+"' and PANDDA_site_index is '"+data_dict['PANDDA_site_index']+"';"
+                    cursor.execute("UPDATE panddaTable SET "+update_string+" WHERE CrystalName="+"'"+sampleID+"' and PANDDA_site_index is '"+data_dict['PANDDA_site_index']+"' and PANDDA_site_event_index is '"+data_dict['PANDDA_site_event_index']+"';")
+        else:
+            column_string=''
+            value_string=''
+            for key in data_dict:
+                value=data_dict[key]
+                if key=='ID':
+                    continue
+#                if key not in available_columns:
+#                    continue
+                if not str(value).replace(' ','')=='':  # ignore if nothing in csv field
+                    value_string+="'"+str(value)+"'"+','
+                    column_string+=key+','
+            print "INSERT INTO panddaTable ("+column_string[:-1]+") VALUES ("+value_string[:-1]+");"
+            cursor.execute("INSERT INTO panddaTable ("+column_string[:-1]+") VALUES ("+value_string[:-1]+");")
+        connect.commit()
+
 
 
     def update_insert_depositTable(self,sampleID,data_dict):
