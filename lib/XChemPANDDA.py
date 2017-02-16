@@ -132,6 +132,7 @@ class run_pandda_export(QtCore.QThread):
         progress=0
         self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
+        self.Logfile.insert('reading '+os.path.join(self.panddas_directory,'analyses','pandda_inspect_events.csv'))
         with open(os.path.join(self.panddas_directory,'analyses','pandda_inspect_events.csv'),'rb') as csv_import:
             csv_dict = csv.DictReader(csv_import)
 

@@ -4441,7 +4441,10 @@ class XChemExplorer(QtGui.QApplication):
             msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.RejectRole)
             reply = msgBox.exec_();
             if reply == 0:
-                self.update_log.insert('OK, will export ALL models!')
+                if update_datasource_only:
+                    self.update_log.insert('will update panddaTable in database only')
+                else:
+                    self.update_log.insert('will export ALL models!')
                 start_thread=True
             else:
                 start_thread=False
