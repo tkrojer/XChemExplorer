@@ -159,6 +159,7 @@ class run_pandda_export(QtCore.QThread):
                     filename=file[file.rfind('/')+1:]
                     if filename.startswith(sampleID+'-event_'+event_index) and filename.endswith('map.native.ccp4'):
                         event_map=file
+                        self.Logfile.insert('found respective event maps in %s: %s' %(self.initial_model_directory,event_map))
                         break
 
                 # initial pandda model and mtz file
@@ -211,6 +212,8 @@ class run_pandda_export(QtCore.QThread):
                 self.db.execute_statement("update mainTable set DimplePANDDAhit = 'True' where CrystalName is '%s'" %sampleID)
                 progress += progress_step
                 self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+        self.Logfile.insert('done reading pandda_inspect_sites.csv')
 
         # finally find all samples which do not have a pandda hit
         os.chdir(os.path.join(self.panddas_directory,'processed_datasets'))
