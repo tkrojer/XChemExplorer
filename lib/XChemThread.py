@@ -718,6 +718,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                 panddaPATH=entry[6]
                 apoStructures=entry[7]
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'checking %s -> site %s -> event %s ' %(xtal,site_index,event_index))
+                self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+                progress += progress_step
 
                 try:
                     event_x = float(str(entry[3]))
@@ -846,8 +848,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                     self.db.update_site_event_panddaTable(xtal, site_index, event_index, db_pandda_dict)
                     self.Logfile.insert('updating panddaTable for xtal: %s, site: %s' %(xtal,site_index))
 
-                progress += progress_step
-                self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+#                progress += progress_step
+#                self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
 
 
