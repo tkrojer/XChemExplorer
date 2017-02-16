@@ -194,7 +194,7 @@ class run_pandda_export(QtCore.QThread):
                 db_dict['PANDDA_site_y']                =   line['y']
                 db_dict['PANDDA_site_z']                =   line['z']
                 db_dict['PANDDA_site_ligand_id']        =   ''
-                db_dict['PANDDA_site_event_map']        =   ''
+                db_dict['PANDDA_site_event_map']        =   event_map
                 db_dict['PANDDA_site_initial_model']    =   pandda_model
                 db_dict['PANDDA_site_initial_mtz']      =   inital_mtz
                 db_dict['PANDDA_site_spider_plot']      =   ''
