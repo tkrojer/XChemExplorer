@@ -785,6 +785,11 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
                 if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'refine.pdb')):
                     ligands_in_file=pdbtools(os.path.join(self.initial_model_directory,xtal,'refine.pdb')).find_xce_ligand_details()
+                    if ligands_in_file == []:
+                        self.Logfile.warning('%s: could not find any ligands in refine.pdb' %xtal)
+                        continue
+                    else:
+                        self.Logfile.insert('%s: found the following ligands in refine.pdb: %s' %(xtal,str(ligands_in_file)))
 
                     distanceList=[]
                     for ligand in ligands_in_file:
@@ -798,7 +803,11 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                         self.Logfile.insert('%s: calculating distance between event and ligand (%s %s %s): %s' %(xtal,residue_name,residue_chain,residue_number,str(distance)))
 
                     # now take the ligand that is closest to the event
-                    smallestDistance = min(distanceList, key=lambda x: x[0])
+                    try:
+                        smallestDistance = min(distanceList, key=lambda x: x[0])
+                    except ValueError:
+                        self.Logfile.error('could not determine smallest distance between current ligand pandda events')
+                        continue
                     distance =          smallestDistance[0]
                     residue_name =      smallestDistance[1]
                     residue_chain =     smallestDistance[2]
