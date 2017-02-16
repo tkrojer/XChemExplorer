@@ -138,8 +138,8 @@ class run_pandda_export(QtCore.QThread):
             for i,line in enumerate(csv_dict):
                 db_dict={}
                 sampleID=line['dtag']
-                if sampleID == 'JMJD2DA-x393':
-                    print line
+#                if sampleID == 'JMJD2DA-x393':
+#                    print line
                 if sampleID not in pandda_hit_list:
                     pandda_hit_list.append(sampleID)
                 site_index=line['site_idx']
@@ -152,7 +152,7 @@ class run_pandda_export(QtCore.QThread):
                         break
 
                 # check if EVENT map exists in project directory
-                event_map='event_map'
+                event_map=''
                 for file in glob.glob(os.path.join(self.initial_model_directory,sampleID,'*ccp4')):
                     filename=file[file.rfind('/')+1:]
                     if filename.startswith(sampleID+'-event_'+event_index) and filename.endswith('map.native.ccp4'):
@@ -160,7 +160,7 @@ class run_pandda_export(QtCore.QThread):
                         break
 
                 # initial pandda model and mtz file
-                pandda_model='pandda_model'
+                pandda_model=''
                 for file in glob.glob(os.path.join(self.initial_model_directory,sampleID,'*pdb')):
                     filename=file[file.rfind('/')+1:]
                     if filename.endswith('-ensemble-model.pdb'):
@@ -168,7 +168,7 @@ class run_pandda_export(QtCore.QThread):
                         if sampleID not in self.already_exported_models:
                             self.already_exported_models.append(sampleID)
                         break
-                inital_mtz='initial_mtz'
+                inital_mtz=''
                 for file in glob.glob(os.path.join(self.initial_model_directory,sampleID,'*mtz')):
                     filename=file[file.rfind('/')+1:]
                     if filename.endswith('pandda-input.mtz'):
@@ -247,16 +247,18 @@ class run_pandda_export(QtCore.QThread):
         samples_to_export={}
         self.Logfile.insert('checking which PanDDA models were newly created or updated')
         if self.which_models=='all':
-            self.Logfile.insert('ALL available PanDDA models will exported and refined.')
+            self.Logfile.insert('Note: you chose to export ALL available PanDDA!')
 
         for sample in fileModelsDict:
             if self.which_models=='all':
+                self.Logfile.insert('exporting '+sample)
                 samples_to_export[sample]=fileModelsDict[sample]
             else:
                 if sample in dbModelsDict:
                     try:
                         difference=(datetime.strptime(fileModelsDict[sample],'%Y-%m-%d %H:%M:%S') - datetime.strptime(dbModelsDict[sample],'%Y-%m-%d %H:%M:%S')  )
                         if difference.seconds != 0:
+                            self.Logfile.insert('exporting '+sample+' -> was already refined, but newer PanDDA model available')
                             samples_to_export[sample]=fileModelsDict[sample]
                     except ValueError:
                         # this will be raised if timestamp is not properly formatted;
@@ -269,6 +271,7 @@ class run_pandda_export(QtCore.QThread):
                                     'of the respective sample to "2 - PANDDA model", save the database and repeat the export prodedure.'        )
                         self.Logfile.insert(advice)
                 else:
+                    self.Logfile.insert('exporting '+sample+' -> first time to be exported and refined')
                     samples_to_export[sample]=fileModelsDict[sample]
 
         # update the DB:
