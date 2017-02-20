@@ -1,4 +1,4 @@
-# last edited: 16/02/2017, 15:00
+# last edited: 20/02/2017, 15:00
 
 import sqlite3
 import os,sys,glob
@@ -1170,6 +1170,69 @@ class data_source:
             sample_list_for_coot.append(line)
 
         return sample_list_for_coot
+
+
+    def get_todoList_for_coot(self,RefinementOutcome):
+        sample_list_for_coot=[]
+        connect=sqlite3.connect(self.data_source_file)
+        cursor = connect.cursor()
+
+        if RefinementOutcome=='0 - All Datasets':
+            outcome = " not null "
+        else:
+            outcome = " '%s' " %RefinementOutcome
+
+        sqlite = (
+            "select"
+            " CrystalName,"
+            " CompoundCode,"
+            " RefinementCIF,"
+            " RefinementMTZfree,"
+            " RefinementPathToRefinementFolder,"
+            " RefinementOutcome,"
+            " RefinementLigandConfidence "
+            "from mainTable "
+            "where RefinementOutcome is %s;" %outcome
+            )
+
+        cursor.execute(sqlite)
+
+        tmp = cursor.fetchall()
+        for item in tmp:
+            tmpx=[]
+            for i in list(item):
+                if i==None:
+                    tmpx.append('None')
+                else:
+                    tmpx.append(i)
+            line=[x.encode('UTF8') for x in tmpx]
+            sample_list_for_coot.append(line)
+
+        crystalDict={}
+        for entry in sample_list_for_coot:
+            if entry[0] not in crystalDict:
+                sqlite = (  "select"
+                            " PANDDA_site_event_map,"
+                            " PANDDA_site_x,"
+                            " PANDDA_site_y,"
+                            " PANDDA_site_z,"
+                            " PANDDA_site_spider_plot,"
+                            " PANDDA_site_index,"
+                            " PANDDA_site_event_index "
+                            "from panddaTable  "
+                            "where "
+                            " CrystalName is '%s';" %xtalID     )
+                cursor.execute(sqlite)
+                tmp = cursor.fetchall()
+                if tmp != []:
+                    crystalDict[entry[0]]=[]
+                    for item in tmp:
+                        crystalDict[entry[0]].append( [ str(item[0]),str(item[1]),str(item[2]),str(item[3]),str(item[4]),str(item[5]),str(item[6]) ])
+
+        return sample_list_for_coot,crystalDict
+
+
+
 
     def translate_xce_column_list_to_sqlite(self,column_list):
         out_list=[]

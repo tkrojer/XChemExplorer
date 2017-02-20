@@ -79,6 +79,7 @@ class GUI(object):
         self.Refine=None
         self.index = -1
         self.Todo=[]
+        self.siteDict={}
 
         self.xtalID=''
         self.compoundID=''
@@ -173,16 +174,15 @@ class GUI(object):
             self.cb_select_samples.append_text(citeria)
         self.hbox_select_samples.add(self.cb_select_samples)
 
-        self.cb_select_sites = gtk.combo_box_new_text()
-        self.cb_select_sites.connect("changed", self.set_site)
-        for site in self.ligand_site_information:
-            self.cb_select_sites.append_text(str(site[0])+' - '+str(site[1]))
-        self.hbox_select_samples.add(self.cb_select_sites)
- #       self.hbox_select_samples.add(vbox)
+#        self.cb_select_sites = gtk.combo_box_new_text()
+#        self.cb_select_sites.connect("changed", self.set_site)
+#        for site in self.ligand_site_information:
+#            self.cb_select_sites.append_text(str(site[0])+' - '+str(site[1]))
+#        self.hbox_select_samples.add(self.cb_select_sites)
+
         self.select_samples_button = gtk.Button(label="GO")
         self.select_samples_button.connect("clicked",self.get_samples_to_look_at)
         self.hbox_select_samples.add(self.select_samples_button)
-#        self.vbox.pack_start(self.hbox_select_samples)
         frame.add(self.hbox_select_samples)
         self.vbox.pack_start(frame)
 
@@ -438,8 +438,11 @@ class GUI(object):
         self.vbox.add(gtk.Label(' '))
 
         #################################################################################
+        outer_frame = gtk.Frame(label='Sample Navigator')
+        hboxSample=gtk.HBox()
+
         # --- crystal navigator combobox ---
-        frame = gtk.Frame(label='Sample Navigator')
+        frame = gtk.Frame()
         self.vbox_sample_navigator=gtk.VBox()
         self.cb = gtk.combo_box_new_text()
         self.cb.connect("changed", self.ChooseXtal)
@@ -454,7 +457,28 @@ class GUI(object):
         hbox.pack_start(self.NEXTbutton)
         self.vbox_sample_navigator.add(hbox)
         frame.add(self.vbox_sample_navigator)
-        self.vbox.add(frame)
+        hboxSample.add(frame)
+
+        # --- site navigator combobox ---
+        frame = gtk.Frame()
+        self.vbox_site_navigator=gtk.VBox()
+        self.cb_site = gtk.combo_box_new_text()
+        self.cb_site.connect("changed", self.ChooseSite)
+        self.vbox_site_navigator.add(self.cb_site)
+        # --- site navigator backward/forward button ---
+        self.PREVbuttonSite = gtk.Button(label="<<<")
+        self.NEXTbuttonSite = gtk.Button(label=">>>")
+        self.PREVbuttonSite.connect("clicked", self.ChangeSite,-1)
+        self.NEXTbuttonSite.connect("clicked", self.ChangeSite,+1)
+        hbox = gtk.HBox()
+        hbox.pack_start(self.PREVbuttonSite)
+        hbox.pack_start(self.NEXTbuttonSite)
+        self.vbox_site_navigator.add(hbox)
+        frame.add(self.vbox_site_navigator)
+        hboxSample.add(frame)
+
+        outer_frame.add(hboxSample)
+        self.vbox.add(outer_frame)
 
         # SPACER
         self.vbox.add(gtk.Label(' '))
@@ -608,6 +632,10 @@ class GUI(object):
                 self.event_map=''
                 self.spider_plot=''
         self.RefreshData()
+
+    def ChooseSite(self, widget):
+        if self.xtalID in self.siteDict:
+            XXX
 
 
     def update_data_source(self,widget,data=None):              # update and move to next xtal
@@ -924,10 +952,21 @@ class GUI(object):
             for n,item in enumerate(self.Todo):
                 self.cb.remove_text(0)
         self.Todo=[]
-        self.Todo=self.db.get_todo_list_for_coot(self.selection_mode,self.selected_site[0])
+        self.siteDict={}
+        self.Todo,self.siteDict={}=self.db.get_todoList_for_coot(self.selection_mode)
         self.status_label.set_text('found %s samples' %len(self.Todo))
         for item in sorted(self.Todo):
             self.cb.append_text('%s' %item[0])
+        if self.siteDict == {}:
+            self.cb_site.set_sensitive(False)
+            self.PREVbuttonSite.set_sensitive(False)
+            self.NEXTbuttonSite.set_sensitive(False)
+        else:
+            self.cb_site.set_sensitive(True)
+            self.PREVbuttonSite.set_sensitive(True)
+            self.NEXTbuttonSite.set_sensitive(True)
+
+
 
 
 
