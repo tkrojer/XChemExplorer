@@ -1219,18 +1219,21 @@ class remove_selected_dimple_files(QtCore.QThread):
 
 class start_COOT(QtCore.QThread):
 
-    def __init__(self,settings):
+    def __init__(self,settings,interface):
         QtCore.QThread.__init__(self)
         self.settings=settings
-
+        if interface=='old':
+            self.pylib='XChemCoot.py'
+        elif interface=='new':
+            self.pylib='XChemCootNew.py'
 
     def run(self):
         cwd=os.getcwd()
-#        pickle.dump(self.settings,open(os.path.join(cwd,'XChemExplorer_settings.pkl'),'wb'))
-#        os.system('cd %s\ncoot --no-guano --no-state-script --script %s' %(cwd,os.getenv('XChemExplorer_DIR')+'/lib/XChemCoot.py'))
         # coot at Diamond always or sometimes at least open in home directory, so then it won't find the .pkl file
         pickle.dump(self.settings,open(os.path.join(os.getenv('HOME'),'.xce_settings.pkl'),'wb'))
-        os.system('cd %s\ncoot --no-guano --no-state-script --script %s' %(os.getenv('HOME'),os.path.join(os.getenv('XChemExplorer_DIR'),'lib','XChemCoot.py')))
+        os.system('cd %s\ncoot --no-guano --no-state-script --script %s' %(os.getenv('HOME'),os.path.join(os.getenv('XChemExplorer_DIR'),'lib',self.pylib)))
+
+
 
 class start_ICM(QtCore.QThread):
 

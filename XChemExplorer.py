@@ -37,7 +37,7 @@ class XChemExplorer(QtGui.QApplication):
     def __init__(self,args):
         QtGui.QApplication.__init__(self,args)
 
-        self.xce_version='v1.0-beta.3.3'
+        self.xce_version='v1.0-beta.3.4'
 
         # general settings
         self.allowed_unitcell_difference_percent=12
@@ -560,6 +560,7 @@ class XChemExplorer(QtGui.QApplication):
         #
 
         self.refine_file_tasks = [ 'Open COOT',
+                                   'Open COOT - new interface',
                                    'Update Deposition Table',
                                    'Prepare Group Deposition'   ]
 
@@ -4088,12 +4089,17 @@ class XChemExplorer(QtGui.QApplication):
         elif instruction=='check modelled ligands':
             self.compare_modelled_ligands_and_panddaTable()
 
-        elif instruction=="Open COOT":
+        elif instruction.startswith("Open COOT"):
             if not self.coot_running:
                 self.update_log.insert('starting coot...')
-                self.work_thread=XChemThread.start_COOT(self.settings)
+                if instruction=="Open COOT - new interface":
+                    interface='new'
+                else:
+                    interface='old'
+                self.work_thread=XChemThread.start_COOT(self.settings,interface)
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                 self.work_thread.start()
+
 
         elif instruction=='Update Deposition Table':
             self.update_deposition_table()

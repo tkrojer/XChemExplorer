@@ -57,7 +57,8 @@ class GUI(object):
         self.experiment_stage =     [   ['Review PANDDA export',    '2 - PANDDA model',     65000,  0,  0],
                                         ['In Refinement',           '3 - In Refinement',    65000,  0,  0],
                                         ['Comp Chem Ready!',        '4 - CompChem ready',   65000,  0,  0],
-                                        ['Ready for Deposition!',   '5 - Deposition ready', 65000,  0,  0]   ]
+                                        ['Ready for Deposition!',   '5 - Deposition ready', 65000,  0,  0],
+                                        ['In PDB',                  '6 - Deposited',        65000,  0,  0]]
 
         self.ligand_confidence_category = [     '0 - no ligand present',
                                                 '1 - Low Confidence',
@@ -70,7 +71,10 @@ class GUI(object):
 
         # this decides which samples will be looked at
         self.selection_mode = ''
-        self.selected_site=''
+#        self.selected_site=''
+        self.pandda_index=-1     # refers to the number of sites
+        self.site_index='0'
+        self.event_index='0'
 
         # the Folder is kind of a legacy thing because my inital idea was to have separate folders
         # for Data Processing and Refinement
@@ -434,8 +438,55 @@ class GUI(object):
         frame.add(self.hbox_for_info_graphics)
         self.vbox.add(frame)
 
-        # SPACER
-        self.vbox.add(gtk.Label(' '))
+
+
+        #################################################################################
+        # --- pandda.inspect user comments ---
+        outer_frame = gtk.Frame(label='pandda.inspect comments')
+        vbox=gtk.VBox()
+        ligand_site_name_label_frame            = gtk.Frame()
+        ligand_site_name_label                  = gtk.Label('Site Name')
+        ligand_site_name_label_frame.add(ligand_site_name_label)
+        ligand_inspect_confidence_label_frame   = gtk.Frame()
+        ligand_inspect_confidence_label         = gtk.Label('Confidence')
+        ligand_inspect_confidence_label_frame.add(ligand_inspect_confidence_label)
+        ligand_inspect_interesting_label_frame  = gtk.Frame()
+        ligand_inspect_interesting_label        = gtk.Label('Interesting')
+        ligand_inspect_interesting_label_frame.add(ligand_inspect_interesting_label)
+        ligand_inspect_comment_label_frame      = gtk.Frame()
+        ligand_inspect_comment_label            = gtk.Label('Comment')
+        ligand_inspect_comment_label_frame.add(ligand_inspect_comment_label)
+        ligand_site_name_value_frame            = gtk.Frame()
+        self.ligand_site_name_value             = gtk.Label('-')
+        ligand_site_name_value_frame.add(self.ligand_site_name_value)
+        ligand_inspect_confidence_value_frame   = gtk.Frame()
+        self.ligand_inspect_confidence_value    = gtk.Label('-')
+        ligand_inspect_confidence_value_frame.add(self.ligand_inspect_confidence_value)
+        ligand_inspect_interesting_value_frame  = gtk.Frame()
+        self.ligand_inspect_interesting_value   = gtk.Label('-')
+        ligand_inspect_interesting_value_frame.add(self.ligand_inspect_interesting_value)
+        ligand_inspect_comment_value_frame      = gtk.Frame()
+        self.ligand_inspect_comment_value       = gtk.Label('-')
+        ligand_inspect_comment_value_frame.add(self.ligand_inspect_comment_value)
+
+        frame_pandda_inspect_comments_table = gtk.Frame()
+        pandda_inspect_comments_table  = gtk.Table(2, 6, False)
+        pandda_inspect_comments_table.attach(ligand_site_name_label_frame,              0,1,0,1)
+        pandda_inspect_comments_table.attach(ligand_site_name_value_frame,              1,2,0,1)
+        pandda_inspect_comments_table.attach(ligand_inspect_confidence_label_frame,     2,3,0,1)
+        pandda_inspect_comments_table.attach(ligand_inspect_confidence_value_frame,     3,4,0,1)
+        pandda_inspect_comments_table.attach(ligand_inspect_interesting_label_frame,    4,5,0,1)
+        pandda_inspect_comments_table.attach(ligand_inspect_interesting_value_frame,    5,6,0,1)
+        pandda_inspect_comments_table.attach(ligand_inspect_comment_label_frame,        0,1,1,2)
+        pandda_inspect_comments_table.attach(ligand_inspect_comment_value_frame,        1,6,1,2)
+
+        frame_pandda_inspect_comments_table.add(pandda_inspect_comments_table)
+        vbox.add(frame_pandda_inspect_comments_table)
+        outer_frame.add(vbox)
+        self.vbox.pack_start(outer_frame)
+
+#        # SPACER
+#        self.vbox.add(gtk.Label(' '))
 
         #################################################################################
         outer_frame = gtk.Frame(label='Sample Navigator')
@@ -584,58 +635,174 @@ class GUI(object):
         for n,item in enumerate(self.Todo):
             if str(item[0]) == self.xtalID:
                 self.index = n
+        self.merge_ligand_button.set_sensitive(True)
+        self.place_ligand_here_button.set_sensitive(True)
 
+        self.ligand_site_name_value.set_label('-')
+        self.ligand_inspect_confidence_value.set_label('-')
+        self.ligand_inspect_interesting_value.set_label('-')
+        self.ligand_inspect_comment_value.set_label('-')
+
+        self.refresh_site_combobox()
         self.db_dict_mainTable={}
         self.db_dict_panddaTable={}
         if str(self.Todo[self.index][0]) != None:
             self.compoundID=str(self.Todo[self.index][1])
             self.refinement_folder=str(self.Todo[self.index][4])
             self.refinement_outcome=str(self.Todo[self.index][5])
+            self.update_RefinementOutcome_radiobutton()
+        if self.xtalID not in self.siteDict:    # i.e. we are not working with a PanDDA model
             self.ligand_confidence=str(self.Todo[self.index][6])
-            # updating dataset outcome radiobuttons
-            current_stage=0
-            for i,entry in enumerate(self.experiment_stage):
-#                if entry[1]==self.refinement_outcome:                          # use number as identifier, not string since this one might change
-                if entry[1].split()[0] == self.refinement_outcome.split()[0]:
-                    current_stage=i
-                    break
-            for i,button in enumerate(self.experiment_stage_button_list):
-                if i==current_stage:
-                    button.set_active(True)
-                    break
-            # updating ligand confidence radiobuttons
-            current_stage=0
-            for i,entry in enumerate(self.ligand_confidence_category):
-                print '--->',entry,self.ligand_confidence
-#                if entry==self.ligand_confidence:                              # use number as identifier, not string since this one might change
-                try:
-                    if entry.split()[0] == self.ligand_confidence.split()[0]:
-                        current_stage=i
-                        break
-                except IndexError:
-                    pass
-            for i,button in enumerate(self.ligand_confidence_button_list):
-                if i==current_stage:
-                    button.set_active(True)
-                    break
-            if int(self.selected_site[0]) > 0:
-                pandda_info=self.db.get_pandda_info_for_coot(self.xtalID,self.selected_site[0])
-                print 'PANDDA INFO', pandda_info
-                try:
-                    self.event_map=pandda_info[0][0]
-                    coot.set_rotation_centre(float(pandda_info[0][1]),float(pandda_info[0][2]),float(pandda_info[0][3]))
-                    self.spider_plot=pandda_info[0][4]
-                except IndexError:
-                    self.event_map=''
-                    self.spider_plot=''
-            else:
-                self.event_map=''
-                self.spider_plot=''
+            self.update_LigandConfidence_radiobutton()
+
         self.RefreshData()
 
-    def ChooseSite(self, widget):
+
+    def update_RefinementOutcome_radiobutton(self):
+        # updating dataset outcome radiobuttons
+        current_stage=0
+        for i,entry in enumerate(self.experiment_stage):
+            if entry[1].split()[0] == self.refinement_outcome.split()[0]:
+                current_stage=i
+                break
+        for i,button in enumerate(self.experiment_stage_button_list):
+            if i==current_stage:
+                button.set_active(True)
+                break
+
+    def update_LigandConfidence_radiobutton(self):
+        # updating ligand confidence radiobuttons
+        current_stage=0
+        for i,entry in enumerate(self.ligand_confidence_category):
+            print '--->',entry,self.ligand_confidence
+            try:
+                if entry.split()[0] == self.ligand_confidence.split()[0]:
+                    current_stage=i
+                    break
+            except IndexError:
+                pass
+        for i,button in enumerate(self.ligand_confidence_button_list):
+            if i==current_stage:
+                button.set_active(True)
+                break
+
+
+    def refresh_site_combobox(self):
+        # reset self.pandda_index
+        self.pandda_index=-1
+        # clear CB first
+        for n in range(-1,100):
+            self.cb_site.remove_text(n)
+        self.site_index='0'
+        self.event_index='0'
+        # only repopulte if site exists
         if self.xtalID in self.siteDict:
-            XXX
+            for item in sorted(self.siteDict[self.xtalID]):
+                if self.xtalID=='BRD1A-x083': print item
+                self.cb_site.append_text('site: %s - event: %s' %(item[5],item[6]))
+
+    def ChangeSite(self, widget,data=None):
+        if self.xtalID in self.siteDict:
+            self.pandda_index = self.pandda_index + data
+            print 'halloooooooooooooo',self.pandda_index
+            if self.pandda_index < 0:
+                self.pandda_index=0
+            if self.pandda_index >= len(self.siteDict[self.xtalID]):
+                self.pandda_index=0
+            self.cb_site.set_active(self.pandda_index)
+
+    def ChooseSite(self, widget):
+        tmp=str(widget.get_active_text())
+        self.site_index=tmp.split()[1]
+        self.event_index=tmp.split()[4]
+        print 'site',self.site_index,'event',self.event_index
+        for n,item in enumerate(self.siteDict[self.xtalID]):
+            if item[5]==self.site_index and item[6]==self.event_index:
+                self.pandda_index = n
+        self.RefreshSiteData()
+
+    def RefreshSiteData(self):
+
+        if self.pandda_index == -1:
+            self.merge_ligand_button.set_sensitive(True)
+            self.place_ligand_here_button.set_sensitive(True)
+        else:
+            self.merge_ligand_button.set_sensitive(False)
+            self.place_ligand_here_button.set_sensitive(False)
+            # and remove ligand molecule so that there is no temptation to merge it
+            if len(coot_utils_XChem.molecule_number_list()) > 0:
+                for imol in coot_utils_XChem.molecule_number_list():
+                    if self.compoundID+'.pdb' in coot.molecule_name(imol):
+                        coot.close_molecule(imol)
+
+
+        print 'pandda index',self.pandda_index
+        self.spider_plot=self.siteDict[self.xtalID][self.pandda_index][4]
+        print 'new spider plot:',self.spider_plot
+        self.event_map=self.siteDict[self.xtalID][self.pandda_index][0]
+        print 'new event map:',self.event_map
+        self.ligand_confidence=str(self.siteDict[self.xtalID][self.pandda_index][7])
+        self.update_LigandConfidence_radiobutton()
+        site_x=float(self.siteDict[self.xtalID][self.pandda_index][1])
+        site_y=float(self.siteDict[self.xtalID][self.pandda_index][2])
+        site_z=float(self.siteDict[self.xtalID][self.pandda_index][3])
+        print 'new site coordinates:',site_x,site_y,site_z
+        coot.set_rotation_centre(site_x,site_y,site_z)
+
+        self.ligand_site_name_value.set_label(str(self.siteDict[self.xtalID][self.pandda_index][8]))
+        self.ligand_inspect_confidence_value.set_label(str(self.siteDict[self.xtalID][self.pandda_index][9]))
+        self.ligand_inspect_interesting_value.set_label(str(self.siteDict[self.xtalID][self.pandda_index][10]))
+        self.ligand_inspect_comment_value.set_label(str(self.siteDict[self.xtalID][self.pandda_index][11]))
+
+        self.spider_plot_data=self.db.get_db_pandda_dict_for_sample_and_site_and_event(self.xtalID,self.site_index,self.event_index)
+        self.ligandIDValue.set_label(self.spider_plot_data['PANDDA_site_ligand_id'])
+        try:
+            self.ligand_occupancyValue.set_label(           str(round(float(self.spider_plot_data['PANDDA_site_occupancy']),2)) )
+            self.ligand_BaverageValue.set_label(            str(round(float(self.spider_plot_data['PANDDA_site_B_average']),2)) )
+            self.ligand_BratioSurroundingsValue.set_label(  str(round(float(self.spider_plot_data['PANDDA_site_B_ratio_residue_surroundings']),2)) )
+            self.ligand_RSCCValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_RSCC']),2)) )
+            self.ligand_rmsdValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_rmsd']),2)) )
+            self.ligand_RSRValue.set_label(                 str(round(float(self.spider_plot_data['PANDDA_site_RSR']),2)) )
+            self.ligand_RSZDValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_RSZD']),2)) )
+        except ValueError:
+            self.ligand_occupancyValue.set_label('-')
+            self.ligand_BaverageValue.set_label('-')
+            self.ligand_BratioSurroundingsValue.set_label('-')
+            self.ligand_RSCCValue.set_label('-')
+            self.ligand_rmsdValue.set_label('-')
+            self.ligand_RSRValue.set_label('-')
+            self.ligand_RSZDValue.set_label('-')
+
+        #########################################################################################
+        # delete old Event MAPs
+        if len(coot_utils_XChem.molecule_number_list()) > 0:
+            for imol in coot_utils_XChem.molecule_number_list():
+                if 'map.native.ccp4' in coot.molecule_name(imol):
+                    coot.close_molecule(imol)
+
+        #########################################################################################
+        # Spider plot
+        # Note: refinement history was shown instead previously
+        if os.path.isfile(self.spider_plot):
+            spider_plot_pic = gtk.gdk.pixbuf_new_from_file(self.spider_plot)
+        else:
+            spider_plot_pic = gtk.gdk.pixbuf_new_from_file(os.path.join(os.getenv('XChemExplorer_DIR'),'image','NO_SPIDER_PLOT_AVAILABLE.png'))
+        self.spider_plot_pic = spider_plot_pic.scale_simple(190, 190, gtk.gdk.INTERP_BILINEAR)
+        self.spider_plot_image.set_from_pixbuf(self.spider_plot_pic)
+
+        #########################################################################################
+        # check for PANDDAs EVENT maps
+        if os.path.isfile(self.event_map):
+            coot.handle_read_ccp4_map((self.event_map),0)
+            for imol in coot_utils_XChem.molecule_number_list():
+                if self.event_map in coot.molecule_name(imol):
+                    coot.set_contour_level_in_sigma(imol,2)
+#                    coot.set_contour_level_absolute(imol,0.5)
+                    coot.set_last_map_colour(0.4,0,0.4)
+
+
+
+
 
 
     def update_data_source(self,widget,data=None):              # update and move to next xtal
@@ -648,38 +815,44 @@ class GUI(object):
 
 
     def experiment_stage_button_clicked(self,widget, data=None):
-        if self.selected_site[0] == '0':
-            self.db_dict_mainTable['RefinementOutcome']=data
-            print '==> XCE: setting Refinement Outcome for '+self.xtalID+' to '+str(data)+' in mainTable of datasource'
-            self.db.update_data_source(self.xtalID,self.db_dict_mainTable)
-        else:
-            placeholder=False
-            if placeholder:
-#            if int(data.split()[0] >=5:
-                for i,button in enumerate(self.experiment_stage_button_list):
-                    if i==4:
-                        # currently it is not possible to set PanDDA models to deposit, 01/12/2016
-                        # soon one will be able to do so if all sites with good ligand confidence are ready
-                        button.set_active(True)
-                        break
-            else:
-                self.db_dict_panddaTable['RefinementOutcome']=data
-                print '==> XCE: setting Refinement Outcome for '+self.xtalID+' (site='+str(self.selected_site)+') to '+str(data)+' in panddaTable of datasource'
-                self.db.update_panddaTable(self.xtalID,self.selected_site[0],self.db_dict_panddaTable)
+#        if self.selected_site[0] == '0':
+        self.db_dict_mainTable['RefinementOutcome']=data
+        print '==> XCE: setting Refinement Outcome for '+self.xtalID+' to '+str(data)+' in mainTable of datasource'
+        self.db.update_data_source(self.xtalID,self.db_dict_mainTable)
+#        else:
+#            placeholder=False
+#            if placeholder:
+##            if int(data.split()[0] >=5:
+#                for i,button in enumerate(self.experiment_stage_button_list):
+#                    if i==4:
+#                        # currently it is not possible to set PanDDA models to deposit, 01/12/2016
+#                        # soon one will be able to do so if all sites with good ligand confidence are ready
+#                        button.set_active(True)
+#                        break
+#            else:
+#                self.db_dict_panddaTable['RefinementOutcome']=data
+#                print '==> XCE: setting Refinement Outcome for '+self.xtalID+' (site='+str(self.selected_site)+') to '+str(data)+' in panddaTable of datasource'
+#                self.db.update_panddaTable(self.xtalID,self.selected_site[0],self.db_dict_panddaTable)
 
     def ligand_confidence_button_clicked(self,widget,data=None):
-        if self.selected_site[0] == '0':
+        print 'PANDDA_index',self.pandda_index
+        if self.pandda_index == -1:
             self.db_dict_mainTable['RefinementLigandConfidence']=data
             print '==> XCE: setting Ligand Confidence for '+self.xtalID+' to '+str(data)+' in mainTable of datasource'
             self.db.update_data_source(self.xtalID,self.db_dict_mainTable)
             self.Todo[self.index][6]=data
         else:
             self.db_dict_panddaTable['PANDDA_site_confidence']=data
-            print '==> XCE: setting Ligand Confidence for '+self.xtalID+' (site='+str(self.selected_site)+') to '+str(data)+' in panddaTable of datasource'
-            self.db.update_panddaTable(self.xtalID,self.selected_site[0],self.db_dict_panddaTable)
-            self.Todo[self.index][6]=data
+            print '==> XCE: setting Ligand Confidence for '+self.xtalID+' (site='+str(self.site_index)+', event='+str(self.event_index)+') to '+str(data)+' in panddaTable of datasource'
+            self.db.update_site_event_panddaTable(self.xtalID,self.site_index,self.event_index,self.db_dict_panddaTable)
+            self.siteDict[self.xtalID][self.pandda_index][7]=data
 
     def RefreshData(self):
+        # reset spider plot image
+        spider_plot_pic = gtk.gdk.pixbuf_new_from_file(os.path.join(os.getenv('XChemExplorer_DIR'),'image','NO_SPIDER_PLOT_AVAILABLE.png'))
+        self.spider_plot_pic = spider_plot_pic.scale_simple(190, 190, gtk.gdk.INTERP_BILINEAR)
+        self.spider_plot_image.set_from_pixbuf(self.spider_plot_pic)
+
         # initialize Refinement library
         self.Refine=XChemRefine.Refine(self.project_directory,self.xtalID,self.compoundID,self.data_source)
         self.Serial=self.Refine.GetSerial()
@@ -696,26 +869,6 @@ class GUI(object):
 
         # all this information is now updated in the datasource after each refinement cycle
         self.QualityIndicators=self.db.get_db_dict_for_sample(self.xtalID)
-        if int(self.selected_site[0]) > 0:
-            self.spider_plot_data=self.db.get_db_pandda_dict_for_sample_and_site(self.xtalID,self.selected_site[0])
-            self.ligandIDValue.set_label(self.spider_plot_data['PANDDA_site_ligand_id'])
-            try:
-                self.ligand_occupancyValue.set_label(           str(round(float(self.spider_plot_data['PANDDA_site_occupancy']),2)) )
-                self.ligand_BaverageValue.set_label(            str(round(float(self.spider_plot_data['PANDDA_site_B_average']),2)) )
-                self.ligand_BratioSurroundingsValue.set_label(  str(round(float(self.spider_plot_data['PANDDA_site_B_ratio_residue_surroundings']),2)) )
-                self.ligand_RSCCValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_RSCC']),2)) )
-                self.ligand_rmsdValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_rmsd']),2)) )
-                self.ligand_RSRValue.set_label(                 str(round(float(self.spider_plot_data['PANDDA_site_RSR']),2)) )
-                self.ligand_RSZDValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_RSZD']),2)) )
-            except ValueError:
-                self.ligand_occupancyValue.set_label('-')
-                self.ligand_BaverageValue.set_label('-')
-                self.ligand_BratioSurroundingsValue.set_label('-')
-                self.ligand_RSCCValue.set_label('-')
-                self.ligand_rmsdValue.set_label('-')
-                self.ligand_RSRValue.set_label('-')
-                self.ligand_RSZDValue.set_label('-')
-
 
         #########################################################################################
         # history
@@ -730,16 +883,6 @@ class GUI(object):
 #        self.canvas.set_size_request(190, 190)
 #        self.hbox_for_info_graphics.add(self.canvas)
 #        self.canvas.show()
-
-        #########################################################################################
-        # Spider plot
-        # Note: refinement history was shown instead previously
-        if os.path.isfile(self.spider_plot):
-            spider_plot_pic = gtk.gdk.pixbuf_new_from_file(self.spider_plot)
-        else:
-            spider_plot_pic = gtk.gdk.pixbuf_new_from_file(os.path.join(os.getenv('XChemExplorer_DIR'),'image','NO_SPIDER_PLOT_AVAILABLE.png'))
-        self.spider_plot_pic = spider_plot_pic.scale_simple(190, 190, gtk.gdk.INTERP_BILINEAR)
-        self.spider_plot_image.set_from_pixbuf(self.spider_plot_pic)
 
         #########################################################################################
         # update pdb & maps
@@ -809,15 +952,6 @@ class GUI(object):
             elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.mtz')):
                 coot.auto_read_make_and_draw_maps(os.path.join(self.project_directory,self.xtalID,'dimple.mtz'))
 
-        #########################################################################################
-        # check for PANDDAs EVENT maps
-        if os.path.isfile(self.event_map):
-            coot.handle_read_ccp4_map((self.event_map),0)
-            for imol in coot_utils_XChem.molecule_number_list():
-                if self.event_map in coot.molecule_name(imol):
-                    coot.set_contour_level_in_sigma(imol,2)
-#                    coot.set_contour_level_absolute(imol,0.5)
-                    coot.set_last_map_colour(0.4,0,0.4)
 
 
 #        #########################################################################################
@@ -924,28 +1058,28 @@ class GUI(object):
     def set_selection_mode(self,widget):
         self.selection_mode=widget.get_active_text()
 
-    def set_site(self,widget):
-        for site in self.ligand_site_information:
-            if str(site[0])=='0':
-                self.merge_ligand_button.set_sensitive(True)
-                self.place_ligand_here_button.set_sensitive(True)
-            else:
-                self.merge_ligand_button.set_sensitive(False)
-                self.place_ligand_here_button.set_sensitive(False)
-            if str(site[0])==str(widget.get_active_text()).split()[0]:
-                self.selected_site=site
-                break
+#    def set_site(self,widget):
+#        for site in self.ligand_site_information:
+#            if str(site[0])=='0':
+#                self.merge_ligand_button.set_sensitive(True)
+#                self.place_ligand_here_button.set_sensitive(True)
+#            else:
+#                self.merge_ligand_button.set_sensitive(False)
+#                self.place_ligand_here_button.set_sensitive(False)
+#            if str(site[0])==str(widget.get_active_text()).split()[0]:
+#                self.selected_site=site
+#                break
 
     def get_samples_to_look_at(self,widget):
-        if self.selection_mode=='' and self.selected_site=='':
-            self.status_label.set_text('select model stage and site')
-            return
+#        if self.selection_mode=='' and self.selected_site=='':
+#            self.status_label.set_text('select model stage and site')
+#            return
         if self.selection_mode=='':
-            self.status_label.set_text('select model stage (left field)')
+            self.status_label.set_text('select model stage')
             return
-        if self.selected_site=='':
-            self.status_label.set_text('select site (right field)')
-            return
+#        if self.selected_site=='':
+#            self.status_label.set_text('select site (right field)')
+#            return
         self.status_label.set_text('checking datasource for samples... ')
         # first remove old samples if present
         if len(self.Todo) != 0:
@@ -953,8 +1087,9 @@ class GUI(object):
                 self.cb.remove_text(0)
         self.Todo=[]
         self.siteDict={}
-        self.Todo,self.siteDict={}=self.db.get_todoList_for_coot(self.selection_mode)
+        self.Todo,self.siteDict=self.db.get_todoList_for_coot(self.selection_mode)
         self.status_label.set_text('found %s samples' %len(self.Todo))
+        # refresh sample CB
         for item in sorted(self.Todo):
             self.cb.append_text('%s' %item[0])
         if self.siteDict == {}:

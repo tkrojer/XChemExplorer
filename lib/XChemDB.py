@@ -211,6 +211,7 @@ class data_source:
             ['PANDDA_site_event_index',                     'PANDDA_site_event_index',                  'TEXT'],
             ['PANDDA_site_event_comment',                   'PANDDA_site_event_comment',                'TEXT'],
             ['PANDDA_site_confidence',                      'PANDDA_site_confidence',                   'TEXT'],
+            ['PANDDA_site_InspectConfidence',               'PANDDA_site_InspectConfidence',            'TEXT'],
             ['PANDDA_site_ligand_placed',                   'PANDDA_site_ligand_placed',                'TEXT'],
             ['PANDDA_site_viewed',                          'PANDDA_site_viewed',                       'TEXT'],
             ['PANDDA_site_interesting',                     'PANDDA_site_interesting',                  'TEXT'],
@@ -556,6 +557,21 @@ class data_source:
         for column in cursor.description:
             header.append(column[0])
         data = cursor.fetchall()
+        for n,item in enumerate(data[0]):
+            db_dict[header[n]]=str(item)
+        return db_dict
+
+    def get_db_pandda_dict_for_sample_and_site_and_event(self,sampleID,site_index,event_index):
+        db_dict={}
+        header=[]
+        data=[]
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+        cursor.execute("select * from panddaTable where CrystalName='%s' and PANDDA_site_index='%s' and PANDDA_site_event_index='%s' and PANDDA_site_ligand_placed='True';" %(sampleID,site_index,event_index))
+        for column in cursor.description:
+            header.append(column[0])
+        data = cursor.fetchall()
+        print 'data',data
         for n,item in enumerate(data[0]):
             db_dict[header[n]]=str(item)
         return db_dict
@@ -1218,16 +1234,22 @@ class data_source:
                             " PANDDA_site_z,"
                             " PANDDA_site_spider_plot,"
                             " PANDDA_site_index,"
-                            " PANDDA_site_event_index "
+                            " PANDDA_site_event_index,"
+                            " PANDDA_site_confidence,"
+                            " PANDDA_site_name,"
+                            " PANDDA_site_InspectConfidence,"
+                            " PANDDA_site_interesting,"
+                            " PANDDA_site_comment "
                             "from panddaTable  "
                             "where "
-                            " CrystalName is '%s';" %xtalID     )
+                            " CrystalName is '%s' and PANDDA_site_ligand_placed is 'True';" %entry[0]     )
                 cursor.execute(sqlite)
                 tmp = cursor.fetchall()
                 if tmp != []:
                     crystalDict[entry[0]]=[]
                     for item in tmp:
-                        crystalDict[entry[0]].append( [ str(item[0]),str(item[1]),str(item[2]),str(item[3]),str(item[4]),str(item[5]),str(item[6]) ])
+                        print [entry[0], str(item[0]),str(item[1]),str(item[2]),str(item[3]),str(item[4]),str(item[5]),str(item[6]),str(item[7]),str(item[8]),str(item[9]),str(item[10]),str(item[11]) ]
+                        crystalDict[entry[0]].append( [ str(item[0]),str(item[1]),str(item[2]),str(item[3]),str(item[4]),str(item[5]),str(item[6]),str(item[7]),str(item[8]),str(item[9]),str(item[10]),str(item[11]) ])
 
         return sample_list_for_coot,crystalDict
 

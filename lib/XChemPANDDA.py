@@ -178,26 +178,27 @@ class run_pandda_export(QtCore.QThread):
                         inital_mtz=file
                         break
 
-                db_dict['CrystalName']                  =   sampleID
-                db_dict['PANDDApath']                   =   self.panddas_directory
-                db_dict['PANDDA_site_index']            =   site_index
-                db_dict['PANDDA_site_name']             =   site_name
-                db_dict['PANDDA_site_comment']          =   site_comment
-                db_dict['PANDDA_site_event_index']      =   event_index
-                db_dict['PANDDA_site_event_comment']    =   line['Comment'].replace("'","")
-                db_dict['PANDDA_site_confidence']       =   line['Ligand Confidence']
-                db_dict['PANDDA_site_ligand_placed']    =   line['Ligand Placed']
-                db_dict['PANDDA_site_viewed']           =   line['Viewed']
-                db_dict['PANDDA_site_interesting']      =   line['Interesting']
-                db_dict['PANDDA_site_z_peak']           =   line['z_peak']
-                db_dict['PANDDA_site_x']                =   line['x']
-                db_dict['PANDDA_site_y']                =   line['y']
-                db_dict['PANDDA_site_z']                =   line['z']
-                db_dict['PANDDA_site_ligand_id']        =   ''
-                db_dict['PANDDA_site_event_map']        =   event_map
-                db_dict['PANDDA_site_initial_model']    =   pandda_model
-                db_dict['PANDDA_site_initial_mtz']      =   inital_mtz
-                db_dict['PANDDA_site_spider_plot']      =   ''
+                db_dict['CrystalName']                      =   sampleID
+                db_dict['PANDDApath']                       =   self.panddas_directory
+                db_dict['PANDDA_site_index']                =   site_index
+                db_dict['PANDDA_site_name']                 =   site_name
+                db_dict['PANDDA_site_comment']              =   site_comment
+                db_dict['PANDDA_site_event_index']          =   event_index
+                db_dict['PANDDA_site_event_comment']        =   line['Comment'].replace("'","")
+                db_dict['PANDDA_site_confidence']           =   line['Ligand Confidence']
+                db_dict['PANDDA_site_InspectConfidence']    =   line['Ligand Confidence']
+                db_dict['PANDDA_site_ligand_placed']        =   line['Ligand Placed']
+                db_dict['PANDDA_site_viewed']               =   line['Viewed']
+                db_dict['PANDDA_site_interesting']          =   line['Interesting']
+                db_dict['PANDDA_site_z_peak']               =   line['z_peak']
+                db_dict['PANDDA_site_x']                    =   line['x']
+                db_dict['PANDDA_site_y']                    =   line['y']
+                db_dict['PANDDA_site_z']                    =   line['z']
+                db_dict['PANDDA_site_ligand_id']            =   ''
+                db_dict['PANDDA_site_event_map']            =   event_map
+                db_dict['PANDDA_site_initial_model']        =   pandda_model
+                db_dict['PANDDA_site_initial_mtz']          =   inital_mtz
+                db_dict['PANDDA_site_spider_plot']          =   ''
 #                db_dict['RefinementOutcome']            =   '2 - PANDDA model'
 
                 # find apo structures which were used
