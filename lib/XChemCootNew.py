@@ -1,4 +1,4 @@
-# last edited: 20/02/2017 - 15:00
+# last edited: 21/02/2017 - 15:00
 
 import gobject
 import sys
@@ -695,7 +695,7 @@ class GUI(object):
             self.cb_site.remove_text(n)
         self.site_index='0'
         self.event_index='0'
-        # only repopulte if site exists
+        # only repopulate if site exists
         if self.xtalID in self.siteDict:
             for item in sorted(self.siteDict[self.xtalID]):
                 if self.xtalID=='BRD1A-x083': print item
