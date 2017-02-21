@@ -1,4 +1,4 @@
-# last edited: 20/02/2017, 15:00
+# last edited: 21/02/2017, 15:00
 
 import os, sys, glob
 from PyQt4 import QtGui, QtCore
@@ -52,6 +52,7 @@ class run_xia2(QtCore.QThread):
 #                script += 'module load phenix\n'
                 script += 'module load ccp4\n'
                 script += 'module load XDS\n'
+                script += 'module load ccp4 xia2\n'
 
             if self.spg == []:
                 spg_option=''
