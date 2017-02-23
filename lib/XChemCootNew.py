@@ -1,4 +1,4 @@
-# last edited: 21/02/2017 - 15:00
+# last edited: 23/02/2017 - 15:00
 
 import gobject
 import sys
@@ -690,21 +690,19 @@ class GUI(object):
     def refresh_site_combobox(self):
         # reset self.pandda_index
         self.pandda_index=-1
-        # clear CB first
+        # clear CB first, 100 is sort of arbitrary since it's unlikely there will ever be 100 sites
         for n in range(-1,100):
-            self.cb_site.remove_text(n)
+            self.cb_site.remove_text(0)
         self.site_index='0'
         self.event_index='0'
         # only repopulate if site exists
         if self.xtalID in self.siteDict:
             for item in sorted(self.siteDict[self.xtalID]):
-                if self.xtalID=='BRD1A-x083': print item
                 self.cb_site.append_text('site: %s - event: %s' %(item[5],item[6]))
 
     def ChangeSite(self, widget,data=None):
         if self.xtalID in self.siteDict:
             self.pandda_index = self.pandda_index + data
-            print 'halloooooooooooooo',self.pandda_index
             if self.pandda_index < 0:
                 self.pandda_index=0
             if self.pandda_index >= len(self.siteDict[self.xtalID]):
@@ -715,7 +713,6 @@ class GUI(object):
         tmp=str(widget.get_active_text())
         self.site_index=tmp.split()[1]
         self.event_index=tmp.split()[4]
-        print 'site',self.site_index,'event',self.event_index
         for n,item in enumerate(self.siteDict[self.xtalID]):
             if item[5]==self.site_index and item[6]==self.event_index:
                 self.pandda_index = n
@@ -802,37 +799,11 @@ class GUI(object):
 
 
 
-
-
-
-    def update_data_source(self,widget,data=None):              # update and move to next xtal
-#        outcome_dict={'RefinementOutcome': data}
-#        self.db.update_data_source(self.xtalID,outcome_dict)
-        self.index+=1
-        if self.index >= len(self.Todo):
-            self.index = len(self.Todo)
-        self.cb.set_active(self.index)
-
-
     def experiment_stage_button_clicked(self,widget, data=None):
-#        if self.selected_site[0] == '0':
         self.db_dict_mainTable['RefinementOutcome']=data
         print '==> XCE: setting Refinement Outcome for '+self.xtalID+' to '+str(data)+' in mainTable of datasource'
         self.db.update_data_source(self.xtalID,self.db_dict_mainTable)
-#        else:
-#            placeholder=False
-#            if placeholder:
-##            if int(data.split()[0] >=5:
-#                for i,button in enumerate(self.experiment_stage_button_list):
-#                    if i==4:
-#                        # currently it is not possible to set PanDDA models to deposit, 01/12/2016
-#                        # soon one will be able to do so if all sites with good ligand confidence are ready
-#                        button.set_active(True)
-#                        break
-#            else:
-#                self.db_dict_panddaTable['RefinementOutcome']=data
-#                print '==> XCE: setting Refinement Outcome for '+self.xtalID+' (site='+str(self.selected_site)+') to '+str(data)+' in panddaTable of datasource'
-#                self.db.update_panddaTable(self.xtalID,self.selected_site[0],self.db_dict_panddaTable)
+
 
     def ligand_confidence_button_clicked(self,widget,data=None):
         print 'PANDDA_index',self.pandda_index
@@ -952,18 +923,6 @@ class GUI(object):
             elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.mtz')):
                 coot.auto_read_make_and_draw_maps(os.path.join(self.project_directory,self.xtalID,'dimple.mtz'))
 
-
-
-#        #########################################################################################
-#        # update Ligand Confidence combobox
-#        if str(self.ligand_confidence_of_sample)=='None':
-#            self.ligand_confidence_of_sample='Analysis Pending'
-#            db_dict={'RefinementLigandConfidence': self.ligand_confidence_of_sample}
-##            self.db.update_data_source(self.xtalID,db_dict)
-#        for n,criteria in enumerate(self.ligand_confidence):
-#            if criteria.replace('Ligand Confidence: ','')==self.ligand_confidence_of_sample:
-#                self.cb_ligand_confidence.set_active(n)
-
         #########################################################################################
         # update Quality Indicator table
         try:
@@ -1058,28 +1017,11 @@ class GUI(object):
     def set_selection_mode(self,widget):
         self.selection_mode=widget.get_active_text()
 
-#    def set_site(self,widget):
-#        for site in self.ligand_site_information:
-#            if str(site[0])=='0':
-#                self.merge_ligand_button.set_sensitive(True)
-#                self.place_ligand_here_button.set_sensitive(True)
-#            else:
-#                self.merge_ligand_button.set_sensitive(False)
-#                self.place_ligand_here_button.set_sensitive(False)
-#            if str(site[0])==str(widget.get_active_text()).split()[0]:
-#                self.selected_site=site
-#                break
 
     def get_samples_to_look_at(self,widget):
-#        if self.selection_mode=='' and self.selected_site=='':
-#            self.status_label.set_text('select model stage and site')
-#            return
         if self.selection_mode=='':
             self.status_label.set_text('select model stage')
             return
-#        if self.selected_site=='':
-#            self.status_label.set_text('select site (right field)')
-#            return
         self.status_label.set_text('checking datasource for samples... ')
         # first remove old samples if present
         if len(self.Todo) != 0:
