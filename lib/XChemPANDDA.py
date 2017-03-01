@@ -977,6 +977,35 @@ class convert_event_map_to_SF:
         os.system('/bin/rm '+self.ligand_pdb)
 
 
+class run_pandda_inspect_at_home(QtCore.QThread):
+
+    def __init__(self,panddaDir,xce_logfile):
+        QtCore.QThread.__init__(self)
+        self.panddaDir=panddaDir
+        self.Logfile=XChemLog.updateLog(xce_logfile)
+
+    def run(self):
+        os.chdir(os.path.join(self.panddaDir,'processed_datasets'))
+
+        progress_step=1
+        if len(glob.glob('*')) != 0:
+            progress_step=100/float(len(glob.glob('*')))
+        else:
+            progress_step=1
+        progress=0
+        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+
+        self.Logfile.insert('parsing '+self.panddaDir)
+        for xtal in sorted(glob.glob('*')):
+            for files in glob.glob('ligand_files/*')
+                print files
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+        self.emit(QtCore.SIGNAL('show_run_pandda_inspect_at_home_instructions'))
+
+
 class check_number_of_modelled_ligands(QtCore.QThread):
 
     def __init__(self,project_directory,xce_logfile,db_file):

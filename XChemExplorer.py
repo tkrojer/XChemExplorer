@@ -4059,8 +4059,7 @@ class XChemExplorer(QtGui.QApplication):
             self.run_pandda_inspect()
 
         elif instruction=='run pandda.inspect at home':
-            self.status_bar.showMessage('Please check terminal output for more information')
-            XChemToolTips.run_pandda_inspect_at_home(self.panddas_directory)
+            self.run_pandda_inspect_at_home()
 
         elif instruction=='Export NEW PANDDA models':
             update_datasource_only=False
@@ -4406,6 +4405,20 @@ class XChemExplorer(QtGui.QApplication):
         self.work_thread=XChemThread.start_pandda_inspect(self.settings,self.xce_logfile)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
+
+    def run_pandda_inspect_at_home(self):
+        self.work_thread=XChemPANDDA.run_pandda_inspect_at_home(self.panddas_directory,self.xce_logfile)
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.work_thread.start()
+        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.connect(self.work_thread, QtCore.SIGNAL("show_run_pandda_inspect_at_home_instructions"))
+
+    def show_run_pandda_inspect_at_home_instructions(self):
+        self.status_bar.showMessage('Please check terminal output for more information')
+        XChemToolTips.run_pandda_inspect_at_home(self.panddas_directory)
+
 
     def convert_event_maps_to_SF(self):
         self.update_log.insert('converting all event maps in %s to mtz files' %self.initial_model_directory)
