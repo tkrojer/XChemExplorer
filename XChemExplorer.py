@@ -4413,7 +4413,7 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-        self.connect(self.work_thread, QtCore.SIGNAL("show_run_pandda_inspect_at_home_instructions"))
+#        self.connect(self.work_thread, QtCore.SIGNAL("show_run_pandda_inspect_at_home_instructions"))
 
     def show_run_pandda_inspect_at_home_instructions(self):
         self.status_bar.showMessage('Please check terminal output for more information')
