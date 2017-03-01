@@ -1006,7 +1006,7 @@ class run_pandda_inspect_at_home(QtCore.QThread):
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
-#        self.emit(QtCore.SIGNAL('show_run_pandda_inspect_at_home_instructions'))
+        self.emit(QtCore.SIGNAL('show_run_pandda_inspect_at_home_instructions'))
 
 
 class check_number_of_modelled_ligands(QtCore.QThread):
