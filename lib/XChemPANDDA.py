@@ -1,4 +1,4 @@
-# last edited: 21/02/2017, 15:00
+# last edited: 01/03/2017, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -1000,8 +1000,8 @@ class run_pandda_inspect_at_home(QtCore.QThread):
         self.Logfile.insert('parsing '+self.panddaDir)
         for xtal in sorted(glob.glob('*')):
             for files in glob.glob(xtal+'/ligand_files/*'):
-                print xtal
                 if os.path.islink(files):
+                    self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'replacing symlink for %s with real file' %files)
                     self.Logfile.insert('replacing symlink for %s with real file' %files)
                     os.system('cp --remove-destination %s %s/ligand_files' %(os.path.realpath(files),xtal))
             progress += progress_step
