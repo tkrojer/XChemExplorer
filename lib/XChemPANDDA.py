@@ -1007,7 +1007,7 @@ class run_pandda_inspect_at_home(QtCore.QThread):
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
-        self.Logfile.insert(XChemToolTips.run_pandda_inspect_at_home(self.panddaDir))
+        XChemToolTips.run_pandda_inspect_at_home(self.panddaDir)
 
 
 
