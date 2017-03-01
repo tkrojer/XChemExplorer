@@ -1001,7 +1001,7 @@ class run_pandda_inspect_at_home(QtCore.QThread):
             for files in glob.glob(xtal+'/ligand_files/*'):
                 print xtal
                 if os.path.islink(files):
-                    print os.path.realpath(files)
+                    print 'cp --remove-destination %s %s/ligand_files' %(os.path.realpath(files),files)
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
