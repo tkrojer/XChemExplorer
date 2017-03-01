@@ -18,7 +18,7 @@ def relink_interesting_datasets():
 def check_interesting_datasets(panddaDir):
 
     os.chdir(os.path.join(panddaDir,'interesting_datasets'))
-    for xtal in glob.glob('*'):
+    for xtal in sorted(glob.glob('*')):
         if not os.path.islink(xtal):
 #            print xtal
 #            print os.path.join(panddaDir,'interesting_datasets',xtal,'modelled_structures',xtal+'-pandda-model.pdb')
