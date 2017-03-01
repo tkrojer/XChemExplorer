@@ -4,7 +4,7 @@ XChemExplorer (XCE) is a data management and workflow tool for the parallel dete
 
 # Version
 
-A pre-release is currently available for download (v1.0-beta.2). 
+A pre-release is currently available for download (v1.0-beta.3.4). 
 
 # Mailing List
 
@@ -36,7 +36,8 @@ ftp://ftp.sgc.ox.ac.uk/pub/tkrojer/XChemExplorer/Export_HTML_summary.pdf
 
 * 12/10/2016 - pre-release v1.0-beta.1
 * 13/12/2016 - pre-release v1.0-beta.2
-* 13/01/2016 - pre-release v1.0-beta.3
+* 13/01/2017 - pre-release v1.0-beta.3
+* 01/03/2017 - pre-release v1.0-beta.3.4
 
 # Contact
 
