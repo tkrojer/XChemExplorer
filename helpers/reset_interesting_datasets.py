@@ -20,10 +20,13 @@ def check_interesting_datasets(panddaDir):
     os.chdir(os.path.join(panddaDir,'interesting_datasets'))
     for xtal in glob.glob('*'):
         if not os.path.islink(xtal):
-            print xtal
-            print os.path.join(panddaDir,'interesting_datasets',xtal,'modelled_structures',xtal+'-pandda-model.pdb')
+#            print xtal
+#            print os.path.join(panddaDir,'interesting_datasets',xtal,'modelled_structures',xtal+'-pandda-model.pdb')
             if os.path.isfile(os.path.join(panddaDir,'interesting_datasets',xtal,'modelled_structures',xtal+'-pandda-model.pdb')):
-                print 'found pdb file',xtal+'-pandda-model.pdb'
+                print 'mv %s %s' %(os.path.join(panddaDir,'interesting_datasets',xtal,'modelled_structures'),os.path.join(panddaDir,'processed_datasets',xtal))
+                print 'cp %s %s' %(os.path.join(panddaDir,'interesting_datasets',xtal,'*params'),os.path.join(panddaDir,'processed_datasets',xtal))
+
+
 
 
 if __name__=='__main__':
