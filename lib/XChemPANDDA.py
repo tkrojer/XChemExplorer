@@ -999,7 +999,9 @@ class run_pandda_inspect_at_home(QtCore.QThread):
         self.Logfile.insert('parsing '+self.panddaDir)
         for xtal in sorted(glob.glob('*')):
             for files in glob.glob(xtal+'/ligand_files/*'):
-                print files
+                print xtal
+                if os.path.islink(files):
+                    print os.path.realpath(files)
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
