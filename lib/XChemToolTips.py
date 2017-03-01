@@ -1,4 +1,4 @@
-# last edited: 23/02/2017, 17:00
+# last edited: 01/03/2017, 17:00
 
 import os
 import getpass
@@ -127,9 +127,9 @@ def run_pandda_inspect_at_home(pandda_directory):
                         'Be sure to have pandda installed at home, and go to a clean subdirectory.\n'
                         'From that directory, do the steps below.\n'
                         'This moves the relevant files to your site so you can do the model building locally, and then moves the files back to Diamond.\n'
-                        '1.	run:  rsync -alv %s@nx.diamond.ac.uk:%s .\n' %(getpass.getuser(),pandda_directory)+
+                        '1.	run:  rsync -av %s@nx.diamond.ac.uk:%s .\n' %(getpass.getuser(),pandda_directory)+
                         '2.	run: "pandda.inspect", and build all relevant models, etc.\n'
-                        '3.	run:  rsync -alv * %s@nx.diamond.ac.uk:%s\n' %(getpass.getuser(),pandda_directory)+
+                        '3.	run:  rsync -av * %s@nx.diamond.ac.uk:%s\n' %(getpass.getuser(),pandda_directory)+
                         'Now proceed within XChemExplorer as before.\n' )
 
     print instruction
