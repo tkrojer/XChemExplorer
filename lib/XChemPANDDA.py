@@ -1003,7 +1003,7 @@ class run_pandda_inspect_at_home(QtCore.QThread):
                 print xtal
                 if os.path.islink(files):
                     self.Logfile.insert('replacing symlink for %s with real file' %files)
-                    print 'cp --remove-destination %s %s/ligand_files' %(os.path.realpath(files),xtal)
+                    os.system('cp --remove-destination %s %s/ligand_files' %(os.path.realpath(files),xtal))
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
