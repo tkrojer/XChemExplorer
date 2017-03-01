@@ -9,6 +9,7 @@ import XChemDB
 import XChemRefine
 import XChemUtils
 import XChemLog
+import XChemToolTips
 import csv
 
 def get_names_of_current_clusters(xce_logfile,panddas_directory):
@@ -1006,7 +1007,8 @@ class run_pandda_inspect_at_home(QtCore.QThread):
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
-        self.emit(QtCore.SIGNAL('show_run_pandda_inspect_at_home_instructions'))
+        self.update_log.insert(XChemToolTips.run_pandda_inspect_at_home(self.panddaDir))
+
 
 
 class check_number_of_modelled_ligands(QtCore.QThread):
