@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # last edited: 01/03/2017, 15:00
 
 import os,sys
@@ -25,4 +26,3 @@ def check_interesting_datasets(panddaDir):
 if __name__=='__main__':
     panddaDir=sys.argv[1]
     check_interesting_datasets(panddaDir)
-    
