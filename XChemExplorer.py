@@ -4417,7 +4417,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def show_run_pandda_inspect_at_home_instructions(self):
         self.status_bar.showMessage('Please check terminal output for more information')
-        XChemToolTips.run_pandda_inspect_at_home(self.panddas_directory)
+        self.update_log.insert(XChemToolTips.run_pandda_inspect_at_home(self.panddas_directory))
 
 
     def convert_event_maps_to_SF(self):
