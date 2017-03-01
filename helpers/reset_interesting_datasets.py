@@ -12,9 +12,9 @@ def relink_interesting_datasets(panddaDir):
 
     for dirs in dirList:
         print '/bin/rm -fr %s' %dirs
-#        os.system('/bin/rm -fr %s' %dirs)
+        os.system('/bin/rm -fr %s' %dirs)
         print 'ln -s ../processed_datasets/%s .' %dirs
-#        os.system('ln -s ../processed_datasets/%s .' %dirs)
+        os.system('ln -s ../processed_datasets/%s .' %dirs)
 
 def check_interesting_datasets(panddaDir):
 
@@ -25,7 +25,9 @@ def check_interesting_datasets(panddaDir):
 #            print os.path.join(panddaDir,'interesting_datasets',xtal,'modelled_structures',xtal+'-pandda-model.pdb')
             if os.path.isfile(os.path.join(panddaDir,'interesting_datasets',xtal,'modelled_structures',xtal+'-pandda-model.pdb')):
                 print 'mv --backup=numbered %s %s' %(os.path.join(panddaDir,'interesting_datasets',xtal,'modelled_structures'),os.path.join(panddaDir,'processed_datasets',xtal))
+                os.system('mv --backup=numbered %s %s' %(os.path.join(panddaDir,'interesting_datasets',xtal,'modelled_structures'),os.path.join(panddaDir,'processed_datasets',xtal)))
                 print 'cp %s %s' %(os.path.join(panddaDir,'interesting_datasets',xtal,'*params'),os.path.join(panddaDir,'processed_datasets',xtal))
+                os.system('cp %s %s' %(os.path.join(panddaDir,'interesting_datasets',xtal,'*params'),os.path.join(panddaDir,'processed_datasets',xtal)))
 
 
 
