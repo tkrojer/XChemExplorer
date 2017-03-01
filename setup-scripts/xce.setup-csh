@@ -1,3 +1,2 @@
 unsetenv PYTHONPATH
-source /usr/local/ccp4/7.0/ccp4-7.0/setup-scripts/ccp4.setup-csh
 
