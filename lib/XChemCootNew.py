@@ -1,4 +1,4 @@
-# last edited: 23/02/2017 - 15:00
+# last edited: 02/03/2017 - 15:00
 
 import gobject
 import sys
@@ -795,7 +795,8 @@ class GUI(object):
                 if self.event_map in coot.molecule_name(imol):
                     coot.set_contour_level_in_sigma(imol,2)
 #                    coot.set_contour_level_absolute(imol,0.5)
-                    coot.set_last_map_colour(0.4,0,0.4)
+#                    coot.set_last_map_colour(0.4,0,0.4)
+                    coot.set_last_map_colour(0.74,0.44,0.02)
 
 
 

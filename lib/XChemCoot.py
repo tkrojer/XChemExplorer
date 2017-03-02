@@ -1,4 +1,4 @@
-# last edited: 20/02/2017 - 15:00
+# last edited: 02/03/2017 - 15:00
 
 import gobject
 import sys
@@ -732,16 +732,16 @@ class GUI(object):
             imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.pdb'),0)
             self.mol_dict['ligand']=imol
             coot.read_cif_dictionary(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.cif'))
-        if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style)):
-            os.chdir(os.path.join(self.project_directory,self.xtalID))
-            # we want to be able to check dimple results immediately, but don't want to interfere with refinement
-#            if not os.path.isfile('REFINEMENT_IN_PROGRESS'):
-#                if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.xtalID+'-ensemble-model.pdb')):
-#                    os.symlink(self.xtalID+'-ensemble-model.pdb',self.pdb_style)
-#                elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.pdb')):
-#                    os.symlink('dimple.pdb',self.pdb_style)
-#                else:
-#                    self.go_to_next_xtal()
+#        if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style)):
+#            os.chdir(os.path.join(self.project_directory,self.xtalID))
+#            # we want to be able to check dimple results immediately, but don't want to interfere with refinement
+##            if not os.path.isfile('REFINEMENT_IN_PROGRESS'):
+##                if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.xtalID+'-ensemble-model.pdb')):
+##                    os.symlink(self.xtalID+'-ensemble-model.pdb',self.pdb_style)
+##                elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.pdb')):
+##                    os.symlink('dimple.pdb',self.pdb_style)
+##                else:
+##                    self.go_to_next_xtal()
         if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style)):
             os.chdir(os.path.join(self.project_directory,self.xtalID))
             imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style),0)
