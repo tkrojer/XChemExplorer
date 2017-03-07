@@ -1208,7 +1208,7 @@ class data_source:
             " RefinementOutcome,"
             " RefinementLigandConfidence "
             "from mainTable "
-            "where RefinementOutcome is %s;" %outcome
+            "where RefinementOutcome is %s order by CrystalName ASC;" %outcome
             )
 
         cursor.execute(sqlite)
