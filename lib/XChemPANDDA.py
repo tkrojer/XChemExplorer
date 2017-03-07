@@ -299,8 +299,8 @@ class run_pandda_export(QtCore.QThread):
                 self.db.update_data_source(sample,db_dict)
 
             Cmds = (
-#                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
-#                '\n'
+                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
+                '\n'
                 '/dls/science/groups/i04-1/software/pandda-install/ccp4-pandda/bin/pandda.export'
                 ' pandda_dir=%s' %self.panddas_directory+
                 ' export_dir=%s' %self.initial_model_directory+
@@ -519,7 +519,7 @@ class giant_cluster_datasets(QtCore.QThread):
         Cmds = (
                 '#!'+os.getenv('SHELL')+'\n'
                 'unset PYTHONPATH\n'
-#                'source '+source_file+'\n'
+                'source '+source_file+'\n'
                 "giant.cluster_mtzs_and_pdbs %s/*/%s pdb_regex='%s/(.*)/%s' out_dir='%s/cluster_analysis'" %(self.initial_model_directory,self.pdb_style,self.initial_model_directory,self.pdb_style,self.panddas_directory)
             )
 
