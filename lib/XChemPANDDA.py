@@ -409,7 +409,7 @@ class run_pandda_analyse(QtCore.QThread):
             Cmds = (
                 '#!'+os.getenv('SHELL')+'\n'
                 '\n'
-#                'source '+source_file+'\n'
+                'source '+source_file+'\n'
                 '\n'
                 'cd '+self.panddas_directory+'\n'
                 '\n'
