@@ -2,13 +2,15 @@
 
 XChemExplorer (XCE) is a data management and workflow tool for the parallel determination of protein-ligand structures. It was initially written to support crystallographic fragment screening at beamline I04-1 at the Diamond Light Source (http://www.diamond.ac.uk/Beamlines/Mx/Fragment-Screening.html), but it is a generic program that can be used to facilitate any structure-based drug design project.
 
-# Version
 
-A pre-release is currently available for download (v1.0-beta.3.4). 
+# Download
+A pre-release is currently available for download (v1.0-beta.3.4:
+https://github.com/tkrojer/XChemExplorer/archive/v1.0-beta.3.4.tar.gz
+
 
 # Mailing List
 
-For questions, suggestions, hints, bug reports, please visit XCHEMBB@jiscmail.ac.uk
+For questions, suggestions, hints, bug reports, please sign up to XCHEMBB@jiscmail.ac.uk
 
 # Operating System
 * LINUX
@@ -17,7 +19,6 @@ For questions, suggestions, hints, bug reports, please visit XCHEMBB@jiscmail.ac
 # Prerequisites:
 * CCP4 version 7.0 (or higher)
 * PHENIX (optional but recommended)
-* PANDDA (optional, but recommended) [http://pandda.bitbucket.org]
 
 # Installation
 
