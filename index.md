@@ -99,13 +99,6 @@ alias XChemExplorer='/home/tkrojer/software/XChemExplorer-1.0-beta.3.4/XChemExpl
 Krojer, T., Talon, R., Pearce, N., Collins, P., Douangamath, A., Brandao-Neto, J., Dias, A., Marsden, B., and von Delft, F. (2017). The XChemExplorer graphical workflow tool for routine or large-scale protein–ligand structure determination. _Acta Cryst D_ 73, 267–278.
 
 
-# Version History
-
-* 12/10/2016 - pre-release v1.0-beta.1
-* 13/12/2016 - pre-release v1.0-beta.2
-* 13/01/2017 - pre-release v1.0-beta.3
-* 01/03/2017 - pre-release v1.0-beta.3.4
-
 # Contact
 
 Tobias Krojer
@@ -113,4 +106,9 @@ tobias.krojer@sgc.ox.ac.uk
 
 
 # Links
-[SGC Oxford](http://www.thesgc.org/scientists/groups/oxford)
+
+* [SGC Oxford](http://www.thesgc.org/scientists/groups/oxford)
+
+* [XChem](http://www.diamond.ac.uk/Beamlines/Mx/Fragment-Screening.html)
+
+* [PanDDA](https://pandda.bitbucket.io)
