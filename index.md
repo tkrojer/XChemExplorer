@@ -92,7 +92,7 @@ alias XChemExplorer='/home/tkrojer/software/XChemExplorer-1.0-beta.3.4/XChemExpl
 
 # Manual
 
-[Download](ftp://ftp.sgc.ox.ac.uk/pub/tkrojer/XChemExplorer/Export_HTML_summary.pdf)
+![TEST](https://github.com/tkrojer/XChemExplorer/blob/gh-pages/XCE_manual.pdf)
 
 # Reference
 
