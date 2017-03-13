@@ -1,4 +1,4 @@
-# last edited: 01/02/2017, 15:00
+# last edited: 13/03/2017, 15:00
 
 import os,glob
 import sys
@@ -175,7 +175,7 @@ def print_acedrg_status(xce_logfile,xtal_db_dict):
         if 'pending' in status:
             pending+=1
         elif 'started' in status:
-            status+=1
+            started+=1
         elif 'running' in status:
             running+=1
         elif 'missing' in status:
