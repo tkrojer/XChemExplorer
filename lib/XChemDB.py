@@ -1156,7 +1156,7 @@ class data_source:
                 " RefinementOutcome,"
                 " RefinementLigandConfidence "
                 "from mainTable "
-                "where RefinementOutcome is %s;" %outcome
+                "where RefinementOutcome is %s and DimpleRfree is not Null;" %outcome
                 )
 #            sqlite = (
 #                "select"
@@ -1170,6 +1170,9 @@ class data_source:
 #                "from mainTable "
 #                "where RefinementOutcome like "+outcome.split()[0]+"%';"
 #                )
+
+
+        print sqlite
 
 #        print sqlite
         cursor.execute(sqlite)

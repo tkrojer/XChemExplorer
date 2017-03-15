@@ -860,6 +860,7 @@ class XChemExplorer(QtGui.QApplication):
                                                 'Run\nxia2',
                                                 'Resolution\n[Mn<I/sig(I)> = 1.5]',
                                                 'Rmerge\nLow',
+                                                'Dimple\nRfree',
                                                 'DataProcessing\nSpaceGroup',
                                                 'DataProcessing\nUnitCell',
                                                 'DataProcessing\nStatus'    ]
