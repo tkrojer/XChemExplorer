@@ -612,7 +612,7 @@ class find_diffraction_image_directory_fast(QtCore.QThread):
         for xtal in glob.glob('*'):
             if 'screening' in xtal:
                 continue
-            self.data_dict[xtal]=[[],[]]
+            self.data_dict[xtal]=[]
             rootList=[]
             imageCounter=0
 
@@ -635,12 +635,12 @@ class find_diffraction_image_directory_fast(QtCore.QThread):
                     imageCounter=0
 
                 if imageCounter == 20:
-                    self.data_dict[xtal][0].append(os.path.join(self.diffraction_data_directory,xtal))
-                    self.data_dict[xtal][1].append(file_root)
+                    self.data_dict[xtal].append([os.path.join(self.diffraction_data_directory,xtal),file_root])
+#                    self.data_dict[xtal][1].append(file_root)
 
                 imageCounter+=1
 
-            if self.data_dict[xtal]==[[],[]]:
+            if self.data_dict[xtal]==[]:
                 del self.data_dict[xtal]
 
             progress += progress_step
