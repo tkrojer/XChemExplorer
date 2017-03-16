@@ -109,7 +109,7 @@ class run_xia2(QtCore.QThread):
                 os.mkdir(os.path.join(self.initial_model_directory,xtal,'diffraction_images','run_'+str(newRun)))
                 image_dir=os.path.join(self.initial_model_directory,xtal,'diffraction_images','run_'+str(newRun))
                 os.chdir(os.path.join(self.initial_model_directory,xtal,'diffraction_images','run_'+str(newRun)))
-#                os.system('ln -s '+os.path.join(entry[0],entry[1])+'* .')
+                os.system('ln -s '+os.path.join(entry[0],entry[1])+'* .')
 
                 os.chdir(os.path.join(self.initial_model_directory,xtal,'processed'))
                 os.mkdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(newRun)))
@@ -161,7 +161,7 @@ class run_xia2(QtCore.QThread):
             db_dict['DataProcessingStatus']='started'
             self.Logfile.insert('%s: setting DataProcessingStatus flag to started' %xtal)
             self.db.update_data_source(xtal,db_dict)
-        quit()
+
         # submit job
         self.Logfile.insert('created input scripts for '+str(n+1)+' in '+self.ccp4_scratch_directory)
         os.chdir(self.ccp4_scratch_directory)
