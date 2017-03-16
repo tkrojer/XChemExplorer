@@ -99,7 +99,7 @@ class run_xia2(QtCore.QThread):
                 os.chdir(os.path.join(self.initial_model_directory,xtal,'processed'))
                 os.system('touch run_in_progress')
 
-            for n,entry in enumerate(self.run_dict[xtal]):
+            for n,entry in enumerate(sorted(self.run_dict[xtal])):
                 print 'here'
                 print entry
                 newRun=1
@@ -109,7 +109,7 @@ class run_xia2(QtCore.QThread):
                 os.mkdir(os.path.join(self.initial_model_directory,xtal,'diffraction_images','run_'+str(newRun)))
                 image_dir=os.path.join(self.initial_model_directory,xtal,'diffraction_images','run_'+str(newRun))
                 os.chdir(os.path.join(self.initial_model_directory,xtal,'diffraction_images','run_'+str(newRun)))
-                os.system('ln -s '+os.path.join(entry[0],entry[1])+'* .')
+#                os.system('ln -s '+os.path.join(entry[0],entry[1])+'* .')
 
                 os.chdir(os.path.join(self.initial_model_directory,xtal,'processed'))
                 os.mkdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(newRun)))
@@ -123,6 +123,7 @@ class run_xia2(QtCore.QThread):
                     script+='xia2 pipeline='+pipeline+' '+ref_option+' '+spg_option+' '+reso_limit_option+' '+cc_half_option+' '+image_dir+'\n'
 
 
+#            for n,root in enumerate(sorted(self.run_dict[xtal])):
 #                if n==0:
 #                    datadir=root[0]
 #                else:
