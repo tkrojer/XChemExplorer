@@ -3716,6 +3716,8 @@ class XChemExplorer(QtGui.QApplication):
         self.diffraction_data_table_dict={}
         self.diffraction_data_dict=data_dict
 
+        print self.diffraction_data_directory
+
         for stuff in self.diffraction_data_directory:
             print 'here'
             print stuff
