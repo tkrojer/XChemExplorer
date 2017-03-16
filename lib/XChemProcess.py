@@ -100,6 +100,8 @@ class run_xia2(QtCore.QThread):
                 os.system('touch run_in_progress')
 
             for n,entry in enumerate(self.run_dict[xtal]):
+                print 'here'
+                print entry
                 newRun=1
                 for runDir in sorted(glob.glob(os.path.join(self.initial_model_directory,xtal,'diffraction_images','run_*'))):
                     newRun=int(runDir[runDir.rfind('_')+1:])+1
@@ -158,7 +160,7 @@ class run_xia2(QtCore.QThread):
             db_dict['DataProcessingStatus']='started'
             self.Logfile.insert('%s: setting DataProcessingStatus flag to started' %xtal)
             self.db.update_data_source(xtal,db_dict)
-
+        quit()
         # submit job
         self.Logfile.insert('created input scripts for '+str(n+1)+' in '+self.ccp4_scratch_directory)
         os.chdir(self.ccp4_scratch_directory)
