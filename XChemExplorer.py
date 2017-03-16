@@ -3650,7 +3650,8 @@ class XChemExplorer(QtGui.QApplication):
 
     def search_for_datasets(self):
         self.update_log.insert('search diffraction data directory for datasets...')
-        self.work_thread=XChemMain.find_diffraction_image_directory(self.diffraction_data_directory)
+#        self.work_thread=XChemMain.find_diffraction_image_directory(self.diffraction_data_directory)
+        self.work_thread=XChemMain.find_diffraction_image_directory_fast(self.diffraction_data_directory)
         self.explorer_active=1
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
