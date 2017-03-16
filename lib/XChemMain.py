@@ -619,6 +619,7 @@ class find_diffraction_image_directory_fast(QtCore.QThread):
             # find image file extension; the assumption is that there is only one file type
             imageExtension='cbf'
             for files in sorted(glob.glob(os.path.join(xtal,'*'))):
+                fileName=os.path.join(self.diffraction_data_directory,files)
                 file_extension=fileName[fileName.rfind('.'):]
                 if file_extension in self.diffraction_image_extension:
                     imageExtension=file_extension
@@ -626,9 +627,7 @@ class find_diffraction_image_directory_fast(QtCore.QThread):
 
             for files in sorted(glob.glob(os.path.join(xtal,'*'+imageExtension))):
                 fileName=os.path.join(self.diffraction_data_directory,files)
-                file_extension=fileName[fileName.rfind('.'):]
                 file_root=fileName[:fileName.rfind('_')]
-                image_file_list = []
 
                 if file_root not in rootList:
                     rootList.append(file_root)

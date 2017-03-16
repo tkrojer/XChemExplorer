@@ -3737,7 +3737,8 @@ class XChemExplorer(QtGui.QApplication):
         # set rows to 0
         self.reprocess_datasets_table.setRowCount(0)
         for entry in sorted(self.diffraction_data_dict):
-            print self.diffraction_data_dict[entry]
+            self.update_log.insert(str(self.diffraction_data_dict[entry]))
+#            print self.diffraction_data_dict[entry]
             if entry in self.xtal_db_dict:
                 db_dict=self.xtal_db_dict[entry]
             else:
