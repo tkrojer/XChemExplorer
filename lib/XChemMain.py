@@ -626,7 +626,7 @@ class find_diffraction_image_directory_fast(QtCore.QThread):
                     break
 
             for files in sorted(glob.glob(os.path.join(xtal,'*'+imageExtension))):
-                fileName=os.path.join(self.diffraction_data_directory,files)
+                fileName=files[files.rfind('/')+1:]
                 file_root=fileName[:fileName.rfind('_')]
 
                 if file_root not in rootList:
