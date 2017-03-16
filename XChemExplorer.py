@@ -415,7 +415,8 @@ class XChemExplorer(QtGui.QApplication):
                                 'Run DIMPLE on All Autoprocessing MTZ files',
                                 'Rescore Datasets',
                                 'Read PKL file',
-                                'Run xia2 on selected datasets' ]
+                                'Run xia2 on selected datasets',
+                                'Run xia2 on selected datasets - overwrite' ]
 
         frame_dataset_task=QtGui.QFrame()
         frame_dataset_task.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -3455,7 +3456,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
 
-    def run_xia2_on_selected_datasets(self):
+    def run_xia2_on_selected_datasets(self,overwrite):
 
         # check which programs should be run
         protocol=[]
@@ -3506,7 +3507,8 @@ class XChemExplorer(QtGui.QApplication):
                                                     self.external_software,
                                                     self.ccp4_scratch_directory,
                                                     self.max_queue_jobs,
-                                                    os.path.join(self.database_directory,self.data_source_file)     )
+                                                    os.path.join(self.database_directory,self.data_source_file),
+                                                    overwrite   )
             self.explorer_active=1
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
@@ -4016,7 +4018,7 @@ class XChemExplorer(QtGui.QApplication):
             XChemMain.print_acedrg_status(self.xce_logfile,self.xtal_db_dict)
             XChemMain.print_cluster_status_message('acedrg',cluster_dict,self.xce_logfile)
 
-        elif instruction=='Run xia2 on selected datasets':
+        elif instruction.startswith('Run xia2 on selected datasets'):
             XChemMain.print_cluster_status_message('xia2',cluster_dict,self.xce_logfile)
 
         elif 'pandda' in instruction.lower():
@@ -4042,7 +4044,10 @@ class XChemExplorer(QtGui.QApplication):
             self.create_widgets_for_autoprocessing_results_only(summary)
 
         elif instruction=='Run xia2 on selected datasets':
-            self.run_xia2_on_selected_datasets()
+            self.run_xia2_on_selected_datasets(False)
+
+        elif instruction=='Run xia2 on selected datasets - overwrite':
+            self.run_xia2_on_selected_datasets(True)
 
         elif instruction=='Run DIMPLE on All Autoprocessing MTZ files':
             self.rerun_dimple_on_all_autoprocessing_files()
