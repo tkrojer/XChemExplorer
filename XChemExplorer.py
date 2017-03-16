@@ -3716,12 +3716,12 @@ class XChemExplorer(QtGui.QApplication):
         self.diffraction_data_table_dict={}
         self.diffraction_data_dict=data_dict
 
-        print self.diffraction_data_directory
+#        print self.diffraction_data_directory
 
-        for stuff in self.diffraction_data_directory:
-            print 'here'
-            print stuff
-            print self.diffraction_data_dict[stuff]
+#        for stuff in self.diffraction_data_directory:
+#            print 'here'
+#            print stuff
+#            print self.diffraction_data_dict[stuff]
 
         self.diffraction_data_search_info='found '+str(len(self.diffraction_data_dict))+' datasets'
         self.diffraction_data_search_label.setText(self.diffraction_data_search_info)
