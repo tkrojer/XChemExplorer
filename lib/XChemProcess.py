@@ -8,7 +8,7 @@ import XChemLog
 import XChemDB
 
 class run_xia2(QtCore.QThread):
-    def __init__(self,initial_model_directory,run_dict,protocol,spg,ref,reso_limit,cc_half,xce_logfile,external_software,ccp4_scratch_directory,max_queue_jobs,database):
+    def __init__(self,initial_model_directory,run_dict,protocol,spg,ref,reso_limit,cc_half,xce_logfile,external_software,ccp4_scratch_directory,max_queue_jobs,database,overwrite):
         QtCore.QThread.__init__(self)
         self.initial_model_directory=initial_model_directory
         self.run_dict=run_dict
@@ -24,6 +24,7 @@ class run_xia2(QtCore.QThread):
         self.max_queue_jobs=max_queue_jobs
         self.database=database
         self.db=XChemDB.data_source(database)
+        self.overwrite=overwrite
 
     def run(self):
         os.chdir(os.path.join(self.initial_model_directory))
@@ -88,43 +89,61 @@ class run_xia2(QtCore.QThread):
                 self.Logfile.insert('data processing is in progress; skipping...')
                 continue
             else:
+                if self.overwrite:
+                    os.chdir(os.path.join(self.initial_model_directory,xtal,'diffraction_images'))
+                    self.Logfile.insert('removing all links to diffraction images in '+os.path.join(self.initial_model_directory,xtal,'diffraction_images'))
+                    os.system('/bin/rm -fr *')
+                    os.chdir(os.path.join(self.initial_model_directory,xtal,'processed'))
+                    self.Logfile.insert('removing all links to diffraction images in '+os.path.join(self.initial_model_directory,xtal,'processed'))
+                    os.system('/bin/rm -fr *')
                 os.chdir(os.path.join(self.initial_model_directory,xtal,'processed'))
                 os.system('touch run_in_progress')
 
-            for n,root in enumerate(self.run_dict[xtal]):
-                if n==0:
-                    datadir=root[0]
-                else:
-                    if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'diffraction_images','run_'+str(n))):
-                        os.mkdir(os.path.join(self.initial_model_directory,xtal,'diffraction_images','run_'+str(n)))
-                    image_dir=os.path.join(self.initial_model_directory,xtal,'diffraction_images','run_'+str(n))
-                    os.chdir(os.path.join(self.initial_model_directory,xtal,'diffraction_images','run_'+str(n)))
-                    os.system('ln -s '+os.path.join(datadir,root[0])+'* .')
+            for n,entry in enumerate(self.run_dict[xtal]):
+                newRun=1
+                for runDir in sorted(glob.glob(os.path.join(self.initial_model_directory,xtal,'diffraction_images','run_*'))):
+                    newRun=int(runDir[runDir.rfind('_')+1:])+1
 
-                    os.chdir(os.path.join(self.initial_model_directory,xtal))
-                    if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'processed')):
-                        os.mkdir(os.path.join(self.initial_model_directory,xtal,'processed'))
-                    if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n))):
-                        os.mkdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n)))
+                os.mkdir(os.path.join(self.initial_model_directory,xtal,'diffraction_images','run_'+str(newRun)))
+                image_dir=os.path.join(self.initial_model_directory,xtal,'diffraction_images','run_'+str(newRun))
+                os.chdir(os.path.join(self.initial_model_directory,xtal,'diffraction_images','run_'+str(newRun)))
+                os.system('ln -s '+os.path.join(entry[0],entry[1])+'* .')
+
+                os.chdir(os.path.join(self.initial_model_directory,xtal,'processed'))
+                os.mkdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(newRun)))
+
+                for pipeline in self.protocol:
+                    script+='cd '+os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(newRun),pipeline)+'\n'
+                    if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(newRun),pipeline)):
+                        os.mkdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(newRun),pipeline))
+
+                    script+='$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_status_flag.py')+' %s %s %s %s\n' %(self.database,xtal,'DataProcessingStatus','running')
+                    script+='xia2 pipeline='+pipeline+' '+ref_option+' '+spg_option+' '+reso_limit_option+' '+cc_half_option+' '+image_dir+'\n'
 
 
-#                    os.chdir(os.path.join(self.initial_model_directory,xtal,'processed'))
-#                    os.system('touch run_in_progress')
-
-                    for pipeline in self.protocol:
-                        script+='cd '+os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline)+'\n'
-                        if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline)):
-                            os.mkdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline))
-
-#                        if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline,'run_in_progress')):
-#                            self.Logfile.insert('data processing is in progress; skipping...')
-#                            continue
-#                        else:
-#                            os.chdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline))
-#                            os.system('touch run_in_progress')
-
-                        script+='$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_status_flag.py')+' %s %s %s %s\n' %(self.database,xtal,'DataProcessingStatus','running')
-                        script+='xia2 pipeline='+pipeline+' '+ref_option+' '+spg_option+' '+reso_limit_option+' '+cc_half_option+' '+image_dir+'\n'
+#                if n==0:
+#                    datadir=root[0]
+#                else:
+#                    if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'diffraction_images','run_'+str(n))):
+#                        os.mkdir(os.path.join(self.initial_model_directory,xtal,'diffraction_images','run_'+str(n)))
+#                    image_dir=os.path.join(self.initial_model_directory,xtal,'diffraction_images','run_'+str(n))
+#                    os.chdir(os.path.join(self.initial_model_directory,xtal,'diffraction_images','run_'+str(n)))
+#                    os.system('ln -s '+os.path.join(datadir,root[0])+'* .')
+#
+#                    os.chdir(os.path.join(self.initial_model_directory,xtal))
+#                    if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'processed')):
+#                        os.mkdir(os.path.join(self.initial_model_directory,xtal,'processed'))
+#                    if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n))):
+#                        os.mkdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n)))
+#
+#
+#                    for pipeline in self.protocol:
+#                        script+='cd '+os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline)+'\n'
+#                        if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline)):
+#                            os.mkdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(n),pipeline))
+#
+#                        script+='$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_status_flag.py')+' %s %s %s %s\n' %(self.database,xtal,'DataProcessingStatus','running')
+#                        script+='xia2 pipeline='+pipeline+' '+ref_option+' '+spg_option+' '+reso_limit_option+' '+cc_half_option+' '+image_dir+'\n'
 
             script+='$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_status_flag.py')+' %s %s %s %s\n' %(self.database,xtal,'DataProcessingStatus','finished')
             script+='cd '+os.path.join(self.initial_model_directory,xtal,'processed')+'\n'
