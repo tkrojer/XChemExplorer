@@ -3715,6 +3715,12 @@ class XChemExplorer(QtGui.QApplication):
         self.update_log.insert('updating reprocess datasets table')
         self.diffraction_data_table_dict={}
         self.diffraction_data_dict=data_dict
+
+        for stuff in self.diffraction_data_directory:
+            print 'here'
+            print stuff
+            print self.diffraction_data_dict[stuff]
+
         self.diffraction_data_search_info='found '+str(len(self.diffraction_data_dict))+' datasets'
         self.diffraction_data_search_label.setText(self.diffraction_data_search_info)
         self.update_log.insert(self.diffraction_data_search_info)
