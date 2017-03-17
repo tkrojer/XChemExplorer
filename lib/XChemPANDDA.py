@@ -618,6 +618,7 @@ class check_if_pandda_can_run:
             datasetStructure=XChemUtils.pdbtools(dataset)
             symmDataset=datasetStructure.get_spg_number_from_pdb()
             ucVolDataset=datasetStructure.calc_unitcell_volume_from_pdb()
+            if 'DCP' in ref: print ref
             if 'DCP' in ref: print dataset, ucVolDataset
             if 'DCP' in ref: print symmRef, symmDataset
             if 'DCP' in ref: print ucVolRef, ucVolDataset
