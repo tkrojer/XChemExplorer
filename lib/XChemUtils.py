@@ -1551,7 +1551,8 @@ class pdbtools(object):
                 alpha=line.split()[4]
                 beta=line.split()[5]
                 gamma=line.split()[6]
-                spg=line[55:len(line)-1]
+#                spg=line[55:len(line)-1]
+                spg=line[55:65]
         return [a,b,c,alpha,beta,gamma,spg]
 
     def get_spg_from_pdb(self):
