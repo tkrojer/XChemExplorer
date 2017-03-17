@@ -1560,17 +1560,17 @@ class pdbtools(object):
 
     def get_spg_number_from_pdb(self):
         spg=self.get_spg_from_pdb().replace(' ','').lower()
-        if 'DCP' in self.pdb:
-            print 'hereX',spg
+#        if 'DCP' in self.pdb:
+#            print 'hereX',spg
         spg_number='0'
         for key in self.translate_spg_to_number_dict:
             if key==spg:
                 spg_number=str(self.translate_spg_to_number_dict[key])
-                if 'DCP' in self.pdb:
-                    print 'found:',key,spg,spg_number
+#                if 'DCP' in self.pdb:
+#                    print 'found:',key,spg,spg_number
                 break
-        if 'DCP' in self.pdb:
-            print 'hhh',spg_number
+#        if 'DCP' in self.pdb:
+#            print 'hhh',spg_number
         return spg_number
 
     def get_bravais_lattice_from_pdb(self):

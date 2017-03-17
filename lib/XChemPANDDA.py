@@ -619,15 +619,14 @@ class check_if_pandda_can_run:
             datasetStructure=XChemUtils.pdbtools(dataset)
             symmDataset=datasetStructure.get_spg_number_from_pdb()
             ucVolDataset=datasetStructure.calc_unitcell_volume_from_pdb()
-            if 'DCP' in ref:
-                print ref,os.path.join(reference_directory,ref+'.pdb')
-                if os.path.isfile(os.path.join(reference_directory,ref+'.pdb')):
-                    print 'found ref'
-                    print 'hallo'
-
-            if 'DCP' in ref: print dataset, ucVolDataset
-            if 'DCP' in ref: print symmRef, symmDataset
-            if 'DCP' in ref: print ucVolRef, ucVolDataset
+#            if 'DCP' in ref:
+#                print ref,os.path.join(reference_directory,ref+'.pdb')
+#                if os.path.isfile(os.path.join(reference_directory,ref+'.pdb')):
+#                    print 'found ref'
+#                    print 'hallo'
+#            if 'DCP' in ref: print dataset, ucVolDataset
+#            if 'DCP' in ref: print symmRef, symmDataset
+#            if 'DCP' in ref: print ucVolRef, ucVolDataset
             if symmDataset == symmRef:
                 try:
                     difference=math.fabs(1-(float(ucVolRef)/float(ucVolDataset)))*100
