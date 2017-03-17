@@ -618,7 +618,7 @@ class check_if_pandda_can_run:
             datasetStructure=XChemUtils.pdbtools(dataset)
             symmDataset=datasetStructure.get_spg_number_from_pdb()
             ucVolDataset=datasetStructure.calc_unitcell_volume_from_pdb()
-            print dataset, ucVolDataset
+            if 'DCP' in refStructure: print dataset, ucVolDataset
             if symmDataset == symmRef:
                 try:
                     difference=math.fabs(1-(float(ucVolRef)/float(ucVolDataset)))*100
