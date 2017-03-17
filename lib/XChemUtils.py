@@ -1562,7 +1562,8 @@ class pdbtools(object):
         spg=self.get_spg_from_pdb().replace(' ','').lower()
         if '/dls/labxchem/data/2016/lb13385-64/processing/reference/DCP2B.pdb' in self.pdb:
             print 'hereX',spg
-            print 'hereY','->'+spg+'<-'
+            print 'hereY ->'+spg+'<-'
+            print '-----------------'
         spg_number='0'
         for key in self.translate_spg_to_number_dict:
             if key==spg:
