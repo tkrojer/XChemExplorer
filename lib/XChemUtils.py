@@ -1560,6 +1560,8 @@ class pdbtools(object):
 
     def get_spg_number_from_pdb(self):
         spg=self.get_spg_from_pdb().replace(' ','').lower()
+        if 'DCP' in self.pdb:
+            print 'hereX',spg
         spg_number='0'
         for key in self.translate_spg_to_number_dict:
             if key==spg:
