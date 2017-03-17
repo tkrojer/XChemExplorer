@@ -1559,7 +1559,7 @@ class pdbtools(object):
         return spg
 
     def get_spg_number_from_pdb(self):
-        spg=self.get_spg_from_pdb().replace(' ','').lower()
+        spg=self.get_spg_from_pdb().replace(' ','').lower().replace('\n','').replace('\r','')
         if '/dls/labxchem/data/2016/lb13385-64/processing/reference/DCP2B.pdb' in self.pdb:
             print 'hereX',spg
             print 'hereU',spg[:-1]
