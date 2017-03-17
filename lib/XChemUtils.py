@@ -1560,21 +1560,11 @@ class pdbtools(object):
 
     def get_spg_number_from_pdb(self):
         spg=self.get_spg_from_pdb().replace(' ','').lower().replace('\n','').replace('\r','')
-        if '/dls/labxchem/data/2016/lb13385-64/processing/reference/DCP2B.pdb' in self.pdb:
-            print 'hereX',spg
-            print 'hereU',spg[:-1]
-            print 'uuuuuuuuuuuuuuuu'
-            print 'hereY ->'+spg+'<-'
-            print '-----------------'
         spg_number='0'
         for key in self.translate_spg_to_number_dict:
             if key==spg:
                 spg_number=str(self.translate_spg_to_number_dict[key])
-                if '/dls/labxchem/data/2016/lb13385-64/processing/reference/DCP2B.pdb' in self.pdb:
-                    print 'found:',key,spg,spg_number
                 break
-        if '/dls/labxchem/data/2016/lb13385-64/processing/reference/DCP2B.pdb' in self.pdb:
-            print 'hhh',spg_number
         return spg_number
 
     def get_bravais_lattice_from_pdb(self):
