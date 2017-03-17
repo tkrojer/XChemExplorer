@@ -622,6 +622,7 @@ class check_if_pandda_can_run:
                 print ref,os.path.join(reference_directory,ref+'.pdb')
                 if os.path.isfile(os.path.join(reference_directory,ref+'.pdb')):
                     print 'found ref'
+                    print 'hallo'
 
             if 'DCP' in ref: print dataset, ucVolDataset
             if 'DCP' in ref: print symmRef, symmDataset
