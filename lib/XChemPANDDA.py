@@ -630,8 +630,6 @@ class check_if_pandda_can_run:
             if symmDataset == symmRef:
                 try:
                     difference=math.fabs(1-(float(ucVolRef)/float(ucVolDataset)))*100
-                    if 'DCP2B' in refStructure:
-                        print dataset,difference
                     if difference < allowed_unitcell_difference_percent:
                         sampleID=dataset.replace('/'+self.pdb_style,'')[dataset.replace('/'+self.pdb_style,'').rfind('/')+1:]
                         cluster_dict[ref].append(sampleID)
