@@ -1566,6 +1566,8 @@ class pdbtools(object):
         for key in self.translate_spg_to_number_dict:
             if key==spg:
                 spg_number=str(self.translate_spg_to_number_dict[key])
+                if 'DCP' in self.pdb:
+                    print 'found:',key,spg,spg_number
                 break
         return spg_number
 
