@@ -611,6 +611,7 @@ class check_if_pandda_can_run:
     def get_datasets_which_fit_to_reference_file(self,ref,reference_directory,cluster_dict,allowed_unitcell_difference_percent):
         refStructure=XChemUtils.pdbtools(os.path.join(reference_directory,ref+'.pdb'))
         symmRef=refStructure.get_spg_number_from_pdb()
+        if 'DCP' in ref: print 'GGGGGGGGGG',symmRef
         ucVolRef=refStructure.calc_unitcell_volume_from_pdb()
         cluster_dict[ref]=[]
         cluster_dict[ref].append(os.path.join(reference_directory,ref+'.pdb'))
