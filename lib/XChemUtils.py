@@ -1569,6 +1569,8 @@ class pdbtools(object):
                 if 'DCP' in self.pdb:
                     print 'found:',key,spg,spg_number
                 break
+        if 'DCP' in self.pdb:
+            print 'hhh',spg_number
         return spg_number
 
     def get_bravais_lattice_from_pdb(self):
