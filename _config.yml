@@ -3,6 +3,7 @@ description:
 google_analytics: 
 show_downloads: False
 theme: jekyll-theme-midnight
+image:  XChemExplorer_banner.png
 
 gems:
   - jekyll-mentions
