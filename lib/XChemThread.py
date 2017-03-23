@@ -895,12 +895,13 @@ class create_png_and_cif_of_compound(QtCore.QThread):
                 # remove symbolic links if present
                 if os.path.isfile(os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.pdb')):
                     os.system('/bin/rm '+os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.pdb'))
-                if os.path.isfile(os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.cif')):
-                    # copy existing CIF file to old.cif so that it can be used as input in
-                    # restraints generating program
-                    os.chdir(os.path.join(self.initial_model_directory,sampleID))
-                    os.system('/bin/cp %s old.cif' %(compoundID.replace(' ','')+'.cif'))
-                    os.system('/bin/rm '+os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.cif'))
+#               commented this out since people found the presence of the old.cif file interfering with pandda.inspect
+#                if os.path.isfile(os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.cif')):
+#                    # copy existing CIF file to old.cif so that it can be used as input in
+#                    # restraints generating program
+#                    os.chdir(os.path.join(self.initial_model_directory,sampleID))
+#                    os.system('/bin/cp %s old.cif' %(compoundID.replace(' ','')+'.cif'))
+#                    os.system('/bin/rm '+os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.cif'))
                 if os.path.isfile(os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.png')):
                     os.system('/bin/rm '+os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.png'))
                 if os.path.isdir(os.path.join(self.initial_model_directory,sampleID,'compound')):
