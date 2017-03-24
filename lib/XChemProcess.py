@@ -1,4 +1,4 @@
-# last edited: 16/03/2017, 15:00
+# last edited: 24/03/2017, 15:00
 
 import os, sys, glob
 from PyQt4 import QtGui, QtCore
@@ -63,7 +63,7 @@ class run_xia2(QtCore.QThread):
             if self.ref == []:
                 ref_option=''
             else:
-                ref_option='-reference_reflection_file '+str(self.ref[0])
+                ref_option='reference_reflection_file='+str(self.ref[0])
 
             if self.reso_limit == []:
                 reso_limit_option=''
