@@ -1242,7 +1242,7 @@ class data_source:
                             " PANDDA_site_name,"
                             " PANDDA_site_InspectConfidence,"
                             " PANDDA_site_interesting,"
-                            " PANDDA_site_comment "
+                            " PANDDA_site_event_comment "
                             "from panddaTable  "
                             "where "
                             " CrystalName is '%s' and PANDDA_site_ligand_placed is 'True';" %entry[0]     )
