@@ -1211,7 +1211,7 @@ class data_source:
             " RefinementOutcome,"
             " RefinementLigandConfidence "
             "from mainTable "
-            "where RefinementOutcome is %s and DimpleRfree is not Null order by CrystalName ASC;" %outcome
+            "where RefinementOutcome is %s and (DimpleRfree is not Null or RefinementRfree is not Null) order by CrystalName ASC;" %outcome
             )
 
         cursor.execute(sqlite)
