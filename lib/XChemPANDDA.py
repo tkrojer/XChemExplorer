@@ -749,7 +749,7 @@ class convert_all_event_maps_in_database(QtCore.QThread):
             if os.path.isfile(os.path.join(self.initial_model_directory,xtalID,'refine.pdb')):
                 os.chdir(os.path.join(self.initial_model_directory,xtalID))
                 self.Logfile.insert('extracting ligand (%s,%s,%s,%s) from refine.pdb' %(str(resname),str(chainID),str(resseq),str(altLoc)))
-                XChemUtils.pdbtools('refine.pdb').save_specific_ligands_to_pdb(resname,chainID,resseq,altLoc)
+                XChemUtils.pdbtools(os.path.join(self.initial_model_directory,xtalID,'refine.pdb')).save_specific_ligands_to_pdb(resname,chainID,resseq,altLoc)
                 if os.path.isfile('ligand_%s_%s_%s_%s.pdb' %(str(resname),str(chainID),str(resseq),str(altLoc))):
                     ligand_pdb='ligand_%s_%s_%s_%s.pdb' %(str(resname),str(chainID),str(resseq),str(altLoc))
                     print os.path.join(self.initial_model_directory,xtalID,ligand_pdb)
