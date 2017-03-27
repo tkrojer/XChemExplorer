@@ -1,4 +1,4 @@
-# last edited: 10/02/2017, 15:00
+# last edited: 27/03/2017, 15:00
 
 import sys
 import os
@@ -76,9 +76,18 @@ class templates:
             if taxonomy_dict[key]==depositDict['Expression_system_scientific_name']:
                 pdbx_host_org_ncbi_taxonomy_id=key
 
-        structure_author_name=''
+#        structure_author_name=''
+#        for name in depositDict['structure_author_name'].split(';'):
+#            structure_author_name+='<structure_author_name=  %s>\n' %name
+
+        audit_author_name=''
+        # one name must be within quotation, last name and first initial must be separated by comma and space
         for name in depositDict['structure_author_name'].split(';'):
-            structure_author_name+='<structure_author_name=  %s>\n' %name
+            if name.replace(' ','') == '':
+                continue
+            if name[name.find(',')+1:name.find(',')+2] != ' ':
+                name=name.replace(',',', ')
+            audit_author_name+="'%s'\n" %name
 
         primary_citation_author_name=''
         # one name must be within quotation, last name and first initial must be separated by comma and space
@@ -155,12 +164,6 @@ class templates:
             '_entity_poly.pdbx_seq_db_name\n'
             '1 "polypeptide(L)"\n'
             +molecule_one_letter_sequence+'\n'
-#        ';MDPEVTLLLQCPGGGLPQEQIQAELSPAHDRRPLPGGDEAITAIWETRLKAQPWLFDAPK\n'
-#        'FRLHSATLAPIGSRGPQLLLRLGLTSYRDFLGTNWSSSAAWLRQQGATDWGDTQAYLADP\n'
-#        'LGVGAALATADDFLVFLRRSRQVAEAPGLVDVPGGHPEPQALCPGGSPQHQDLAGQLVVH\n'
-#        'ELFSSVLQEICDEVNLPLLTLSQPLLLGIARNETSAGRASAEFYVQCSLTSEQVRKHYLS\n'
-#        'GGPEAHESTGIFFVETQNVQRLLETEMWAELCPSAKGAIILYNRVQGSPTGAALGSPALL\n'
-#        'PPL\n'
             ';\n'
             '%s %s UNP\n'                                        %(depositDict['protein_chains'],depositDict['molecule_one_letter_sequence_uniprot_id'])+
             '#\n'
@@ -173,34 +176,6 @@ class templates:
             '_entity_src_gen.pdbx_host_org_ncbi_taxonomy_id\n'
             '1 ? "%s" %s  "%s" %s\n'                %(depositDict['Source_organism_scientific_name'],pdbx_gene_src_ncbi_taxonomy_id,depositDict['Expression_system_scientific_name'],pdbx_host_org_ncbi_taxonomy_id)+
             '#\n'
-#            '#\n'
-##            '_pdbx_contact_author.id                  1\n'
-##            "_pdbx_contact_author.address_1           '%s'\n"                           %depositDict['contact_author_PI_address']+
-##            '_pdbx_contact_author.address_2           "%s"\n'                           %depositDict['contact_author_PI_organization_name']+
-##            '_pdbx_contact_author.city                %s\n'                             %depositDict['contact_author_PI_city']+
-##            "_pdbx_contact_author.state_province      '%s'\n"                           %depositDict['contact_author_PI_State_or_Province']+
-##            '_pdbx_contact_author.postal_code         %s\n'                             %depositDict['contact_author_PI_Zip_Code']+
-##            '_pdbx_contact_author.email               %s\n'                             %depositDict['contact_author_PI_email']+
-##            '_pdbx_contact_author.name_first          %s\n'                             %depositDict['contact_author_PI_first_name']+
-##            '_pdbx_contact_author.name_last           %s\n'                             %depositDict['contact_author_PI_last_name']+
-##            '_pdbx_contact_author.country             "%s"\n'                           %depositDict['contact_author_PI_Country']+
-##            '_pdbx_contact_author.phone               %s\n'                             %depositDict['contact_author_PI_phone_number']+
-##            '_pdbx_contact_author.role                "%s"\n'                           %depositDict['contact_author_PI_role']+
-##            '_pdbx_contact_author.organization_type   %s\n'                             %depositDict['contact_author_PI_organization_type']+
-##            '#\n'
-#            '_pdbx_contact_author.id                  2\n'
-#            "_pdbx_contact_author.address_1           '%s'\n"                           %depositDict['contact_author_address']+
-#            '_pdbx_contact_author.address_2           "%s"\n'                           %depositDict['contact_author_organization_name']+
-#            '_pdbx_contact_author.city                %s\n'                             %depositDict['contact_author_city']+
-#            "_pdbx_contact_author.state_province      '%s'\n"                           %depositDict['contact_author_State_or_Province']+
-#            '_pdbx_contact_author.postal_code         %s\n'                             %depositDict['contact_author_Zip_Code'].replace(' ','')+
-#            '_pdbx_contact_author.email               %s\n'                             %depositDict['contact_author_email']+
-#            '_pdbx_contact_author.name_first          %s\n'                             %depositDict['contact_author_first_name']+
-#            '_pdbx_contact_author.name_last           %s\n'                             %depositDict['contact_author_last_name']+
-#            '_pdbx_contact_author.country             "%s"\n'                           %depositDict['contact_author_Country']+
-#            '_pdbx_contact_author.phone               %s\n'                             %depositDict['contact_author_phone_number']+
-#            '_pdbx_contact_author.role                "%s"\n'                           %depositDict['contact_author_role']+
-#            '_pdbx_contact_author.organization_type   %s\n'                             %depositDict['contact_author_organization_type']+
             'loop_\n'
             '_pdbx_contact_author.id                  \n'
             "_pdbx_contact_author.address_1           \n"
@@ -220,9 +195,8 @@ class templates:
             '#\n'
             'loop_\n'
             '_audit_author.name\n'
-            "'%s, %s.'\n" %(depositDict['contact_author_last_name'],depositDict['contact_author_first_name'][0])+
-#            "'Krojer, T.'\n"
-#            "'Von Delft, F.'\n"
+            +audit_author_name+
+#            "'%s, %s.'\n" %(depositDict['contact_author_last_name'],depositDict['contact_author_first_name'][0])+
             '#\n'
             '_citation.id                        primary\n'
             "_citation.title                     '%s'\n"   %depositDict['group_title']+
