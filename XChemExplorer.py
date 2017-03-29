@@ -4308,7 +4308,7 @@ class XChemExplorer(QtGui.QApplication):
             msgBox.setText(msg)
             msgBox.exec_()
             return
-        elif len(cluster_dict) == 1:
+        elif len(cluster_dict) == 1 and reference_file == '...':
             reference_ID=cluster_dict.keys[0]
             reference_file=os.path.join(self.reference_directory,reference_ID+'.pdb')
             filter_pdb=''

@@ -1,4 +1,4 @@
-# last edited: 27/03/2017, 15:00
+# last edited: 29/03/2017, 15:00
 
 import sqlite3
 import os,sys,glob
@@ -1389,6 +1389,7 @@ class data_source:
         for item in tmp:
             apoStructureList.append(str(item[0]))
 
+        counter=0   # there is a SQLite limit which does not allow to insert more than 500 records at once
         newEntries=''
         for files in glob.glob(os.path.join(projectDir,'*')):
             xtal=files[files.rfind('/')+1:]
@@ -1407,6 +1408,15 @@ class data_source:
                     Logfile.insert('%s: missing files -> dimple.pdb: %s, dimple.mtz: %s, %s.log: %s' %(xtal,str(dimple_pdb),str(dimple_mtz),xtal,str(aimless_log)))
                 else:
                     newEntries+="('%s','apo')," %xtal
+                    counter+=1
+
+                if counter == 450:  # set to 450 to stay well below 500 records limit
+                    sqlite='insert into depositTable (CrystalName,StructureType) values %s;' %newEntries[:-1]
+                    Logfile.insert('creating new entries with the following SQLite command:\n'+sqlite)
+                    cursor.execute(sqlite)
+                    connect.commit()
+                    counter=0
+                    newEntries=''
 
         if newEntries != '':
             sqlite='insert into depositTable (CrystalName,StructureType) values %s;' %newEntries[:-1]
