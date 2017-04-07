@@ -270,8 +270,8 @@ class XChemExplorer(QtGui.QApplication):
 	
 	size_policy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 	self.window.setSizePolicy(size_policy)
-	screen = QtGui.QDesktopWidget().screenGeometry()
-        self.window.setFixedSize(screen.width(),screen.height()-70)
+	self.screen = QtGui.QDesktopWidget().screenGeometry()
+        self.window.setFixedSize(self.screen.width(),self.screen.height()-70)
 	#print self.window.sizeHint()
         ######################################################################################
         # Menu Widget
@@ -1452,9 +1452,25 @@ class XChemExplorer(QtGui.QApplication):
         #
 
         ######################################################################################
-        # Settings Tab
-        self.data_collection_vbox_for_settings=QtGui.QVBoxLayout()
-        self.tab_dict[self.workflow_dict['Settings']][1].addLayout(self.data_collection_vbox_for_settings)
+        self.settings_container=QtGui.QWidget()
+	self.buttons_etc = QtGui.QWidget()
+	self.settings_vbox=QtGui.QVBoxLayout()
+
+        self.scroll = QtGui.QScrollArea(self.settings_container)
+        self.settings_vbox.addWidget(self.scroll)
+        scroll.setSizePolicy(size_policy)  #setWidgetResizable(True)
+        scrollContent_settings = QtGui.QWidget(scroll)
+        scrollContent_settings.setSizePolicy(size_policy)
+
+        scrollLayout_settings = QtGui.QVBoxLayout(scrollContent_settings)
+        scrollContent_settings.setLayout(scrollLayout_settings)
+
+
+	# Settings Tab
+	self.data_collection_vbox_for_settings=QtGui.QVBoxLayout()
+	
+	self.buttons_etc.setLayout(self.data_collection_vbox_for_settings)
+	self.scroll.setWidget(self.buttons_etc)
 
         self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nProject Directory: - REQUIRED -'))
         settings_hbox_initial_model_directory=QtGui.QHBoxLayout()
@@ -1558,9 +1574,11 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_vbox_for_settings.addLayout(settings_hbox_group_deposition_directory)
 
         self.data_collection_vbox_for_settings.setSpacing(0)
-        self.data_collection_vbox_for_settings.setMargin(0)
+        self.data_collection_vbox_for_settings.setContentsMargins(30,0,0,0)
 
-
+	self.buttons_etc.resize(self.screen.width()-100, self.buttons_etc.sizeHint().height())
+	self.tab_dict[self.workflow_dict['Settings']][1].addLayout(self.settings_vbox)
+	
         ######################################################################################
 
 
