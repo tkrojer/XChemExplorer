@@ -1,4 +1,4 @@
-# last edited: 06/04/2017, 15:00
+# last edited: 07/04/2017, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -89,7 +89,7 @@ class run_pandda_export(QtCore.QThread):
             compoundID=str(item[1])
             if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.free.mtz')):
                 if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb')):
-                    self.Logfile.insert('running inital refinement on PANDDA model of'+xtal)
+                    self.Logfile.insert('running inital refinement on PANDDA model of '+xtal)
                     Refine=XChemRefine.Refine(self.initial_model_directory,xtal,compoundID,self.datasource)
                     Serial=Refine.GetSerial()
                     os.mkdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+str(Serial)))
@@ -299,9 +299,10 @@ class run_pandda_export(QtCore.QThread):
                 self.db.update_data_source(sample,db_dict)
 
             Cmds = (
-                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
-                '\n'
-                '/dls/science/groups/i04-1/software/pandda-install/ccp4-pandda/bin/pandda.export'
+#                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
+#                '\n'
+#                '/dls/science/groups/i04-1/software/pandda-install/ccp4-pandda/bin/pandda.export'
+                'pandda.export'
                 ' pandda_dir=%s' %self.panddas_directory+
                 ' export_dir=%s' %self.initial_model_directory+
                 ' %s' %select_dir_string+
