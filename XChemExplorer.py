@@ -264,7 +264,7 @@ class XChemExplorer(QtGui.QApplication):
         self.window=QtGui.QWidget()
         #self.screenShape = QtGui.QDesktopWidget().screenGeometry()
 	#self.window.resize(self.screenShape.width()/8, self.screenShape.height()/8)
-	self.window.setWindowTitle("XChemExplorer_RACHAELBETA")
+	self.window.setWindowTitle("XChemExplorer")
         #self.center_main_window()
 	#self.window.showMaximized()
 	
