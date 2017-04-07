@@ -1,4 +1,4 @@
-# last edited: 27/03/2017, 15:00
+# last edited: 06/04/2017, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -1143,11 +1143,14 @@ class check_number_of_modelled_ligands(QtCore.QThread):
         for xtal in sorted(glob.glob('*')):
             if os.path.isfile(os.path.join(xtal,'refine.pdb')):
                 ligands=XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).ligand_details_as_list()
-                self.Logfile.insert(xtal+' '+str(ligands))
+                self.Logfile.insert('%s: found file refine.pdb' %xtal)
                 if ligands != []:
                     if os.path.isdir(os.path.join(xtal,'xceTmp')):
                         os.system('/bin/rm -fr %s' %os.path.join(xtal,'xceTmp'))
                     os.mkdir(os.path.join(xtal,'xceTmp'))
+                else:
+                    self.Logfile.warning('%s: cannot find ligand molecule in refine.pdb; skipping...' %xtal)
+                    continue
 
                 made_sym_copies=False
                 ligands_not_in_panddaTable=[]
@@ -1158,12 +1161,12 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                     altLocLIG=      item[3]
                     occupancyLig=   item[4]
                     if altLocLIG.replace(' ','') == '':
-                        self.Logfile.insert(xtal+': found a ligand not modelled with pandda.inspect -> '+str(item))
+                        self.Logfile.insert(xtal+': found a ligand not modelled with pandda.inspect -> %s %s %s' %(resnameLIG,chainLIG,seqnumLIG))
                     residue_xyz = XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).get_center_of_gravity_of_residue_ish(item[1],item[2])
                     ligands[n].append(residue_xyz)
                     foundLigand=False
                     if xtal in dbDict:
-                        self.Logfile.insert(str(dbDict[xtal]))
+#                        self.Logfile.insert(str(dbDict[xtal]))
                         for entry in dbDict[xtal]:
                             resnameTable=entry[4]
                             chainTable=entry[5]
@@ -1173,13 +1176,13 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                                 self.Logfile.insert('%s: found ligand in database -> %s %s %s' %(xtal,resnameTable,chainTable,seqnumTable))
                                 foundLigand=True
                         if not foundLigand:
-                            self.Logfile.warning('%s: did NOT find ligand in database -> %s %s %s' % (xtal, resnameLIG, chainLIG, seqnumLIG))
+                            self.Logfile.error('%s: did NOT find ligand in database -> %s %s %s' % (xtal, resnameLIG, chainLIG, seqnumLIG))
                             ligands_not_in_panddaTable.append([resnameLIG,chainLIG,seqnumLIG,altLocLIG,occupancyLig,residue_xyz])
                     else:
                         self.Logfile.warning('ligand in PDB file, but dataset not listed in panddaTable: %s -> %s %s %s' %(xtal,item[0],item[1],item[2]))
 
                 for entry in ligands_not_in_panddaTable:
-                    self.Logfile.warning('%s: refine.pdb contains a ligand that is not assigned in the panddaTable: %s %s %s %s' %(xtal,entry[0],entry[1],entry[2],entry[3]))
+                    self.Logfile.error('%s: refine.pdb contains a ligand that is not assigned in the panddaTable: %s %s %s %s' %(xtal,entry[0],entry[1],entry[2],entry[3]))
 
                 for site in ligands_not_in_panddaTable:
 #                    self.Logfile.insert('%s: making copy of refine.pdb' %xtal)

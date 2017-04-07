@@ -1,4 +1,4 @@
-# last edited: 27/03/2017, 15:00
+# last edited: 06/04/2017, 15:00
 
 import sys
 import os
@@ -557,8 +557,14 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
             refSoft=pdbtools(pdb).GetRefinementProgram()
 
-            Cmd = ( 'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/setup.sh')+'\n'
-                    +os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/bin/pdb_extract')+
+            if os.path.isdir('/dls'):
+                pdb_extract_init='source /dls/science/groups/i04-1/software/pdb-extract-prod/setup.sh\n'
+                pdb_extract_init+='/dls/science/groups/i04-1/software/pdb-extract-prod/bin/pdb_extract'
+            else:
+                pdb_extract_init='source '+os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/setup.sh')+'\n'
+                pdb_extract_init+=+os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/bin/pdb_extract')
+
+            Cmd = ( pdb_extract_init+
 #                    ' -r PHENIX'
                     ' -r %s'            %refSoft+
 #                    ' -iLOG initial.log'
@@ -1021,9 +1027,13 @@ class compare_smiles_in_db_with_ligand_in_pdb(QtCore.QThread):
         for xtal in sorted(glob.glob('*')):
             if os.path.isfile(os.path.join(xtal,'refine.pdb')):
                 smiles=self.db.execute_statement("select CompoundSmiles,CompoundCode from mainTable where CrystalName is '%s'" %xtal)
-                LigandSmiles=str(smiles[0][0])
-                LigandCode=str(smiles[0][1])
-                elementDict_smiles=smilestools(LigandSmiles).ElementDict()
+                try:
+                    LigandSmiles=str(smiles[0][0])
+                    LigandCode=str(smiles[0][1])
+                    elementDict_smiles=smilestools(LigandSmiles).ElementDict()
+                except IndexError:
+                    self.Logfile.error("%s: something is seems to be wrong with the CompoundCode or SMILES string: %s" %(xtal,str(smiles)))
+                    continue
 
                 pdb=pdbtools(os.path.join(xtal,'refine.pdb'))
                 ligandList=pdb.ligand_details_as_list()
