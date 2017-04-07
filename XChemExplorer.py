@@ -262,16 +262,24 @@ class XChemExplorer(QtGui.QApplication):
 
         # GUI setup
         self.window=QtGui.QWidget()
-        self.window.setWindowTitle("XChemExplorer")
-        self.center_main_window()
-
+        #self.screenShape = QtGui.QDesktopWidget().screenGeometry()
+	#self.window.resize(self.screenShape.width()/8, self.screenShape.height()/8)
+	self.window.setWindowTitle("XChemExplorer_RACHAELBETA")
+        #self.center_main_window()
+	#self.window.showMaximized()
+	
+	size_policy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+	self.window.setSizePolicy(size_policy)
+	screen = QtGui.QDesktopWidget().screenGeometry()
+        self.window.setFixedSize(screen.width(),screen.height()-70)
+	#print self.window.sizeHint()
         ######################################################################################
         # Menu Widget
         menu_bar = QtGui.QMenuBar()
 
         file = menu_bar.addMenu("&File")
         load=QtGui.QAction("Open Config File", self.window)
-        load.setShortcut('Ctrl+O')
+	load.setShortcut('Ctrl+O')
         load.triggered.connect(self.open_config_file)
         save=QtGui.QAction("Save Config File", self.window)
         save.setShortcut('Ctrl+S')
@@ -616,6 +624,7 @@ class XChemExplorer(QtGui.QApplication):
         #
 
         self.main_tab_widget = QtGui.QTabWidget()
+	self.main_tab_widget.setSizePolicy(size_policy)
         self.tab_dict={}
         for page in self.workflow:
             tab=QtGui.QWidget()
@@ -628,7 +637,8 @@ class XChemExplorer(QtGui.QApplication):
         #
 
         overview_tab_widget = QtGui.QTabWidget()
-        self.tab_dict[self.workflow_dict['Overview']][1].addWidget(overview_tab_widget)
+        overview_tab_widget.setSizePolicy(size_policy)
+	self.tab_dict[self.workflow_dict['Overview']][1].addWidget(overview_tab_widget)
         overview_tab_list = [   'Data Source',
                                 'Summary'    ]
 
@@ -693,7 +703,8 @@ class XChemExplorer(QtGui.QApplication):
 
 
         dls_tab_widget = QtGui.QTabWidget()
-        dls_tab_list = [ 'Summary',
+        dls_tab_widget.setSizePolicy(size_policy)
+	dls_tab_list = [ 'Summary',
         #                 'Dewar',
                          'Reprocess'    ]
 
@@ -1059,8 +1070,9 @@ class XChemExplorer(QtGui.QApplication):
 
         scroll = QtGui.QScrollArea()
         self.deposition_vbox.addWidget(scroll)
-        scroll.setWidgetResizable(True)
+        scroll.setSizePolicy(size_policy)  #setWidgetResizable(True)
         scrollContent = QtGui.QWidget(scroll)
+	scrollContent.setSizePolicy(size_policy)
 
         scrollLayout = QtGui.QVBoxLayout(scrollContent)
         scrollContent.setLayout(scrollLayout)
@@ -1073,8 +1085,9 @@ class XChemExplorer(QtGui.QApplication):
         label_text.setStyleSheet("font: 17pt Arial")
         scrollLayout.addWidget(label_text)
         scrollLayout.addWidget(QtGui.QLabel(''))
-        image=QtGui.QLabel()
+        image = QtGui.QLabel()
         pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'),'image','html_summary_page.png'))
+	#pixmap = pixmap.scaledToWidth(200)
         image.setPixmap(pixmap)
         scrollLayout.addWidget(image)
         scrollLayout.addWidget(QtGui.QLabel(''))
@@ -1210,7 +1223,8 @@ class XChemExplorer(QtGui.QApplication):
         self.tab_dict[self.workflow_dict['PANDDAs']][1].addLayout(self.panddas_results_vbox)
 
         pandda_tab_widget = QtGui.QTabWidget()
-        pandda_tab_list = [ 'pandda.analyse',
+        pandda_tab_widget.setSizePolicy(size_policy)
+	pandda_tab_list = [ 'pandda.analyse',
                             'Dataset Summary',
                             'Results Summary',
                             'Inspect Summary'  ]
@@ -1226,7 +1240,8 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_tab_dict['pandda.analyse'][1].addLayout(self.pandda_analyse_hbox)
 
         grid_pandda = QtGui.QGridLayout()
-
+	grid_pandda.setColumnStretch(0,20)
+	grid_pandda.setRowStretch(0,20)
         # left hand side: table with information about available datasets
         self.pandda_column_name = [ 'Sample ID',
                                     'Refinement\nSpace Group',
@@ -1577,6 +1592,7 @@ class XChemExplorer(QtGui.QApplication):
         self.window.setLayout(vbox_main)
 
         self.status_bar.showMessage('Ready')
+       # print self.window.minimumSize()
         self.window.show()
 
         if self.data_source_file != '':
@@ -1586,9 +1602,9 @@ class XChemExplorer(QtGui.QApplication):
 
     def center_main_window(self):
         screen = QtGui.QDesktopWidget().screenGeometry()
-#        self.window.setFixedSize(screen.width()-(screen.width()/8),screen.height()-(screen.height()/8))
+        self.window.setFixedSize(screen.width(),screen.height())
         size = self.window.geometry()
-        self.window.move((screen.width()-size.width())/2, (screen.height()-size.height())/2)
+        #self.window.move((screen.width()-size.width())/2, (screen.height()-size.height())/2)
 
 
 
@@ -1862,6 +1878,7 @@ class XChemExplorer(QtGui.QApplication):
         vbox = QtGui.QVBoxLayout()
 
         deposit_tab_widget = QtGui.QTabWidget()
+	deposit_tab_widget.setSizePolicy(size_policy)
         deposit_tab_list = [ 'Contact',
                              'General',
                              'Authors',
@@ -4816,7 +4833,7 @@ class XChemExplorer(QtGui.QApplication):
 #            data_collection_table.verticalHeader().setStretchLastSection(False)
 #            data_collection_table.itemSelectionChanged.connect(self.update_selected_autoproc_data_collection_summary_table)
             data_collection_table.cellClicked.connect(self.user_update_selected_autoproc_data_collection_summary_table)
-            data_collection_table.setSizePolicy(QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Minimum)
+            #data_collection_table.setSizePolicy(QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Minimum)
 
             # select best resolution file + set data collection outcome
             # the assumption is that index in data_collection_dict and row number are identical
@@ -5726,7 +5743,7 @@ class XChemExplorer(QtGui.QApplication):
                                     vbox=QtGui.QVBoxLayout()
                                     vbox.addWidget(QtGui.QLabel(str(entry[x])))
                                     frame.setLayout(vbox)
-                                    frame.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Minimum))
+                                    #frame.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Minimum))
                                     grid.addWidget(frame,y,x)
                             outerFrame.setLayout(grid)
                             self.summary_table.setCellWidget(current_row, column, outerFrame)
@@ -5801,8 +5818,10 @@ class XChemExplorer(QtGui.QApplication):
                 pickle.dump(self.data_collection_dict,open(self.data_collection_summary_file,'wb'))
         self.update_log.insert('quitting XCE... bye,bye!')
         QtGui.qApp.quit()
-
+	
+    
 
 if __name__ == "__main__":
-    app=XChemExplorer(sys.argv[1:])
+	app=XChemExplorer(sys.argv[1:])
+	
 
