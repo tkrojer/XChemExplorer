@@ -1,4 +1,4 @@
-# last edited: 06/04/2017, 15:00
+# last edited: 10/04/2017, 15:00
 
 import sys
 import os
@@ -57,7 +57,7 @@ def update_file_locations_of_apo_structuresin_DB(database,projectDir,xce_logfile
         if os.path.isfile(os.path.join(projectDir,xtal,'dimple.pdb')):
             db_dict['PDB_file']=os.path.realpath(os.path.join(projectDir,xtal,'dimple.pdb'))
             if os.path.isfile(os.path.join(projectDir,xtal,'dimple.mtz')):
-                db_dict['PDB_file']=os.path.realpath(os.path.join(projectDir,xtal,'dimple.mtz'))
+                db_dict['MTZ_file']=os.path.realpath(os.path.join(projectDir,xtal,'dimple.mtz'))
                 Logfile.insert('updating depositTable for apo structure '+xtal)
                 db.update_depositTable(xtal,'apo',db_dict)
 
