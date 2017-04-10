@@ -1878,7 +1878,7 @@ class XChemExplorer(QtGui.QApplication):
         vbox = QtGui.QVBoxLayout()
 
         deposit_tab_widget = QtGui.QTabWidget()
-	deposit_tab_widget.setSizePolicy(size_policy)
+#	deposit_tab_widget.setSizePolicy(size_policy)
         deposit_tab_list = [ 'Contact',
                              'General',
                              'Authors',
