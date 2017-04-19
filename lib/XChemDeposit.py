@@ -1,4 +1,4 @@
-# last edited: 06/04/2017, 15:00
+# last edited: 10/04/2017, 15:00
 
 import sys
 import os
@@ -57,7 +57,7 @@ def update_file_locations_of_apo_structuresin_DB(database,projectDir,xce_logfile
         if os.path.isfile(os.path.join(projectDir,xtal,'dimple.pdb')):
             db_dict['PDB_file']=os.path.realpath(os.path.join(projectDir,xtal,'dimple.pdb'))
             if os.path.isfile(os.path.join(projectDir,xtal,'dimple.mtz')):
-                db_dict['PDB_file']=os.path.realpath(os.path.join(projectDir,xtal,'dimple.mtz'))
+                db_dict['MTZ_file']=os.path.realpath(os.path.join(projectDir,xtal,'dimple.mtz'))
                 Logfile.insert('updating depositTable for apo structure '+xtal)
                 db.update_depositTable(xtal,'apo',db_dict)
 
@@ -597,8 +597,14 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             elif self.structureType=='apo':
                 out=xtal+'-apo'
 
-            Cmd = ( 'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/setup.sh')+'\n'
-                    +os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/bin/sf_convert')+
+            if os.path.isdir('/dls'):
+                pdb_extract_init='source /dls/science/groups/i04-1/software/pdb-extract-prod/setup.sh\n'
+                pdb_extract_init+='/dls/science/groups/i04-1/software/pdb-extract-prod/bin/sf_convert'
+            else:
+                pdb_extract_init='source '+os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/setup.sh')+'\n'
+                pdb_extract_init+=+os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/pdb-extract-prod/bin/sf_convert')
+
+            Cmd = ( pdb_extract_init+
                     ' -o mmcif'
                     ' -sf %s' %mtzin+
                     ' -out %s_sf.mmcif  > %s.sf_mmcif.log' %(out,out) )
