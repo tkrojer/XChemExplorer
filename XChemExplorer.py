@@ -4,6 +4,8 @@ import os, sys, glob
 from datetime import datetime
 import time
 
+import subprocess
+
 from PyQt4 import QtGui, QtCore, QtWebKit
 
 import pickle
@@ -371,9 +373,18 @@ class XChemExplorer(QtGui.QApplication):
 #        prepare_bound_models_for_deposition=QtGui.QAction('prepare_bound_models_for_deposition',self.window)
 #        prepare_bound_models_for_deposition.triggered.connect(self.prepare_bound_models_for_deposition)
 #        deposition_menu.addAction(prepare_bound_models_for_deposition)
+	
+	def openFile(file):
+   		if sys.platform == 'linux2':
+        		subprocess.call(["xdg-open", file])
+    		else:
+        		os.startfile(file)
 
-        help = menu_bar.addMenu("&Help")
-
+        help_menu = menu_bar.addMenu("&Help")
+	load_xce_tutorial = QtGui.QAction('Open XCE tutorial', self.window)
+	file = '/dls/science/groups/i04-1/software/docs/XChemExplorer.pdf'
+	load_xce_tutorial.triggered.connect(lambda:openFile(file))
+	help_menu.addAction(load_xce_tutorial)
 
         ######################################################################################
         #
