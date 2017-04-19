@@ -269,15 +269,8 @@ class XChemExplorer(QtGui.QApplication):
         size_policy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         self.window.setSizePolicy(size_policy)
         self.screen = QtGui.QDesktopWidget().screenGeometry()
-<<<<<<< HEAD
-<<<<<<< HEAD
         #self.window.setFixedSize(self.screen.width(),self.screen.height()-70)
-=======
-        self.window.setFixedSize(self.screen.width(),self.screen.height()-70)
->>>>>>> origin/master
-=======
-        self.window.setFixedSize(self.screen.width(),self.screen.height()-70)
->>>>>>> origin/master
+
 
         ######################################################################################
         # Menu Widget
