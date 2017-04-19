@@ -1,4 +1,4 @@
-# last edited: 17/03/2017, 15:00
+# last edited: 19/04/2017, 18:00
 
 import os, sys, glob
 from datetime import datetime
@@ -264,24 +264,20 @@ class XChemExplorer(QtGui.QApplication):
 
         # GUI setup
         self.window=QtGui.QWidget()
-        #self.screenShape = QtGui.QDesktopWidget().screenGeometry()
-	#self.window.resize(self.screenShape.width()/8, self.screenShape.height()/8)
-	self.window.setWindowTitle("XChemExplorer")
-        #self.center_main_window()
-	#self.window.showMaximized()
+        self.window.setWindowTitle("XChemExplorer")
 	
-	size_policy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
-	self.window.setSizePolicy(size_policy)
-	self.screen = QtGui.QDesktopWidget().screenGeometry()
+        size_policy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        self.window.setSizePolicy(size_policy)
+        self.screen = QtGui.QDesktopWidget().screenGeometry()
         self.window.setFixedSize(self.screen.width(),self.screen.height()-70)
-	#print self.window.sizeHint()
+
         ######################################################################################
         # Menu Widget
         menu_bar = QtGui.QMenuBar()
 
         file = menu_bar.addMenu("&File")
         load=QtGui.QAction("Open Config File", self.window)
-	load.setShortcut('Ctrl+O')
+        load.setShortcut('Ctrl+O')
         load.triggered.connect(self.open_config_file)
         save=QtGui.QAction("Save Config File", self.window)
         save.setShortcut('Ctrl+S')
@@ -441,7 +437,7 @@ class XChemExplorer(QtGui.QApplication):
         frame_dataset_task.setFrameShape(QtGui.QFrame.StyledPanel)
         frame_dataset_task.setStyleSheet("QFrame { border: 1px solid black; border-radius: 1px; padding: 0px; margin: 0px }")
         vboxTask=QtGui.QVBoxLayout()
-#        label=QtGui.QLabel(self.workflow_dict['Datasets'])
+#       label=QtGui.QLabel(self.workflow_dict['Datasets'])
         label=QtGui.QLabel('Datasets')
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
         label.setFont(headlineLabelfont)
@@ -488,7 +484,7 @@ class XChemExplorer(QtGui.QApplication):
         frame_map_cif_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
         frame_map_cif_file_task.setStyleSheet("QFrame { border: 1px solid black; border-radius: 1px; padding: 0px; margin: 0px }")
         vboxTask=QtGui.QVBoxLayout()
-#        label=QtGui.QLabel(self.workflow_dict['Maps'])
+#       label=QtGui.QLabel(self.workflow_dict['Maps'])
         label=QtGui.QLabel('Maps & Restraints')
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
         label.setFont(headlineLabelfont)
@@ -635,7 +631,7 @@ class XChemExplorer(QtGui.QApplication):
         #
 
         self.main_tab_widget = QtGui.QTabWidget()
-	self.main_tab_widget.setSizePolicy(size_policy)
+        self.main_tab_widget.setSizePolicy(size_policy)
         self.tab_dict={}
         for page in self.workflow:
             tab=QtGui.QWidget()
@@ -649,7 +645,7 @@ class XChemExplorer(QtGui.QApplication):
 
         overview_tab_widget = QtGui.QTabWidget()
         overview_tab_widget.setSizePolicy(size_policy)
-	self.tab_dict[self.workflow_dict['Overview']][1].addWidget(overview_tab_widget)
+        self.tab_dict[self.workflow_dict['Overview']][1].addWidget(overview_tab_widget)
         overview_tab_list = [   'Data Source',
                                 'Summary'    ]
 
@@ -715,7 +711,7 @@ class XChemExplorer(QtGui.QApplication):
 
         dls_tab_widget = QtGui.QTabWidget()
         dls_tab_widget.setSizePolicy(size_policy)
-	dls_tab_list = [ 'Summary',
+        dls_tab_list = [ 'Summary',
         #                 'Dewar',
                          'Reprocess'    ]
 
@@ -1083,7 +1079,7 @@ class XChemExplorer(QtGui.QApplication):
         self.deposition_vbox.addWidget(scroll)
         scroll.setSizePolicy(size_policy)  #setWidgetResizable(True)
         scrollContent = QtGui.QWidget(scroll)
-	scrollContent.setSizePolicy(size_policy)
+        scrollContent.setSizePolicy(size_policy)
 
         scrollLayout = QtGui.QVBoxLayout(scrollContent)
         scrollContent.setLayout(scrollLayout)
@@ -1235,7 +1231,7 @@ class XChemExplorer(QtGui.QApplication):
 
         pandda_tab_widget = QtGui.QTabWidget()
         pandda_tab_widget.setSizePolicy(size_policy)
-	pandda_tab_list = [ 'pandda.analyse',
+        pandda_tab_list = [ 'pandda.analyse',
                             'Dataset Summary',
                             'Results Summary',
                             'Inspect Summary'  ]
@@ -1251,8 +1247,8 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_tab_dict['pandda.analyse'][1].addLayout(self.pandda_analyse_hbox)
 
         grid_pandda = QtGui.QGridLayout()
-	grid_pandda.setColumnStretch(0,20)
-	grid_pandda.setRowStretch(0,20)
+        grid_pandda.setColumnStretch(0,20)
+        grid_pandda.setRowStretch(0,20)
         # left hand side: table with information about available datasets
         self.pandda_column_name = [ 'Sample ID',
                                     'Refinement\nSpace Group',
@@ -1464,8 +1460,8 @@ class XChemExplorer(QtGui.QApplication):
 
         ######################################################################################
         self.settings_container=QtGui.QWidget()
-	self.buttons_etc = QtGui.QWidget()
-	self.settings_vbox=QtGui.QVBoxLayout()
+        self.buttons_etc = QtGui.QWidget()
+        self.settings_vbox=QtGui.QVBoxLayout()
 
         self.scroll = QtGui.QScrollArea(self.settings_container)
         self.settings_vbox.addWidget(self.scroll)
@@ -1477,10 +1473,10 @@ class XChemExplorer(QtGui.QApplication):
         scrollContent_settings.setLayout(scrollLayout_settings)
 
 
-	# Settings Tab
-	self.data_collection_vbox_for_settings=QtGui.QVBoxLayout()
+        # Settings Tab
+        self.data_collection_vbox_for_settings=QtGui.QVBoxLayout()
 	
-	self.buttons_etc.setLayout(self.data_collection_vbox_for_settings)
+        self.buttons_etc.setLayout(self.data_collection_vbox_for_settings)
 	self.scroll.setWidget(self.buttons_etc)
 
         self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nProject Directory: - REQUIRED -'))
@@ -1907,7 +1903,7 @@ class XChemExplorer(QtGui.QApplication):
         vbox = QtGui.QVBoxLayout()
 
         deposit_tab_widget = QtGui.QTabWidget()
-	deposit_tab_widget.setSizePolicy(size_policy)
+        deposit_tab_widget.setSizePolicy(size_policy)
         deposit_tab_list = [ 'Contact',
                              'General',
                              'Authors',
