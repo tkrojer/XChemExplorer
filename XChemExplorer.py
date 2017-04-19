@@ -266,8 +266,8 @@ class XChemExplorer(QtGui.QApplication):
         self.window=QtGui.QWidget()
         self.window.setWindowTitle("XChemExplorer")
 	
-        size_policy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
-        self.window.setSizePolicy(size_policy)
+        #size_policy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        #self.window.setSizePolicy(size_policy)
         self.screen = QtGui.QDesktopWidget().screenGeometry()
         #self.window.setFixedSize(self.screen.width(),self.screen.height()-70)
 
@@ -632,7 +632,7 @@ class XChemExplorer(QtGui.QApplication):
         #
 
         self.main_tab_widget = QtGui.QTabWidget()
-        self.main_tab_widget.setSizePolicy(size_policy)
+        #self.main_tab_widget.setSizePolicy(size_policy)
         self.tab_dict={}
         for page in self.workflow:
             tab=QtGui.QWidget()
@@ -645,7 +645,7 @@ class XChemExplorer(QtGui.QApplication):
         #
 
         overview_tab_widget = QtGui.QTabWidget()
-        overview_tab_widget.setSizePolicy(size_policy)
+        #overview_tab_widget.setSizePolicy(size_policy)
         self.tab_dict[self.workflow_dict['Overview']][1].addWidget(overview_tab_widget)
         overview_tab_list = [   'Data Source',
                                 'Summary'    ]
@@ -711,7 +711,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
         dls_tab_widget = QtGui.QTabWidget()
-        dls_tab_widget.setSizePolicy(size_policy)
+        #dls_tab_widget.setSizePolicy(size_policy)
         dls_tab_list = [ 'Summary',
         #                 'Dewar',
                          'Reprocess'    ]
@@ -1078,9 +1078,9 @@ class XChemExplorer(QtGui.QApplication):
 
         scroll = QtGui.QScrollArea()
         self.deposition_vbox.addWidget(scroll)
-        scroll.setSizePolicy(size_policy)  #setWidgetResizable(True)
+        #scroll.setSizePolicy(size_policy)  #setWidgetResizable(True)
         scrollContent = QtGui.QWidget(scroll)
-        scrollContent.setSizePolicy(size_policy)
+        #scrollContent.setSizePolicy(size_policy)
 
         scrollLayout = QtGui.QVBoxLayout(scrollContent)
         scrollContent.setLayout(scrollLayout)
@@ -1231,7 +1231,7 @@ class XChemExplorer(QtGui.QApplication):
         self.tab_dict[self.workflow_dict['PANDDAs']][1].addLayout(self.panddas_results_vbox)
 
         pandda_tab_widget = QtGui.QTabWidget()
-        pandda_tab_widget.setSizePolicy(size_policy)
+        #pandda_tab_widget.setSizePolicy(size_policy)
         pandda_tab_list = [ 'pandda.analyse',
                             'Dataset Summary',
                             'Results Summary',
@@ -1466,9 +1466,9 @@ class XChemExplorer(QtGui.QApplication):
 
         self.scroll = QtGui.QScrollArea(self.settings_container)
         self.settings_vbox.addWidget(self.scroll)
-        scroll.setSizePolicy(size_policy)  #setWidgetResizable(True)
+        #scroll.setSizePolicy(size_policy)  #setWidgetResizable(True)
         scrollContent_settings = QtGui.QWidget(scroll)
-        scrollContent_settings.setSizePolicy(size_policy)
+        #scrollContent_settings.setSizePolicy(size_policy)
 
         scrollLayout_settings = QtGui.QVBoxLayout(scrollContent_settings)
         scrollContent_settings.setLayout(scrollLayout_settings)
@@ -1914,7 +1914,7 @@ class XChemExplorer(QtGui.QApplication):
         vbox = QtGui.QVBoxLayout()
 
         deposit_tab_widget = QtGui.QTabWidget()
-        deposit_tab_widget.setSizePolicy(size_policy)
+#        deposit_tab_widget.setSizePolicy(size_policy)
         deposit_tab_list = [ 'Contact',
                              'General',
                              'Authors',
