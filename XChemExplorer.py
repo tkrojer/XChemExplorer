@@ -378,10 +378,15 @@ class XChemExplorer(QtGui.QApplication):
         		os.startfile(file)
 
         help_menu = menu_bar.addMenu("&Help")
-	load_xce_tutorial = QtGui.QAction('Open XCE tutorial', self.window)
-	file = '/dls/science/groups/i04-1/software/docs/XChemExplorer.pdf'
-	load_xce_tutorial.triggered.connect(lambda:openFile(file))
-	help_menu.addAction(load_xce_tutorial)
+        load_xce_tutorial = QtGui.QAction('Open XCE tutorial', self.window)
+        file = '/dls/science/groups/i04-1/software/docs/XChemExplorer.pdf'
+        load_xce_tutorial.triggered.connect(lambda:openFile(file))
+        help_menu.addAction(load_xce_tutorial)
+
+        load_xce_troubleshoot = QtGui.QAction('Troubleshooting', self.window)
+        file2 = '/dls/science/groups/i04-1/software/xce_troubleshooting.pdf'
+        load_xce_troubleshoot.triggered.connect(lambda:openFile(file2))
+        help_menu.addAction(load_xce_troubleshoot)
 
         ######################################################################################
         #
