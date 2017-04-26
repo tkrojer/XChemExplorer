@@ -7,6 +7,109 @@ def openFile(file):
     else:
         os.startfile(file)
 
+def quit_xce(self):
+    # save pkl file
+    if self.data_collection_dict != {}:
+        if os.path.isfile(self.data_collection_summary_file):
+            self.update_log.insert('saving results to PKL file')
+            pickle.dump(self.data_collection_dict,open(self.data_collection_summary_file,'wb'))
+    self.update_log.insert('quitting XCE... bye,bye!')
+    QtGui.qApp.quit()
+
+def datasource_menu_save_samples(self):
+    print 'hallo'
+
+def datasource_menu_import_csv_file(self):
+    if self.data_source_set:
+        file_name = QtGui.QFileDialog.getOpenFileName(self.window,'Open file', self.database_directory)
+        self.db.import_csv_file(file_name)
+    else:
+        self.update_status_bar('Please load a data source file first')
+
+def datasource_menu_export_csv_file(self):
+    file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
+    if file_name.rfind('.') != -1:
+        file_name=file_name[:file_name.rfind('.')]+'.csv'
+    else:
+        file_name=file_name+'.csv'
+    self.db.export_to_csv_file(file_name)
+
+def datasource_menu_update_datasource(self):
+    self.work_thread=XChemThread.synchronise_db_and_filesystem(self.initial_model_directory,os.path.join(self.database_directory,self.data_source_file),self.panddas_directory,self.xce_logfile,'project_directory')
+    self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+    self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+    self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+    self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
+    self.work_thread.start()
+
+def select_datasource_columns_to_display(self):
+    columns_to_show = QtGui.QMessageBox()
+    columns_to_showLayout = columns_to_show.layout()
+    columns_in_data_source=self.db.return_column_list()
+    try:
+        columns_in_data_source=self.db.return_column_list()
+    except AttributeError:
+        print '==> XCE: please select a datasource file'
+        self.status_bar.showMessage('please select a datasource file')
+        return
+
+    column_dict={}
+    vbox = QtGui.QVBoxLayout()
+    number_of_entries=len(columns_in_data_source)
+    columns_shown_in_dialog_column=15
+    grid = QtGui.QGridLayout()
+    x=0
+    y=0
+
+    columns_to_ignore=self.db.columns_not_to_display()
+    for entries_added in range(number_of_entries):
+        if not columns_in_data_source[entries_added][1] in columns_to_ignore:
+            data_source_column = QtGui.QCheckBox(columns_in_data_source[entries_added][1])
+            column_dict[entries_added]=data_source_column
+            if columns_in_data_source[entries_added][1] in self.data_source_columns_to_display:
+                data_source_column.setChecked(True)
+            grid.addWidget(data_source_column, y,x)
+            y+=1
+        if y==columns_shown_in_dialog_column:
+            y=0
+            x+=1
+    vbox.addLayout(grid)
+    columns_to_showLayout.addLayout(vbox,0,0)
+
+    columns_to_show.addButton(QtGui.QPushButton('OK'), QtGui.QMessageBox.YesRole)
+    columns_to_show.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
+    reply=columns_to_show.exec_();
+    if reply == 0:
+        columns_to_show_list=['Sample ID']
+        for key in column_dict:
+            if column_dict[key].isChecked():
+                columns_to_show_list.append(columns_in_data_source[key][1])
+        self.data_source_columns_to_display=columns_to_show_list
+        self.populate_and_update_data_source_table()
+
+def create_new_data_source_func(self):
+    file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
+    #make sure that the file always has .sqlite extension
+    if file_name.rfind('.') != -1:
+        file_name=file_name[:file_name.rfind('.')]+'.sqlite'
+    else:
+        file_name=file_name+'.sqlite'
+    self.db=XChemDB.data_source(file_name)
+    print '==> XCE: creating new data source'
+    self.db.create_empty_data_source_file()
+    self.db.create_missing_columns()
+    self.database_directory=file_name[:file_name.rfind('/')]
+    self.data_source_file=file_name[file_name.rfind('/')+1:]
+    self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
+    self.settings['database_directory']=self.database_directory
+    self.settings['data_source']=self.data_source_file
+    self.data_source_set=True
+    self.datasource_menu_reload_samples()
+
+def export_data_for_WONKA(self):
+    self.update_log.insert('exporting CSV file for input into WONKA')
+    self.db.export_csv_for_WONKA()
+
 ## menu bar options and processes
 def menu_bar(self):
     # initiate a menubar instance
@@ -28,7 +131,7 @@ def menu_bar(self):
     # quit xce
     quit = QtGui.QAction("Quit", self.window)
     quit.setShortcut('Ctrl+Q')
-    quit.triggered.connect(self.quit_xce)
+    quit.triggered.connect(quit_xce)
 
     # add the actions for the file menu
     file.addAction(load)
@@ -44,31 +147,31 @@ def menu_bar(self):
 
     # save samples to datasource
     save_samples_to_datasource = QtGui.QAction('Save Samples to Datasource', self.window)
-    save_samples_to_datasource.triggered.connect(self.datasource_menu_save_samples)
+    save_samples_to_datasource.triggered.connect(datasource_menu_save_samples)
 
     # import csv
     import_csv_file_into_datasource = QtGui.QAction('Import CSV file into Datasource', self.window)
-    import_csv_file_into_datasource.triggered.connect(self.datasource_menu_import_csv_file)
+    import_csv_file_into_datasource.triggered.connect(datasource_menu_import_csv_file)
 
     # export csv
     export_csv_file_into_datasource = QtGui.QAction('Export CSV file from Datasource', self.window)
-    export_csv_file_into_datasource.triggered.connect(self.datasource_menu_export_csv_file)
+    export_csv_file_into_datasource.triggered.connect(datasource_menu_export_csv_file)
 
     # update datasource
     update_datasource = QtGui.QAction('Update Datasource from file system', self.window)
-    update_datasource.triggered.connect(self.datasource_menu_update_datasource)
+    update_datasource.triggered.connect(datasource_menu_update_datasource)
 
     # select columns to show
     select_columns_to_show = QtGui.QAction('Select columns to show', self.window)
-    select_columns_to_show.triggered.connect(self.select_datasource_columns_to_display)
+    select_columns_to_show.triggered.connect(select_datasource_columns_to_display)
 
     # create new datasource
     create_new_data_source = QtGui.QAction('Create New Data Source (SQLite)', self.window)
-    create_new_data_source.triggered.connect(self.create_new_data_source)
+    create_new_data_source.triggered.connect(create_new_data_source_func)
 
     # export csv (wonka)
     export_csv_for_WONKA = QtGui.QAction('export CSV for WONKA', self.window)
-    export_csv_for_WONKA.triggered.connect(self.export_data_for_WONKA)
+    export_csv_for_WONKA.triggered.connect(export_data_for_WONKA)
 
     # add the actions for the datasource menu
     datasource_menu.addAction(reload_samples_from_datasource)

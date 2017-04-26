@@ -1,6 +1,4 @@
 from import_modules import *
-import datasourcebutton_functions as buttonfunc
-import TCdatasets_functions as TCdatafunc
 
 def workflow(self):
     self.workflow =             [   'Overview',         # 0
@@ -71,7 +69,7 @@ def datasource_button(self):
         "QPushButton { padding: 1px; margin: 1px; background: rgb(140,140,140) }")
     self.headlineLabelfont = QtGui.QFont("Arial", 20, QtGui.QFont.Bold)
     update_from_datasource_button.setFont(self.headlineLabelfont)
-    update_from_datasource_button.clicked.connect(buttonfunc.datasource_menu_reload_samples)
+    update_from_datasource_button.clicked.connect(self.datasource_menu_reload_samples)
     update_from_datasource_button.setMaximumWidth((self.screen.width() - 20) / 5)
 
     return update_from_datasource_button
@@ -342,3 +340,5 @@ def setup_for_layout(self):
     self.hboxTaskFrames.addWidget(maps)
     self.hboxTaskFrames.addWidget(panddas)
     self.hboxTaskFrames.addWidget(refine)
+
+    return self

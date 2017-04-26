@@ -19,7 +19,6 @@ class XChemExplorer(QtGui.QApplication):
     def start_GUI(self):
         gl.setup_layout(self)
 
-    # gui/main_tabs.py
     def select_sample_for_dimple(self):
         indexes = self.initial_model_table.selectionModel().selectedRows()
         for index in sorted(indexes):
@@ -27,7 +26,6 @@ class XChemExplorer(QtGui.QApplication):
             self.update_log.insert('%s is marked for DIMPLE' %index.row())
             self.initial_model_dimple_dict[xtal][0].setChecked(True)
 
-    #gui/main_tabs.py
     def select_sample_for_xia2(self):
         indexes = self.reprocess_datasets_table.selectionModel().selectedRows()
         for index in sorted(indexes):
@@ -138,15 +136,6 @@ class XChemExplorer(QtGui.QApplication):
         pdbID_entryLayout = pdbID_entry.layout()
 
         vbox = QtGui.QVBoxLayout()
-#        settings_hbox_filename_root=QtGui.QHBoxLayout()
-#        filename_root_label=QtGui.QLabel('filename root:')
-#        settings_hbox_filename_root.addWidget(filename_root_label)
-#        filename_root_input = QtGui.QLineEdit()
-#        filename_root_input.setFixedWidth(400)
-#        filename_root_input.setText(str(self.filename_root))
-#        filename_root_input.textChanged[str].connect(self.change_filename_root)
-#        settings_hbox_filename_root.addWidget(filename_root_input)
-#        vbox.addLayout(settings_hbox_filename_root)
 
         frame=QtGui.QFrame()
         frame.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -177,7 +166,6 @@ class XChemExplorer(QtGui.QApplication):
 
     def export_to_html(self):
         self.update_log.insert('exporting contents of SQLite database into '+self.html_export_directory)
-#        print 'ccp4-python '+os.getenv('XChemExplorer_DIR')+'/web/process_sqlite.py -t Summary -s '+os.path.join(self.database_directory,self.data_source_file)+' -d '+self.html_export_directory
         os.system('ccp4-python '+os.getenv('XChemExplorer_DIR')+'/web/process_sqlite.py -t Summary -s '+os.path.join(self.database_directory,self.data_source_file)+' -d '+self.html_export_directory)
         XChemWeb.create_ICM_input_file(self.html_export_directory,os.path.join(self.database_directory,self.data_source_file))
         self.update_log.insert('open ICMpro:')
@@ -195,8 +183,6 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
-
-
     def update_html_for_zenodo_upload(self):
         try:
             uploadID=int(self.zenodo_upload_id_entry.text())
@@ -207,7 +193,6 @@ class XChemExplorer(QtGui.QApplication):
             self.update_log.insert('zenodo upload ID must be an integer!')
 
     def create_missing_apo_records_in_depositTable(self):
-#        self.db.create_missing_apo_records_in_depositTable(self.xce_logfile)
         self.db.create_missing_apo_records_for_all_structures_in_depositTable(self.initial_model_directory,self.xce_logfile)
 
     def update_file_information_of_apo_records(self):
@@ -254,18 +239,6 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("show_error_dict"), self.show_error_dict)
         self.work_thread.start()
 
-#    def prepare_bound_models_for_deposition(self):
-#        overwrite_existing_mmcif=True
-#        self.work_thread=XChemDeposit.prepare_bound_models_for_deposition(  os.path.join(self.database_directory,self.data_source_file),
-#                                                                            self.xce_logfile,
-#                                                                            overwrite_existing_mmcif,
-#                                                                            self.initial_model_directory    )
-#        self.explorer_active=1
-#        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-#        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-#        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-#        self.work_thread.start()
-
     def deposition_data(self):
 
         depositData = QtGui.QMessageBox()
@@ -275,7 +248,6 @@ class XChemExplorer(QtGui.QApplication):
         vbox = QtGui.QVBoxLayout()
 
         deposit_tab_widget = QtGui.QTabWidget()
-#        deposit_tab_widget.setSizePolicy(size_policy)
         deposit_tab_list = [ 'Contact',
                              'General',
                              'Authors',
@@ -332,18 +304,13 @@ class XChemExplorer(QtGui.QApplication):
         grid.addWidget(self.contact_author_PI_middle_name, 4,1)
 
         grid.addWidget(QtGui.QLabel('PI role'), 5,0)
-#        self.contact_author_PI_role = QtGui.QLineEdit()
         self.contact_author_PI_role = QtGui.QComboBox()
         PIroles = ['group leader','principal investigator','investigator']
         for item in PIroles: self.contact_author_PI_role.addItem(item)
-#        self.contact_author_PI_role.setText('group leader')
-#        self.contact_author_PI_role.setFixedWidth(200)
         grid.addWidget(self.contact_author_PI_role, 5,1)
 
         grid.addWidget(QtGui.QLabel('Organization type'), 6,0)
-#        self.contact_author_PI_organization_type = QtGui.QLineEdit()
-#        self.contact_author_PI_organization_type.setText('academic')
-#        self.contact_author_PI_organization_type.setFixedWidth(200)
+
         self.contact_author_PI_organization_type = QtGui.QComboBox()
         Organizations = ['academic','commercial','government']
         for item in Organizations: self.contact_author_PI_organization_type.addItem(item)
@@ -399,15 +366,9 @@ class XChemExplorer(QtGui.QApplication):
         self.contact_author_PI_phone_number.setFixedWidth(200)
         grid.addWidget(self.contact_author_PI_phone_number, 14,1)
 
-#        grid.addWidget(QtGui.QLabel('Fax'), 15,0)
-#        self.contact_author_PI_fax_number = QtGui.QLineEdit()
-#        self.contact_author_PI_fax_number.setText('')
-#        self.contact_author_PI_fax_number.setFixedWidth(200)
-#        grid.addWidget(self.contact_author_PI_fax_number, 15,1)
 
         frame.setLayout(grid)
         hbox.addWidget(frame)
-
 
         frame=QtGui.QFrame()
         frame.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -440,18 +401,14 @@ class XChemExplorer(QtGui.QApplication):
         grid.addWidget(self.contact_author_middle_name, 4,1)
 
         grid.addWidget(QtGui.QLabel('Role'), 5,0)
-#        self.contact_author_role = QtGui.QLineEdit()
-#        self.contact_author_role.setText('scientist')
-#        self.contact_author_role.setFixedWidth(200)
+
         self.contact_author_role = QtGui.QComboBox()
         ScientistRoles = ['responsible scientist','investigator']
         for item in ScientistRoles: self.contact_author_role.addItem(item)
         grid.addWidget(self.contact_author_role, 5,1)
 
         grid.addWidget(QtGui.QLabel('Organization type'), 6,0)
-#        self.contact_author_organization_type = QtGui.QLineEdit()
-#        self.contact_author_organization_type.setText('academic')
-#        self.contact_author_organization_type.setFixedWidth(200)
+
         self.contact_author_organization_type = QtGui.QComboBox()
         for item in Organizations: self.contact_author_organization_type.addItem(item)
         grid.addWidget(self.contact_author_organization_type, 6,1)
@@ -505,12 +462,6 @@ class XChemExplorer(QtGui.QApplication):
         self.contact_author_phone_number.setFixedWidth(200)
         grid.addWidget(self.contact_author_phone_number, 14,1)
 
-#        grid.addWidget(QtGui.QLabel('Fax'), 15,0)
-#        self.contact_author_fax_number = QtGui.QLineEdit()
-#        self.contact_author_fax_number.setText('')
-#        self.contact_author_fax_number.setFixedWidth(200)
-#        grid.addWidget(self.contact_author_fax_number, 15,1)
-
         frame.setLayout(grid)
         hbox.addWidget(frame)
 
@@ -533,37 +484,15 @@ class XChemExplorer(QtGui.QApplication):
         grid = QtGui.QGridLayout()
         grid.addWidget(QtGui.QLabel('Release status'), 0,0)
 
-#        grid.addWidget(QtGui.QLabel('Release Status for coordinates/ SF'), 2,0)
-##        self.Release_status_for_coordinates = QtGui.QLineEdit()
-##        self.Release_status_for_coordinates.setText('')
-##        self.Release_status_for_coordinates.setFixedWidth(200)
-#        self.Release_status_for_coordinates = QtGui.QComboBox()
-#        coordStatus = ['RELEASE NOW','HOLD FOR PUBLICATION','HOLD FOR 4 WEEKS','HOLD FOR 6 MONTHS','HOLD FOR 1 YEAR']
-#        for item in coordStatus: self.Release_status_for_coordinates.addItem(item)
-#        grid.addWidget(self.Release_status_for_coordinates, 2,1)
-##        grid.addWidget(QtGui.QLabel('(e.g. HOLD FOR PUBLICATION, RELEASE NOW)'), 1,2)
-
-#        grid.addWidget(QtGui.QLabel('Release Status for structure factors'), 2,0)
-#        self.Release_status_for_structure_factor = QtGui.QLineEdit()
-#        self.Release_status_for_structure_factor.setText('')
-#        self.Release_status_for_structure_factor.setFixedWidth(200)
-#        grid.addWidget(self.Release_status_for_structure_factor, 2,1)
-#        grid.addWidget(QtGui.QLabel('(e.g. HOLD FOR PUBLICATION, RELEASE NOW)'), 2,2)
-
         grid.addWidget(QtGui.QLabel('Release Status for sequence'), 4,0)
-#        self.Release_status_for_sequence = QtGui.QLineEdit()
-#        self.Release_status_for_sequence.setText('')
-#        self.Release_status_for_sequence.setFixedWidth(200)
+
         self.Release_status_for_sequence = QtGui.QComboBox()
         codeStatus = ['RELEASE NOW','HOLD FOR RELEASE']
         for item in codeStatus: self.Release_status_for_sequence.addItem(item)
         grid.addWidget(self.Release_status_for_sequence, 4,1)
-#        grid.addWidget(QtGui.QLabel('(e.g. RELEASE NOW, HOLD FOR RELEASE)'), 3,2)
 
         grid.addWidget(QtGui.QLabel('Release Status for coordinates/ SF'), 8,0)
-#        self.Release_status_for_coordinates = QtGui.QLineEdit()
-#        self.Release_status_for_coordinates.setText('')
-#        self.Release_status_for_coordinates.setFixedWidth(200)
+
         self.Release_status_for_coordinates = QtGui.QComboBox()
         coordStatus = ['RELEASE NOW','HOLD FOR PUBLICATION','HOLD FOR 4 WEEKS','HOLD FOR 6 MONTHS','HOLD FOR 1 YEAR']
         for item in coordStatus: self.Release_status_for_coordinates.addItem(item)
@@ -588,7 +517,6 @@ class XChemExplorer(QtGui.QApplication):
         self.group_deposition_title = QtGui.QLineEdit()
         self.group_deposition_title.setText('PanDDA analysis group deposition')
         self.group_deposition_title.setFixedWidth(600)
-#        self.group_deposition_title.setStyleSheet("background-color: rgb(192, 192, 192);")
         grid.addWidget(self.group_deposition_title, 2,1)
 
         grid.addWidget(QtGui.QLabel('Description'), 3,0)
@@ -603,31 +531,14 @@ class XChemExplorer(QtGui.QApplication):
         self.structure_title.setFixedWidth(600)
         grid.addWidget(self.structure_title, 4,1)
 
-
-
-
-#        grid.addWidget(QtGui.QLabel('Details'), 4,0)
-#        self.structure_details = QtGui.QLineEdit()
-#        self.structure_details.setText('')
-#        self.structure_details.setFixedWidth(600)
-#        grid.addWidget(self.structure_details, 4,1)
-
         note = ( '\n\nApo Structure:\nonly use if you want to deposit PanDDA models!'        )
         grid.addWidget(QtGui.QLabel(note), 6,0)
-
-#        grid.addWidget(QtGui.QLabel('Group deposition title'), 5,0)
-#        self.group_deposition_title_apo = QtGui.QLineEdit()
-#        self.group_deposition_title_apo.setText('Fragment screening campaign for $ProteinName - apo structures for PanDDA analysis')
-#        self.group_deposition_title_apo.setFixedWidth(600)
-#        self.group_deposition_title_apo.setStyleSheet("background-color: rgb(192, 192, 192);")
-#        grid.addWidget(self.group_deposition_title_apo, 5,1)
 
         grid.addWidget(QtGui.QLabel('Structure Title (apo)'), 7,0)
         self.structure_title_apo = QtGui.QLineEdit()
         self.structure_title_apo.setText('Crystal Structure of $ProteinName after initial refinement with no ligand modelled (structure $n)')
         self.structure_title_apo.setFixedWidth(600)
         grid.addWidget(self.structure_title_apo, 7,1)
-
 
         frame.setLayout(grid)
         vb.addWidget(frame)
@@ -809,16 +720,12 @@ class XChemExplorer(QtGui.QApplication):
         grid.addWidget(QtGui.QLabel('Genetically Manipulated Source'), 6,0)
 
         grid.addWidget(QtGui.QLabel('Source organism scientific name'), 7,0)
-#        self.Source_organism_scientific_name = QtGui.QLineEdit()
-#        self.Source_organism_scientific_name.setText('')
-#        self.Source_organism_scientific_name.setFixedWidth(300)
-#        grid.addWidget(self.Source_organism_scientific_name, 7,1)
+
         self.Source_organism_scientific_name = QtGui.QComboBox()
         taxonomy_dict=XChemMain.NCBI_taxonomy_ID()
         for item in taxonomy_dict:
             self.Source_organism_scientific_name.addItem(taxonomy_dict[item])
         grid.addWidget(self.Source_organism_scientific_name, 7,1)
-#        grid.addWidget(QtGui.QLabel('(e.g. Homo sapiens)'), 7,2)
 
         grid.addWidget(QtGui.QLabel('Source organism gene'), 8,0)
         self.Source_organism_gene = QtGui.QLineEdit()
@@ -836,11 +743,7 @@ class XChemExplorer(QtGui.QApplication):
         grid.addWidget(QtGui.QLabel('(e.g. BH10 ISOLATE, K-12...)'), 9,2)
 
         grid.addWidget(QtGui.QLabel('Expression system scientific name'), 10,0)
-#        self.Expression_system_scientific_name = QtGui.QLineEdit()
-#        self.Expression_system_scientific_name.setText('')
-#        self.Expression_system_scientific_name.setFixedWidth(300)
-#        grid.addWidget(self.Expression_system_scientific_name, 10,1)
-#        grid.addWidget(QtGui.QLabel('(e.g. Escherichia coli)'), 10,2)
+
         self.Expression_system_scientific_name = QtGui.QComboBox()
         for item in taxonomy_dict:
             self.Expression_system_scientific_name.addItem(taxonomy_dict[item])
@@ -964,11 +867,7 @@ class XChemExplorer(QtGui.QApplication):
         grid.addWidget(QtGui.QLabel('Crystallization'), 1,0)
 
         grid.addWidget(QtGui.QLabel('Method'), 2,0)
-#        self.crystallization_method = QtGui.QLineEdit()
-#        self.crystallization_method.setText('')
-#        self.crystallization_method.setFixedWidth(300)
-#        grid.addWidget(self.crystallization_method, 2,1)
-#        grid.addWidget(QtGui.QLabel('(e.g. VAPOUR DIFFUSION)'), 2,2)
+
         self.crystallization_method = QtGui.QComboBox()
         for item in XChemMain.crystal_growth_methods(): self.crystallization_method.addItem(item)
         grid.addWidget(self.crystallization_method, 2,1)
@@ -1001,21 +900,13 @@ class XChemExplorer(QtGui.QApplication):
         grid.addWidget(QtGui.QLabel(note), 7,0)
 
         grid.addWidget(QtGui.QLabel('Source'), 8,0)
-#        self.radiation_source = QtGui.QLineEdit()
-#        self.radiation_source.setText('')
-#        self.radiation_source.setFixedWidth(300)
-#        grid.addWidget(self.radiation_source, 8,1)
-#        grid.addWidget(QtGui.QLabel('(e.g. SYNCHROTRON)'), 8,2)
+
         self.radiation_source = QtGui.QComboBox()
         for item in XChemMain.radiationSource(): self.radiation_source.addItem(item)
         grid.addWidget(self.radiation_source, 8,1)
 
         grid.addWidget(QtGui.QLabel('Source Type'), 9,0)
-#        self.radiation_source_type = QtGui.QLineEdit()
-#        self.radiation_source_type.setText('')
-#        self.radiation_source_type.setFixedWidth(300)
-#        grid.addWidget(self.radiation_source_type, 9,1)
-#        grid.addWidget(QtGui.QLabel('(e.g. NSLS BEAMLINE X8C ..)'), 9,2)
+
         self.radiation_source_type = QtGui.QComboBox()
         for item in XChemMain.wwBeamlines(): self.radiation_source_type.addItem(item)
         grid.addWidget(self.radiation_source_type, 9,1)
@@ -1029,22 +920,14 @@ class XChemExplorer(QtGui.QApplication):
         grid.addWidget(QtGui.QLabel('(e.g. 1.502)'), 10,2)
 
         grid.addWidget(QtGui.QLabel('Detector'), 11,0)
-#        self.radiation_detector = QtGui.QLineEdit()
-#        self.radiation_detector.setText('')
-#        self.radiation_detector.setFixedWidth(300)
-#        grid.addWidget(self.radiation_detector, 11,1)
-#        grid.addWidget(QtGui.QLabel('(e.g. CCD)'), 11,2)
+
         self.radiation_detector = QtGui.QComboBox()
         for item in XChemMain.detector(): self.radiation_detector.addItem(item)
         grid.addWidget(self.radiation_detector, 11,1)
 
 
         grid.addWidget(QtGui.QLabel('Detector Type'), 12,0)
-#        self.radiation_detector_type = QtGui.QLineEdit()
-#        self.radiation_detector_type.setText('')
-#        self.radiation_detector_type.setFixedWidth(300)
-#        grid.addWidget(self.radiation_detector_type, 12,1)
-#        grid.addWidget(QtGui.QLabel('(e.g. ADSC QUANTUM 1,  ..)'), 12,2)
+
         self.radiation_detector_type = QtGui.QComboBox()
         for item in XChemMain.detectorType(): self.radiation_detector_type.addItem(item)
         grid.addWidget(self.radiation_detector_type, 12,1)
@@ -1089,11 +972,6 @@ class XChemExplorer(QtGui.QApplication):
 
         grid = QtGui.QGridLayout()
 
-#        grid.addWidget(QtGui.QLabel('Method'), 2,0)
-#        self.crystallization_method = QtGui.QComboBox()
-#        for item in XChemMain.crystal_growth_methods(): self.crystallization_method.addItem(item)
-#        grid.addWidget(self.crystallization_method, 2,1)
-
         grid.addWidget(QtGui.QLabel('PDB starting model'), 1,0)
         self.pdbx_starting_model = QtGui.QLineEdit()
         self.pdbx_starting_model.setText('')
@@ -1119,8 +997,6 @@ class XChemExplorer(QtGui.QApplication):
 
         deposit_tab_dict['Software'][1].addLayout(vb)
 
-
-
         vbox.addWidget(deposit_tab_widget)
 
         hbox=QtGui.QHBoxLayout()
@@ -1143,7 +1019,6 @@ class XChemExplorer(QtGui.QApplication):
 
         depositData.exec_();
 
-
     def save_deposit_config_file(self):
         self.update_deposit_dict()
         file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.current_directory))
@@ -1163,8 +1038,6 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
-
-
 
     def load_deposit_config_file(self):
         file_name_temp = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Open file', self.current_directory,'*.deposit')
@@ -1192,18 +1065,14 @@ class XChemExplorer(QtGui.QApplication):
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.work_thread.start()
 
-
-
     def update_deposit_input(self):
         try:
             self.contact_author_PI_salutation.setText(self.deposit_dict['contact_author_PI_salutation'])
             self.contact_author_PI_first_name.setText(self.deposit_dict['contact_author_PI_first_name'])
             self.contact_author_PI_last_name.setText(self.deposit_dict['contact_author_PI_last_name'])
             self.contact_author_PI_middle_name.setText(self.deposit_dict['contact_author_PI_middle_name'])
-#            self.contact_author_PI_role.setText(self.deposit_dict['contact_author_PI_role'])
             index = self.contact_author_PI_role.findText(self.deposit_dict['contact_author_PI_role'], QtCore.Qt.MatchFixedString)
             self.contact_author_PI_role.setCurrentIndex(index)
-#            self.contact_author_PI_organization_type.setText(self.deposit_dict['contact_author_PI_organization_type'])
             index = self.contact_author_PI_organization_type.findText(self.deposit_dict['contact_author_PI_organization_type'], QtCore.Qt.MatchFixedString)
             self.contact_author_PI_organization_type.setCurrentIndex(index)
             self.contact_author_PI_organization_name.setText(self.deposit_dict['contact_author_PI_organization_name'])
@@ -1213,17 +1082,14 @@ class XChemExplorer(QtGui.QApplication):
             self.contact_author_PI_State_or_Province.setText(self.deposit_dict['contact_author_PI_State_or_Province'])
             self.contact_author_PI_Zip_Code.setText(self.deposit_dict['contact_author_PI_Zip_Code'])
             self.contact_author_PI_Country.setText(self.deposit_dict['contact_author_PI_Country'])
-#            self.contact_author_PI_fax_number.setText(self.deposit_dict['contact_author_PI_fax_number'])
             self.contact_author_PI_phone_number.setText(self.deposit_dict['contact_author_PI_phone_number'])
 
             self.contact_author_salutation.setText(self.deposit_dict['contact_author_salutation'])
             self.contact_author_first_name.setText(self.deposit_dict['contact_author_first_name'])
             self.contact_author_last_name.setText(self.deposit_dict['contact_author_last_name'])
             self.contact_author_middle_name.setText(self.deposit_dict['contact_author_middle_name'])
-#            self.contact_author_role.setText(self.deposit_dict['contact_author_role'])
             index = self.contact_author_role.findText(self.deposit_dict['contact_author_role'], QtCore.Qt.MatchFixedString)
             self.contact_author_role.setCurrentIndex(index)
-#            self.contact_author_organization_type.setText(self.deposit_dict['contact_author_organization_type'])
             index = self.contact_author_organization_type.findText(self.deposit_dict['contact_author_organization_type'], QtCore.Qt.MatchFixedString)
             self.contact_author_organization_type.setCurrentIndex(index)
             self.contact_author_organization_name.setText(self.deposit_dict['contact_author_organization_name'])
@@ -1233,22 +1099,16 @@ class XChemExplorer(QtGui.QApplication):
             self.contact_author_State_or_Province.setText(self.deposit_dict['contact_author_State_or_Province'])
             self.contact_author_Zip_Code.setText(self.deposit_dict['contact_author_Zip_Code'])
             self.contact_author_Country.setText(self.deposit_dict['contact_author_Country'])
-#            self.contact_author_fax_number.setText(self.deposit_dict['contact_author_fax_number'])
             self.contact_author_phone_number.setText(self.deposit_dict['contact_author_phone_number'])
-#            self.Release_status_for_coordinates.setText(self.deposit_dict['Release_status_for_coordinates'])
             index = self.Release_status_for_coordinates.findText(self.deposit_dict['Release_status_for_coordinates'], QtCore.Qt.MatchFixedString)
             self.Release_status_for_coordinates.setCurrentIndex(index)
-#            self.Release_status_for_structure_factor.setText(self.deposit_dict['Release_status_for_structure_factor'])
-#            self.Release_status_for_sequence.setText(self.deposit_dict['Release_status_for_sequence'])
             index = self.Release_status_for_sequence.findText(self.deposit_dict['Release_status_for_sequence'], QtCore.Qt.MatchFixedString)
             self.Release_status_for_sequence.setCurrentIndex(index)
 
             self.group_deposition_title.setText(self.deposit_dict['group_deposition_title'])
             self.group_description.setText(self.deposit_dict['group_description'])
 
-#            self.group_deposition_title_apo.setText(self.deposit_dict['group_deposition_title_apo'])
             self.structure_title.setText(self.deposit_dict['structure_title'])
-#            self.structure_details.setText(self.deposit_dict['structure_details'])
             self.structure_title_apo.setText(self.deposit_dict['structure_title_apo'])
 
             for n,name in enumerate(self.deposit_dict['structure_author_name'].split(';')):
@@ -1266,19 +1126,14 @@ class XChemExplorer(QtGui.QApplication):
                 self.primary_citation_author_name_List[n].setText(name)
 
             self.molecule_name.setText(self.deposit_dict['molecule_name'])
-#            self.fragment_name_one.setText(self.deposit_dict['fragment_name_one'])
             self.fragment_name_one_specific_mutation.setText(self.deposit_dict['fragment_name_one_specific_mutation'])
-#            self.fragment_name_one_enzyme_comission_number.setText(self.deposit_dict['fragment_name_one_enzyme_comission_number'])
-#            self.Source_organism_scientific_name.setText(self.deposit_dict['Source_organism_scientific_name'])
             index = self.Source_organism_scientific_name.findText(self.deposit_dict['Source_organism_scientific_name'], QtCore.Qt.MatchFixedString)
             self.Source_organism_scientific_name.setCurrentIndex(index)
 
             self.Source_organism_gene.setText(self.deposit_dict['Source_organism_gene'])
             self.Source_organism_strain.setText(self.deposit_dict['Source_organism_strain'])
-#            self.Expression_system_scientific_name.setText(self.deposit_dict['Expression_system_scientific_name'])
             index = self.Expression_system_scientific_name.findText(self.deposit_dict['Expression_system_scientific_name'], QtCore.Qt.MatchFixedString)
             self.Expression_system_scientific_name.setCurrentIndex(index)
-
 
             self.Expression_system_strain.setText(self.deposit_dict['Expression_system_strain'])
             self.Expression_system_vector_type.setText(self.deposit_dict['Expression_system_vector_type'])
@@ -1292,27 +1147,22 @@ class XChemExplorer(QtGui.QApplication):
             self.SG_project_name.setText(self.deposit_dict['SG_project_name'])
             self.full_name_of_SG_center.setText(self.deposit_dict['full_name_of_SG_center'])
 
-#            self.crystallization_method.setText(self.deposit_dict['crystallization_method'])
             index = self.crystallization_method.findText(self.deposit_dict['crystallization_method'], QtCore.Qt.MatchFixedString)
             self.crystallization_method.setCurrentIndex(index)
 
             self.crystallization_pH.setText(self.deposit_dict['crystallization_pH'])
             self.crystallization_temperature.setText(self.deposit_dict['crystallization_temperature'])
             self.crystallization_details.setText(self.deposit_dict['crystallization_details'])
-#            self.radiation_source.setText(self.deposit_dict['radiation_source'])
             index = self.radiation_source.findText(self.deposit_dict['radiation_source'], QtCore.Qt.MatchFixedString)
             self.radiation_source.setCurrentIndex(index)
 
-#            self.radiation_source_type.setText(self.deposit_dict['radiation_source_type'])
             index = self.radiation_source_type.findText(self.deposit_dict['radiation_source_type'], QtCore.Qt.MatchFixedString)
             self.radiation_source_type.setCurrentIndex(index)
 
             self.radiation_wavelengths.setText(self.deposit_dict['radiation_wavelengths'])
-#            self.radiation_detector.setText(self.deposit_dict['radiation_detector'])
             index = self.radiation_detector.findText(self.deposit_dict['radiation_detector'], QtCore.Qt.MatchFixedString)
             self.radiation_detector.setCurrentIndex(index)
 
-#            self.radiation_detector_type.setText(self.deposit_dict['radiation_detector_type'])
             index = self.radiation_detector_type.findText(self.deposit_dict['radiation_detector_type'], QtCore.Qt.MatchFixedString)
             self.radiation_detector_type.setCurrentIndex(index)
 
@@ -1326,9 +1176,6 @@ class XChemExplorer(QtGui.QApplication):
             index = self.phasing_software.findText(self.deposit_dict['phasing_software'], QtCore.Qt.MatchFixedString)
             self.phasing_software.setCurrentIndex(index)
 
-#        except KeyError:
-#            self.update_status_bar('Sorry, this is not a XChemExplorer deposit file!')
-#            self.update_log.insert('Sorry, this is not a XChemExplorer deposit file!')
         except ValueError:
             self.update_status_bar('Sorry, this is not a XChemExplorer deposit file!')
             self.update_log.insert('Sorry, this is not a XChemExplorer deposit file!')
@@ -1341,9 +1188,7 @@ class XChemExplorer(QtGui.QApplication):
             'contact_author_PI_first_name':         str(self.contact_author_PI_first_name.text()),
             'contact_author_PI_last_name':          str(self.contact_author_PI_last_name.text()),
             'contact_author_PI_middle_name':        str(self.contact_author_PI_middle_name.text()),
-#            'contact_author_PI_role':               str(self.contact_author_PI_role.text()),
             'contact_author_PI_role':               str(self.contact_author_PI_role.currentText()),
-#            'contact_author_PI_organization_type':  str(self.contact_author_PI_organization_type.text()),
             'contact_author_PI_organization_type':  str(self.contact_author_PI_organization_type.currentText()),
             'contact_author_PI_organization_name':  str(self.contact_author_PI_organization_name.text()),
             'contact_author_PI_email':              str(self.contact_author_PI_email.text()),
@@ -1352,16 +1197,13 @@ class XChemExplorer(QtGui.QApplication):
             'contact_author_PI_State_or_Province':  str(self.contact_author_PI_State_or_Province.text()),
             'contact_author_PI_Zip_Code':           str(self.contact_author_PI_Zip_Code.text()),
             'contact_author_PI_Country':            str(self.contact_author_PI_Country.text()),
-#            'contact_author_PI_fax_number':         str(self.contact_author_PI_fax_number.text()),
             'contact_author_PI_phone_number':       str(self.contact_author_PI_phone_number.text()),
 
             'contact_author_salutation':            str(self.contact_author_salutation.text()),
             'contact_author_first_name':            str(self.contact_author_first_name.text()),
             'contact_author_last_name':             str(self.contact_author_last_name.text()),
             'contact_author_middle_name':           str(self.contact_author_middle_name.text()),
-#            'contact_author_role':                  str(self.contact_author_role.text()),
             'contact_author_role':                  str(self.contact_author_role.currentText()),
-#            'contact_author_organization_type':     str(self.contact_author_organization_type.text()),
             'contact_author_organization_type':     str(self.contact_author_organization_type.currentText()),
             'contact_author_organization_name':     str(self.contact_author_organization_name.text()),
             'contact_author_email':                 str(self.contact_author_email.text()),
@@ -1373,15 +1215,13 @@ class XChemExplorer(QtGui.QApplication):
             'contact_author_phone_number':          str(self.contact_author_phone_number.text()),
 
             'Release_status_for_coordinates':       str(self.Release_status_for_coordinates.currentText()),
-#            'Release_status_for_structure_factor':  str(self.Release_status_for_structure_factor.text()),
             'Release_status_for_sequence':          str(self.Release_status_for_sequence.currentText()),
 
             'group_deposition_title':               str(self.group_deposition_title.text()),
             'group_description':                    str(self.group_description.text()),
 
             'structure_title':                      str(self.structure_title.text()),
-#            'structure_details':                    str(self.structure_details.text()),
-#            'group_deposition_title_apo':           str(self.group_deposition_title_apo.text()),
+
             'structure_title_apo':                  str(self.structure_title_apo.text()),
 
             'primary_citation_id':                  str(self.primary_citation_id.text()),
@@ -1410,20 +1250,15 @@ class XChemExplorer(QtGui.QApplication):
             'full_name_of_SG_center':                       str(self.full_name_of_SG_center.text()),
             'molecule_one_letter_sequence':                 str(self.molecule_one_letter_sequence.toPlainText()).replace(' ','').replace('\n','').replace('\r',''),
 
-#            'crystallization_method':                       str(self.crystallization_method.text()),
             'crystallization_method':                       str(self.crystallization_method.currentText()),
             'crystallization_pH':                           str(self.crystallization_pH.text()),
             'crystallization_temperature':                  str(self.crystallization_temperature.text()),
             'crystallization_details':                      str(self.crystallization_details.text()),
 
-#            'radiation_source':                             str(self.radiation_source.text()),
             'radiation_source':                             str(self.radiation_source.currentText()),
-#            'radiation_source_type':                        str(self.radiation_source_type.text()),
             'radiation_source_type':                        str(self.radiation_source_type.currentText()),
             'radiation_wavelengths':                        str(self.radiation_wavelengths.text()),
-#            'radiation_detector':                           str(self.radiation_detector.text()),
             'radiation_detector':                           str(self.radiation_detector.currentText()),
-#            'radiation_detector_type':                      str(self.radiation_detector_type.text()),
             'radiation_detector_type':                      str(self.radiation_detector_type.currentText()),
             'data_collection_date':                         str(self.data_collection_date.text()),
             'data_collection_temperature':                  str(self.data_collection_temperature.text()),
@@ -1453,12 +1288,6 @@ class XChemExplorer(QtGui.QApplication):
             for n,entry in enumerate(self.primary_citation_author_name_List):
                 entry.setText('')
 
-
-
-###################################################################################################
-
-
-
     def set_xce_logfile(self):
         file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.current_directory))
         self.xce_logfile=str(file_name)
@@ -1468,103 +1297,6 @@ class XChemExplorer(QtGui.QApplication):
         else:
             XChemLog.startLog(self.xce_logfile).create_logfile(self.xce_version)
             self.update_log=XChemLog.updateLog(self.xce_logfile)
-
-
-    def select_datasource_columns_to_display(self):
-#        self.data_source_columns_to_display, ok = XChemDialogs.select_columns_to_show(
-#            os.path.join(self.database_directory,self.data_source_file)).return_selected_columns()
-#        self.populate_and_update_data_source_table()
-        columns_to_show = QtGui.QMessageBox()
-        columns_to_showLayout = columns_to_show.layout()
-        columns_in_data_source=self.db.return_column_list()
-        try:
-            columns_in_data_source=self.db.return_column_list()
-        except AttributeError:
-            print '==> XCE: please select a datasource file'
-            self.status_bar.showMessage('please select a datasource file')
-            return
-
-        column_dict={}
-        vbox = QtGui.QVBoxLayout()
-        number_of_entries=len(columns_in_data_source)
-        columns_shown_in_dialog_column=15
-        grid = QtGui.QGridLayout()
-        x=0
-        y=0
-#        columns_to_ignore=['Sample ID','ID']
-        columns_to_ignore=self.db.columns_not_to_display()
-        for entries_added in range(number_of_entries):
-            if not columns_in_data_source[entries_added][1] in columns_to_ignore:
-                data_source_column = QtGui.QCheckBox(columns_in_data_source[entries_added][1])
-                column_dict[entries_added]=data_source_column
-                if columns_in_data_source[entries_added][1] in self.data_source_columns_to_display:
-                    data_source_column.setChecked(True)
-                grid.addWidget(data_source_column, y,x)
-                y+=1
-            if y==columns_shown_in_dialog_column:
-                y=0
-                x+=1
-        vbox.addLayout(grid)
-        columns_to_showLayout.addLayout(vbox,0,0)
-
-        columns_to_show.addButton(QtGui.QPushButton('OK'), QtGui.QMessageBox.YesRole)
-        columns_to_show.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
-        reply=columns_to_show.exec_();
-        if reply == 0:
-            columns_to_show_list=['Sample ID']
-            for key in column_dict:
-                if column_dict[key].isChecked():
-                    columns_to_show_list.append(columns_in_data_source[key][1])
-            self.data_source_columns_to_display=columns_to_show_list
-            self.populate_and_update_data_source_table()
-
-
-
-    def datasource_menu_save_samples(self):
-        print 'hallo'
-
-    def datasource_menu_export_csv_file(self):
-        file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
-        if file_name.rfind('.') != -1:
-            file_name=file_name[:file_name.rfind('.')]+'.csv'
-        else:
-            file_name=file_name+'.csv'
-        self.db.export_to_csv_file(file_name)
-
-    def datasource_menu_import_csv_file(self):
-        if self.data_source_set:
-            file_name = QtGui.QFileDialog.getOpenFileName(self.window,'Open file', self.database_directory)
-            self.db.import_csv_file(file_name)
-        else:
-            self.update_status_bar('Please load a data source file first')
-
-
-    def datasource_menu_update_datasource(self):
-#        self.work_thread=XChemThread.update_datasource_from_file_system(self.initial_model_directory,os.path.join(self.database_directory,self.data_source_file),self.panddas_directory,self.xce_logfile)
-#        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-#        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-#        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-#        self.connect(self.work_thread, QtCore.SIGNAL("create_initial_model_table"),self.create_initial_model_table)
-#        self.work_thread.start()
-        self.work_thread=XChemThread.synchronise_db_and_filesystem(self.initial_model_directory,os.path.join(self.database_directory,self.data_source_file),self.panddas_directory,self.xce_logfile,'project_directory')
-        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-        self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
-        self.work_thread.start()
-
-    def export_data_for_WONKA(self):
-        self.update_log.insert('exporting CSV file for input into WONKA')
-        self.db.export_csv_for_WONKA()
-
-
-
-
-
-
-
-
-
 
     def show_html_summary_in_firefox(self,xtal):
         html_summary=self.albula_button_dict[xtal][2]
@@ -1582,7 +1314,6 @@ class XChemExplorer(QtGui.QApplication):
                 for key in self.xtalform_dict:
                     self.pandda_analyse_crystal_from_selection_combobox.addItem(key)
 
-
     def populate_reference_combobox(self,combobox):
         combobox.clear()
 #        self.reference_file_list=self.get_reference_file_list(' ')
@@ -1595,13 +1326,10 @@ class XChemExplorer(QtGui.QApplication):
         for stage in self.refinement_stage:
             combobox.addItem(stage)
 
-
-
     def populate_target_selection_combobox(self,combobox):
         combobox.clear()
         for target in self.target_list:
             combobox.addItem(target)
-
 
     def open_config_file(self):
         file_name_temp = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Open file', self.current_directory,'*.conf')
@@ -1651,12 +1379,6 @@ class XChemExplorer(QtGui.QApplication):
                         self.data_source_set=True
                         self.db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
                         self.datasource_menu_reload_samples()
-#                        self.update_header_and_data_from_datasource()
-#                        self.populate_and_update_data_source_table()
-#                        self.create_initial_model_table()
-#                else:
-#                    XChemDB.data_source(self.settings['data_source']).create_empty_data_source_file()
-#                self.data_source_set=True
 
             self.ccp4_scratch_directory=pickled_settings['ccp4_scratch']
             self.settings['ccp4_scratch']=self.ccp4_scratch_directory
@@ -1677,11 +1399,8 @@ class XChemExplorer(QtGui.QApplication):
             self.panddas_directory_label.setText(self.panddas_directory)
             self.pandda_output_data_dir_entry.setText(self.panddas_directory)
             self.reference_directory_label.setText(self.reference_directory)
-#            self.database_directory_label.setText(self.database_directory)
             self.beamline_directory_label.setText(self.beamline_directory)
             self.ccp4_scratch_directory_label.setText(self.ccp4_scratch_directory)
-#            self.adjust_allowed_unit_cell_difference.setText(str(self.allowed_unitcell_difference_percent))
-#            self.adjust_acceptable_low_resolution_limit.setText(str(self.acceptable_low_resolution_limit_for_data))
             self.reference_file_list=self.get_reference_file_list(' ')
 
 
@@ -1698,16 +1417,13 @@ class XChemExplorer(QtGui.QApplication):
             file_name=file_name+'.conf'
         pickle.dump(self.settings,open(file_name,'wb'))
 
-
     def update_reference_files(self,reference_root):
         self.reference_file_list=self.get_reference_file_list(reference_root)
         self.populate_reference_combobox(self.reference_file_selection_combobox)
         self.populate_reference_combobox(self.pandda_reference_file_selection_combobox)
 
-
     def check_status_rerun_dimple_on_all_autoprocessing_files(self):
         print 'hallo'
-
 
     def rerun_dimple_on_all_autoprocessing_files(self):
         job_list=[]
@@ -1777,13 +1493,9 @@ class XChemExplorer(QtGui.QApplication):
                                         reference_file_mtz,
                                         reference_file_cif  ])
 
-
-
-
         if job_list != []:
             self.update_log.insert('trying to run DIMPLE on SELECTED auto-processing files')
             self.check_before_running_dimple(job_list)
-
 
     def remove_selected_dimple_files(self):
         job_list=[]
@@ -1813,8 +1525,6 @@ class XChemExplorer(QtGui.QApplication):
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                 self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
                 self.work_thread.start()
-
-
 
     def run_xia2_on_selected_datasets(self,overwrite):
 
@@ -1942,7 +1652,6 @@ class XChemExplorer(QtGui.QApplication):
         self.status_bar.showMessage('idle')
         return job_list
 
-
     def check_before_running_dimple(self,job_list):
 
         msgBox = QtGui.QMessageBox()
@@ -1975,22 +1684,6 @@ class XChemExplorer(QtGui.QApplication):
             self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
             self.work_thread.start()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     def update_all_tables(self):
         self.update_log.insert('checking for new reference files')
         self.update_status_bar('checking for new reference files')
@@ -2012,8 +1705,6 @@ class XChemExplorer(QtGui.QApplication):
         self.update_reprocessing_table()
         self.update_status_bar('idle')
         self.update_summary_plot()
-
-
 
     def change_allowed_unitcell_difference_percent(self,text):
         try:
@@ -2041,7 +1732,6 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 pass
 
-
     def change_acceptable_low_resolution_limit(self,text):
         try:
             self.acceptable_low_resolution_limit_for_data=float(text)
@@ -2049,36 +1739,9 @@ class XChemExplorer(QtGui.QApplication):
         except ValueError:
             pass
 
-
-
-
     def change_filename_root(self,text):
         self.filename_root=str(text)
         self.settings['filename_root']=self.filename_root
-
-
-    def create_new_data_source(self):
-        file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
-        #make sure that the file always has .sqlite extension
-        if file_name.rfind('.') != -1:
-            file_name=file_name[:file_name.rfind('.')]+'.sqlite'
-        else:
-            file_name=file_name+'.sqlite'
-        self.db=XChemDB.data_source(file_name)
-        print '==> XCE: creating new data source'
-        self.db.create_empty_data_source_file()
-        self.db.create_missing_columns()
-        self.database_directory=file_name[:file_name.rfind('/')]
-        self.data_source_file=file_name[file_name.rfind('/')+1:]
-        self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
-        self.settings['database_directory']=self.database_directory
-        self.settings['data_source']=self.data_source_file
-        self.data_source_set=True
-        self.datasource_menu_reload_samples()
-
-
-
-
 
     def get_status_of_workflow_milestone(self,instruction):
         # first update all tables
@@ -2113,9 +1776,6 @@ class XChemExplorer(QtGui.QApplication):
 
         if instruction=='Get New Results from Autoprocessing':
             datafunc.autoprocessing_or_rescore(False)
-
-#        elif instruction=="Save Files from Autoprocessing to Project Folder" :
-#            self.save_files_to_initial_model_folder()
 
         elif instruction=='Rescore Datasets':
             datafunc.autoprocessing_or_rescore(True)
@@ -2196,12 +1856,8 @@ class XChemExplorer(QtGui.QApplication):
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                 self.work_thread.start()
 
-
         elif instruction=='Update Deposition Table':
             self.update_deposition_table()
-
-
-
 
     def check_status_create_png_of_soaked_compound(self):
         number_of_samples=0
@@ -2223,9 +1879,6 @@ class XChemExplorer(QtGui.QApplication):
             last_timestamp='n/a'
         message='Datasets: '+str(number_of_samples)+', jobs running: '+str(running)+', jobs finished: '+str(cif_file_generated)+', last job submmitted: '+str(last_timestamp)
         self.status_bar.showMessage(message)
-
-
-
 
         if start_thread:
             if self.target=='=== SELECT TARGET ===':
@@ -2303,24 +1956,7 @@ class XChemExplorer(QtGui.QApplication):
         cluster_dict=XChemPANDDA.get_names_of_current_clusters(self.xce_logfile,self.panddas_directory)
 
         added_new_reference_files=False
-        # copy first pdb file in each cluster into reference directory
-        # 20/01/2017:
-        # take this step out; turned out not to be ideal since it the presence of these files
-        # in the refererence folder interferes with map calculation and in general confuses userss
-#        for cluster in cluster_dict:
-#            if not os.path.isfile(os.path.join(self.reference_directory,cluster+'.pdb')):
-#                added_new_reference_files=True
-#                os.system('/bin/cp %s %s' %(cluster_dict[cluster][0],os.path.join(self.reference_directory,cluster+'.pdb')))
-#                self.update_log.insert('copying %s as reference file for cluster %s in reference directory as %s.pdb' %(cluster_dict[cluster][0],cluster,cluster))
 
-#        if added_new_reference_files:
-#            currentRef = str(self.pandda_reference_file_selection_combobox.currentText())
-#            self.update_log.insert('updating combobox')
-#            self.update_reference_files(' ')
-#            index = self.pandda_reference_file_selection_combobox.findText(currentRef)
-#            self.pandda_reference_file_selection_combobox.setCurrentIndex(index)
-
-        # now need to check for the other reference files in the reference file folder
         for item in self.reference_file_list:
             self.update_log.insert('checking which datasets are suitable for '+str(item[0])+' as reference')
             if not str(item[0]).startswith('.') and str(item[0]) not in cluster_dict:
@@ -2438,18 +2074,6 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
-
-
-
-#    def check_data_for_pandda_analyse(self):
-#        counter=0
-#        for file in glob.glob(os.path.join(str(self.pandda_input_data_dir_entry.text()),str(self.pandda_pdb_style_entry.text()))):
-#            if os.path.isfile(file):
-#                counter+=1
-#        self.status_bar.showMessage('pandda.analyse: found %s useable datasets' %counter)
-#        self.update_log.insert('pandda.analyse: found %s useable datasets' %counter)
-#        return counter
-
     def run_pandda_inspect(self):
         self.settings['panddas_directory']=str(self.pandda_output_data_dir_entry.text())
         print '==> XCE: starting pandda.inspect'
@@ -2464,7 +2088,6 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-
 
     def convert_event_maps_to_SF(self):
         self.update_log.insert('converting all event maps in %s to mtz files' %self.initial_model_directory)
@@ -2488,7 +2111,6 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.connect(self.work_thread, QtCore.SIGNAL("show_error_dict"), self.show_error_dict)
         self.work_thread.start()
-
 
     def run_pandda_export(self,update_datasource_only,which_models):
         self.settings['panddas_directory']=str(self.pandda_output_data_dir_entry.text())
@@ -2522,7 +2144,6 @@ class XChemExplorer(QtGui.QApplication):
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.work_thread.start()
 
-
     def show_pandda_html_summary(self):
         self.pandda_initial_html.load(QtCore.QUrl(self.pandda_initial_html_file))
         self.pandda_initial_html.show()
@@ -2530,8 +2151,6 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_html.show()
         self.pandda_inspect_html.load(QtCore.QUrl(self.pandda_inspect_html_file))
         self.pandda_inspect_html.show()
-
-
 
     def create_cif_pdb_png_files(self,todo):
         tmp=self.db.execute_statement("select CrystalName,CompoundCode,CompoundSmiles from mainTable where CrystalName is not '' and CompoundSmiles is not '' and CompoundSmiles is not NULL;")
@@ -2579,34 +2198,6 @@ class XChemExplorer(QtGui.QApplication):
             self.work_thread.start()
 
 
-#    def check_status_create_cif_pdb_png_files(self):
-#        self.update_status_bar('Please check terminal window for details!')
-##        samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not NULL;")
-##        smiles_for_sample=self.db.execute_statement("select CrystalName,compoundSMILES from mainTable where compoundSMILES is not NULL or compoundSMILES is not '';")
-##        samples_with_data=self.db.execute_statement("select CrystalName from mainTable where DataCollectionOutcome is 'success';")
-##        cif_files=self.db.execute_statement("select CrystalName,RefinementCIF from mainTable where RefinementCIF is not Null or RefinementCIF is not '';")
-#        print '==> XCE: summary for compounds:'
-##        print '    * nr samples in datasource:',len(samples_in_db)
-##        print '    * nr SMILES for samples:   ',len(smiles_for_sample)
-##        print '    * nr samples with data:    ',len(samples_with_data)
-##        print '    * nr CIF files created:    ',len(cif_files)
-#        print XChemMain.get_jobs_running_on_cluster()
-#        print XChemMain.get_datasource_summary(os.path.join(self.database_directory,self.data_source_file))
-##        out_bytes = subprocess.check_output(['qstat'])
-##        out_text = out_bytes.decode('utf-8')
-##        jobs_on_cluster = subprocess.check_output(['qstat'])
-##        jobs_running=0
-##        for n,line in enumerate(jobs_on_cluster):
-##
-##        jobs_running=n
-##        print '==> XCE: job info'
-##        print '    * nr jobs currently running on cluster:',jobs_running
-##        print '    * nr ACEDRG jobs submitted'
-##        print '    * nr ACEDRG jobs waiting'
-##        print '    * nr ACEDRG jobs finished'
-##        print '    * time ACEDRG queue started'
-##        print '    * expected time to finish'
-
     def update_deposition_table(self):
         # check if PanDDA models are ready for deposition
 
@@ -2625,32 +2216,10 @@ class XChemExplorer(QtGui.QApplication):
             self.db.update_insert_depositTable(xtal,{})
 
 
-
-        # check if all sites in each model are set to deposit
-        # throw error if not
-
-        # then set RefinementOutcome in mainTable to 'ready for deposition'
-
-        # if not pandda models are set fpor deposition, check if stuff in mainTable it set for depostion
-
-
-
-
-
-
     def show_html_summary_and_diffraction_image(self):
         for key in self.albula_button_dict:
             if self.albula_button_dict[key][0]==self.sender():
                 print '==> XCE: showing html summary in firefox'
-                self.show_html_summary_in_firefox(key)
-                # dials image viewer is unavailable at the moment (23/06/2016)
-                # because of a clash with the PANDDA ccp4 installation
-#                print '==> XCE: starting dials.image_viewer'
-#                self.work_thread=XChemThread.start_dials_image_viewer(self.albula_button_dict[key][1])
-#                self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-#                self.work_thread.start()
-
-
 
     def need_to_switch_main_tab(self,task_index):
         msgBox = QtGui.QMessageBox()
@@ -2661,8 +2230,6 @@ class XChemExplorer(QtGui.QApplication):
         if reply == 0:
             self.main_tab_widget.setCurrentIndex(task_index)
 
-
-
     def check_write_permissions_of_data_source(self):
         write_enabled=True
         if not os.access(os.path.join(self.database_directory,self.data_source_file),os.W_OK):
@@ -2672,7 +2239,6 @@ class XChemExplorer(QtGui.QApplication):
                         QtGui.QMessageBox.NoButton)
             write_enabled=False
         return write_enabled
-
 
     def no_data_source_selected(self):
         QtGui.QMessageBox.warning(self.window, "Data Source Problem",
@@ -2685,8 +2251,6 @@ class XChemExplorer(QtGui.QApplication):
                                       ('- Data Source -> Create New Data\nSource (SQLite)'),
                         QtGui.QMessageBox.Cancel, QtGui.QMessageBox.NoButton,
                         QtGui.QMessageBox.NoButton)
-
-
 
     def update_progress_bar(self,progress):
         self.progress_bar.setValue(progress)
@@ -2708,8 +2272,6 @@ class XChemExplorer(QtGui.QApplication):
         msgBox = QtGui.QMessageBox()
         msgBox.setText(text)
         msgBox.exec_();
-
-
 
     def create_widgets_for_autoprocessing_results_only(self,data_dict):
         self.status_bar.showMessage('Building details table for data processing results')
@@ -2756,8 +2318,7 @@ class XChemExplorer(QtGui.QApplication):
             data_collection_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
             data_collection_table.setColumnCount(len(column_name))
             font = QtGui.QFont()
-##            font.setFamily(_fromUtf8("Verdana"))
-##            font =  self.horizontalHeader().font()
+
             font.setPointSize(8)
             data_collection_table.setFont(font)
             data_collection_table.setHorizontalHeaderLabels(column_name)
@@ -2781,7 +2342,6 @@ class XChemExplorer(QtGui.QApplication):
 
             # b) sort by the previously assigned run number
             #    note: entry[6]==run_number
-#            layout=self.data_collection_image_dict[xtal][0]
             for entry in sorted(tmp,key=lambda x: x[6]):
                 run_number=entry[6]
                 images_already_in_table=False
@@ -2845,12 +2405,8 @@ class XChemExplorer(QtGui.QApplication):
 
                 self.data_collection_table_dict[xtal].append(['logfile',entry[1],entry[2],entry[3],entry[4]])   # 'logfile' is just added to have
                                                                                                                 # same index numbers between lists
-#            data_collection_table.setFixedHeight(300)
-#            data_collection_table.horizontalHeader().setStretchLastSection(False)
-#            data_collection_table.verticalHeader().setStretchLastSection(False)
-#            data_collection_table.itemSelectionChanged.connect(self.update_selected_autoproc_data_collection_summary_table)
+
             data_collection_table.cellClicked.connect(self.user_update_selected_autoproc_data_collection_summary_table)
-            #data_collection_table.setSizePolicy(QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Minimum)
 
             # select best resolution file + set data collection outcome
             # the assumption is that index in data_collection_dict and row number are identical
@@ -2862,42 +2418,29 @@ class XChemExplorer(QtGui.QApplication):
                     best_file=entry[8]
                     logfile_found=True
                     if best_file:
-#                        # we change the selection only if the user did not touch it, assuming that he/she knows best
-#                        if not selection_changed_by_user:
+                        # we change the selection only if the user did not touch it, assuming that he/she knows best
+                        #if not selection_changed_by_user:
                         data_collection_table.selectRow(index)
 
         self.populate_data_collection_summary_table()
-
-        #-----------------------------------------------------------------------------------------------
-
 
     def find_suitable_reference_file(self,db_dict):
         reference_file=[]
         dummy=['...', '', '', '', 0, '0']
         reference_file.append([dummy,999])
-#        self.status_bar.showMessage('checking: '+str(os.path.join(db_dict['DataProcessingPathToMTZfile'],db_dict['DataProcessingMTZfileName'])))
         suitable_reference=[]
         for reference in self.reference_file_list:
             # first we need one in the same pointgroup
             if reference[5]==db_dict['DataProcessingPointGroup']:
-#                try:
-#                    difference=math.fabs(1-(float(db_dict['DataProcessingUnitCellVolume'])/float(reference[4])))*100
-#                    if difference < self.allowed_unitcell_difference_percent:
-#                        suitable_reference.append([reference,difference])
-#                except ValueError:
-#                    continue
                 try:
                     difference=math.fabs(1-(float(db_dict['DataProcessingUnitCellVolume'])/float(reference[4])))*100
                     reference_file.append([reference,difference])
                 except ValueError:
                     continue
-#        if suitable_reference != []:
-#            reference_file=min(suitable_reference,key=lambda x: x[1])
         return reference_file
 
 
     def create_initial_model_table(self):
-#        self.update_header_and_data_from_datasource()
         column_name=self.db.translate_xce_column_list_to_sqlite(self.inital_model_column_list)
 
         for xtal in sorted(self.xtal_db_dict):
@@ -2987,13 +2530,6 @@ class XChemExplorer(QtGui.QApplication):
             if new_xtal:
                 self.initial_model_dimple_dict[xtal]=[run_dimple,reference_file_selection_combobox]
 
-
-
-
-#    def pandda_analyse_crystal_from_selection_combobox_changed(self,i):
-#        crystal_form = self.pandda_analyse_crystal_from_selection_combobox.currentText()
-#        self.populate_pandda_analyse_input_table(crystal_form)
-
     def preferences_data_to_copy_combobox_changed(self,i):
         text = str(self.preferences_data_to_copy_combobox.currentText())
         for item in self.preferences_data_to_copy:
@@ -3016,7 +2552,6 @@ class XChemExplorer(QtGui.QApplication):
                 db_dict={}
                 db_dict['RefinementOutcome']=str(self.sender().currentText())
                 self.db.create_or_remove_missing_records_in_depositTable(self.xce_logfile,xtal,'ligand_bound',db_dict)
-
 
     def get_reference_file_list(self,reference_root):
         # check available reference files
@@ -3057,9 +2592,6 @@ class XChemExplorer(QtGui.QApplication):
             self.update_log.insert('reference file %s: %s' %(n,file))
         return reference_file_list
 
-
-
-
     def dataset_outcome_combobox_change_outcome(self,text):
         outcome=str(text)
         xtal=''
@@ -3088,17 +2620,10 @@ class XChemExplorer(QtGui.QApplication):
             update_dict['DataCollectionOutcome']=outcome
             self.db.update_insert_data_source(xtal,update_dict)
 
-
-
-
     def show_data_collection_details(self,state):
         # first remove currently displayed widget
         if self.data_collection_details_currently_on_display != None:
             self.data_collection_details_currently_on_display.hide()
-#            self.data_collection_summarys_vbox_for_details.removeWidget(self.data_collection_details_currently_on_display)
-#            self.data_collection_details_currently_on_display.deleteLater()
-#            self.data_collection_details_currently_on_display.setParent(None)
-#            sip.delete(self.data_collection_details_currently_on_display)
             self.data_collection_details_currently_on_display=None
 
         tmp=[]
@@ -3112,30 +2637,17 @@ class XChemExplorer(QtGui.QApplication):
                     for item in tmp:
                         if item[0]==key:
                             self.data_collection_summary_table.selectRow(item[1])
-#                            for column in range(self.data_collection_summary_table.columnCount()):
-#                                try:
-#                                    self.data_collection_summary_table.item(item[1], column).setBackground(QtGui.QColor(255,255,150))
-#                                except AttributeError:
-#                                    pass
-#                    print self.data_collection_column_three_dict[key][0].frameGeometry().height()
                     self.data_collection_details_currently_on_display=self.data_collection_column_three_dict[key][0]
                     self.data_collection_summarys_vbox_for_details.addWidget(self.data_collection_details_currently_on_display)
-#                    self.data_collection_summarys_vbox_for_details.setSizeConstraint(QtGui.QLayout.SetMinimumSize)
                     self.data_collection_details_currently_on_display.show()
             else:
                 # un-check all other ones
                 self.data_collection_summary_dict[key][3].setChecked(False)
-#        print self.data_collection_summary_table.columnCount()
-#            if xtal_in_table and mtz_already_in_inital_model_directory:
-#                self.main_data_collection_table.item(current_row, 0).setBackground(QtGui.QColor(100,100,150))
-#                self.main_data_collection_table.item(current_row, 1).setBackground(QtGui.QColor(100,100,150))
 
     def populate_data_collection_summary_table(self):
         self.status_bar.showMessage('Building summary table for data processing results; be patient this may take a while')
         row = self.data_collection_summary_table.rowCount()
-#        column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
         column_name=self.db.translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
-#        new_xtal=False
 
         pinList = self.db.execute_statement("Select CrystalName,PinBarcode,DataCollectionPinBarcode from mainTable where CrystalName is not ''")
         pinDict={}
@@ -3148,7 +2660,6 @@ class XChemExplorer(QtGui.QApplication):
                 row = self.data_collection_summary_table.rowCount()
                 self.data_collection_summary_table.insertRow(row)
                 self.data_collection_summary_dict[xtal]=[]
-                # self.data_collection_summary_dict[xtal]=[outcome,db_dict,image,diffraction_image]
                 new_xtal=True
 
             # check for dataset outcome
@@ -3167,20 +2678,11 @@ class XChemExplorer(QtGui.QApplication):
                         except ValueError:
                             pass
 
-#            if not logfile_found:
-#                db_dict={}
             try:
                 outcome=str(self.db.get_value_from_field(xtal,'DataCollectionOutcome')[0])
             except TypeError:
                 outcome='Failed - unknown'
                 self.update_log.insert('cannot find DataCollectionOutcome for %s' %xtal)
-#                print '==> xtal:',xtal
-#            if logfile_found and not too_low_resolution:
-#                outcome="success"
-#            elif logfile_found and too_low_resolution:
-#                outcome="Failed - low resolution"
-#            else:
-#                outcome="Failed - unknown"
             self.dataset_outcome_dict[xtal]=outcome
 
             # find latest run for crystal and diffraction images
@@ -3296,8 +2798,6 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.data_collection_summary_table.setItem(current_row, column, cell_text)
 
-
-
                 else:
                     cell_text=QtGui.QTableWidgetItem()
                     # in case data collection failed for whatever reason
@@ -3317,24 +2817,14 @@ class XChemExplorer(QtGui.QApplication):
                             cell_text.setText('')
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                     self.data_collection_summary_table.setItem(current_row, column, cell_text)
-
-            # update data source
-#            if db_dict != {}:
-#                self.update_data_source(xtal,db_dict)
-
             row += 1
 
         self.data_collection_summary_table.resizeRowsToContents()
         self.data_collection_summary_table.resizeColumnsToContents()
 
         self.status_bar.showMessage('updating Overview table')
-#        self.update_header_and_data_from_datasource()
-#        self.populate_and_update_data_source_table()
-
         self.status_bar.showMessage('idle')
-
         self.save_files_to_initial_model_folder()
-
         self.update_dewar_configuration_tab()
 
     def update_dewar_configuration_tab(self):
@@ -3348,8 +2838,6 @@ class XChemExplorer(QtGui.QApplication):
         # 6 -   yellow:   flagged for re-collection
 
         # first find out what is currently in the dewar
-#        self.dewar_sample_configuration_dict=self.get_dewar_configuration()
-
         occupied_positions=[]
         for puck_position in self.dewar_sample_configuration_dict:
             sample=self.dewar_sample_configuration_dict[puck_position]
@@ -3379,9 +2867,6 @@ class XChemExplorer(QtGui.QApplication):
                     self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: red")
                 self.dewar_configuration_dict[puck_position].setStyleSheet("font-size:7px;border-width: 0px")
 
-
-
-
     def update_outcome_data_collection_summary_table(self,sample,outcome):
         rows_in_table=self.data_collection_summary_table.rowCount()
         for row in range(rows_in_table):
@@ -3389,33 +2874,6 @@ class XChemExplorer(QtGui.QApplication):
                 cell_text=QtGui.QTableWidgetItem()
                 cell_text.setText(outcome)
                 self.data_collection_summary_table.setItem(row, 3, cell_text)
-#            self.data_collection_summary_table.resizeRowsToContents()
-#            self.data_collection_summary_table.resizeColumnsToContents()
-
-#    def user_update_selected_autoproc_data_collection_summary_table(self):
-#        for key in self.data_collection_column_three_dict:
-#            if self.data_collection_column_three_dict[key][0]==self.sender():
-#                # the user changed the selection, i.e. no automated selection will update it
-#                self.update_log.insert('user changed selection')
-#                self.data_collection_column_three_dict[key][1]=True
-#                # need to also update if not yet done
-#                user_already_changed_selection=False
-#                for n,entry in enumerate(self.data_collection_dict[key]):
-#                    if entry[0]=='user_changed_selection':
-#                        user_already_changed_selection=True
-#                    if entry[0]=='logfile':
-#                        db_dict=entry[6]
-#                        db_dict['DataProcessingAutoAssigned']='False'
-#                        entry[6]=db_dict
-#                        self.data_collection_dict[key][n]=entry
-#                if not user_already_changed_selection:
-#                    self.data_collection_dict[key].append(['user_changed_selection'])
-#                XChemMain.change_links_to_selected_data_collection_outcome(key,self.data_collection_dict,
-#                                                                           self.data_collection_column_three_dict,
-#                                                                           self.dataset_outcome_dict,
-#                                                                           self.initial_model_directory,
-#                                                                           os.path.join(self.database_directory,self.data_source_file),
-#                                                                           self.xce_logfile)
 
     def user_update_selected_autoproc_data_collection_summary_table(self):
         for key in self.data_collection_column_three_dict:
@@ -3442,7 +2900,6 @@ class XChemExplorer(QtGui.QApplication):
                             run=db_dict['DataCollectionRun']
                             self.update_log.insert('user changed data processing files for %s to visit=%s, run=%s, program=%s' %(key,visit,run,program))
                             # update datasource
-        #                    print db_dict
                             self.update_log.insert('updating datasource...')
                             self.update_data_source(key,db_dict)
                             entry[8]=True
@@ -3483,8 +2940,6 @@ class XChemExplorer(QtGui.QApplication):
                                 except KeyError:
                                     pass
 
-
-
     def update_selected_autoproc_data_collection_summary_table(self):
         for key in self.data_collection_column_three_dict:
             if self.data_collection_column_three_dict[key][0]==self.sender():
@@ -3503,17 +2958,12 @@ class XChemExplorer(QtGui.QApplication):
                     run=db_dict['DataCollectionRun']
                     self.update_log.insert('user changed data processing files for %s to visit=%s, run=%s, program=%s' %(sample,visit,run,program))
                     # update datasource
-#                    print db_dict
                     self.update_log.insert('updating datasource...')
                     self.update_data_source(sample,db_dict)
                     entry[8]=True
                 else:
                     entry[8]=False
                 self.data_collection_dict[sample][n]=entry
-
-        # update Overview table
-#        self.update_header_and_data_from_datasource()
-#        self.populate_and_update_data_source_table()
 
         # update 'Datasets' table
         column_name=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file)).translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
@@ -3534,8 +2984,6 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text.setText(str( db_dict[ header[1] ]  ))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.data_collection_summary_table.setItem(row, column, cell_text)
-
-
 
     def populate_data_source_table(self,header,data):
         self.mounted_crystal_table.setColumnCount(0)
@@ -3565,9 +3013,7 @@ class XChemExplorer(QtGui.QApplication):
         self.mounted_crystal_table.setHorizontalHeaderLabels(self.data_source_columns_to_display)
 
     def populate_and_update_data_source_table(self):
-#        self.mounted_crystal_table.setColumnCount(0)
         self.mounted_crystal_table.setColumnCount(len(self.data_source_columns_to_display))
-#        self.mounted_crystal_table.setRowCount(0)
 
         # first get a list of all the samples that are already in the table and which will be updated
         samples_in_table=[]
@@ -3578,9 +3024,7 @@ class XChemExplorer(QtGui.QApplication):
 
         columns_to_show=self.get_columns_to_show(self.data_source_columns_to_display)
         n_rows=self.get_rows_with_sample_id_not_null_from_datasource()
-#        self.mounted_crystal_table.setRowCount(n_rows)
         sample_id_column=self.get_columns_to_show(['Sample ID'])
-
 
         for row in self.data:
             if str(row[sample_id_column[0]]).lower() == 'none' or str(row[sample_id_column[0]]).replace(' ','') == '':
@@ -3609,31 +3053,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.mounted_crystal_table.setItem(x, y, cell_text)
         self.mounted_crystal_table.setHorizontalHeaderLabels(self.data_source_columns_to_display)
 
-
-#    def populate_summary_table(self,header,data):
-#        self.summary_table.setColumnCount(len(self.summary_column_name))
-#        self.summary_table.setRowCount(0)
-#        self.summary_table.setRowCount(len(data))
-#
-#        columns_to_show=self.get_columns_to_show(self.summary_column_name,header)
-#        for x,row in enumerate(data):
-#            for y,item in enumerate(columns_to_show):
-#                cell_text=QtGui.QTableWidgetItem()
-##                if item=='Image':
-##                    cell_text.setText('')
-#                if row[item]==None:
-#                    cell_text.setText('')
-#                else:
-#                    cell_text.setText(str(row[item]))
-#                if self.summary_column_name[y]=='Sample ID':     # assumption is that column 0 is always sampleID
-#                    cell_text.setFlags(QtCore.Qt.ItemIsEnabled)             # and this field cannot be changed
-#                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-#                self.summary_table.setItem(x, y, cell_text)
-#        self.summary_table.setHorizontalHeaderLabels(self.summary_column_name)
-
-
     def populate_pandda_analyse_input_table(self):
-#        self.update_header_and_data_from_datasource()
         column_name=self.db.translate_xce_column_list_to_sqlite(self.pandda_column_name)
         for xtal in sorted(self.xtal_db_dict):
             new_xtal=False
@@ -3676,18 +3096,14 @@ class XChemExplorer(QtGui.QApplication):
 
     def populate_and_update_refinement_table(self):
 
-        panddaList = self.db.execute_statement("select CrystalName,PANDDA_site_index,PANDDA_site_name,RefinementOutcome from panddaTable where CrystalName is not '' and PANDDA_site_ligand_placed is 'True';")
+        panddaList = self.db.execute_statement("select CrystalName,PANDDA_site_index,PANDDA_site_name,RefinementOutcome "
+                                               "from panddaTable where CrystalName is not '' and PANDDA_site_ligand_placed "
+                                               "is 'True';")
         panddaDict={}
         for item in panddaList:
             if str(item[0]) not in panddaDict:
                 panddaDict[str(item[0])]=[]
             panddaDict[str(item[0])].append([str(item[1]),str(item[2]),str(item[3])])
-
-#        refinementList = self.db.execute_statement("select CrystalName,RefinementOutcome from mainTable where CrystalName is not '';")
-#        refinementDict={}
-#        for item in refinementList:
-#            if str(item[0]) not in refinementDict:
-#                refinementDict[str(item[0])]=str(item[1])
 
         column_name=self.db.translate_xce_column_list_to_sqlite(self.summary_column_name)
         for xtal in sorted(self.xtal_db_dict):
@@ -3730,8 +3146,6 @@ class XChemExplorer(QtGui.QApplication):
                         refinement_outcome_combobox.setCurrentIndex(index)
                         refinement_outcome_combobox.currentIndexChanged.connect(self.refinement_outcome_combobox_changed)
 
-
-
                     elif header[0]=='PanDDA site details':
                         try:
                             panddaDict[xtal].insert(0,['Index','Name','Status'])
@@ -3745,7 +3159,6 @@ class XChemExplorer(QtGui.QApplication):
                                     vbox=QtGui.QVBoxLayout()
                                     vbox.addWidget(QtGui.QLabel(str(entry[x])))
                                     frame.setLayout(vbox)
-                                    #frame.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Minimum))
                                     grid.addWidget(frame,y,x)
                             outerFrame.setLayout(grid)
                             self.summary_table.setCellWidget(current_row, column, outerFrame)
@@ -3776,8 +3189,6 @@ class XChemExplorer(QtGui.QApplication):
         self.summary_table.resizeColumnsToContents()
         self.summary_table.resizeRowsToContents()
 
-
-
     def get_columns_to_show(self,column_list):
         # maybe I coded some garbage before, but I need to find out which column name in the
         # data source corresponds to the actually displayed column name in the table
@@ -3795,7 +3206,6 @@ class XChemExplorer(QtGui.QApplication):
                     break
         return columns_to_show
 
-
     def get_rows_with_sample_id_not_null_from_datasource(self):
         sample_id_column=self.get_columns_to_show(['Sample ID'])
         n_rows=0
@@ -3806,24 +3216,42 @@ class XChemExplorer(QtGui.QApplication):
 
     def update_data_source(self,sample,db_dict):
         data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
-#        try:
-#            data_source=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
-#            data_source.update_insert_data_source(sample,db_dict)
-#        except sqlite3.OperationalError,NameError:
-#            pass
 
-    def quit_xce(self):
-        # save pkl file
-        if self.data_collection_dict != {}:
-            if os.path.isfile(self.data_collection_summary_file):
-                self.update_log.insert('saving results to PKL file')
-                pickle.dump(self.data_collection_dict,open(self.data_collection_summary_file,'wb'))
-        self.update_log.insert('quitting XCE... bye,bye!')
-        QtGui.qApp.quit()
-	
-    
+    def update_header_and_data_from_datasource(self):
+        self.update_log.insert('getting information for all samples from data source...')
+        self.db = XChemDB.data_source(os.path.join(self.database_directory, self.data_source_file))
+        self.update_log.insert('creating missing columns in data source')
+        self.db.create_missing_columns()
+        self.update_log.insert('load header and data from data source')
+        self.header, self.data = self.db.load_samples_from_data_source()
+        self.update_log.insert('get all samples in data source')
+        all_samples_in_db = self.db.execute_statement("select CrystalName from mainTable where CrystalName is not '';")
+
+        self.xtal_db_dict = {}
+        sampleID_column = 0
+        for n, entry in enumerate(self.header):
+            if entry == 'CrystalName':
+                sampleID_column = n
+                break
+        for line in self.data:
+            if str(line[sampleID_column]) != '':
+                db_dict = {}
+                for n, entry in enumerate(line):
+                    if n != sampleID_column:
+                        db_dict[str(self.header[n])] = str(entry)
+                self.xtal_db_dict[str(line[sampleID_column])] = db_dict
+
+        print '==> XCE: found ' + str(len(self.xtal_db_dict)) + ' samples'
+
+        return self
+
+    def datasource_menu_reload_samples(self):
+        self.update_log.insert(
+            'reading samples from data source: ' + os.path.join(self.database_directory, self.data_source_file))
+        self.update_status_bar(
+            'reading samples from data source: ' + os.path.join(self.database_directory, self.data_source_file))
+        self.update_header_and_data_from_datasource()
+        self.update_all_tables()
 
 if __name__ == "__main__":
-	app=XChemExplorer(sys.argv[1:])
-	
-
+    app=XChemExplorer(sys.argv[1:])
