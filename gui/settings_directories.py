@@ -139,7 +139,6 @@ def settings_directories(self):
     self.diffraction_data_table_dict = {}
     self.summary_table_dict = {}
     self.main_data_collection_table_exists = False
-    self.timer_to_check_for_new_data_collection = QtCore.QTimer()
     self.target_list, self.visit_list = XChemMain.get_target_and_visit_list(self.beamline_directory)
     self.diffraction_data_dict = {}
 

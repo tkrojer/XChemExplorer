@@ -1,4 +1,9 @@
 from import_modules import *
+import dataset_functions as datafunc
+import maps_functions as mapfunc
+import pandda_functions as panfunc
+import settings_functions as settingsfunc
+import deposition_functions as depofunc
 
 def add_subtabs(self, tablist, tabwidget):
     tabdict = {}
@@ -72,7 +77,7 @@ def dataset_tab(self):
     check_for_new_data_collection = QtGui.QCheckBox('Check for new data collection every two minutes')
     check_for_new_data_collection.toggle()
     check_for_new_data_collection.setChecked(False)
-    check_for_new_data_collection.stateChanged.connect(self.continously_check_for_new_data_collection)
+    check_for_new_data_collection.stateChanged.connect(datafunc.collection_autoupdate)
     hbox.addWidget(check_for_new_data_collection)
 
     # add dropdown for target selection
@@ -80,7 +85,7 @@ def dataset_tab(self):
     hbox.addWidget(QtGui.QLabel('Select Target: '))
     self.target_selection_combobox = QtGui.QComboBox()
     self.populate_target_selection_combobox(self.target_selection_combobox)
-    self.target_selection_combobox.activated[str].connect(self.target_selection_combobox_activated)
+    self.target_selection_combobox.activated[str].connect(datafunc.target_selection_combobox_activated)
     hbox.addWidget(self.target_selection_combobox)
     self.target = str(self.target_selection_combobox.currentText())
     self.dls_data_collection_vbox.addLayout(hbox)
@@ -133,9 +138,9 @@ def dataset_tab(self):
     # create context menu
     self.popMenu = QtGui.QMenu()
     recollect = QtGui.QAction("recollect", self.window)
-    recollect.triggered.connect(self.flag_sample_for_recollection)
+    recollect.triggered.connect(datafunc.flag_sample_for_recollection)
     undo_recollect = QtGui.QAction("undo", self.window)
-    undo_recollect.triggered.connect(self.undo_flag_sample_for_recollection)
+    undo_recollect.triggered.connect(datafunc.undo_flag_sample_for_recollection)
     self.popMenu.addAction(recollect)
     self.popMenu.addAction(undo_recollect)
 
@@ -164,7 +169,7 @@ def dataset_tab(self):
                 self.dewar_configuration_dict[str(puck) + '-' + str(position)] = frame
                 self.dewar_sample_configuration_dict[str(puck) + '-' + str(position)] = []
                 frame.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-                frame.customContextMenuRequested.connect(self.on_context_menu)
+                frame.customContextMenuRequested.connect(datafunc.on_context_menu)
             self.dewar_configuration_layout.addWidget(frame, position, puck)
 
     ## END WARNING!
@@ -190,14 +195,14 @@ def dataset_tab(self):
     dir_label_box = QtGui.QVBoxLayout()
 
     # data collection path
-    self.diffraction_data_dir_label = QtGui.QLabel(self.diffraction_data_directory)
-    dir_label_box.addWidget(self.diffraction_data_dir_label)
+    self.diffraction_data_dir_label = QtGui.QLabel(self.diffraction_data_directory) # diffraction_data_directory in:
+    dir_label_box.addWidget(self.diffraction_data_dir_label)                        # settings_directories.py
     dir_frame.setLayout(dir_label_box)
     hbox_select.addWidget(dir_frame)
 
     # 'select' button for data collection directory
     select_button = QtGui.QPushButton("Select")
-    select_button.clicked.connect(self.select_diffraction_data_directory)
+    select_button.clicked.connect(datafunc.select_diffraction_data_directory)
     hbox_select.addWidget(select_button)
     frame_select.setLayout(hbox_select)
     hbox.addWidget(frame_select)
@@ -209,7 +214,7 @@ def dataset_tab(self):
 
     # search datasets button
     button = QtGui.QPushButton("Search Datasets")
-    button.clicked.connect(self.search_for_datasets)
+    button.clicked.connect(datafunc.search_for_datasets)
     hbox_search.addWidget(button)
 
     # frame for number of datasets found
@@ -236,7 +241,7 @@ def dataset_tab(self):
     # button to perform translation
     translate_button = QtGui.QPushButton('Open CSV')
     translate_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
-    translate_button.clicked.connect(self.translate_datasetID_to_sampleID)
+    translate_button.clicked.connect(datafunc.translate_datasetID_to_sampleID)
     vbox_translate.addWidget(translate_button)
     frame_translate.setLayout(vbox_translate)
     hbox.addWidget(frame_translate)
@@ -271,7 +276,7 @@ def dataset_tab(self):
     run_xia2_on_selected.triggered.connect(self.select_sample_for_xia2)
     self.popMenu_for_reprocess_datasets_table.addAction(run_xia2_on_selected)
     self.reprocess_datasets_table.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-    self.reprocess_datasets_table.customContextMenuRequested.connect(self.on_context_menu_reprocess_data)
+    self.reprocess_datasets_table.customContextMenuRequested.connect(datafunc.on_context_menu_reprocess_data)
 
     ######## GAVE UP ON COMMENTING HERE
     frame = QtGui.QFrame()
@@ -318,7 +323,7 @@ def dataset_tab(self):
     frame_ref_info.setLayout(hbox_frame_ref_info)
     hbox_ref.addWidget(frame_ref_info)
     button = QtGui.QPushButton("Select")
-    button.clicked.connect(self.select_reprocess_reference_mtz)
+    button.clicked.connect(datafunc.select_reprocess_reference_mtz)
     hbox_ref.addWidget(button)
     frame_ref.setLayout(hbox_ref)
     hbox.addWidget(frame_ref)
@@ -363,19 +368,16 @@ def dataset_tab(self):
     self.dls_tab_dict['Reprocess'][1].addLayout(reprocess_vbox)
 
 def maps_tab(self):
-    #
-    # @ MAP files Tab ####################################################################
-    #
-
+    # select all samples in maps tab checkbox
     initial_model_checkbutton_hbox = QtGui.QHBoxLayout()
     select_sample_for_dimple = QtGui.QCheckBox('(de-)select all samples for DIMPLE')
     select_sample_for_dimple.toggle()
     select_sample_for_dimple.setChecked(False)
-    select_sample_for_dimple.stateChanged.connect(self.set_run_dimple_flag)
+    select_sample_for_dimple.stateChanged.connect(mapfunc.set_run_dimple_flag)
     initial_model_checkbutton_hbox.addWidget(select_sample_for_dimple)
 
     set_new_reference_button = QtGui.QPushButton("Set New Reference (if applicable)")
-    set_new_reference_button.clicked.connect(self.set_new_reference_if_applicable)
+    set_new_reference_button.clicked.connect(mapfunc.set_new_reference_if_applicable)
     initial_model_checkbutton_hbox.addWidget(set_new_reference_button)
 
     self.reference_file_list = self.get_reference_file_list(' ')
@@ -415,7 +417,7 @@ def maps_tab(self):
     run_dimple.triggered.connect(self.select_sample_for_dimple)
     self.popMenu_for_initial_model_table.addAction(run_dimple)
     self.initial_model_table.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-    self.initial_model_table.customContextMenuRequested.connect(self.on_context_menu_initial_model)
+    self.initial_model_table.customContextMenuRequested.connect(mapfunc.on_context_menu_initial_model)
 
 def panddas_tab(self):
     pandda_tab_widget = QtGui.QTabWidget()
@@ -427,13 +429,8 @@ def panddas_tab(self):
     # create vbox containers for sub tabs
     self.pandda_tab_dict = add_subtabs(self, pandda_tab_list, pandda_tab_widget)
 
-    #
-    # @ PANDDAs Tab ######################################################################
-    #
-
     self.panddas_results_vbox = QtGui.QVBoxLayout()
     self.tab_dict[self.workflow_dict['PANDDAs']][1].addLayout(self.panddas_results_vbox)
-
 
     self.pandda_analyse_hbox = QtGui.QHBoxLayout()
     self.pandda_tab_dict['pandda.analyse'][1].addLayout(self.pandda_analyse_hbox)
@@ -458,17 +455,12 @@ def panddas_tab(self):
     self.pandda_analyse_data_table.resizeColumnsToContents()
     self.pandda_analyse_data_table.setColumnCount(len(self.pandda_column_name))
     self.pandda_analyse_data_table.setHorizontalHeaderLabels(self.pandda_column_name)
-    ##        self.pandda_analyse_data_table.setSizePolicy(QtGui.QSizePolicy.Maximum,QtGui.QSizePolicy.Maximum)
-    ##        self.pandda_analyse_data_table.setSizePolicy(QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Minimum)
-    #        self.pandda_analyse_hbox.addWidget(self.pandda_analyse_data_table)
 
     frame_pandda = QtGui.QFrame()
     grid_pandda.addWidget(self.pandda_analyse_data_table, 0, 0)
 
-    #        self.pandda_analyse_hbox.addStretch(1)
 
     # right hand side: input parameters for PANDDAs run
-
     frame_right = QtGui.QFrame()
     frame_right.setFrameShape(QtGui.QFrame.StyledPanel)
 
@@ -485,13 +477,12 @@ def panddas_tab(self):
     self.select_pandda_input_dir_button = QtGui.QPushButton("Select Input Template")
     #        self.select_pandda_input_dir_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
     self.select_pandda_input_dir_button.setMaximumWidth(200)
-    self.select_pandda_input_dir_button.clicked.connect(self.select_pandda_input_template)
+    self.select_pandda_input_dir_button.clicked.connect(panfunc.select_pandda_input_template)
     pandda_input_dir_hbox.addWidget(self.select_pandda_input_dir_button)
     self.pandda_analyse_input_params_vbox.addLayout(pandda_input_dir_hbox)
 
     pandda_pdb_style_hbox = QtGui.QHBoxLayout()
     label = QtGui.QLabel('pdb style')
-    #        label.setSizePolicy(QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Minimum)
     pandda_pdb_style_hbox.addWidget(label)
     self.pandda_pdb_style_entry = QtGui.QLineEdit()
     self.pandda_pdb_style_entry.setText('dimple.pdb')
@@ -501,7 +492,6 @@ def panddas_tab(self):
 
     pandda_mtz_style_hbox = QtGui.QHBoxLayout()
     label = QtGui.QLabel('mtz style')
-    #        label.setSizePolicy(QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Minimum)
     pandda_mtz_style_hbox.addWidget(label)
     self.pandda_mtz_style_entry = QtGui.QLineEdit()
     self.pandda_mtz_style_entry.setText('dimple.mtz')
@@ -511,16 +501,14 @@ def panddas_tab(self):
 
     pandda_output_dir_hbox = QtGui.QHBoxLayout()
     label = QtGui.QLabel('output directory')
-    #        label.setSizePolicy(QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Minimum)
     self.pandda_analyse_input_params_vbox.addWidget(label)
     self.pandda_output_data_dir_entry = QtGui.QLineEdit()
     self.pandda_output_data_dir_entry.setText(self.panddas_directory)
     self.pandda_output_data_dir_entry.setFixedWidth(300)
     pandda_output_dir_hbox.addWidget(self.pandda_output_data_dir_entry)
     self.select_pandda_output_dir_button = QtGui.QPushButton("Select PANNDAs Directory")
-    #        self.select_pandda_output_dir_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
     self.select_pandda_output_dir_button.setMaximumWidth(200)
-    self.select_pandda_output_dir_button.clicked.connect(self.settings_button_clicked)
+    self.select_pandda_output_dir_button.clicked.connect(settingsfunc.settings_button_clicked)
     pandda_output_dir_hbox.addWidget(self.select_pandda_output_dir_button)
     self.pandda_analyse_input_params_vbox.addLayout(pandda_output_dir_hbox)
 
@@ -562,7 +550,7 @@ def panddas_tab(self):
     self.reference_file_list = self.get_reference_file_list(' ')
     self.pandda_reference_file_selection_combobox = QtGui.QComboBox()
     self.populate_reference_combobox(self.pandda_reference_file_selection_combobox)
-    self.pandda_reference_file_selection_combobox.activated[str].connect(self.change_pandda_spg_label)
+    self.pandda_reference_file_selection_combobox.activated[str].connect(panfunc.change_pandda_spg_label)
     hbox.addWidget(self.pandda_reference_file_selection_combobox)
     self.pandda_reference_file_spg_label = QtGui.QLabel()
     hbox.addWidget(self.pandda_reference_file_spg_label)
@@ -602,22 +590,11 @@ def panddas_tab(self):
 
     frame_right.setSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Minimum)
     frame_right.setLayout(self.pandda_analyse_input_params_vbox)
-    #        self.pandda_analyse_hbox.addWidget(frame_right)
 
-    #        # green 'Run Pandda' button (which is red when pandda run in progress
-    #        self.run_panddas_button=QtGui.QPushButton("Run PANDDAs")
-    #        self.run_panddas_button.clicked.connect(self.button_clicked)
-    #        self.run_panddas_button.setFixedWidth(200)
-    #        self.run_panddas_button.setFixedHeight(100)
-    #        self.color_run_panddas_button()
-    #        self.pandda_analyse_input_params_vbox.addWidget(self.run_panddas_button)
-
-    #        self.pandda_analyse_hbox.addLayout(self.pandda_analyse_input_params_vbox)
     grid_pandda.addWidget(frame_right, 0, 1, 5, 5)
     frame_pandda.setLayout(grid_pandda)
     self.pandda_analyse_hbox.addWidget(frame_pandda)
 
-    #######################################################
     # next three blocks display html documents created by pandda.analyse
     self.pandda_initial_html_file = os.path.join(self.panddas_directory, 'results_summaries', 'pandda_initial.html')
     self.pandda_analyse_html_file = os.path.join(self.panddas_directory, 'results_summaries', 'pandda_analyse.html')
@@ -638,19 +615,10 @@ def panddas_tab(self):
     self.pandda_inspect_html.load(QtCore.QUrl(self.pandda_inspect_html_file))
     self.pandda_inspect_html.show()
 
-    #        self.pandda_analyse_html = QtWebKit.QWebView()
-    #        self.pandda_inspect_html = QtWebKit.QWebView()
-
     self.panddas_results_vbox.addWidget(pandda_tab_widget)
     self.show_pandda_html_summary()
 
-    ######################################################################################
-
 def refinement_tab(self):
-    #
-    # @ Refine Tab #######################################################################
-    #
-
     self.summary_vbox_for_table = QtGui.QVBoxLayout()
     self.summary_column_name = ['Sample ID',
                                 'Compound ID',
@@ -669,20 +637,12 @@ def refinement_tab(self):
     self.summary_vbox_for_table.addWidget(self.summary_table)
     self.tab_dict[self.workflow_dict['Refinement']][1].addLayout(self.summary_vbox_for_table)
 
-    ######################################################################################
-
 def deposition_tab(self):
-    #
-    # @ DEPOSITION Tab ###################################################################
-    #
-
     self.deposition_vbox = QtGui.QVBoxLayout()
 
     scroll = QtGui.QScrollArea()
     self.deposition_vbox.addWidget(scroll)
-    # scroll.setSizePolicy(size_policy)  #setWidgetResizable(True)
     scrollContent = QtGui.QWidget(scroll)
-    # scrollContent.setSizePolicy(size_policy)
 
     scrollLayout = QtGui.QVBoxLayout(scrollContent)
     scrollContent.setLayout(scrollLayout)
@@ -697,7 +657,7 @@ def deposition_tab(self):
     scrollLayout.addWidget(QtGui.QLabel(''))
     image = QtGui.QLabel()
     pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'), 'image', 'html_summary_page.png'))
-    # pixmap = pixmap.scaledToWidth(200)
+
     image.setPixmap(pixmap)
     scrollLayout.addWidget(image)
     scrollLayout.addWidget(QtGui.QLabel(''))
@@ -763,7 +723,7 @@ def deposition_tab(self):
     label_text.setStyleSheet("font: 17pt Arial")
     scrollLayout.addWidget(label_text)
     button = QtGui.QPushButton('prepare files')
-    button.clicked.connect(self.prepare_files_for_zenodo_upload)
+    button.clicked.connect(depofunc.prepare_files_for_zenodo_upload)
     button.setMaximumWidth(200)
     scrollLayout.addWidget(button)
     scrollLayout.addWidget(QtGui.QLabel('\n'))
@@ -820,23 +780,14 @@ def deposition_tab(self):
 
     self.tab_dict[self.workflow_dict['Deposition']][1].addLayout(self.deposition_vbox)
 
-    ######################################################################################
-
 def settings_tab(self):
-    #
-    # @ Settings Tab #####################################################################
-    #
-
-    ######################################################################################
     self.settings_container = QtGui.QWidget()
     self.buttons_etc = QtGui.QWidget()
     self.settings_vbox = QtGui.QVBoxLayout()
 
     self.scroll = QtGui.QScrollArea(self.settings_container)
     self.settings_vbox.addWidget(self.scroll)
-    # scroll.setSizePolicy(size_policy)  #setWidgetResizable(True)
     scrollContent_settings = QtGui.QWidget(self.scroll)
-    # scrollContent_settings.setSizePolicy(size_policy)
 
     scrollLayout_settings = QtGui.QVBoxLayout(scrollContent_settings)
     scrollContent_settings.setLayout(scrollLayout_settings)
@@ -852,7 +803,7 @@ def settings_tab(self):
     self.initial_model_directory_label = QtGui.QLabel(self.initial_model_directory)
     settings_hbox_initial_model_directory.addWidget(self.initial_model_directory_label)
     settings_buttoon_initial_model_directory = QtGui.QPushButton('Select Project Directory')
-    settings_buttoon_initial_model_directory.clicked.connect(self.settings_button_clicked)
+    settings_buttoon_initial_model_directory.clicked.connect(settingsfunc.settings_button_clicked)
     settings_hbox_initial_model_directory.addWidget(settings_buttoon_initial_model_directory)
     self.data_collection_vbox_for_settings.addLayout(settings_hbox_initial_model_directory)
 
@@ -861,7 +812,7 @@ def settings_tab(self):
     self.reference_directory_label = QtGui.QLabel(self.reference_directory)
     settings_hbox_reference_directory.addWidget(self.reference_directory_label)
     settings_buttoon_reference_directory = QtGui.QPushButton('Select Reference Structure Directory')
-    settings_buttoon_reference_directory.clicked.connect(self.settings_button_clicked)
+    settings_buttoon_reference_directory.clicked.connect(settingsfunc.settings_button_clicked)
     settings_hbox_reference_directory.addWidget(settings_buttoon_reference_directory)
     self.data_collection_vbox_for_settings.addLayout(settings_hbox_reference_directory)
 
@@ -873,11 +824,10 @@ def settings_tab(self):
         self.data_source_file_label = QtGui.QLabel('')
     settings_hbox_data_source_file.addWidget(self.data_source_file_label)
     settings_buttoon_data_source_file = QtGui.QPushButton('Select Data Source File')
-    settings_buttoon_data_source_file.clicked.connect(self.settings_button_clicked)
+    settings_buttoon_data_source_file.clicked.connect(settingsfunc.settings_button_clicked)
     settings_hbox_data_source_file.addWidget(settings_buttoon_data_source_file)
     self.data_collection_vbox_for_settings.addLayout(settings_hbox_data_source_file)
 
-    #################
     # Data Collection
     self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nData Collection Directory: - OPTIONAL -'))
 
@@ -889,7 +839,7 @@ def settings_tab(self):
     self.beamline_directory_label = QtGui.QLabel(self.beamline_directory)
     settings_hbox_beamline_directory.addWidget(self.beamline_directory_label)
     settings_buttoon_beamline_directory = QtGui.QPushButton('Select Data Collection Directory')
-    settings_buttoon_beamline_directory.clicked.connect(self.settings_button_clicked)
+    settings_buttoon_beamline_directory.clicked.connect(settingsfunc.settings_button_clicked)
     settings_hbox_beamline_directory.addWidget(settings_buttoon_beamline_directory)
     settings_beamline_vbox.addLayout(settings_hbox_beamline_directory)
 
@@ -897,25 +847,24 @@ def settings_tab(self):
     self.data_collection_summary_file_label = QtGui.QLabel(self.data_collection_summary_file)
     settings_hbox_data_collection_summary_file.addWidget(self.data_collection_summary_file_label)
     settings_button_data_collection_summary_file = QtGui.QPushButton('Select Existing\nCollection Summary File')
-    settings_button_data_collection_summary_file.clicked.connect(self.settings_button_clicked)
+    settings_button_data_collection_summary_file.clicked.connect(settingsfunc.settings_button_clicked)
     settings_hbox_data_collection_summary_file.addWidget(settings_button_data_collection_summary_file)
 
     settings_button_new_data_collection_summary_file = QtGui.QPushButton('Assign New\nCollection Summary File')
-    settings_button_new_data_collection_summary_file.clicked.connect(self.settings_button_clicked)
+    settings_button_new_data_collection_summary_file.clicked.connect(settingsfunc.settings_button_clicked)
     settings_hbox_data_collection_summary_file.addWidget(settings_button_new_data_collection_summary_file)
 
     settings_beamline_vbox.addLayout(settings_hbox_data_collection_summary_file)
 
     settings_beamline_frame.setLayout(settings_beamline_vbox)
     self.data_collection_vbox_for_settings.addWidget(settings_beamline_frame)
-    #################
 
     self.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nCCP4_SCR Directory: - OPTIONAL -'))
     settings_hbox_ccp4_scratch_directory = QtGui.QHBoxLayout()
     self.ccp4_scratch_directory_label = QtGui.QLabel(self.ccp4_scratch_directory)
     settings_hbox_ccp4_scratch_directory.addWidget(self.ccp4_scratch_directory_label)
     settings_buttoon_ccp4_scratch_directory = QtGui.QPushButton('Select CCP4_SCR Directory')
-    settings_buttoon_ccp4_scratch_directory.clicked.connect(self.settings_button_clicked)
+    settings_buttoon_ccp4_scratch_directory.clicked.connect(settingsfunc.settings_button_clicked)
     settings_hbox_ccp4_scratch_directory.addWidget(settings_buttoon_ccp4_scratch_directory)
     self.data_collection_vbox_for_settings.addLayout(settings_hbox_ccp4_scratch_directory)
 
@@ -924,7 +873,7 @@ def settings_tab(self):
     self.panddas_directory_label = QtGui.QLabel(self.panddas_directory)
     settings_hbox_panddas_directory.addWidget(self.panddas_directory_label)
     settings_button_panddas_directory = QtGui.QPushButton('Select PANNDAs Directory')
-    settings_button_panddas_directory.clicked.connect(self.settings_button_clicked)
+    settings_button_panddas_directory.clicked.connect(settingsfunc.settings_button_clicked)
     settings_hbox_panddas_directory.addWidget(settings_button_panddas_directory)
     self.data_collection_vbox_for_settings.addLayout(settings_hbox_panddas_directory)
 
@@ -933,7 +882,7 @@ def settings_tab(self):
     self.html_export_directory_label = QtGui.QLabel(self.html_export_directory)
     settings_hbox_html_export_directory.addWidget(self.html_export_directory_label)
     settings_button_html_export_directory = QtGui.QPushButton('Select HTML Export Directory')
-    settings_button_html_export_directory.clicked.connect(self.settings_button_clicked)
+    settings_button_html_export_directory.clicked.connect(settingsfunc.settings_button_clicked)
     settings_hbox_html_export_directory.addWidget(settings_button_html_export_directory)
     self.data_collection_vbox_for_settings.addLayout(settings_hbox_html_export_directory)
 
@@ -942,7 +891,7 @@ def settings_tab(self):
     self.group_deposition_directory_label = QtGui.QLabel(self.group_deposit_directory)
     settings_hbox_group_deposition_directory.addWidget(self.group_deposition_directory_label)
     settings_button_group_deposition_directory = QtGui.QPushButton('Select Group deposition Directory')
-    settings_button_group_deposition_directory.clicked.connect(self.settings_button_clicked)
+    settings_button_group_deposition_directory.clicked.connect(settingsfunc.settings_button_clicked)
     settings_hbox_group_deposition_directory.addWidget(settings_button_group_deposition_directory)
     self.data_collection_vbox_for_settings.addLayout(settings_hbox_group_deposition_directory)
 
