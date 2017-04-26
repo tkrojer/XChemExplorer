@@ -1,7 +1,9 @@
 from import_modules import *
+import datasourcebutton_functions as buttonfunc
+import TCdatasets_functions as TCdatafunc
 
 def workflow(self):
-    self.workflow =     [   'Overview',         # 0
+    self.workflow =             [   'Overview',         # 0
                                     'Datasets',         # 1
                                     'Maps',             # 2
                                     'PANDDAs',          # 3
@@ -19,7 +21,48 @@ def workflow(self):
 
     self.workflow_widget_dict = {}
 
+def button_clicked(self):
 
+    if self.data_source_set==False:
+        if self.sender().text()=="Create New Data\nSource (SQLite)":
+            file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
+            #make sure that the file always has .sqlite extension
+            if file_name.rfind('.') != -1:
+                file_name=file_name[:file_name.rfind('.')]+'.sqlite'
+            else:
+                file_name=file_name+'.sqlite'
+            self.db=XChemDB.data_source(file_name)
+            print '==> XCE: creating new data source'
+            self.db.create_empty_data_source_file()
+            self.db.create_missing_columns()
+            if self.data_source_file=='':
+                self.database_directory=file_name[:file_name.rfind('/')]
+                self.data_source_file=file_name[file_name.rfind('/')+1:]
+                self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
+                self.settings['database_directory']=self.database_directory
+                self.settings['data_source']=self.data_source_file
+                self.data_source_set=True
+        else:
+            self.no_data_source_selected()
+            pass
+
+    # first find out which of the 'Run' or 'Status' buttons is sending
+    for item in self.workflow_widget_dict:
+        for widget in self.workflow_widget_dict[item]:
+            if widget==self.sender():
+                # get index of item in self.workflow; Note this index should be the same as the index
+                # of the self.main_tab_widget which belongs to this task
+                task_index=self.workflow.index(item)
+                instruction =   str(self.workflow_widget_dict[item][0].currentText())
+                action =        str(self.sender().text())
+                if self.main_tab_widget.currentIndex()==task_index:
+                    if self.explorer_active==0 and self.data_source_set==True:
+                        if action=='Run':
+                            self.prepare_and_run_task(instruction)
+                        elif action=='Status':
+                            self.get_status_of_workflow_milestone(instruction)
+                else:
+                    self.need_to_switch_main_tab(task_index)
 
 def datasource_button(self):
     update_from_datasource_button = QtGui.QPushButton("Update Tables\nFrom Datasource")
@@ -28,14 +71,13 @@ def datasource_button(self):
         "QPushButton { padding: 1px; margin: 1px; background: rgb(140,140,140) }")
     self.headlineLabelfont = QtGui.QFont("Arial", 20, QtGui.QFont.Bold)
     update_from_datasource_button.setFont(self.headlineLabelfont)
-    update_from_datasource_button.clicked.connect(self.datasource_menu_reload_samples)
+    update_from_datasource_button.clicked.connect(buttonfunc.datasource_menu_reload_samples)
     update_from_datasource_button.setMaximumWidth((self.screen.width() - 20) / 5)
 
     return update_from_datasource_button
 
 def datasets_section(self):
     self.dataset_tasks = ['Get New Results from Autoprocessing',
-                          # 'Save Files from Autoprocessing to Project Folder',
                           'Run DIMPLE on All Autoprocessing MTZ files',
                           'Rescore Datasets',
                           'Read PKL file',
@@ -47,7 +89,6 @@ def datasets_section(self):
     frame_dataset_task.setStyleSheet(
         "QFrame { border: 1px solid black; border-radius: 1px; padding: 0px; margin: 0px }")
     vboxTask = QtGui.QVBoxLayout()
-    #       label=QtGui.QLabel(self.workflow_dict['Datasets'])
     label = QtGui.QLabel('Datasets')
     label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
     label.setFont(self.headlineLabelfont)
@@ -64,12 +105,12 @@ def datasets_section(self):
     vboxButton = QtGui.QVBoxLayout()
     dataset_task_run_button = QtGui.QPushButton("Run")
     dataset_task_run_button.setToolTip(XChemToolTips.dataset_task_run_button_tip())
-    dataset_task_run_button.clicked.connect(self.button_clicked)
+    dataset_task_run_button.clicked.connect(button_clicked)
     dataset_task_run_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
     vboxButton.addWidget(dataset_task_run_button)
     dataset_task_status_button = QtGui.QPushButton("Status")
     dataset_task_status_button.setToolTip(XChemToolTips.dataset_task_status_button_tip())
-    dataset_task_status_button.clicked.connect(self.button_clicked)
+    dataset_task_status_button.clicked.connect(button_clicked)
     dataset_task_status_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
     vboxButton.addWidget(dataset_task_status_button)
     hboxAction.addLayout(vboxButton)
@@ -113,12 +154,12 @@ def maps_section(self):
     vboxButton = QtGui.QVBoxLayout()
     map_cif_file_task_run_button = QtGui.QPushButton("Run")
     map_cif_file_task_run_button.setToolTip(XChemToolTips.map_cif_file_task_run_button_tip())
-    map_cif_file_task_run_button.clicked.connect(self.button_clicked)
+    map_cif_file_task_run_button.clicked.connect(button_clicked)
     map_cif_file_task_run_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
     vboxButton.addWidget(map_cif_file_task_run_button)
     map_cif_file_task_status_button = QtGui.QPushButton("Status")
     map_cif_file_task_status_button.setToolTip(XChemToolTips.map_cif_file_task_status_button_tip())
-    map_cif_file_task_status_button.clicked.connect(self.button_clicked)
+    map_cif_file_task_status_button.clicked.connect(button_clicked)
     map_cif_file_task_status_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
     vboxButton.addWidget(map_cif_file_task_status_button)
     hboxAction.addLayout(vboxButton)
@@ -139,7 +180,6 @@ def maps_section(self):
     frame_map_cif_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
     frame_map_cif_file_task.setStyleSheet("QFrame { border: 1px solid black; border-radius: 1px; padding: 0px; margin: 0px }")
     vboxTask=QtGui.QVBoxLayout()
-#       label=QtGui.QLabel(self.workflow_dict['Maps'])
     label=QtGui.QLabel('Maps & Restraints')
     label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
     label.setFont(self.headlineLabelfont)
@@ -155,12 +195,12 @@ def maps_section(self):
     vboxButton=QtGui.QVBoxLayout()
     map_cif_file_task_run_button=QtGui.QPushButton("Run")
     map_cif_file_task_run_button.setToolTip(XChemToolTips.map_cif_file_task_run_button_tip())
-    map_cif_file_task_run_button.clicked.connect(self.button_clicked)
+    map_cif_file_task_run_button.clicked.connect(button_clicked)
     map_cif_file_task_run_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
     vboxButton.addWidget(map_cif_file_task_run_button)
     map_cif_file_task_status_button=QtGui.QPushButton("Status")
     map_cif_file_task_status_button.setToolTip(XChemToolTips.map_cif_file_task_status_button_tip())
-    map_cif_file_task_status_button.clicked.connect(self.button_clicked)
+    map_cif_file_task_status_button.clicked.connect(button_clicked)
     map_cif_file_task_status_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
     vboxButton.addWidget(map_cif_file_task_status_button)
     hboxAction.addLayout(vboxButton)
@@ -191,7 +231,6 @@ def panddas_section(self):
     frame_panddas_file_task.setStyleSheet(
         "QFrame { border: 1px solid black; border-radius: 1px; padding: 0px; margin: 0px }")
     vboxTask = QtGui.QVBoxLayout()
-    #        label=QtGui.QLabel(self.workflow_dict['PANDDAs'])
     label = QtGui.QLabel('Hit Identification')
     label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
     label.setFont(self.headlineLabelfont)
@@ -208,12 +247,12 @@ def panddas_section(self):
     vboxButton = QtGui.QVBoxLayout()
     panddas_file_task_run_button = QtGui.QPushButton("Run")
     panddas_file_task_run_button.setToolTip(XChemToolTips.panddas_file_task_run_button_tip())
-    panddas_file_task_run_button.clicked.connect(self.button_clicked)
+    panddas_file_task_run_button.clicked.connect(button_clicked)
     panddas_file_task_run_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
     vboxButton.addWidget(panddas_file_task_run_button)
     panddas_file_task_status_button = QtGui.QPushButton("Status")
     panddas_file_task_status_button.setToolTip(XChemToolTips.panddas_file_task_status_button_tip())
-    panddas_file_task_status_button.clicked.connect(self.button_clicked)
+    panddas_file_task_status_button.clicked.connect(button_clicked)
     panddas_file_task_status_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
     vboxButton.addWidget(panddas_file_task_status_button)
     hboxAction.addLayout(vboxButton)
@@ -256,12 +295,12 @@ def refine_section(self):
     vboxButton = QtGui.QVBoxLayout()
     refine_file_task_run_button = QtGui.QPushButton("Run")
     refine_file_task_run_button.setToolTip(XChemToolTips.refine_file_task_run_button_tip())
-    refine_file_task_run_button.clicked.connect(self.button_clicked)
+    refine_file_task_run_button.clicked.connect(button_clicked)
     refine_file_task_run_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
     vboxButton.addWidget(refine_file_task_run_button)
     refine_file_task_status_button = QtGui.QPushButton("Status")
     refine_file_task_status_button.setToolTip(XChemToolTips.refine_file_task_status_button_tip())
-    refine_file_task_status_button.clicked.connect(self.button_clicked)
+    refine_file_task_status_button.clicked.connect(button_clicked)
     refine_file_task_status_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
     vboxButton.addWidget(refine_file_task_status_button)
     hboxAction.addLayout(vboxButton)

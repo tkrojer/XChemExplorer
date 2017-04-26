@@ -1518,39 +1518,7 @@ class XChemExplorer(QtGui.QApplication):
             self.data_source_columns_to_display=columns_to_show_list
             self.populate_and_update_data_source_table()
 
-    def update_header_and_data_from_datasource(self):
-        self.update_log.insert('getting information for all samples from data source...')
-        self.db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
-        self.update_log.insert('creating missing columns in data source')
-        self.db.create_missing_columns()
-        self.update_log.insert('load header and data from data source')
-        self.header,self.data=self.db.load_samples_from_data_source()
-        self.update_log.insert('get all samples in data source')
-        all_samples_in_db=self.db.execute_statement("select CrystalName from mainTable where CrystalName is not '';")
 
-        self.xtal_db_dict={}
-        sampleID_column=0
-        for n,entry in enumerate(self.header):
-            if entry=='CrystalName':
-                sampleID_column=n
-                break
-        for line in self.data:
-            if str(line[sampleID_column]) != '':
-                db_dict={}
-                for n,entry in enumerate(line):
-                    if n != sampleID_column:
-                        db_dict[str(self.header[n])]=str(entry)
-                self.xtal_db_dict[str(line[sampleID_column])]=db_dict
-
-        print '==> XCE: found '+str(len(self.xtal_db_dict))+' samples'
-
-    def datasource_menu_reload_samples(self):
-        self.update_log.insert('reading samples from data source: '+os.path.join(self.database_directory,self.data_source_file))
-        self.update_status_bar('reading samples from data source: '+os.path.join(self.database_directory,self.data_source_file))
-        self.update_header_and_data_from_datasource()
-        self.update_all_tables()
-#        self.populate_and_update_data_source_table()
-#        self.create_initial_model_table()
 
     def datasource_menu_save_samples(self):
         print 'hallo'
@@ -2110,49 +2078,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
 
-    def button_clicked(self):
 
-        if self.data_source_set==False:
-            if self.sender().text()=="Create New Data\nSource (SQLite)":
-                file_name = str(QtGui.QFileDialog.getSaveFileName(self.window,'Save file', self.database_directory))
-                #make sure that the file always has .sqlite extension
-                if file_name.rfind('.') != -1:
-                    file_name=file_name[:file_name.rfind('.')]+'.sqlite'
-                else:
-                    file_name=file_name+'.sqlite'
-                self.db=XChemDB.data_source(file_name)
-                print '==> XCE: creating new data source'
-                self.db.create_empty_data_source_file()
-                self.db.create_missing_columns()
-                if self.data_source_file=='':
-                    self.database_directory=file_name[:file_name.rfind('/')]
-                    self.data_source_file=file_name[file_name.rfind('/')+1:]
-                    self.data_source_file_label.setText(os.path.join(self.database_directory,self.data_source_file))
-#                    self.database_directory_label.setText(str(self.database_directory))
-                    self.settings['database_directory']=self.database_directory
-                    self.settings['data_source']=self.data_source_file
-                    self.data_source_set=True
-            else:
-                self.no_data_source_selected()
-                pass
-
-        # first find out which of the 'Run' or 'Status' buttons is sending
-        for item in self.workflow_widget_dict:
-            for widget in self.workflow_widget_dict[item]:
-                if widget==self.sender():
-                    # get index of item in self.workflow; Note this index should be the same as the index
-                    # of the self.main_tab_widget which belongs to this task
-                    task_index=self.workflow.index(item)
-                    instruction =   str(self.workflow_widget_dict[item][0].currentText())
-                    action =        str(self.sender().text())
-                    if self.main_tab_widget.currentIndex()==task_index:
-                        if self.explorer_active==0 and self.data_source_set==True:
-                            if action=='Run':
-                                self.prepare_and_run_task(instruction)
-                            elif action=='Status':
-                                self.get_status_of_workflow_milestone(instruction)
-                    else:
-                        self.need_to_switch_main_tab(task_index)
 
     def get_status_of_workflow_milestone(self,instruction):
         # first update all tables
