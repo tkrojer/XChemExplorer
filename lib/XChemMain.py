@@ -1,4 +1,4 @@
-# last edited: 16/03/2017, 15:00
+# last edited: 15/05/2017, 15:00
 
 import os,glob
 import sys
@@ -491,7 +491,8 @@ def detectorType():
 def NCBI_taxonomy_ID():
 
     taxonomy_dict = {   '9606':     'homo sapiens',
-                        '562':    'escherichia coli'    }
+                        '562':      'escherichia coli',
+                        '7108':     'SPODOPTERA FRUGIPERDA' }
 
     return taxonomy_dict
 
