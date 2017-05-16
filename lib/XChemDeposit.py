@@ -815,7 +815,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             self.Logfile.insert('SMILES string of soaked compound: %s' %smiles)
             if smiles.lower() != 'none' or smiles.lower() != "null":
                 self.Logfile.insert('adding _pdbx_entry_details.nonpolymer_details to mmcif')
-                mmcif_text+='smiles string of soaked compound: %s;\n' %smiles
+                mmcif_text+='smiles string of soaked compound: %s\n;\n' %smiles
             else:
                 mmcif_text=''
 
