@@ -1,4 +1,4 @@
-# last edited: 15/05/2017, 15:00
+# last edited: 16/05/2017, 15:00
 
 import sys
 import os
@@ -812,6 +812,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         smiles=str(general[0][0])
 
         if self.structureType=='apo':
+            self.Logfile.insert('SMILES string of soaked compound: %s' %smiles)
             if smiles.lower() != 'none' or smiles.lower() != "null":
                 mmcif_text+='smiles string of soaked compound: %s;\n' %smiles
             else:
