@@ -1,4 +1,4 @@
-# last edited: 07/04/2017, 15:00
+# last edited: 19/054/2017, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -106,10 +106,13 @@ class run_pandda_export(QtCore.QThread):
 #            self.Logfile.insert("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'False',DimplePANDDApath='%s' where CrystalName is '%s'" %(self.panddas_directory,xtal))
             self.db.execute_statement("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'False',DimplePANDDApath='%s' where CrystalName is '%s'" %(self.panddas_directory,xtal))
         # do the same as before, but look for rejected datasets
-        os.chdir(os.path.join(self.panddas_directory,'rejected_datasets'))
-        for xtal in glob.glob('*'):
-#            self.Logfile.insert("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'True',DimplePANDDApath='%s',DimplePANDDAhit = 'False' where CrystalName is '%s'" %(self.panddas_directory,xtal))
-            self.db.execute_statement("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'True',DimplePANDDApath='%s',DimplePANDDAhit = 'False' where CrystalName is '%s'" %(self.panddas_directory,xtal))
+
+        try:
+            os.chdir(os.path.join(self.panddas_directory,'rejected_datasets'))
+            for xtal in glob.glob('*'):
+                self.db.execute_statement("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'True',DimplePANDDApath='%s',DimplePANDDAhit = 'False' where CrystalName is '%s'" %(self.panddas_directory,xtal))
+        except OSError:
+            pass
 
         site_list = []
         pandda_hit_list=[]
