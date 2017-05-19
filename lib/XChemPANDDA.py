@@ -293,11 +293,13 @@ class run_pandda_export(QtCore.QThread):
 
         if samples_to_export != {}:
             select_dir_string=''
+            select_dir_string_new_pannda=' '
             for sample in samples_to_export:
                 db_dict={}
                 db_dict['RefinementOutcome']='2 - PANDDA model'
                 db_dict['DatePanDDAModelCreated']=samples_to_export[sample]
                 select_dir_string+="select_dir=%s " %sample
+                select_dir_string_new_pannda+='%s ' %sample
                 self.Logfile.insert('updating database for '+sample+' setting time model was created to '+db_dict['DatePanDDAModelCreated']+' and RefinementOutcome to '+db_dict['RefinementOutcome'])
                 self.db.update_data_source(sample,db_dict)
 
@@ -325,6 +327,7 @@ class run_pandda_export(QtCore.QThread):
                     'pandda.export'
                     ' pandda_dir=%s' %self.panddas_directory+
                     ' export_dir=%s' %self.initial_model_directory+
+                    ' %s' %select_dir_string_new_pannda+
                     ' generate_restraints=True\n'
                     )
 
