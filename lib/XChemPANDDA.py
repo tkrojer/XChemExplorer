@@ -325,7 +325,6 @@ class run_pandda_export(QtCore.QThread):
                     'pandda.export'
                     ' pandda_dir=%s' %self.panddas_directory+
                     ' export_dir=%s' %self.initial_model_directory+
-                    ' %s' %select_dir_string+
                     ' generate_restraints=True\n'
                     )
 
