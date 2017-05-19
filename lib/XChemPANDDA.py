@@ -301,17 +301,35 @@ class run_pandda_export(QtCore.QThread):
                 self.Logfile.insert('updating database for '+sample+' setting time model was created to '+db_dict['DatePanDDAModelCreated']+' and RefinementOutcome to '+db_dict['RefinementOutcome'])
                 self.db.update_data_source(sample,db_dict)
 
-            Cmds = (
+
+            if os.path.isdir(os.path.join(self.panddas_directory,'rejected_datasets')):
+
+                Cmds = (
 #                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
 #                '\n'
 #                '/dls/science/groups/i04-1/software/pandda-install/ccp4-pandda/bin/pandda.export'
-                'pandda.export'
-                ' pandda_dir=%s' %self.panddas_directory+
-                ' export_dir=%s' %self.initial_model_directory+
-                ' %s' %select_dir_string+
-                ' export_ligands=False'
-                ' generate_occupancy_groupings=True\n'
-                )
+                    'pandda.export'
+                    ' pandda_dir=%s' %self.panddas_directory+
+                    ' export_dir=%s' %self.initial_model_directory+
+                    ' %s' %select_dir_string+
+                    ' export_ligands=False'
+                    ' generate_occupancy_groupings=True\n'
+                    )
+
+            else:
+
+                Cmds = (
+#                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
+#                '\n'
+#                '/dls/science/groups/i04-1/software/pandda-install/ccp4-pandda/bin/pandda.export'
+                    'pandda.export'
+                    ' pandda_dir=%s' %self.panddas_directory+
+                    ' export_dir=%s' %self.initial_model_directory+
+                    ' %s' %select_dir_string+
+                    ' generate_restraints=True\n'
+                    )
+
+
 
             self.Logfile.insert('running pandda.export with the following settings:\n'+Cmds)
             os.system(Cmds)
