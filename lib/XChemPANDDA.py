@@ -1,4 +1,4 @@
-# last edited: 19/054/2017, 15:00
+# last eidited: 31/05/2017, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -324,6 +324,7 @@ class run_pandda_export(QtCore.QThread):
 #                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
 #                '\n'
 #                '/dls/science/groups/i04-1/software/pandda-install/ccp4-pandda/bin/pandda.export'
+                    'source /dls/science/groups/i04-1/software/pandda-update/ccp4-7.0/setup-scripts/ccp4.setup-sh\n'
                     'pandda.export'
                     ' pandda_dir=%s' %self.panddas_directory+
                     ' export_dir=%s' %self.initial_model_directory+
