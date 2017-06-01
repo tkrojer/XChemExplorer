@@ -1,4 +1,4 @@
-# last edited: 07/04/2017, 15:00
+# last eidited: 31/05/2017, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -106,10 +106,13 @@ class run_pandda_export(QtCore.QThread):
 #            self.Logfile.insert("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'False',DimplePANDDApath='%s' where CrystalName is '%s'" %(self.panddas_directory,xtal))
             self.db.execute_statement("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'False',DimplePANDDApath='%s' where CrystalName is '%s'" %(self.panddas_directory,xtal))
         # do the same as before, but look for rejected datasets
-        os.chdir(os.path.join(self.panddas_directory,'rejected_datasets'))
-        for xtal in glob.glob('*'):
-#            self.Logfile.insert("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'True',DimplePANDDApath='%s',DimplePANDDAhit = 'False' where CrystalName is '%s'" %(self.panddas_directory,xtal))
-            self.db.execute_statement("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'True',DimplePANDDApath='%s',DimplePANDDAhit = 'False' where CrystalName is '%s'" %(self.panddas_directory,xtal))
+
+        try:
+            os.chdir(os.path.join(self.panddas_directory,'rejected_datasets'))
+            for xtal in glob.glob('*'):
+                self.db.execute_statement("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'True',DimplePANDDApath='%s',DimplePANDDAhit = 'False' where CrystalName is '%s'" %(self.panddas_directory,xtal))
+        except OSError:
+            pass
 
         site_list = []
         pandda_hit_list=[]
@@ -290,25 +293,46 @@ class run_pandda_export(QtCore.QThread):
 
         if samples_to_export != {}:
             select_dir_string=''
+            select_dir_string_new_pannda=' '
             for sample in samples_to_export:
                 db_dict={}
                 db_dict['RefinementOutcome']='2 - PANDDA model'
                 db_dict['DatePanDDAModelCreated']=samples_to_export[sample]
                 select_dir_string+="select_dir=%s " %sample
+                select_dir_string_new_pannda+='%s ' %sample
                 self.Logfile.insert('updating database for '+sample+' setting time model was created to '+db_dict['DatePanDDAModelCreated']+' and RefinementOutcome to '+db_dict['RefinementOutcome'])
                 self.db.update_data_source(sample,db_dict)
 
-            Cmds = (
+
+            if os.path.isdir(os.path.join(self.panddas_directory,'rejected_datasets')):
+
+                Cmds = (
 #                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
 #                '\n'
 #                '/dls/science/groups/i04-1/software/pandda-install/ccp4-pandda/bin/pandda.export'
-                'pandda.export'
-                ' pandda_dir=%s' %self.panddas_directory+
-                ' export_dir=%s' %self.initial_model_directory+
-                ' %s' %select_dir_string+
-                ' export_ligands=False'
-                ' generate_occupancy_groupings=True\n'
-                )
+                    'pandda.export'
+                    ' pandda_dir=%s' %self.panddas_directory+
+                    ' export_dir=%s' %self.initial_model_directory+
+                    ' %s' %select_dir_string+
+                    ' export_ligands=False'
+                    ' generate_occupancy_groupings=True\n'
+                    )
+
+            else:
+
+                Cmds = (
+#                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
+#                '\n'
+#                '/dls/science/groups/i04-1/software/pandda-install/ccp4-pandda/bin/pandda.export'
+                    'source /dls/science/groups/i04-1/software/pandda-update/ccp4-7.0/setup-scripts/ccp4.setup-sh\n'
+                    'pandda.export'
+                    ' pandda_dir=%s' %self.panddas_directory+
+                    ' export_dir=%s' %self.initial_model_directory+
+                    ' %s' %select_dir_string_new_pannda+
+                    ' generate_restraints=True\n'
+                    )
+
+
 
             self.Logfile.insert('running pandda.export with the following settings:\n'+Cmds)
             os.system(Cmds)
