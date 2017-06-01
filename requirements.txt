@@ -1,0 +1,7 @@
+matplotlib==1.4.3
+lxml==3.2.4
+numpy==1.12.1
+PyQt4==4.11.4
+gobject==0.1.0
+pygtk==2.24.2
+rdkit==2009.Q1-1
