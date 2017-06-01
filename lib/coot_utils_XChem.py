@@ -600,8 +600,10 @@ def shell_command_to_string(cmd):
 # this finds absolute file names too
 #
 def command_in_path_qm(cmd, only_extension_here=None,
-                       add_extensions_here=[]):
+                       add_extensions_here=None):
 
+    if add_extensions_here is None:
+        add_extensions_here = []
     exe_path = find_exe(cmd, "PATH", no_disk_search=True,
                         screen_info=False,
                         only_extension=only_extension_here,
@@ -614,9 +616,11 @@ def command_in_path_qm(cmd, only_extension_here=None,
     
 
 
-def command_in_path_qm_old_version(cmd, only_extension="", add_extensions=[]):
+def command_in_path_qm_old_version(cmd, only_extension="", add_extensions=None):
     # test for command (see goosh-command-with-file-input description)
     # 
+    if add_extensions is None:
+        add_extensions = []
     import os, string
 
     # we shall check for full path names first
@@ -3547,7 +3551,9 @@ def printl(ls):
 #
 # uses os.spawn if python version < 2.4 otherwise subprocess
 # 
-def run_concurrently(cmd, args=[], data_list=None, logfile=None, screen_flag=False):
+def run_concurrently(cmd, args=None, data_list=None, logfile=None, screen_flag=False):
+    if args is None:
+        args = []
     import sys, string, os
 
     major, minor, micro, releaselevel, serial = sys.version_info
