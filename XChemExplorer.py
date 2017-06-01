@@ -1686,7 +1686,7 @@ class XChemExplorer(QtGui.QApplication):
         indexes = self.initial_model_table.selectionModel().selectedRows()
         for index in sorted(indexes):
             xtal=str(self.initial_model_table.item(index.row(), 0).text())
-            self.update_log.insert('%s is marked for DIMPLE' %index.row())
+            self.update_log.insert('{0!s} is marked for DIMPLE'.format(index.row()))
             self.initial_model_dimple_dict[xtal][0].setChecked(True)
 
     def select_sample_for_xia2(self):
@@ -1694,7 +1694,7 @@ class XChemExplorer(QtGui.QApplication):
         for index in sorted(indexes):
             xtal=str(self.reprocess_datasets_table.item(index.row(), 1).text())
             print xtal,self.diffraction_data_table_dict[xtal][0]
-            self.update_log.insert('%s marked for reprocessing' %index.row())
+            self.update_log.insert('{0!s} marked for reprocessing'.format(index.row()))
             self.diffraction_data_table_dict[xtal][0].setChecked(True)
 
 
@@ -1874,7 +1874,7 @@ class XChemExplorer(QtGui.QApplication):
             uploadID=int(self.zenodo_upload_id_entry.text())
             self.update_log.insert('updating html files for ZENODO upload,...')
             self.update_log.insert('ZENODO upload = '+str(uploadID))
-            os.system('ccp4-python '+os.getenv('XChemExplorer_DIR')+'/helpers/prepare_for_zenodo_upload.py %s %s' %(self.html_export_directory,uploadID))
+            os.system('ccp4-python '+os.getenv('XChemExplorer_DIR')+'/helpers/prepare_for_zenodo_upload.py {0!s} {1!s}'.format(self.html_export_directory, uploadID))
         except ValueError:
             self.update_log.insert('zenodo upload ID must be an integer!')
 
@@ -3552,7 +3552,7 @@ class XChemExplorer(QtGui.QApplication):
 
         if job_list != []:
             msgBox = QtGui.QMessageBox()
-            msgBox.setText("Do you really want to delete %s Dimple files?" %len(job_list))
+            msgBox.setText("Do you really want to delete {0!s} Dimple files?".format(len(job_list)))
             msgBox.addButton(QtGui.QPushButton('Go'), QtGui.QMessageBox.YesRole)
             msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
             reply = msgBox.exec_();
@@ -3705,17 +3705,17 @@ class XChemExplorer(QtGui.QApplication):
     def check_before_running_dimple(self,job_list):
 
         msgBox = QtGui.QMessageBox()
-        msgBox.setText("Do you really want to run %s Dimple jobs?\nNote: we will not run more than 100 at once on the cluster!" %len(job_list))
+        msgBox.setText("Do you really want to run {0!s} Dimple jobs?\nNote: we will not run more than 100 at once on the cluster!".format(len(job_list)))
         msgBox.addButton(QtGui.QPushButton('Go'), QtGui.QMessageBox.YesRole)
         msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
         reply = msgBox.exec_();
 
         if reply == 0:
-            self.status_bar.showMessage('preparing %s DIMPLE jobs' %len(job_list))
-            self.update_log.insert('preparing to run %s DIMPLE jobs' %len(job_list))
+            self.status_bar.showMessage('preparing {0!s} DIMPLE jobs'.format(len(job_list)))
+            self.update_log.insert('preparing to run {0!s} DIMPLE jobs'.format(len(job_list)))
             if self.external_software['qsub_array']:
                 self.update_log.insert('we will be running an ARRAY job on the DLS computer cluster')
-                self.update_log.insert('please note that the maximum number of jobs that will be running at once is %s' %self.max_queue_jobs)
+                self.update_log.insert('please note that the maximum number of jobs that will be running at once is {0!s}'.format(self.max_queue_jobs))
                 self.update_log.insert('you can change this in the PREFERENCES menu, but be warned that to high a number might break the cluster!')
             self.update_log.insert('preparing input files for DIMPLE...')
             self.work_thread=XChemThread.run_dimple_on_all_autoprocessing_files(    job_list,
@@ -3813,7 +3813,7 @@ class XChemExplorer(QtGui.QApplication):
                             cell_text.setText(trans_dict[dataset_id])
                             cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                             self.reprocess_datasets_table.setItem(row, 1, cell_text)
-                            self.update_log.insert('dataset: %s -> changing sampleID to: %s' %(dataset_id,trans_dict[dataset_id]))
+                            self.update_log.insert('dataset: {0!s} -> changing sampleID to: {1!s}'.format(dataset_id, trans_dict[dataset_id]))
 
 
     def open_csv_file_translate_datasetID_to_sampleID(self):
@@ -4020,12 +4020,12 @@ class XChemExplorer(QtGui.QApplication):
         try:
             self.allowed_unitcell_difference_percent=int(text)
             self.settings['unitcell_difference']=self.allowed_unitcell_difference_percent
-            self.update_log.insert('changing max allowed unit cell difference between reference and xtal to %s percent' %self.allowed_unitcell_difference_percent)
+            self.update_log.insert('changing max allowed unit cell difference between reference and xtal to {0!s} percent'.format(self.allowed_unitcell_difference_percent))
         except ValueError:
             if str(text).find('.') != -1:
                 self.allowed_unitcell_difference_percent=int(str(text)[:str(text).find('.')])
                 self.settings['unitcell_difference']=self.allowed_unitcell_difference_percent
-                self.update_log.insert('changing max allowed unit cell difference between reference and xtal to %s percent' %self.allowed_unitcell_difference_percent)
+                self.update_log.insert('changing max allowed unit cell difference between reference and xtal to {0!s} percent'.format(self.allowed_unitcell_difference_percent))
             else:
                 pass
 
@@ -4033,12 +4033,12 @@ class XChemExplorer(QtGui.QApplication):
         try:
             self.max_queue_jobs=int(text)
             self.settings['max_queue_jobs']=self.max_queue_jobs
-            self.update_log.insert('changing max number of jobs running simultaneously on DLS cluster to %s' %self.max_queue_jobs)
+            self.update_log.insert('changing max number of jobs running simultaneously on DLS cluster to {0!s}'.format(self.max_queue_jobs))
         except ValueError:
             if str(text).find('.') != -1:
                 self.max_queue_jobs=int(str(text)[:str(text).find('.')])
                 self.settings['max_queue_jobs']=self.max_queue_jobs
-                self.update_log.insert('changing max number of jobs running simultaneously on DLS cluster to %s' %self.max_queue_jobs)
+                self.update_log.insert('changing max number of jobs running simultaneously on DLS cluster to {0!s}'.format(self.max_queue_jobs))
             else:
                 pass
 
@@ -4143,7 +4143,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.status_bar.showMessage('please check terminal window for further information')
 
-        self.update_log.insert('%s samples are currently in database' %str(len(self.xtal_db_dict)))
+        self.update_log.insert('{0!s} samples are currently in database'.format(str(len(self.xtal_db_dict))))
 
         if 'DIMPLE' in instruction:
             XChemMain.print_cluster_status_message('dimple',cluster_dict,self.xce_logfile)
@@ -4427,7 +4427,7 @@ class XChemExplorer(QtGui.QApplication):
                 cluster_dict=pandda_checks.get_datasets_which_fit_to_reference_file(str(item[0]),self.reference_directory,cluster_dict,self.allowed_unitcell_difference_percent)
 
         for key in cluster_dict:
-            self.update_log.insert('cluster %s:   %s datasets' %(str(key),str(len(cluster_dict[key])-1)))
+            self.update_log.insert('cluster {0!s}:   {1!s} datasets'.format(str(key), str(len(cluster_dict[key])-1)))
 
         reference_ID=str(self.pandda_reference_file_selection_combobox.currentText())
         if len(cluster_dict) > 1 and not os.path.isfile(os.path.join(self.reference_directory,reference_ID+'.pdb')):
@@ -4449,11 +4449,11 @@ class XChemExplorer(QtGui.QApplication):
             if os.path.isfile(reference_file):
                 self.update_log.insert('only one crystal form; continuing without reference file')
             else:
-                self.update_log.insert('cannot find %s -> stopping pandda.analyse' %reference_file)
+                self.update_log.insert('cannot find {0!s} -> stopping pandda.analyse'.format(reference_file))
         elif os.path.isfile(os.path.join(self.reference_directory,reference_ID+'.pdb')):
             reference_file=os.path.join(self.reference_directory,reference_ID+'.pdb')
             filter_pdb=reference_file
-            self.update_log.insert('using %s as reference file for PanDDA' %reference_file)
+            self.update_log.insert('using {0!s} as reference file for PanDDA'.format(reference_file))
 
         pandda_params['filter_pdb']=filter_pdb
 
@@ -4464,19 +4464,19 @@ class XChemExplorer(QtGui.QApplication):
         error=True
         if mismatch == [] and n_datasets >= int(pandda_params['min_build_datasets']):
             error=False
-            self.update_log.insert('found sufficient number of datasets: %s; all PDB files have the same number of atoms ==> OK' %str(n_datasets))
+            self.update_log.insert('found sufficient number of datasets: {0!s}; all PDB files have the same number of atoms ==> OK'.format(str(n_datasets)))
         elif mismatch != [] and n_datasets >= int(pandda_params['min_build_datasets']):
-            self.update_log.insert('found sufficient number of datasets: %s; but NOT all PDB files have the same number of atoms ==> ERROR' %str(n_datasets))
+            self.update_log.insert('found sufficient number of datasets: {0!s}; but NOT all PDB files have the same number of atoms ==> ERROR'.format(str(n_datasets)))
         elif mismatch == [] and n_datasets < int(pandda_params['min_build_datasets']):
-            self.update_log.insert('did NOT find sufficient number of datasets: %s; all PDB files have the same number of atoms ==> ERROR' %str(n_datasets))
+            self.update_log.insert('did NOT find sufficient number of datasets: {0!s}; all PDB files have the same number of atoms ==> ERROR'.format(str(n_datasets)))
         elif mismatch != [] and n_datasets < int(pandda_params['min_build_datasets']):
-            self.update_log.insert('did NOT find sufficient number of datasets: %s; but NOT all PDB files have the same number of atoms ==> ERROR' %str(n_datasets))
+            self.update_log.insert('did NOT find sufficient number of datasets: {0!s}; but NOT all PDB files have the same number of atoms ==> ERROR'.format(str(n_datasets)))
 
         if error:
             if n_datasets < int(pandda_params['min_build_datasets']):
                 msgBox = QtGui.QMessageBox()
                 msgText = (
-                    'Need %s datasets, but only %s are available\n' %(str(pandda_params['min_build_datasets']),str(n_datasets))+
+                    'Need {0!s} datasets, but only {1!s} are available\n'.format(str(pandda_params['min_build_datasets']), str(n_datasets))+
                     'pandda.analyse cannot start!'
                 )
                 self.update_log.insert(msgText)
@@ -4490,7 +4490,7 @@ class XChemExplorer(QtGui.QApplication):
                 fraction=round((float(len(mismatch))/float(n_datasets))*100,1)
                 msgBox = QtGui.QMessageBox()
                 msgText = (
-                    'XCE found that %s percent of your datasets contain a different number of atoms than your reference file. ' %str(fraction)+
+                    'XCE found that {0!s} percent of your datasets contain a different number of atoms than your reference file. '.format(str(fraction))+
                     'Unfortunately, pandda.analyse cannot run under these circumstances! '
                     'Please check the terminal output for details about which datasets are affected. '
                     'Most of the time it will be sufficient to calculate inital maps with the selected reference file again.\n'
@@ -4567,7 +4567,7 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def convert_event_maps_to_SF(self):
-        self.update_log.insert('converting all event maps in %s to mtz files' %self.initial_model_directory)
+        self.update_log.insert('converting all event maps in {0!s} to mtz files'.format(self.initial_model_directory))
         self.work_thread=XChemPANDDA.convert_all_event_maps_in_database(self.initial_model_directory,
                                                                         self.xce_logfile,
                                                                         os.path.join(self.database_directory,self.data_source_file))
@@ -4803,7 +4803,7 @@ class XChemExplorer(QtGui.QApplication):
     def show_error_dict(self,errorDict):
         text=''
         for key in errorDict:
-            text+='%s:\n' %key
+            text+='{0!s}:\n'.format(key)
             for entry in errorDict[key]:
                 text+='  - '+entry+'\n'
         msgBox = QtGui.QMessageBox()
@@ -5109,7 +5109,7 @@ class XChemExplorer(QtGui.QApplication):
     def preferences_restraints_generation_combobox_changed(self):
         text = str(self.preferences_restraints_generation_combobox.currentText())
         self.restraints_program=text
-        self.update_log.insert('will use %s for generation of ligand coordinates and restraints' %text)
+        self.update_log.insert('will use {0!s} for generation of ligand coordinates and restraints'.format(text))
 
     def refinement_outcome_combobox_changed(self):
         for xtal in self.summary_table_dict:
@@ -5155,7 +5155,7 @@ class XChemExplorer(QtGui.QApplication):
                                                     unitcell_volume_reference,
                                                     pointgroup_reference])
         for n,file in enumerate(reference_file_list):
-            self.update_log.insert('reference file %s: %s' %(n,file))
+            self.update_log.insert('reference file {0!s}: {1!s}'.format(n, file))
         return reference_file_list
 
 
@@ -5167,7 +5167,7 @@ class XChemExplorer(QtGui.QApplication):
         for key in self.dataset_outcome_combobox_dict:
             if self.dataset_outcome_combobox_dict[key]==self.sender():
                 xtal=key
-                self.update_log.insert('user changed data collection outcome of %s to %s' %(xtal,outcome))
+                self.update_log.insert('user changed data collection outcome of {0!s} to {1!s}'.format(xtal, outcome))
                 break
         self.dataset_outcome_dict[xtal]=outcome
         if xtal != '':
@@ -5184,7 +5184,7 @@ class XChemExplorer(QtGui.QApplication):
             if not user_already_changed_selection:
                 self.data_collection_dict[xtal].append(['user_changed_selection'])
             # finally need to update outcome field in data source accordingly
-            self.update_log.insert('updating dataset outcome in datasource for %s' %xtal)
+            self.update_log.insert('updating dataset outcome in datasource for {0!s}'.format(xtal))
             update_dict={}
             update_dict['DataCollectionOutcome']=outcome
             self.db.update_insert_data_source(xtal,update_dict)
@@ -5289,7 +5289,7 @@ class XChemExplorer(QtGui.QApplication):
                 outcome=str(self.db.get_value_from_field(xtal,'DataCollectionOutcome')[0])
             except TypeError:
                 outcome='Failed - unknown'
-                self.update_log.insert('cannot find DataCollectionOutcome for %s' %xtal)
+                self.update_log.insert('cannot find DataCollectionOutcome for {0!s}'.format(xtal))
 #                print '==> xtal:',xtal
 #            if logfile_found and not too_low_resolution:
 #                outcome="success"
@@ -5556,7 +5556,7 @@ class XChemExplorer(QtGui.QApplication):
                             program=db_dict['DataProcessingProgram']
                             visit=db_dict['DataCollectionVisit']
                             run=db_dict['DataCollectionRun']
-                            self.update_log.insert('user changed data processing files for %s to visit=%s, run=%s, program=%s' %(key,visit,run,program))
+                            self.update_log.insert('user changed data processing files for {0!s} to visit={1!s}, run={2!s}, program={3!s}'.format(key, visit, run, program))
                             # update datasource
         #                    print db_dict
                             self.update_log.insert('updating datasource...')
@@ -5617,7 +5617,7 @@ class XChemExplorer(QtGui.QApplication):
                     program=db_dict['DataProcessingProgram']
                     visit=db_dict['DataCollectionVisit']
                     run=db_dict['DataCollectionRun']
-                    self.update_log.insert('user changed data processing files for %s to visit=%s, run=%s, program=%s' %(sample,visit,run,program))
+                    self.update_log.insert('user changed data processing files for {0!s} to visit={1!s}, run={2!s}, program={3!s}'.format(sample, visit, run, program))
                     # update datasource
 #                    print db_dict
                     self.update_log.insert('updating datasource...')

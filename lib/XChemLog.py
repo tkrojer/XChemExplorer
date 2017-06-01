@@ -55,8 +55,8 @@ class depositLog:
         while nbytes >= 1024 and i < len(self.suffixes)-1:
             nbytes /= 1024.
             i += 1
-        f = ('%.2f' % nbytes).rstrip('0').rstrip('.')
-        return '%s %s' % (f, self.suffixes[i])
+        f = ('{0:.2f}'.format(nbytes)).rstrip('0').rstrip('.')
+        return '{0!s} {1!s}'.format(f, self.suffixes[i])
 
     def modelInfo(self,xtal,structureType):
         message=(xtal+' @ '+structureType)
@@ -78,8 +78,8 @@ class depositLog:
                         'SUMMARY:\n'
                         '--------------------------------------------------------------------------\n'
                         ' - structure type:             %s\n'   %structureType+
-                        ' - n(structures to deposit):   %s\n'   %str(n_toDeposit)+
-                        ' - n(successful mmcif):        %s\n'   %str(success)+
+                        ' - n(structures to deposit):   {0!s}\n'.format(str(n_toDeposit))+
+                        ' - n(successful mmcif):        {0!s}\n'.format(str(success))+
                         '--------------------------------------------------------------------------\n'  )
 
         if successDict != {}:
@@ -95,7 +95,7 @@ class depositLog:
             message+='--------------------------------------------------------------------------\n'
         for key in failureDict:
             for entry in failureDict[key]:
-                message+='%s -> %s\n' %(key,entry)
+                message+='{0!s} -> {1!s}\n'.format(key, entry)
 
         message+='==========================================================================\n\n'
 
