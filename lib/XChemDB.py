@@ -525,7 +525,7 @@ class data_source:
         data=[]
         connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
         cursor = connect.cursor()
-        cursor.execute("select * from mainTable where CrystalName='%s';" %sampleID)
+        cursor.execute("select * from mainTable where CrystalName='{0!s}';".format(sampleID))
         for column in cursor.description:
             header.append(column[0])
         data = cursor.fetchall()
@@ -539,7 +539,7 @@ class data_source:
         data=[]
         connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
         cursor = connect.cursor()
-        cursor.execute("select * from depositTable where CrystalName='%s';" %sampleID)
+        cursor.execute("select * from depositTable where CrystalName='{0!s}';".format(sampleID))
         for column in cursor.description:
             header.append(column[0])
         data = cursor.fetchall()
@@ -553,7 +553,7 @@ class data_source:
         data=[]
         connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
         cursor = connect.cursor()
-        cursor.execute("select * from panddaTable where CrystalName='%s' and PANDDA_site_index='%s';" %(sampleID,site_index))
+        cursor.execute("select * from panddaTable where CrystalName='{0!s}' and PANDDA_site_index='{1!s}';".format(sampleID, site_index))
         for column in cursor.description:
             header.append(column[0])
         data = cursor.fetchall()
@@ -567,7 +567,7 @@ class data_source:
         data=[]
         connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
         cursor = connect.cursor()
-        cursor.execute("select * from panddaTable where CrystalName='%s' and PANDDA_site_index='%s' and PANDDA_site_event_index='%s' and PANDDA_site_ligand_placed='True';" %(sampleID,site_index,event_index))
+        cursor.execute("select * from panddaTable where CrystalName='{0!s}' and PANDDA_site_index='{1!s}' and PANDDA_site_event_index='{2!s}' and PANDDA_site_ligand_placed='True';".format(sampleID, site_index, event_index))
         for column in cursor.description:
             header.append(column[0])
         data = cursor.fetchall()
@@ -678,7 +678,7 @@ class data_source:
             else:
                 update_string+=str(key)+' = null,'
         if update_string != '':
-            cursor.execute("UPDATE panddaTable SET "+update_string[:-1]+" WHERE CrystalName='%s' and PANDDA_site_index='%s'" %(sampleID,site_index))
+            cursor.execute("UPDATE panddaTable SET "+update_string[:-1]+" WHERE CrystalName='{0!s}' and PANDDA_site_index='{1!s}'".format(sampleID, site_index))
             connect.commit()
 
     def update_site_event_panddaTable(self,sampleID,site_index,event_index,data_dict):
@@ -696,7 +696,7 @@ class data_source:
             else:
                 update_string+=str(key)+' = null,'
         if update_string != '':
-            cursor.execute("UPDATE panddaTable SET "+update_string[:-1]+" WHERE CrystalName='%s' and PANDDA_site_index='%s' and PANDDA_site_event_index='%s'" %(sampleID,site_index,event_index))
+            cursor.execute("UPDATE panddaTable SET "+update_string[:-1]+" WHERE CrystalName='{0!s}' and PANDDA_site_index='{1!s}' and PANDDA_site_event_index='{2!s}'".format(sampleID, site_index, event_index))
             connect.commit()
 
     def update_depositTable(self,sampleID,structure_type,data_dict):
@@ -714,7 +714,7 @@ class data_source:
             else:
                 update_string+=str(key)+' = null,'
         if update_string != '':
-            cursor.execute("UPDATE depositTable SET "+update_string[:-1]+" WHERE CrystalName='%s' and StructureType='%s'" %(sampleID,structure_type))
+            cursor.execute("UPDATE depositTable SET "+update_string[:-1]+" WHERE CrystalName='{0!s}' and StructureType='{1!s}'".format(sampleID, structure_type))
             connect.commit()
 
 
@@ -1073,7 +1073,7 @@ class data_source:
             "from panddaTable  "
             "where "
             " CrystalName is '%s'" %xtalID+
-            " and PANDDA_site_index is '%s';" %pandda_site
+            " and PANDDA_site_index is '{0!s}';".format(pandda_site)
             )
 
         cursor.execute(sqlite)
@@ -1101,7 +1101,7 @@ class data_source:
         if RefinementOutcome=='0 - All Datasets':
             outcome = " not null "
         else:
-            outcome = " '%s' " %RefinementOutcome
+            outcome = " '{0!s}' ".format(RefinementOutcome)
 
         if int(pandda_site) > 0:
 #            sqlite = (
@@ -1199,7 +1199,7 @@ class data_source:
         if RefinementOutcome=='0 - All Datasets':
             outcome = " not null "
         else:
-            outcome = " '%s' " %RefinementOutcome
+            outcome = " '{0!s}' ".format(RefinementOutcome)
 
         sqlite = (
             "select"
@@ -1371,9 +1371,9 @@ class data_source:
             for xtal in apoStructureList:
                 if xtal not in apoInDB:
                     Logfile.insert('no entry for '+xtal+' in depositTable')
-                    newEntries+="('%s','apo')," %xtal
+                    newEntries+="('{0!s}','apo'),".format(xtal)
             if newEntries != '':
-                sqlite='insert into depositTable (CrystalName,StructureType) values %s;' %newEntries[:-1]
+                sqlite='insert into depositTable (CrystalName,StructureType) values {0!s};'.format(newEntries[:-1])
                 Logfile.insert('creating new entries with the following SQLite command:\n'+sqlite)
                 cursor.execute(sqlite)
                 connect.commit()
@@ -1405,13 +1405,13 @@ class data_source:
                     aimless_log=True
 
                 if dimple_mtz==False or dimple_pdb==False or aimless_log==False:
-                    Logfile.insert('%s: missing files -> dimple.pdb: %s, dimple.mtz: %s, %s.log: %s' %(xtal,str(dimple_pdb),str(dimple_mtz),xtal,str(aimless_log)))
+                    Logfile.insert('{0!s}: missing files -> dimple.pdb: {1!s}, dimple.mtz: {2!s}, {3!s}.log: {4!s}'.format(xtal, str(dimple_pdb), str(dimple_mtz), xtal, str(aimless_log)))
                 else:
-                    newEntries+="('%s','apo')," %xtal
+                    newEntries+="('{0!s}','apo'),".format(xtal)
                     counter+=1
 
                 if counter == 450:  # set to 450 to stay well below 500 records limit
-                    sqlite='insert into depositTable (CrystalName,StructureType) values %s;' %newEntries[:-1]
+                    sqlite='insert into depositTable (CrystalName,StructureType) values {0!s};'.format(newEntries[:-1])
                     Logfile.insert('creating new entries with the following SQLite command:\n'+sqlite)
                     cursor.execute(sqlite)
                     connect.commit()
@@ -1419,7 +1419,7 @@ class data_source:
                     newEntries=''
 
         if newEntries != '':
-            sqlite='insert into depositTable (CrystalName,StructureType) values %s;' %newEntries[:-1]
+            sqlite='insert into depositTable (CrystalName,StructureType) values {0!s};'.format(newEntries[:-1])
             Logfile.insert('creating new entries with the following SQLite command:\n'+sqlite)
             cursor.execute(sqlite)
             connect.commit()
@@ -1452,7 +1452,7 @@ class data_source:
     def create_or_remove_missing_records_in_depositTable(self,xce_logfile,xtal,type,db_dict):
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
-        cursor.execute("select RefinementOutcome from mainTable where CrystalName is '%s'" %xtal)
+        cursor.execute("select RefinementOutcome from mainTable where CrystalName is '{0!s}'".format(xtal))
         tmp = cursor.fetchall()
         oldRefiStage=str(tmp[0][0])
 
@@ -1460,16 +1460,16 @@ class data_source:
         Logfile.insert('setting RefinementOutcome field to "'+db_dict['RefinementOutcome']+'" for '+xtal)
         self.update_insert_data_source(xtal,db_dict)
 
-        cursor.execute("select CrystalName,StructureType from depositTable where CrystalName is '%s' and StructureType is '%s'" %(xtal,type))
+        cursor.execute("select CrystalName,StructureType from depositTable where CrystalName is '{0!s}' and StructureType is '{1!s}'".format(xtal, type))
         tmp = cursor.fetchall()
         if tmp == [] and int(db_dict['RefinementOutcome'].split()[0]) == 5:
-            sqlite="insert into depositTable (CrystalName,StructureType) values ('%s','%s');" %(xtal,type)
+            sqlite="insert into depositTable (CrystalName,StructureType) values ('{0!s}','{1!s}');".format(xtal, type)
             Logfile.insert('creating new entry for '+str(type)+' structure of '+xtal+' in depositTable')
             cursor.execute(sqlite)
             connect.commit()
         else:
             if int(db_dict['RefinementOutcome'].split()[0]) < 5:
-                sqlite="delete from depositTable where CrystalName is '%s' and StructureType is '%s'" %(xtal,type)
+                sqlite="delete from depositTable where CrystalName is '{0!s}' and StructureType is '{1!s}'".format(xtal, type)
                 Logfile.insert('removing entry for '+str(type)+' structure of '+xtal+' from depositTable')
                 cursor.execute(sqlite)
                 connect.commit()
@@ -1488,7 +1488,7 @@ class data_source:
             deleteStrg+="Crystalname is '"+xtal+"' or "
         deleteStrg=deleteStrg[:-4]+")"
 
-        sqlite="delete from depositTable where %s and StructureType is 'apo'" %deleteStrg
+        sqlite="delete from depositTable where {0!s} and StructureType is 'apo'".format(deleteStrg)
         Logfile.insert('executing the following SQLite command:\n'+sqlite)
         cursor.execute(sqlite)
         connect.commit()

@@ -11,10 +11,10 @@ def relink_interesting_datasets(panddaDir):
             dirList.append(dirs)
 
     for dirs in dirList:
-        print '/bin/rm -fr %s' %dirs
-        os.system('/bin/rm -fr %s' %dirs)
-        print 'ln -s ../processed_datasets/%s .' %dirs
-        os.system('ln -s ../processed_datasets/%s .' %dirs)
+        print '/bin/rm -fr {0!s}'.format(dirs)
+        os.system('/bin/rm -fr {0!s}'.format(dirs))
+        print 'ln -s ../processed_datasets/{0!s} .'.format(dirs)
+        os.system('ln -s ../processed_datasets/{0!s} .'.format(dirs))
 
 def check_interesting_datasets(panddaDir):
 
@@ -24,10 +24,10 @@ def check_interesting_datasets(panddaDir):
 #            print xtal
 #            print os.path.join(panddaDir,'interesting_datasets',xtal,'modelled_structures',xtal+'-pandda-model.pdb')
             if os.path.isfile(os.path.join(panddaDir,'interesting_datasets',xtal,'modelled_structures',xtal+'-pandda-model.pdb')):
-                print 'mv --backup=numbered %s %s' %(os.path.join(panddaDir,'interesting_datasets',xtal,'modelled_structures'),os.path.join(panddaDir,'processed_datasets',xtal))
-                os.system('mv --backup=numbered %s %s' %(os.path.join(panddaDir,'interesting_datasets',xtal,'modelled_structures'),os.path.join(panddaDir,'processed_datasets',xtal)))
-                print 'cp %s %s' %(os.path.join(panddaDir,'interesting_datasets',xtal,'*params'),os.path.join(panddaDir,'processed_datasets',xtal))
-                os.system('cp %s %s' %(os.path.join(panddaDir,'interesting_datasets',xtal,'*params'),os.path.join(panddaDir,'processed_datasets',xtal)))
+                print 'mv --backup=numbered {0!s} {1!s}'.format(os.path.join(panddaDir,'interesting_datasets',xtal,'modelled_structures'), os.path.join(panddaDir,'processed_datasets',xtal))
+                os.system('mv --backup=numbered {0!s} {1!s}'.format(os.path.join(panddaDir,'interesting_datasets',xtal,'modelled_structures'), os.path.join(panddaDir,'processed_datasets',xtal)))
+                print 'cp {0!s} {1!s}'.format(os.path.join(panddaDir,'interesting_datasets',xtal,'*params'), os.path.join(panddaDir,'processed_datasets',xtal))
+                os.system('cp {0!s} {1!s}'.format(os.path.join(panddaDir,'interesting_datasets',xtal,'*params'), os.path.join(panddaDir,'processed_datasets',xtal)))
 
 
 

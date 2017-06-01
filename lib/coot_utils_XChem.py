@@ -739,7 +739,7 @@ def popen_command(cmd, args, data_list, log_file, screen_flag=False):
                 return 0
             os.remove(data_list_file)
     else:
-        print "WARNING:: could not find %s, so not running" %cmd
+        print "WARNING:: could not find {0!s}, so not running".format(cmd)
         return False
 
 # example usage:
@@ -1397,7 +1397,7 @@ def centre_of_mass(imol):
        print "molecule number",imol,"is not valid"
        return False
     else:
-       print "Centre of mass for molecule %s is %s" % (imol, centre)
+       print "Centre of mass for molecule {0!s} is {1!s}".format(imol, centre)
        # for use somewhere let's return the centre
        return centre
 
@@ -1532,8 +1532,7 @@ def auto_weight_for_refinement():
             # Simple is overdamped.
             current_weight = matrix_state()
             new_weight = (target_auto_weighting_value * current_weight) / av_rms_d
-            print "INFO:: setting refinement weight to %s from * %s / %s" \
-                  %(new_weight, current_weight, av_rms_d)
+            print "INFO:: setting refinement weight to {0!s} from * {1!s} / {2!s}".format(new_weight, current_weight, av_rms_d)
             if (new_weight < 2):
                 # weight refinement not converging
                 print "BL INFO:: not convering, weight to set was", new_weight
@@ -1632,7 +1631,7 @@ def add_key_binding(name, key, thunk):
     keys     = [elem[1] for elem in key_bindings]
     codes    = [elem[0] for elem in key_bindings]
     if (key in std_keys):
-        print "INFO:: you shall not overwrite a standard key binding (%s)" %key
+        print "INFO:: you shall not overwrite a standard key binding ({0!s})".format(key)
     else:
         if (type(key) is IntType):
             if (key in keys):
@@ -1649,7 +1648,7 @@ def add_key_binding(name, key, thunk):
             if (("Control_" in key) or not (code == -1)):
                 key_bindings.append([code, key, name, thunk])
             else:
-                print "INFO:: key %s not found in code table" %key
+                print "INFO:: key {0!s} not found in code table".format(key)
         else:
             print "BL WARNING:: invalid key", key
                 
@@ -1675,7 +1674,7 @@ def graphics_general_key_press_hook(key, control_flag = 0):
             run_scheme_command("(graphics-general-key-press-hook " + \
                                str(key) + \
                                ")")
-        print "Key %s not found in (python) key bindings" %key
+        print "Key {0!s} not found in (python) key bindings".format(key)
 
 
 # Function requested by Mark White.
@@ -2186,7 +2185,7 @@ def sanitise_alt_confs_active_residue():
 
 def print_molecule_names():
 
-    map(lambda molecule_number: printf( "    %s    %s\n" %(molecule_number, molecule_name(molecule_number))),
+    map(lambda molecule_number: printf( "    {0!s}    {1!s}\n".format(molecule_number, molecule_name(molecule_number))),
         molecule_number_list())
 
 # save the dialog positions to the coot_dialog_positions.py file in ./coot-preferences
@@ -2233,7 +2232,7 @@ def save_dialog_positions_to_init_file():
     state_file = "0-coot.state.py"
     save_state()
     if (not os.path.isfile(state_file)):
-        print "Ooops %s does not exist (either guile enabled or problem writing the file" %state_file
+        print "Ooops {0!s} does not exist (either guile enabled or problem writing the file".format(state_file)
     else:
         port = open("0-coot.state.py", 'r')
         try:
@@ -2304,7 +2303,7 @@ def remove_line_containing_from_file(remove_str_ls, filename):
         lines = port.readlines()
         port.close()
     else:
-        print "BL INFO:: no %s file, so cannot remove line" %init_file
+        print "BL INFO:: no {0!s} file, so cannot remove line".format(init_file)
         lines = []
     if (lines):
         patt = string.join(remove_str_ls,'|')
@@ -2348,7 +2347,7 @@ def multi_chicken(imol, n_colours = False):
             set_last_map_contour_level(sigma * contour_level_sigma)
             set_last_map_colour(*rotate_colour_map(initial_colour, colour_range * frac))
     else:
-        print "BL INFO:: %s is not valid map" %imol
+        print "BL INFO:: {0!s} is not valid map".format(imol)
         
 
 # simple enumeration
@@ -2729,7 +2728,7 @@ def run_download_binary_curl(revision, version_string,
         else:
             if not os.path.isfile(target_md5sum_file_name):
                 #print "OOps! %s does not exist" %target_md5sum_file_name
-                print "OOps! %s does not exist" %target_md5sum_file_name
+                print "OOps! {0!s} does not exist".format(target_md5sum_file_name)
                 return False
             else:
                 target_md5_string = get_target_md5_string(target_md5sum_file_name)
@@ -2738,19 +2737,18 @@ def run_download_binary_curl(revision, version_string,
                 md5_string = get_md5sum_string(tar_file_name)
                 if not target_md5_string:    # need to test if string?
                     #print "OOps %s is not a string" %target_md5_string
-                    print "OOps %s is not a string" %target_md5_string
+                    print "OOps {0!s} is not a string".format(target_md5_string)
                     return False
                 else:
                     if not md5_string:       # as above
                         #print "OOps %s is not a string" %md5_string
-                        print "OOps %s is not a string" %md5_string
+                        print "OOps {0!s} is not a string".format(md5_string)
                         return False
                     else:
                         if not (target_md5_string == md5_string):
                             #print "Oops: md5sums do not match %s %s.  Doing nothing" \
                             #      %(target_md5_string, md5_string)
-                            print "Oops: md5sums do not match %s %s.  Doing nothing" \
-                                  %(target_md5_string, md5_string)
+                            print "Oops: md5sums do not match {0!s} {1!s}.  Doing nothing".format(target_md5_string, md5_string)
                             return False
                         else:
                             return True
@@ -2902,10 +2900,10 @@ def run_download_binary_curl(revision, version_string,
                 dots = int(percent / 2.5) * "="
                 if percent < 100:
                     dots += ">"
-                sys.stdout.write("\rProgress %d%%" %percent + "  |%-40s|" %dots)
+                sys.stdout.write("\rProgress {0:d}%".format(percent) + "  |{0:<40!s}|".format(dots))
                 sys.stdout.flush()
                 if progress_bar:
-                    progress_bar.set_text("Downloading %s %%" %percent)
+                    progress_bar.set_text("Downloading {0!s} %".format(percent))
                     progress_bar.set_fraction(percent/100.)
                 if (pending_install_in_place == "cancelled"):
                     # Brute force exit of thread!
@@ -2920,7 +2918,7 @@ def run_download_binary_curl(revision, version_string,
                 return False
             try:
                 print "\n"
-                print "Downloading: %s" %tar_file_name
+                print "Downloading: {0!s}".format(tar_file_name)
                 url_local_file_name, url_info =  urllib.urlretrieve(url, tar_file_name, progress_function)
                 pending_install_in_place = "full"
                 print "\nDone"
@@ -3038,7 +3036,7 @@ def update_self(use_curl=False):
     else:
         coot_url = get_url_as_string(url)
     if not coot_url:
-        print "BL INFO:: could not get string from URL %s, so no update" %url
+        print "BL INFO:: could not get string from URL {0!s}, so no update".format(url)
     else:
         version_string = coot_split_version_string(coot_url)
         revision = get_revision_from_string(version_string)
@@ -3077,7 +3075,7 @@ def update_self(use_curl=False):
                             f = v2 / v1
                             #sys.stdout.write("\rProgress %3.2f%%" %(f*100))
                             #sys.stdout.flush()
-                            print "%3.2f%%" %(f*100)
+                            print "{0:3.2f}%".format((f*100))
                             if f > 0.999:
                                 continue_status = False
             elif count >= 1500:  # about 50 min
@@ -3484,7 +3482,7 @@ def find_exe(program_name, *args, **kwargs):
                             return program_exe
                 except:
                     if info:
-                        print "BL WARNING:: %s not defined!" %search_path
+                        print "BL WARNING:: {0!s} not defined!".format(search_path)
             
     # BL says: before we search everywhere we might want to ask
     # the user if he actually wishes to do so!
@@ -3509,7 +3507,7 @@ def find_exe(program_name, *args, **kwargs):
             print "BL INFO:: we don't search the whole disk for", program_name_noext
             
     if info:
-        print "BL WARNING:: We cannot find %s anywhere! Program %s won't run!" %(program_name_noext, program_name_noext)
+        print "BL WARNING:: We cannot find {0!s} anywhere! Program {1!s} won't run!".format(program_name_noext, program_name_noext)
     return False
 
 # for running online docs
@@ -3519,7 +3517,7 @@ def open_url(url):
     try:
       webbrowser.open(url,1,1)
     except:
-      print "BL WARNING:: Cannot open the URL %s in webbrowser %s!" %(url,webbrowser.get())
+      print "BL WARNING:: Cannot open the URL {0!s} in webbrowser {1!s}!".format(url, webbrowser.get())
 
 
 # to reload modules
@@ -3591,7 +3589,7 @@ def run_concurrently(cmd, args=None, data_list=None, logfile=None, screen_flag=F
             pid = os.spawnv(os.P_NOWAIT, cmd_execfile, [cmd_execfile] + args)
             return pid
     else:
-        print "WARNING:: could not find %s, so not running this program" %cmd
+        print "WARNING:: could not find {0!s}, so not running this program".format(cmd)
         return False
 
 # python command to see if we have pygtk available
@@ -3631,9 +3629,9 @@ def kill_process(pid):
             if (major >= 2 and minor >=4):
                 # new style
                 import subprocess
-                ret = subprocess.call("taskkill /F /PID %i" % pid, shell=True)
+                ret = subprocess.call("taskkill /F /PID {0:d}".format(pid), shell=True)
             else:
-                ret = os.system("taskkill /F /PID %i" % pid)
+                ret = os.system("taskkill /F /PID {0:d}".format(pid))
             if (ret == 0):
                 # success
                 return True

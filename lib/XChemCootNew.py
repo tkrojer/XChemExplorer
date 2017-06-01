@@ -698,7 +698,7 @@ class GUI(object):
         # only repopulate if site exists
         if self.xtalID in self.siteDict:
             for item in sorted(self.siteDict[self.xtalID]):
-                self.cb_site.append_text('site: %s - event: %s' %(item[5],item[6]))
+                self.cb_site.append_text('site: {0!s} - event: {1!s}'.format(item[5], item[6]))
 
     def ChangeSite(self, widget,data=None):
         if self.xtalID in self.siteDict:
@@ -1031,10 +1031,10 @@ class GUI(object):
         self.Todo=[]
         self.siteDict={}
         self.Todo,self.siteDict=self.db.get_todoList_for_coot(self.selection_mode)
-        self.status_label.set_text('found %s samples' %len(self.Todo))
+        self.status_label.set_text('found {0!s} samples'.format(len(self.Todo)))
         # refresh sample CB
         for item in sorted(self.Todo):
-            self.cb.append_text('%s' %item[0])
+            self.cb.append_text('{0!s}'.format(item[0]))
         if self.siteDict == {}:
             self.cb_site.set_sensitive(False)
             self.PREVbuttonSite.set_sensitive(False)

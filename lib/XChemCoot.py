@@ -925,9 +925,9 @@ class GUI(object):
                 self.cb.remove_text(0)
         self.Todo=[]
         self.Todo=self.db.get_todo_list_for_coot(self.selection_mode,self.selected_site[0])
-        self.status_label.set_text('found %s samples' %len(self.Todo))
+        self.status_label.set_text('found {0!s} samples'.format(len(self.Todo)))
         for item in sorted(self.Todo):
-            self.cb.append_text('%s' %item[0])
+            self.cb.append_text('{0!s}'.format(item[0]))
 
 
 

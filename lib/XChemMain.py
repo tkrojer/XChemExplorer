@@ -129,7 +129,7 @@ def get_jobs_running_on_cluster():
                     second_start=start_time.split(':')[2]
 
                 if start_time != '' and start_date != '':
-                    start='%s-%s-%s %s:%s:%s' %(year_start,month_start,day_start,hour_start,minute_start,second_start)
+                    start='{0!s}-{1!s}-{2!s} {3!s}:{4!s}:{5!s}'.format(year_start, month_start, day_start, hour_start, minute_start, second_start)
                     run_time=datetime.now()-datetime.strptime(start,"%Y-%m-%d %H:%M:%S")
                     run_time_seconds=int(run_time.total_seconds())
                     run_time_minutes=int(run_time.total_seconds() / 60)
@@ -186,18 +186,18 @@ def print_acedrg_status(xce_logfile,xtal_db_dict):
             success+=1
         else:
             unknown+=1
-    Logfile.insert('restraint generation pending: ...... %s' %str(pending))
-    Logfile.insert('restraint generation started: ...... %s' %str(started))
-    Logfile.insert('restraint generation running: ...... %s' %str(running))
-    Logfile.insert('missing smiles string: ............. %s' %str(missing_smiles))
-    Logfile.insert('restraint generation failed: ....... %s' %str(failed))
-    Logfile.insert('restraints successfully created: ... %s' %str(success))
-    Logfile.insert('unknown status: .................... %s' %str(unknown))
+    Logfile.insert('restraint generation pending: ...... {0!s}'.format(str(pending)))
+    Logfile.insert('restraint generation started: ...... {0!s}'.format(str(started)))
+    Logfile.insert('restraint generation running: ...... {0!s}'.format(str(running)))
+    Logfile.insert('missing smiles string: ............. {0!s}'.format(str(missing_smiles)))
+    Logfile.insert('restraint generation failed: ....... {0!s}'.format(str(failed)))
+    Logfile.insert('restraints successfully created: ... {0!s}'.format(str(success)))
+    Logfile.insert('unknown status: .................... {0!s}'.format(str(unknown)))
 
 def print_cluster_status_message(program,cluster_dict,xce_logfile):
     Logfile=XChemLog.updateLog(xce_logfile)
     Logfile.insert('cluster status summary:')
-    Logfile.insert('%s %s jobs are running on the cluster' %(len(cluster_dict[program]),program))
+    Logfile.insert('{0!s} {1!s} jobs are running on the cluster'.format(len(cluster_dict[program]), program))
     if len(cluster_dict[program]) > 0:
         cumulative_runtime=0
         job_ids = []
@@ -222,7 +222,7 @@ def display_queue_status_in_terminal(in_dict):
     print '----------------------------------------------------------------------------'
     print '| Task                   | Nr. Jobs               | Max. Runtime (minutes) |'
     print '----------------------------------------------------------------------------'
-    print '{0:24} {1:24} {2:24} {3:1}'.format('| DIMPLE', '| %s' %len(in_dict['dimple']),'| %s' &max_dimple_runtime,'|')
+    print '{0:24} {1:24} {2:24} {3:1}'.format('| DIMPLE', '| {0!s}'.format(len(in_dict['dimple'])),'| %s' &max_dimple_runtime,'|')
     print '----------------------------------------------------------------------------'
 
 def get_datasource_summary(db_file):
@@ -416,7 +416,7 @@ def append_dict_of_gda_barcodes(out_dict,files,xce_logfile):
                     if 'Snapshots will be saved' in line:
                         sampleID=line.split()[len(line.split())-1].split('/')[-1]
                         out_dict[sampleID]=barcode
-                        Logfile.insert('found: sample=%s, barcode=%s, file=%s' %(sampleID,barcode,files))
+                        Logfile.insert('found: sample={0!s}, barcode={1!s}, file={2!s}'.format(sampleID, barcode, files))
                         found_barcode_entry=False
     elif gda_log.startswith('gda_server') and gda_log.endswith('log'):
         for line in open(files):
@@ -427,7 +427,7 @@ def append_dict_of_gda_barcodes(out_dict,files,xce_logfile):
                 if 'Snapshots will be saved' in line:
                     sampleID=line.split()[len(line.split())-1].split('/')[-1]
                     out_dict[sampleID]=barcode
-                    Logfile.insert('found: sample=%s, barcode=%s, file=%s' %(sampleID,barcode,files))
+                    Logfile.insert('found: sample={0!s}, barcode={1!s}, file={2!s}'.format(sampleID, barcode, files))
                     found_barcode_entry=False
 
     return out_dict

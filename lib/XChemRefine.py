@@ -50,7 +50,7 @@ class Refine(object):
         # first check if refinement is ongoing and exit if yes
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'REFINEMENT_IN_PROGRESS')):
 #            coot.info_dialog('*** REFINEMENT IN PROGRESS ***')
-            Logfile.insert('cannot start new refinement for %s: *** REFINEMENT IN PROGRESS ***' %self.xtalID)
+            Logfile.insert('cannot start new refinement for {0!s}: *** REFINEMENT IN PROGRESS ***'.format(self.xtalID))
             return None
 
         #######################################################
@@ -60,7 +60,7 @@ class Refine(object):
         elif os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz')):
             RefmacParams['HKLIN']='HKLIN '+os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz \\\n')
         else:
-            Logfile.insert('%s: cannot find HKLIN for refinement; aborting...' %self.xtalID)
+            Logfile.insert('{0!s}: cannot find HKLIN for refinement; aborting...'.format(self.xtalID))
             return None
         RefmacParams['HKLOUT']='HKLOUT '+os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refine_'+Serial+'.mtz \\\n')
 
@@ -207,7 +207,7 @@ class Refine(object):
                 mtz_two=os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz')
                 pdb_one=os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refine_'+Serial+'.pdb')
                 mtz_one=os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refine_'+Serial+'.mtz')
-                spider_plot='giant.score_model pdb1=%s mtz1=%s pdb2=%s mtz2=%s res_names=LIG,UNL,DRG,FRG\n' %(pdb_one,mtz_one,pdb_two,mtz_two)
+                spider_plot='giant.score_model pdb1={0!s} mtz1={1!s} pdb2={2!s} mtz2={3!s} res_names=LIG,UNL,DRG,FRG\n'.format(pdb_one, mtz_one, pdb_two, mtz_two)
 
         #######################################################
         # PHENIX stuff (if working at DLS)
@@ -303,14 +303,14 @@ class Refine(object):
             'mmtbx.validate_ligands refine_%s.pdb refine_%s.mtz LIG > validate_ligands.txt\n' %(Serial,Serial)+
             'cd '+self.ProjectPath+'/'+self.xtalID+'\n'
             '#ln -s %s/%s/Refine_%s/refine_%s.pdb refine.pdb\n' %(self.ProjectPath,self.xtalID,Serial,Serial)+
-            '#ln -s %s/%s/Refine_%s/refine_%s.mtz refine.mtz\n' %(self.ProjectPath,self.xtalID,Serial,Serial)+
-            'ln -s ./Refine_%s/refine_%s.pdb refine.pdb\n' %(Serial,Serial)+
-            'ln -s ./Refine_%s/refine_%s.mtz refine.mtz\n' %(Serial,Serial)+
+            '#ln -s {0!s}/{1!s}/Refine_{2!s}/refine_{3!s}.mtz refine.mtz\n'.format(self.ProjectPath, self.xtalID, Serial, Serial)+
+            'ln -s ./Refine_{0!s}/refine_{1!s}.pdb refine.pdb\n'.format(Serial, Serial)+
+            'ln -s ./Refine_{0!s}/refine_{1!s}.mtz refine.mtz\n'.format(Serial, Serial)+
             '\n'
             +create_bound_conformation+
             '\n'
             'ln -s Refine_%s/validate_ligands.txt .\n' %Serial+
-            'ln -s Refine_%s/refine_molprobity.log .\n' %Serial+
+            'ln -s Refine_{0!s}/refine_molprobity.log .\n'.format(Serial)+
             'mmtbx.validation_summary refine.pdb > validation_summary.txt\n'
             '\n'
             'fft hklin refine.mtz mapout 2fofc.map << EOF\n'
@@ -322,7 +322,7 @@ class Refine(object):
             'EOF\n'
              '\n'
             '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_after_refinement.py')+
-            ' %s %s %s %s\n' %(self.datasource,self.xtalID,self.ProjectPath,os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))+
+            ' {0!s} {1!s} {2!s} {3!s}\n'.format(self.datasource, self.xtalID, self.ProjectPath, os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))+
             '\n'
             '/bin/rm %s/%s/REFINEMENT_IN_PROGRESS\n' %(self.ProjectPath,self.xtalID)+
             '\n'
@@ -335,7 +335,7 @@ class Refine(object):
 
         os.chdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
 #        os.system('ssh artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(self.ProjectPath,self.xtalID,Serial))
-        Logfile.insert('changing directory to %s' %(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial)))
+        Logfile.insert('changing directory to {0!s}'.format((os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))))
         if external_software['qsub']:
             Logfile.insert('starting refinement on cluster')
             os.system('qsub -P labxchem refmac.csh')

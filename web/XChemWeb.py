@@ -5,11 +5,11 @@ import os,sys
 def create_ICM_input_file(html_export_directory,database):
 
     if os.getcwd().startswith('/work'):
-        panddaDir='panddaDir="%s"\n' %html_export_directory.replace('/work','W:')
-        molcart='connect molcart filename="%s"\n' %database.replace('/work','W:')
+        panddaDir='panddaDir="{0!s}"\n'.format(html_export_directory.replace('/work','W:'))
+        molcart='connect molcart filename="{0!s}"\n'.format(database.replace('/work','W:'))
     else:
-        panddaDir='panddaDir="%s"\n' %html_export_directory
-        molcart='connect molcart filename="%s"\n' %database
+        panddaDir='panddaDir="{0!s}"\n'.format(html_export_directory)
+        molcart='connect molcart filename="{0!s}"\n'.format(database)
 
     icm_in = (
         '#!/usr/local/bin/icm\n'
@@ -106,6 +106,6 @@ def create_ICM_input_file(html_export_directory,database):
         'endfor\n'
         )
 
-    f=open('%s/dsEvent_sqlite.icm' %html_export_directory,'w')
+    f=open('{0!s}/dsEvent_sqlite.icm'.format(html_export_directory),'w')
     f.write(icm_in)
     f.close()
