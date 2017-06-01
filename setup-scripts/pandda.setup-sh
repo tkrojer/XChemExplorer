@@ -2,4 +2,4 @@
 
 module load pymol
 
-source /dls/science/groups/i04-1/software/pandda-install/ccp4-pandda/bin/ccp4.setup-sh
+source /dls/science/groups/i04-1/software/pandda-update/ccp4-7.0/setup-scripts/ccp4.setup-sh

@@ -1239,8 +1239,8 @@ class XChemExplorer(QtGui.QApplication):
         #pandda_tab_widget.setSizePolicy(size_policy)
         pandda_tab_list = [ 'pandda.analyse',
                             'Dataset Summary',
-                            'Results Summary',
-                            'Inspect Summary'  ]
+                            'Processing Output',
+                            'Statistical Map Summaries']
 
         self.pandda_tab_dict={}
         for page in pandda_tab_list:
@@ -1251,6 +1251,16 @@ class XChemExplorer(QtGui.QApplication):
 
         self.pandda_analyse_hbox=QtGui.QHBoxLayout()
         self.pandda_tab_dict['pandda.analyse'][1].addLayout(self.pandda_analyse_hbox)
+        self.pandda_map_layout = QtGui.QVBoxLayout()
+        self.pandda_map_list = QtGui.QComboBox()
+        self.pandda_maps_html = QtWebKit.QWebView()
+        #self.pandda_maps_html.load(QtCore.QUrl(self.map_url))
+        #self.pandda_maps_html.show()
+        self.pandda_map_layout.addWidget(self.pandda_map_list)
+        self.pandda_map_layout.addWidget(self.pandda_maps_html)
+
+        self.pandda_tab_dict['Statistical Map Summaries'][1].addLayout(self.pandda_map_layout)
+        self.pandda_maps_html.show()
 
         grid_pandda = QtGui.QGridLayout()
         grid_pandda.setColumnStretch(0,20)
@@ -1262,10 +1272,11 @@ class XChemExplorer(QtGui.QApplication):
                                     'Dimple\nRcryst',
                                     'Dimple\nRfree',
                                     'Crystal Form\nName',
-                                    'PanDDA\nlaunched?',
-                                    'PanDDA\nhit?',
-                                    'PanDDA\nreject?',
-                                    'PanDDA\nStatus'    ]
+                                    #'PanDDA\nlaunched?',
+                                    #'PanDDA\nhit?',
+                                    #'PanDDA\nreject?'
+                                    ]
+                                    #'PanDDA\nStatus'    ]
 
         self.pandda_analyse_data_table=QtGui.QTableWidget()
         self.pandda_analyse_data_table.setSortingEnabled(True)
@@ -1278,6 +1289,21 @@ class XChemExplorer(QtGui.QApplication):
 
         frame_pandda=QtGui.QFrame()
         grid_pandda.addWidget(self.pandda_analyse_data_table,0,0)
+
+        self.pandda_status = 'UNKNOWN'
+        self.pandda_status_label = QtGui.QLabel()
+        if os.path.exists(str(self.panddas_directory + '/pandda.done')):
+            self.pandda_status = 'Finished!'
+            self.pandda_status_label.setStyleSheet('color: green')
+        if os.path.exists(str(self.panddas_directory + '/pandda.running')):
+            self.pandda_status = 'Running...'
+            self.pandda_status_label.setStyleSheet('color: orange')
+        if os.path.exists(str(self.panddas_directory + '/pandda.errored')):
+            self.pandda_status = 'Error encountered... please check the log files for pandda!'
+            self.pandda_status_label.setStyleSheet('color: red')
+        self.pandda_status_label.setText(str('STATUS: ' + self.pandda_status))
+        self.pandda_status_label.setFont(QtGui.QFont("Arial",25, QtGui.QFont.Bold))
+        grid_pandda.addWidget(self.pandda_status_label,3,0)
 
 #        self.pandda_analyse_hbox.addStretch(1)
 
@@ -1432,9 +1458,14 @@ class XChemExplorer(QtGui.QApplication):
 
         #######################################################
         # next three blocks display html documents created by pandda.analyse
-        self.pandda_initial_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_initial.html')
-        self.pandda_analyse_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_analyse.html')
-        self.pandda_inspect_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_inspect.html')
+        if os.path.exists(str(self.panddas_directory+'/interesting_datasets')):
+            print('WARNING: USING RESULTS FROM OLD PANDDA ANALYSE! THIS IS NOT FULLY SUPPORTED IN XCE2')
+            print('PLEASE CHANGE YOUR PANDDA DIRECTORY TO A NEW RUN, OR USE THE OLD VERSION OF XCE!')
+            self.pandda_initial_html_file=str(self.panddas_directory+'/results_summareis/pandda_initial.html')
+            self.pandda_analyse_html_file = str(self.panddas_directory + '/results_summaries/pandda_analyse.html')
+        self.pandda_initial_html_file=str(self.panddas_directory+'/analyses/html_summaries/'+'pandda_initial.html')
+        self.pandda_analyse_html_file=str(self.panddas_directory+'/analyses/html_summaries/'+'pandda_analyse.html')
+        #self.pandda_inspect_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_inspect.html')
 
         self.pandda_initial_html = QtWebKit.QWebView()
         self.pandda_tab_dict['Dataset Summary'][1].addWidget(self.pandda_initial_html)
@@ -1442,14 +1473,16 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_initial_html.show()
 
         self.pandda_analyse_html = QtWebKit.QWebView()
-        self.pandda_tab_dict['Results Summary'][1].addWidget(self.pandda_analyse_html)
+        self.pandda_tab_dict['Processing Output'][1].addWidget(self.pandda_analyse_html)
         self.pandda_analyse_html.load(QtCore.QUrl(self.pandda_analyse_html_file))
         self.pandda_analyse_html.show()
 
+
+
         self.pandda_inspect_html = QtWebKit.QWebView()
-        self.pandda_tab_dict['Inspect Summary'][1].addWidget(self.pandda_inspect_html)
-        self.pandda_inspect_html.load(QtCore.QUrl(self.pandda_inspect_html_file))
-        self.pandda_inspect_html.show()
+        #self.pandda_tab_dict['Statistical Map Summaries'][1].addWidget(self.pandda_inspect_html)
+        #self.pandda_inspect_html.load(QtCore.QUrl(self.pandda_inspect_html_file))
+        #self.pandda_inspect_html.show()
 
 #        self.pandda_analyse_html = QtWebKit.QWebView()
 #        self.pandda_inspect_html = QtWebKit.QWebView()
@@ -3296,6 +3329,28 @@ class XChemExplorer(QtGui.QApplication):
         for target in self.target_list:
             combobox.addItem(target)
 
+    def combo_selected(self, text):
+        self.map_url = str(self.panddas_directory+'/analyses/html_summaries/pandda_map_' + text + '.html')
+        self.pandda_maps_html.load(QtCore.QUrl(self.map_url))
+        self.pandda_maps_html.show()
+
+
+    def add_map_html(self):
+        self.map_list = glob.glob(str(self.panddas_directory + '/analyses/html_summaries/pandda_map_*.html'))
+        self.list_options = []
+        for i in range(0, len(self.map_list)):
+            string = self.map_list[i]
+            string = string.replace('/analyses/html_summaries/pandda_map_', '')
+            string = string.replace('.html', '')
+            string = string.replace(self.panddas_directory, '')
+            self.list_options.append(string)
+        self.pandda_map_list.clear()
+        for i in range(0, len(self.list_options)):
+            self.pandda_map_list.addItem(self.list_options[i])
+        self.connect(self.pandda_map_list, QtCore.SIGNAL('activated(QString)'), self.combo_selected)
+
+
+
 
     def open_config_file(self):
         file_name_temp = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window,'Open file', self.current_directory,'*.conf')
@@ -3314,9 +3369,15 @@ class XChemExplorer(QtGui.QApplication):
 
             self.panddas_directory=pickled_settings['panddas_directory']
             self.settings['panddas_directory']=self.panddas_directory
-            self.pandda_initial_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_initial.html')
-            self.pandda_analyse_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_analyse.html')
-            self.pandda_inspect_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_inspect.html')
+            if os.path.exists(str(self.panddas_directory + '/interesting_datasets')):
+                print('WARNING: USING RESULTS FROM OLD PANDDA ANALYSE! THIS IS NOT FULLY SUPPORTED IN XCE2')
+                print('PLEASE CHANGE YOUR PANDDA DIRECTORY TO A NEW RUN, OR USE THE OLD VERSION OF XCE!')
+                self.pandda_initial_html_file = str(self.panddas_directory + '/results_summareis/pandda_initial.html')
+                self.pandda_analyse_html_file = str(self.panddas_directory + '/results_summaries/pandda_analyse.html')
+            self.pandda_initial_html_file=str(self.panddas_directory+'/analyses/html_summaries/'+'pandda_initial.html')
+            self.pandda_analyse_html_file=str(self.panddas_directory+'/analyses/html_summaries/'+'pandda_analyse.html')
+
+            #self.pandda_inspect_html_file=str(self.panddas_directory+'/analyses/html_summaries/'+'pandda_inspect.html')
             self.show_pandda_html_summary()
 
             self.html_export_directory=pickled_settings['html_export_directory']
@@ -3935,9 +3996,14 @@ class XChemExplorer(QtGui.QApplication):
             self.pandda_output_data_dir_entry.setText(self.panddas_directory)
             print 'PANDDA',self.panddas_directory
             self.settings['panddas_directory']=self.panddas_directory
-            self.pandda_initial_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_initial.html')
-            self.pandda_analyse_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_analyse.html')
-            self.pandda_inspect_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_inspect.html')
+            if os.path.exists(str(self.panddas_directory + '/interesting_datasets')):
+                print('WARNING: USING RESULTS FROM OLD PANDDA ANALYSE! THIS IS NOT FULLY SUPPORTED IN XCE2')
+                print('PLEASE CHANGE YOUR PANDDA DIRECTORY TO A NEW RUN, OR USE THE OLD VERSION OF XCE!')
+                self.pandda_initial_html_file = str(self.panddas_directory + '/results_summareis/pandda_initial.html')
+                self.pandda_analyse_html_file = str(self.panddas_directory + '/results_summaries/pandda_analyse.html')
+            self.pandda_initial_html_file=str(self.panddas_directory+'/analyses/html_summaries/'+'pandda_initial.html')
+            self.pandda_analyse_html_file=str(self.panddas_directory+'/analyses/html_summaries/'+'pandda_analyse.html')
+            #self.pandda_inspect_html_file=str(self.panddas_directory+'/analyses/html_summaries/'+'pandda_inspect.html')
 
         if self.sender().text()=='Select HTML Export Directory':
             self.html_export_directory=str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
@@ -4054,6 +4120,16 @@ class XChemExplorer(QtGui.QApplication):
                                 self.prepare_and_run_task(instruction)
                             elif action=='Status':
                                 self.get_status_of_workflow_milestone(instruction)
+                                if os.path.exists(str(self.panddas_directory + '/pandda.done')):
+                                    self.pandda_status = 'Finished!'
+                                    self.pandda_status_label.setStyleSheet('color: green')
+                                if os.path.exists(str(self.panddas_directory + '/pandda.running')):
+                                    self.pandda_status = 'Running...'
+                                    self.pandda_status_label.setStyleSheet('color: orange')
+                                if os.path.exists(str(self.panddas_directory + '/pandda.errored')):
+                                    self.pandda_status = 'Error encountered... please check the log files for pandda!'
+                                    self.pandda_status_label.setStyleSheet('color: red')
+                                self.pandda_status_label.setText(str('STATUS: ' + self.pandda_status))
                     else:
                         self.need_to_switch_main_tab(task_index)
 
@@ -4552,8 +4628,9 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_initial_html.show()
         self.pandda_analyse_html.load(QtCore.QUrl(self.pandda_analyse_html_file))
         self.pandda_analyse_html.show()
-        self.pandda_inspect_html.load(QtCore.QUrl(self.pandda_inspect_html_file))
-        self.pandda_inspect_html.show()
+        self.add_map_html()
+        #self.pandda_inspect_html.load(QtCore.QUrl(self.pandda_inspect_html_file))
+        #self.pandda_inspect_html.show()
 
 
 

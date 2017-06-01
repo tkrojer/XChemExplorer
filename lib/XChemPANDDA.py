@@ -414,7 +414,7 @@ class run_pandda_analyse(QtCore.QThread):
                 '\n'
                 'cd '+self.panddas_directory+'\n'
                 '\n'
-                '$CCP4/bin/ccp4-python %s %s %s %s\n' %(  os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_pandda_status_flag.py'), self.datasource,crystalString[:-1],'running') +
+                #'$CCP4/bin/ccp4-python %s %s %s %s\n' %(  os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_pandda_status_flag.py'), self.datasource,crystalString[:-1],'running') +
                 '\n'
                 )
 
@@ -425,18 +425,42 @@ class run_pandda_analyse(QtCore.QThread):
                     ' data_dirs="'+self.data_directory+'"'
                     ' out_dir='+self.panddas_directory+
                     ' min_build_datasets='+self.min_build_datasets+
-                    ' maps.ampl_label=FWT maps.phas_label=PHWT'
+                    #' maps.ampl_label=FWT maps.phas_label=PHWT'
                     ' max_new_datasets='+self.max_new_datasets+
                     ' grid_spacing='+self.grid_spacing+
                     ' cpus='+self.nproc+
                     ' events.order_by='+self.sort_event+
                     filter_pdb+
                     ' pdb_style='+self.pdb_style+
-                    ' mtz_style='+self.mtz_style+'\n'
+                    ' mtz_style='+self.mtz_style+
+                    ' lig_style=/compound/*.cif'+
                     '\n'
                     )
 
-            Cmds += '$CCP4/bin/ccp4-python %s %s %s %s\n' %(  os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_pandda_status_flag.py'),    self.datasource,crystalString[:-1],'finished')
+            print(self.data_directory)
+
+            #Cmds += '$CCP4/bin/ccp4-python %s %s %s %s\n' %(  os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_pandda_status_flag.py'),    self.datasource,crystalString[:-1],'finished')
+            Cmds += '\n'
+
+            data_dir_string = self.data_directory.replace('/*', '')
+
+            Cmds += str(
+                        'find ' + data_dir_string +
+                        '/*/compound -name "*.cif" | while read line; do  echo ${line//"' +
+                        data_dir_string + '"/"' + self.panddas_directory +
+                        '/processed_datasets/"}| while read line2; do cp $line ${line2//compound/ligand_files}; '
+                        'done; done;')
+
+            Cmds += '\n'
+
+
+
+            Cmds += str(
+                        'find ' + data_dir_string +
+                        '/*/compound -name "*.pdb" | while read line; do  echo ${line//"' +
+                        data_dir_string + '"/"' + self.panddas_directory +
+                        '/processed_datasets/"}| while read line2; do cp $line ${line2//compound/ligand_files}; '
+                        'done; done;')
 
             self.Logfile.insert('running pandda.analyse with the following command:\n'+Cmds)
 
@@ -521,7 +545,7 @@ class giant_cluster_datasets(QtCore.QThread):
                 '#!'+os.getenv('SHELL')+'\n'
                 'unset PYTHONPATH\n'
                 'source '+source_file+'\n'
-                "giant.cluster_mtzs_and_pdbs %s/*/%s pdb_regex='%s/(.*)/%s' out_dir='%s/cluster_analysis'" %(self.initial_model_directory,self.pdb_style,self.initial_model_directory,self.pdb_style,self.panddas_directory)
+                "giant.datasets.cluster %s/*/%s pdb_regex='%s/(.*)/%s' out_dir='%s/cluster_analysis'" %(self.initial_model_directory,self.pdb_style,self.initial_model_directory,self.pdb_style,self.panddas_directory)
             )
 
 #        os.system("giant.cluster_mtzs_and_pdbs %s/*/%s pdb_regex='%s/(.*)/%s' out_dir='%s/cluster_analysis'" %(self.initial_model_directory,self.pdb_style,self.initial_model_directory,self.pdb_style,self.panddas_directory))
