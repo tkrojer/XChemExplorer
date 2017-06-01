@@ -726,7 +726,7 @@ def popen_command(cmd, args, data_list, log_file, screen_flag=False):
             # print "BL DEBUG:: popen command is", cmd_execfile + " " + args_string + " < " + data_list_file + " > " + log_file
             status = os.popen(cmd_execfile + " " + args_string + " < " + data_list_file + " > " + log_file, 'r')
             cmd_finished = status.close()
-            if (cmd_finished != None):
+            if (cmd_finished is not None):
                 print "running command ", cmd, " failed!"
                 return 1
             else:

@@ -1082,7 +1082,7 @@ class data_source:
         for item in tmp:
             tmpx=[]
             for i in list(item):
-                if i==None:
+                if i is None:
                     tmpx.append('None')
                 else:
                     tmpx.append(i)
@@ -1181,7 +1181,7 @@ class data_source:
         for item in tmp:
             tmpx=[]
             for i in list(item):
-                if i==None:
+                if i is None:
                     tmpx.append('None')
                 else:
                     tmpx.append(i)
@@ -1220,7 +1220,7 @@ class data_source:
         for item in tmp:
             tmpx=[]
             for i in list(item):
-                if i==None:
+                if i is None:
                     tmpx.append('None')
                 else:
                     tmpx.append(i)
