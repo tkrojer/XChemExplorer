@@ -1,5 +1,5 @@
-matplotlib==1.4.3
-lxml==3.2.4
-numpy==1.12.1
-pygtk==2.24.2
-rdkit==2009.Q1-1
+matplotlib=>1.4.3
+lxml=>3.2.4
+numpy=>1.12.1
+pygtk=>2.24.2
+rdkit=>2009.Q1-1
