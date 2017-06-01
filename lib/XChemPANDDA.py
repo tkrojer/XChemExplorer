@@ -807,7 +807,7 @@ class convert_event_map_to_SF:
         if not os.path.isfile(self.event_map):
             self.Logfile.insert('cannot find Event map: '+self.event_map)
             self.Logfile.insert('cannot convert event_map to structure factors!')
-            return None
+            
 
         self.project_directory=project_directory
         self.xtalID=xtalID
