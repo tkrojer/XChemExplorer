@@ -5200,7 +5200,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def show_data_collection_details(self,state):
         # first remove currently displayed widget
-        if self.data_collection_details_currently_on_display != None:
+        if self.data_collection_details_currently_on_display is not None:
             self.data_collection_details_currently_on_display.hide()
 #            self.data_collection_summarys_vbox_for_details.removeWidget(self.data_collection_details_currently_on_display)
 #            self.data_collection_details_currently_on_display.deleteLater()
@@ -5669,7 +5669,7 @@ class XChemExplorer(QtGui.QApplication):
                 continue        # do not show rows where sampleID is null
             for y,item in enumerate(columns_to_show):
                 cell_text=QtGui.QTableWidgetItem()
-                if row[item]==None:
+                if row[item] is None:
                     cell_text.setText('')
                 else:
                     cell_text.setText(str(row[item]))
@@ -5715,7 +5715,7 @@ class XChemExplorer(QtGui.QApplication):
                             break
             for y,item in enumerate(columns_to_show):
                 cell_text=QtGui.QTableWidgetItem()
-                if row[item]==None:
+                if row[item] is None:
                     cell_text.setText('')
                 else:
                     cell_text.setText(str(row[item]))

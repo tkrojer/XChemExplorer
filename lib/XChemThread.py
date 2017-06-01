@@ -163,11 +163,11 @@ class update_datasource_from_file_system(QtCore.QThread):
                     db_pandda_dict={}
                     db_pandda_dict['PANDDA_site_index']=entry[1]
                     db_pandda_dict['PANDDApath']=self.panddas_directory
-                    if entry[3] != None:
+                    if entry[3] is not None:
                         event_map=os.path.join(self.initial_model_directory,xtal,entry[3].split('/')[len(entry[3].split('/'))-1])
                         if os.path.isfile(event_map):
                             db_pandda_dict['PANDDA_site_event_map']=event_map
-                    if entry[2] != None:
+                    if entry[2] is not None:
                         spider_plot=os.path.join(self.initial_model_directory,xtal,entry[2].split('/')[len(entry[2].split('/'))-3],entry[2].split('/')[len(entry[2].split('/'))-2],entry[2].split('/')[len(entry[2].split('/'))-1])
                         if os.path.isfile(spider_plot):
                             db_pandda_dict['PANDDA_site_spider_plot']=spider_plot
@@ -885,7 +885,7 @@ class create_png_and_cif_of_compound(QtCore.QThread):
             compoundID=item[1]
             smiles=item[2]
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'creating ACEDRG shell script for '+sampleID)
-            if compoundID=='' or compoundID==None:
+            if compoundID=='' or compoundID is None:
                 compoundID='compound'
 
             if not os.path.isdir(os.path.join(self.initial_model_directory,sampleID)):
