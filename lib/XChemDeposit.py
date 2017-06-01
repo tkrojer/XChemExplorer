@@ -1,4 +1,4 @@
-# last edited: 10/04/2017, 15:00
+# last edited: 16/05/2017, 15:00
 
 import sys
 import os
@@ -349,7 +349,15 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             if self.structureType=='ligand_bound':
                 self.Logfile.insert(xtal+' is ready for deposition')
                 self.Logfile.insert('checking refinement stage of respective PanDDA sites...')
-                panddaSites=self.db.execute_statement("select CrystalName,RefinementOutcome,PANDDA_site_event_map_mtz from panddaTable where CrystalName is '%s' and PANDDA_site_ligand_placed is 'True'" %xtal)
+
+                sqlite = (
+                    "select CrystalName,RefinementOutcome,PANDDA_site_event_map_mtz from panddaTable "
+                    "where CrystalName is '%s' and PANDDA_site_ligand_placed is 'True' and " %xtal+
+                    "(PANDDA_site_confidence like '1%' or PANDDA_site_confidence like '2%' or PANDDA_site_confidence like '3%' or PANDDA_site_confidence like '4%')"
+                )
+
+#                panddaSites=self.db.execute_statement("select CrystalName,RefinementOutcome,PANDDA_site_event_map_mtz from panddaTable where CrystalName is '%s' and PANDDA_site_ligand_placed is 'True' and (PANDDA_site_confidence like '1%' or PANDDA_site_confidence like '2%' or PANDDA_site_confidence like '3%' or PANDDA_site_confidence like '4%')" %xtal)
+                panddaSites=self.db.execute_statement(sqlite)
                 self.Logfile.insert('found '+str(len(panddaSites))+' ligands')
                 for site in panddaSites:
                     if str(site[1]).startswith('5'):
@@ -804,8 +812,10 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         smiles=str(general[0][0])
 
         if self.structureType=='apo':
+            self.Logfile.insert('SMILES string of soaked compound: %s' %smiles)
             if smiles.lower() != 'none' or smiles.lower() != "null":
-                mmcif_text+='smiles string of soaked compound: %s;\n' %smiles
+                self.Logfile.insert('adding _pdbx_entry_details.nonpolymer_details to mmcif')
+                mmcif_text+='smiles string of soaked compound: %s\n;\n' %smiles
             else:
                 mmcif_text=''
 
