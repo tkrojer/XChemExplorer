@@ -376,6 +376,7 @@ class run_pandda_analyse(QtCore.QThread):
         self.max_new_datasets=pandda_params['max_new_datasets']
         self.grid_spacing=pandda_params['grid_spacing']
         self.filter_pdb=pandda_params['filter_pdb']
+        self.wilson_scaling = pandda_params['perform_diffraction_data_scaling']
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.dataset_list=dataset_list
         self.datasource=datasource
@@ -458,6 +459,7 @@ class run_pandda_analyse(QtCore.QThread):
                     ' pdb_style='+self.pdb_style+
                     ' mtz_style='+self.mtz_style+
                     ' lig_style=/compound/*.cif'+
+                    ' perform_diffraction_data_scaling='+self.wilson_scaling+
                     '\n'
                     )
 
