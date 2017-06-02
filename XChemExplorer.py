@@ -1240,6 +1240,7 @@ class XChemExplorer(QtGui.QApplication):
         pandda_tab_list = [ 'pandda.analyse',
                             'Dataset Summary',
                             'Processing Output',
+                            'pandda.inspect',
                             'Statistical Map Summaries']
 
         self.pandda_tab_dict={}
@@ -1408,13 +1409,16 @@ class XChemExplorer(QtGui.QApplication):
         hbox.addWidget(self.pandda_reference_file_spg_label)
         self.pandda_analyse_input_params_vbox.addLayout(hbox)
 
-        label=QtGui.QLabel('\n\n\nExpert Parameters (only change if you know what you are doing!):\n')
-#        label.setSizePolicy(QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Minimum)
+        label=QtGui.QLabel('\nExpert Parameters (only change if you know what you are doing!):')
         self.pandda_analyse_input_params_vbox.addWidget(label)
+
+        self.wilson_checkbox = QtGui.QCheckBox('Wilson B-factor Scaling')
+        self.wilson_checkbox.toggle()
+        self.wilson_checkbox.setChecked(False)
+        self.pandda_analyse_input_params_vbox.addWidget(self.wilson_checkbox)
 
         # minimum number of datasets
         label=QtGui.QLabel('min_build_datasets')
-#        label.setSizePolicy(QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Minimum)
         self.pandda_analyse_input_params_vbox.addWidget(label)
         self.pandda_min_build_dataset_entry = QtGui.QLineEdit()
         self.pandda_min_build_dataset_entry.setText('40')
@@ -1422,7 +1426,6 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_min_build_dataset_entry)
 
         label=QtGui.QLabel('max_new_datasets')
-#        label.setSizePolicy(QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Minimum)
         self.pandda_analyse_input_params_vbox.addWidget(label)
         self.pandda_max_new_datasets_entry = QtGui.QLineEdit()
         self.pandda_max_new_datasets_entry.setText('200')
@@ -1430,7 +1433,6 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_max_new_datasets_entry)
 
         label=QtGui.QLabel('grid_spacing (default=0.6)\nNote: higher values speed up calculations, but maps might be less pretty)')
-#        label.setSizePolicy(QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Minimum)
         self.pandda_analyse_input_params_vbox.addWidget(label)
         self.pandda_grid_spacing_entry = QtGui.QLineEdit()
         self.pandda_grid_spacing_entry.setText('0.6')
@@ -1441,17 +1443,7 @@ class XChemExplorer(QtGui.QApplication):
 
         frame_right.setSizePolicy(QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Minimum)
         frame_right.setLayout(self.pandda_analyse_input_params_vbox)
-#        self.pandda_analyse_hbox.addWidget(frame_right)
 
-#        # green 'Run Pandda' button (which is red when pandda run in progress
-#        self.run_panddas_button=QtGui.QPushButton("Run PANDDAs")
-#        self.run_panddas_button.clicked.connect(self.button_clicked)
-#        self.run_panddas_button.setFixedWidth(200)
-#        self.run_panddas_button.setFixedHeight(100)
-#        self.color_run_panddas_button()
-#        self.pandda_analyse_input_params_vbox.addWidget(self.run_panddas_button)
-
-#        self.pandda_analyse_hbox.addLayout(self.pandda_analyse_input_params_vbox)
         grid_pandda.addWidget(frame_right,0,1,5,5)
         frame_pandda.setLayout(grid_pandda)
         self.pandda_analyse_hbox.addWidget(frame_pandda)
@@ -1465,7 +1457,7 @@ class XChemExplorer(QtGui.QApplication):
             self.pandda_analyse_html_file = str(self.panddas_directory + '/results_summaries/pandda_analyse.html')
         self.pandda_initial_html_file=str(self.panddas_directory+'/analyses/html_summaries/'+'pandda_initial.html')
         self.pandda_analyse_html_file=str(self.panddas_directory+'/analyses/html_summaries/'+'pandda_analyse.html')
-        #self.pandda_inspect_html_file=os.path.join(self.panddas_directory,'results_summaries','pandda_inspect.html')
+        self.pandda_inspect_html_file=str(self.panddas_directory+'/analyses/html_summaries/'+'pandda_inspect.html')
 
         self.pandda_initial_html = QtWebKit.QWebView()
         self.pandda_tab_dict['Dataset Summary'][1].addWidget(self.pandda_initial_html)
@@ -1477,15 +1469,10 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_html.load(QtCore.QUrl(self.pandda_analyse_html_file))
         self.pandda_analyse_html.show()
 
-
-
         self.pandda_inspect_html = QtWebKit.QWebView()
-        #self.pandda_tab_dict['Statistical Map Summaries'][1].addWidget(self.pandda_inspect_html)
-        #self.pandda_inspect_html.load(QtCore.QUrl(self.pandda_inspect_html_file))
-        #self.pandda_inspect_html.show()
-
-#        self.pandda_analyse_html = QtWebKit.QWebView()
-#        self.pandda_inspect_html = QtWebKit.QWebView()
+        self.pandda_tab_dict['pandda.inspect'][1].addWidget(self.pandda_inspect_html)
+        self.pandda_analyse_html.load(QtCore.QUrl(self.pandda_inspect_html_file))
+        self.pandda_analyse_html.show()
 
         self.panddas_results_vbox.addWidget(pandda_tab_widget)
         self.show_pandda_html_summary()
@@ -3377,7 +3364,7 @@ class XChemExplorer(QtGui.QApplication):
             self.pandda_initial_html_file=str(self.panddas_directory+'/analyses/html_summaries/'+'pandda_initial.html')
             self.pandda_analyse_html_file=str(self.panddas_directory+'/analyses/html_summaries/'+'pandda_analyse.html')
 
-            #self.pandda_inspect_html_file=str(self.panddas_directory+'/analyses/html_summaries/'+'pandda_inspect.html')
+            self.pandda_inspect_html_file=str(self.panddas_directory+'/analyses/html_summaries/'+'pandda_inspect.html')
             self.show_pandda_html_summary()
 
             self.html_export_directory=pickled_settings['html_export_directory']
@@ -4003,7 +3990,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.pandda_analyse_html_file = str(self.panddas_directory + '/results_summaries/pandda_analyse.html')
             self.pandda_initial_html_file=str(self.panddas_directory+'/analyses/html_summaries/'+'pandda_initial.html')
             self.pandda_analyse_html_file=str(self.panddas_directory+'/analyses/html_summaries/'+'pandda_analyse.html')
-            #self.pandda_inspect_html_file=str(self.panddas_directory+'/analyses/html_summaries/'+'pandda_inspect.html')
+            self.pandda_inspect_html_file=str(self.panddas_directory+'/analyses/html_summaries/'+'pandda_inspect.html')
 
         if self.sender().text()=='Select HTML Export Directory':
             self.html_export_directory=str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
@@ -4395,7 +4382,8 @@ class XChemExplorer(QtGui.QApplication):
                 'sort_event':           str(self.pandda_sort_event_combobox.currentText()),
                 'max_new_datasets':     str(self.pandda_max_new_datasets_entry.text()),
                 'grid_spacing':         str(self.pandda_grid_spacing_entry.text()),
-                'pandda_dir_structure': str(self.pandda_input_data_dir_entry.text())
+                'pandda_dir_structure': str(self.pandda_input_data_dir_entry.text()),
+                'perform_diffraction_data_scaling': str(self.wilson_checkbox.isChecked())
                         }
 
         pandda_checks=XChemPANDDA.check_if_pandda_can_run(pandda_params,self.xce_logfile,os.path.join(self.database_directory,self.data_source_file))
@@ -4629,8 +4617,8 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_html.load(QtCore.QUrl(self.pandda_analyse_html_file))
         self.pandda_analyse_html.show()
         self.add_map_html()
-        #self.pandda_inspect_html.load(QtCore.QUrl(self.pandda_inspect_html_file))
-        #self.pandda_inspect_html.show()
+        self.pandda_inspect_html.load(QtCore.QUrl(self.pandda_inspect_html_file))
+        self.pandda_inspect_html.show()
 
 
 
