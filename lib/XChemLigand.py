@@ -7,7 +7,7 @@ from rdkit.Chem.Draw import IPythonConsole
 
 
 
-class generate_all_stereoisomers:
+#class generate_all_stereoisomers:
 
     # https://github.com/rdkit/rdkit/issues/626
 

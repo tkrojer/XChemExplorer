@@ -1,4 +1,4 @@
-# last edited: 06/03/2017, 15:00
+# last edited: 26/04/2017, 15:00
 
 #!/usr/local/anaconda/sgc_default/envs/sgc_default/bin/python
 
@@ -38,7 +38,7 @@ def writeTableRow (row,htmlfile):
   htmlfile.write("<td>"+row['PANDDA_site_comment']+"</td>\n")
 #  htmlfile.write("<td>TBD</td>\n")
 #  htmlfile.write("<td>http://www.rcsb.org/pdb/explore/explore.do?structureId=%s</td>\n" %row['Deposition_PDB_ID'])
-  htmlfile.write('<td><a target="_blank" href="http://www.rcsb.org/pdb/explore/explore.do?structureId=%s">%s</a></td>\n' %(row['Deposition_PDB_ID'],row['Deposition_PDB_ID']))
+  htmlfile.write('<td><a target="_blank" href="http://www.rcsb.org/pdb/explore/explore.do?structureId={0!s}">{1!s}</a></td>\n'.format(row['Deposition_PDB_ID'], row['Deposition_PDB_ID']))
   htmlfile.write("<td>"+row['DataProcessingResolutionHigh']+"</td>\n")
   htmlfile.write("<td>"+row['DataProcessingSpaceGroup']+"</td>\n")
   htmlfile.write("<td>"+row['DataProcessingUnitCell']+"</td>\n")
@@ -237,27 +237,40 @@ def main (argv):
       c.row_factory=sqlite3.Row
       cur=c.cursor()
 
-      sql = ( "select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.CrystalName || '_event'|| p.PANDDA_site_event_index "
-              " as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence "
-              " as LigandConfidence,p.RefinementOutcome "
-              " as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, "
-              "                p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,"
-              "                m.DataProcessingUnitCell,m.RefinementPDB_latest,m.RefinementMTZ_latest,p.PANDDA_site_event_map "
-              " from panddaTable as p, mainTable as m "
-              " where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and "
-              "       (LigandConfidence like '1%' or LigandConfidence like '2%' or LigandConfidence like '3%' or LigandConfidence like '4%') "
-              " order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index"
+#      sql = ( "select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.CrystalName || '_event'|| p.PANDDA_site_event_index "
+#              " as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence "
+#              " as LigandConfidence,p.RefinementOutcome "
+#              " as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, "
+#              "                p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,"
+#              "                m.DataProcessingUnitCell,m.RefinementPDB_latest,m.RefinementMTZ_latest,p.PANDDA_site_event_map "
+#              " from panddaTable as p, mainTable as m "
+#              " where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and "
+#              "       (LigandConfidence like '1%' or LigandConfidence like '2%' or LigandConfidence like '3%' or LigandConfidence like '4%') "
+#              " order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index"
+#      )
 
-      )
-
-#      cur.execute("select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.CrystalName || '_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,m.RefinementBoundConformation,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (LigandConfidence like '1%' or LigandConfidence like '2%' or LigandConfidence like '3%' or LigandConfidence like '4%') order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index")
       # query below is without the LigandConfidence being constrained; this is because some older DBs don't have a starting digit
       # here we constrain RefinementOutcome of site
-#      cur.execute("select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.CrystalName || '_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,m.RefinementBoundConformation,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (p.RefinementOutcome like '4%' or p.RefinementOutcome like '5%' or p.RefinementOutcome like '6%')  order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index")
-#      cur.execute("select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.CrystalName || '_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,m.RefinementPDB_latest,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and p.RefinementOutcome like '4%' order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index")
-      cur.execute("select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.CrystalName || '_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,m.Deposition_PDB_ID,p.PANDDA_site_name,p.PANDDA_site_confidence as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,m.RefinementBoundConformation,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (p.RefinementOutcome like '4%' or p.RefinementOutcome like '5%' or p.RefinementOutcome like '6%')  order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index")
+#      cur.execute("select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.CrystalName || '_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,m.Deposition_PDB_ID,p.PANDDA_site_name,p.PANDDA_site_confidence as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,m.RefinementBoundConformation,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (p.RefinementOutcome like '4%' or p.RefinementOutcome like '5%' or p.RefinementOutcome like '6%')  order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index")
 
-#      cur.execute("select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.CrystalName || '_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,m.RefinementPDB_latest,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (LigandConfidence like '1%' or LigandConfidence like '2%' or LigandConfidence like '3%' or LigandConfidence like '4%') order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index")
+
+      sql = (
+        "select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.CrystalName || '_event'|| p.PANDDA_site_event_index "
+        " as ModelName,m.CompoundCode,m.CompoundSMILES,m.Deposition_PDB_ID,p.PANDDA_site_name,"
+        " p.PANDDA_site_confidence as LigandConfidence,"
+        " p.RefinementOutcome as ModelStatus,"
+        " p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, p.PANDDA_site_spider_plot,"
+        " m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,"
+        " m.RefinementBoundConformation,m.RefinementMTZ_latest,"
+        " p.PANDDA_site_event_map from panddaTable as p, "
+        " mainTable as m where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' "
+        " and (p.RefinementOutcome like '4%' or p.RefinementOutcome like '5%' or p.RefinementOutcome like '6%')  "
+        " and (LigandConfidence like '1%' or LigandConfidence like '2%' or LigandConfidence like '3%' or LigandConfidence like '4%')"
+        " order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index"
+      )
+
+      cur.execute(sql)
+
       rows=cur.fetchall()
       if rows == []:
         print '==> WARNING: none of your samples seems to be at least CompChem ready (4)'
@@ -325,7 +338,7 @@ def main (argv):
   zf.close()
 
   # change folder permissions
-  os.system('chmod -R 775 %s' %panddadir)
+  os.system('chmod -R 775 {0!s}'.format(panddadir))
 
   return
 

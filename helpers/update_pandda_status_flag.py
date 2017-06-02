@@ -9,8 +9,8 @@ import XChemDB
 def update_data_source(db_file,crystalString,status):
     db=XChemDB.data_source(db_file)
 
-    print "update mainTable set PANDDAStatus = '%s' where CrystalName in (%s)" %(status,"'"+crystalString.replace(",","','")+"'")
-    db.execute_statement("update mainTable set PANDDAStatus = '%s' where CrystalName in (%s)" %(status,"'"+crystalString.replace(",","','")+"'"))
+    print "update mainTable set PANDDAStatus = '{0!s}' where CrystalName in ({1!s})".format(status, "'"+crystalString.replace(",","','")+"'")
+    db.execute_statement("update mainTable set PANDDAStatus = '{0!s}' where CrystalName in ({1!s})".format(status, "'"+crystalString.replace(",","','")+"'"))
 
 
 if __name__=='__main__':

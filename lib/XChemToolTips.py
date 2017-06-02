@@ -207,7 +207,7 @@ def zenodo_upload_part_three():
 
 def zenodo_upload_part_four(html_export_directory):
 
-    instruction = (     'Upload ALL html files in %s to ZENODO and publish the page.' %os.path.join(html_export_directory,'zenodo'))
+    instruction = (     'Upload ALL html files in {0!s} to ZENODO and publish the page.'.format(os.path.join(html_export_directory,'zenodo')))
 
     return instruction
 

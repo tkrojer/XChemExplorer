@@ -1,4 +1,4 @@
-# last edited: 10/04/2017, 15:00
+# last edited: 16/05/2017, 15:00
 
 import sys
 import os
@@ -87,7 +87,7 @@ class templates:
                 continue
             if name[name.find(',')+1:name.find(',')+2] != ' ':
                 name=name.replace(',',', ')
-            audit_author_name+="'%s'\n" %name
+            audit_author_name+="'{0!s}'\n".format(name)
 
         primary_citation_author_name=''
         # one name must be within quotation, last name and first initial must be separated by comma and space
@@ -96,7 +96,7 @@ class templates:
                 continue
             if name[name.find(',')+1:name.find(',')+2] != ' ':
                 name=name.replace(',',', ')
-            primary_citation_author_name+="primary '%s'\n" %name
+            primary_citation_author_name+="primary '{0!s}'\n".format(name)
 
         molecule_one_letter_sequence=';'
         counter=1
@@ -113,17 +113,17 @@ class templates:
             '#\n'
             '_pdbx_database_status.entry_id                       UNNAMED\n'
             "_pdbx_database_status.dep_release_code_coordinates   '%s'\n"                       %depositDict['Release_status_for_coordinates']+
-            "_pdbx_database_status.dep_release_code_sequence      '%s'\n"                       %depositDict['Release_status_for_sequence']+
+            "_pdbx_database_status.dep_release_code_sequence      '{0!s}'\n".format(depositDict['Release_status_for_sequence'])+
             '#\n'
             '_pdbx_deposit_group.group_id	   UNNAMED\n'
             '_pdbx_deposit_group.group_description  "%s"\n'                                     %depositDict['group_description']+
-            '_pdbx_deposit_group.group_title        "%s"\n'                                     %depositDict['group_title']+
+            '_pdbx_deposit_group.group_title        "{0!s}"\n'.format(depositDict['group_title'])+
             '#\n'
             '_exptl_crystal_grow.crystal_id      1\n'
             "_exptl_crystal_grow.method          '%s'\n"                                        %depositDict['crystallization_method']+
-            '_exptl_crystal_grow.pH              %s\n'                                          %depositDict['crystallization_pH']+
-            '_exptl_crystal_grow.temp            %s\n'                                          %depositDict['crystallization_temperature']+
-            '_exptl_crystal_grow.pdbx_details    "%s"\n'                                        %depositDict['crystallization_details']+
+            '_exptl_crystal_grow.pH              {0!s}\n'.format(depositDict['crystallization_pH'])+
+            '_exptl_crystal_grow.temp            {0!s}\n'.format(depositDict['crystallization_temperature'])+
+            '_exptl_crystal_grow.pdbx_details    "{0!s}"\n'.format(depositDict['crystallization_details'])+
             '#\n'
             '_diffrn.id                     1\n'
             '_diffrn.ambient_temp           %s\n'                                               %depositDict['data_collection_temperature']+
@@ -131,12 +131,12 @@ class templates:
             '#\n'
             '_diffrn_source.diffrn_id                       1\n'
             '_diffrn_source.source                          %s\n'                               %depositDict['radiation_source']+
-            '_diffrn_source.type                            "%s"\n'                             %depositDict['radiation_source_type']+
-            '_diffrn_source.pdbx_wavelength_list            %s\n'                               %depositDict['radiation_wavelengths']+
+            '_diffrn_source.type                            "{0!s}"\n'.format(depositDict['radiation_source_type'])+
+            '_diffrn_source.pdbx_wavelength_list            {0!s}\n'.format(depositDict['radiation_wavelengths'])+
             '#\n'
             '_diffrn_detector.detector               %s\n'                                      %depositDict['radiation_detector']+
-            "_diffrn_detector.type                   '%s'\n"                                    %depositDict['radiation_detector_type']+
-            '_diffrn_detector.pdbx_collection_date   %s\n'                                      %depositDict['data_collection_date']+
+            "_diffrn_detector.type                   '{0!s}'\n".format(depositDict['radiation_detector_type'])+
+            '_diffrn_detector.pdbx_collection_date   {0!s}\n'.format(depositDict['data_collection_date'])+
             '_diffrn_detector.diffrn_id              1\n'
             '#\n'
             '_diffrn_radiation.diffrn_id                        1\n'
@@ -191,7 +191,7 @@ class templates:
             '_pdbx_contact_author.role                \n'
             '_pdbx_contact_author.organization_type   \n'
             "1 '%s' '%s' '%s' '%s' '%s' %s %s '%s' '%s' '%s' '%s' %s\n" %(depositDict['contact_author_PI_address'],depositDict['contact_author_PI_organization_name'],depositDict['contact_author_PI_city'],depositDict['contact_author_PI_State_or_Province'],depositDict['contact_author_PI_Zip_Code'],depositDict['contact_author_PI_email'],depositDict['contact_author_PI_first_name'],depositDict['contact_author_PI_last_name'],depositDict['contact_author_PI_Country'],depositDict['contact_author_PI_phone_number'],depositDict['contact_author_PI_role'],depositDict['contact_author_PI_organization_type'])+
-            "2 '%s' '%s' '%s' '%s' '%s' %s %s '%s' '%s' '%s' '%s' %s\n" %(depositDict['contact_author_address'],depositDict['contact_author_organization_name'],depositDict['contact_author_city'],depositDict['contact_author_State_or_Province'],depositDict['contact_author_Zip_Code'].replace(' ',''),depositDict['contact_author_email'],depositDict['contact_author_first_name'],depositDict['contact_author_last_name'],depositDict['contact_author_Country'],depositDict['contact_author_phone_number'],depositDict['contact_author_role'],depositDict['contact_author_organization_type'])+
+            "2 '{0!s}' '{1!s}' '{2!s}' '{3!s}' '{4!s}' {5!s} {6!s} '{7!s}' '{8!s}' '{9!s}' '{10!s}' {11!s}\n".format(depositDict['contact_author_address'], depositDict['contact_author_organization_name'], depositDict['contact_author_city'], depositDict['contact_author_State_or_Province'], depositDict['contact_author_Zip_Code'].replace(' ',''), depositDict['contact_author_email'], depositDict['contact_author_first_name'], depositDict['contact_author_last_name'], depositDict['contact_author_Country'], depositDict['contact_author_phone_number'], depositDict['contact_author_role'], depositDict['contact_author_organization_type'])+
             '#\n'
             'loop_\n'
             '_audit_author.name\n'
@@ -247,7 +247,7 @@ class update_depositTable(QtCore.QThread):
             db_dict=self.deposit_dict   # need to do this because individual fields might need updating for some xtals
 
             # try to get information about the diffraction experiment
-            diffractionExperiment=self.db.execute_statement("select DataCollectionBeamline,DataCollectionDate from mainTable where CrystalName is '%s'" %xtal)
+            diffractionExperiment=self.db.execute_statement("select DataCollectionBeamline,DataCollectionDate from mainTable where CrystalName is '{0!s}'".format(xtal))
             beamline=str(diffractionExperiment[0][0])
             date=str(diffractionExperiment[0][1])
             if beamline.lower() != 'none':
@@ -349,7 +349,15 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             if self.structureType=='ligand_bound':
                 self.Logfile.insert(xtal+' is ready for deposition')
                 self.Logfile.insert('checking refinement stage of respective PanDDA sites...')
-                panddaSites=self.db.execute_statement("select CrystalName,RefinementOutcome,PANDDA_site_event_map_mtz from panddaTable where CrystalName is '%s' and PANDDA_site_ligand_placed is 'True'" %xtal)
+
+                sqlite = (
+                    "select CrystalName,RefinementOutcome,PANDDA_site_event_map_mtz from panddaTable "
+                    "where CrystalName is '%s' and PANDDA_site_ligand_placed is 'True' and " %xtal+
+                    "(PANDDA_site_confidence like '1%' or PANDDA_site_confidence like '2%' or PANDDA_site_confidence like '3%' or PANDDA_site_confidence like '4%')"
+                )
+
+#                panddaSites=self.db.execute_statement("select CrystalName,RefinementOutcome,PANDDA_site_event_map_mtz from panddaTable where CrystalName is '%s' and PANDDA_site_ligand_placed is 'True' and (PANDDA_site_confidence like '1%' or PANDDA_site_confidence like '2%' or PANDDA_site_confidence like '3%' or PANDDA_site_confidence like '4%')" %xtal)
+                panddaSites=self.db.execute_statement(sqlite)
                 self.Logfile.insert('found '+str(len(panddaSites))+' ligands')
                 for site in panddaSites:
                     if str(site[1]).startswith('5'):
@@ -365,7 +373,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             if preparation_can_go_ahead:
                 self.depositLog.nEvents(xtal,n_eventMtz)
                 if self.structureType=='ligand_bound':
-                    ModelData=self.db.execute_statement("select RefinementPDB_latest,RefinementMTZ_latest,RefinementCIF,DataProcessingPathToLogfile,RefinementProgram,CompoundCode,CompoundSMILES,RefinementMTZfree from mainTable where CrystalName is '%s'" %xtal)
+                    ModelData=self.db.execute_statement("select RefinementPDB_latest,RefinementMTZ_latest,RefinementCIF,DataProcessingPathToLogfile,RefinementProgram,CompoundCode,CompoundSMILES,RefinementMTZfree from mainTable where CrystalName is '{0!s}'".format(xtal))
                     pdb=str(ModelData[0][0])
                     mtzFinal=str(ModelData[0][1])
                     if not os.path.isfile(mtzFinal):
@@ -381,7 +389,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                         continue
 
                 if self.structureType=='apo':
-                    ModelData=self.db.execute_statement("select DimplePathToPDB,DimplePathToMTZ,RefinementCIF,DataProcessingPathToLogfile,RefinementProgram,CompoundCode,CompoundSMILES,ProjectDirectory,RefinementMTZfree from mainTable where CrystalName is '%s'" %xtal)
+                    ModelData=self.db.execute_statement("select DimplePathToPDB,DimplePathToMTZ,RefinementCIF,DataProcessingPathToLogfile,RefinementProgram,CompoundCode,CompoundSMILES,ProjectDirectory,RefinementMTZfree from mainTable where CrystalName is '{0!s}'".format(xtal))
 
                     if os.path.isfile(os.path.join(str(ModelData[0][7]),xtal,str(ModelData[0][0]))):
                         pdb=os.path.join(str(ModelData[0][7]),xtal,str(ModelData[0][0]))
@@ -421,9 +429,9 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 if self.structureType=='ligand_bound':
                     if not os.path.isfile(cif):
                         if not os.path.isfile(os.path.join(self.projectDir,xtal,cif)):
-                            self.Logfile.insert('cannot find ligand CIF file! Please check %s and the database!' %(os.path.join(self.projectDir,xtal)))
-                            self.depositLog.text('cannot find ligand CIF file for %s; skipping... => ERROR' %xtal)
-                            self.Logfile.insert('cannot prepare mmcif files for %s; skipping... => ERROR' %xtal)
+                            self.Logfile.insert('cannot find ligand CIF file! Please check {0!s} and the database!'.format((os.path.join(self.projectDir,xtal))))
+                            self.depositLog.text('cannot find ligand CIF file for {0!s}; skipping... => ERROR'.format(xtal))
+                            self.Logfile.insert('cannot prepare mmcif files for {0!s}; skipping... => ERROR'.format(xtal))
                             self.updateFailureDict(xtal,'cannot find CIF file for ligand')
                             continue
                 log=str(ModelData[0][3])
@@ -472,7 +480,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             for mmcif in glob.glob('*.mmcif'):
                 self.Logfile.insert(xtal+' -> removing exisiting file: '+mmcif)
                 os.system('/bin/rm '+mmcif)
-                self.db.execute_statement("update depositTable set mmCIF_model_file='',mmCIF_SF_file='' where CrystalName is '%s' and StructureType is '%s'" %(xtal,self.structureType))
+                self.db.execute_statement("update depositTable set mmCIF_model_file='',mmCIF_SF_file='' where CrystalName is '{0!s}' and StructureType is '{1!s}'".format(xtal, self.structureType))
 
     def updateFailureDict(self,xtal,error):
         if xtal not in self.failureDict:
@@ -521,13 +529,13 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             data_template_dict['protein_chains']=data_template_dict['protein_chains'][:-1]
 
             if self.structureType=='ligand_bound':
-                self.Logfile.insert('creating %s file for ligand bound structure of %s' %(self.data_template_bound,xtal))
+                self.Logfile.insert('creating {0!s} file for ligand bound structure of {1!s}'.format(self.data_template_bound, xtal))
                 data_template=templates().data_template_cif(data_template_dict)
                 site_details=self.make_site_description(xtal)
                 data_template+=site_details
                 f=open(os.path.join(self.projectDir,xtal,self.data_template_bound),'w')
             elif self.structureType=='apo':
-                self.Logfile.insert('creating %s file for apo structure of %s' %(self.data_template_apo,xtal))
+                self.Logfile.insert('creating {0!s} file for apo structure of {1!s}'.format(self.data_template_apo, xtal))
                 data_template=templates().data_template_cif(data_template_dict)
                 site_details=self.make_site_description(xtal)
                 data_template+=site_details
@@ -566,16 +574,16 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
             Cmd = ( pdb_extract_init+
 #                    ' -r PHENIX'
-                    ' -r %s'            %refSoft+
+                    ' -r {0!s}'.format(refSoft)+
 #                    ' -iLOG initial.log'
-                    ' -iPDB %s'         %pdb+
+                    ' -iPDB {0!s}'.format(pdb)+
 #                    ' -i %s'            %self.data_template_dict['data_integration_software']+
 #                    ' -p %s'            %self.data_template_dict['phasing_software']+
                     ' -e MR'
                     ' -s AIMLESS'
                     ' -iLOG %s'         %log+
-                    ' -iENT %s'         %data_template+
-                    ' -o %s.mmcif > %s.mmcif.log'      %(out,out)       )
+                    ' -iENT {0!s}'.format(data_template)+
+                    ' -o {0!s}.mmcif > {1!s}.mmcif.log'.format(out, out)       )
 
             self.Logfile.insert('running pdb_extract: '+Cmd)
             os.system(Cmd)
@@ -607,7 +615,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             Cmd = ( pdb_extract_init+
                     ' -o mmcif'
                     ' -sf %s' %mtzin+
-                    ' -out %s_sf.mmcif  > %s.sf_mmcif.log' %(out,out) )
+                    ' -out {0!s}_sf.mmcif  > {1!s}.sf_mmcif.log'.format(out, out) )
 
 #            Cmd = ( os.path.join(os.getenv('XChemExplorer_DIR'),'pdb_extract/sf-convert-v1.204-prod-src/bin/sf_convert')+
 #                    ' -o mmcif'
@@ -661,21 +669,21 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                     tmpText+='_refine.pdbx_ls_cross_valid_method               THROUGHOUT \n'
 
                 elif '_refine.pdbx_starting_model' in line and starting_model == '?':
-                    tmpText+='_refine.pdbx_starting_model                      %s \n' %self.data_template_dict['pdbx_starting_model']
+                    tmpText+='_refine.pdbx_starting_model                      {0!s} \n'.format(self.data_template_dict['pdbx_starting_model'])
 
                 elif '_refine.pdbx_method_to_determine_struct' in line:
                     tmpText+="_refine.pdbx_method_to_determine_struct          'FOURIER SYNTHESIS'\n"
 
                 elif '_reflns.d_resolution_low' in line and len(line.split()) == 2:
-                    tmpText+='_reflns.d_resolution_low             %s\n' %min(low_reso_list)
+                    tmpText+='_reflns.d_resolution_low             {0!s}\n'.format(min(low_reso_list))
 
                 elif '_refine.ls_d_res_low' in line and len(line.split()) == 2:
-                    tmpText+='_refine.ls_d_res_low                             %s\n' %min(low_reso_list)
+                    tmpText+='_refine.ls_d_res_low                             {0!s}\n'.format(min(low_reso_list))
 
                 elif n == softwareLine:
                     print 'software',softwareEntry
-                    tmpText+=   (   "%s %s ? ? program ? ? 'data reduction' ? ?\n"      %(str(max(softwareEntry)+1),self.data_template_dict['data_integration_software'])+
-                                    '%s %s ? ? program ? ? phasing ? ?\n'                %(str(max(softwareEntry)+2),self.data_template_dict['phasing_software'])+
+                    tmpText+=   (   "{0!s} {1!s} ? ? program ? ? 'data reduction' ? ?\n".format(str(max(softwareEntry)+1), self.data_template_dict['data_integration_software'])+
+                                    '{0!s} {1!s} ? ? program ? ? phasing ? ?\n'.format(str(max(softwareEntry)+2), self.data_template_dict['phasing_software'])+
                                     '#\n'   )
 
                 else:
@@ -704,14 +712,14 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                     if line.startswith('_refln.crystal_id'):
                         n_eventMTZ_found+=1
                 if n_eventMTZ_found != n_eventMtz:
-                    self.Logfile.error('%s event map mtz files were specified as input, but only %s ended up in the mmcif file' %(str(n_eventMtz),str(n_eventMTZ_found)))
-                    self.depositLog.text('%s event map mtz files were specified as input, but only %s ended up in the mmcif file => ERROR' %(str(n_eventMtz),str(n_eventMTZ_found)))
-                    self.updateFailureDict(xtal,'%s event mtz in input; only %s in mmcif SF file' %(str(n_eventMtz),str(n_eventMTZ_found)))
+                    self.Logfile.error('{0!s} event map mtz files were specified as input, but only {1!s} ended up in the mmcif file'.format(str(n_eventMtz), str(n_eventMTZ_found)))
+                    self.depositLog.text('{0!s} event map mtz files were specified as input, but only {1!s} ended up in the mmcif file => ERROR'.format(str(n_eventMtz), str(n_eventMTZ_found)))
+                    self.updateFailureDict(xtal,'{0!s} event mtz in input; only {1!s} in mmcif SF file'.format(str(n_eventMtz), str(n_eventMTZ_found)))
                     foundFiles=False
                 else:
-                    self.Logfile.insert('%s event map mtz files were specified as input, %s ended up in the mmcif file, all well so far...' %(str(n_eventMtz),str(n_eventMTZ_found)))
+                    self.Logfile.insert('{0!s} event map mtz files were specified as input, {1!s} ended up in the mmcif file, all well so far...'.format(str(n_eventMtz), str(n_eventMTZ_found)))
 
-            self.Logfile.insert('editing wavelength information in SF mmcif file; changing wavelength to %s' %wavelength)
+            self.Logfile.insert('editing wavelength information in SF mmcif file; changing wavelength to {0!s}'.format(wavelength))
 
             apo = [     "data from inital refinement with DIMPLE, initial.mtz",
                         "data from original reflection, data.mtz"]
@@ -753,7 +761,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                     tmpText+=addLines
                     continue
                 if line.startswith('_diffrn_radiation_wavelength.wavelength'):
-                    tmpText+='_diffrn_radiation_wavelength.wavelength   %s\n' %wavelength
+                    tmpText+='_diffrn_radiation_wavelength.wavelength   {0!s}\n'.format(wavelength)
                 else:
                     tmpText+=line
             f=open(mmcif_sf,'w')
@@ -774,20 +782,20 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             foundFiles=False
 
         if foundFiles:
-            self.Logfile.insert('updating database with file locations for %s.mmcif and %s_sf.mmcif' %(self.out,self.out))
+            self.Logfile.insert('updating database with file locations for {0!s}.mmcif and {1!s}_sf.mmcif'.format(self.out, self.out))
             self.successDict[xtal]=[self.out+'mmcif',os.path.getsize(self.out+'.mmcif'),self.out+'_sf.mmcif',os.path.getsize(self.out+'_sf.mmcif')]
             self.success+=1
-            self.db.execute_statement("update depositTable set mmCIF_model_file='%s',mmCIF_SF_file='%s' where CrystalName is '%s' and StructureType is '%s'" %(mmcif,mmcif_sf,xtal,self.structureType))
+            self.db.execute_statement("update depositTable set mmCIF_model_file='{0!s}',mmCIF_SF_file='{1!s}' where CrystalName is '{2!s}' and StructureType is '{3!s}'".format(mmcif, mmcif_sf, xtal, self.structureType))
         else:
             self.Logfile.insert('could not find %s.mmcif and/or %s_sf.mmcif; removing empty files...')
-            os.system('/bin/rm %s.mmcif 2> /dev/null' %self.out)
-            os.system('/bin/rm %s_sf.mmcif 2> /dev/null' %self.out)
+            os.system('/bin/rm {0!s}.mmcif 2> /dev/null'.format(self.out))
+            os.system('/bin/rm {0!s}_sf.mmcif 2> /dev/null'.format(self.out))
 
         return mmcif
 
 
     def add_ligand_cif_file(self,mmcif,ligand_cif):
-        self.Logfile.insert('adding ligand cif file to %s' %mmcif)
+        self.Logfile.insert('adding ligand cif file to {0!s}'.format(mmcif))
         tmpText=''
         for line in open(mmcif):
             tmpText+=line
@@ -800,12 +808,14 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
     def make_site_description(self,xtal):
         mmcif_text='_pdbx_entry_details.nonpolymer_details\n;'
 
-        general=self.db.execute_statement("select CompoundSMILES from mainTable where CrystalName is '%s'" %xtal)
+        general=self.db.execute_statement("select CompoundSMILES from mainTable where CrystalName is '{0!s}'".format(xtal))
         smiles=str(general[0][0])
 
         if self.structureType=='apo':
+            self.Logfile.insert('SMILES string of soaked compound: {0!s}'.format(smiles))
             if smiles.lower() != 'none' or smiles.lower() != "null":
-                mmcif_text+='smiles string of soaked compound: %s;\n' %smiles
+                self.Logfile.insert('adding _pdbx_entry_details.nonpolymer_details to mmcif')
+                mmcif_text+='smiles string of soaked compound: {0!s}\n;\n'.format(smiles)
             else:
                 mmcif_text=''
 
@@ -835,7 +845,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             child1 = etree.SubElement(root, "used_for_statistical_map")
             child1.text = 'yes'
             child2 = etree.SubElement(root, "smiles_of_compound_added")
-            child2.text = '%s' %smiles
+            child2.text = '{0!s}'.format(smiles)
 
             site_descpription_complete=True
             for site in panddaSites:
@@ -859,29 +869,29 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
                 child = etree.SubElement(root, "site"+SiteIndex)
                 childa = etree.SubElement(child, "label")
-                childa.text = '%s' %label
+                childa.text = '{0!s}'.format(label)
                 childx = etree.SubElement(child, "coordinate")
-                childx.text = '%s %s %s' %(x_coord,y_coord,z_coord)
+                childx.text = '{0!s} {1!s} {2!s}'.format(x_coord, y_coord, z_coord)
                 childy = etree.SubElement(child, "smiles")
-                childy.text = '%s' %smiles
+                childy.text = '{0!s}'.format(smiles)
                 childz = etree.SubElement(child, "confidence")
-                childz.text = '%s' %confidence
+                childz.text = '{0!s}'.format(confidence)
                 childb = etree.SubElement(child, "comment")
-                childb.text = '%s' %comment
+                childb.text = '{0!s}'.format(comment)
                 childc = etree.SubElement(child, "occupancy")
-                childc.text = '%s' %occupancy
+                childc.text = '{0!s}'.format(occupancy)
                 childd = etree.SubElement(child, "B_average")
-                childd.text = '%s' %Baverage
+                childd.text = '{0!s}'.format(Baverage)
                 childe = etree.SubElement(child, "B_ratio")
-                childe.text = '%s' %Bratio
+                childe.text = '{0!s}'.format(Bratio)
                 childf = etree.SubElement(child, "RSCC")
-                childf.text = '%s' %RSCC
+                childf.text = '{0!s}'.format(RSCC)
                 childg = etree.SubElement(child, "RSR")
-                childg.text = '%s' %RSR
+                childg.text = '{0!s}'.format(RSR)
                 childh = etree.SubElement(child, "RSZD")
-                childh.text = '%s' %RSZD
+                childh.text = '{0!s}'.format(RSZD)
                 childi = etree.SubElement(child, "RMSD")
-                childi.text = '%s' %RMSD
+                childi.text = '{0!s}'.format(RMSD)
 
 #        # pretty string
             s = etree.tostring(root, pretty_print=True)
@@ -921,17 +931,17 @@ class prepare_for_group_deposition_upload(QtCore.QThread):
             mmcif=str(item[1])
             mmcif_sf=str(item[2])
             if os.path.isfile(mmcif) and os.path.isfile(mmcif_sf):
-                self.Logfile.insert('copying %s to %s' %(mmcif,self.depositDir))
-                os.system('/bin/cp %s .' %mmcif)
-                self.Logfile.insert('copying %s to %s' %(mmcif_sf,self.depositDir))
-                os.system('/bin/cp %s .' %mmcif_sf)
+                self.Logfile.insert('copying {0!s} to {1!s}'.format(mmcif, self.depositDir))
+                os.system('/bin/cp {0!s} .'.format(mmcif))
+                self.Logfile.insert('copying {0!s} to {1!s}'.format(mmcif_sf, self.depositDir))
+                os.system('/bin/cp {0!s} .'.format(mmcif_sf))
             else:
                 self.Logfile.insert('cannot find apo mmcif file for '+xtal+' => ERROR')
 
-            text = (    'label: %s-ligand_bound\n'                      %xtal+
-                        'description: ligand_bound structure of %s\n'   %xtal+
-                        'model: %s\n'                                   %mmcif[mmcif.rfind('/')+1:]+
-                        'sf: %s\n\n'                                    %mmcif_sf[mmcif_sf.rfind('/')+1:]          )
+            text = (    'label: {0!s}-ligand_bound\n'.format(xtal)+
+                        'description: ligand_bound structure of {0!s}\n'.format(xtal)+
+                        'model: {0!s}\n'.format(mmcif[mmcif.rfind('/')+1:])+
+                        'sf: {0!s}\n\n'.format(mmcif_sf[mmcif_sf.rfind('/')+1:])          )
             TextIndex+=text
 
         f = open('index.txt','w')
@@ -956,17 +966,17 @@ class prepare_for_group_deposition_upload(QtCore.QThread):
             mmcif=str(item[1])
             mmcif_sf=str(item[2])
             if os.path.isfile(mmcif) and os.path.isfile(mmcif_sf):
-                self.Logfile.insert('copying %s to %s' %(mmcif,self.depositDir))
-                os.system('/bin/cp %s .' %mmcif)
-                self.Logfile.insert('copying %s to %s' %(mmcif_sf,self.depositDir))
-                os.system('/bin/cp %s .' %mmcif_sf)
+                self.Logfile.insert('copying {0!s} to {1!s}'.format(mmcif, self.depositDir))
+                os.system('/bin/cp {0!s} .'.format(mmcif))
+                self.Logfile.insert('copying {0!s} to {1!s}'.format(mmcif_sf, self.depositDir))
+                os.system('/bin/cp {0!s} .'.format(mmcif_sf))
             else:
                 self.Logfile.insert('cannot find apo mmcif file for '+xtal+' => ERROR')
 
-            text = (    'label: %s-apo\n'                     %xtal+
-                        'description: apo structure of %s\n'  %xtal+
-                        'model: %s\n'                         %mmcif[mmcif.rfind('/')+1:]+
-                        'sf: %s\n\n'                          %mmcif_sf[mmcif_sf.rfind('/')+1:]          )
+            text = (    'label: {0!s}-apo\n'.format(xtal)+
+                        'description: apo structure of {0!s}\n'.format(xtal)+
+                        'model: {0!s}\n'.format(mmcif[mmcif.rfind('/')+1:])+
+                        'sf: {0!s}\n\n'.format(mmcif_sf[mmcif_sf.rfind('/')+1:])          )
             TextIndex+=text
 
         f = open('index.txt','w')
@@ -999,7 +1009,7 @@ class import_PDB_IDs(QtCore.QThread):
                 xtal=line[:line.rfind('-ligand_bound')].replace(' ','')
                 pdbID=line.split('/')[1].replace(' ','')
                 self.Logfile.insert('setting PDB ID for '+xtal+' to '+pdbID)
-                sqlite="UPDATE mainTable SET Deposition_PDB_ID='%s',RefinementOutcome='6 - Deposited' where CrystalName is '%s';" %(pdbID,xtal)
+                sqlite="UPDATE mainTable SET Deposition_PDB_ID='{0!s}',RefinementOutcome='6 - Deposited' where CrystalName is '{1!s}';".format(pdbID, xtal)
                 self.db.execute_statement(sqlite)
 
 
@@ -1032,13 +1042,13 @@ class compare_smiles_in_db_with_ligand_in_pdb(QtCore.QThread):
 
         for xtal in sorted(glob.glob('*')):
             if os.path.isfile(os.path.join(xtal,'refine.pdb')):
-                smiles=self.db.execute_statement("select CompoundSmiles,CompoundCode from mainTable where CrystalName is '%s'" %xtal)
+                smiles=self.db.execute_statement("select CompoundSmiles,CompoundCode from mainTable where CrystalName is '{0!s}'".format(xtal))
                 try:
                     LigandSmiles=str(smiles[0][0])
                     LigandCode=str(smiles[0][1])
                     elementDict_smiles=smilestools(LigandSmiles).ElementDict()
                 except IndexError:
-                    self.Logfile.error("%s: something is seems to be wrong with the CompoundCode or SMILES string: %s" %(xtal,str(smiles)))
+                    self.Logfile.error("{0!s}: something is seems to be wrong with the CompoundCode or SMILES string: {1!s}".format(xtal, str(smiles)))
                     continue
 
                 pdb=pdbtools(os.path.join(xtal,'refine.pdb'))
@@ -1051,8 +1061,8 @@ class compare_smiles_in_db_with_ligand_in_pdb(QtCore.QThread):
                     elementDict_ligand=pdb.ElementDict(resname,chainID,resseq,altLoc)
                     for element in elementDict_ligand:
                         if elementDict_ligand[element] != elementDict_smiles[element]:
-                            self.Logfile.error('%s: %s %s %s %s contains different number of atoms than smiles in DB: %s -> %s' %(xtal,resname,chainID,resseq,altLoc,LigandSmiles,LigandCode))
-                            self.update_ErrorDict(xtal, '%s %s %s %s contains different number of atoms than smiles in DB' %(resname,chainID,resseq,altLoc))
+                            self.Logfile.error('{0!s}: {1!s} {2!s} {3!s} {4!s} contains different number of atoms than smiles in DB: {5!s} -> {6!s}'.format(xtal, resname, chainID, resseq, altLoc, LigandSmiles, LigandCode))
+                            self.update_ErrorDict(xtal, '{0!s} {1!s} {2!s} {3!s} contains different number of atoms than smiles in DB'.format(resname, chainID, resseq, altLoc))
                             break
 
 

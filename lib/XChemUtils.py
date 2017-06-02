@@ -82,7 +82,7 @@ class process:
                     'EOF\n'
                     '\n'
                     'freerflag hklin cad.mtz hklout ../%s > freerflag.log\n' %self.mtz_free +
-                    '#uniqueify cad.mtz ../%s\n' %self.mtz_free
+                    '#uniqueify cad.mtz ../{0!s}\n'.format(self.mtz_free)
                     )
 #            os.chdir(os.path.join(self.project_directory,self.xtalID))
 #            os.system(Cmds)
@@ -90,21 +90,21 @@ class process:
             return Cmds
 
     def dimple(self):
-        os.chdir('%s/%s' %(self.project_directory,self.xtalID))
+        os.chdir('{0!s}/{1!s}'.format(self.project_directory, self.xtalID))
         generate_Rfree_Cmds=''
-        if os.path.isdir('%s/%s/Dimple' %(self.project_directory,self.xtalID)):
+        if os.path.isdir('{0!s}/{1!s}/Dimple'.format(self.project_directory, self.xtalID)):
             # this 'if not' step is usually not necessary; only if process was stopped in an odd way
             if not os.path.isfile(self.project_directory+'/'+self.xtalID+'/'+self.mtz_free):
                 generate_Rfree_Cmds=self.get_Rfree()
             if self.delete_old==True:
                 os.system('rm -fr Dimple')
-                os.mkdir('%s/%s/Dimple' %(self.project_directory,self.xtalID))
+                os.mkdir('{0!s}/{1!s}/Dimple'.format(self.project_directory, self.xtalID))
             else:
                 return None
         else:
-            os.mkdir('%s/%s/Dimple' %(self.project_directory,self.xtalID))
+            os.mkdir('{0!s}/{1!s}/Dimple'.format(self.project_directory, self.xtalID))
             generate_Rfree_Cmds=self.get_Rfree()
-            os.chdir('%s/%s/Dimple' %(self.project_directory,self.xtalID))
+            os.chdir('{0!s}/{1!s}/Dimple'.format(self.project_directory, self.xtalID))
 
         if self.queueing_system_available:
             top_line='#PBS -joe -N XCE_dimple'
@@ -130,7 +130,7 @@ class process:
             ref_lib=''
 
         Cmds = (
-                '%s\n' %top_line+
+                '{0!s}\n'.format(top_line)+
                 generate_Rfree_Cmds+
                 '\n'
                 'cd %s/%s/Dimple\n' %(self.project_directory,self.xtalID) +
@@ -214,22 +214,22 @@ class helpers:
         software=''
         if restraints_program=='acedrg':
             if os.path.isfile(os.path.join(initial_model_directory,sample,'old.cif')):
-                software='acedrg --res LIG -c ../old.cif -o %s\n' %(compoundID.replace(' ',''))
+                software='acedrg --res LIG -c ../old.cif -o {0!s}\n'.format((compoundID.replace(' ','')))
             else:
-                software='acedrg --res LIG -i "%s" -o %s\n' %(smiles,compoundID.replace(' ',''))
+                software='acedrg --res LIG -i "{0!s}" -o {1!s}\n'.format(smiles, compoundID.replace(' ',''))
         elif restraints_program=='phenix.elbow':
             if os.path.isfile(os.path.join(initial_model_directory,sample,'old.cif')):
-                software='phenix.elbow --file=../old.cif --id LIG --output %s\n' %(compoundID.replace(' ',''))
+                software='phenix.elbow --file=../old.cif --id LIG --output {0!s}\n'.format((compoundID.replace(' ','')))
             else:
-                software='phenix.elbow --smiles="%s" --id LIG --output %s\n' %(smiles,compoundID.replace(' ',''))
+                software='phenix.elbow --smiles="{0!s}" --id LIG --output {1!s}\n'.format(smiles, compoundID.replace(' ',''))
         elif restraints_program=='grade':
             if os.getcwd().startswith('/dls'):
                 software+='module load buster\n'
             software+="export BDG_TOOL_OBABEL='none'\n"
             if os.path.isfile(os.path.join(initial_model_directory,sample,'old.cif')):
-                software+='grade -resname LIG -nomogul -in ../old.cif -ocif %s.cif -opdb %s.pdb\n' %(compoundID.replace(' ',''),compoundID.replace(' ',''))
+                software+='grade -resname LIG -nomogul -in ../old.cif -ocif {0!s}.cif -opdb {1!s}.pdb\n'.format(compoundID.replace(' ',''), compoundID.replace(' ',''))
             else:
-                software+='grade -resname LIG -nomogul "%s" -ocif %s.cif -opdb %s.pdb\n' %(smiles,compoundID.replace(' ',''),compoundID.replace(' ',''))
+                software+='grade -resname LIG -nomogul "{0!s}" -ocif {1!s}.cif -opdb {2!s}.pdb\n'.format(smiles, compoundID.replace(' ',''), compoundID.replace(' ',''))
 
         Cmds = (
                     header+
@@ -241,7 +241,7 @@ class helpers:
                     '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(os.path.join(database_directory,data_source_file),sample,'RefinementCIFStatus','running') +
                     '\n'
                     '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','create_png_of_compound.py')+
-                    ' "%s" %s %s %s\n' %(smiles,compoundID.replace(' ',''),sample,initial_model_directory)+
+                    ' "{0!s}" {1!s} {2!s} {3!s}\n'.format(smiles, compoundID.replace(' ',''), sample, initial_model_directory)+
                     '\n'
                     'cd '+os.path.join(initial_model_directory,sample,'compound')+'\n'
                     '\n'
@@ -250,20 +250,20 @@ class helpers:
                     'cd '+os.path.join(initial_model_directory,sample)+'\n'
                     '\n'
                     'ln -s compound/%s.cif .\n' %compoundID.replace(' ','')+
-                    'ln -s compound/%s.pdb .\n' %compoundID.replace(' ','')+
-                    'ln -s compound/%s.png .\n' %compoundID.replace(' ','')+
+                    'ln -s compound/{0!s}.pdb .\n'.format(compoundID.replace(' ',''))+
+                    'ln -s compound/{0!s}.png .\n'.format(compoundID.replace(' ',''))+
                     '\n'
                     '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_for_new_cif_files.py')+
-                    ' %s %s %s %s\n' %(os.path.join(database_directory,data_source_file),sample,initial_model_directory,compoundID.replace(' ','') )+
+                    ' {0!s} {1!s} {2!s} {3!s}\n'.format(os.path.join(database_directory,data_source_file), sample, initial_model_directory, compoundID.replace(' ','') )+
                     '\n'
                     '/bin/rm compound/RESTRAINTS_IN_PROGRESS\n'
             )
         os.chdir(ccp4_scratch_directory)
-        Logfile.insert('creating ACEDRG shell script for %s,%s in %s' %(sample,compoundID,ccp4_scratch_directory))
-        f = open('xce_acedrg_%s.sh' %str(counter),'w')
+        Logfile.insert('creating ACEDRG shell script for {0!s},{1!s} in {2!s}'.format(sample, compoundID, ccp4_scratch_directory))
+        f = open('xce_acedrg_{0!s}.sh'.format(str(counter)),'w')
         f.write(Cmds)
         f.close()
-        os.system('chmod +x xce_acedrg_%s.sh' %str(counter))
+        os.system('chmod +x xce_acedrg_{0!s}.sh'.format(str(counter)))
 
 
 
@@ -1517,7 +1517,7 @@ class pdbtools(object):
             if line.startswith('ATOM') and line[17:20] in self.AminoAcids:
                 if line[21:22] not in chain:
                     chain.append(line[21:22])
-                    Sequence=Sequence+'\n>chain%s.\n' %line[21:22]
+                    Sequence=Sequence+'\n>chain{0!s}.\n'.format(line[21:22])
                     ResiNum=[]
                 if line[13:15]=='CA' and line[22:27] not in ResiNum:
                     Sequence=Sequence+self.AAdict[line[17:20]]
@@ -1629,8 +1629,8 @@ class pdbtools(object):
             '#!/bin/csh -f\n'
             'matthews_coef << eof\n'
             ' cell %s\n' %(symm[0]+' '+symm[1]+' '+symm[2]+' '+symm[3]+' '+symm[4]+' '+symm[5])+
-            ' symm %s\n' %symm[6].replace(' ','')+
-            ' nres %s\n' %nres+
+            ' symm {0!s}\n'.format(symm[6].replace(' ',''))+
+            ' nres {0!s}\n'.format(nres)+
             ' auto\n'
             ' end\n'
             'eof\n'
@@ -1672,7 +1672,7 @@ class pdbtools(object):
                         pdb+=line
                     if (line.startswith('ATOM') or line.startswith('HETATM')) and line[17:20]==item[0] and line[21:22]==item[1] and line[23:26]==item[2]:
                         pdb=pdb+line
-                f=open('ligand_%s.pdb' %n,'w')
+                f=open('ligand_{0!s}.pdb'.format(n),'w')
                 f.write(pdb)
                 f.close()
         return Ligands
@@ -1687,7 +1687,7 @@ class pdbtools(object):
                         pdb+=line
                     if (line.startswith('ATOM') or line.startswith('HETATM')) and line[17:20]==item[0] and line[21:22]==item[1] and line[23:26]==item[2]:
                         pdb=pdb+line
-                f=open(os.path.join(outDir,'ligand_%s.pdb' %n),'w')
+                f=open(os.path.join(outDir,'ligand_{0!s}.pdb'.format(n)),'w')
                 f.write(pdb)
                 f.close()
         return Ligands
@@ -1721,7 +1721,7 @@ class pdbtools(object):
                     pdb=pdb+line
 
         if pdb != '':
-            f=open('%s/ligand_%s_%s_%s_%s.pdb' %(outDir,str(resname),str(chainID),str(resseq),str(altLoc)),'w')
+            f=open('{0!s}/ligand_{1!s}_{2!s}_{3!s}_{4!s}.pdb'.format(outDir, str(resname), str(chainID), str(resseq), str(altLoc)),'w')
             f.write(pdb)
             f.close()
 
@@ -1978,8 +1978,8 @@ class pdbtools(object):
         outPDB=os.path.join(outDir,root+'_sym.pdb')
         pdbset = (  '#!'+os.getenv('SHELL')+'\n'
                     'pdbset xyzin %s xyzout %s << eof\n' %(self.pdb,outPDB)+
-                    'cell %s\n'    %(str(','.join(unit_cell)))+
-                    'spacegroup %s\n' %spg  )
+                    'cell {0!s}\n'.format((str(','.join(unit_cell))))+
+                    'spacegroup {0!s}\n'.format(spg)  )
         for op in symop:
             pdbset+='SYMGEN '+','.join(op)+'\n'
         pdbset+='eof\n'
@@ -1993,8 +1993,8 @@ class pdbtools(object):
         root=pdbIN[pdbIN.rfind('/')+1:pdbIN.rfind('.')]
         pdbset = (  '#!'+os.getenv('SHELL')+'\n'
                     'pdbset xyzin %s xyzout %s/%s_0.pdb << eof\n' %(pdbIN,outDir,root)+
-                    'cell %s\n'    %(str(','.join(unit_cell)))+
-                    'spacegroup %s\n' %spg  )
+                    'cell {0!s}\n'.format((str(','.join(unit_cell))))+
+                    'spacegroup {0!s}\n'.format(spg)  )
         for op in symop:
             pdbset+='SYMGEN '+','.join(op)+'\n'
         pdbset+='eof\n'
@@ -2014,8 +2014,8 @@ class pdbtools(object):
         root=pdbIN[pdbIN.rfind('/')+1:pdbIN.rfind('.')]
         pdbset = (  '#!'+os.getenv('SHELL')+'\n'
                     'pdbset xyzin %s xyzout %s/out.pdb << eof  2> /dev/null\n' %(pdbIN,outDir)+
-                    'cell %s\n'    %(str(','.join(unit_cell)))+
-                    'spacegroup %s\n' %spg  )
+                    'cell {0!s}\n'.format((str(','.join(unit_cell))))+
+                    'spacegroup {0!s}\n'.format(spg)  )
         for op in symop:
             pdbset+='SYMGEN '+','.join(op)+'\n'
         pdbset+='eof\n'
@@ -2089,9 +2089,9 @@ class pdbtools(object):
         for n,shift in enumerate(translations):
             pdbset = (  '#!'+os.getenv('SHELL')+'\n'
                         'pdbset xyzin %s/%s.pdb xyzout %s/%s_%s.pdb << eof  2> /dev/null\n' %(outDir,root,outDir,root,str(n+1))+
-                        'cell %s\n'    %(str(','.join(unit_cell)))+
-                        'spacegroup %s\n' %spg+
-                        'shift fractional %s\n' %str(shift).replace('[','').replace(']','')+
+                        'cell {0!s}\n'.format((str(','.join(unit_cell))))+
+                        'spacegroup {0!s}\n'.format(spg)+
+                        'shift fractional {0!s}\n'.format(str(shift).replace('[','').replace(']',''))+
                         'eof\n'            )
             print 'pdinin',pdbIN
             print 'outdir',outDir
@@ -2196,7 +2196,7 @@ class maptools(object):
             'p4132': 213, 'i4132': 214        }
 
         self.map=map
-        cmd = ( 'mapdump mapin %s << eof\n' %self.map+
+        cmd = ( 'mapdump mapin {0!s} << eof\n'.format(self.map)+
                 'end\n'
                 'eof'   )
         mapdump=subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE)

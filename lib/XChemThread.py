@@ -60,7 +60,7 @@ class update_datasource_from_file_system(QtCore.QThread):
             xtal=directory[directory.rfind('/')+1:]
             if xtal not in all_samples_in_datasource:
                 self.Logfile.insert('inserting '+xtal+' into data source')
-                self.db.execute_statement("insert into mainTable (CrystalName) values ('%s');" %xtal)
+                self.db.execute_statement("insert into mainTable (CrystalName) values ('{0!s}');".format(xtal))
                 all_samples_in_datasource.append(xtal)
             compoundID=str(self.db.get_value_from_field(xtal,'CompoundCode')[0])
             db_dict={}
@@ -157,23 +157,23 @@ class update_datasource_from_file_system(QtCore.QThread):
                 self.db.update_data_source(xtal,db_dict)
 
             # also need to update PANDDA table...
-            pandda_models=self.db.execute_statement("select CrystalName,PANDDA_site_index,PANDDA_site_spider_plot,PANDDA_site_event_map from panddaTable where CrystalName='%s'" %xtal)
+            pandda_models=self.db.execute_statement("select CrystalName,PANDDA_site_index,PANDDA_site_spider_plot,PANDDA_site_event_map from panddaTable where CrystalName='{0!s}'".format(xtal))
             if not pandda_models == []:
                 for entry in pandda_models:
                     db_pandda_dict={}
                     db_pandda_dict['PANDDA_site_index']=entry[1]
                     db_pandda_dict['PANDDApath']=self.panddas_directory
-                    if entry[3] != None:
+                    if entry[3] is not None:
                         event_map=os.path.join(self.initial_model_directory,xtal,entry[3].split('/')[len(entry[3].split('/'))-1])
                         if os.path.isfile(event_map):
                             db_pandda_dict['PANDDA_site_event_map']=event_map
-                    if entry[2] != None:
+                    if entry[2] is not None:
                         spider_plot=os.path.join(self.initial_model_directory,xtal,entry[2].split('/')[len(entry[2].split('/'))-3],entry[2].split('/')[len(entry[2].split('/'))-2],entry[2].split('/')[len(entry[2].split('/'))-1])
                         if os.path.isfile(spider_plot):
                             db_pandda_dict['PANDDA_site_spider_plot']=spider_plot
 #                            db_pandda_dict['RefinementOutcome']='3 - In Refinement'    # just in case; presence of a spider plot definitely signals that refinement happened
                                                                                         # should probably be not updated! Will overwrite CompChem ready
-                    self.Logfile.insert('updating panddaTable for xtal: %s, site: %s' %(entry[0],entry[1]))
+                    self.Logfile.insert('updating panddaTable for xtal: {0!s}, site: {1!s}'.format(entry[0], entry[1]))
                     self.db.update_insert_panddaTable(xtal,db_pandda_dict)
 
             progress += progress_step
@@ -238,7 +238,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
             os.chdir(os.path.join(self.initial_model_directory,xtal))
             if xtal not in self.all_samples_in_datasource:
                 self.Logfile.insert('sampleID not found in database: inserting '+xtal)
-                self.db.execute_statement("insert into mainTable (CrystalName) values ('%s');" %xtal)
+                self.db.execute_statement("insert into mainTable (CrystalName) values ('{0!s}');".format(xtal))
                 self.all_samples_in_datasource.append(xtal)
 
             db_dict=self.db.get_db_dict_for_sample(xtal)
@@ -274,7 +274,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
     def change_absolute_to_relative_links(self,target,filename):
         os.unlink(filename)
         os.symlink(os.path.relpath(target),filename)
-        self.Logfile.insert('%s -> %s' %(os.readlink(filename),target))
+        self.Logfile.insert('{0!s} -> {1!s}'.format(os.readlink(filename), target))
 
     def find_file(self,filename,xtal):
         found_file=False
@@ -293,11 +293,11 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                             found_file=True
                         else:
                             self.Logfile.insert('removing broken link: '+filename)
-                            os.system('/bin/rm %s 2> /dev/null' %filename)
+                            os.system('/bin/rm {0!s} 2> /dev/null'.format(filename))
                     else:
                         if not os.path.isfile(link):
                             self.Logfile.insert('removing broken link: '+filename)
-                            os.system('/bin/rm %s 2> /dev/null' %filename)
+                            os.system('/bin/rm {0!s} 2> /dev/null'.format(filename))
                         else:
                             found_file=True
                 except OSError:
@@ -426,8 +426,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
             db_dict['RefinementCIF']=os.path.realpath(compoundID+'.cif').replace(os.getcwd()+'/','')
             db_dict['RefinementCIFStatus']='restraints generated'
         else:
-            os.system('/bin/rm %s.cif 2> /dev/null' %compoundID)
-            os.system('/bin/rm compound/%s.cif 2> /dev/null' %compoundID)
+            os.system('/bin/rm {0!s}.cif 2> /dev/null'.format(compoundID))
+            os.system('/bin/rm compound/{0!s}.cif 2> /dev/null'.format(compoundID))
             db_dict['RefinementCIF']=''
             db_dict['RefinementCIFStatus']='pending'
 
@@ -449,12 +449,12 @@ class synchronise_db_and_filesystem(QtCore.QThread):
             db_dict['RefinementCIFStatus']='missing smiles'
 
         if not os.path.isfile(compoundID+'.pdb') or  os.path.getsize(compoundID+'.pdb') < 20:
-            os.system('/bin/rm %s.pdb 2> /dev/null' %compoundID)
-            os.system('/bin/rm compound/%s.pdb 2> /dev/null' %compoundID)
+            os.system('/bin/rm {0!s}.pdb 2> /dev/null'.format(compoundID))
+            os.system('/bin/rm compound/{0!s}.pdb 2> /dev/null'.format(compoundID))
 
         if not os.path.isfile(compoundID+'.png') or  os.path.getsize(compoundID+'.png') < 20:
-            os.system('/bin/rm %s.png 2> /dev/null' %compoundID)
-            os.system('/bin/rm compound/%s.png 2> /dev/null' %compoundID)
+            os.system('/bin/rm {0!s}.png 2> /dev/null'.format(compoundID))
+            os.system('/bin/rm compound/{0!s}.png 2> /dev/null'.format(compoundID))
 
         return db_dict
 
@@ -717,7 +717,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                 event_index=entry[2]
                 panddaPATH=entry[6]
                 apoStructures=entry[7]
-                self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'checking %s -> site %s -> event %s ' %(xtal,site_index,event_index))
+                self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'checking {0!s} -> site {1!s} -> event {2!s} '.format(xtal, site_index, event_index))
                 self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
                 progress += progress_step
 
@@ -788,10 +788,10 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                 if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'refine.pdb')):
                     ligands_in_file=pdbtools(os.path.join(self.initial_model_directory,xtal,'refine.pdb')).find_xce_ligand_details()
                     if ligands_in_file == []:
-                        self.Logfile.warning('%s: could not find any ligands in refine.pdb' %xtal)
+                        self.Logfile.warning('{0!s}: could not find any ligands in refine.pdb'.format(xtal))
                         continue
                     else:
-                        self.Logfile.insert('%s: found the following ligands in refine.pdb: %s' %(xtal,str(ligands_in_file)))
+                        self.Logfile.insert('{0!s}: found the following ligands in refine.pdb: {1!s}'.format(xtal, str(ligands_in_file)))
 
                     distanceList=[]
                     for ligand in ligands_in_file:
@@ -802,7 +802,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                         residue_xyz = pdbtools(os.path.join(self.initial_model_directory,xtal,'refine.pdb')).get_center_of_gravity_of_residue_ish(residue_chain, residue_number)
                         distance = misc().calculate_distance_between_coordinates(residue_xyz[0], residue_xyz[1],residue_xyz[2],event_x, event_y,event_z)
                         distanceList.append([distance,residue_name,residue_chain,residue_number,residue_altLoc])
-                        self.Logfile.insert('%s: calculating distance between event and ligand (%s %s %s): %s' %(xtal,residue_name,residue_chain,residue_number,str(distance)))
+                        self.Logfile.insert('{0!s}: calculating distance between event and ligand ({1!s} {2!s} {3!s}): {4!s}'.format(xtal, residue_name, residue_chain, residue_number, str(distance)))
 
                     # now take the ligand that is closest to the event
                     try:
@@ -815,7 +815,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                     residue_chain =     smallestDistance[2]
                     residue_number =    smallestDistance[3]
                     residue_altLoc =    smallestDistance[4]
-                    self.Logfile.insert('%s: ligand with the shorted distance (%sA) to the current event (id: %s): %s %s %s %s' %(xtal,str(distance),event_index,residue_name,residue_chain,residue_number,residue_altLoc))
+                    self.Logfile.insert('{0!s}: ligand with the shorted distance ({1!s}A) to the current event (id: {2!s}): {3!s} {4!s} {5!s} {6!s}'.format(xtal, str(distance), event_index, residue_name, residue_chain, residue_number, residue_altLoc))
                     db_pandda_dict['PANDDA_site_ligand_resname'] = residue_name
                     db_pandda_dict['PANDDA_site_ligand_chain'] = residue_chain
                     db_pandda_dict['PANDDA_site_ligand_sequence_number'] = residue_number
@@ -846,7 +846,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                 if db_pandda_dict != {}:
 #            self.db.update_panddaTable(xtal, site_index, db_pandda_dict)
                     self.db.update_site_event_panddaTable(xtal, site_index, event_index, db_pandda_dict)
-                    self.Logfile.insert('updating panddaTable for xtal: %s, site: %s' %(xtal,site_index))
+                    self.Logfile.insert('updating panddaTable for xtal: {0!s}, site: {1!s}'.format(xtal, site_index))
 
 #                progress += progress_step
 #                self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
@@ -885,7 +885,7 @@ class create_png_and_cif_of_compound(QtCore.QThread):
             compoundID=item[1]
             smiles=item[2]
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'creating ACEDRG shell script for '+sampleID)
-            if compoundID=='' or compoundID==None:
+            if compoundID=='' or compoundID is None:
                 compoundID='compound'
 
             if not os.path.isdir(os.path.join(self.initial_model_directory,sampleID)):
@@ -908,8 +908,8 @@ class create_png_and_cif_of_compound(QtCore.QThread):
                     os.system('/bin/rm -fr '+os.path.join(self.initial_model_directory,sampleID,'compound'))
                     db_dict={}
                     db_dict['RefinementCIFStatus']='pending'
-                    self.Logfile.insert('%s: removed compound directory and all its contents' %sampleID)
-                    self.Logfile.insert('%s: setting RefinementCIFStatus flag to started' %sampleID)
+                    self.Logfile.insert('{0!s}: removed compound directory and all its contents'.format(sampleID))
+                    self.Logfile.insert('{0!s}: setting RefinementCIFStatus flag to started'.format(sampleID))
                     self.db.update_data_source(sampleID,db_dict)
 
             # create 'compound' directory if not present
@@ -942,7 +942,7 @@ class create_png_and_cif_of_compound(QtCore.QThread):
                 db_dict={}
                 db_dict['RefinementCIFprogram']=self.restraints_program
                 db_dict['RefinementCIFStatus']='started'
-                self.Logfile.insert('%s: setting RefinementCIFStatus flag to started' %sampleID)
+                self.Logfile.insert('{0!s}: setting RefinementCIFStatus flag to started'.format(sampleID))
                 self.db.update_data_source(sampleID,db_dict)
 
             progress += progress_step
@@ -965,21 +965,21 @@ class create_png_and_cif_of_compound(QtCore.QThread):
                     f.close()
                     self.Logfile.insert('submitting array job with maximal 100 jobs running on cluster')
                     self.Logfile.insert('using the following command:')
-                    self.Logfile.insert('         qsub -P labxchem -t 1:%s -tc %s acedrg_master.sh' %(str(counter),self.max_queue_jobs))
-                    os.system('qsub -P labxchem -t 1:%s -tc %s acedrg_master.sh' %(str(counter),self.max_queue_jobs))
+                    self.Logfile.insert('         qsub -P labxchem -t 1:{0!s} -tc {1!s} acedrg_master.sh'.format(str(counter), self.max_queue_jobs))
+                    os.system('qsub -P labxchem -t 1:{0!s} -tc {1!s} acedrg_master.sh'.format(str(counter), self.max_queue_jobs))
                 else:
                     self.Logfile.insert("cannot start ARRAY job: make sure that 'module load global/cluster' is in your .bashrc or .cshrc file")
             elif self.external_software['qsub']:
-                self.Logfile.insert('submitting %s individual jobs to cluster' %(str(counter)))
+                self.Logfile.insert('submitting {0!s} individual jobs to cluster'.format((str(counter))))
                 self.Logfile.insert('WARNING: this could potentially lead to a crash...')
                 for i in range(counter):
-                    self.Logfile.insert('qsub xce_acedrg_%s.sh' %(str(i+1)))
-                    os.system('qsub xce_acedrg_%s.sh' %(str(i+1)))
+                    self.Logfile.insert('qsub xce_acedrg_{0!s}.sh'.format((str(i+1))))
+                    os.system('qsub xce_acedrg_{0!s}.sh'.format((str(i+1))))
             else:
                 self.Logfile.insert('running %s consecutive ACEDRG jobs on your local machine')
                 for i in range(counter):
-                    self.Logfile.insert('starting xce_acedrg_%s.sh' %(str(i+1)))
-                    os.system('./xce_acedrg_%s.sh' %(str(i+1)))
+                    self.Logfile.insert('starting xce_acedrg_{0!s}.sh'.format((str(i+1))))
+                    os.system('./xce_acedrg_{0!s}.sh'.format((str(i+1))))
 
 #        self.emit(QtCore.SIGNAL("finished()"))
         self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
@@ -1030,10 +1030,10 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             if os.path.isfile(ref_mtz):
                 mtz_column_dict=mtztools(ref_mtz).get_all_columns_as_dict()
                 if 'FreeR_flag' not in mtz_column_dict['RFREE']:
-                    self.Logfile.insert('cannot find FreeR_flag in reference mtz file: %s -> ignoring reference mtzfile!!!' %ref_mtz)
+                    self.Logfile.insert('cannot find FreeR_flag in reference mtz file: {0!s} -> ignoring reference mtzfile!!!'.format(ref_mtz))
                     ref_mtz = ''
                     if mtz_column_dict['RFREE'] != []:
-                        self.Logfile.insert('found Rfree set with other column name though: %s' %str(mtz_column_dict['RFREE']))
+                        self.Logfile.insert('found Rfree set with other column name though: {0!s}'.format(str(mtz_column_dict['RFREE'])))
                         self.Logfile.insert('try renaming Rfree column to FreeR_flag with CAD!')
 
 
@@ -1068,7 +1068,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
 
             if 'dimple_rerun_on_selected_file' in visit_run_autoproc:
                 additional_cmds = (
-                            'cd %s\n' %os.path.join(self.initial_model_directory,xtal) +
+                            'cd {0!s}\n'.format(os.path.join(self.initial_model_directory,xtal)) +
                             '/bin/rm dimple.pdb\n'
                             'ln -s dimple/dimple_rerun_on_selected_file/dimple/final.pdb dimple.pdb\n'
                             '/bin/rm dimple.mtz\n'
@@ -1079,7 +1079,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                             'ln -s dimple/dimple_rerun_on_selected_file/dimple/fofc.map .\n'
                             '\n'
                             '$CCP4/libexec/python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_for_new_dimple_pdb.py')+
-                            ' %s %s %s\n' %(os.path.join(self.database_directory,self.data_source_file),xtal,self.initial_model_directory)  )
+                            ' {0!s} {1!s} {2!s}\n'.format(os.path.join(self.database_directory,self.data_source_file), xtal, self.initial_model_directory)  )
 
             else:
                 additional_cmds=''
@@ -1087,7 +1087,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
 
 
             Cmds = (
-                    '%s\n' %top_line+
+                    '{0!s}\n'.format(top_line)+
                     '\n'
                     'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
                     '\n'
@@ -1122,13 +1122,13 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     )
 
             os.chdir(self.ccp4_scratch_directory)
-            f = open('xce_dimple_%s.sh' %str(n+1),'w')
+            f = open('xce_dimple_{0!s}.sh'.format(str(n+1)),'w')
             f.write(Cmds)
             f.close()
-            os.system('chmod +x xce_dimple_%s.sh' %str(n+1))
+            os.system('chmod +x xce_dimple_{0!s}.sh'.format(str(n+1)))
             db_dict={}
             db_dict['DimpleStatus']='started'
-            self.Logfile.insert('%s: setting DataProcessingStatus flag to started' %xtal)
+            self.Logfile.insert('{0!s}: setting DataProcessingStatus flag to started'.format(xtal))
             db.update_data_source(xtal,db_dict)
 
 
@@ -1150,21 +1150,21 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                 f.close()
                 self.Logfile.insert('submitting array job with maximal 100 jobs running on cluster')
                 self.Logfile.insert('using the following command:')
-                self.Logfile.insert('qsub -P labxchem -t 1:%s -tc %s dimple_master.sh' %(str(n+1),self.max_queue_jobs))
-                os.system('qsub -P labxchem -t 1:%s -tc %s dimple_master.sh' %(str(n+1),self.max_queue_jobs))
+                self.Logfile.insert('qsub -P labxchem -t 1:{0!s} -tc {1!s} dimple_master.sh'.format(str(n+1), self.max_queue_jobs))
+                os.system('qsub -P labxchem -t 1:{0!s} -tc {1!s} dimple_master.sh'.format(str(n+1), self.max_queue_jobs))
             else:
                 self.Logfile.insert("cannot start ARRAY job: make sure that 'module load global/cluster' is in your .bashrc or .cshrc file")
         elif self.external_software['qsub']:
-            self.Logfile.insert('submitting %s individual jobs to cluster' %(str(n+1)))
+            self.Logfile.insert('submitting {0!s} individual jobs to cluster'.format((str(n+1))))
             self.Logfile.insert('WARNING: this could potentially lead to a crash...')
             for i in range(n+1):
-                self.Logfile.insert('qsub xce_dimple_%s.sh' %(str(i+1)))
-                os.system('qsub xce_dimple_%s.sh' %(str(i+1)))
+                self.Logfile.insert('qsub xce_dimple_{0!s}.sh'.format((str(i+1))))
+                os.system('qsub xce_dimple_{0!s}.sh'.format((str(i+1))))
         else:
             self.Logfile.insert('running %s consecutive DIMPLE jobs on your local machine')
             for i in range(n+1):
-                self.Logfile.insert('starting xce_dimple_%s.sh' %(str(i+1)))
-                os.system('./xce_dimple_%s.sh' %(str(i+1)))
+                self.Logfile.insert('starting xce_dimple_{0!s}.sh'.format((str(i+1))))
+                os.system('./xce_dimple_{0!s}.sh'.format((str(i+1))))
 
         self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
 
@@ -1199,7 +1199,7 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
         self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
         os.chdir(self.ccp4_scratch_directory)
-        os.system('/bin/rm -f xce_%s*sh' %self.pipeline)
+        os.system('/bin/rm -f xce_{0!s}*sh'.format(self.pipeline))
 
 
         for item in sorted(self.sample_list):
@@ -1264,7 +1264,7 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
         os.system('/bin/rm final.pdb 2> /dev/null')
 
         if self.queueing_system_available:
-            top_line='#PBS -joe -N XCE_%s\n' %self.pipeline
+            top_line='#PBS -joe -N XCE_{0!s}\n'.format(self.pipeline)
         else:
             top_line='#!'+os.getenv('SHELL')+'\n'
 
@@ -1279,7 +1279,7 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
             ccp4_scratch+='module load phenix\n'
 
         Cmds = (
-                '%s\n' %top_line+
+                '{0!s}\n'.format(top_line)+
                 '\n'
                 'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
                 '\n'
@@ -1315,20 +1315,20 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
                 'EOF\n'
                 '\n'
                 '$CCP4/libexec/python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_for_new_dimple_pdb.py')+
-                ' %s %s %s\n' %(os.path.join(self.database_directory,self.data_source_file),xtal,self.initial_model_directory)+
+                ' {0!s} {1!s} {2!s}\n'.format(os.path.join(self.database_directory,self.data_source_file), xtal, self.initial_model_directory)+
                 '\n'
                 '/bin/rm dimple_run_in_progress\n'
                 )
 
         os.chdir(self.ccp4_scratch_directory)
-        f = open('xce_%s_%s.sh' %(self.pipeline,str(n+1)),'w')
+        f = open('xce_{0!s}_{1!s}.sh'.format(self.pipeline, str(n+1)),'w')
         f.write(Cmds)
         f.close()
         self.n+=1
-        os.system('chmod +x xce_%s_%s.sh' %(self.pipeline,str(n+1)))
+        os.system('chmod +x xce_{0!s}_{1!s}.sh'.format(self.pipeline, str(n+1)))
         db_dict={}
         db_dict['DimpleStatus']='started'
-        self.Logfile.insert('%s: setting DataProcessingStatus flag to started' %xtal)
+        self.Logfile.insert('{0!s}: setting DataProcessingStatus flag to started'.format(xtal))
         self.db.update_data_source(xtal,db_dict)
 
 
@@ -1363,7 +1363,7 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
         os.system('/bin/rm final.pdb 2> /dev/null')
 
         if self.queueing_system_available:
-            top_line='#PBS -joe -N XCE_%s\n' %self.pipeline
+            top_line='#PBS -joe -N XCE_{0!s}\n'.format(self.pipeline)
         else:
             top_line='#!'+os.getenv('SHELL')+'\n'
 
@@ -1378,12 +1378,12 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
             ccp4_scratch+='module load buster\n'
 
         if os.path.isfile(ref_mtz):
-            hklref_line=' -hklref %s' %ref_mtz
+            hklref_line=' -hklref {0!s}'.format(ref_mtz)
         else:
             hklref_line=''
 
         Cmds = (
-                '%s\n' %top_line+
+                '{0!s}\n'.format(top_line)+
                 '\n'
                 'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
                 '\n'
@@ -1399,7 +1399,7 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
                 ' -d pipedreamDir'
                 ' -xyzin %s' %ref_pdb+
                 hklref_line+
-                ' -hklin %s' %mtzin+
+                ' -hklin {0!s}'.format(mtzin)+
                 ' -keepwater\n'
                 '\n'
                 'cd %s\n' %os.path.join(self.initial_model_directory,xtal) +
@@ -1416,20 +1416,20 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
                 'EOF\n'
                 '\n'
                 '$CCP4/libexec/python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_for_new_dimple_pdb.py')+
-                ' %s %s %s\n' %(os.path.join(self.database_directory,self.data_source_file),xtal,self.initial_model_directory)+
+                ' {0!s} {1!s} {2!s}\n'.format(os.path.join(self.database_directory,self.data_source_file), xtal, self.initial_model_directory)+
                 '\n'
                 '/bin/rm dimple_run_in_progress\n'
                 )
 
         os.chdir(self.ccp4_scratch_directory)
-        f = open('xce_%s_%s.sh' %(self.pipeline,str(n+1)),'w')
+        f = open('xce_{0!s}_{1!s}.sh'.format(self.pipeline, str(n+1)),'w')
         f.write(Cmds)
         f.close()
         self.n+=1
-        os.system('chmod +x xce_%s_%s.sh' %(self.pipeline,str(n+1)))
+        os.system('chmod +x xce_{0!s}_{1!s}.sh'.format(self.pipeline, str(n+1)))
         db_dict={}
         db_dict['DimpleStatus']='started'
-        self.Logfile.insert('%s: setting DataProcessingStatus flag to started' %xtal)
+        self.Logfile.insert('{0!s}: setting DataProcessingStatus flag to started'.format(xtal))
         self.db.update_data_source(xtal,db_dict)
 
 
@@ -1446,10 +1446,10 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
         if os.path.isfile(ref_mtz):
             mtz_column_dict=mtztools(ref_mtz).get_all_columns_as_dict()
             if 'FreeR_flag' not in mtz_column_dict['RFREE']:
-                self.Logfile.insert('cannot find FreeR_flag in reference mtz file: %s -> ignoring reference mtzfile!!!' %ref_mtz)
+                self.Logfile.insert('cannot find FreeR_flag in reference mtz file: {0!s} -> ignoring reference mtzfile!!!'.format(ref_mtz))
                 ref_mtz = ''
                 if mtz_column_dict['RFREE'] != []:
-                    self.Logfile.insert('found Rfree set with other column name though: %s' %str(mtz_column_dict['RFREE']))
+                    self.Logfile.insert('found Rfree set with other column name though: {0!s}'.format(str(mtz_column_dict['RFREE'])))
                     self.Logfile.insert('try renaming Rfree column to FreeR_flag with CAD!')
 
         db_dict={}
@@ -1483,7 +1483,7 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
 
         if 'dimple_rerun_on_selected_file' in visit_run_autoproc:
             additional_cmds = (
-                            'cd %s\n' %os.path.join(self.initial_model_directory,xtal) +
+                            'cd {0!s}\n'.format(os.path.join(self.initial_model_directory,xtal)) +
                             '/bin/rm dimple.pdb\n'
                             'ln -s dimple/dimple_rerun_on_selected_file/dimple/final.pdb dimple.pdb\n'
                             '/bin/rm dimple.mtz\n'
@@ -1494,13 +1494,13 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
                             'ln -s dimple/dimple_rerun_on_selected_file/dimple/fofc.map .\n'
                             '\n'
                             '$CCP4/libexec/python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_for_new_dimple_pdb.py')+
-                            ' %s %s %s\n' %(os.path.join(self.database_directory,self.data_source_file),xtal,self.initial_model_directory)  )
+                            ' {0!s} {1!s} {2!s}\n'.format(os.path.join(self.database_directory,self.data_source_file), xtal, self.initial_model_directory)  )
 
         else:
             additional_cmds=''
 
         Cmds = (
-                '%s\n' %top_line+
+                '{0!s}\n'.format(top_line)+
                 '\n'
                 'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
                 '\n'
@@ -1535,14 +1535,14 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
                 )
 
         os.chdir(self.ccp4_scratch_directory)
-        f = open('xce_%s_%s.sh' %(self.pipeline,str(n+1)),'w')
+        f = open('xce_{0!s}_{1!s}.sh'.format(self.pipeline, str(n+1)),'w')
         f.write(Cmds)
         f.close()
         self.n+=1
-        os.system('chmod +x xce_%s_%s.sh' %(self.pipeline,str(n+1)))
+        os.system('chmod +x xce_{0!s}_{1!s}.sh'.format(self.pipeline, str(n+1)))
         db_dict={}
         db_dict['DimpleStatus']='started'
-        self.Logfile.insert('%s: setting DataProcessingStatus flag to started' %xtal)
+        self.Logfile.insert('{0!s}: setting DataProcessingStatus flag to started'.format(xtal))
         self.db.update_data_source(xtal,db_dict)
 
 
@@ -1553,29 +1553,29 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
         if os.path.isdir('/dls'):
             if self.external_software['qsub_array']:
                 Cmds = (
-                        '#PBS -joe -N xce_%s_master\n' %self.pipeline+
-                        './xce_%s_$SGE_TASK_ID.sh\n' %self.pipeline
+                        '#PBS -joe -N xce_{0!s}_master\n'.format(self.pipeline)+
+                        './xce_{0!s}_$SGE_TASK_ID.sh\n'.format(self.pipeline)
                         )
-                f = open('%s_master.sh' %self.pipeline,'w')
+                f = open('{0!s}_master.sh'.format(self.pipeline),'w')
                 f.write(Cmds)
                 f.close()
                 self.Logfile.insert('submitting array job with maximal 100 jobs running on cluster')
                 self.Logfile.insert('using the following command:')
-                self.Logfile.insert('qsub -P labxchem -t 1:%s -tc %s %s_master.sh' %(str(self.n),self.max_queue_jobs,self.pipeline))
-                os.system('qsub -P labxchem -t 1:%s -tc %s %s_master.sh' %(str(self.n),self.max_queue_jobs,self.pipeline))
+                self.Logfile.insert('qsub -P labxchem -t 1:{0!s} -tc {1!s} {2!s}_master.sh'.format(str(self.n), self.max_queue_jobs, self.pipeline))
+                os.system('qsub -P labxchem -t 1:{0!s} -tc {1!s} {2!s}_master.sh'.format(str(self.n), self.max_queue_jobs, self.pipeline))
             else:
                 self.Logfile.insert("cannot start ARRAY job: make sure that 'module load global/cluster' is in your .bashrc or .cshrc file")
         elif self.external_software['qsub']:
-            self.Logfile.insert('submitting %s individual jobs to cluster' %(str(self.n)))
+            self.Logfile.insert('submitting {0!s} individual jobs to cluster'.format((str(self.n))))
             self.Logfile.insert('WARNING: this could potentially lead to a crash...')
             for i in range(self.n):
-                self.Logfile.insert('qsub xce_%s_%s.sh' %(str(i+1),self.pipeline))
-                os.system('qsub xce_%s_%s.sh' %(str(i+1),self.pipeline))
+                self.Logfile.insert('qsub xce_{0!s}_{1!s}.sh'.format(str(i+1), self.pipeline))
+                os.system('qsub xce_{0!s}_{1!s}.sh'.format(str(i+1), self.pipeline))
         else:
-            self.Logfile.insert('running %s consecutive %s jobs on your local machine' %(self.pipeline))
+            self.Logfile.insert('running {0!s} consecutive {1!s} jobs on your local machine'.format(*(self.pipeline)))
             for i in range(self.n):
-                self.Logfile.insert('starting xce_%s_%s.sh' %(str(i+1),self.pipeline))
-                os.system('./xce_%s_%s.sh' %(str(i+1),self.pipeline))
+                self.Logfile.insert('starting xce_{0!s}_{1!s}.sh'.format(str(i+1), self.pipeline))
+                os.system('./xce_{0!s}_{1!s}.sh'.format(str(i+1), self.pipeline))
 
 
 
@@ -1598,12 +1598,12 @@ class remove_selected_dimple_files(QtCore.QThread):
         for n,xtal in enumerate(self.sample_list):
             db_dict={}
             os.chdir(os.path.join(self.initial_model_directory,xtal))
-            self.Logfile.insert('%s: removing dimple.pdb/dimple.mtz' %xtal)
+            self.Logfile.insert('{0!s}: removing dimple.pdb/dimple.mtz'.format(xtal))
             os.system('/bin/rm dimple.pdb 2> /dev/null')
             os.system('/bin/rm dimple.mtz 2> /dev/null')
             if os.path.isdir(os.path.join(self.initial_model_directory,xtal,'dimple','dimple_rerun_on_selected_file')):
                 os.chdir('dimple')
-                self.Logfile.insert('%s removing directory dimple/dimple_rerun_on_selected_file' %xtal)
+                self.Logfile.insert('{0!s} removing directory dimple/dimple_rerun_on_selected_file'.format(xtal))
                 os.system('/bin/rm -fr dimple_rerun_on_selected_file')
 
             db_dict['DimpleResolutionHigh']=''
@@ -1618,7 +1618,7 @@ class remove_selected_dimple_files(QtCore.QThread):
             db_dict['DimplePANDDApath']=''
             db_dict['DimpleStatus']='pending'
 
-            self.Logfile.insert('%s: updating database' %xtal)
+            self.Logfile.insert('{0!s}: updating database'.format(xtal))
             self.db.update_data_source(xtal,db_dict)
 
 
@@ -1644,7 +1644,7 @@ class start_COOT(QtCore.QThread):
         cwd=os.getcwd()
         # coot at Diamond always or sometimes at least open in home directory, so then it won't find the .pkl file
         pickle.dump(self.settings,open(os.path.join(os.getenv('HOME'),'.xce_settings.pkl'),'wb'))
-        os.system('cd %s\ncoot --no-guano --no-state-script --script %s' %(os.getenv('HOME'),os.path.join(os.getenv('XChemExplorer_DIR'),'lib',self.pylib)))
+        os.system('cd {0!s}\ncoot --no-guano --no-state-script --script {1!s}'.format(os.getenv('HOME'), os.path.join(os.getenv('XChemExplorer_DIR'),'lib',self.pylib)))
 
 
 
@@ -1662,7 +1662,7 @@ class start_ICM(QtCore.QThread):
 #                f=open(os.path.join('/home',getpass.getuser(),'.flexlmrc'),'w')
 #                f.write('MOLSOFTD_LICENSE_FILE=@diamvicmpro.diamond.ac.uk')
 #                f.close()
-            os.system('nautilus %s &' %self.html_export_directory)
+            os.system('nautilus {0!s} &'.format(self.html_export_directory))
             os.system('/dls/science/groups/i04-1/software/icm-3.8-5/icm64 -g')
 
 class start_pandda_inspect(QtCore.QThread):
@@ -2810,7 +2810,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
 
                 if xtal in gda_pin_dict:
                     gda_pin_id=gda_pin_dict[xtal]
-                    self.data_source.execute_statement("update mainTable set DataCollectionPinBarcode ='%s' where CrystalName = '%s'"%(gda_pin_id,xtal))
+                    self.data_source.execute_statement("update mainTable set DataCollectionPinBarcode ='{0!s}' where CrystalName = '{1!s}'".format(gda_pin_id, xtal))
 
 
                 self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'Step 1 of 2: searching visit '+ \
