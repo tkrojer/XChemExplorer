@@ -1,4 +1,4 @@
-# last edited: 02/03/2017 - 15:00
+# last edited: 05/06/2017 - 15:00
 
 import gobject
 import sys
@@ -160,7 +160,7 @@ class GUI(object):
         self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         self.window.connect("delete_event", gtk.main_quit)
         self.window.set_border_width(10)
-        self.window.set_default_size(400, 1000)
+        self.window.set_default_size(400, 800)
         self.window.set_title("XChemExplorer")
         self.vbox = gtk.VBox()                      # this is the main container
 
@@ -486,7 +486,7 @@ class GUI(object):
         self.vbox.pack_start(outer_frame)
 
 #        # SPACER
-#        self.vbox.add(gtk.Label(' '))
+        self.vbox.add(gtk.Label(' '))
 
         #################################################################################
         outer_frame = gtk.Frame(label='Sample Navigator')
@@ -752,22 +752,41 @@ class GUI(object):
         self.ligand_inspect_comment_value.set_label(str(self.siteDict[self.xtalID][self.pandda_index][11]))
 
         self.spider_plot_data=self.db.get_db_pandda_dict_for_sample_and_site_and_event(self.xtalID,self.site_index,self.event_index)
+        print '>>>>> spider plot data',self.spider_plot_data
         self.ligandIDValue.set_label(self.spider_plot_data['PANDDA_site_ligand_id'])
         try:
             self.ligand_occupancyValue.set_label(           str(round(float(self.spider_plot_data['PANDDA_site_occupancy']),2)) )
-            self.ligand_BaverageValue.set_label(            str(round(float(self.spider_plot_data['PANDDA_site_B_average']),2)) )
-            self.ligand_BratioSurroundingsValue.set_label(  str(round(float(self.spider_plot_data['PANDDA_site_B_ratio_residue_surroundings']),2)) )
-            self.ligand_RSCCValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_RSCC']),2)) )
-            self.ligand_rmsdValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_rmsd']),2)) )
-            self.ligand_RSRValue.set_label(                 str(round(float(self.spider_plot_data['PANDDA_site_RSR']),2)) )
-            self.ligand_RSZDValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_RSZD']),2)) )
         except ValueError:
             self.ligand_occupancyValue.set_label('-')
+
+        try:
+            self.ligand_BaverageValue.set_label(            str(round(float(self.spider_plot_data['PANDDA_site_B_average']),2)) )
+        except ValueError:
             self.ligand_BaverageValue.set_label('-')
+
+        try:
+            self.ligand_BratioSurroundingsValue.set_label(  str(round(float(self.spider_plot_data['PANDDA_site_B_ratio_residue_surroundings']),2)) )
+        except ValueError:
             self.ligand_BratioSurroundingsValue.set_label('-')
+
+        try:
+            self.ligand_RSCCValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_RSCC']),2)) )
+        except ValueError:
             self.ligand_RSCCValue.set_label('-')
+
+        try:
+            self.ligand_rmsdValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_rmsd']),2)) )
+        except ValueError:
             self.ligand_rmsdValue.set_label('-')
+
+        try:
+            self.ligand_RSRValue.set_label(                 str(round(float(self.spider_plot_data['PANDDA_site_RSR']),2)) )
+        except ValueError:
             self.ligand_RSRValue.set_label('-')
+
+        try:
+            self.ligand_RSZDValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_RSZD']),2)) )
+        except ValueError:
             self.ligand_RSZDValue.set_label('-')
 
         #########################################################################################
