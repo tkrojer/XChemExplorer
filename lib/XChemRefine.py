@@ -6,6 +6,7 @@ import glob
 import sys
 import getpass
 import fileinput
+import time
 #sys.path.append(os.path.join(os.getenv('CCP4'),'lib/python2.7/site-packages'))
 #import coot
 #sys.path.append('/usr/local/coot/SoakProc/lib')
@@ -153,7 +154,8 @@ class Refine(object):
                     'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
                     "giant.create_occupancy_params pdb=in.pdb refmac_occ_out='refmac_refine.params'\n"  )
 #            os.system("giant.create_occupancy_params pdb=in.pdb refmac_occ_out='refmac_refine.params'")
-            os.system(cmd)
+#            os.system(cmd)
+            os.system("giant.create_occupancy_params pdb=in.pdb refmac_occ_out='refmac_refine.params")
             # quick fix for the moment; need to talk to Nick since this should not be necessary
             try:
                 params_file = fileinput.input('refmac_refine.params',inplace=True)
@@ -170,6 +172,12 @@ class Refine(object):
             except OSError:
                 # this may happen in case giant.create_occupancy_params did not produce a params output file
                 pass
+
+            print '==> XCE: waiting 5 seconds for giant.create_occupancy_params to finish...'
+            time.sleep(5)
+            print '==> XCE: done!'
+
+        print '==> XCE: assembling refmac.csh'
 
         create_bound_conformation=''
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refmac_refine.params')):
@@ -207,7 +215,8 @@ class Refine(object):
                 mtz_two=os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz')
                 pdb_one=os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refine_'+Serial+'.pdb')
                 mtz_one=os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refine_'+Serial+'.mtz')
-                spider_plot='giant.score_model pdb1=%s mtz1=%s pdb2=%s mtz2=%s res_names=LIG,UNL,DRG,FRG\n' %(pdb_one,mtz_one,pdb_two,mtz_two)
+                spider_plot='$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/resort_ligand_atoms.py %s %s\n' %(pdb_two,pdb_one)
+                spider_plot+='giant.score_model pdb1=%s mtz1=%s pdb2=%s mtz2=%s res_names=LIG,UNL,DRG,FRG\n' %(pdb_one,mtz_one,pdb_two,mtz_two)
 
         #######################################################
         # PHENIX stuff (if working at DLS)
