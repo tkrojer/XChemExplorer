@@ -1,4 +1,4 @@
-# last edited: 29/03/2017, 15:00
+# last edited: 07/06/2017, 15:00
 
 import sqlite3
 import os,sys,glob
@@ -1314,9 +1314,9 @@ class data_source:
         cursor.execute(sqlite)
         tmp=cursor.fetchall()
         for item in tmp:
-            print item
-            print str(item[0])
-            print str(item[1])
+#            print item
+#            print str(item[0])
+#            print str(item[1])
 #            line=[x.encode('UTF8') for x in list(item)]
             site_list.append([str(item[0]),str(item[1])])
 
