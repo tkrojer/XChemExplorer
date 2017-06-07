@@ -1314,8 +1314,9 @@ class data_source:
         cursor.execute(sqlite)
         tmp=cursor.fetchall()
         for item in tmp:
-            line=[x.encode('UTF8') for x in list(item)]
-            site_list.append(line)
+            print item
+#            line=[x.encode('UTF8') for x in list(item)]
+#            site_list.append(line)
 
         return site_list
 
