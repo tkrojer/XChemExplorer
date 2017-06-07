@@ -1315,6 +1315,8 @@ class data_source:
         tmp=cursor.fetchall()
         for item in tmp:
             print item
+            print str(item[0])
+            print str(item[1])
 #            line=[x.encode('UTF8') for x in list(item)]
 #            site_list.append(line)
 
