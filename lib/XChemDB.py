@@ -1318,7 +1318,7 @@ class data_source:
             print str(item[0])
             print str(item[1])
 #            line=[x.encode('UTF8') for x in list(item)]
-#            site_list.append(line)
+            site_list.append([str(item[0]),str(item[1])])
 
         return site_list
 
