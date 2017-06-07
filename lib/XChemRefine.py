@@ -215,9 +215,9 @@ class Refine(object):
                 mtz_two=os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz')
                 pdb_one=os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refine_'+Serial+'.pdb')
                 mtz_one=os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refine_'+Serial+'.mtz')
-#                spider_plot='$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/resort_ligand_atoms.py %s %s\n\n' %(pdb_two,pdb_one)
-#                spider_plot+='giant.score_model pdb1=%s mtz1=%s pdb2=%s mtz2=%s res_names=LIG,UNL,DRG,FRG\n' %(pdb_one,mtz_one,pdb_two,mtz_two)
-                spider_plot='giant.score_model pdb1=%s mtz1=%s pdb2=%s mtz2=%s res_names=LIG,UNL,DRG,FRG\n' %(pdb_one,mtz_one,pdb_two,mtz_two)
+                spider_plot='$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/resort_ligand_atoms.py %s %s\n\n' %(pdb_two,pdb_one)
+                spider_plot+='giant.score_model pdb1=%s mtz1=%s pdb2=%s mtz2=%s res_names=LIG,UNL,DRG,FRG\n' %(pdb_one,mtz_one,pdb_two,mtz_two)
+#                spider_plot='giant.score_model pdb1=%s mtz1=%s pdb2=%s mtz2=%s res_names=LIG,UNL,DRG,FRG\n' %(pdb_one,mtz_one,pdb_two,mtz_two)
 
         #######################################################
         # PHENIX stuff (if working at DLS)

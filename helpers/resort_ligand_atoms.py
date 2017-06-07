@@ -12,14 +12,21 @@ def get_atom_order_of_ensemble_model(ensembleModel):
     for line in open(ensembleModel):
         if line.startswith('ATOM') or line.startswith('HETATM'):
             atomName_line=  str(line[11:16])
+            altLoc_line=    str(line[16:17])
             resname_line=   str(line[17:20])
             chainID_line=   str(line[20:23])
             resseq_line=    str(line[23:26])
-            residueID=resname_line.replace(' ','')+'-'+chainID_line.replace(' ','')+'-'+resseq_line.replace(' ','')
+
+            residueID = resname_line.replace(' ','')+'-'+\
+                        chainID_line.replace(' ','')+'-'+\
+                        resseq_line.replace(' ','')+'-'+\
+                        chainID_line.replace(' ','')+'-'+\
+                        altLoc_line
+
             if resname_line in ligandResnames:
                 if residueID not in ensembleLIGdir:
                     ensembleLIGdir[residueID]=[]
-                ensembleLIGdir[residueID].append(atomName_line)
+                ensembleLIGdir[residueID].append([atomName_line,altLoc_line,resname_line,chainID_line,resseq_line])
 
     return ensembleLIGdir
 
@@ -31,10 +38,17 @@ def resort_ligand_atoms_in_refined_model(refinedModel,ensembleLIGdir):
     LIGlist=[]
     for line in open(refinedModel):
         if line.startswith('ATOM') or line.startswith('HETATM'):
+            altLoc_line=    str(line[16:17])
             resname_line=   str(line[17:20])
             chainID_line=   str(line[20:23])
             resseq_line=    str(line[23:26])
-            residueID=resname_line.replace(' ','')+'-'+chainID_line.replace(' ','')+'-'+resseq_line.replace(' ','')
+
+            residueID = resname_line.replace(' ','')+'-'+\
+                        chainID_line.replace(' ','')+'-'+\
+                        resseq_line.replace(' ','')+'-'+\
+                        chainID_line.replace(' ','')+'-'+\
+                        altLoc_line
+
             if residueID in ensembleLIGdir:
                 if residueID not in refineLIGDir:
                     refineLIGDir[residueID]=[]
@@ -46,7 +60,8 @@ def resort_ligand_atoms_in_refined_model(refinedModel,ensembleLIGdir):
 
     LIGline=''
     for ligand in ensembleLIGdir:
-        for atom in ensembleLIGdir[ligand]:
+        for atomLine in ensembleLIGdir[ligand]:
+            atomName=atomLine[0]
             for line in refineLIGDir[ligand]:
                 atomName_line=str(line[11:16])
                 if atomName_line==atom:
