@@ -333,6 +333,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                                 for line in open('dimple/dimple_rerun_on_selected_file/dimple/dimple.log'):
                                     if foundLine:
                                         mtzin=line
+                                        print '====>',mtzin
                                         break
                                     if line.startswith(' --no-cleanup'):
                                         foundLine=True
