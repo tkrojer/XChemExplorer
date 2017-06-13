@@ -324,6 +324,20 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                 CC=refineMTZ.calculate_correlaton_between_mtzfiles(xtal+'.mtz')
                 self.Logfile.insert('%s: calculating CC between refine.mtz (%s refl) and %s.mtz (%s refl): %s' %(xtal,str(nREFrefine),xtal,str(nREF),str(CC)))
 
+                try:
+                    if float(CC) < 0.9:
+                        self.Logfile.insert('correlation coefficient between the two files is below 0.9; will search autoprocessing directory for file with higher CC')
+                        for mtzfile in glob.glob('autoprocessing/*/%s.mtz' %xtal):
+                            self.Logfile.insert('checking %s' %mtzfile)
+                            procMTZ=mtztools(mtzfile)
+                            nREF=procMTZ.get_number_measured_reflections()
+                            CC=refineMTZ.calculate_correlaton_between_mtzfiles(mtzfile)
+                            self.Logfile.insert('%s: calculating CC between refine.mtz (%s refl) and %s (%s refl): %s' %(xtal,str(nREFrefine),mtzfile.split('/')[1],str(nREF),str(CC)))
+
+                except ValueError:
+                    pass
+
+
 #            for mtzfile in glob.glob('autoprocessing/*/%s.mtz' %xtal):
 #                procMTZ=mtztools(mtzfile)
 #                nREF=procMTZ.get_number_measured_reflections()
