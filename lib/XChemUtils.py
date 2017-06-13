@@ -1111,7 +1111,11 @@ class mtztools:
 
     def calculate_correlaton_between_mtzfiles(self,mtzin):
         CC = '0.0'
-        cmd = 'pointless hklin %s hklref %s' %(mtzin,self.mtzfile)
+        cmd = ( 'pointless hklin %s hklref %s << eof\n' %(mtzin,self.mtzfile)+
+                'labref F=F\n'
+                'labin F=F\n'
+                'eof\n' )
+        
         pointless=subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE)
         foundLine=False
         for line in iter(pointless.stdout.readline,''):
