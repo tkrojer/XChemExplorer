@@ -1115,7 +1115,7 @@ class mtztools:
                 'labref F=F\n'
                 'labin F=F\n'
                 'eof\n' )
-        
+
         pointless=subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE)
         foundLine=False
         for line in iter(pointless.stdout.readline,''):
