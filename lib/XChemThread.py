@@ -333,14 +333,12 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                                 for line in open('dimple/dimple_rerun_on_selected_file/dimple/dimple.log'):
                                     if foundLine:
                                         mtzin=line
-                                        print '====>',mtzin
+                                        self.Logfile.insert('%s was used for inital map calculation' %mtzin)
                                         break
                                     if line.startswith(' --no-cleanup'):
                                         foundLine=True
 
                                 if os.path.isfile(mtzin):
-
-
                                     self.Logfile.insert('%s: mtzfile used for refinement is not the same as the one chosen from autoprocessing' %xtal)
                                     self.Logfile.insert('%s: current mtzfile after autoprocessing: %s' %(xtal,os.path.realpath(xtal+'.mtz')))
                                     self.Logfile.insert('%s: removing links for %s.mtz/%s.log' %(xtal,xtal,xtal))
