@@ -1,4 +1,4 @@
-# last edited: 06/04/2017, 17:00
+# last edited: 13/06/2017, 17:00
 
 import sys
 import os
@@ -1075,6 +1075,42 @@ class mtztools:
                 resolution_high=line.split()[5]
         return resolution_high
         
+    def get_low_resolution_from_mtz(self):
+        resolution_low='n/a'
+        resolution_line=1000000
+        mtzdmp=subprocess.Popen(['mtzdmp',self.mtzfile],stdout=subprocess.PIPE)
+        for n,line in enumerate(iter(mtzdmp.stdout.readline,'')):
+            if line.startswith(' *  Resolution Range :'):
+                resolution_line=n+2
+            if n==resolution_line and len(line.split())==8:
+                resolution_low=line.split()[3]
+        return resolution_low
+
+    def get_number_measured_reflections(self):
+        missing_reflections='0'
+        all_reflections='0'
+        meassured_reflections='0'
+        resolution_line=1000000
+        mtzdmp=subprocess.Popen(['mtzdmp',self.mtzfile],stdout=subprocess.PIPE)
+        foundTable=False
+        for n,line in enumerate(iter(mtzdmp.stdout.readline,'')):
+            if line.startswith(' Col Sort    Min    Max    Num      %     Mean     Mean   Resolution   Type Column'):
+                foundTable=True
+            if foundTable and len(line.split())==12:
+                if line.split()[11]=='F':
+                    missing_reflections=line.split()[4]
+                    foundTable=False
+            if line.startswith(' No. of reflections used in FILE STATISTICS'):
+                all_reflections=line.split()[7]
+                break
+        try:
+            meassured_reflections=int(all_reflections)-int(missing_reflections)
+        except ValueError:
+            pass
+        return meassured_reflections
+
+
+
     def get_all_values_as_dict(self):
         mtz = { 'resolution_high':  'n/a',
                 'unitcell':         'n/a',

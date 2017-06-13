@@ -1,4 +1,4 @@
-# last edited: 06/04/2016, 15:00
+# last edited: 13/06/2017, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -313,8 +313,29 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         # AIMLESS logfile
 
-#        found_logfile=self.find_file(xtal+'.log',xtal)
-#        if found_logfile:
+        # in case the MTZ file which is used for refinement is different to the one used for refinement
+        if os.path.isfile('refine.mtz'):
+            refineMTZ=mtztools('refine.mtz')
+            nREFrefine=refineMTZ.get_number_measured_reflections()
+            resoHIGHrefine=refineMTZ.get_high_resolution_from_mtz()
+            for mtzfile in glob.glob('autoprocessing/*/%s.mtz' %xtal):
+                procMTZ=mtztools(mtzfile)
+                nREF=procMTZ.get_number_measured_reflections()
+                resoHIGH=procMTZ.get_high_resolution_from_mtz()
+                if nREF==nREFrefine and resoHIGH==resoHIGHrefine:
+                    if os.path.isfile(xtal+'.mtz'):
+                        if os.path.realpath(xtal+'.mtz') != os.path.realpath(mtzfile):
+                            self.Logfile.insert('%s: mtzfile used for refinement is not the same as the one chosen from autoprocessing' %xtal)
+                            self.Logfile.insert('%s: current mtzfile after autoprocessing: %s' %(xtal,os.path.realpath(xtal+'.mtz')))
+                            self.Logfile.insert('%s: removing links for %s.mtz/%s.log' %(xtal,xtal))
+                            os.system('/bin/rm %s.mtz 2> /dev/null' %xtal)
+                            os.system('/bin/rm %s.log 2> /dev/null' %xtal)
+                            self.Logfile.insert('linking %s to %s.mtz' %(mtzfile,xtal))
+                            os.symlink(mtzfile,xtal+'.mtz')
+                            self.Logfile.insert('linking %s to %s.log' %(mtzfile.replace('.mtz','.log'),xtal))
+                            os.symlink(mtzfile.replace('.mtz','.log'),xtal+'.log')
+                            break
+
         found_logfile=False
         if os.path.isfile(xtal+'.log'):
             found_logfile=True
