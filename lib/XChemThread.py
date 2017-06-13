@@ -315,8 +315,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         # in case the MTZ file which is used for refinement is different to the one used for refinement
         if os.path.isfile('refine.mtz'):
-            if os.path.isfile(xtal+'free.mtz'):
-                freeMTZ=mtztools(xtal+'free.mtz')
+            if os.path.isfile(xtal+'.free.mtz'):
+                freeMTZ=mtztools(xtal+'.free.mtz')
                 nREFfree=refineMTZ.get_number_measured_reflections()
                 if os.path.isfile(xtal+'.mtz'):
                     procMTZ=mtztools(xtal+'.mtz')
