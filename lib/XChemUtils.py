@@ -1109,7 +1109,18 @@ class mtztools:
             pass
         return meassured_reflections
 
-
+    def calculate_correlaton_between_mtzfiles(self,mtzin):
+        CC = '0.0'
+        cmd = 'pointless hklin %s hklref %s' %(mtzin,self.mtzfile)
+        pointless=subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE)
+        foundLine=False
+        for line in iter(pointless.stdout.readline,''):
+            if foundLine:
+                CC=line.split()[3]
+                break
+            if '       Alternative reindexing        Lklhd' in line:
+                foundLine=True
+        return CC
 
     def get_all_values_as_dict(self):
         mtz = { 'resolution_high':  'n/a',
