@@ -315,27 +315,27 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         # in case the MTZ file which is used for refinement is different to the one used for refinement
         if os.path.isfile('refine.mtz'):
-            refineMTZ=mtztools('refine.mtz')
-            nREFrefine=refineMTZ.get_number_measured_reflections()
-            resoHIGHrefine=refineMTZ.get_high_resolution_from_mtz()
-            if os.path.isfile(xtal+'.mtz'):
-                procMTZ=mtztools(xtal+'.mtz')
-                nREF=procMTZ.get_number_measured_reflections()
-                CC=refineMTZ.calculate_correlaton_between_mtzfiles(xtal+'.mtz')
-                self.Logfile.insert('%s: calculating CC between refine.mtz (%s refl) and %s.mtz (%s refl): %s' %(xtal,str(nREFrefine),xtal,str(nREF),str(CC)))
+            if os.path.isfile(xtal+'free.mtz'):
+                freeMTZ=mtztools(xtal+'free.mtz')
+                nREFfree=refineMTZ.get_number_measured_reflections()
+                if os.path.isfile(xtal+'.mtz'):
+                    procMTZ=mtztools(xtal+'.mtz')
+                    nREF=procMTZ.get_number_measured_reflections()
+                    CC=freeMTZ.calculate_correlaton_between_mtzfiles(xtal+'.mtz')
+                    self.Logfile.insert('%s: calculating CC between %s.free.mtz (%s refl) and %s.mtz (%s refl): %s' %(xtal,xtal,str(nREFfree),xtal,str(nREF),str(CC)))
 
-                try:
-                    if float(CC) < 0.9:
-                        self.Logfile.insert('correlation coefficient between the two files is below 0.9; will search autoprocessing directory for file with higher CC')
-                        for mtzfile in glob.glob('autoprocessing/*/%s.mtz' %xtal):
-                            self.Logfile.insert('checking %s' %mtzfile)
-                            procMTZ=mtztools(mtzfile)
-                            nREF=procMTZ.get_number_measured_reflections()
-                            CC=refineMTZ.calculate_correlaton_between_mtzfiles(mtzfile)
-                            self.Logfile.insert('%s: calculating CC between refine.mtz (%s refl) and %s (%s refl): %s' %(xtal,str(nREFrefine),mtzfile.split('/')[1],str(nREF),str(CC)))
+                    try:
+                        if float(CC) < 0.9:
+                            self.Logfile.insert('correlation coefficient between the two files is below 0.9; will search autoprocessing directory for file with higher CC')
+                            for mtzfile in glob.glob('autoprocessing/*/%s.mtz' %xtal):
+                                self.Logfile.insert('checking %s' %mtzfile)
+                                procMTZ=mtztools(mtzfile)
+                                nREF=procMTZ.get_number_measured_reflections()
+                                CC=freeMTZ.calculate_correlaton_between_mtzfiles(mtzfile)
+                                self.Logfile.insert('%s: calculating CC between refine.mtz (%s refl) and %s (%s refl): %s' %(xtal,str(nREFfree),mtzfile.split('/')[1],str(nREF),str(CC)))
 
-                except ValueError:
-                    pass
+                    except ValueError:
+                        pass
 
 
 #            for mtzfile in glob.glob('autoprocessing/*/%s.mtz' %xtal):
