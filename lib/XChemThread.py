@@ -322,7 +322,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                 procMTZ=mtztools(mtzfile)
                 nREF=procMTZ.get_number_measured_reflections()
                 resoHIGH=procMTZ.get_high_resolution_from_mtz()
-                if nREF==nREFrefine and resoHIGH==resoHIGHrefine:
+#                if nREF==nREFrefine and resoHIGH==resoHIGHrefine:
+                if nREF==nREFrefine:
                     if os.path.isfile(xtal+'.mtz'):
                         if os.path.realpath(xtal+'.mtz') != os.path.realpath(mtzfile):
                             self.Logfile.insert('%s: mtzfile used for refinement is not the same as the one chosen from autoprocessing' %xtal)
