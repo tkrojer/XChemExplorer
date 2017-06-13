@@ -318,24 +318,31 @@ class synchronise_db_and_filesystem(QtCore.QThread):
             refineMTZ=mtztools('refine.mtz')
             nREFrefine=refineMTZ.get_number_measured_reflections()
             resoHIGHrefine=refineMTZ.get_high_resolution_from_mtz()
-            for mtzfile in glob.glob('autoprocessing/*/%s.mtz' %xtal):
-                procMTZ=mtztools(mtzfile)
+            if os.path.isfile(xtal+'.mtz'):
+                procMTZ=mtztools(xtal+'.mtz')
                 nREF=procMTZ.get_number_measured_reflections()
-                resoHIGH=procMTZ.get_high_resolution_from_mtz()
-#                if nREF==nREFrefine and resoHIGH==resoHIGHrefine:
-                if nREF==nREFrefine:
-                    if os.path.isfile(xtal+'.mtz'):
-                        if os.path.realpath(xtal+'.mtz') != os.path.realpath(mtzfile):
-                            self.Logfile.insert('%s: mtzfile used for refinement is not the same as the one chosen from autoprocessing' %xtal)
-                            self.Logfile.insert('%s: current mtzfile after autoprocessing: %s' %(xtal,os.path.realpath(xtal+'.mtz')))
-                            self.Logfile.insert('%s: removing links for %s.mtz/%s.log' %(xtal,xtal,xtal))
-                            os.system('/bin/rm %s.mtz 2> /dev/null' %xtal)
-                            os.system('/bin/rm %s.log 2> /dev/null' %xtal)
-                            self.Logfile.insert('linking %s to %s.mtz' %(mtzfile,xtal))
-                            os.symlink(mtzfile,xtal+'.mtz')
-                            self.Logfile.insert('linking %s to %s.log' %(mtzfile.replace('.mtz','.log'),xtal))
-                            os.symlink(mtzfile.replace('.mtz','.log'),xtal+'.log')
-                            break
+                CC=refineMTZ.calculate_correlaton_between_mtzfiles(xtal+'.mtz')
+                self.Logfile.insert('%s: calculating CC between refine.mtz (%s refl) and %s.mtz (%s refl): %s' %(xtal,str(nREFrefine),xtal,str(nREF),str(CC)))
+
+#            for mtzfile in glob.glob('autoprocessing/*/%s.mtz' %xtal):
+#                procMTZ=mtztools(mtzfile)
+#                nREF=procMTZ.get_number_measured_reflections()
+#                resoHIGH=procMTZ.get_high_resolution_from_mtz()
+#                CC=refineMTZ.calculate_correlaton_between_mtzfiles(mtzfile)
+#                self.Logfile.insert('comparing refine.mtz ')
+#                if nREF==nREFrefine:
+#                    if os.path.isfile(xtal+'.mtz'):
+#                        if os.path.realpath(xtal+'.mtz') != os.path.realpath(mtzfile):
+#                            self.Logfile.insert('%s: mtzfile used for refinement is not the same as the one chosen from autoprocessing' %xtal)
+#                            self.Logfile.insert('%s: current mtzfile after autoprocessing: %s' %(xtal,os.path.realpath(xtal+'.mtz')))
+#                            self.Logfile.insert('%s: removing links for %s.mtz/%s.log' %(xtal,xtal,xtal))
+#                            os.system('/bin/rm %s.mtz 2> /dev/null' %xtal)
+#                            os.system('/bin/rm %s.log 2> /dev/null' %xtal)
+#                            self.Logfile.insert('linking %s to %s.mtz' %(mtzfile,xtal))
+#                            os.symlink(mtzfile,xtal+'.mtz')
+#                            self.Logfile.insert('linking %s to %s.log' %(mtzfile.replace('.mtz','.log'),xtal))
+#                            os.symlink(mtzfile.replace('.mtz','.log'),xtal+'.log')
+#                            break
 
         found_logfile=False
         if os.path.isfile(xtal+'.log'):
