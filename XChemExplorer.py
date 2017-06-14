@@ -5470,16 +5470,15 @@ class XChemExplorer(QtGui.QApplication):
                     reply = msgBox.exec_();
                     if reply == 0:
                         self.update_log.insert('will not change data processing selection')
-
                         # restore previous selection
                         for n,entry in enumerate(self.data_collection_dict[key]):
+                            print '==>',n
                             if entry[0]=='logfile':
                                 if entry[8]==True:
+                                    print '===> found:',n
                                     self.data_collection_column_three_dict[key][0].selectRow(n)
-
-
-
                         pass
+
                 indexes=self.sender().selectionModel().selectedRows()
                 selected_processing_result=1000000
                 for index in sorted(indexes):
