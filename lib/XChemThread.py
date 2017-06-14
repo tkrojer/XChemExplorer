@@ -349,11 +349,11 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                                     self.Logfile.insert('linking %s to %s.mtz' %(os.path.relpath(mtzin),xtal))
                                     os.symlink(os.path.relpath(mtzin),xtal+'.mtz')
                                     print 'mtzin',mtzin
-                                    print "os.path.relpath(mtzin[mtzin.rfind('/'):])",os.path.relpath(mtzin[mtzin.rfind('/'):])
-                                    print "os.path.join(os.path.relpath(mtzin[mtzin.rfind('/'):]),'*log')",os.path.join(os.path.relpath(mtzin[mtzin.rfind('/'):]),'*log')
-                                    for logfile in glob.glob(os.path.join(os.path.relpath(mtzin[mtzin.rfind('/'):]),'*log')):
+                                    print "mtzin[mtzin.rfind('/'):]",mtzin[mtzin.rfind('/'):]
+                                    print "os.path.join(mtzin[mtzin.rfind('/'):]),'*log')",os.path.join(mtzin[mtzin.rfind('/'):],'*log')
+                                    for logfile in glob.glob(os.path.join(mtzin[mtzin.rfind('/'):],'*log')):
                                         self.Logfile.insert('linking %s to %s.log' %(logfile,xtal))
-                                        os.symlink(logfile,xtal+'.log')
+                                        os.symlink(os.path.relpath(logfile),xtal+'.log')
                                         break
 
 
