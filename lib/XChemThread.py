@@ -348,55 +348,15 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                                     os.system('/bin/rm %s.log 2> /dev/null' %xtal)
                                     self.Logfile.insert('linking %s to %s.mtz' %(os.path.relpath(mtzin),xtal))
                                     os.symlink(os.path.relpath(mtzin),xtal+'.mtz')
-                                    print 'mtzin',mtzin
-                                    print "mtzin[mtzin.rfind('/'):]",mtzin[:mtzin.rfind('/')]
-                                    print "os.path.join(mtzin[mtzin.rfind('/'):]),'*log')",os.path.join(mtzin[:mtzin.rfind('/')],'*log')
                                     for logfile in glob.glob(os.path.join(mtzin[:mtzin.rfind('/')],'*log')):
                                         self.Logfile.insert('linking %s to %s.log' %(os.path.relpath(logfile),xtal))
                                         os.symlink(os.path.relpath(logfile),xtal+'.log')
                                         break
 
-
-
-
-#                            for mtzfile in glob.glob('autoprocessing/*/%s.mtz' %xtal):
-#                                self.Logfile.insert('checking %s' %mtzfile)
-#                                procMTZ=mtztools(mtzfile)
-#                                nREF=procMTZ.get_number_measured_reflections()
-#                                CC=freeMTZ.calculate_correlaton_between_mtzfiles(mtzfile)
-#                                self.Logfile.insert('%s: calculating CC between refine.mtz (%s refl) and %s (%s refl): %s' %(xtal,str(nREFfree),mtzfile.split('/')[1],str(nREF),str(CC)))
-#                            self.Logfile.insert('correlation coefficient between the two files is below 0.9; will search autoprocessing directory for file with higher CC')
-#                            for mtzfile in glob.glob('autoprocessing/*/%s.mtz' %xtal):
-#                                self.Logfile.insert('checking %s' %mtzfile)
-#                                procMTZ=mtztools(mtzfile)
-#                                nREF=procMTZ.get_number_measured_reflections()
-#                                CC=freeMTZ.calculate_correlaton_between_mtzfiles(mtzfile)
-#                                self.Logfile.insert('%s: calculating CC between refine.mtz (%s refl) and %s (%s refl): %s' %(xtal,str(nREFfree),mtzfile.split('/')[1],str(nREF),str(CC)))
-
-
                     except ValueError:
                         self.Logfile.insert('something went wrong: calculated CC value does not seem to be a floating point number')
 
 
-#            for mtzfile in glob.glob('autoprocessing/*/%s.mtz' %xtal):
-#                procMTZ=mtztools(mtzfile)
-#                nREF=procMTZ.get_number_measured_reflections()
-#                resoHIGH=procMTZ.get_high_resolution_from_mtz()
-#                CC=refineMTZ.calculate_correlaton_between_mtzfiles(mtzfile)
-#                self.Logfile.insert('comparing refine.mtz ')
-#                if nREF==nREFrefine:
-#                    if os.path.isfile(xtal+'.mtz'):
-#                        if os.path.realpath(xtal+'.mtz') != os.path.realpath(mtzfile):
-#                            self.Logfile.insert('%s: mtzfile used for refinement is not the same as the one chosen from autoprocessing' %xtal)
-#                            self.Logfile.insert('%s: current mtzfile after autoprocessing: %s' %(xtal,os.path.realpath(xtal+'.mtz')))
-#                            self.Logfile.insert('%s: removing links for %s.mtz/%s.log' %(xtal,xtal,xtal))
-#                            os.system('/bin/rm %s.mtz 2> /dev/null' %xtal)
-#                            os.system('/bin/rm %s.log 2> /dev/null' %xtal)
-#                            self.Logfile.insert('linking %s to %s.mtz' %(mtzfile,xtal))
-#                            os.symlink(mtzfile,xtal+'.mtz')
-#                            self.Logfile.insert('linking %s to %s.log' %(mtzfile.replace('.mtz','.log'),xtal))
-#                            os.symlink(mtzfile.replace('.mtz','.log'),xtal+'.log')
-#                            break
 
         found_logfile=False
         if os.path.isfile(xtal+'.log'):
