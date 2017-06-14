@@ -337,7 +337,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                                         break
                                     if line.startswith(' --no-cleanup'):
                                         foundLine=True
-
+                                print 'hallo'
                                 if os.path.isfile(mtzin):
                                     self.Logfile.insert('%s: mtzfile used for refinement is not the same as the one chosen from autoprocessing' %xtal)
                                     self.Logfile.insert('%s: current mtzfile after autoprocessing: %s' %(xtal,os.path.realpath(xtal+'.mtz')))
