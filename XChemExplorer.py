@@ -5477,7 +5477,7 @@ class XChemExplorer(QtGui.QApplication):
                                 if entry[8]==True:
                                     print '===> found:',n
                                     self.data_collection_column_three_dict[key][0].selectRow(n)
-                        pass
+                        break
 
                 indexes=self.sender().selectionModel().selectedRows()
                 selected_processing_result=1000000
