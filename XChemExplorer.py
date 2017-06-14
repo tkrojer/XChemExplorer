@@ -5475,7 +5475,7 @@ class XChemExplorer(QtGui.QApplication):
                         for n,entry in enumerate(self.data_collection_dict[key]):
                             if entry[0]=='logfile':
                                 if entry[8]==True:
-                                    self.sender.selectRow(n)
+                                    self.data_collection_column_three_dict[key][0].selectRow(n)
 
 
 
