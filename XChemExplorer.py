@@ -1,4 +1,4 @@
-# last edited: 19/04/2017, 18:00
+# last edited: 14/06/2017, 18:00
 
 import os, sys, glob
 from datetime import datetime
@@ -5464,7 +5464,7 @@ class XChemExplorer(QtGui.QApplication):
                 print '===>',key,stage
                 if int(stage) > 2:
                     msgBox = QtGui.QMessageBox()
-                    msgBox.setText("*** WARNING ***\n%s is currently %s\nIt will disappear from the Refinement table,\nwhen you refresh it next time.\nDo you want to continue?" %(key,stage))
+                    msgBox.setText("*** WARNING ***\n%s is currently %s\nIt will disappear from the Refinement table,\nwhen you refresh it next time.\nDo you want to continue?" %(key,dbTmp['RefinementOutcome']))
                     msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.YesRole)
                     msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.RejectRole)
                     reply = msgBox.exec_();
