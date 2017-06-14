@@ -327,8 +327,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                         self.Logfile.insert('pointless failed with the following error: %s' %errorMessage)
 
                     try:
-                        if float(CC) < 0.95:
-                            self.Logfile.insert('correlation coefficient between the two files is below 0.95; will try to understand from dimple.log which one was used for initial map calculation')
+                        if float(CC) < 0.999:
+                            self.Logfile.insert('correlation coefficient between the two files is below 0.999; will try to understand from dimple.log which one was used for initial map calculation')
                             if os.path.isfile('dimple/dimple_rerun_on_selected_file/dimple/dimple.log'):
                                 foundLine=False
                                 mtzin=''
