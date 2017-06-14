@@ -5462,14 +5462,23 @@ class XChemExplorer(QtGui.QApplication):
                 dbTmp=self.xtal_db_dict[key]
                 stage=dbTmp['RefinementOutcome'].split()[0]
                 print '===>',key,stage
-                if int(stage) > 3:
+                if int(stage) > 2:
                     msgBox = QtGui.QMessageBox()
-                    msgBox.setText("*** WARNING ***\n%s is currently %s\nIt will disappear from the Refinement table\nDo you want to continue?" %(key,stage))
+                    msgBox.setText("*** WARNING ***\n%s is currently %s\nIt will disappear from the Refinement table,\nwhen you refresh it next time.\nDo you want to continue?" %(key,stage))
                     msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.YesRole)
                     msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.RejectRole)
                     reply = msgBox.exec_();
                     if reply == 0:
                         self.update_log.insert('will not change data processing selection')
+
+                        # restore previous selection
+                        for n,entry in enumerate(self.data_collection_dict[key]):
+                            if entry[0]=='logfile':
+                                if entry[8]==True:
+                                    self.sender.selectRow(n)
+
+
+
                         pass
                 indexes=self.sender().selectionModel().selectedRows()
                 selected_processing_result=1000000
