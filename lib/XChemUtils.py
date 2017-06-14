@@ -1122,7 +1122,7 @@ class mtztools:
             if foundLine:
                 CC=line.split()[3]
                 break
-            if '       Alternative reindexing        Lklhd' in line:
+            if 'Alternative reindexing        Lklhd      CC' in line:
                 foundLine=True
         return CC
 
