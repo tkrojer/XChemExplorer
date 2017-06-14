@@ -5459,10 +5459,16 @@ class XChemExplorer(QtGui.QApplication):
     def user_update_selected_autoproc_data_collection_summary_table(self):
         for key in self.data_collection_column_three_dict:
             if self.data_collection_column_three_dict[key][0]==self.sender():
-
-                print '===> key:',key
                 dbTmp=self.xtal_db_dict[key]
-                print '====> RefinementOutcome:',dbTmp['RefinementOutcome']
+                stage=dbTmp['RefinementOutcome'].split()[0]
+                if int(stage) > 3:
+                    msgBox = QtGui.QMessageBox()
+                    msgBox.setText("*** WARNING ***\n%s is currently %s\nIt will disappear from the Refinement table\nDo you want to continue?")
+                    msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.YesRole)
+                    msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.RejectRole)
+                    reply = msgBox.exec_();
+                    if reply == 0:
+                        self.update_log.insert('aborted...')
 
                 indexes=self.sender().selectionModel().selectedRows()
                 selected_processing_result=1000000
