@@ -1109,8 +1109,9 @@ class mtztools:
             pass
         return meassured_reflections
 
-    def calculate_correlaton_between_mtzfiles(self,mtzin):
+    def calculate_correlaton_between_intensities_in_mtzfiles(self,mtzin):
         CC = '0.0'
+        errorMessage=''
 #        cmd = ( 'pointless hklin %s hklref %s << eof\n' %(mtzin,self.mtzfile)+
 #                'labref F=F\n'
 #                'labin F=F\n'
@@ -1128,7 +1129,14 @@ class mtztools:
                 break
             if 'Alternative reindexing        Lklhd      CC' in line:
                 foundLine=True
-        return CC
+            if '**** Incompatible symmetries ****' in line:
+                errorMessage='**** Incompatible symmetries ****'
+                break
+            if 'Merged test dataset (HKLIN) has different Laue symmetry to reference set' in line:
+                errorMessage='%s has different Laue symmetry to %s' %(mtzin,self.mtzfile)
+                break
+
+        return CC,errorMessage
 
     def get_all_values_as_dict(self):
         mtz = { 'resolution_high':  'n/a',

@@ -321,8 +321,10 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                 if os.path.isfile(xtal+'.mtz'):
                     procMTZ=mtztools(xtal+'.mtz')
                     nREF=procMTZ.get_number_measured_reflections()
-                    CC=freeMTZ.calculate_correlaton_between_mtzfiles(xtal+'.mtz')
+                    CC,errorMessage=freeMTZ.calculate_correlaton_between_intensities_in_mtzfiles(xtal+'.mtz')
                     self.Logfile.insert('%s: calculating CC between %s.free.mtz (%s refl) and %s.mtz (%s refl): %s' %(xtal,xtal,str(nREFfree),xtal,str(nREF),str(CC)))
+                    if errorMessage != '':
+                        self.Logfile.insert('pointless failed with the following error: %s' %errorMessage)
 
                     try:
                         if float(CC) < 0.95:
