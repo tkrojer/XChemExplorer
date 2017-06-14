@@ -5461,6 +5461,7 @@ class XChemExplorer(QtGui.QApplication):
             if self.data_collection_column_three_dict[key][0]==self.sender():
                 dbTmp=self.xtal_db_dict[key]
                 stage=dbTmp['RefinementOutcome'].split()[0]
+                print '===>',key,stage
                 if int(stage) > 3:
                     msgBox = QtGui.QMessageBox()
                     msgBox.setText("*** WARNING ***\n%s is currently %s\nIt will disappear from the Refinement table\nDo you want to continue?" %(key,stage))
