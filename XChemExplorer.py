@@ -5463,13 +5463,13 @@ class XChemExplorer(QtGui.QApplication):
                 stage=dbTmp['RefinementOutcome'].split()[0]
                 if int(stage) > 3:
                     msgBox = QtGui.QMessageBox()
-                    msgBox.setText("*** WARNING ***\n%s is currently %s\nIt will disappear from the Refinement table\nDo you want to continue?")
+                    msgBox.setText("*** WARNING ***\n%s is currently %s\nIt will disappear from the Refinement table\nDo you want to continue?" %(key,stage))
                     msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.YesRole)
                     msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.RejectRole)
                     reply = msgBox.exec_();
                     if reply == 0:
-                        self.update_log.insert('aborted...')
-
+                        self.update_log.insert('will not change data processing selection')
+                        pass
                 indexes=self.sender().selectionModel().selectedRows()
                 selected_processing_result=1000000
                 for index in sorted(indexes):
