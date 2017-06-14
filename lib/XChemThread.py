@@ -344,12 +344,12 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                                     self.Logfile.insert('%s: mtzfile used for refinement is not the same as the one chosen from autoprocessing' %xtal)
                                     self.Logfile.insert('%s: current mtzfile after autoprocessing: %s' %(xtal,os.path.realpath(xtal+'.mtz')))
                                     self.Logfile.insert('%s: removing links for %s.mtz/%s.log' %(xtal,xtal,xtal))
-#                                    os.system('/bin/rm %s.mtz 2> /dev/null' %xtal)
-#                                    os.system('/bin/rm %s.log 2> /dev/null' %xtal)
+                                    os.system('/bin/rm %s.mtz 2> /dev/null' %xtal)
+                                    os.system('/bin/rm %s.log 2> /dev/null' %xtal)
                                     self.Logfile.insert('linking %s to %s.mtz' %(os.path.relpath(mtzin),xtal))
- #                                   os.symlink(os.path.relpath(mtzin),xtal+'.mtz')
+                                    os.symlink(os.path.relpath(mtzin),xtal+'.mtz')
                                     self.Logfile.insert('linking %s to %s.log' %(os.path.relpath(mtzin).replace('.mtz','.log'),xtal))
-#                                    os.symlink(os.path.relpath(mtzin).replace('.mtz','.log'),xtal+'.log')
+                                    os.symlink(os.path.relpath(mtzin).replace('.mtz','.log'),xtal+'.log')
 
 
 
