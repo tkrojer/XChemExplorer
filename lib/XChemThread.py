@@ -332,12 +332,12 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                                 mtzin=''
                                 for line in open('dimple/dimple_rerun_on_selected_file/dimple/dimple.log'):
                                     if foundLine:
-                                        mtzin=line
+                                        mtzin=line.replace(' ','').replace('\n','').replace('\r','')
                                         self.Logfile.insert('%s was used for inital map calculation' %mtzin)
                                         break
                                     if line.startswith(' --no-cleanup'):
                                         foundLine=True
-                                print 'hallo'
+
                                 if os.path.isfile(mtzin):
                                     self.Logfile.insert('%s: mtzfile used for refinement is not the same as the one chosen from autoprocessing' %xtal)
                                     self.Logfile.insert('%s: current mtzfile after autoprocessing: %s' %(xtal,os.path.realpath(xtal+'.mtz')))
@@ -368,7 +368,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
 
                     except ValueError:
-                        pass
+                        self.Logfile.insert('something went wrong: calculated CC value does not seem to be a floating point number')
 
 
 #            for mtzfile in glob.glob('autoprocessing/*/%s.mtz' %xtal):
