@@ -5461,6 +5461,8 @@ class XChemExplorer(QtGui.QApplication):
             if self.data_collection_column_three_dict[key][0]==self.sender():
 
                 print '===> key:',key
+                dbTmp=self.xtal_db_dict[key]
+                print '====> RefinementOutcome:',dbTmp['RefinementOutcome']
 
                 indexes=self.sender().selectionModel().selectedRows()
                 selected_processing_result=1000000
