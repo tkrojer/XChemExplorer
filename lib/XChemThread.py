@@ -1,4 +1,4 @@
-# last edited: 14/06/2017, 15:00
+# last edited: 15/06/2017, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -437,6 +437,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 #            db_dict['RefinementMTZfree']=os.path.realpath(xtal+'.free.mtz').replace(os.getcwd()+'/','')
         else:
             db_dict['RefinementMTZfree']=''
+            os.system('/bin/rm %s.free.mtz 2> /dev/null' %xtal)
             if os.path.isfile(os.path.join(dimple_path,'prepared2.mtz')):
                 os.symlink(os.path.relpath(os.path.join(dimple_path,'prepared2.mtz')),xtal+'.free.mtz')
 #                db_dict['RefinementMTZfree']=os.path.realpath(xtal+'.free.mtz').replace(os.getcwd()+'/','')
