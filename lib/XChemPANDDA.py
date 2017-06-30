@@ -445,21 +445,22 @@ class run_pandda_analyse(QtCore.QThread):
 
             for i in range(number_of_cyles):
                 Cmds += (
-                    '\n'
-                    'pandda.analyse '
+                    'module load pymol '+
+		    '\n'+
+                    'pandda.analyse '+
                     ' data_dirs="'+self.data_directory+'"'
-                    ' out_dir='+self.panddas_directory+
+                    ' out_dir="'+self.panddas_directory+'"'
                     ' min_build_datasets='+self.min_build_datasets+
                     #' maps.ampl_label=FWT maps.phas_label=PHWT'
                     ' max_new_datasets='+self.max_new_datasets+
                     ' grid_spacing='+self.grid_spacing+
                     ' cpus='+self.nproc+
                     ' events.order_by='+self.sort_event+
-                    filter_pdb+
+                    #filter_pdb+
                     ' pdb_style='+self.pdb_style+
                     ' mtz_style='+self.mtz_style+
                     ' lig_style=/compound/*.cif'+
-                    ' perform_diffraction_data_scaling='+self.wilson_scaling+
+                    ' use_b_factor_scaled_data='+self.wilson_scaling+
                     '\n'
                     )
 
