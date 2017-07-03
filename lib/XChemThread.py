@@ -1,4 +1,4 @@
-# last edited: 15/06/2017, 15:00
+# last edited: 03/07/2017, 12:00
 
 import os, sys, glob
 from datetime import datetime
@@ -1143,7 +1143,8 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     '\n'
                     '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(database,xtal,'DimpleStatus','running') +
                     '\n'
-                    'dimple --no-cleanup %s %s %s %s dimple\n' %(mtzin,ref_pdb,ref_mtz,ref_cif) +
+                    'uniqueify %s %s.unique.mtz\n' %(mtzin,xtal)+
+                    'dimple --no-cleanup %s.unique.mtz %s %s %s dimple\n' %(xtal,ref_pdb,ref_mtz,ref_cif) +
                     '\n'
                     'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc,'dimple') +
                     '\n'
@@ -3182,3 +3183,6 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
         cPickle.dump(self.data_collection_dict,open(self.data_collection_summary_file,'wb'))
 
         self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results_only'), self.data_collection_dict)
+
+
+
