@@ -1,4 +1,4 @@
-# last edited: 26/04/2017, 15:00
+# last edited: 05/07/2017, 15:00
 
 #!/usr/local/anaconda/sgc_default/envs/sgc_default/bin/python
 
@@ -265,6 +265,21 @@ def main (argv):
         " p.PANDDA_site_event_map from panddaTable as p, "
         " mainTable as m where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' "
         " and (p.RefinementOutcome like '4%' or p.RefinementOutcome like '5%' or p.RefinementOutcome like '6%')  "
+        " and (LigandConfidence like '1%' or LigandConfidence like '2%' or LigandConfidence like '3%' or LigandConfidence like '4%')"
+        " order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index"
+      )
+
+      sql = (
+        "select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.CrystalName || '_event'|| p.PANDDA_site_event_index "
+        " as ModelName,m.CompoundCode,m.CompoundSMILES,m.Deposition_PDB_ID,p.PANDDA_site_name,"
+        " p.PANDDA_site_confidence as LigandConfidence,"
+        " p.RefinementOutcome as ModelStatus,"
+        " p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, p.PANDDA_site_spider_plot,"
+        " m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,"
+        " m.RefinementBoundConformation,m.RefinementMTZ_latest,"
+        " p.PANDDA_site_event_map from panddaTable as p, "
+        " mainTable as m where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' "
+        " and (m.RefinementOutcome like '4%' or m.RefinementOutcome like '5%' or m.RefinementOutcome like '6%')  "
         " and (LigandConfidence like '1%' or LigandConfidence like '2%' or LigandConfidence like '3%' or LigandConfidence like '4%')"
         " order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index"
       )
