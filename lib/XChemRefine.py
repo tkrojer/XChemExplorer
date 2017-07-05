@@ -155,6 +155,7 @@ class Refine(object):
                     "giant.create_occupancy_params pdb=in.pdb refmac_occ_out='refmac_refine.params'\n"  )
 #            os.system("giant.create_occupancy_params pdb=in.pdb refmac_occ_out='refmac_refine.params'")
 #            os.system(cmd)
+            print "==> XCE: running giant.create_occupancy_params pdb=in.pdb refmac_occ_out='refmac_refine.params"
             os.system("giant.create_occupancy_params pdb=in.pdb refmac_occ_out='refmac_refine.params")
             # quick fix for the moment; need to talk to Nick since this should not be necessary
             try:
