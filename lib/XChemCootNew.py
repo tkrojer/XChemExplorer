@@ -1,4 +1,4 @@
-# last edited: 05/06/2017 - 15:00
+# last edited: 07/07/2017 - 15:00
 
 import gobject
 import sys
@@ -36,6 +36,7 @@ class GUI(object):
         # read in settings file from XChemExplorer to set the relevant paths
         print 'current dir',os.getcwd()
         self.settings = pickle.load(open(".xce_settings.pkl","rb"))
+        remote_qsub_submission=self.settings['remote_qsub']
         print 'setting',self.settings
 #        self.refine_model_directory=self.settings['refine_model_directory']
         self.database_directory=self.settings['database_directory']
@@ -45,6 +46,7 @@ class GUI(object):
 
         # checking for external software packages
         self.external_software=XChemUtils.external_software(self.xce_logfile).check()
+        self.external_software['qsub_remote']=remote_qsub_submission
 
         self.selection_criteria = [     '0 - All Datasets',
                                         '1 - Analysis Pending',

@@ -1,4 +1,4 @@
-# last edited: 14/06/2017, 18:00
+# last edited: 07/07/2017, 18:00
 
 import os, sys, glob
 from datetime import datetime
@@ -39,7 +39,7 @@ class XChemExplorer(QtGui.QApplication):
     def __init__(self,args):
         QtGui.QApplication.__init__(self,args)
 
-        self.xce_version='v1.0-beta.3.4'
+        self.xce_version='v1.0-beta.4.1'
 
         # general settings
         self.allowed_unitcell_difference_percent=12
@@ -156,7 +156,8 @@ class XChemExplorer(QtGui.QApplication):
                              'max_queue_jobs':                  self.max_queue_jobs,
                              'diffraction_data_directory':      self.diffraction_data_directory,
                              'html_export_directory':           self.html_export_directory,
-                             'group_deposit_directory':         self.group_deposit_directory        }
+                             'group_deposit_directory':         self.group_deposit_directory,
+                             'remote_qsub':                     ''  }
 
 
         #
@@ -250,6 +251,9 @@ class XChemExplorer(QtGui.QApplication):
         else:
             self.restraints_program=''
             self.update_log.insert('No program for generation of ligand coordinates and restraints available!')
+
+        self.using_remote_qsub_submission=False
+        self.remote_qsub_submission="ssh <dls fed ID>@nx.diamond.ac.uk 'module load global/cluster; qsub'"
 
         # start GUI
 
@@ -1758,11 +1762,38 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_max_queue_jobs.addWidget(adjust_max_queue_jobs)
         vbox.addLayout(settings_hbox_max_queue_jobs)
 
+        settings_hbox_remote_qsub=QtGui.QHBoxLayout()
+        remote_qsub_label=QtGui.QLabel('remote qsub:')
+        settings_hbox_remote_qsub.addWidget(remote_qsub_label)
+        self.remote_qsub_checkbox = QtGui.QCheckBox('use')
+        self.remote_qsub_checkbox.toggled.connect(self.run_qsub_remotely)
+        if self.using_remote_qsub_submission:
+            self.remote_qsub_checkbox.setChecked(True)
+        settings_hbox_remote_qsub.addWidget(self.remote_qsub_checkbox)
+        self.remote_qsub_command = QtGui.QLineEdit()
+        self.remote_qsub_command.setFixedWidth(550)
+        self.remote_qsub_command.setText(self.remote_qsub_submission)
+#        remote_qsub.textChanged[str].connect(self.change_max_queue_jobs)
+        settings_hbox_remote_qsub.addWidget(self.remote_qsub_command)
+        vbox.addLayout(settings_hbox_remote_qsub)
+
 
         preferencesLayout.addLayout(vbox,0,0)
 
         preferences.exec_();
 
+    def run_qsub_remotely(self):
+        self.remote_qsub_submission=str(self.remote_qsub_command.text())
+        if self.remote_qsub_checkbox.isChecked():
+            self.update_log.insert('submitting jobs to remote machine with: %s' %self.remote_qsub_submission)
+            self.external_software['qsub_remote']=self.remote_qsub_submission
+            self.using_remote_qsub_submission=True
+            self.settings['remote_qsub']=self.remote_qsub_submission
+        else:
+            self.update_log.insert('switching off remote job submission')
+            self.external_software['qsub_remote']=''
+            self.settings['remote_qsub']=''
+            self.using_remote_qsub_submission=False
 
     def enter_pdb_codes(self):
         pdbID_entry = QtGui.QMessageBox()

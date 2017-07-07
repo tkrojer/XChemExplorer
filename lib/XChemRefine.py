@@ -1,4 +1,4 @@
-# last edited: 05/07/2017, 15:00
+# last edited: 07/07/2017, 15:00
 
 import pygtk, gtk, pango
 import os
@@ -350,7 +350,13 @@ class Refine(object):
         if external_software['qsub']:
             Logfile.insert('starting refinement on cluster')
             os.system('qsub -P labxchem refmac.csh')
+        elif external_software['qsub_remote'] != '':
+            Logfile.insert('starting refinement on remote cluster')
+            remote_command=external_software['qsub_remote'].replace('qsub','cd %s; qsub' %os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
+            os.system('%s -P labxchem refmac.csh' %remote_command)
+            print '%s -P labxchem refmac.csh' %remote_command
         else:
+            print 'oh not here'
             os.system('chmod +x refmac.csh')
             Logfile.insert('starting refinement on local machine')
             os.system('./refmac.csh &')

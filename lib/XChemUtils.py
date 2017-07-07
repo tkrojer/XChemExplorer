@@ -1,4 +1,4 @@
-# last edited: 14/06/2017, 17:00
+# last edited: 07/07/2017, 17:00
 
 import sys
 import os
@@ -1256,6 +1256,9 @@ class external_software:
     def check(self):
 
         self.Logfile.insert('Searching for external software...')
+
+        # default is False; user needs to explicitely set this
+        self.available_programs['qsub_remote']=''
 
         FNULL = open(os.devnull, 'w')
 
