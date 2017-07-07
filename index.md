@@ -6,7 +6,7 @@ XChemExplorer (XCE) is a data management and workflow tool for the parallel dete
 # [](#header-1)Download
 A pre-release is currently available for download:
 
-[v1.0-beta.4.0](https://github.com/tkrojer/XChemExplorer/archive/v1.0-beta.4.0.tar.gz)
+[v1.0-beta.4.1](https://github.com/tkrojer/XChemExplorer/archive/v1.0-beta.4.1.tar.gz)
 
 
 
@@ -37,14 +37,14 @@ Then change to the respective directory and unpack the archive, e.g.:
 
 ```shell
 cd /home/tkrojer/software
-gunzip XChemExplorer-1.0-beta.3.4.tar.gz
-tar –xvf XChemExplorer-1.0-beta.3.4.tar
+gunzip XChemExplorer-1.0-beta.4.1.tar.gz
+tar –xvf XChemExplorer-1.0-beta.4.1.tar
 ```
 
 This will create a new directory, i.e. from now on your XChemExplorer directory. Change into this directory, e.g.:
 
 ```shell
-cd XChemExplorer-1.0-beta.3.4
+cd XChemExplorer-1.0-beta.4.1
 ```
 
 The contents of the directory should look something like this when you type ‘ls –l’:
