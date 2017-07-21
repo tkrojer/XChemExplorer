@@ -110,8 +110,8 @@ class GUI(object):
         ###########################################################################################
         # some COOT settings
         coot.set_map_radius(17)
-        coot.set_colour_map_rotation_for_map(21)
-        coot.set_colour_map_rotation_on_read_pdb_flag(0)
+        coot.set_colour_map_rotation_for_map(0)
+#        coot.set_colour_map_rotation_on_read_pdb_flag(21)
 
         self.QualityIndicators = {  'RefinementRcryst':                         '-',
                                     'RefinementRfree':                          '-',
@@ -817,6 +817,7 @@ class GUI(object):
         #########################################################################################
         # check for PANDDAs EVENT maps
         if os.path.isfile(self.event_map):
+            coot.set_colour_map_rotation_on_read_pdb(0)
             coot.handle_read_ccp4_map((self.event_map),0)
             for imol in coot_utils_XChem.molecule_number_list():
                 if self.event_map in coot.molecule_name(imol):
@@ -900,6 +901,7 @@ class GUI(object):
         # read protein molecule after ligand so that this one is the active molecule
         coot.set_nomenclature_errors_on_read("ignore")
         if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.pdb')):
+            coot.set_colour_map_rotation_on_read_pdb(0)
             imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.pdb'),0)
             self.mol_dict['ligand']=imol
             coot.read_cif_dictionary(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.cif'))
@@ -909,13 +911,17 @@ class GUI(object):
         if self.refinementProtocol=='pandda':
             if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.ground-state.pdb')):
                 os.chdir(os.path.join(self.project_directory,self.xtalID))
-                coot.set_colour_map_rotation_on_read_pdb(190)
+                coot.set_colour_map_rotation_on_read_pdb(0)
                 imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.ground-state.pdb'),0)
                 coot.set_colour_by_molecule(imol)
                 coot.set_mol_active(imol,0)
             if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb')):
                 os.chdir(os.path.join(self.project_directory,self.xtalID))
-                coot.set_colour_map_rotation_on_read_pdb(21)
+                coot.set_colour_map_rotation_on_read_pdb(0)
+                color_wheel_rotation=21/float(imol+2)
+                print 'IMOLLLLLL',imol
+                print 'color_wheel_rotattion',color_wheel_rotation
+                coot.set_colour_map_rotation_on_read_pdb(color_wheel_rotation)
                 imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb'),0)
                 self.mol_dict['protein']=imol
             else:
@@ -941,6 +947,7 @@ class GUI(object):
         # - read ccp4 map: 0 - 2fofc map, 1 - fofc.map
         # read 2fofc map last so that one can change its contour level
         if os.path.isfile(os.path.join(self.project_directory,self.xtalID,'2fofc.map')):
+            coot.set_colour_map_rotation_on_read_pdb(0)
             coot.set_default_initial_contour_level_for_difference_map(3)
             coot.handle_read_ccp4_map(os.path.join(self.project_directory,self.xtalID,'fofc.map'),1)
             coot.set_default_initial_contour_level_for_map(1)
