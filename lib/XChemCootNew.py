@@ -912,6 +912,8 @@ class GUI(object):
             if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.ground-state.pdb')):
                 os.chdir(os.path.join(self.project_directory,self.xtalID))
                 coot.set_colour_map_rotation_on_read_pdb(0)
+                color_wheel_rotation=160/float(imol+2)
+                coot.set_colour_map_rotation_on_read_pdb(color_wheel_rotation)
                 imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.ground-state.pdb'),0)
                 coot.set_colour_by_molecule(imol)
                 coot.set_mol_active(imol,0)
@@ -919,8 +921,6 @@ class GUI(object):
                 os.chdir(os.path.join(self.project_directory,self.xtalID))
                 coot.set_colour_map_rotation_on_read_pdb(0)
                 color_wheel_rotation=21/float(imol+2)
-                print 'IMOLLLLLL',imol
-                print 'color_wheel_rotattion',color_wheel_rotation
                 coot.set_colour_map_rotation_on_read_pdb(color_wheel_rotation)
                 imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb'),0)
                 self.mol_dict['protein']=imol
