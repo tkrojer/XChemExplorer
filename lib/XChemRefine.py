@@ -883,7 +883,7 @@ class panddaRefine(object):
             'EOF\n'
              '\n'
             '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_after_refinement.py')+
-            ' %s %s %s %s\n' %(self.datasource,self.xtalID,self.ProjectPath,os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))+
+            ' %s %s %s %s\n' %(self.datasource,self.xtalID,self.ProjectPath,os.path.join(self.ProjectPath,self.xtalID,'Refine_'+str(Serial)))+
             '\n'
             '/bin/rm %s/%s/REFINEMENT_IN_PROGRESS\n' %(self.ProjectPath,self.xtalID)+
             '\n'
@@ -894,15 +894,15 @@ class panddaRefine(object):
         cmd.write(refmacCmds)
         cmd.close()
 
-        os.chdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
+        os.chdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+str(Serial)))
 #        os.system('ssh artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(self.ProjectPath,self.xtalID,Serial))
-        Logfile.insert('changing directory to %s' %(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial)))
+        Logfile.insert('changing directory to %s' %(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+str(Serial))))
         if external_software['qsub']:
             Logfile.insert('starting refinement on cluster')
             os.system('qsub -P labxchem refmac.csh')
         elif external_software['qsub_remote'] != '':
             Logfile.insert('starting refinement on remote cluster')
-            remote_command=external_software['qsub_remote'].replace('qsub','cd %s; qsub' %os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
+            remote_command=external_software['qsub_remote'].replace('qsub','cd %s; qsub' %os.path.join(self.ProjectPath,self.xtalID,'Refine_'+str(Serial)))
             os.system('%s -P labxchem refmac.csh' %remote_command)
             print '%s -P labxchem refmac.csh' %remote_command
         else:
