@@ -907,20 +907,20 @@ class GUI(object):
             os.chdir(os.path.join(self.project_directory,self.xtalID))
 
         if self.refinementProtocol=='pandda':
-            print 'looking for ',os.path.join(self.project_directory,self.xtalID,self.pdb_style+'.split.bound-state.pdb')
-            if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style+'.split.bound-state.pdb')):
+            print 'looking for ',os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb')
+            if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb')):
                 print 'found it'
                 os.chdir(os.path.join(self.project_directory,self.xtalID))
                 coot.set_colour_map_rotation_on_read_pdb(21)
-                imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style+'.split.bound-state.pdb'),0)
+                imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb'),0)
                 self.mol_dict['protein']=imol
             else:
                 print 'did not find it'
                 self.go_to_next_xtal()
-            if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style+'.split.ground-state.pdb')):
+            if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.ground-state.pdb')):
                 os.chdir(os.path.join(self.project_directory,self.xtalID))
                 coot.set_colour_map_rotation_on_read_pdb(190)
-                imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style+'.split.ground-state.pdb'),0)
+                imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.ground-state.pdb'),0)
                 coot.set_colour_by_molecule(imol)
                 coot.set_mol_active(imol,0)
         else:
@@ -935,7 +935,7 @@ class GUI(object):
             self.mol_dict['protein']=imol
 
         for item in coot_utils_XChem.molecule_number_list():
-            if coot.molecule_name(item).endswith(self.pdb_style+'.split.bound-state.pdb') or coot.molecule_name(item).endswith(self.pdb_style):
+            if coot.molecule_name(item).endswith(self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb') or coot.molecule_name(item).endswith(self.pdb_style):
                 coot.set_show_symmetry_master(1)    # master switch to show symmetry molecules
                 coot.set_show_symmetry_molecule(item,1) # show symm for model
 
@@ -1034,7 +1034,7 @@ class GUI(object):
         # now take protein pdb file and write it to newly create Refine_<serial> folder
         # note: the user has to make sure that the ligand file was merged into main file
         for item in coot_utils_XChem.molecule_number_list():
-            if coot.molecule_name(item).endswith(self.pdb_style+'.split.bound-state.pdb') or coot.molecule_name(item).endswith(self.pdb_style):
+            if coot.molecule_name(item).endswith(self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb') or coot.molecule_name(item).endswith(self.pdb_style):
                 coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'cootOut','Refine_'+str(self.Serial),'refine.modified.pdb'))
                 break
             elif coot.molecule_name(item).endswith('dimple.pdb'):
