@@ -907,22 +907,19 @@ class GUI(object):
             os.chdir(os.path.join(self.project_directory,self.xtalID))
 
         if self.refinementProtocol=='pandda':
-            print 'looking for ',os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb')
-            if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb')):
-                print 'found it'
-                os.chdir(os.path.join(self.project_directory,self.xtalID))
-                coot.set_colour_map_rotation_on_read_pdb(21)
-                imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb'),0)
-                self.mol_dict['protein']=imol
-            else:
-                print 'did not find it'
-                self.go_to_next_xtal()
             if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.ground-state.pdb')):
                 os.chdir(os.path.join(self.project_directory,self.xtalID))
                 coot.set_colour_map_rotation_on_read_pdb(190)
                 imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.ground-state.pdb'),0)
                 coot.set_colour_by_molecule(imol)
                 coot.set_mol_active(imol,0)
+            if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb')):
+                os.chdir(os.path.join(self.project_directory,self.xtalID))
+                coot.set_colour_map_rotation_on_read_pdb(21)
+                imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb'),0)
+                self.mol_dict['protein']=imol
+            else:
+                self.go_to_next_xtal()
         else:
             if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style)):
                 os.chdir(os.path.join(self.project_directory,self.xtalID))
