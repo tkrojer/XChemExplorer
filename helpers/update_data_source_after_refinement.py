@@ -1,4 +1,4 @@
-# last edited: 17/11/2016, 17:00
+# last edited: 21/07/2016, 17:00
 
 import os,sys
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
@@ -30,6 +30,8 @@ def parse_pdb(inital_model_directory,xtal,db_dict):
         db_dict['RefinementStatus'] =               'failed'
     if os.path.isfile(os.path.join(inital_model_directory,xtal,'refine.bound.pdb')):
         db_dict['RefinementBoundConformation']=os.path.realpath(os.path.join(inital_model_directory,xtal,'refine.bound.pdb'))
+    elif os.path.isfile(os.path.join(inital_model_directory,xtal,'refine.split.bound-state.pdb')):
+        db_dict['RefinementBoundConformation']=os.path.realpath(os.path.join(inital_model_directory,xtal,'refine.split.bound-state.pdb'))
 
     return db_dict
 
