@@ -907,12 +907,15 @@ class GUI(object):
             os.chdir(os.path.join(self.project_directory,self.xtalID))
 
         if self.refinementProtocol=='pandda':
+            print 'looking for ',os.path.join(self.project_directory,self.xtalID,self.pdb_style+'.split.bound-state.pdb')
             if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style+'.split.bound-state.pdb')):
+                print 'found it'
                 os.chdir(os.path.join(self.project_directory,self.xtalID))
                 coot.set_colour_map_rotation_on_read_pdb(21)
                 imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style+'.split.bound-state.pdb'),0)
                 self.mol_dict['protein']=imol
             else:
+                print 'did not find it'
                 self.go_to_next_xtal()
             if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style+'.split.ground-state.pdb')):
                 os.chdir(os.path.join(self.project_directory,self.xtalID))
