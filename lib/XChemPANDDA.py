@@ -1,4 +1,4 @@
-# last eidited: 31/05/2017, 15:00
+# last eidited: 20/07/2017, 15:00
 
 import os, sys, glob
 from datetime import datetime
@@ -90,12 +90,18 @@ class run_pandda_export(QtCore.QThread):
             if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.free.mtz')):
                 if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb')):
                     self.Logfile.insert('running inital refinement on PANDDA model of '+xtal)
-                    Refine=XChemRefine.Refine(self.initial_model_directory,xtal,compoundID,self.datasource)
-                    Serial=Refine.GetSerial()
-                    os.mkdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+str(Serial)))
-                    os.chdir(os.path.join(self.initial_model_directory,xtal,'Refine_'+str(Serial)))
-                    os.symlink(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb'),'in.pdb')
-                    Refine.RunRefmac(Serial,self.RefmacParams,self.external_software,self.xce_logfile)
+                    Serial=XChemRefine.GetSerial(self.initial_model_directory,xtal)
+                    #######################################################
+                    if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'cootOut')):
+                        os.mkdir(os.path.join(self.initial_model_directory,xtal,'cootOut'))
+                    # create folder for new refinement cycle
+                    os.mkdir(os.path.join(self.initial_model_directory,xtal,'cootOut','Refine_'+str(Serial)))
+                    os.chdir(os.path.join(self.initial_model_directory,xtal,'cootOut','Refine_'+str(Serial)))
+                    Refine=XChemRefine.panddaRefine(self.initial_model_directory,xtal,compoundID,self.datasource)
+                    os.symlink(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb'),xtal+'-ensemble-model.pdb')
+                    Refine.RunQuickRefine(Serial,self.RefmacParams,self.external_software,self.xce_logfile)
+            else:
+                self.Logfile.error('%s: cannot start refinement because %s.free.mtz is missing in %s' %(xtal,xtal,os.path.join(self.initial_model_directory,xta)))
 
 
     def import_samples_into_datasouce(self):

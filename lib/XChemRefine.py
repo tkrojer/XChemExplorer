@@ -1,4 +1,4 @@
-# last edited: 07/07/2017, 15:00
+# last edited: 20/07/2017, 15:00
 
 import pygtk, gtk, pango
 import os
@@ -14,6 +14,239 @@ import time
 
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 import XChemLog
+
+
+def GetSerial(ProjectPath,xtalID):
+    # check if there were already previous refinements
+    # if no: create a folder Refine_1
+    # if yes: create a folder Refine_<max+1>
+    temp = []
+    found = 0
+    if os.path.isdir(os.path.join(ProjectPath,xtalID)):
+        for item in glob.glob(os.path.join(ProjectPath,xtalID,'*')):
+            if item.startswith(os.path.join(ProjectPath,xtalID,'Refine_')):
+                    print int(item[item.rfind('_')+1:])
+                    temp.append(int(item[item.rfind('_')+1:]))
+                    found = 1
+    if found:
+        Serial = max(temp) + 1
+    else:
+        Serial=1
+    return Serial
+
+
+
+class RefineParams(object):
+
+    def __init__(self,ProjectPath,xtalID,compoundID,datasource):
+        self.ProjectPath = ProjectPath
+        self.xtalID = xtalID
+        self.compoundID = compoundID
+        self.prefix = 'refine'
+        self.datasource=datasource
+
+    def RefmacRefinementParams(self,RefmacParams):
+        self.RefmacParams=RefmacParams
+        self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+        self.window.connect("delete_event", gtk.main_quit)
+        self.window.set_border_width(10)
+        self.window.set_title("Refmac Parameters")
+        self.vbox = gtk.VBox()
+
+        self.hbox1=gtk.HBox()
+        self.hbox1.add(gtk.Label('Refine'))
+        self.cb = gtk.combo_box_new_text()
+        self.cb.connect("changed", self.ChooseBfacRefinement)
+        for item in ['isotropic','anisotropic']:
+            self.cb.append_text(item)
+        if 'ISOT' in self.RefmacParams['BREF']:
+            self.cb.set_active(0)
+        if 'ANIS' in self.RefmacParams['BREF']:
+            self.cb.set_active(1)
+        self.hbox1.add(self.cb)
+        self.hbox1.add(gtk.Label('temperature factors'))
+        self.vbox.add(self.hbox1)
+
+        self.hbox2=gtk.HBox()
+        self.hbox2.add(gtk.Label('Number of Cycles: '))
+        self.Ncycles=gtk.Entry()
+        self.Ncycles.add_events(gtk.gdk.KEY_RELEASE_MASK)
+        self.Ncycles.connect("key-release-event", self.on_key_release_Ncycles)
+        self.Ncycles.set_text(self.RefmacParams['NCYCLES'])
+        self.hbox2.add(self.Ncycles)
+        self.vbox.add(self.hbox2)
+
+        self.hbox3=gtk.HBox()
+        self.hbox3.add(gtk.Label('MATRIX WEIGHT: '))
+        self.MATRIX_WEIGHT=gtk.Entry()
+        self.MATRIX_WEIGHT.add_events(gtk.gdk.KEY_RELEASE_MASK)
+        self.MATRIX_WEIGHT.connect("key-release-event", self.on_key_release_MATRIX_WEIGHT)
+        self.MATRIX_WEIGHT.set_text(self.RefmacParams['MATRIX_WEIGHT'])
+        self.hbox3.add(self.MATRIX_WEIGHT)
+        self.vbox.add(self.hbox3)
+
+        self.TLS = gtk.CheckButton('TLS (find TLS groups with phenix.find_tls_groups)')
+        self.TLS.connect("toggled", self.TLSCallback)
+        if self.RefmacParams['TLS']=='refi tlsc 10\n': self.TLS.set_active(True)
+        self.vbox.pack_start(self.TLS,False)
+
+        self.NCS = gtk.CheckButton('NCS (if applicable')
+        self.NCS.connect("toggled", self.NCSCallback)
+        if self.RefmacParams['NCS']=='NCSR LOCAL\n': self.NCS.set_active(True)
+        self.vbox.pack_start(self.NCS,False)
+
+        self.TWIN = gtk.CheckButton('Twin?')
+        self.TWIN.connect("toggled", self.TWINCallback)
+        if self.RefmacParams['TWIN']=='TWIN\n': self.TWIN.set_active(True)
+        self.vbox.pack_start(self.TWIN,False)
+
+        self.OKbutton = gtk.Button(label="OK")
+        self.OKbutton.connect("clicked",self.OK)
+        self.vbox.add(self.OKbutton)
+
+        self.window.add(self.vbox)
+        self.window.show_all()
+        return self.RefmacParams
+
+
+    def TLSCallback(self, widget):
+        if widget.get_active():
+            self.RefmacParams['TLS']='refi tlsc 10\n'
+            self.RefmacParams['TLSIN']='refmac.tls\n'
+            self.RefmacParams['TLSOUT']='out.tls\n'
+            self.RefmacParams['TLSADD']='TLSO ADDU\n'
+        else:
+            self.RefmacParams['TLS']=''
+            self.RefmacParams['TLSIN']=''
+            self.RefmacParams['TLSOUT']=''
+            self.RefmacParams['TLSADD']=''
+        return self.RefmacParams
+
+    def NCSCallback(self, widget):
+        if widget.get_active():
+            self.RefmacParams['NCS']='NCSR LOCAL\n'
+        else:
+            self.RefmacParams['NCS']=''
+        return self.RefmacParams
+
+    def ChooseBfacRefinement(self,widget):
+        if widget.get_active_text()=='isotropic':
+            self.RefmacParams['BREF']='    bref ISOT\n'
+        if widget.get_active_text()=='anisotropic':
+            self.RefmacParams['BREF']='    bref ANIS\n'
+        return self.RefmacParams
+
+    def on_key_release_Ncycles(self, widget, event):
+        print widget.get_text()
+        self.RefmacParams['NCYCLES'] = widget.get_text()
+        return self.RefmacParams
+
+    def on_key_release_MATRIX_WEIGHT(self, widget, event):
+        self.RefmacParams['MATRIX_WEIGHT'] = widget.get_text()
+        return self.RefmacParams
+
+    def TWINCallback(self, widget):
+        if widget.get_active():
+            self.RefmacParams['TWIN']='TWIN\n'
+        else:
+            self.RefmacParams['TWIN']=''
+        return self.RefmacParams
+
+    def OK(self,widget):
+        self.window.destroy()
+
+
+    def ParamsFromPreviousCycle(self,Serial):
+
+        RefmacParams={ 'HKLIN': '', 'HKLOUT': '',
+                       'XYZIN': '', 'XYZOUT': '',
+                       'LIBIN': '', 'LIBOUT': '',
+                       'TLSIN': '', 'TLSOUT': '',
+                       'TLSADD': '',
+                       'NCYCLES': '10',
+                       'MATRIX_WEIGHT': 'AUTO',
+                       'BREF':   '    bref ISOT\n',
+                       'TLS':    '',
+                       'NCS':    '',
+                       'TWIN':   ''    }
+
+        if os.path.isfile(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(Serial)+'/refmac.csh'):
+            for line in open(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(Serial)+'/refmac.csh'):
+                if line.startswith('refi tlsc'):
+                    RefmacParams['TLS']=line
+                if line.startswith('TLSO'):
+                    RefmacParams['TLSADD']=line
+                if line.startswith('NCSR LOCAL'):
+                    RefmacParams['NCS']=line
+                if line.startswith('    bref '):
+                    RefmacParams['BREF']=line
+                if line.startswith('ncyc'):
+                    RefmacParams['Ncycles'] = line.split()[1]
+                if line.startswith('weight'):
+                    RefmacParams['MATRIX_WEIGHT'] = line.split()[len(line.split())-1]
+                if line.startswith('TWIN'):
+                    RefmacParams['TWIN']=line
+
+        return RefmacParams
+
+    def GetRefinementHistory(self):
+#        RefinementHistory=''
+        RefinementCycle = []
+        RcrystList=[]
+        RfreeList=[]
+
+        found = False
+        for item in glob.glob(os.path.join(self.ProjectPath,self.xtalID,'*')):
+            if item.startswith(os.path.join(self.ProjectPath,self.xtalID,'Refine_')):
+                    print item[item.rfind('_')+1:]
+                    RefinementCycle.append(int(item[item.rfind('_')+1:]))
+                    found = True
+        if found:
+            for cycle in sorted(RefinementCycle):
+#            for cycle in RefinementCycle:
+#                Rcryst=0
+#                Rfree=0
+#                LigandCC=0
+                try:
+                    found_Rcryst=False
+                    found_Rfree=False
+                    newestPDB = max(glob.iglob(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(cycle)+'/refine_'+str(cycle)+'.pdb'), key=os.path.getctime)
+                    for line in open(newestPDB):
+                        if line.startswith('REMARK   3   R VALUE     (WORKING + TEST SET) :'):
+                            Rcryst = line.split()[9]
+                            RcrystList.append(float(Rcryst))
+                            found_Rcryst=True
+                        if line.startswith('REMARK   3   FREE R VALUE                     :'):
+                            Rfree = line.split()[6]
+                            RfreeList.append(float(Rfree))
+                            found_Rfree=True
+                    if not found_Rcryst:
+                        RcrystList.append(0)
+                    if not found_Rfree:
+                        RfreeList.append(0)
+#                    if os.path.isfile(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(cycle)+'/validate_ligands.txt'):
+#                        for line in open(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(cycle)+'/validate_ligands.txt'):
+#                                if line.startswith('|  LIG'): LigandCC = line.split()[6]
+#                    RefinementHistory=RefinementHistory+str(cycle).rjust(10)+str(R).rjust(10)+str(Rfree).rjust(10)+str(LigandCC).rjust(10)+'\n'
+                except ValueError:
+                    RcrystList.append(0)
+                    RfreeList.append(0)
+#                    RefinementHistory=RefinementHistory+str(cycle).rjust(10)+str(R).rjust(10)+str(Rfree).rjust(10)+str(LigandCC).rjust(10)+'\n'
+        else:
+            RefinementCycle = [0]
+            RcrystList=[0]
+            RfreeList=[0]
+        print RefinementCycle,RcrystList,RfreeList
+        return(sorted(RefinementCycle),RcrystList,RfreeList)
+
+
+
+
+
+
+
+
+
 
 
 class Refine(object):
@@ -74,47 +307,8 @@ class Refine(object):
         # LIBIN & LIBOUT
         found_cif=False
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.compoundID+'.cif')):
-            found_cif=True
-            # in cases where multiple liagnds are present (e.g. NOG, ATP) the user for now needs to put
-            # the respective dictionary into the xtalID folder
-            # need to think of a better mechanism in the future
-            additional_cif=False
-            additional_cif_file=''
-            for file in glob.glob(os.path.join(self.ProjectPath,self.xtalID,'*')):
-                if file.endswith('.cif'):
-                    if self.compoundID not in file:
-                        additional_cif_file=file
-#                        additional_cif=True   <- should be true, but need to check this part of the code! 16/11/2016
-                        additional_cif=False
-            if additional_cif:
-                Cmds = (
-                    '#!'+os.getenv('SHELL')+'\n'
-                    '\n'
-                    '$CCP4/bin/libcheck << eof \n'
-                    '_Y\n'
-                    '_FILE_L '+os.path.join(self.ProjectPath,self.xtalID,self.compoundID+'.cif')+'\n'
-                    '_FILE_L2 '+additional_cif_file+'\n'
-                    '_FILE_O '+os.path.join(self.ProjectPath,self.xtalID,'combined_cif')+'\n'
-                    '_END\n'
-                    'eof\n'
-                    )
-                os.chdir(os.path.join(self.ProjectPath,self.xtalID))
-                print Cmds
-                os.system(Cmds)
-                RefmacParams['LIBIN']='LIBIN '+self.ProjectPath+'/'+self.xtalID+'/combined_cif.lib \\\n'
-            else:
-                RefmacParams['LIBIN']='LIBIN '+self.ProjectPath+'/'+self.xtalID+'/'+self.compoundID+'.cif \\\n'
+            RefmacParams['LIBIN']='LIBIN '+self.ProjectPath+'/'+self.xtalID+'/'+self.compoundID+'.cif \\\n'
             RefmacParams['LIBOUT']='LIBOUT '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'/refine_'+Serial+'.cif \\\n'
-        if not found_cif:
-        # this should actually not be necessary, but the following scenario can happen:
-        # if a new data source is created from a file system, but smiles and compoundID where not updated;
-        # so the ligand may still be in the structure, but since the compoundID is unknown to the datasource,
-        # its restraints won't be read in and refmac will fail
-            for file in glob.glob(os.path.join(self.ProjectPath,self.xtalID,'*')):
-                if file.endswith('.cif'):
-                    RefmacParams['LIBIN']='LIBIN '+file+' \\\n'
-                    RefmacParams['LIBOUT']='LIBOUT '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'/refine_'+Serial+'.cif \\\n'
-                    break
 
         #######################################################
         # TLSIN & TLSOUT
@@ -129,61 +323,7 @@ class Refine(object):
             else:
                 RefmacParams['TLS']='\n'
 
-
-#        #######################################################
-#        # create folder for new refinement cycle
-#        os.mkdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
-#
-#        #######################################################
-#        # write PDB file
-#        # now take protein pdb file and write it to newly create Refine_<serial> folder
-#        # note: the user has to make sure that the ligand file was merged into main file
-#        for item in coot_utils_XChem.molecule_number_list():
-#            if coot.molecule_name(item).endswith(self.prefix+'.pdb'):
-#                coot.write_pdb_file(item,os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'in.pdb'))
-
-        #######################################################
-        # PANDDAs stuff
-        # only use occupancy refinement if EVENT map is present
-        occupancy_refinement=''
-        if external_software['giant.create_occupancy_params']:
-            os.chdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
-            cmd = ( '#!'+os.getenv('SHELL')+'\n'
-                    'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
-                    'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','xce.setup-sh')+'\n'
-                    'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
-                    "giant.create_occupancy_params pdb=in.pdb refmac_occ_out='refmac_refine.params'\n"  )
-#            os.system("giant.create_occupancy_params pdb=in.pdb refmac_occ_out='refmac_refine.params'")
-#            os.system(cmd)
-            print "==> XCE: running giant.create_occupancy_params pdb=in.pdb refmac_occ_out='refmac_refine.params'"
-            os.system("giant.create_occupancy_params pdb=in.pdb refmac_occ_out='refmac_refine.params'")
-            # quick fix for the moment; need to talk to Nick since this should not be necessary
-            try:
-                params_file = fileinput.input('refmac_refine.params',inplace=True)
-                for line in params_file:
-                    if 'incomplete' in line:
-                        line=line.replace('incomplete','complete')
-                        print line,
-#                elif 'occupancy refine' in line:
-#                    line=line.replace('occupancy refine','occupancy refine ncycle 10\noccupancy refine')
-#                    print line,
-                    else:
-                        print line,
-                params_file.close()
-            except OSError:
-                # this may happen in case giant.create_occupancy_params did not produce a params output file
-                pass
-
-            print '==> XCE: waiting 5 seconds for giant.create_occupancy_params to finish...'
-            time.sleep(5)
-            print '==> XCE: done!'
-
         print '==> XCE: assembling refmac.csh'
-
-        create_bound_conformation=''
-        if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refmac_refine.params')):
-            occupancy_refinement='@refmac_refine.params\n'
-            create_bound_conformation="/bin/rm *bound.pdb\ngiant.strip_conformations pdb=refine.pdb suffix='.bound.pdb'\n"
 
         #######################################################
         # we write 'REFINEMENT_IN_PROGRESS' immediately to avoid unncessary refiment
@@ -206,19 +346,6 @@ class Refine(object):
             weight='weight AUTO\n'
         else:
             weight='weight matrix '+str(RefmacParams['MATRIX_WEIGHT'])+'\n'
-
-        #######################################################
-        # PANDDA validation @ spider plot
-        spider_plot=''
-        if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-ensemble-model.pdb')):
-            if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz')):
-                pdb_two=os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-ensemble-model.pdb')
-                mtz_two=os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz')
-                pdb_one=os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refine_'+Serial+'.pdb')
-                mtz_one=os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refine_'+Serial+'.mtz')
-                spider_plot='$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/resort_ligand_atoms.py %s %s\n\n' %(pdb_two,pdb_one)
-                spider_plot+='giant.score_model pdb1=%s mtz1=%s pdb2=%s mtz2=%s res_names=LIG,UNL,DRG,FRG\n' %(pdb_one,mtz_one,pdb_two,mtz_two)
-#                spider_plot='giant.score_model pdb1=%s mtz1=%s pdb2=%s mtz2=%s res_names=LIG,UNL,DRG,FRG\n' %(pdb_one,mtz_one,pdb_two,mtz_two)
 
         #######################################################
         # PHENIX stuff (if working at DLS)
@@ -289,7 +416,6 @@ class Refine(object):
             '    EXPE\n'
             +weight+
             'solvent YES\n'
-            +occupancy_refinement+
             'monitor MEDIUM -\n'
             '    torsion 10.0 -\n'
             '    distance 10.0 -\n'
@@ -307,8 +433,6 @@ class Refine(object):
             'END\n'
             'EOF\n'
             '\n'
-            +spider_plot+
-            '\n'
             'phenix.molprobity refine_%s.pdb refine_%s.mtz\n' %(Serial,Serial)+
             '/bin/mv molprobity.out refine_molprobity.log\n'
             'mmtbx.validate_ligands refine_%s.pdb refine_%s.mtz LIG > validate_ligands.txt\n' %(Serial,Serial)+
@@ -317,8 +441,6 @@ class Refine(object):
             '#ln -s %s/%s/Refine_%s/refine_%s.mtz refine.mtz\n' %(self.ProjectPath,self.xtalID,Serial,Serial)+
             'ln -s ./Refine_%s/refine_%s.pdb refine.pdb\n' %(Serial,Serial)+
             'ln -s ./Refine_%s/refine_%s.mtz refine.mtz\n' %(Serial,Serial)+
-            '\n'
-            +create_bound_conformation+
             '\n'
             'ln -s Refine_%s/validate_ligands.txt .\n' %Serial+
             'ln -s Refine_%s/refine_molprobity.log .\n' %Serial+
@@ -341,6 +463,434 @@ class Refine(object):
 
         Logfile.insert('writing refinement shell script to'+os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refmac.csh'))
         cmd = open(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refmac.csh'),'w')
+        cmd.write(refmacCmds)
+        cmd.close()
+
+        os.chdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
+#        os.system('ssh artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(self.ProjectPath,self.xtalID,Serial))
+        Logfile.insert('changing directory to %s' %(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial)))
+        if external_software['qsub']:
+            Logfile.insert('starting refinement on cluster')
+            os.system('qsub -P labxchem refmac.csh')
+        elif external_software['qsub_remote'] != '':
+            Logfile.insert('starting refinement on remote cluster')
+            remote_command=external_software['qsub_remote'].replace('qsub','cd %s; qsub' %os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
+            os.system('%s -P labxchem refmac.csh' %remote_command)
+            print '%s -P labxchem refmac.csh' %remote_command
+        else:
+            os.system('chmod +x refmac.csh')
+            Logfile.insert('starting refinement on local machine')
+            os.system('./refmac.csh &')
+
+
+
+    def RefinementParams(self,RefmacParams):
+        self.RefmacParams=RefmacParams
+        self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+        self.window.connect("delete_event", gtk.main_quit)
+        self.window.set_border_width(10)
+        self.window.set_title("Refmac Parameters")
+        self.vbox = gtk.VBox()
+
+        self.hbox1=gtk.HBox()
+        self.hbox1.add(gtk.Label('Refine'))
+        self.cb = gtk.combo_box_new_text()
+        self.cb.connect("changed", self.ChooseBfacRefinement)
+        for item in ['isotropic','anisotropic']:
+            self.cb.append_text(item)
+        if 'ISOT' in self.RefmacParams['BREF']:
+            self.cb.set_active(0)
+        if 'ANIS' in self.RefmacParams['BREF']:
+            self.cb.set_active(1)
+        self.hbox1.add(self.cb)
+        self.hbox1.add(gtk.Label('temperature factors'))
+        self.vbox.add(self.hbox1)
+
+        self.hbox2=gtk.HBox()
+        self.hbox2.add(gtk.Label('Number of Cycles: '))
+        self.Ncycles=gtk.Entry()
+        self.Ncycles.add_events(gtk.gdk.KEY_RELEASE_MASK)
+        self.Ncycles.connect("key-release-event", self.on_key_release_Ncycles)
+        self.Ncycles.set_text(self.RefmacParams['NCYCLES'])
+        self.hbox2.add(self.Ncycles)
+        self.vbox.add(self.hbox2)
+
+        self.hbox3=gtk.HBox()
+        self.hbox3.add(gtk.Label('MATRIX WEIGHT: '))
+        self.MATRIX_WEIGHT=gtk.Entry()
+        self.MATRIX_WEIGHT.add_events(gtk.gdk.KEY_RELEASE_MASK)
+        self.MATRIX_WEIGHT.connect("key-release-event", self.on_key_release_MATRIX_WEIGHT)
+        self.MATRIX_WEIGHT.set_text(self.RefmacParams['MATRIX_WEIGHT'])
+        self.hbox3.add(self.MATRIX_WEIGHT)
+        self.vbox.add(self.hbox3)
+
+        self.TLS = gtk.CheckButton('TLS (find TLS groups with phenix.find_tls_groups)')
+        self.TLS.connect("toggled", self.TLSCallback)
+        if self.RefmacParams['TLS']=='refi tlsc 10\n': self.TLS.set_active(True)
+        self.vbox.pack_start(self.TLS,False)
+
+        self.NCS = gtk.CheckButton('NCS (if applicable')
+        self.NCS.connect("toggled", self.NCSCallback)
+        if self.RefmacParams['NCS']=='NCSR LOCAL\n': self.NCS.set_active(True)
+        self.vbox.pack_start(self.NCS,False)
+
+        self.TWIN = gtk.CheckButton('Twin?')
+        self.TWIN.connect("toggled", self.TWINCallback)
+        if self.RefmacParams['TWIN']=='TWIN\n': self.TWIN.set_active(True)
+        self.vbox.pack_start(self.TWIN,False)
+
+        self.OKbutton = gtk.Button(label="OK")
+        self.OKbutton.connect("clicked",self.OK)
+        self.vbox.add(self.OKbutton)
+
+        self.window.add(self.vbox)
+        self.window.show_all()
+        return self.RefmacParams
+
+
+    def TLSCallback(self, widget):
+        if widget.get_active():
+            self.RefmacParams['TLS']='refi tlsc 10\n'
+            self.RefmacParams['TLSIN']='refmac.tls\n'
+            self.RefmacParams['TLSOUT']='out.tls\n'
+            self.RefmacParams['TLSADD']='TLSO ADDU\n'
+        else:
+            self.RefmacParams['TLS']=''
+            self.RefmacParams['TLSIN']=''
+            self.RefmacParams['TLSOUT']=''
+            self.RefmacParams['TLSADD']=''
+        return self.RefmacParams
+
+    def NCSCallback(self, widget):
+        if widget.get_active():
+            self.RefmacParams['NCS']='NCSR LOCAL\n'
+        else:
+            self.RefmacParams['NCS']=''
+        return self.RefmacParams
+
+    def ChooseBfacRefinement(self,widget):
+        if widget.get_active_text()=='isotropic':
+            self.RefmacParams['BREF']='    bref ISOT\n'
+        if widget.get_active_text()=='anisotropic':
+            self.RefmacParams['BREF']='    bref ANIS\n'
+        return self.RefmacParams
+
+    def on_key_release_Ncycles(self, widget, event):
+        print widget.get_text()
+        self.RefmacParams['NCYCLES'] = widget.get_text()
+        return self.RefmacParams
+
+    def on_key_release_MATRIX_WEIGHT(self, widget, event):
+        self.RefmacParams['MATRIX_WEIGHT'] = widget.get_text()
+        return self.RefmacParams
+
+    def TWINCallback(self, widget):
+        if widget.get_active():
+            self.RefmacParams['TWIN']='TWIN\n'
+        else:
+            self.RefmacParams['TWIN']=''
+        return self.RefmacParams
+
+    def OK(self,widget):
+        self.window.destroy()
+
+
+    def ParamsFromPreviousCycle(self,Serial):
+
+        RefmacParams={ 'HKLIN': '', 'HKLOUT': '',
+                       'XYZIN': '', 'XYZOUT': '',
+                       'LIBIN': '', 'LIBOUT': '',
+                       'TLSIN': '', 'TLSOUT': '',
+                       'TLSADD': '',
+                       'NCYCLES': '10',
+                       'MATRIX_WEIGHT': 'AUTO',
+                       'BREF':   '    bref ISOT\n',
+                       'TLS':    '',
+                       'NCS':    '',
+                       'TWIN':   ''    }
+
+        if os.path.isfile(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(Serial)+'/refmac.csh'):
+            for line in open(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(Serial)+'/refmac.csh'):
+                if line.startswith('refi tlsc'):
+                    RefmacParams['TLS']=line
+                if line.startswith('TLSO'):
+                    RefmacParams['TLSADD']=line
+                if line.startswith('NCSR LOCAL'):
+                    RefmacParams['NCS']=line
+                if line.startswith('    bref '):
+                    RefmacParams['BREF']=line
+                if line.startswith('ncyc'):
+                    RefmacParams['Ncycles'] = line.split()[1]
+                if line.startswith('weight'):
+                    RefmacParams['MATRIX_WEIGHT'] = line.split()[len(line.split())-1]
+                if line.startswith('TWIN'):
+                    RefmacParams['TWIN']=line
+
+        return RefmacParams
+
+    def GetRefinementHistory(self):
+#        RefinementHistory=''
+        RefinementCycle = []
+        RcrystList=[]
+        RfreeList=[]
+
+        found = False
+        for item in glob.glob(os.path.join(self.ProjectPath,self.xtalID,'*')):
+            if item.startswith(os.path.join(self.ProjectPath,self.xtalID,'Refine_')):
+                    print item[item.rfind('_')+1:]
+                    RefinementCycle.append(int(item[item.rfind('_')+1:]))
+                    found = True
+        if found:
+            for cycle in sorted(RefinementCycle):
+#            for cycle in RefinementCycle:
+#                Rcryst=0
+#                Rfree=0
+#                LigandCC=0
+                try:
+                    found_Rcryst=False
+                    found_Rfree=False
+                    newestPDB = max(glob.iglob(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(cycle)+'/refine_'+str(cycle)+'.pdb'), key=os.path.getctime)
+                    for line in open(newestPDB):
+                        if line.startswith('REMARK   3   R VALUE     (WORKING + TEST SET) :'):
+                            Rcryst = line.split()[9]
+                            RcrystList.append(float(Rcryst))
+                            found_Rcryst=True
+                        if line.startswith('REMARK   3   FREE R VALUE                     :'):
+                            Rfree = line.split()[6]
+                            RfreeList.append(float(Rfree))
+                            found_Rfree=True
+                    if not found_Rcryst:
+                        RcrystList.append(0)
+                    if not found_Rfree:
+                        RfreeList.append(0)
+#                    if os.path.isfile(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(cycle)+'/validate_ligands.txt'):
+#                        for line in open(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(cycle)+'/validate_ligands.txt'):
+#                                if line.startswith('|  LIG'): LigandCC = line.split()[6]
+#                    RefinementHistory=RefinementHistory+str(cycle).rjust(10)+str(R).rjust(10)+str(Rfree).rjust(10)+str(LigandCC).rjust(10)+'\n'
+                except ValueError:
+                    RcrystList.append(0)
+                    RfreeList.append(0)
+#                    RefinementHistory=RefinementHistory+str(cycle).rjust(10)+str(R).rjust(10)+str(Rfree).rjust(10)+str(LigandCC).rjust(10)+'\n'
+        else:
+            RefinementCycle = [0]
+            RcrystList=[0]
+            RfreeList=[0]
+        print RefinementCycle,RcrystList,RfreeList
+        return(sorted(RefinementCycle),RcrystList,RfreeList)
+
+
+class panddaRefine(object):
+
+    def __init__(self,ProjectPath,xtalID,compoundID,datasource):
+        self.ProjectPath = ProjectPath
+        self.xtalID = xtalID
+        self.compoundID = compoundID
+        self.prefix = 'refine'
+        self.datasource=datasource
+
+    def RunQuickRefine(self,Serial,RefmacParams,external_software,xce_logfile):
+        Logfile=XChemLog.updateLog(xce_logfile)
+        Logfile.insert('preparing files for giant.quick_refine')
+        # panddaSerial because giant.quick_refine writes Refine_0001 instead of Refine_1
+        panddaSerial=m=(4-len(str(Serial)))*'0'+str(Serial)
+
+        # first check if refinement is ongoing and exit if yes
+        if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'REFINEMENT_IN_PROGRESS')):
+#            coot.info_dialog('*** REFINEMENT IN PROGRESS ***')
+            Logfile.insert('cannot start new refinement for %s: *** REFINEMENT IN PROGRESS ***' %self.xtalID)
+            return None
+
+        #######################################################
+        # HKLIN & HKLOUT
+        if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'.free.mtz')):
+            RefmacParams['HKLIN']=os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'.free.mtz')
+        elif os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz')):
+            RefmacParams['HKLIN']=os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz')
+        else:
+            Logfile.insert('%s: cannot find HKLIN for refinement; aborting...' %self.xtalID)
+            return None
+
+        #######################################################
+        # LIBIN & LIBOUT
+        found_cif=False
+        if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.compoundID+'.cif')):
+            found_cif=True
+            RefmacParams['LIBIN']=os.path.join(self.ProjectPath,self.xtalID,self.compoundID+'.cif')
+        if not found_cif:
+        # this should actually not be necessary, but the following scenario can happen:
+        # if a new data source is created from a file system, but smiles and compoundID where not updated;
+        # so the ligand may still be in the structure, but since the compoundID is unknown to the datasource,
+        # its restraints won't be read in and refmac will fail
+            for file in glob.glob(os.path.join(self.ProjectPath,self.xtalID,'*')):
+                if file.endswith('.cif'):
+                    RefmacParams['LIBIN']=file
+                    break
+
+        #######################################################
+        # giant_merge_conformations
+        Logfile.insert('trying to merge modified bound state with ground state')
+        if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),self.xtalID+'-ensemble-model.pdb')):
+            Logfile.insert('seems to be an initial refinement after pandda.export, no need to merge the conformations')
+            os.chdir(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
+            Logfile.insert('running giant.make_restraints %s' %self.xtalID+'-ensemble-model.pdb')
+            os.system('giant.make_restraints %s' %self.xtalID+'-ensemble-model.pdb')
+            Logfile.insert('waiting 10 seconds for giant.make_restraints to finish...')
+            time.sleep(10)
+        elif os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'refine.split.ground-state.pdb')):
+            Logfile.insert('found model of ground state: '+os.path.join(self.ProjectPath,self.xtalID,'refine.split.ground-state.pdb'))
+            if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'refine.modified.pdb')):
+                Logfile.insert('found model of modified bound state')
+                os.chdir(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
+                ground_state=os.path.join(self.ProjectPath,self.xtalID,'refine.split.ground-state.pdb')
+                bound_state='refine.modified.pdb'
+                Logfile.insert('running giant.merge_conformations input.pdb=%s input.pdb=%s' %(ground_state,bound_state))
+                os.system('giant.merge_conformations input.pdb=%s input.pdb=%s' %(ground_state,bound_state))
+                Logfile.insert('waiting 10 seconds for giant.merge_conformations to finish...')
+                time.sleep(10)
+            else:
+                Logfile.error('cannot find modified version of bound state in %s' %os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
+                return None
+        else:
+            Logfile.error('cannot find model of ground state, aborting...')
+            return None
+
+
+        #######################################################
+        # checking if input PDB files are present
+        Logfile.insert('checking if input PDB files for REFMAC are present')
+        if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),self.xtalID+'-ensemble-model.pdb')):
+            RefmacParams['XYZIN']=os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),self.xtalID+'-ensemble-model.pdb')
+        elif os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-model.pdb')):
+            RefmacParams['XYZIN']=os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-model.pdb')
+        else:
+            Logfile.error('cannot find multi-state-model.pdb in %s; aborting...' %os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
+            return None
+
+
+        #######################################################
+        # checking if multi-state-restraints.refmac.params file is present
+        if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-restraints.refmac.params')):
+            # add REFMAC keywords to multi-state-restraints.refmac.params
+            with open('multi-state-restraints.refmac.params','a') as refmacParams:
+                refmacParams.write(RefmacParams['BREF'])
+                refmacParams.write(RefmacParams['TLS'])
+                refmacParams.write(RefmacParams['TWIN'])
+                refmacParams.write('ncyc '+RefmacParams['NCYCLES'])
+                if str(RefmacParams['MATRIX_WEIGHT']).lower() == 'auto':
+                    refmacParams.write('weight AUTO')
+                else:
+                    refmacParams.write('weight matrix '+str(RefmacParams['MATRIX_WEIGHT']))
+                refmacParams.write(RefmacParams['TLSADD'])
+        else:
+            Logfile.error('cannot find multi-state-restraints.refmac.params in %s; aborting...' %os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
+            return None
+
+        #######################################################
+        # we write 'REFINEMENT_IN_PROGRESS' immediately to avoid unncessary refinement
+        os.chdir(os.path.join(self.ProjectPath,self.xtalID))
+        os.system('touch REFINEMENT_IN_PROGRESS')
+
+        #######################################################
+        # clean up!
+        # and remove all files which will be re-created by current refinement cycle
+        os.chdir(os.path.join(self.ProjectPath,self.xtalID))
+        files_to_remove = ( 'refine.pdb '
+                            'refine.mtz '
+                            'refine.split.bound-state.pdb '
+                            'refine.split.ground-state.pdb '
+                            'validation_summary.txt '
+                            'validate_ligands.txt '
+                            '2fofc.map '
+                            'fofc.map '
+                            'refine_molprobity.log' )
+        os.system('/bin/rm %s' %files_to_remove)
+
+        if external_software['qsub']:
+            pbs_line='#PBS -joe -N XCE_refmac\n'
+        else:
+            pbs_line='\n'
+
+        #######################################################
+        # PANDDA validation @ spider plot
+        spider_plot=''
+        if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-ensemble-model.pdb')):
+            if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz')):
+                pdb_two=os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-ensemble-model.pdb')
+                mtz_two=os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz')
+                pdb_one=os.path.join(self.ProjectPath,self.xtalID,'Refine_'+panddaSerial,'refine_'+Serial+'.pdb')
+                mtz_one=os.path.join(self.ProjectPath,self.xtalID,'Refine_'+panddaSerial,'refine_'+Serial+'.mtz')
+                spider_plot+='giant.score_model pdb1=%s mtz1=%s pdb2=%s mtz2=%s res_names=LIG,UNL,DRG,FRG\n' %(pdb_one,mtz_one,pdb_two,mtz_two)
+
+        #######################################################
+        # PHENIX stuff (if working at DLS)
+        module_load=''
+        if os.getcwd().startswith('/dls'):
+            module_load='module load phenix\n'
+
+        # 2017-07-20: for the time being this will explicitly source pandda since version 0.2 really only works at DLS
+        source =''
+        if 'bash' in os.getenv('SHELL'):
+            source = (
+                'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
+                '\n'
+                'source /dls/science/groups/i04-1/software/pandda-update/ccp4-7.0/setup-scripts/ccp4.setup-sh\n'
+            )
+        elif 'csh' in os.getenv('SHELL'):
+            source = (
+                'setenv XChemExplorer_DIR '+os.getenv('XChemExplorer_DIR')+'\n'
+                '\n'
+                'source /dls/science/groups/i04-1/software/pandda-update/ccp4-7.0/setup-scripts/ccp4.setup-sh\n'
+            )
+
+
+        refmacCmds = (
+            '#!'+os.getenv('SHELL')+'\n'
+            +pbs_line+
+            '\n'
+            +source+
+            '\n'
+            +module_load+
+            'cd '+self.ProjectPath+'/'+self.xtalID+'\n'
+            '\n'
+            '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(self.datasource,self.xtalID,'RefinementStatus','running') +
+            '\n'
+            'giant.quick_refine'
+            ' input.pdb=%s' %RefmacParams['XYZIN']+
+            ' mtz=%s' %RefmacParams['HKLIN']+
+            ' cif=%s' %RefmacParams['LIBIN']+
+            ' program=refmac'
+            " dir_prefix='Refine_' '"
+            " out_prefix='refine_%s'" %str(Serial)+
+            '\n'
+            'cd '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(panddaSerial)+'\n'
+            +spider_plot+
+            '\n'
+            'phenix.molprobity refine_%s.pdb refine_%s.mtz\n' %(Serial,Serial)+
+            '/bin/mv molprobity.out refine_molprobity.log\n'
+            'mmtbx.validate_ligands refine_%s.pdb refine_%s.mtz LIG > validate_ligands.txt\n' %(Serial,Serial)+
+            'cd '+self.ProjectPath+'/'+self.xtalID+'\n'
+            '\n'
+            'ln -s Refine_%s/validate_ligands.txt .\n' %panddaSerial+
+            'ln -s Refine_%s/refine_molprobity.log .\n' %panddaSerial+
+            'mmtbx.validation_summary refine.pdb > validation_summary.txt\n'
+            '\n'
+            'fft hklin refine.mtz mapout 2fofc.map << EOF\n'
+            'labin F1=FWT PHI=PHWT\n'
+            'EOF\n'
+            '\n'
+            'fft hklin refine.mtz mapout fofc.map << EOF\n'
+            'labin F1=DELFWT PHI=PHDELWT\n'
+            'EOF\n'
+             '\n'
+            '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_after_refinement.py')+
+            ' %s %s %s %s\n' %(self.datasource,self.xtalID,self.ProjectPath,os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))+
+            '\n'
+            '/bin/rm %s/%s/REFINEMENT_IN_PROGRESS\n' %(self.ProjectPath,self.xtalID)+
+            '\n'
+           )
+
+        Logfile.insert('writing refinement shell script to'+os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'refmac.csh'))
+        cmd = open(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'refmac.csh'),'w')
         cmd.write(refmacCmds)
         cmd.close()
 
