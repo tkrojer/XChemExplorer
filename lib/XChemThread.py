@@ -1,4 +1,4 @@
-# last edited: 03/07/2017, 12:00
+# last edited: 21/07/2017, 12:00
 
 import os, sys, glob
 from datetime import datetime
@@ -1684,6 +1684,8 @@ class start_COOT(QtCore.QThread):
             self.pylib='XChemCoot.py'
         elif interface=='new':
             self.pylib='XChemCootNew.py'
+        elif interface=='panddaV1':
+            self.pylib='XChemCootOld.py'
 
     def run(self):
         cwd=os.getcwd()

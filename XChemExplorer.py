@@ -1,4 +1,4 @@
-# last edited: 07/07/2017, 18:00
+# last edited: 21/07/2017, 18:00
 
 import os, sys, glob
 from datetime import datetime
@@ -587,6 +587,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.refine_file_tasks = [ 'Open COOT',
                                    'Open COOT - new interface',
+                                   'Open COOT for old PanDDA',
                                    'Update Deposition Table',
                                    'Prepare Group Deposition'   ]
 
@@ -4198,6 +4199,8 @@ class XChemExplorer(QtGui.QApplication):
                 self.update_log.insert('starting coot...')
                 if instruction=="Open COOT - new interface":
                     interface='new'
+                elif instruction=="Open COOT for old PanDDA":
+                    interface='panddaV1'
                 else:
                     interface='old'
                 self.work_thread=XChemThread.start_COOT(self.settings,interface)
