@@ -861,7 +861,6 @@ class panddaRefine(object):
             '\n'
             +source+
             '\n'
-            +module_load+
             'cd '+self.ProjectPath+'/'+self.xtalID+'\n'
             '\n'
             '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(self.datasource,self.xtalID,'RefinementStatus','running') +
@@ -873,11 +872,12 @@ class panddaRefine(object):
             ' program=refmac'
             ' params=%s' %os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-restraints.refmac.params')+
             " dir_prefix='Refine_'"
-            " out_prefix='refine_%s'" %str(Serial)+
+            " out_prefix='refine_%s'\n" %str(Serial)+
             '\n'
             'cd '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(panddaSerial)+'\n'
             +spider_plot+
             '\n'
+            +module_load+
             'phenix.molprobity refine_%s.pdb refine_%s.mtz\n' %(Serial,Serial)+
             '/bin/mv molprobity.out refine_molprobity.log\n'
             'mmtbx.validate_ligands refine_%s.pdb refine_%s.mtz LIG > validate_ligands.txt\n' %(Serial,Serial)+
