@@ -732,8 +732,14 @@ class panddaRefine(object):
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),self.xtalID+'-ensemble-model.pdb')):
             Logfile.insert('seems to be an initial refinement after pandda.export, no need to merge the conformations')
             os.chdir(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
-            Logfile.insert('running giant.make_restraints %s' %self.xtalID+'-ensemble-model.pdb')
-            os.system('giant.make_restraints %s' %self.xtalID+'-ensemble-model.pdb')
+            Logfile.insert('running giant.make_restraints %s:' %self.xtalID+'-ensemble-model.pdb')
+#            os.system('giant.make_restraints %s' %self.xtalID+'-ensemble-model.pdb')
+            cmd = (
+                'source /dls/science/groups/i04-1/software/pandda-update/ccp4-7.0/setup-scripts/ccp4.setup-sh\n'
+                'giant.make_restraints %s-ensemble-model.pdb' %self.xtalID
+            )
+            Logfile.insert(cmd+'\n')
+            os.system(cmd)
             Logfile.insert('waiting 10 seconds for giant.make_restraints to finish...')
             time.sleep(10)
         elif os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'refine.split.ground-state.pdb')):
@@ -744,7 +750,13 @@ class panddaRefine(object):
                 ground_state=os.path.join(self.ProjectPath,self.xtalID,'refine.split.ground-state.pdb')
                 bound_state='refine.modified.pdb'
                 Logfile.insert('running giant.merge_conformations input.pdb=%s input.pdb=%s' %(ground_state,bound_state))
-                os.system('giant.merge_conformations input.pdb=%s input.pdb=%s' %(ground_state,bound_state))
+#                os.system('giant.merge_conformations input.pdb=%s input.pdb=%s' %(ground_state,bound_state))
+                cmd = (
+                'source /dls/science/groups/i04-1/software/pandda-update/ccp4-7.0/setup-scripts/ccp4.setup-sh\n'
+                'giant.merge_conformations input.pdb=%s input.pdb=%s' %(ground_state,bound_state)
+                )
+                Logfile.insert(cmd+'\n')
+                os.system(cmd)
                 Logfile.insert('waiting 10 seconds for giant.merge_conformations to finish...')
                 time.sleep(10)
             else:
