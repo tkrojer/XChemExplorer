@@ -95,8 +95,12 @@ class run_pandda_export(QtCore.QThread):
                     if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'cootOut')):
                         os.mkdir(os.path.join(self.initial_model_directory,xtal,'cootOut'))
                     # create folder for new refinement cycle
-                    os.mkdir(os.path.join(self.initial_model_directory,xtal,'cootOut','Refine_'+str(Serial)))
-                    os.chdir(os.path.join(self.initial_model_directory,xtal,'cootOut','Refine_'+str(Serial)))
+                    if os.path.isdir(os.path.join(self.initial_model_directory,xtal,'cootOut','Refine_'+str(Serial))):
+                        os.chdir(os.path.join(self.initial_model_directory,xtal,'cootOut','Refine_'+str(Serial)))
+                        os.system('/bin/rm *-ensemble-model.pdb *restraints*')
+                    else:
+                        os.mkdir(os.path.join(self.initial_model_directory,xtal,'cootOut','Refine_'+str(Serial)))
+                        os.chdir(os.path.join(self.initial_model_directory,xtal,'cootOut','Refine_'+str(Serial)))
                     Refine=XChemRefine.panddaRefine(self.initial_model_directory,xtal,compoundID,self.datasource)
                     os.symlink(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb'),xtal+'-ensemble-model.pdb')
                     Refine.RunQuickRefine(Serial,self.RefmacParams,self.external_software,self.xce_logfile)
