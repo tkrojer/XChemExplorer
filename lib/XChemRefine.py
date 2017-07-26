@@ -871,6 +871,7 @@ class panddaRefine(object):
             ' mtz=%s' %RefmacParams['HKLIN']+
             ' cif=%s' %RefmacParams['LIBIN']+
             ' program=refmac'
+            ' params=%s' %os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-restraints.refmac.params')+
             " dir_prefix='Refine_'"
             " out_prefix='refine_%s'" %str(Serial)+
             '\n'
