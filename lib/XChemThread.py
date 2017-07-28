@@ -1143,7 +1143,12 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     '\n'
                     '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(database,xtal,'DimpleStatus','running') +
                     '\n'
-                    'uniqueify %s %s.unique.mtz\n' %(mtzin,xtal)+
+                    'freerflag hklin %s hklout %s.unique.mtz << eof > freerflag.log\n' %(mtzin,xtal)+
+                    ' COMPLETE FREE=FreeR_flag\n'
+                    ' UNIQUE\n''
+                    ' END\n'
+                    'eof\n'
+                    '\n'
                     'dimple --no-cleanup %s.unique.mtz %s %s %s dimple\n' %(xtal,ref_pdb,ref_mtz,ref_cif) +
                     '\n'
                     'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc,'dimple') +
