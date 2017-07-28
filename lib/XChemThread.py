@@ -1145,7 +1145,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     '\n'
                     'freerflag hklin %s hklout %s.unique.mtz << eof > freerflag.log\n' %(mtzin,xtal)+
                     ' COMPLETE FREE=FreeR_flag\n'
-                    ' UNIQUE\n''
+                    ' UNIQUE\n'
                     ' END\n'
                     'eof\n'
                     '\n'
