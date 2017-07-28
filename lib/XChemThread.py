@@ -1148,12 +1148,13 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
 #                    ' UNIQUE\n'
 #                    ' END\n'
 #                    'eof\n'
-                    'freerflag hklin %s hklout %s.unique.mtz << eof > freerflag.log\n' %(mtzin,xtal)+
-                    ' UNIQUE\n'
-                    ' END\n'
-                    'eof\n'
-                    '\n'
-                    'dimple --no-cleanup %s.unique.mtz %s %s %s dimple\n' %(xtal,ref_pdb,ref_mtz,ref_cif) +
+#                    'freerflag hklin %s hklout %s.unique.mtz << eof > freerflag.log\n' %(mtzin,xtal)+
+#                    ' UNIQUE\n'
+#                    ' END\n'
+#                    'eof\n'
+#                    '\n'
+#                    'dimple --no-cleanup %s.unique.mtz %s %s %s dimple\n' %(xtal,ref_pdb,ref_mtz,ref_cif) +
+                    'dimple --no-cleanup %s %s %s %s dimple\n' %(mtzin,ref_pdb,ref_mtz,ref_cif) +
                     '\n'
                     'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc,'dimple') +
                     '\n'
