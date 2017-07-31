@@ -117,21 +117,21 @@ class run_xia2(QtCore.QThread):
                     if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(newRun),pipeline)):
                         os.mkdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(newRun),pipeline))
 
-                    script+='$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_status_flag.py')+' %s %s %s %s\n' %(self.database,xtal,'DataProcessingStatus','running')
+                    script+='$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_status_flag.py')+' {0!s} {1!s} {2!s} {3!s}\n'.format(self.database, xtal, 'DataProcessingStatus', 'running')
                     script+='xia2 pipeline='+pipeline+' '+ref_option+' '+spg_option+' '+reso_limit_option+' '+cc_half_option+' '+image_dir+'\n'
 
-            script+='$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_status_flag.py')+' %s %s %s %s\n' %(self.database,xtal,'DataProcessingStatus','finished')
+            script+='$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_status_flag.py')+' {0!s} {1!s} {2!s} {3!s}\n'.format(self.database, xtal, 'DataProcessingStatus', 'finished')
             script+='cd '+os.path.join(self.initial_model_directory,xtal,'processed')+'\n'
             script+='/bin/rm run_in_progress\n'
 
             os.chdir(self.ccp4_scratch_directory)
-            f = open('xce_xia2_%s.sh' %str(i+1),'w')
+            f = open('xce_xia2_{0!s}.sh'.format(str(i+1)),'w')
             f.write(script)
             f.close()
-            os.system('chmod +x xce_xia2_%s.sh' %str(i+1))
+            os.system('chmod +x xce_xia2_{0!s}.sh'.format(str(i+1)))
             db_dict={}
             db_dict['DataProcessingStatus']='started'
-            self.Logfile.insert('%s: setting DataProcessingStatus flag to started' %xtal)
+            self.Logfile.insert('{0!s}: setting DataProcessingStatus flag to started'.format(xtal))
             self.db.update_data_source(xtal,db_dict)
 
         # submit job
@@ -148,21 +148,21 @@ class run_xia2(QtCore.QThread):
                 f.close()
                 self.Logfile.insert('submitting array job with maximal 100 jobs running on cluster')
                 self.Logfile.insert('using the following command:')
-                self.Logfile.insert('qsub -t 1:%s -tc %s xia2_master.sh' %(str(i+1),self.max_queue_jobs))
-                os.system('qsub -P labxchem -t 1:%s -tc %s xia2_master.sh' %(str(i+1),self.max_queue_jobs))
+                self.Logfile.insert('qsub -t 1:{0!s} -tc {1!s} xia2_master.sh'.format(str(i+1), self.max_queue_jobs))
+                os.system('qsub -P labxchem -t 1:{0!s} -tc {1!s} xia2_master.sh'.format(str(i+1), self.max_queue_jobs))
             else:
                 self.Logfile.insert("cannot start ARRAY job: make sure that 'module load global/cluster' is in your .bashrc or .cshrc file")
         elif self.external_software['qsub']:
-            self.Logfile.insert('submitting %s individual jobs to cluster' %(str(i+1)))
+            self.Logfile.insert('submitting {0!s} individual jobs to cluster'.format((str(i+1))))
             self.Logfile.insert('WARNING: this could potentially lead to a crash...')
             for n in range(i+1):
-                self.Logfile.insert('qsub xce_xia2_%s.sh' %(str(n+1)))
-                os.system('qsub xce_xia2_%s.sh' %(str(n+1)))
+                self.Logfile.insert('qsub xce_xia2_{0!s}.sh'.format((str(n+1))))
+                os.system('qsub xce_xia2_{0!s}.sh'.format((str(n+1))))
         else:
             self.Logfile.insert('running %s consecutive XIA2 jobs on your local machine')
             for n in range(i+1):
-                self.Logfile.insert('starting xce_xia2_%s.sh' %(str(n+1)))
-                os.system('./xce_xia2_%s.sh' %(str(n+1)))
+                self.Logfile.insert('starting xce_xia2_{0!s}.sh'.format((str(n+1))))
+                os.system('./xce_xia2_{0!s}.sh'.format((str(n+1))))
 
 
 #            if not os.path.isdir(os.path.join(self.initial_model_directory,xtal)):

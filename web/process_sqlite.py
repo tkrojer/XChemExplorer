@@ -38,7 +38,7 @@ def writeTableRow (row,htmlfile):
   htmlfile.write("<td>"+row['PANDDA_site_comment']+"</td>\n")
 #  htmlfile.write("<td>TBD</td>\n")
 #  htmlfile.write("<td>http://www.rcsb.org/pdb/explore/explore.do?structureId=%s</td>\n" %row['Deposition_PDB_ID'])
-  htmlfile.write('<td><a target="_blank" href="http://www.rcsb.org/pdb/explore/explore.do?structureId=%s">%s</a></td>\n' %(row['Deposition_PDB_ID'],row['Deposition_PDB_ID']))
+  htmlfile.write('<td><a target="_blank" href="http://www.rcsb.org/pdb/explore/explore.do?structureId={0!s}">{1!s}</a></td>\n'.format(row['Deposition_PDB_ID'], row['Deposition_PDB_ID']))
   htmlfile.write("<td>"+row['DataProcessingResolutionHigh']+"</td>\n")
   htmlfile.write("<td>"+row['DataProcessingSpaceGroup']+"</td>\n")
   htmlfile.write("<td>"+row['DataProcessingUnitCell']+"</td>\n")
@@ -353,7 +353,7 @@ def main (argv):
   zf.close()
 
   # change folder permissions
-  os.system('chmod -R 775 %s' %panddadir)
+  os.system('chmod -R 775 {0!s}'.format(panddadir))
 
   return
 

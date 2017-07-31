@@ -563,7 +563,7 @@ class GUI(object):
 
         self.db_dict_mainTable={}
         self.db_dict_panddaTable={}
-        if str(self.Todo[self.index][0]) != None:
+        if str(self.Todo[self.index][0]) is not None:
             self.compoundID=str(self.Todo[self.index][1])
             self.refinement_folder=str(self.Todo[self.index][4])
             self.refinement_outcome=str(self.Todo[self.index][5])
@@ -925,9 +925,9 @@ class GUI(object):
                 self.cb.remove_text(0)
         self.Todo=[]
         self.Todo=self.db.get_todo_list_for_coot(self.selection_mode,self.selected_site[0])
-        self.status_label.set_text('found %s samples' %len(self.Todo))
+        self.status_label.set_text('found {0!s} samples'.format(len(self.Todo)))
         for item in sorted(self.Todo):
-            self.cb.append_text('%s' %item[0])
+            self.cb.append_text('{0!s}'.format(item[0]))
 
 
 

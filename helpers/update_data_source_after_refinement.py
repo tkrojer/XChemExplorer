@@ -105,7 +105,7 @@ def parse_ligand_validation(inital_model_directory,refinement_directory,xtal):
                     residue_chain = residue.split('-')[0]
                     residue_number = residue.split('-')[1]
                     residue_xyz = pdbtools(os.path.join(inital_model_directory, xtal, 'refine.pdb')).get_center_of_gravity_of_residue_ish(residue_chain, residue_number)
-                    event = db.execute_statement("select PANDDA_site_x,PANDDA_site_y,PANDDA_site_z,PANDDA_site_index from panddaTable where CrystalName='%s'" % xtal)
+                    event = db.execute_statement("select PANDDA_site_x,PANDDA_site_y,PANDDA_site_z,PANDDA_site_index from panddaTable where CrystalName='{0!s}'".format(xtal))
                     for coord in event:
                         db_pandda_dict = {}
                         event_x = float(str(coord[0]))
@@ -145,7 +145,7 @@ def update_ligand_information_in_panddaTable(inital_model_directory,xtal):
             residue_number= ligand[2]
             residue_altLoc= ligand[3]
             residue_xyz = pdbtools(os.path.join(inital_model_directory, xtal, 'refine.pdb')).get_center_of_gravity_of_residue_ish(residue_chain, residue_number)
-            event = db.execute_statement("select PANDDA_site_x,PANDDA_site_y,PANDDA_site_z,PANDDA_site_index from panddaTable where CrystalName='%s'" % xtal)
+            event = db.execute_statement("select PANDDA_site_x,PANDDA_site_y,PANDDA_site_z,PANDDA_site_index from panddaTable where CrystalName='{0!s}'".format(xtal))
             for coord in event:
                 db_pandda_dict = {}
                 event_x = float(str(coord[0]))
@@ -173,13 +173,13 @@ def update_data_source(db_dict):
         db.update_data_source(xtal,db_dict)
         # update refinement outcome if necessary
         sqlite = (
-            "update mainTable set RefinementOutcome = '3 - In Refinement' where CrystalName is '%s' " %xtal+
+            "update mainTable set RefinementOutcome = '3 - In Refinement' where CrystalName is '{0!s}' ".format(xtal)+
             "and (RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending' or RefinementOutcome is '2 - PANDDA model')"
                 )
         db.execute_statement(sqlite)
         # now do the same for each site in the pandda table
         sqlite = (
-            "update panddaTable set RefinementOutcome = '3 - In Refinement' where CrystalName is '%s' " %xtal+
+            "update panddaTable set RefinementOutcome = '3 - In Refinement' where CrystalName is '{0!s}' ".format(xtal)+
             "and (RefinementOutcome is null or RefinementOutcome is '1 - Analysis Pending' or RefinementOutcome is '2 - PANDDA model')"
                 )
         db.execute_statement(sqlite)
