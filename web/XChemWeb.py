@@ -1,15 +1,15 @@
-# last edited: 26/04/2017, 15:00
+# last edited: 05/07/2017, 15:00
 
 import os,sys
 
 def create_ICM_input_file(html_export_directory,database):
 
     if os.getcwd().startswith('/work'):
-        panddaDir='panddaDir="{0!s}"\n'.format(html_export_directory.replace('/work','W:'))
-        molcart='connect molcart filename="{0!s}"\n'.format(database.replace('/work','W:'))
+        panddaDir='panddaDir="%s"\n' %html_export_directory.replace('/work','W:')
+        molcart='connect molcart filename="%s"\n' %database.replace('/work','W:')
     else:
-        panddaDir='panddaDir="{0!s}"\n'.format(html_export_directory)
-        molcart='connect molcart filename="{0!s}"\n'.format(database)
+        panddaDir='panddaDir="%s"\n' %html_export_directory
+        molcart='connect molcart filename="%s"\n' %database
 
     icm_in = (
         '#!/usr/local/bin/icm\n'
@@ -40,12 +40,21 @@ def create_ICM_input_file(html_export_directory,database):
 #        "where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (p.RefinementOutcome like '4%' or p.RefinementOutcome like '5%' or p.RefinementOutcome like '6%') "
 #        'order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index" name="T"\n'
 
+#        'query molcart "select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.PANDDA_site_confidence,p.CrystalName || '
+#        "'_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence "
+#        "as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, "
+#        "p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,"
+#        "m.RefinementBoundConformation,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m "
+#        "where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (p.RefinementOutcome like '4%' or p.RefinementOutcome like '5%' or p.RefinementOutcome like '6%') "
+#        " and (p.PANDDA_site_confidence like '1%' or p.PANDDA_site_confidence like '2%' or p.PANDDA_site_confidence like '3%' or p.PANDDA_site_confidence like '4%')"
+#        'order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index" name="T"\n'
+
         'query molcart "select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.PANDDA_site_confidence,p.CrystalName || '
         "'_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence "
         "as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, "
         "p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,"
         "m.RefinementBoundConformation,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m "
-        "where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (p.RefinementOutcome like '4%' or p.RefinementOutcome like '5%' or p.RefinementOutcome like '6%') "
+        "where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (m.RefinementOutcome like '4%' or m.RefinementOutcome like '5%' or m.RefinementOutcome like '6%') "
         " and (p.PANDDA_site_confidence like '1%' or p.PANDDA_site_confidence like '2%' or p.PANDDA_site_confidence like '3%' or p.PANDDA_site_confidence like '4%')"
         'order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index" name="T"\n'
 
@@ -106,6 +115,6 @@ def create_ICM_input_file(html_export_directory,database):
         'endfor\n'
         )
 
-    f=open('{0!s}/dsEvent_sqlite.icm'.format(html_export_directory),'w')
+    f=open('%s/dsEvent_sqlite.icm' %html_export_directory,'w')
     f.write(icm_in)
     f.close()
