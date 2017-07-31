@@ -1,4 +1,4 @@
-# last edited: 19/04/2017, 18:00
+# last edited: 21/07/2017, 18:00
 
 import os, sys, glob
 from datetime import datetime
@@ -40,7 +40,7 @@ class XChemExplorer(QtGui.QApplication):
     def __init__(self,args):
         QtGui.QApplication.__init__(self,args)
 
-        self.xce_version='v1.0-beta.3.4'
+        self.xce_version='v1.0-beta.4.1'
 
         # general settings
         self.allowed_unitcell_difference_percent=12
@@ -155,7 +155,8 @@ class XChemExplorer(QtGui.QApplication):
                              'max_queue_jobs':                  self.max_queue_jobs,
                              'diffraction_data_directory':      self.diffraction_data_directory,
                              'html_export_directory':           self.html_export_directory,
-                             'group_deposit_directory':         self.group_deposit_directory        }
+                             'group_deposit_directory':         self.group_deposit_directory,
+                             'remote_qsub':                     ''  }
 
 
         #
@@ -249,6 +250,9 @@ class XChemExplorer(QtGui.QApplication):
         else:
             self.restraints_program=''
             self.update_log.insert('No program for generation of ligand coordinates and restraints available!')
+
+        self.using_remote_qsub_submission=False
+        self.remote_qsub_submission="ssh <dls fed ID>@nx.diamond.ac.uk 'module load global/cluster; qsub'"
 
         # start GUI
         self.start_GUI()
@@ -663,6 +667,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.refine_file_tasks = [ 'Open COOT',
                                    'Open COOT - new interface',
+                                   'Open COOT for old PanDDA',
                                    'Update Deposition Table',
                                    'Prepare Group Deposition'   ]
 
@@ -1803,11 +1808,38 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_max_queue_jobs.addWidget(adjust_max_queue_jobs)
         vbox.addLayout(settings_hbox_max_queue_jobs)
 
+        settings_hbox_remote_qsub=QtGui.QHBoxLayout()
+        remote_qsub_label=QtGui.QLabel('remote qsub:')
+        settings_hbox_remote_qsub.addWidget(remote_qsub_label)
+        self.remote_qsub_checkbox = QtGui.QCheckBox('use')
+        self.remote_qsub_checkbox.toggled.connect(self.run_qsub_remotely)
+        if self.using_remote_qsub_submission:
+            self.remote_qsub_checkbox.setChecked(True)
+        settings_hbox_remote_qsub.addWidget(self.remote_qsub_checkbox)
+        self.remote_qsub_command = QtGui.QLineEdit()
+        self.remote_qsub_command.setFixedWidth(550)
+        self.remote_qsub_command.setText(self.remote_qsub_submission)
+#        remote_qsub.textChanged[str].connect(self.change_max_queue_jobs)
+        settings_hbox_remote_qsub.addWidget(self.remote_qsub_command)
+        vbox.addLayout(settings_hbox_remote_qsub)
+
 
         preferencesLayout.addLayout(vbox,0,0)
 
         preferences.exec_();
 
+    def run_qsub_remotely(self):
+        self.remote_qsub_submission=str(self.remote_qsub_command.text())
+        if self.remote_qsub_checkbox.isChecked():
+            self.update_log.insert('submitting jobs to remote machine with: %s' %self.remote_qsub_submission)
+            self.external_software['qsub_remote']=self.remote_qsub_submission
+            self.using_remote_qsub_submission=True
+            self.settings['remote_qsub']=self.remote_qsub_submission
+        else:
+            self.update_log.insert('switching off remote job submission')
+            self.external_software['qsub_remote']=''
+            self.settings['remote_qsub']=''
+            self.using_remote_qsub_submission=False
 
     def enter_pdb_codes(self):
         pdbID_entry = QtGui.QMessageBox()
@@ -4025,6 +4057,8 @@ class XChemExplorer(QtGui.QApplication):
                 self.update_log.insert('starting coot...')
                 if instruction=="Open COOT - new interface":
                     interface='new'
+                elif instruction=="Open COOT for old PanDDA":
+                    interface='panddaV1'
                 else:
                     interface='old'
                 self.work_thread=XChemThread.start_COOT(self.settings,interface)
@@ -5139,6 +5173,26 @@ class XChemExplorer(QtGui.QApplication):
     def user_update_selected_autoproc_data_collection_summary_table(self):
         for key in self.data_collection_column_three_dict:
             if self.data_collection_column_three_dict[key][0]==self.sender():
+                dbTmp=self.xtal_db_dict[key]
+                stage=dbTmp['RefinementOutcome'].split()[0]
+                print '===>',key,stage
+                if int(stage) > 2:
+                    msgBox = QtGui.QMessageBox()
+                    msgBox.setText("*** WARNING ***\n%s is currently %s\nIt will disappear from the Refinement table,\nwhen you refresh it next time.\nDo you want to continue?" %(key,dbTmp['RefinementOutcome']))
+                    msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.YesRole)
+                    msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.RejectRole)
+                    reply = msgBox.exec_();
+                    if reply == 0:
+                        self.update_log.insert('will not change data processing selection')
+                        # restore previous selection
+                        for n,entry in enumerate(self.data_collection_dict[key]):
+                            print '==>',n
+                            if entry[0]=='logfile':
+                                if entry[8]==True:
+                                    print '===> found:',n
+                                    self.data_collection_column_three_dict[key][0].selectRow(n)
+                        break
+
                 indexes=self.sender().selectionModel().selectedRows()
                 selected_processing_result=1000000
                 for index in sorted(indexes):

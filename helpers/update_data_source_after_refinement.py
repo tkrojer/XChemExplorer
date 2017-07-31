@@ -1,4 +1,4 @@
-# last edited: 17/11/2016, 17:00
+# last edited: 27/07/2016, 17:00
 
 import os,sys
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
@@ -30,6 +30,8 @@ def parse_pdb(inital_model_directory,xtal,db_dict):
         db_dict['RefinementStatus'] =               'failed'
     if os.path.isfile(os.path.join(inital_model_directory,xtal,'refine.bound.pdb')):
         db_dict['RefinementBoundConformation']=os.path.realpath(os.path.join(inital_model_directory,xtal,'refine.bound.pdb'))
+    elif os.path.isfile(os.path.join(inital_model_directory,xtal,'refine.split.bound-state.pdb')):
+        db_dict['RefinementBoundConformation']=os.path.realpath(os.path.join(inital_model_directory,xtal,'refine.split.bound-state.pdb'))
 
     return db_dict
 
@@ -95,12 +97,13 @@ def parse_ligand_validation(inital_model_directory,refinement_directory,xtal):
             csv_dict = csv.DictReader(csv_import)
             for i, line in enumerate(csv_dict):
                 db_pandda_dict = {}
-                residue = line['']
-                if len(residue.split('-')) == 3:
-                    residue_name = residue.split('-')[0]
-                    print residue_name
-                    residue_chain = residue.split('-')[1]
-                    residue_number = residue.split('-')[2]
+                residue = line[''].replace(' ','')
+                residueFilename = line['']
+                if len(residue.split('-')) == 2:
+#                    residue_name = residue.split('-')[0]
+#                    print residue_name
+                    residue_chain = residue.split('-')[0]
+                    residue_number = residue.split('-')[1]
                     residue_xyz = pdbtools(os.path.join(inital_model_directory, xtal, 'refine.pdb')).get_center_of_gravity_of_residue_ish(residue_chain, residue_number)
                     event = db.execute_statement("select PANDDA_site_x,PANDDA_site_y,PANDDA_site_z,PANDDA_site_index from panddaTable where CrystalName='{0!s}'".format(xtal))
                     for coord in event:
@@ -122,10 +125,10 @@ def parse_ligand_validation(inital_model_directory,refinement_directory,xtal):
                             db_pandda_dict['PANDDA_site_RSCC'] = line['RSCC']
                             db_pandda_dict['PANDDA_site_RSR'] = line['RSR']
                             db_pandda_dict['PANDDA_site_RSZD'] = line['RSZD']
-                            if os.path.isfile(os.path.join(refinement_directory, 'residue_plots', residue + '.png')):
+                            if os.path.isfile(os.path.join(refinement_directory, 'residue_plots', residueFilename + '.png')):
                                 db_pandda_dict['PANDDA_site_spider_plot'] = os.path.join(refinement_directory,
                                                                                          'residue_plots',
-                                                                                         residue + '.png')
+                                                                                         residueFilename + '.png')
                             else:
                                 db_pandda_dict['PANDDA_site_spider_plot'] = ''
 
