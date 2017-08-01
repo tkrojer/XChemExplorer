@@ -547,7 +547,7 @@ class GUI(object):
                     coot.close_molecule(item)
 
         for item in self.meanMaps:
-            if item==widget.get_active_text():
+            if item==self.cb_select_mean_map.get_active_text():
                 self.ground_state_mean_map=self.meanMaps[item]
                 break
 
