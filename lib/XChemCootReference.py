@@ -534,6 +534,9 @@ class GUI(object):
         if os.path.isfile(os.path.join(self.reference_directory,self.refinementDir,'refine.mtz')):
             self.mtzRefine=os.path.join(self.reference_directory,self.refinementDir,'refine.mtz')
             self.mtzRefine_label.set_text('Refine_'+str(self.Serial)+'/refine.mtz')
+            coot.set_default_initial_contour_level_for_map(1)
+            if os.path.isfile(os.path.join(self.reference_directory,self.refinementDir,self.mtz_style)):
+                coot.auto_read_make_and_draw_maps(os.path.join(self.project_directory,self.xtalID,self.mtz_style))
         else:
             self.mtzRefine_label.set_text('missing file')
             self.Logfile.warning('cannot find file with F,SIGF and FreeR_flag; cannot start refinement')
