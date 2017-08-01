@@ -435,7 +435,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 #            db_dict['RefinementMTZfree']=os.path.realpath(xtal+'.free.mtz').replace(os.getcwd()+'/','')
         else:
             db_dict['RefinementMTZfree']=''
-			os.system('/bin/rm %s.free.mtz 2> /dev/null' %xtal)
+            os.system('/bin/rm %s.free.mtz 2> /dev/null' %xtal)
             if os.path.isfile(os.path.join(dimple_path,'prepared2.mtz')):
                 os.symlink(os.path.relpath(os.path.join(dimple_path,'prepared2.mtz')),xtal+'.free.mtz')
 #                db_dict['RefinementMTZfree']=os.path.realpath(xtal+'.free.mtz').replace(os.getcwd()+'/','')
@@ -1692,8 +1692,10 @@ class start_COOT(QtCore.QThread):
             self.pylib='XChemCoot.py'
         elif interface=='new':
             self.pylib='XChemCootNew.py'
-		elif interface=='panddaV1':
+        elif interface=='panddaV1':
             self.pylib='XChemCootOld.py'
+        elif interface=='reference':
+            self.pylib='XChemCootReference.py'
 
     def run(self):
         cwd=os.getcwd()

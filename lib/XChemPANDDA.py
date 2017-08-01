@@ -91,7 +91,7 @@ class run_pandda_export(QtCore.QThread):
             if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.free.mtz')):
                 if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb')):
                     self.Logfile.insert('running inital refinement on PANDDA model of '+xtal)
-					Serial=XChemRefine.GetSerial(self.initial_model_directory,xtal)
+                    Serial=XChemRefine.GetSerial(self.initial_model_directory,xtal)
                     #######################################################
                     if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'cootOut')):
                         os.mkdir(os.path.join(self.initial_model_directory,xtal,'cootOut'))

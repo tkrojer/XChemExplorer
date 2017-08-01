@@ -278,7 +278,7 @@ class Refine(object):
 
 
     def RunRefmac(self,Serial,RefmacParams,external_software,xce_logfile):
-        Logfile=XChemLog.updateLog(xce_logfile)
+        if os.path.isfile(xce_logfile): Logfile=XChemLog.updateLog(xce_logfile)
         Serial=str(Serial)
 
         # first check if refinement is ongoing and exit if yes
@@ -331,6 +331,17 @@ class Refine(object):
         os.system('touch REFINEMENT_IN_PROGRESS')
 
         #######################################################
+        # Database updates:
+        # no DB will be specified when a reference model is built and refined
+        refinementStatus=''
+        updateDB=''
+        if os.path.isfile(self.datasource):
+            refinementStatus='$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(self.datasource,self.xtalID,'RefinementStatus','running')
+            updateDB = (    '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_after_refinement.py')+
+                            ' %s %s %s %s\n' %(self.datasource,self.xtalID,self.ProjectPath,os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))    )
+
+
+        #######################################################
         # clean up!
         # and remove all files which will be re-created by current refinement cycle
         os.system('/bin/rm refine.pdb refine.mtz validation_summary.txt validate_ligands.txt 2fofc.map fofc.map refine_molprobity.log')
@@ -377,7 +388,7 @@ class Refine(object):
             +module_load+
             'cd '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'\n'
             '\n'
-            '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(self.datasource,self.xtalID,'RefinementStatus','running') +
+            +refinementStatus+
             '\n'
             +findTLS+
             'refmac5 '
@@ -454,32 +465,31 @@ class Refine(object):
             'labin F1=DELFWT PHI=PHDELWT\n'
             'EOF\n'
              '\n'
-            '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_after_refinement.py')+
-            ' %s %s %s %s\n' %(self.datasource,self.xtalID,self.ProjectPath,os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))+
+            +updateDB+
             '\n'
             '/bin/rm %s/%s/REFINEMENT_IN_PROGRESS\n' %(self.ProjectPath,self.xtalID)+
             '\n'
            )
 
-        Logfile.insert('writing refinement shell script to'+os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refmac.csh'))
+        if os.path.isfile(xce_logfile): Logfile.insert('writing refinement shell script to'+os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refmac.csh'))
         cmd = open(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refmac.csh'),'w')
         cmd.write(refmacCmds)
         cmd.close()
 
         os.chdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
 #        os.system('ssh artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(self.ProjectPath,self.xtalID,Serial))
-        Logfile.insert('changing directory to %s' %(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial)))
+        if os.path.isfile(xce_logfile): Logfile.insert('changing directory to %s' %(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial)))
         if external_software['qsub']:
             Logfile.insert('starting refinement on cluster')
             os.system('qsub -P labxchem refmac.csh')
         elif external_software['qsub_remote'] != '':
-            Logfile.insert('starting refinement on remote cluster')
+            if os.path.isfile(xce_logfile): Logfile.insert('starting refinement on remote cluster')
             remote_command=external_software['qsub_remote'].replace('qsub','cd %s; qsub' %os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
             os.system('%s -P labxchem refmac.csh' %remote_command)
             print '%s -P labxchem refmac.csh' %remote_command
         else:
             os.system('chmod +x refmac.csh')
-            Logfile.insert('starting refinement on local machine')
+            if os.path.isfile(xce_logfile): Logfile.insert('starting refinement on local machine')
             os.system('./refmac.csh &')
 
 

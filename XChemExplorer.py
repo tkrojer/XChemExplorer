@@ -389,8 +389,9 @@ class XChemExplorer(QtGui.QApplication):
         # add proasis menu to main menu
         self.proasis_menu = menu_bar.addMenu('Proasis')
         # connect to soakDB to get proasis info
-        conn = sqlite3.connect(os.path.join(self.database_directory, self.data_source_file))
-        c = conn.cursor()
+        if os.path.isfile(os.path.join(self.database_directory, self.data_source_file)):
+            conn = sqlite3.connect(os.path.join(self.database_directory, self.data_source_file))
+            c = conn.cursor()
 
         # Project details or add project in menu
         counter = 0
@@ -411,12 +412,17 @@ class XChemExplorer(QtGui.QApplication):
                     self.proasis_project = QtGui.QAction(str('Project Name: ' + self.proasis_name), self.window)
                     self.proasis_menu.addAction(self.proasis_project)
         # should catch if project doesnt exitst
+        except AttributeError:
+            self.update_log.insert('cannot find %s' %os.path.join(self.database_directory, self.data_source_file))
+        except UnboundLocalError:
+            self.update_log.insert('cannot find %s' %os.path.join(self.database_directory, self.data_source_file))
         except:
                 # option to create project, action = create_project()
                 self.proasis_project = QtGui.QAction(str('Create Project for ' + self.proasis_name + '...'),
                                                      self.window)
                 self.proasis_project.triggered.connect(lambda: create_project(self.proasis_name))
                 self.proasis_menu.addAction(self.proasis_project)
+
 
         # Lead details or add lead in menu
         counter = 0
@@ -622,7 +628,8 @@ class XChemExplorer(QtGui.QApplication):
                                     'Update datasource with results from pandda.inspect',
                                     'cluster datasets',
                                     'Event Map -> SF',
-                                    'check modelled ligands'    ]
+                                    'check modelled ligands',
+                                    'Build reference structure' ]
 
         frame_panddas_file_task=QtGui.QFrame()
         frame_panddas_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -4052,13 +4059,15 @@ class XChemExplorer(QtGui.QApplication):
         elif instruction=='check modelled ligands':
             self.compare_modelled_ligands_and_panddaTable()
 
-        elif instruction.startswith("Open COOT"):
+        elif instruction.startswith("Open COOT") or instruction=='Build reference structure':
             if not self.coot_running:
                 self.update_log.insert('starting coot...')
                 if instruction=="Open COOT - new interface":
                     interface='new'
                 elif instruction=="Open COOT for old PanDDA":
                     interface='panddaV1'
+                elif instruction=='Build reference structure':
+                    interface='reference'
                 else:
                     interface='old'
                 self.work_thread=XChemThread.start_COOT(self.settings,interface)
