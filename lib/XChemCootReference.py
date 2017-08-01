@@ -511,7 +511,7 @@ class GUI(object):
             self.Logfile.error('cannot find PDB file')
 
         if self.pdbFile != '':
-            os.chdir(os.path.join(self.reference_directory,self.refinementDir))
+#            os.chdir(os.path.join(self.reference_directory,self.refinementDir))
             coot.set_colour_map_rotation_on_read_pdb(0)
             imol=coot.handle_read_draw_molecule_with_recentre(self.pdbFile,0)
             self.QualityIndicators=XChemUtils.parse().PDBheader(os.path.join(self.pdbFile))
