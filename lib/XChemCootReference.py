@@ -521,6 +521,7 @@ class GUI(object):
 
 
         self.mtzFree=''
+        print 'FREEEEEEEEEEEE',self.pdbFile.replace('.pdb','')+'.free.mtz'
         if os.path.isfile(self.pdbFile.replace('.pdb','')+'.free.mtz'):
             self.mtzFree=self.pdbFile.replace('.pdb','')+'.free.mtz'
             self.mtzFree_label.set_text(str(self.pdbFile.replace('.pdb','')+'.free.mtz')[self.pdbFile.rfind('/')+1:])
