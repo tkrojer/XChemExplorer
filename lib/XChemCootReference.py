@@ -546,6 +546,11 @@ class GUI(object):
                 if 'ground-state-mean-map' in coot.molecule_name(item):
                     coot.close_molecule(item)
 
+        for item in self.meanMaps:
+            if item==widget.get_active_text():
+                self.ground_state_mean_map=self.meanMaps[item]
+                break
+
         coot.set_colour_map_rotation_on_read_pdb(0)
         coot.handle_read_ccp4_map((self.ground_state_mean_map),0)
         for imol in coot_utils_XChem.molecule_number_list():
