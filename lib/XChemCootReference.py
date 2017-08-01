@@ -523,10 +523,10 @@ class GUI(object):
 
 
         if self.mtzFree=='':
-            print 'FREE',os.path.join(self.refinementDir,pdbRoot.replace('.pdb','')+'.free.mtz')
-            if os.path.isfile(os.path.join(self.refinementDir,pdbRoot.replace('.pdb','')+'.free.mtz')):
-                self.mtzFree=os.path.join(self.refinementDir,pdbRoot.replace('.pdb','')+'.free.mtz')
-                self.mtzFree_label.set_text(str(self.pdbFile.replace('.pdb','')+'.free.mtz')[self.pdbFile.rfind('/')+1:])
+            print 'FREE',os.path.join(self.reference_directory,pdbRoot.replace('.pdb','')+'.free.mtz')
+            if os.path.isfile(os.path.join(self.reference_directory,pdbRoot.replace('.pdb','')+'.free.mtz')):
+                self.mtzFree=os.path.join(self.reference_directory,pdbRoot.replace('.pdb','')+'.free.mtz')
+                self.mtzFree_label.set_text(pdbRoot.replace('.pdb','')+'.free.mtz')
                 self.REFINEbutton.set_sensitive(True)
             else:
                 self.mtzFree_label.set_text('missing file')
