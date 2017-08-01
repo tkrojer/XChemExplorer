@@ -523,8 +523,9 @@ class GUI(object):
 
 
         if self.mtzFree=='':
-            if os.path.isfile(os.path.join(self.refinementDir,pdbRoot+'.free.mtz')):
-                self.mtzFree=os.path.join(self.refinementDir,pdbRoot+'.free.mtz')
+            print 'FREE'
+            if os.path.isfile(os.path.join(self.refinementDir,pdbRoot.replace('.pdb','')+'.free.mtz')):
+                self.mtzFree=os.path.join(self.refinementDir,pdbRoot.replace('.pdb','')+'.free.mtz')
                 self.mtzFree_label.set_text(str(self.pdbFile.replace('.pdb','')+'.free.mtz')[self.pdbFile.rfind('/')+1:])
                 self.REFINEbutton.set_sensitive(True)
             else:
