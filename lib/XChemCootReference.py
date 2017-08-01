@@ -452,15 +452,16 @@ class GUI(object):
         self.spinnerBox.add(self.refinementRunning)
         self.refinementRunning.start()
         self.status_label.set_text('Refinement running...')
-        # launch refinement
 
+        # launch refinement
+        time.sleep(1)   # waiting 1s to make sure that REFINEMENT_IN_PROGRESS is written
         self.source_id = gobject.timeout_add(100, self.wait_for_refined_pdb)
 
     def wait_for_refined_pdb(self):
         self.spinnerBox.add(self.refinementRunning)
         self.refinementRunning.show()
         self.refinementRunning.start()
-        if os.path.isfile(os.path.join(self.reference_directory,'cootOut','Refine_'+str(self.Serial),'refine_'+str(self.Serial)+'.pdb')):
+        if not os.path.isfile(os.path.join(self.reference_directory,self.refinementDir,'REFINEMENT_IN_PROGRESS')):
             self.job_running=False
             self.end_thread()
         return True
@@ -487,7 +488,7 @@ class GUI(object):
         if self.pdbFile != '':
             self.Logfile.error('sorry, you need to close the current instance of COOT and start again')
 
-        self.refinementDir=self.pdbFile.replace('.pdb','_refine')
+        self.refinementDir=pdbRoot.replace('.pdb','')
         self.update_pdb_mtz_files(pdbRoot)
 
     def update_pdb_mtz_files(self,pdbRoot):
@@ -514,8 +515,8 @@ class GUI(object):
             coot.set_colour_map_rotation_on_read_pdb(0)
             imol=coot.handle_read_draw_molecule_with_recentre(self.pdbFile,0)
             self.QualityIndicators=XChemUtils.parse().PDBheader(os.path.join(self.pdbFile))
-            self.QualityIndicators.update(XChemUtils.logtools('XXX').phenix_molprobity())
-            self.QualityIndicators.update(XChemUtils.logtools('XXX').refmac_log())
+            self.QualityIndicators.update(XChemUtils.logtools(os.path.join(self.reference_directory,self.refinementDir,'refine_molprobity.log')).phenix_molprobity())
+            self.QualityIndicators.update(XChemUtils.logtools(os.path.join(self.reference_directory,self.refinementDir,'Refine_'+str(self.Serial),'refmac.log')).refmac_log())
             self.mol_dict['protein']=imol
 
 
@@ -525,7 +526,7 @@ class GUI(object):
             self.mtzFree_label.set_text(self.pdbFile.replace('.pdb','')+'.free.mtz')
             self.REFINEbutton.set_sensitive(True)
         else:
-            self.mtzFree_label.set_text('cannot find %s in reference directory' %self.pdbFile.replace('.pdb','')+'.free.mtz')
+            self.mtzFree_label.set_text('missing file')
             self.Logfile.error('cannot find file with F,SIGF and FreeR_flag; cannot start refinement')
             self.REFINEbutton.set_sensitive(False)
 
@@ -534,7 +535,7 @@ class GUI(object):
             self.mtzRefine=os.path.join(self.reference_directory,self.refinementDir,'refine.mtz')
             self.mtzRefine_label.set_text(mtzFree)
         else:
-            self.mtzRefine_label.set_text('cannot find refine.mtz in %s' %os.path.join(self.reference_directory,self.refinementDir))
+            self.mtzRefine_label.set_text('missing file')
             self.Logfile.warning('cannot find file with F,SIGF and FreeR_flag; cannot start refinement')
 
         self.RefreshData()
@@ -559,9 +560,8 @@ class GUI(object):
                 coot.set_last_map_colour(0.74,0.44,0.02)
 
     def show_molprobity_to_do(self,widget):
-        if os.path.isfile(os.path.join(self.reference_directory,self.xtalID,'Refine_'+str(self.Serial-1),'molprobity_coot.py')):
-            print '==> XCE: running MolProbity Summary for',self.xtalID
-            coot.run_script(os.path.join(self.reference_directory,self.xtalID,'Refine_'+str(self.Serial-1),'molprobity_coot.py'))
+        if os.path.isfile(os.path.join(self.reference_directory,self.refinementDir,'Refine_'+str(self.Serial-1),'molprobity_coot.py')):
+            coot.run_script(os.path.join(self.reference_directory,self.refinementDir,'Refine_'+str(self.Serial-1),'molprobity_coot.py'))
         else:
             print '==> XCE: cannot find '+os.path.join(self.reference_directory,self.xtalID,'Refine_'+str(self.Serial-1),'molprobity_coot.py')
 
