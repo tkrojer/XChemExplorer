@@ -523,7 +523,7 @@ class GUI(object):
         self.mtzFree=''
         if os.path.isfile(os.path.join(self.reference_directory,self.pdbFile.replace('.pdb','')+'.free.mtz')):
             self.mtzFree=os.path.join(self.reference_directory,self.pdbFile.replace('.pdb','')+'.free.mtz')
-            self.mtzFree_label.set_text(self.pdbFile.replace('.pdb','')+'.free.mtz')
+            self.mtzFree_label.set_text(str(self.pdbFile.replace('.pdb','')+'.free.mtz')[self.pdbFile.rfind('/')+1:])
             self.REFINEbutton.set_sensitive(True)
         else:
             self.mtzFree_label.set_text('missing file')
