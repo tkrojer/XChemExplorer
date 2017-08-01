@@ -521,8 +521,8 @@ class GUI(object):
 
 
         self.mtzFree=''
-        if os.path.isfile(os.path.join(self.reference_directory,self.pdbFile.replace('.pdb','')+'.free.mtz')):
-            self.mtzFree=os.path.join(self.reference_directory,self.pdbFile.replace('.pdb','')+'.free.mtz')
+        if os.path.isfile(self.pdbFile.replace('.pdb','')+'.free.mtz'):
+            self.mtzFree=self.pdbFile.replace('.pdb','')+'.free.mtz'
             self.mtzFree_label.set_text(str(self.pdbFile.replace('.pdb','')+'.free.mtz')[self.pdbFile.rfind('/')+1:])
             self.REFINEbutton.set_sensitive(True)
         else:
@@ -533,7 +533,7 @@ class GUI(object):
         self.mtzRefine=''
         if os.path.isfile(os.path.join(self.reference_directory,self.refinementDir,'refine.mtz')):
             self.mtzRefine=os.path.join(self.reference_directory,self.refinementDir,'refine.mtz')
-            self.mtzRefine_label.set_text(mtzFree)
+            self.mtzRefine_label.set_text('Refine_'+str(self.Serial)+'/refine.mtz')
         else:
             self.mtzRefine_label.set_text('missing file')
             self.Logfile.warning('cannot find file with F,SIGF and FreeR_flag; cannot start refinement')
