@@ -62,6 +62,7 @@ class GUI(object):
         self.spider_plot=''
         self.refinement_folder=''
         self.pdbFile=''
+        self.mtzFree=''
 
         self.pdb_style='refine.pdb'
         self.mtz_style='refine.mtz'
@@ -487,6 +488,7 @@ class GUI(object):
         pdbRoot=self.cb_select_pdb.get_active_text()
         if self.pdbFile != '':
             self.Logfile.error('sorry, you need to close the current instance of COOT and start again')
+            return None
 
         self.refinementDir=pdbRoot.replace('.pdb','')
         self.update_pdb_mtz_files(pdbRoot)
@@ -520,16 +522,15 @@ class GUI(object):
             self.mol_dict['protein']=imol
 
 
-        self.mtzFree=''
-        print 'FREEEEEEEEEEEE',self.pdbFile.replace('.pdb','')+'.free.mtz'
-        if os.path.isfile(self.pdbFile.replace('.pdb','')+'.free.mtz'):
-            self.mtzFree=self.pdbFile.replace('.pdb','')+'.free.mtz'
-            self.mtzFree_label.set_text(str(self.pdbFile.replace('.pdb','')+'.free.mtz')[self.pdbFile.rfind('/')+1:])
-            self.REFINEbutton.set_sensitive(True)
-        else:
-            self.mtzFree_label.set_text('missing file')
-            self.Logfile.error('cannot find file with F,SIGF and FreeR_flag; cannot start refinement')
-            self.REFINEbutton.set_sensitive(False)
+        if self.mtzFree=='':
+            if os.path.isfile(os.path.join(self.refinementDir,pdbRoot+'.free.mtz')):
+                self.mtzFree=os.path.join(self.refinementDir,pdbRoot+'.free.mtz')
+                self.mtzFree_label.set_text(str(self.pdbFile.replace('.pdb','')+'.free.mtz')[self.pdbFile.rfind('/')+1:])
+                self.REFINEbutton.set_sensitive(True)
+            else:
+                self.mtzFree_label.set_text('missing file')
+                self.Logfile.error('cannot find file with F,SIGF and FreeR_flag; cannot start refinement')
+                self.REFINEbutton.set_sensitive(False)
 
         self.mtzRefine=''
         if os.path.isfile(os.path.join(self.reference_directory,self.refinementDir,'refine.mtz')):
