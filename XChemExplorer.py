@@ -4228,7 +4228,8 @@ class XChemExplorer(QtGui.QApplication):
                 'filter_pdb':                           str(self.pandda_reference_file_selection_combobox.currentText()),
                 'reference_dir':                        self.reference_directory,
                 'appendix':                             '',
-                'N_datasets':                           len(glob.glob(os.path.join(self.panddas_directory,'*')))
+                'N_datasets':                           len(glob.glob(os.path.join(self.panddas_directory,'*'))),
+                'write_mean_map':                       'interesting'
                         }
 
         if run=='pre_run':
@@ -4258,7 +4259,8 @@ class XChemExplorer(QtGui.QApplication):
             if reply == 0:
                 pandda_params['appendix']=str(appendix.text())
                 pandda_params['max_new_datasets'] = '100'
-                pandda_params['N_datasets'] =100
+                pandda_params['N_datasets'] = 100
+                pandda_params['write_mean_map'] = 'all'
             else:
                 return None
 

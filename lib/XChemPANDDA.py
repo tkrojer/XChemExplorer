@@ -393,6 +393,7 @@ class run_pandda_analyse(QtCore.QThread):
         self.datasource=datasource
         self.db=XChemDB.data_source(datasource)
         self.appendix=pandda_params['appendix']
+        self.write_mean_maps=pandda_params['write_mean_map']
 
         if self.appendix != '':
             self.panddas_directory=os.path.join(self.reference_dir,'PanDDA_'+self.appendix)
@@ -414,7 +415,7 @@ class run_pandda_analyse(QtCore.QThread):
         # (this will be quicker than the original analysis). It will then merge the results of the two analyses.
         #
         # 3) Repeat 2) until you don't add any "new" datasets. Then you can build the models as normal.
-    
+
 #        crystalString=''
 #        for n,dataset in enumerate(self.dataset_list):
 #            if n > 0:       # first entry is reference file!
@@ -478,7 +479,8 @@ class run_pandda_analyse(QtCore.QThread):
                     ' pdb_style='+self.pdb_style+
                     ' mtz_style='+self.mtz_style+
                     ' lig_style=/compound/*.cif'+
-                    ' use_b_factor_scaled_data='+self.wilson_scaling+
+                    ' use_b_factor_scaling='+self.wilson_scaling+
+                    ' write_mean_map='+self.write_mean_maps+
                     '\n'
                     )
 
