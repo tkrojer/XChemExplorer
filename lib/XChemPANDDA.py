@@ -484,30 +484,28 @@ class run_pandda_analyse(QtCore.QThread):
                     '\n'
                     )
 
-            print(self.data_directory)
-
             #Cmds += '$CCP4/bin/ccp4-python %s %s %s %s\n' %(  os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_pandda_status_flag.py'),    self.datasource,crystalString[:-1],'finished')
             Cmds += '\n'
 
             data_dir_string = self.data_directory.replace('/*', '')
 
-            Cmds += str(
-                        'find ' + data_dir_string +
-                        '/*/compound -name "*.cif" | while read line; do  echo ${line//"' +
-                        data_dir_string + '"/"' + self.panddas_directory +
-                        '/processed_datasets/"}| while read line2; do cp $line ${line2//compound/ligand_files}; '
-                        'done; done;')
-
-            Cmds += '\n'
-
-
-
-            Cmds += str(
-                        'find ' + data_dir_string +
-                        '/*/compound -name "*.pdb" | while read line; do  echo ${line//"' +
-                        data_dir_string + '"/"' + self.panddas_directory +
-                        '/processed_datasets/"}| while read line2; do cp $line ${line2//compound/ligand_files}; '
-                        'done; done;')
+#            Cmds += str(
+#                        'find ' + data_dir_string +
+#                        '/*/compound -name "*.cif" | while read line; do  echo ${line//"' +
+#                        data_dir_string + '"/"' + self.panddas_directory +
+#                        '/processed_datasets/"}| while read line2; do cp $line ${line2//compound/ligand_files}; '
+#                        'done; done;')
+#
+#            Cmds += '\n'
+#
+#
+#
+#            Cmds += str(
+#                        'find ' + data_dir_string +
+#                        '/*/compound -name "*.pdb" | while read line; do  echo ${line//"' +
+#                        data_dir_string + '"/"' + self.panddas_directory +
+#                        '/processed_datasets/"}| while read line2; do cp $line ${line2//compound/ligand_files}; '
+#                        'done; done;')
 
             self.Logfile.insert('running pandda.analyse with the following command:\n'+Cmds)
 
