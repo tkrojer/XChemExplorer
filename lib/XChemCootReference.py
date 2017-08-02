@@ -370,6 +370,7 @@ class GUI(object):
         #########################################################################################
         # history
         # if the structure was previously refined, try to read the parameters
+        self.hbox_for_info_graphics.remove(self.canvas)
         if self.Serial > 1:
             self.RefmacParams=self.Refine.ParamsFromPreviousCycle(self.Serial-1)
             refinement_cycle,Rfree,Rcryst=self.Refine.GetRefinementHistory()
