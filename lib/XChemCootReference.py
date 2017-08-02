@@ -74,6 +74,7 @@ class GUI(object):
                             'fofc':     -1,
                             'event':    -1  }
 
+        self.ground_state_map_List = []
         self.job_running=False
 
         ###########################################################################################
@@ -185,7 +186,7 @@ class GUI(object):
                     self.meanMaps[panddaDir]=files
                     break
 
-        frame = gtk.Frame(label='Load ground-state-mean-map file')
+        frame = gtk.Frame(label='Load ground-state-mean-map files')
         hbox=gtk.HBox()
         self.cb_select_mean_map = gtk.combo_box_new_text()
         for item in self.meanMaps:
@@ -197,6 +198,16 @@ class GUI(object):
         frame.add(hbox)
         self.vbox.pack_start(frame)
 
+        frame = gtk.Frame()
+        hbox=gtk.HBox()
+        self.show_highres_ground_state_map_button = gtk.Button(label="Show Highest\nResolution Map")
+        self.show_highres_ground_state_map_button.connect("clicked",self.show_highres_ground_state_map)
+        hbox.add(self.show_highres_ground_state_map_button)
+        self.show_all_ground_state_map_button = gtk.Button(label="Show All Maps")
+        self.show_all_ground_state_map_button.connect("clicked",self.show_all_ground_state_map)
+        hbox.add(self.show_all_ground_state_map_button)
+        frame.add(hbox)
+        self.vbox.pack_start(frame)
 
         # SPACER
         self.vbox.add(gtk.Label(' \n '))
@@ -555,17 +566,41 @@ class GUI(object):
                 if 'ground-state-mean-map' in coot.molecule_name(item):
                     coot.close_molecule(item)
 
-        for item in self.meanMaps:
-            if item==self.cb_select_mean_map.get_active_text():
-                self.ground_state_mean_map=self.meanMaps[item]
-                break
+#        for item in self.meanMaps:
+#            if item==self.cb_select_mean_map.get_active_text():
+#                self.ground_state_mean_map=self.meanMaps[item]
+#                break
+#
+#        coot.set_colour_map_rotation_on_read_pdb(0)
+#        coot.handle_read_ccp4_map((self.ground_state_mean_map),0)
+#        for imol in coot_utils_XChem.molecule_number_list():
+#            if self.ground_state_mean_map in coot.molecule_name(imol):
+#                coot.set_contour_level_in_sigma(imol,2)
+#                coot.set_last_map_colour(0.74,0.44,0.02)
 
-        coot.set_colour_map_rotation_on_read_pdb(0)
-        coot.handle_read_ccp4_map((self.ground_state_mean_map),0)
-        for imol in coot_utils_XChem.molecule_number_list():
-            if self.ground_state_mean_map in coot.molecule_name(imol):
-                coot.set_contour_level_in_sigma(imol,2)
-                coot.set_last_map_colour(0.74,0.44,0.02)
+        self.get_ground_state_maps_by_resolution()
+        blueStart=0.02
+        for map in self.ground_state_map_List:
+            imol=coot.handle_read_ccp4_map((map[1]),0)
+            coot.set_contour_level_in_sigma(imol,1)
+            coot.set_last_map_colour(0.74,0.44,blueStart)
+            blueStart+=0.05
+
+    def show_highres_ground_state_map(self):
+        if len(self.ground_state_map_List) >= 1:
+            for imol in coot_utils_XChem.molecule_number_list():
+                if coot.molecule_name(imol) in self.ground_state_map_List[0][1]:
+                    coot.set_map_displayed(imol,1)
+                elif 'ground-state-mean-map' in coot.molecule_name(imol):
+                    coot.set_map_displayed(imol,0)
+
+    def show_all_ground_state_map(self):
+        if len(self.ground_state_map_List) >= 1:
+            for imol in coot_utils_XChem.molecule_number_list():
+                if 'ground-state-mean-map' in coot.molecule_name(imol):
+                    coot.set_map_displayed(imol,1)
+
+
 
     def show_molprobity_to_do(self,widget):
         if os.path.isfile(os.path.join(self.reference_directory,self.refinementDir,'Refine_'+str(self.Serial-1),'molprobity_coot.py')):
@@ -583,6 +618,21 @@ class GUI(object):
         Plot.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
                 ncol=2, mode="expand", borderaxespad=0.,fontsize=12)
         return fig
+
+    def get_ground_state_maps_by_resolution(self):
+        found=False
+        self.ground_state_map_List=[]
+        for n,line in enumerate(open(glob.glob(os.path.join(self.reference_directory,self.cb_select_mean_map.get_active_text(),'logs','*.log')))):
+            if line.startswith('Statistical Electron Density Characterisation') and len(line.split()) == 6:
+                resolution=line.split()[5]
+                found=True
+                foundLine=n
+            if found and n==foundLine+2:
+                xtal=line.split(',')[0]
+                meanmap=os.path.join(self.reference_directory,self.cb_select_mean_map.get_active_text(),'processed_datasets',xtal,xtal+'-x0149-ground-state-mean-map.native.ccp4')
+                self.ground_state_map_List.append([resolution,meanmap])
+                found=False
+        return self.ground_state_map_List
 
 
 

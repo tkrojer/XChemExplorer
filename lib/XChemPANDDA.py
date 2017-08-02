@@ -386,12 +386,20 @@ class run_pandda_analyse(QtCore.QThread):
         self.number_of_datasets=pandda_params['N_datasets']
         self.max_new_datasets=pandda_params['max_new_datasets']
         self.grid_spacing=pandda_params['grid_spacing']
-        self.filter_pdb=pandda_params['filter_pdb']
+        self.reference_dir=pandda_params['reference_dir']
+        self.filter_pdb=os.path.join(self.reference_dir,pandda_params['filter_pdb'])
         self.wilson_scaling = pandda_params['perform_diffraction_data_scaling']
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.dataset_list=dataset_list
         self.datasource=datasource
         self.db=XChemDB.data_source(datasource)
+        self.appendix=pandda_params['appendix']
+
+        if self.appendix != '':
+            self.panddas_directory=os.path.join(self.reference_dir,'PanDDA_'+self.appendix)
+            if os.path.isdir(self.panddas_directory):
+                os.system('/bin/rm -fr %s' %self.panddas_directory)
+            os.mkdir(self.panddas_directory)
 
     def run(self):
 
@@ -467,7 +475,7 @@ class run_pandda_analyse(QtCore.QThread):
                     ' grid_spacing='+self.grid_spacing+
                     ' cpus='+self.nproc+
                     ' events.order_by='+self.sort_event+
-                    #filter_pdb+
+                    filter_pdb+
                     ' pdb_style='+self.pdb_style+
                     ' mtz_style='+self.mtz_style+
                     ' lig_style=/compound/*.cif'+
@@ -519,7 +527,7 @@ class run_pandda_analyse(QtCore.QThread):
 
 class giant_cluster_datasets(QtCore.QThread):
 
-    def __init__(self,initial_model_directory,pandda_params,xce_logfile,datasource,run_pandda_analyse):
+    def __init__(self,initial_model_directory,pandda_params,xce_logfile,datasource,):
         QtCore.QThread.__init__(self)
         self.panddas_directory=pandda_params['out_dir']
         self.pdb_style=pandda_params['pdb_style']
@@ -527,7 +535,7 @@ class giant_cluster_datasets(QtCore.QThread):
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.initial_model_directory=initial_model_directory
         self.db=XChemDB.data_source(datasource)
-        self.run_pandda_analyse=run_pandda_analyse
+
 
     def run(self):
 
@@ -616,8 +624,6 @@ class giant_cluster_datasets(QtCore.QThread):
         self.emit(QtCore.SIGNAL('update_progress_bar'), 100)
         self.Logfile.insert('finished giant.cluster_mtzs_and_pdbs')
         self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
-        if self.run_pandda_analyse:
-            self.emit(QtCore.SIGNAL('run_pandda_analyse'))
 
 class check_if_pandda_can_run:
 
@@ -860,47 +866,6 @@ class convert_event_map_to_SF:
     def run(self):
         os.chdir(os.path.join(self.project_directory,self.xtalID))
 
-#        if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,'2fofc.map')):
-#            self.Logfile.insert('cannot find 2fofc.map in '+os.path.join(self.project_directory,self.xtalID))
-#            self.Logfile.insert('--> need 2fofc.map to determine grid')
-#            mtzin=''
-#            if os.path.isfile(os.path.join(self.project_directory,self.xtalID,'refine.mtz')):
-#                mtzin='refine.mtz'
-#            elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.mtz')):
-#                mtzin='dimple.mtz'
-#            if mtzin != '':
-#                self.calculate_electron_density_map(mtzin)
-#            else:
-#                self.Logfile.insert('cannot find refine.mtz or dimple.mtz in '+os.path.join(self.project_directory,self.xtalID))
-#                self.Logfile.insert('cannot calculate structure factors for '+self.event_map)
-#                self.Logfile.insert('stopping')
-#                return None
-#
-#
-#        ElectronDensityMap=XChemUtils.maptools(os.path.join(self.project_directory,self.xtalID,'2fofc.map'))
-#
-#        self.gridElectronDensityMap=ElectronDensityMap.grid_sampling
-#        self.Logfile.insert('using '+str(self.gridElectronDensityMap)+' as grid')
-#
-#        self.space_group_numberElectronDensityMap=ElectronDensityMap.space_group_number
-#        self.Logfile.insert('using '+str(self.space_group_numberElectronDensityMap)+' as space group')
-#
-#        self.space_group=ElectronDensityMap.space_group()
-#        self.Logfile.insert('using '+str(self.space_group)+' as space group')
-#
-#        self.unit_cell=ElectronDensityMap.cell_dimensions
-#        self.Logfile.insert('using '+str(self.unit_cell)+' as cell dimensions')
-#
-#        if not os.path.isfile(self.ligand_pdb):
-#            self.Logfile.insert('cannot find '+self.ligand_pdb)
-#            self.Logfile.insert('stopping')
-#            return None
-#
-#        # prepare input script
-#        self.prepare_conversion_script()
-#
-#        # run script
-#        self.run_conversion_script()
 
         # remove exisiting mtz file
         if os.path.isfile(self.event+'.mtz'):
@@ -1016,8 +981,14 @@ class convert_event_map_to_SF:
     def run_phenix_map_to_structure_factors(self):
         if float(self.resolution) < 1.21:   # program complains if resolution is 1.2 or higher
             self.resolution='1.21'
-        self.Logfile.insert('running phenix.map_to_structure_factors {0!s} d_min={1!s} output_file_name={2!s}.mtz'.format(self.event_map, self.resolution, self.event))
+        self.Logfile.insert('running phenix.map_to_structure_factors {0!s} d_min={1!s} output_file_name={2!s}_tmp.mtz'.format(self.event_map, self.resolution, self.event))
         os.system('phenix.map_to_structure_factors {0!s} d_min={1!s} output_file_name={2!s}_tmp.mtz'.format(self.event_map, self.resolution, self.event))
+
+    def run_cinvfft(self,mtzin):
+        # mtzin is usually refine.mtz
+        self.Logfile.insert('running cinvfft -mapin {0!s} -mtzin {1!s} -mtzout {2!s}_tmp.mtz -colout event'.format(self.event_map, mtzin, self.event))
+        os.system('cinvfft -mapin {0!s} -mtzin {1!s} -mtzout {2!s}_tmp.mtz -colout event'.format(self.event_map, mtzin, self.event))
+
 
     def remove_and_rename_column_labels(self):
 
@@ -1029,6 +1000,18 @@ class convert_event_map_to_SF:
                     'eof\n'
                     '\n' )
         self.Logfile.insert('running CAD: new column labels F_ampl,PHIF')
+        os.system(cmd)
+
+    def remove_and_rename_column_labels_after_cinvfft(self):
+
+        cmd = (     '#!'+os.getenv('SHELL')+'\n'
+                    '\n'
+                    'cad hklin1 %s_tmp.mtz hklout %s.mtz << eof\n' %(self.event,self.event)+
+                    ' labin file_number 1 E1=event.F_phi.F E2=event.F_phi.phi\n'
+                    ' labout file_number 1 E1=F_ampl E2=PHIF\n'
+                    'eof\n'
+                    '\n' )
+        self.Logfile.insert('running CAD: renaming event.F_phi.F -> F_ampl and event.F_phi.phi -> PHIF')
         os.system(cmd)
 
 

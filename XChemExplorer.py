@@ -629,7 +629,8 @@ class XChemExplorer(QtGui.QApplication):
                                     'cluster datasets',
                                     'Event Map -> SF',
                                     'check modelled ligands',
-                                    'Build reference structure' ]
+                                    'pre-run for ground state model',
+                                    'Build ground state model' ]
 
         frame_panddas_file_task=QtGui.QFrame()
         frame_panddas_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -1473,14 +1474,14 @@ class XChemExplorer(QtGui.QApplication):
         label=QtGui.QLabel('max_new_datasets')
         self.pandda_analyse_input_params_vbox.addWidget(label)
         self.pandda_max_new_datasets_entry = QtGui.QLineEdit()
-        self.pandda_max_new_datasets_entry.setText('200')
+        self.pandda_max_new_datasets_entry.setText('500')
         self.pandda_max_new_datasets_entry.setFixedWidth(200)
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_max_new_datasets_entry)
 
-        label=QtGui.QLabel('grid_spacing (default=0.6)\nNote: higher values speed up calculations, but maps might be less pretty)')
+        label=QtGui.QLabel('grid_spacing (default=0.5)\nNote: higher values speed up calculations, but maps might be less pretty)')
         self.pandda_analyse_input_params_vbox.addWidget(label)
         self.pandda_grid_spacing_entry = QtGui.QLineEdit()
-        self.pandda_grid_spacing_entry.setText('0.6')
+        self.pandda_grid_spacing_entry.setText('0.5')
         self.pandda_grid_spacing_entry.setFixedWidth(200)
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_grid_spacing_entry)
 
@@ -4023,8 +4024,10 @@ class XChemExplorer(QtGui.QApplication):
             self.create_cif_pdb_png_files('SELECTED')
 
         elif instruction=='pandda.analyse':
-            run_pandda_analyse=True
-            self.cluster_datasets_for_pandda(run_pandda_analyse)
+            self.run_pandda_analyse('production_run')
+
+        elif instruction=='pre-run for ground state model':
+            self.run_pandda_analyse('pre_run')
 
         elif instruction=='pandda.inspect':
             self.run_pandda_inspect()
@@ -4043,7 +4046,7 @@ class XChemExplorer(QtGui.QApplication):
             self.run_pandda_export(update_datasource_only,which_models)
 
         elif instruction=='cluster datasets':
-            self.cluster_datasets_for_pandda(False)
+            self.cluster_datasets_for_pandda()
 
         elif instruction=='Update datasource with results from pandda.inspect':
             update_datasource_only=True
@@ -4059,14 +4062,14 @@ class XChemExplorer(QtGui.QApplication):
         elif instruction=='check modelled ligands':
             self.compare_modelled_ligands_and_panddaTable()
 
-        elif instruction.startswith("Open COOT") or instruction=='Build reference structure':
+        elif instruction.startswith("Open COOT") or instruction=='Build ground state model':
             if not self.coot_running:
                 self.update_log.insert('starting coot...')
                 if instruction=="Open COOT - new interface":
                     interface='new'
                 elif instruction=="Open COOT for old PanDDA":
                     interface='panddaV1'
-                elif instruction=='Build reference structure':
+                elif instruction=='Build ground state model':
                     interface='reference'
                 else:
                     interface='old'
@@ -4208,126 +4211,64 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
-    def run_pandda_analyse(self):
+    def run_pandda_analyse(self,run):
         pandda_params = {
-                'data_dir':             str(self.pandda_input_data_dir_entry.text()),
-                'out_dir':              str(self.pandda_output_data_dir_entry.text()),
-                'submit_mode':          str(self.pandda_submission_mode_selection_combobox.currentText()),
-                'nproc':                str(self.pandda_nproc_entry.text()),
-                'min_build_datasets':   str(self.pandda_min_build_dataset_entry.text()),
-                'pdb_style':            str(self.pandda_pdb_style_entry.text()),
-                'mtz_style':            str(self.pandda_mtz_style_entry.text()),
-                'sort_event':           str(self.pandda_sort_event_combobox.currentText()),
-                'max_new_datasets':     str(self.pandda_max_new_datasets_entry.text()),
-                'grid_spacing':         str(self.pandda_grid_spacing_entry.text()),
-                'pandda_dir_structure': str(self.pandda_input_data_dir_entry.text()),
-                'perform_diffraction_data_scaling': str(self.wilson_checkbox.isChecked())
+                'data_dir':                             str(self.pandda_input_data_dir_entry.text()),
+                'out_dir':                              str(self.pandda_output_data_dir_entry.text()),
+                'submit_mode':                          str(self.pandda_submission_mode_selection_combobox.currentText()),
+                'nproc':                                str(self.pandda_nproc_entry.text()),
+                'min_build_datasets':                   str(self.pandda_min_build_dataset_entry.text()),
+                'pdb_style':                            str(self.pandda_pdb_style_entry.text()),
+                'mtz_style':                            str(self.pandda_mtz_style_entry.text()),
+                'sort_event':                           str(self.pandda_sort_event_combobox.currentText()),
+                'max_new_datasets':                     str(self.pandda_max_new_datasets_entry.text()),
+                'grid_spacing':                         str(self.pandda_grid_spacing_entry.text()),
+                'pandda_dir_structure':                 str(self.pandda_input_data_dir_entry.text()),
+                'perform_diffraction_data_scaling':     str(self.wilson_checkbox.isChecked()),
+                'filter_pdb':                           str(self.pandda_reference_file_selection_combobox.currentText()),
+                'reference_dir':                        self.reference_directory,
+                'appendix':                             ''
                         }
 
-        pandda_checks=XChemPANDDA.check_if_pandda_can_run(pandda_params,self.xce_logfile,os.path.join(self.database_directory,self.data_source_file))
-
-        cluster_dict=XChemPANDDA.get_names_of_current_clusters(self.xce_logfile,self.panddas_directory)
-
-        added_new_reference_files=False
-        # now need to check for the other reference files in the reference file folder
-        for item in self.reference_file_list:
-            self.update_log.insert('checking which datasets are suitable for '+str(item[0])+' as reference')
-            if not str(item[0]).startswith('.') and str(item[0]) not in cluster_dict:
-                cluster_dict=pandda_checks.get_datasets_which_fit_to_reference_file(str(item[0]),self.reference_directory,cluster_dict,self.allowed_unitcell_difference_percent)
-
-        for key in cluster_dict:
-            self.update_log.insert('cluster {0!s}:   {1!s} datasets'.format(str(key), str(len(cluster_dict[key])-1)))
-
-        reference_ID=str(self.pandda_reference_file_selection_combobox.currentText())
-        if len(cluster_dict) > 1 and not os.path.isfile(os.path.join(self.reference_directory,reference_ID+'.pdb')):
-            msg = (
-                    '*** WARNING ***\n'
-                    'The datasets in your project directory belong to more than one crystal form.\n'
-                    'But you did not select a specific reference file.\n'
-                    'Please select a reference file and try again!\n'
-                )
-            self.update_log.insert(msg)
+        if run=='pre_run':
             msgBox = QtGui.QMessageBox()
-            msgBox.setText(msg)
-            msgBox.exec_()
-            return
-        elif len(cluster_dict) == 1 and reference_file == '...':
-            reference_ID=cluster_dict.keys[0]
-            reference_file=os.path.join(self.reference_directory,reference_ID+'.pdb')
-            filter_pdb=''
-            if os.path.isfile(reference_file):
-                self.update_log.insert('only one crystal form; continuing without reference file')
+            msgBoxLayout = msgBox.layout()
+            vbox = QtGui.QVBoxLayout()
+            text = (    'The aim of the pre-run is NOT to identify bound ligands,\n'
+                        'but to create mean ground state maps.  to pre-run will only comprise 100 datasets. The aim is not to identify\n'
+                        'bound ligands, but to create the ground-state maps.\n'
+                        'You can run m\n'
+                        '- select "Build ground state model" \n'
+                        '- calculate new maps with the improved reference structure\n'
+                        '- run "pandda.analyse\n'    )
+            vbox.addWidget(QtGui.QLabel(text))
+            hbox=QtGui.QHBoxLayout()
+            hbox.addWidget(QtGui.QLabel('appendix:'))
+            appendix = QtGui.QLineEdit()
+            appendix.setText('pre')
+            appendix.setFixedWidth(200)
+            hbox.addWidget(appendix)
+            vbox.addLayout(hbox)
+
+            msgBoxLayout.addLayout(vbox,0,0)
+            msgBox.addButton(QtGui.QPushButton('Go'), QtGui.QMessageBox.YesRole)
+            msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
+            reply = msgBox.exec_();
+            if reply == 0:
+                pandda_params['appendix']=str(appendix.text())
+                pandda_params['max_new_datasets'] = '100'
             else:
-                self.update_log.insert('cannot find {0!s} -> stopping pandda.analyse'.format(reference_file))
-        elif os.path.isfile(os.path.join(self.reference_directory,reference_ID+'.pdb')):
-            reference_file=os.path.join(self.reference_directory,reference_ID+'.pdb')
-            filter_pdb=reference_file
-            self.update_log.insert('using {0!s} as reference file for PanDDA'.format(reference_file))
+                return None
 
-        pandda_params['filter_pdb']=filter_pdb
-
-        self.update_log.insert('checking if PDB files in project directory contain same number of atoms as reference file')
-        n_datasets,mismatch=pandda_checks.compare_number_of_atoms_in_reference_vs_all_datasets(reference_file,cluster_dict[reference_ID])
-        pandda_params['N_datasets']=n_datasets
-
-        error=True
-        if mismatch == [] and n_datasets >= int(pandda_params['min_build_datasets']):
-            error=False
-            self.update_log.insert('found sufficient number of datasets: {0!s}; all PDB files have the same number of atoms ==> OK'.format(str(n_datasets)))
-        elif mismatch != [] and n_datasets >= int(pandda_params['min_build_datasets']):
-            self.update_log.insert('found sufficient number of datasets: {0!s}; but NOT all PDB files have the same number of atoms ==> ERROR'.format(str(n_datasets)))
-        elif mismatch == [] and n_datasets < int(pandda_params['min_build_datasets']):
-            self.update_log.insert('did NOT find sufficient number of datasets: {0!s}; all PDB files have the same number of atoms ==> ERROR'.format(str(n_datasets)))
-        elif mismatch != [] and n_datasets < int(pandda_params['min_build_datasets']):
-            self.update_log.insert('did NOT find sufficient number of datasets: {0!s}; but NOT all PDB files have the same number of atoms ==> ERROR'.format(str(n_datasets)))
-
-        if error:
-            if n_datasets < int(pandda_params['min_build_datasets']):
-                msgBox = QtGui.QMessageBox()
-                msgText = (
-                    'Need {0!s} datasets, but only {1!s} are available\n'.format(str(pandda_params['min_build_datasets']), str(n_datasets))+
-                    'pandda.analyse cannot start!'
-                )
-                self.update_log.insert(msgText)
-                msgBox.setText(msgText)
-                msgBox.exec_();
-                return
-            elif mismatch != []:
-                self.update_log.insert('the following PDB files have a different number of atoms than the reference file:')
-                for dataset in mismatch:
-                    self.update_log.insert(dataset)
-                fraction=round((float(len(mismatch))/float(n_datasets))*100,1)
-                msgBox = QtGui.QMessageBox()
-                msgText = (
-                    'XCE found that {0!s} percent of your datasets contain a different number of atoms than your reference file. '.format(str(fraction))+
-                    'Unfortunately, pandda.analyse cannot run under these circumstances! '
-                    'Please check the terminal output for details about which datasets are affected. '
-                    'Most of the time it will be sufficient to calculate inital maps with the selected reference file again.\n'
-                    'Press "Cancel" if you want to abort the current task.\n'
-                    'Press "GO" to delete all problematic datasets and continue!'
-                )
-                self.update_log.insert(msgText)
-                msgBox.setText(msgText)
-                msgBox.addButton(QtGui.QPushButton('Go'), QtGui.QMessageBox.YesRole)
-                msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
-                reply = msgBox.exec_();
-                if reply == 0:
-                    # may need to find a better solution for that
-                    pandda_checks.remove_dimple_files(mismatch)
-                    # need to run cluster function again, because N_datasets could be too low now.
-                    self.cluster_datasets_for_pandda(True)
-                else:
-                    self.update_log.insert('stopping pandda.analyse...')
-                    return
-            return
         self.update_log.insert('preparing pandda.analyse input script')
+        self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params,self.xce_logfile,cluster_dict[reference_ID],os.path.join(self.database_directory,self.data_source_file))
         self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params,self.xce_logfile,cluster_dict[reference_ID],os.path.join(self.database_directory,self.data_source_file))
         self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
 
-    def cluster_datasets_for_pandda(self,run_pandda_analyse):
+    def cluster_datasets_for_pandda(self):
 
         pandda_params = {
                 'out_dir':              str(self.pandda_output_data_dir_entry.text()),
@@ -4340,8 +4281,6 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
-        if run_pandda_analyse:
-            self.connect(self.work_thread, QtCore.SIGNAL("run_pandda_analyse"),self.run_pandda_analyse)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
