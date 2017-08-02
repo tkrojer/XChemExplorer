@@ -414,7 +414,7 @@ class run_pandda_analyse(QtCore.QThread):
         # (this will be quicker than the original analysis). It will then merge the results of the two analyses.
         #
         # 3) Repeat 2) until you don't add any "new" datasets. Then you can build the models as normal.
-
+    
 #        crystalString=''
 #        for n,dataset in enumerate(self.dataset_list):
 #            if n > 0:       # first entry is reference file!
