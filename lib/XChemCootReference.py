@@ -179,7 +179,7 @@ class GUI(object):
         # --- ground state mean map ---
         # checking for ground state mean map in reference folder
         self.meanMaps = {}
-        for dirs in glob.glob(os.path.join(self.reference_directory,'pandda_*')):
+        for dirs in glob.glob(os.path.join(self.reference_directory,'PanDDA_*')):
             panddaDir=dirs.split('/')[len(dirs.split('/'))-1]
             for files in glob.glob(os.path.join(dirs,'processed_datasets','*','*ground-state-mean-map.native.ccp4')):
                 if os.path.isfile(files):
