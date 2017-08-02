@@ -369,7 +369,7 @@ class run_pandda_export(QtCore.QThread):
 
 class run_pandda_analyse(QtCore.QThread):
 
-    def __init__(self,pandda_params,xce_logfile,dataset_list,datasource):
+    def __init__(self,pandda_params,xce_logfile,datasource):
         QtCore.QThread.__init__(self)
         self.data_directory=pandda_params['data_dir']
         self.panddas_directory=pandda_params['out_dir']
@@ -390,7 +390,6 @@ class run_pandda_analyse(QtCore.QThread):
         self.filter_pdb=os.path.join(self.reference_dir,pandda_params['filter_pdb'])
         self.wilson_scaling = pandda_params['perform_diffraction_data_scaling']
         self.Logfile=XChemLog.updateLog(xce_logfile)
-        self.dataset_list=dataset_list
         self.datasource=datasource
         self.db=XChemDB.data_source(datasource)
         self.appendix=pandda_params['appendix']
@@ -416,12 +415,12 @@ class run_pandda_analyse(QtCore.QThread):
         #
         # 3) Repeat 2) until you don't add any "new" datasets. Then you can build the models as normal.
 
-        crystalString=''
-        for n,dataset in enumerate(self.dataset_list):
-            if n > 0:       # first entry is reference file!
-                crystalString+="'"+dataset+"',"
-        print ("update mainTable set PANDDAStatus = 'started' where CrystalName in ({0!s})".format(crystalString[:-1]))
-        self.db.execute_statement("update mainTable set PANDDAStatus = 'started' where CrystalName in ({0!s})".format(crystalString[:-1]))
+#        crystalString=''
+#        for n,dataset in enumerate(self.dataset_list):
+#            if n > 0:       # first entry is reference file!
+#                crystalString+="'"+dataset+"',"
+#        print ("update mainTable set PANDDAStatus = 'started' where CrystalName in ({0!s})".format(crystalString[:-1]))
+#        self.db.execute_statement("update mainTable set PANDDAStatus = 'started' where CrystalName in ({0!s})".format(crystalString[:-1]))
 
         number_of_cyles=int(self.number_of_datasets)/int(self.max_new_datasets)
         if int(self.number_of_datasets) % int(self.max_new_datasets) != 0:  # modulo gives remainder after integer division

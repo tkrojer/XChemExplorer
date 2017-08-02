@@ -4261,8 +4261,8 @@ class XChemExplorer(QtGui.QApplication):
                 return None
 
         self.update_log.insert('preparing pandda.analyse input script')
-        self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params,self.xce_logfile,cluster_dict[reference_ID],os.path.join(self.database_directory,self.data_source_file))
-        self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params,self.xce_logfile,cluster_dict[reference_ID],os.path.join(self.database_directory,self.data_source_file))
+        self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params,self.xce_logfile,os.path.join(self.database_directory,self.data_source_file))
+        self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params,self.xce_logfile,os.path.join(self.database_directory,self.data_source_file))
         self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
