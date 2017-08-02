@@ -201,13 +201,14 @@ class GUI(object):
         # SPACER
         self.vbox.add(gtk.Label(' \n '))
 
+        #################################################################################
         # --- Refinement History ---
         frame = gtk.Frame(label='Refinement History')
         self.hbox_for_info_graphics=gtk.HBox()
         self.canvas = FigureCanvas(self.update_plot([0],[0],[0]))
         self.canvas.set_size_request(190, 190)
         self.hbox_for_info_graphics.add(self.canvas)
-        frame.add(hbox)
+        frame.add(self.hbox_for_info_graphics)
         self.vbox.pack_start(frame)
 
         #################################################################################
@@ -406,7 +407,7 @@ class GUI(object):
             self.RamachandranOutliersBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RamachandranOutliersColor']))
         except ValueError:
             pass
-        self.RamachandranFavoredValue.set_label(self.QualityIndicators['RamachandranFavoredColor'])
+        self.RamachandranFavoredValue.set_label(self.QualityIndicators['RamachandranFavored'])
         try:
             self.RamachandranFavoredBox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(self.QualityIndicators['RamachandranFavoredColor']))
         except ValueError:
@@ -498,7 +499,7 @@ class GUI(object):
         self.Logfile.insert('removing all PDB and MTZ files from memory')
         if len(coot_utils_XChem.molecule_number_list()) > 0:
             for item in coot_utils_XChem.molecule_number_list():
-                if coot.molecule_name(item).endswith('.pdb') or coot.molecule_name(item).endswith('.mtz'):
+                if coot.molecule_name(item).endswith('.pdb') or '.mtz' in coot.molecule_name(item):
                     self.Logfile.insert('removing %s' %coot.molecule_name(item))
                     coot.close_molecule(item)
 
