@@ -466,8 +466,8 @@ class GUI(object):
                 break
 
         self.Refine.RunRefmac(self.Serial,self.RefmacParams,self.external_software,self.xce_logfile)
-        self.spinnerBox.add(self.refinementRunning)
-        self.refinementRunning.start()
+#        self.spinnerBox.add(self.refinementRunning)
+#        self.refinementRunning.start()
         self.status_label.set_text('Refinement running...')
 
         # launch refinement
@@ -480,15 +480,16 @@ class GUI(object):
         self.refinementRunning.start()
         if not os.path.isfile(os.path.join(self.reference_directory,self.refinementDir,'REFINEMENT_IN_PROGRESS')):
             self.job_running=False
-            self.end_thread()
+            self.end_thread('update_pdb_mtz')
         return True
 
-    def end_thread(self):
+    def end_thread(self,action):
         self.refinementRunning.stop()
         self.spinnerBox.remove(self.refinementRunning)
         self.status_label.set_text('idle')
         gobject.source_remove(self.source_id)
-        self.update_pdb_mtz_files('')
+        if action=='update_pdb_mtz':
+            self.update_pdb_mtz_files('')
 
 
 
@@ -563,23 +564,22 @@ class GUI(object):
         self.RefreshData()
 
     def load_ground_state_map(self,widget):
+        self.spinnerBox.add(self.refinementRunning)
+        self.refinementRunning.start()
+        self.status_label.set_text('loading ground state maps by reso...')
+        self.source_id = gobject.timeout_add(100, self.load_ground_state_map_thread)
+
+
+    def load_ground_state_map_thread(self):
+        self.spinnerBox.add(self.refinementRunning)
+        self.refinementRunning.show()
+        self.refinementRunning.start()
+
         # first remove all ground state maps files
         if len(coot_utils_XChem.molecule_number_list()) > 0:
             for item in coot_utils_XChem.molecule_number_list():
                 if 'ground-state-mean-map' in coot.molecule_name(item):
                     coot.close_molecule(item)
-
-#        for item in self.meanMaps:
-#            if item==self.cb_select_mean_map.get_active_text():
-#                self.ground_state_mean_map=self.meanMaps[item]
-#                break
-#
-#        coot.set_colour_map_rotation_on_read_pdb(0)
-#        coot.handle_read_ccp4_map((self.ground_state_mean_map),0)
-#        for imol in coot_utils_XChem.molecule_number_list():
-#            if self.ground_state_mean_map in coot.molecule_name(imol):
-#                coot.set_contour_level_in_sigma(imol,2)
-#                coot.set_last_map_colour(0.74,0.44,0.02)
 
         # first remove all entries for self.cb_select_mean_map_by_resolution
         # clear CB first, 100 is sort of arbitrary since it's unlikely there will ever be 100 maps
@@ -598,7 +598,7 @@ class GUI(object):
         # show only highest resolution map to start with
         self.show_highres_ground_state_map()
         self.cb_select_mean_map_by_resolution.set_active(0)
-        self.status_label.set_text('idle')
+        self.end_thread('')
 
     def show_highres_ground_state_map(self):
         if len(self.ground_state_map_List) >= 1:
