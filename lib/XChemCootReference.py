@@ -630,7 +630,7 @@ class GUI(object):
                     resolution=line.split()[5]
                     found=True
                     foundLine=n
-                if found and n==foundLine+2:
+                if found and n==foundLine+3:
                     xtal=line.split(',')[0]
                     print 'map:',os.path.join(self.reference_directory,self.cb_select_mean_map.get_active_text(),'processed_datasets',xtal,xtal+'-x0149-ground-state-mean-map.native.ccp4')
                     meanmap=os.path.join(self.reference_directory,self.cb_select_mean_map.get_active_text(),'processed_datasets',xtal,xtal+'-x0149-ground-state-mean-map.native.ccp4')
