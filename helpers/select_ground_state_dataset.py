@@ -29,4 +29,5 @@ def find_highest_resolution_datasets(panddaDir):
 
 if __name__=='__main__':
     panddaDir=sys.argv[1]
+    find_highest_resolution_datasets(panddaDir)
 
