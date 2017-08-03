@@ -616,7 +616,7 @@ class GUI(object):
         mapToshow=''
         for maps in self.ground_state_map_List:
             if maps[0]==reso:
-                mapToshow=map[1]
+                mapToshow=maps[1]
         for imol in coot_utils_XChem.molecule_number_list():
             if coot.molecule_name(imol) in mapToshow:
                 coot.set_map_displayed(imol,1)
