@@ -1091,8 +1091,8 @@ class XChemExplorer(QtGui.QApplication):
         set_new_reference_button.clicked.connect(self.set_new_reference_if_applicable)
         initial_model_checkbutton_hbox.addWidget(set_new_reference_button)
 
-        refresh_reference_file_list_button=QtGui.QPushButton("Set New Reference (if applicable)")
-        refresh_reference_file_list_button.clicked.connect(self.set_new_refresh_reference_file_list)
+        refresh_reference_file_list_button=QtGui.QPushButton("Refresh reference file list")
+        refresh_reference_file_list_button.clicked.connect(self.refresh_reference_file_list)
         initial_model_checkbutton_hbox.addWidget(refresh_reference_file_list_button)
 
         self.reference_file_list=self.get_reference_file_list(' ')
@@ -3172,7 +3172,7 @@ class XChemExplorer(QtGui.QApplication):
         for reference_file in self.reference_file_list:
             combobox.addItem(reference_file[0])
 
-    def set_new_refresh_reference_file_list(self):
+    def refresh_reference_file_list(self):
         self.reference_file_list=self.get_reference_file_list(' ')
         self.populate_reference_combobox(self.reference_file_selection_combobox)
 
