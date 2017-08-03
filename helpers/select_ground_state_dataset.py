@@ -21,10 +21,12 @@ def find_highest_resolution_datasets(panddaDir):
                 found=True
                 foundLine=n
             if found and n>=foundLine+3:
-                if line.startswith('Statistical Electron Density Characterisation'):
+                if line.startswith('---'):
                     break
                 else:
-                    datasetList.append(line.split(',')[0].replace(' ','').replace('\t',''))
+                    tmpLine=line.replace(' ','').replace('\t','').replace('\n','').replace('\r','')
+                    print tmpLine
+                    datasetList.append(tmpLine.split(','))
     print datasetList
 
 
