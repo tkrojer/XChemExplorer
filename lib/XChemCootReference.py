@@ -585,6 +585,8 @@ class GUI(object):
             coot.set_contour_level_in_sigma(imol,1)
             coot.set_last_map_colour(0.74,0.44,blueStart)
             blueStart+=0.05
+        # show only highest resolution map to start with
+        self.show_highres_ground_state_map()
 
     def show_highres_ground_state_map(self):
         if len(self.ground_state_map_List) >= 1:
