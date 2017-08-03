@@ -623,17 +623,19 @@ class GUI(object):
         found=False
         self.ground_state_map_List=[]
         print 'eufheuifuf',str(self.cb_select_mean_map.get_active_text())
-        for n,line in enumerate(open(glob.glob(os.path.join(self.reference_directory,str(self.cb_select_mean_map.get_active_text()),'logs','*.log')))):
-            if line.startswith('Statistical Electron Density Characterisation') and len(line.split()) == 6:
-                resolution=line.split()[5]
-                found=True
-                foundLine=n
-            if found and n==foundLine+2:
-                xtal=line.split(',')[0]
-                print 'map:',os.path.join(self.reference_directory,self.cb_select_mean_map.get_active_text(),'processed_datasets',xtal,xtal+'-x0149-ground-state-mean-map.native.ccp4')
-                meanmap=os.path.join(self.reference_directory,self.cb_select_mean_map.get_active_text(),'processed_datasets',xtal,xtal+'-x0149-ground-state-mean-map.native.ccp4')
-                self.ground_state_map_List.append([resolution,meanmap])
-                found=False
+        print 'oiefohfehfue',os.path.join(self.reference_directory,str(self.cb_select_mean_map.get_active_text()),'logs','*.log')
+        for logFile in glob.glob(os.path.join(self.reference_directory,str(self.cb_select_mean_map.get_active_text()),'logs','*.log')):
+            for n,line in enumerate(open(logFile)):
+                if line.startswith('Statistical Electron Density Characterisation') and len(line.split()) == 6:
+                    resolution=line.split()[5]
+                    found=True
+                    foundLine=n
+                if found and n==foundLine+2:
+                    xtal=line.split(',')[0]
+                    print 'map:',os.path.join(self.reference_directory,self.cb_select_mean_map.get_active_text(),'processed_datasets',xtal,xtal+'-x0149-ground-state-mean-map.native.ccp4')
+                    meanmap=os.path.join(self.reference_directory,self.cb_select_mean_map.get_active_text(),'processed_datasets',xtal,xtal+'-x0149-ground-state-mean-map.native.ccp4')
+                    self.ground_state_map_List.append([resolution,meanmap])
+                    found=False
         return self.ground_state_map_List
 
 
