@@ -1,4 +1,4 @@
-# last edited: 28/07/2017 - 15:00
+# last edited: 03/08/2017 - 15:00
 
 import sys,glob
 import os
@@ -646,8 +646,6 @@ class GUI(object):
     def get_ground_state_maps_by_resolution(self):
         found=False
         self.ground_state_map_List=[]
-        print 'eufheuifuf',str(self.cb_select_mean_map.get_active_text())
-        print 'oiefohfehfue',os.path.join(self.reference_directory,str(self.cb_select_mean_map.get_active_text()),'logs','*.log')
         for logFile in glob.glob(os.path.join(self.reference_directory,str(self.cb_select_mean_map.get_active_text()),'logs','*.log')):
             for n,line in enumerate(open(logFile)):
                 if line.startswith('Statistical Electron Density Characterisation') and len(line.split()) == 6:
@@ -656,11 +654,9 @@ class GUI(object):
                     foundLine=n
                 if found and n==foundLine+3:
                     xtal=line.split(',')[0].replace(' ','').replace('\t','')
-                    print 'map:',os.path.join(self.reference_directory,self.cb_select_mean_map.get_active_text(),'processed_datasets',xtal,xtal+'-ground-state-mean-map.native.ccp4')
                     meanmap=os.path.join(self.reference_directory,self.cb_select_mean_map.get_active_text(),'processed_datasets',xtal,xtal+'-ground-state-mean-map.native.ccp4')
                     self.ground_state_map_List.append([resolution,meanmap])
                     found=False
-        print self.ground_state_map_List
         return self.ground_state_map_List
 
 

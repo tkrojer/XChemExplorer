@@ -1,9 +1,8 @@
-# last edited: 15/11/2016, 15:00
+# last edited: 03/08/2017, 15:00
 
 import os,sys
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 
-import XChemDB
 
 
 # - select datasets with highest resolution
@@ -11,16 +10,23 @@ import XChemDB
 # - take the one with the lowest Rfree
 
 
-def update_data_source(db_file,xtal,db_column,status):
-    db=XChemDB.data_source(db_file)
-    db_dict={}
-    db_dict[db_column] = status
-    db.update_data_source(xtal,db_dict)
+def find_highest_resolution_datasets(panddaDir):
+    found=False
+    datasetList=[]
+    for logFile in glob.glob(os.path.join(panddaDir,'logs','*.log')):
+        for n,line in enumerate(open(logFile)):
+            if line.startswith('Statistical Electron Density Characterisation') and len(line.split()) == 6:
+                resolution=line.split()[5]
+                found=True
+                foundLine=n
+            if found and n>=foundLine+3:
+                if line.startswith('Statistical Electron Density Characterisation'):
+                    break
+                else:
+                    datasetList.append(line.split(',')[0].replace(' ','').replace('\t',''))
+    print datasetList
+
 
 if __name__=='__main__':
-    db_file=sys.argv[1]
-    xtal=sys.argv[2]
-    db_column=sys.argv[3]
-    status=sys.argv[4]
+    panddaDir=sys.argv[1]
 
-    update_data_source(db_file,xtal,db_column,status)
