@@ -522,16 +522,17 @@ class GUI(object):
         coot.set_nomenclature_errors_on_read("ignore")
         # first we check if there is a refinement folder and the respective refine.pdb
         # from previous refinement cycles
+        Root=self.cb_select_pdb.get_active_text()
+        print 'ROOT',Root
+        print 'REFI_DIR',os.path.join(self.reference_directory,self.refinementDir,'refine.pdb')
         if os.path.isfile(os.path.join(self.reference_directory,self.refinementDir,'refine.pdb')):
-            Root=self.cb_select_pdb.get_active_text()
             os.chdir(self.reference_directory)
             print 'CURRENT DIR',os.getcwd()
-            print 'ROOT',Root
             os.system('/bin/rm %s 2> /dev/null' %Root)
             os.symlink(os.path.realpath(os.path.join(self.refinementDir,'refine.pdb')),'%s' %Root)
             self.pdbFile=os.path.join(self.reference_directory,self.refinementDir,'refine.pdb')
-        elif os.path.isfile(os.path.join(self.reference_directory,pdbRoot)):
-            self.pdbFile=os.path.join(self.reference_directory,pdbRoot)
+        elif os.path.isfile(os.path.join(self.reference_directory,Root)):
+            self.pdbFile=os.path.join(self.reference_directory,Root)
         else:
             self.Logfile.error('cannot find PDB file')
 
