@@ -47,6 +47,7 @@ def get_datasets_without_event_map(panddaDir,datasetList):
 
 def select_dataset_with_lowest_Rfree(panddaDir,datasetListwithoutEvent):
     datasetList=[]
+    lowestRfree=''
     for dataset in datasetListwithoutEvent:
         if os.path.isfile(os.path.join(panddaDir,'processed_datasets',dataset,dataset+'-pandda-input.pdb')):
             stats=parse().PDBheader(os.path.join(panddaDir,'processed_datasets',dataset,dataset+'-pandda-input.pdb'))
@@ -58,10 +59,19 @@ def select_dataset_with_lowest_Rfree(panddaDir,datasetListwithoutEvent):
                 pass
     if datasetList != []:
         lowestRfree=min(datasetList,key=lambda x: x[1])[0]
-        print lowestRfree
+    return lowestRfree
+
+def link_pdb_mtz_files(panddaDir,lowestRfree):
+    targetDir='/'.join(panddaDir.split('/')[:len(panddaDir.split('/'))-2])
+    panddaFolder=panddaDir.split('/')[len(panddaDir.split('/'))-2]]
+    print targetDir
+    print panddaFolder
+#    if os.path.isfile(os.path.join(panddaDir,'processed_datasets',lowestRfree,lowestRfree+'-pandda-input.pdb')):
+
 
 if __name__=='__main__':
     panddaDir=sys.argv[1]
     datasetList=find_highest_resolution_datasets(panddaDir)
     datasetListwithoutEvent=get_datasets_without_event_map(panddaDir,datasetList)
-    select_dataset_with_lowest_Rfree(panddaDir,datasetListwithoutEvent)
+    lowestRfree=select_dataset_with_lowest_Rfree(panddaDir,datasetListwithoutEvent)
+    link_pdb_mtz_files(panddaDir,lowestRfree)
