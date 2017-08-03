@@ -63,7 +63,7 @@ def select_dataset_with_lowest_Rfree(panddaDir,datasetListwithoutEvent):
 
 def link_pdb_mtz_files(panddaDir,lowestRfree):
     targetDir='/'.join(panddaDir.split('/')[:len(panddaDir.split('/'))-2])
-    panddaFolder=panddaDir.split('/')[len(panddaDir.split('/'))-2]]
+    panddaFolder=panddaDir.split('/')[len(panddaDir.split('/'))-2]
     print targetDir
     print panddaFolder
 #    if os.path.isfile(os.path.join(panddaDir,'processed_datasets',lowestRfree,lowestRfree+'-pandda-input.pdb')):
