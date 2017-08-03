@@ -1,4 +1,4 @@
-# last edited: 21/07/2017, 18:00
+# last edited: 03/08/2017, 18:00
 
 import os, sys, glob
 from datetime import datetime
@@ -1090,6 +1090,10 @@ class XChemExplorer(QtGui.QApplication):
         set_new_reference_button=QtGui.QPushButton("Set New Reference (if applicable)")
         set_new_reference_button.clicked.connect(self.set_new_reference_if_applicable)
         initial_model_checkbutton_hbox.addWidget(set_new_reference_button)
+
+        refresh_reference_file_list_button=QtGui.QPushButton("Set New Reference (if applicable)")
+        refresh_reference_file_list_button.clicked.connect(self.set_new_refresh_reference_file_list)
+        initial_model_checkbutton_hbox.addWidget(refresh_reference_file_list_button)
 
         self.reference_file_list=self.get_reference_file_list(' ')
         self.reference_file_selection_combobox = QtGui.QComboBox()
@@ -3167,6 +3171,11 @@ class XChemExplorer(QtGui.QApplication):
         combobox.clear()
         for reference_file in self.reference_file_list:
             combobox.addItem(reference_file[0])
+
+    def set_new_refresh_reference_file_list(self):
+        self.reference_file_list=self.get_reference_file_list(' ')
+        self.populate_reference_combobox(self.reference_file_selection_combobox)
+
 
     def populate_refinement_outcome_combobox(self,combobox):
         combobox.clear()
