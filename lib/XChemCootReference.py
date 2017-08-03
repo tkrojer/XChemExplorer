@@ -525,6 +525,8 @@ class GUI(object):
         if os.path.isfile(os.path.join(self.reference_directory,self.refinementDir,'refine.pdb')):
             Root=self.cb_select_pdb.get_active_text()
             os.chdir(self.reference_directory)
+            print 'CURRENT DIR',os.getcwd()
+            print 'ROOT',Root
             os.system('/bin/rm %s 2> /dev/null' %Root)
             os.symlink(os.path.realpath(os.path.join(self.refinementDir,'refine.pdb')),'%s' %Root)
             self.pdbFile=os.path.join(self.reference_directory,self.refinementDir,'refine.pdb')
