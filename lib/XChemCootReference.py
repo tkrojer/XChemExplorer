@@ -622,7 +622,8 @@ class GUI(object):
     def get_ground_state_maps_by_resolution(self):
         found=False
         self.ground_state_map_List=[]
-        for n,line in enumerate(open(glob.glob(os.path.join(self.reference_directory,self.cb_select_mean_map.get_active_text(),'logs','*.log')))):
+        print 'eufheuifuf',str(self.cb_select_mean_map.get_active_text())
+        for n,line in enumerate(open(glob.glob(os.path.join(self.reference_directory,str(self.cb_select_mean_map.get_active_text()),'logs','*.log')))):
             if line.startswith('Statistical Electron Density Characterisation') and len(line.split()) == 6:
                 resolution=line.split()[5]
                 found=True
