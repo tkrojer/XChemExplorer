@@ -636,6 +636,7 @@ class GUI(object):
                     meanmap=os.path.join(self.reference_directory,self.cb_select_mean_map.get_active_text(),'processed_datasets',xtal,xtal+'-x0149-ground-state-mean-map.native.ccp4')
                     self.ground_state_map_List.append([resolution,meanmap])
                     found=False
+        print self.ground_state_map_List
         return self.ground_state_map_List
 
 
