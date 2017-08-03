@@ -4246,14 +4246,7 @@ class XChemExplorer(QtGui.QApplication):
             msgBox = QtGui.QMessageBox()
             msgBoxLayout = msgBox.layout()
             vbox = QtGui.QVBoxLayout()
-            text = (    'The aim of the pre-run is NOT to identify bound ligands,\n'
-                        'but to create mean ground state maps.  to pre-run will only comprise 100 datasets. The aim is not to identify\n'
-                        'bound ligands, but to create the ground-state maps.\n'
-                        'You can run m\n'
-                        '- select "Build ground state model" \n'
-                        '- calculate new maps with the improved reference structure\n'
-                        '- run "pandda.analyse\n'    )
-            vbox.addWidget(QtGui.QLabel(text))
+            vbox.addWidget(QtGui.QLabel(XChemToolTips.pandda_pre_run(self.reference_directory)))
             hbox=QtGui.QHBoxLayout()
             hbox.addWidget(QtGui.QLabel('appendix:'))
             appendix = QtGui.QLineEdit()

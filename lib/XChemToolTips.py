@@ -1,4 +1,4 @@
-# last edited: 01/03/2017, 17:00
+# last edited: 03/08/2017, 17:00
 
 import os
 import getpass
@@ -215,4 +215,26 @@ def deposition_pandda_site_not_ready(xtal):
     msg = (     'Please make sure that all placed ligands in '+xtal+' are ready for deposition.\n'
                 'Go to the Refinement tab -> Open COOT and either delete the ligand or set the site '
                 ' to "5 - Deposition ready"'    )
+    return msg
+
+def pandda_pre_run(reference_directory):
+    msg = (    'The aim of the pre-run is NOT to identify bound ligands,\n'
+                'but to create mean ground state maps.\n'
+                'Hence, the pre-run will only comprise 100 datasets.\n'
+                'After the pre-run is finished use the resulting ground state mean maps\n'
+                'to build a suitable reference model for the subsequent PanDDA production run.\n'
+                'The appendix will determine the name of the folder where the results from\n'
+                'the pre-run will be stored. It is used by the COOT plugin to distinguish\n'
+                'between different pre-runs.\n'
+                'The result from the pre-run will be stored in:\n'
+                '%s/pannda_<appenddix\n'
+                'The bullet points below highlight the next steps after the pre-run is finished:\n'
+                        '- PanDDA tab: run "Build ground state model" \n'
+                        '- MAPS tab: select ALL datasets \n'
+                        '- MAPS tab: press "Refresh reference file list"\n'
+                        '- MAPS tab: select ground state model and set as new reference\n'
+                        '- MAPS tab: press "Run DIMPLE on selected MTZ files"\n'
+                        '- PanDDA tab: run "pandda.analyse\n'
+                        '- run "pandda.analyse\n'    )
+
     return msg
