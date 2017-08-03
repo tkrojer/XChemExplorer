@@ -29,9 +29,22 @@ def find_highest_resolution_datasets(panddaDir):
                         if item != '':
                             datasetList.append(item)
     print datasetList
+    return datasetList
 
+def get_datasets_without_event_map(panddaDir,datasetList):
+    noEvent=True
+    datasetListwithoutEvent=[]
+    for dataset in datasetList:
+        for files in glob.glob(os.path.join(panddaDir,'processed_datasets',dataset,'*')):
+            if 'event' in files:
+                noEvent=False
+                break
+        if noEvent:
+            datasetListwithoutEvent.append(dataset)
+    print datasetListwithoutEvent
+    return datasetListwithoutEvent
 
 if __name__=='__main__':
     panddaDir=sys.argv[1]
-    find_highest_resolution_datasets(panddaDir)
-
+    datasetList=find_highest_resolution_datasets(panddaDir)
+    datasetListwithoutEvent=get_datasets_without_event_map(panddaDir,datasetList)
