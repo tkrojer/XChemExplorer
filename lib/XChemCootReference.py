@@ -586,6 +586,7 @@ class GUI(object):
         for n in range(-1,100):
             self.cb_select_mean_map_by_resolution.remove_text(0)
 
+        self.status_label.set_text('loading ground state maps')
         self.get_ground_state_maps_by_resolution()
         blueStart=0.02
         for map in self.ground_state_map_List:
@@ -597,6 +598,7 @@ class GUI(object):
         # show only highest resolution map to start with
         self.show_highres_ground_state_map()
         self.cb_select_mean_map_by_resolution.set_active(0)
+        self.status_label.set_text('idle')
 
     def show_highres_ground_state_map(self):
         if len(self.ground_state_map_List) >= 1:
