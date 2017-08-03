@@ -200,12 +200,15 @@ class GUI(object):
 
         frame = gtk.Frame()
         hbox=gtk.HBox()
-        self.show_highres_ground_state_map_button = gtk.Button(label="Show Highest\nResolution Map")
-        self.show_highres_ground_state_map_button.connect("clicked",self.show_highres_ground_state_map())
-        hbox.add(self.show_highres_ground_state_map_button)
-        self.show_all_ground_state_map_button = gtk.Button(label="Show All Maps")
-        self.show_all_ground_state_map_button.connect("clicked",self.show_all_ground_state_map())
-        hbox.add(self.show_all_ground_state_map_button)
+        self.cb_select_mean_map_by_resolution = gtk.combo_box_new_text()
+        self.cb_select_mean_map_by_resolution.connect("changed", self.show_selected_mean_map)
+        hbox.add(self.cb_select_mean_map_by_resolution)
+#        self.show_highres_ground_state_map_button = gtk.Button(label="Show Highest\nResolution Map")
+#        self.show_highres_ground_state_map_button.connect("clicked",self.show_highres_ground_state_map)
+#        hbox.add(self.show_highres_ground_state_map_button)
+#        self.show_all_ground_state_map_button = gtk.Button(label="Show All Maps")
+#        self.show_all_ground_state_map_button.connect("clicked",self.show_all_ground_state_map)
+#        hbox.add(self.show_all_ground_state_map_button)
         frame.add(hbox)
         self.vbox.pack_start(frame)
 
@@ -578,9 +581,15 @@ class GUI(object):
 #                coot.set_contour_level_in_sigma(imol,2)
 #                coot.set_last_map_colour(0.74,0.44,0.02)
 
+        # first remove all entries for self.cb_select_mean_map_by_resolution
+        # clear CB first, 100 is sort of arbitrary since it's unlikely there will ever be 100 maps
+        for n in range(-1,100):
+            self.cb_select_mean_map_by_resolution.remove_text(0)
+
         self.get_ground_state_maps_by_resolution()
         blueStart=0.02
         for map in self.ground_state_map_List:
+            self.get_ground_state_maps_by_resolution.append_text(map[0])
             imol=coot.handle_read_ccp4_map((map[1]),0)
             coot.set_contour_level_in_sigma(imol,1)
             coot.set_last_map_colour(0.74,0.44,blueStart)
@@ -596,13 +605,23 @@ class GUI(object):
                 elif 'ground-state-mean-map' in coot.molecule_name(imol):
                     coot.set_map_displayed(imol,0)
 
-    def show_all_ground_state_map(self):
-        if len(self.ground_state_map_List) >= 1:
-            for imol in coot_utils_XChem.molecule_number_list():
-                if 'ground-state-mean-map' in coot.molecule_name(imol):
-                    coot.set_map_displayed(imol,1)
+#    def show_all_ground_state_map(self):
+#        if len(self.ground_state_map_List) >= 1:
+#            for imol in coot_utils_XChem.molecule_number_list():
+#                if 'ground-state-mean-map' in coot.molecule_name(imol):
+#                    coot.set_map_displayed(imol,1)
 
-
+    def show_selected_mean_map(self):
+        reso=str(self.cb_select_mean_map_by_resolution.get_active_text())
+        mapToshow=''
+        for maps in self.ground_state_map_List:
+            if maps[0]==reso:
+                mapToshow=map[1]
+        for imol in coot_utils_XChem.molecule_number_list():
+            if coot.molecule_name(imol) in mapToshow:
+                coot.set_map_displayed(imol,1)
+            elif 'ground-state-mean-map' in coot.molecule_name(imol):
+                coot.set_map_displayed(imol,0)
 
     def show_molprobity_to_do(self,widget):
         if os.path.isfile(os.path.join(self.reference_directory,self.refinementDir,'Refine_'+str(self.Serial-1),'molprobity_coot.py')):
