@@ -611,7 +611,7 @@ class GUI(object):
 #                if 'ground-state-mean-map' in coot.molecule_name(imol):
 #                    coot.set_map_displayed(imol,1)
 
-    def show_selected_mean_map(self):
+    def show_selected_mean_map(self,widget):
         reso=str(self.cb_select_mean_map_by_resolution.get_active_text())
         mapToshow=''
         for maps in self.ground_state_map_List:
