@@ -25,8 +25,9 @@ def find_highest_resolution_datasets(panddaDir):
                     break
                 else:
                     tmpLine=line.replace(' ','').replace('\t','').replace('\n','').replace('\r','')
-                    print tmpLine
-                    datasetList.append(tmpLine.split(','))
+                    for item in tmpLine.split(','):
+                        if item != '':
+                            datasetList.append(item)
     print datasetList
 
 
