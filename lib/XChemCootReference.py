@@ -589,7 +589,7 @@ class GUI(object):
         self.get_ground_state_maps_by_resolution()
         blueStart=0.02
         for map in self.ground_state_map_List:
-            self.get_ground_state_maps_by_resolution.append_text(map[0])
+            self.cb_select_mean_map_by_resolution.append_text(map[0])
             imol=coot.handle_read_ccp4_map((map[1]),0)
             coot.set_contour_level_in_sigma(imol,1)
             coot.set_last_map_colour(0.74,0.44,blueStart)
