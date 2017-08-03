@@ -596,6 +596,7 @@ class GUI(object):
             blueStart+=0.05
         # show only highest resolution map to start with
         self.show_highres_ground_state_map()
+        self.cb_select_mean_map_by_resolution.set_active(0)
 
     def show_highres_ground_state_map(self):
         if len(self.ground_state_map_List) >= 1:
