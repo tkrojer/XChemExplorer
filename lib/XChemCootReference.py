@@ -524,9 +524,10 @@ class GUI(object):
         # from previous refinement cycles
         if os.path.isfile(os.path.join(self.reference_directory,self.refinementDir,'refine.pdb')):
             Root=self.cb_select_pdb.get_active_text().replace('.pdb','')
+            print 'ROOOOOOOOOOOOOT',Root
             os.chdir(self.reference_directory)
             os.system('/bin/rm %s-ground-state.pdb 2> /dev/null' %Root)
-            os.symlink(os.path.realpath(self.refinementDir,'refine.pdb'),'%s-ground-state.pdb' %Root)
+            os.symlink(os.path.realpath(os.path.join(self.refinementDir,'refine.pdb')),'%s-ground-state.pdb' %Root)
             self.pdbFile=os.path.join(self.reference_directory,self.refinementDir,'refine.pdb')
         elif os.path.isfile(os.path.join(self.reference_directory,pdbRoot)):
             self.pdbFile=os.path.join(self.reference_directory,pdbRoot)
