@@ -394,12 +394,14 @@ class run_pandda_analyse(QtCore.QThread):
         self.db=XChemDB.data_source(datasource)
         self.appendix=pandda_params['appendix']
         self.write_mean_maps=pandda_params['write_mean_map']
+        self.select_ground_state_model=''
 
         if self.appendix != '':
-            self.panddas_directory=os.path.join(self.reference_dir,'PanDDA_'+self.appendix)
+            self.panddas_directory=os.path.join(self.reference_dir,'pandda_'+self.appendix)
             if os.path.isdir(self.panddas_directory):
                 os.system('/bin/rm -fr %s' %self.panddas_directory)
             os.mkdir(self.panddas_directory)
+            self.select_ground_state_model='$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/select_ground_state_dataset.py %s\n' %self.panddas_directory
 
     def run(self):
 
@@ -454,6 +456,8 @@ class run_pandda_analyse(QtCore.QThread):
             Cmds = (
                 '#!'+os.getenv('SHELL')+'\n'
                 '\n'
+                'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
+                '\n'
                 'source '+source_file+'\n'
                 '\n'
                 'cd '+self.panddas_directory+'\n'
@@ -485,6 +489,7 @@ class run_pandda_analyse(QtCore.QThread):
                     )
 
             #Cmds += '$CCP4/bin/ccp4-python %s %s %s %s\n' %(  os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_pandda_status_flag.py'),    self.datasource,crystalString[:-1],'finished')
+            Cmds += self.select_ground_state_model
             Cmds += '\n'
 
             data_dir_string = self.data_directory.replace('/*', '')

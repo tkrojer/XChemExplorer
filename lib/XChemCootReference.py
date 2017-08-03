@@ -128,7 +128,7 @@ class GUI(object):
         # --- PDB file selection ---
         # checking for pdb files in reference directory
         referenceFiles=[]
-        for files in glob.glob(os.path.join(self.reference_directory,'*.pdb')):
+        for files in glob.glob(os.path.join(self.reference_directory,'*-ground-state.pdb')):
             pdbFile=files[files.rfind('/')+1:]
             referenceFiles.append(pdbFile)
         frame = gtk.Frame(label='Select PDB file')
@@ -179,7 +179,7 @@ class GUI(object):
         # --- ground state mean map ---
         # checking for ground state mean map in reference folder
         self.meanMaps = {}
-        for dirs in glob.glob(os.path.join(self.reference_directory,'PanDDA_*')):
+        for dirs in glob.glob(os.path.join(self.reference_directory,'pandda_*')):
             panddaDir=dirs.split('/')[len(dirs.split('/'))-1]
             for files in glob.glob(os.path.join(dirs,'processed_datasets','*','*ground-state-mean-map.native.ccp4')):
                 if os.path.isfile(files):
@@ -523,6 +523,10 @@ class GUI(object):
         # first we check if there is a refinement folder and the respective refine.pdb
         # from previous refinement cycles
         if os.path.isfile(os.path.join(self.reference_directory,self.refinementDir,'refine.pdb')):
+            Root=self.cb_select_pdb.get_active_text().replace('.pdb','')
+            os.chdir(self.reference_directory)
+            os.system('/bin/rm %s-ground-state.pdb 2> /dev/null' %Root)
+            os.symlink(os.path.realpath(self.refinementDir,'refine.pdb'),'%s-ground-state.pdb' %Root)
             self.pdbFile=os.path.join(self.reference_directory,self.refinementDir,'refine.pdb')
         elif os.path.isfile(os.path.join(self.reference_directory,pdbRoot)):
             self.pdbFile=os.path.join(self.reference_directory,pdbRoot)
