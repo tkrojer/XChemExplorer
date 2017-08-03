@@ -66,7 +66,13 @@ def link_pdb_mtz_files(panddaDir,lowestRfree):
     panddaFolder=panddaDir.split('/')[len(panddaDir.split('/'))-1]
     print targetDir
     print panddaFolder
-#    if os.path.isfile(os.path.join(panddaDir,'processed_datasets',lowestRfree,lowestRfree+'-pandda-input.pdb')):
+    os.chdir(targetDir)
+    if os.path.isfile(os.path.join(panddaDir,'processed_datasets',lowestRfree,lowestRfree+'-pandda-input.pdb')):
+        os.system('/bin/rm %s-ground-state.pdb 2> /dev/null' %lowestRfree)
+        os.symlink(os.path.join(panddaFolder,'processed_datasets',lowestRfree,lowestRfree+'-pandda-input.pdb'),lowestRfree+'-ground-state.pdb')
+    if os.path.isfile(os.path.join(panddaDir,'processed_datasets',lowestRfree,lowestRfree+'-pandda-input.mtz')):
+        os.system('/bin/rm %s-ground-state.free.mtz 2> /dev/null' %lowestRfree)
+        os.symlink(os.path.join(panddaFolder,'processed_datasets',lowestRfree,lowestRfree+'-pandda-input.mtz'),lowestRfree+'-ground-state.free.mtz')
 
 
 if __name__=='__main__':
