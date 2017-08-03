@@ -4108,6 +4108,7 @@ class XChemExplorer(QtGui.QApplication):
 
         for xtal in self.initial_model_dimple_dict:
             reference_file_selection_combobox=self.initial_model_dimple_dict[xtal][1]
+            self.populate_reference_combobox(reference_file_selection_combobox)
             db_dict=self.xtal_db_dict[xtal]
             pg_xtal=db_dict['DataProcessingPointGroup']
             ucVol_xtal=db_dict['DataProcessingUnitCellVolume']
