@@ -45,7 +45,7 @@ def get_datasets_without_event_map(panddaDir,datasetList):
     print datasetListwithoutEvent
     return datasetListwithoutEvent
 
-def select_dataset_with_lowest_Rfree(panddaDir,datasetListwithoutEvent)
+def select_dataset_with_lowest_Rfree(panddaDir,datasetListwithoutEvent):
     for dataset in datasetListwithoutEvent:
         if os.path.isfile(os.path.join(panddaDir,dataset,dataset+'-pandda-input.pdb')):
             stats=parse().PDBheader(os.path.join(panddaDir,dataset,dataset+'-pandda-input.pdb'))
