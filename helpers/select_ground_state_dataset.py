@@ -4,6 +4,7 @@ import os,sys
 import glob
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 
+from XChemUtils import parse
 
 
 # - select datasets with highest resolution
@@ -44,7 +45,15 @@ def get_datasets_without_event_map(panddaDir,datasetList):
     print datasetListwithoutEvent
     return datasetListwithoutEvent
 
+def select_dataset_with_lowest_Rfree(panddaDir,datasetListwithoutEvent)
+    for dataset in datasetListwithoutEvent:
+        if os.path.isfile(os.path.join(panddaDir,dataset,dataset+'-pandda-input.pdb')):
+            stats=parse().PDBheader(os.path.join(panddaDir,dataset,dataset+'-pandda-input.pdb'))
+            Rfree=stats['Rfree']
+            print dataset,Rfree
+
 if __name__=='__main__':
     panddaDir=sys.argv[1]
     datasetList=find_highest_resolution_datasets(panddaDir)
     datasetListwithoutEvent=get_datasets_without_event_map(panddaDir,datasetList)
+    select_dataset_with_lowest_Rfree(panddaDir,datasetListwithoutEvent)
