@@ -4238,7 +4238,7 @@ class XChemExplorer(QtGui.QApplication):
                 'filter_pdb':                           str(self.pandda_reference_file_selection_combobox.currentText()),
                 'reference_dir':                        self.reference_directory,
                 'appendix':                             '',
-                'N_datasets':                           len(glob.glob(os.path.join(self.panddas_directory,'*'))),
+                'N_datasets':                           len(glob.glob(os.path.join(self.initial_model_directory,'*','dimple.pdb'))),
                 'write_mean_map':                       'interesting'
                         }
 
