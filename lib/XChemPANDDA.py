@@ -455,9 +455,8 @@ class run_pandda_analyse(QtCore.QThread):
             Cmds = (
                 '#!'+os.getenv('SHELL')+'\n'
                 '\n'
-                'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
-                '\n'
-                'source '+source_file+'\n'
+                'yes | module clear' + '\n' +
+                'source /dls/science/groups/i04-1/software/pandda-update/ccp4-7.0/bin/activate \n' +
                 '\n'
                 'cd '+self.panddas_directory+'\n'
                 '\n'
