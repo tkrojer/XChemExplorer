@@ -1,4 +1,4 @@
-# last edited: 21/07/2017 - 15:00
+# last edited: 07/08/2017 - 15:00
 
 import gobject
 import sys
@@ -1071,21 +1071,18 @@ class GUI(object):
         else:
             #######################################################
             # create folder for new refinement cycle and check if free.mtz exists
-            if not os.path.isdir(os.path.join(self.reference_directory,self.refinementDir)):
-                os.mkdir(os.path.join(self.reference_directory,self.refinementDir))
-            if not os.path.isdir(os.path.join(self.reference_directory,self.refinementDir,'Refine_'+str(self.Serial))):
-                os.mkdir(os.path.join(self.reference_directory,self.refinementDir,'Refine_'+str(self.Serial)))
-            if not os.path.isfile(os.path.join(self.reference_directory,self.refinementDir,self.refinementDir+'.free.mtz')):
-                os.chdir(os.path.join(self.reference_directory,self.refinementDir))
-                os.symlink(self.mtzFree,self.refinementDir+'.free.mtz')
+            if not os.path.isdir(os.path.join(self.project_directory,self.xtalID)):
+                os.mkdir(os.path.join(self.project_directory,self.xtalID))
+            if not os.path.isdir(os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial))):
+                os.mkdir(os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial)))
 
             #######################################################
             # write PDB file
             # now take protein pdb file and write it to newly create Refine_<serial> folder
             # note: the user has to make sure that the ligand file was merged into main file
             for item in coot_utils_XChem.molecule_number_list():
-                if coot.molecule_name(item) in self.pdbFile:
-                    coot.write_pdb_file(item,os.path.join(self.reference_directory,self.refinementDir,'Refine_'+str(self.Serial),'in.pdb'))
+                if coot.molecule_name(item).endswith(self.pdb_style):
+                    coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial),'in.pdb'))
                     break
                 elif coot.molecule_name(item).endswith('dimple.pdb'):
                     coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial),'in.pdb'))
