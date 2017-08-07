@@ -1027,32 +1027,72 @@ class GUI(object):
 
     def REFINE(self,widget):
 
-        #######################################################
-        if not os.path.isdir(os.path.join(self.project_directory,self.xtalID,'cootOut')):
-            os.mkdir(os.path.join(self.project_directory,self.xtalID,'cootOut'))
-        # create folder for new refinement cycle
-        os.mkdir(os.path.join(self.project_directory,self.xtalID,'cootOut','Refine_'+str(self.Serial)))
-
-        #######################################################
-        # write PDB file
-        # now take protein pdb file and write it to newly create Refine_<serial> folder
-        # note: the user has to make sure that the ligand file was merged into main file
-        for item in coot_utils_XChem.molecule_number_list():
-            if coot.molecule_name(item).endswith(self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb') or coot.molecule_name(item).endswith(self.pdb_style):
-                coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'cootOut','Refine_'+str(self.Serial),'refine.modified.pdb'))
-                break
-            elif coot.molecule_name(item).endswith('dimple.pdb'):
-                coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'cootOut','Refine_'+str(self.Serial),'refine.modified.pdb'))
-                break
-
+#        #######################################################
+#        if not os.path.isdir(os.path.join(self.project_directory,self.xtalID,'cootOut')):
+#            os.mkdir(os.path.join(self.project_directory,self.xtalID,'cootOut'))
+#        # create folder for new refinement cycle
+#        os.mkdir(os.path.join(self.project_directory,self.xtalID,'cootOut','Refine_'+str(self.Serial)))
+#
+#        #######################################################
+#        # write PDB file
+#        # now take protein pdb file and write it to newly create Refine_<serial> folder
+#        # note: the user has to make sure that the ligand file was merged into main file
+#        for item in coot_utils_XChem.molecule_number_list():
+#            if coot.molecule_name(item).endswith(self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb') or coot.molecule_name(item).endswith(self.pdb_style):
+#                coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'cootOut','Refine_'+str(self.Serial),'refine.modified.pdb'))
+#                break
+#            elif coot.molecule_name(item).endswith('dimple.pdb'):
+#                coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'cootOut','Refine_'+str(self.Serial),'refine.modified.pdb'))
+#                break
+#
 
         #######################################################
         if self.refinementProtocol=='pandda':
+
+            #######################################################
+            if not os.path.isdir(os.path.join(self.project_directory,self.xtalID,'cootOut')):
+                os.mkdir(os.path.join(self.project_directory,self.xtalID,'cootOut'))
+            # create folder for new refinement cycle
+            os.mkdir(os.path.join(self.project_directory,self.xtalID,'cootOut','Refine_'+str(self.Serial)))
+
+            #######################################################
+            # write PDB file
+            # now take protein pdb file and write it to newly create Refine_<serial> folder
+            # note: the user has to make sure that the ligand file was merged into main file
+            for item in coot_utils_XChem.molecule_number_list():
+                if coot.molecule_name(item).endswith(self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb') or coot.molecule_name(item).endswith(self.pdb_style):
+                    coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'cootOut','Refine_'+str(self.Serial),'refine.modified.pdb'))
+                    break
+#                elif coot.molecule_name(item).endswith('dimple.pdb'):
+#                    coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'cootOut','Refine_'+str(self.Serial),'refine.modified.pdb'))
+#                    break
+
             XChemRefine.panddaRefine(self.project_directory,self.xtalID,self.compoundID,self.data_source).RunQuickRefine(self.Serial,self.RefmacParams,self.external_software,self.xce_logfile)
         else:
-            print 'sorry, not programmed yet'
+            #######################################################
+            # create folder for new refinement cycle and check if free.mtz exists
+            if not os.path.isdir(os.path.join(self.reference_directory,self.refinementDir)):
+                os.mkdir(os.path.join(self.reference_directory,self.refinementDir))
+            if not os.path.isdir(os.path.join(self.reference_directory,self.refinementDir,'Refine_'+str(self.Serial))):
+                os.mkdir(os.path.join(self.reference_directory,self.refinementDir,'Refine_'+str(self.Serial)))
+            if not os.path.isfile(os.path.join(self.reference_directory,self.refinementDir,self.refinementDir+'.free.mtz')):
+                os.chdir(os.path.join(self.reference_directory,self.refinementDir))
+                os.symlink(self.mtzFree,self.refinementDir+'.free.mtz')
 
-#            self.Refine.RunRefmac(self.Serial,self.RefmacParams,self.external_software,self.xce_logfile)
+            #######################################################
+            # write PDB file
+            # now take protein pdb file and write it to newly create Refine_<serial> folder
+            # note: the user has to make sure that the ligand file was merged into main file
+            for item in coot_utils_XChem.molecule_number_list():
+                if coot.molecule_name(item) in self.pdbFile:
+                    coot.write_pdb_file(item,os.path.join(self.reference_directory,self.refinementDir,'Refine_'+str(self.Serial),'in.pdb'))
+                    break
+                elif coot.molecule_name(item).endswith('dimple.pdb'):
+                    coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial),'in.pdb'))
+                    break
+
+            self.Refine.RunRefmac(self.Serial,self.RefmacParams,self.external_software,self.xce_logfile)
+
 
         self.index+=1
         if self.index >= len(self.Todo):

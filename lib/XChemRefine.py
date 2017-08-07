@@ -1,4 +1,4 @@
-# last edited: 21/07/2017, 15:00
+# last edited: 07/08/2017, 15:00
 
 import pygtk, gtk, pango
 import os
@@ -291,8 +291,8 @@ class Refine(object):
         # HKLIN & HKLOUT
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'.free.mtz')):
             RefmacParams['HKLIN']='HKLIN '+os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'.free.mtz \\\n')
-        elif os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz')):
-            RefmacParams['HKLIN']='HKLIN '+os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz \\\n')
+#        elif os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz')):
+#            RefmacParams['HKLIN']='HKLIN '+os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz \\\n')
         else:
             Logfile.insert('%s: cannot find HKLIN for refinement; aborting...' %self.xtalID)
             return None
