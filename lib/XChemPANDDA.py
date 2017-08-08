@@ -455,7 +455,7 @@ class run_pandda_analyse(QtCore.QThread):
             Cmds = (
                 '#!'+os.getenv('SHELL')+'\n'
                 '\n'
-                + source_file +
+                'source %s' %source_file +
                 'cd '+self.panddas_directory+'\n'
                 '\n'
                 #'$CCP4/bin/ccp4-python %s %s %s %s\n' %(  os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_pandda_status_flag.py'), self.datasource,crystalString[:-1],'running') +
@@ -465,7 +465,7 @@ class run_pandda_analyse(QtCore.QThread):
             for i in range(number_of_cyles):
                 Cmds += (
                     'module load pymol '+
-		    '\n'+
+		            '\n'+
                     'pandda.analyse '+
                     ' data_dirs="'+self.data_directory+'"'
                     ' out_dir="'+self.panddas_directory+'"'
