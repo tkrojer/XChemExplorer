@@ -867,7 +867,7 @@ class panddaRefine(object):
 
         if refinementProtocol=='pandda_refmac':
             refinementProgram='refmac'
-            refinementParams=os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-restraints.refmac.params')+
+            refinementParams=os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-restraints.refmac.params')
             mapCalculation = (
                 'fft hklin refine.mtz mapout 2fofc.map << EOF\n'
                 'labin F1=FWT PHI=PHWT\n'
@@ -878,7 +878,7 @@ class panddaRefine(object):
                 'EOF\n'   )
         elif refinementProtocol=='pandda_phenix':
             refinementProgram='phenix'
-            refinementParams=os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-restraints.phenix.params')+
+            refinementParams=os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-restraints.phenix.params')
             mapCalculation = (
                 'fft hklin refine.mtz mapout 2fofc.map << EOF\n'
                 'labin F1=2FOFCWT PHI=PH2FOFCWT\n'
