@@ -1,4 +1,4 @@
-# last edited: 02/03/2017 - 15:00
+# last edited: 08/08/2017 - 15:00
 
 import gobject
 import sys
@@ -34,10 +34,8 @@ class GUI(object):
 
         ###########################################################################################
         # read in settings file from XChemExplorer to set the relevant paths
-        print 'current dir',os.getcwd()
         self.settings = pickle.load(open(".xce_settings.pkl","rb"))
-        print 'setting',self.settings
-#        self.refine_model_directory=self.settings['refine_model_directory']
+        remote_qsub_submission=self.settings['remote_qsub']
         self.database_directory=self.settings['database_directory']
         self.xce_logfile=self.settings['xce_logfile']
         self.data_source=self.settings['data_source']
@@ -45,6 +43,7 @@ class GUI(object):
 
         # checking for external software packages
         self.external_software=XChemUtils.external_software(self.xce_logfile).check()
+        self.external_software['qsub_remote']=remote_qsub_submission
 
         self.selection_criteria = [     '0 - All Datasets',
                                         '1 - Analysis Pending',
@@ -90,6 +89,7 @@ class GUI(object):
         self.spider_plot=''
         self.ligand_confidence=''
         self.refinement_folder=''
+        self.refinementProtocol='pandda_refmac'
 #        self.datasetOutcome=''
 
         self.pdb_style='refine.pdb'
@@ -109,9 +109,9 @@ class GUI(object):
 
         ###########################################################################################
         # some COOT settings
-        coot.set_map_radius(15)
+        coot.set_map_radius(17)
         coot.set_colour_map_rotation_for_map(0)
-        coot.set_colour_map_rotation_on_read_pdb_flag(0)
+#        coot.set_colour_map_rotation_on_read_pdb_flag(21)
 
         self.QualityIndicators = {  'RefinementRcryst':                         '-',
                                     'RefinementRfree':                          '-',
@@ -160,7 +160,7 @@ class GUI(object):
         self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         self.window.connect("delete_event", gtk.main_quit)
         self.window.set_border_width(10)
-        self.window.set_default_size(400, 1000)
+        self.window.set_default_size(400, 800)
         self.window.set_title("XChemExplorer")
         self.vbox = gtk.VBox()                      # this is the main container
 
@@ -197,6 +197,23 @@ class GUI(object):
         frame.add(self.status_label)
         self.vbox.pack_start(frame)
 
+        #################################################################################
+        # --- refinement protocol ---
+        frame=gtk.Frame()
+        self.refinementProtocolcheckbox = gtk.CheckButton('giant.quick_refine (REFMAC - default for PanDDA refinement)')
+        self.refinementProtocolcheckbox.connect("toggled", self.refinementProtocolCallback)
+        self.refinementProtocolcheckbox.set_active(True)
+        frame.add(self.refinementProtocolcheckbox)
+        self.vbox.pack_start(frame)
+
+        #################################################################################
+        # --- refinement program ---
+        frame=gtk.Frame()
+        self.refinementProgramcheckbox = gtk.CheckButton('use PHENIX for giant.quick_refine')
+        self.refinementProgramcheckbox.connect("toggled", self.refinementProgramCallback)
+        self.refinementProgramcheckbox.set_active(False)
+        frame.add(self.refinementProgramcheckbox)
+        self.vbox.pack_start(frame)
 
         # SPACER
         self.vbox.add(gtk.Label(' '))
@@ -486,7 +503,7 @@ class GUI(object):
         self.vbox.pack_start(outer_frame)
 
 #        # SPACER
-#        self.vbox.add(gtk.Label(' '))
+        self.vbox.add(gtk.Label(' '))
 
         #################################################################################
         outer_frame = gtk.Frame(label='Sample Navigator')
@@ -752,22 +769,41 @@ class GUI(object):
         self.ligand_inspect_comment_value.set_label(str(self.siteDict[self.xtalID][self.pandda_index][11]))
 
         self.spider_plot_data=self.db.get_db_pandda_dict_for_sample_and_site_and_event(self.xtalID,self.site_index,self.event_index)
+        print '>>>>> spider plot data',self.spider_plot_data
         self.ligandIDValue.set_label(self.spider_plot_data['PANDDA_site_ligand_id'])
         try:
             self.ligand_occupancyValue.set_label(           str(round(float(self.spider_plot_data['PANDDA_site_occupancy']),2)) )
-            self.ligand_BaverageValue.set_label(            str(round(float(self.spider_plot_data['PANDDA_site_B_average']),2)) )
-            self.ligand_BratioSurroundingsValue.set_label(  str(round(float(self.spider_plot_data['PANDDA_site_B_ratio_residue_surroundings']),2)) )
-            self.ligand_RSCCValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_RSCC']),2)) )
-            self.ligand_rmsdValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_rmsd']),2)) )
-            self.ligand_RSRValue.set_label(                 str(round(float(self.spider_plot_data['PANDDA_site_RSR']),2)) )
-            self.ligand_RSZDValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_RSZD']),2)) )
         except ValueError:
             self.ligand_occupancyValue.set_label('-')
+
+        try:
+            self.ligand_BaverageValue.set_label(            str(round(float(self.spider_plot_data['PANDDA_site_B_average']),2)) )
+        except ValueError:
             self.ligand_BaverageValue.set_label('-')
+
+        try:
+            self.ligand_BratioSurroundingsValue.set_label(  str(round(float(self.spider_plot_data['PANDDA_site_B_ratio_residue_surroundings']),2)) )
+        except ValueError:
             self.ligand_BratioSurroundingsValue.set_label('-')
+
+        try:
+            self.ligand_RSCCValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_RSCC']),2)) )
+        except ValueError:
             self.ligand_RSCCValue.set_label('-')
+
+        try:
+            self.ligand_rmsdValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_rmsd']),2)) )
+        except ValueError:
             self.ligand_rmsdValue.set_label('-')
+
+        try:
+            self.ligand_RSRValue.set_label(                 str(round(float(self.spider_plot_data['PANDDA_site_RSR']),2)) )
+        except ValueError:
             self.ligand_RSRValue.set_label('-')
+
+        try:
+            self.ligand_RSZDValue.set_label(                str(round(float(self.spider_plot_data['PANDDA_site_RSZD']),2)) )
+        except ValueError:
             self.ligand_RSZDValue.set_label('-')
 
         #########################################################################################
@@ -790,6 +826,7 @@ class GUI(object):
         #########################################################################################
         # check for PANDDAs EVENT maps
         if os.path.isfile(self.event_map):
+            coot.set_colour_map_rotation_on_read_pdb(0)
             coot.handle_read_ccp4_map((self.event_map),0)
             for imol in coot_utils_XChem.molecule_number_list():
                 if self.event_map in coot.molecule_name(imol):
@@ -827,7 +864,8 @@ class GUI(object):
 
         # initialize Refinement library
         self.Refine=XChemRefine.Refine(self.project_directory,self.xtalID,self.compoundID,self.data_source)
-        self.Serial=self.Refine.GetSerial()
+        self.Serial=XChemRefine.GetSerial(self.project_directory,self.xtalID)
+#        self.Serial=self.Refine.GetSerial()
         if self.Serial==1:
             # i.e. no refinement has been done; data is probably straight out of dimple
             if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style)):
@@ -872,30 +910,44 @@ class GUI(object):
         # read protein molecule after ligand so that this one is the active molecule
         coot.set_nomenclature_errors_on_read("ignore")
         if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.pdb')):
+            coot.set_colour_map_rotation_on_read_pdb(0)
             imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.pdb'),0)
             self.mol_dict['ligand']=imol
             coot.read_cif_dictionary(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.cif'))
         if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style)):
             os.chdir(os.path.join(self.project_directory,self.xtalID))
-            # we want to be able to check dimple results immediately, but don't want to interfere with refinement
-#            if not os.path.isfile('REFINEMENT_IN_PROGRESS'):
-#                if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.xtalID+'-ensemble-model.pdb')):
-#                    os.symlink(self.xtalID+'-ensemble-model.pdb',self.pdb_style)
-#                elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.pdb')):
-#                    os.symlink('dimple.pdb',self.pdb_style)
-#                else:
-#                    self.go_to_next_xtal()
-        if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style)):
-            os.chdir(os.path.join(self.project_directory,self.xtalID))
-            imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style),0)
-        elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.pdb')):
-            os.chdir(os.path.join(self.project_directory,self.xtalID))
-            imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,'dimple.pdb'),0)
+
+        if self.refinementProtocol.startswith('pandda'):
+            if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.ground-state.pdb')):
+                os.chdir(os.path.join(self.project_directory,self.xtalID))
+                coot.set_colour_map_rotation_on_read_pdb(0)
+                color_wheel_rotation=160/float(imol+2)
+                coot.set_colour_map_rotation_on_read_pdb(color_wheel_rotation)
+                imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.ground-state.pdb'),0)
+                coot.set_colour_by_molecule(imol)
+                coot.set_mol_active(imol,0)
+            if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb')):
+                os.chdir(os.path.join(self.project_directory,self.xtalID))
+                coot.set_colour_map_rotation_on_read_pdb(0)
+                color_wheel_rotation=21/float(imol+2)
+                coot.set_colour_map_rotation_on_read_pdb(color_wheel_rotation)
+                imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb'),0)
+                self.mol_dict['protein']=imol
+            else:
+                self.go_to_next_xtal()
         else:
-            self.go_to_next_xtal()
-        self.mol_dict['protein']=imol
+            if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style)):
+                os.chdir(os.path.join(self.project_directory,self.xtalID))
+                imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style),0)
+            elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.pdb')):
+                os.chdir(os.path.join(self.project_directory,self.xtalID))
+                imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,'dimple.pdb'),0)
+            else:
+                self.go_to_next_xtal()
+            self.mol_dict['protein']=imol
+
         for item in coot_utils_XChem.molecule_number_list():
-            if coot.molecule_name(item).endswith(self.pdb_style):
+            if coot.molecule_name(item).endswith(self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb') or coot.molecule_name(item).endswith(self.pdb_style):
                 coot.set_show_symmetry_master(1)    # master switch to show symmetry molecules
                 coot.set_show_symmetry_molecule(item,1) # show symm for model
 
@@ -904,6 +956,7 @@ class GUI(object):
         # - read ccp4 map: 0 - 2fofc map, 1 - fofc.map
         # read 2fofc map last so that one can change its contour level
         if os.path.isfile(os.path.join(self.project_directory,self.xtalID,'2fofc.map')):
+            coot.set_colour_map_rotation_on_read_pdb(0)
             coot.set_default_initial_contour_level_for_difference_map(3)
             coot.handle_read_ccp4_map(os.path.join(self.project_directory,self.xtalID,'fofc.map'),1)
             coot.set_default_initial_contour_level_for_map(1)
@@ -983,26 +1036,69 @@ class GUI(object):
 
     def REFINE(self,widget):
 
-        #######################################################
-        # create folder for new refinement cycle
-        os.mkdir(os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial)))
+#        #######################################################
+#        if not os.path.isdir(os.path.join(self.project_directory,self.xtalID,'cootOut')):
+#            os.mkdir(os.path.join(self.project_directory,self.xtalID,'cootOut'))
+#        # create folder for new refinement cycle
+#        os.mkdir(os.path.join(self.project_directory,self.xtalID,'cootOut','Refine_'+str(self.Serial)))
+#
+#        #######################################################
+#        # write PDB file
+#        # now take protein pdb file and write it to newly create Refine_<serial> folder
+#        # note: the user has to make sure that the ligand file was merged into main file
+#        for item in coot_utils_XChem.molecule_number_list():
+#            if coot.molecule_name(item).endswith(self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb') or coot.molecule_name(item).endswith(self.pdb_style):
+#                coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'cootOut','Refine_'+str(self.Serial),'refine.modified.pdb'))
+#                break
+#            elif coot.molecule_name(item).endswith('dimple.pdb'):
+#                coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'cootOut','Refine_'+str(self.Serial),'refine.modified.pdb'))
+#                break
+#
 
         #######################################################
-        # write PDB file
-        # now take protein pdb file and write it to newly create Refine_<serial> folder
-        # note: the user has to make sure that the ligand file was merged into main file
-        for item in coot_utils_XChem.molecule_number_list():
-            if coot.molecule_name(item).endswith(self.pdb_style):
-                coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial),'in.pdb'))
-                break
-            elif coot.molecule_name(item).endswith('dimple.pdb'):
-                coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial),'in.pdb'))
-                break
+        if self.refinementProtocol.startswith('pandda'):
 
+            #######################################################
+            if not os.path.isdir(os.path.join(self.project_directory,self.xtalID,'cootOut')):
+                os.mkdir(os.path.join(self.project_directory,self.xtalID,'cootOut'))
+            # create folder for new refinement cycle
+            os.mkdir(os.path.join(self.project_directory,self.xtalID,'cootOut','Refine_'+str(self.Serial)))
 
-        #######################################################
-        # run REFMAC
-        self.Refine.RunRefmac(self.Serial,self.RefmacParams,self.external_software,self.xce_logfile)
+            #######################################################
+            # write PDB file
+            # now take protein pdb file and write it to newly create Refine_<serial> folder
+            # note: the user has to make sure that the ligand file was merged into main file
+            for item in coot_utils_XChem.molecule_number_list():
+                if coot.molecule_name(item).endswith(self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb') or coot.molecule_name(item).endswith(self.pdb_style):
+                    coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'cootOut','Refine_'+str(self.Serial),'refine.modified.pdb'))
+                    break
+#                elif coot.molecule_name(item).endswith('dimple.pdb'):
+#                    coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'cootOut','Refine_'+str(self.Serial),'refine.modified.pdb'))
+#                    break
+
+            XChemRefine.panddaRefine(self.project_directory,self.xtalID,self.compoundID,self.data_source).RunQuickRefine(self.Serial,self.RefmacParams,self.external_software,self.xce_logfile,self.refinementProtocol)
+        else:
+            #######################################################
+            # create folder for new refinement cycle and check if free.mtz exists
+            if not os.path.isdir(os.path.join(self.project_directory,self.xtalID)):
+                os.mkdir(os.path.join(self.project_directory,self.xtalID))
+            if not os.path.isdir(os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial))):
+                os.mkdir(os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial)))
+
+            #######################################################
+            # write PDB file
+            # now take protein pdb file and write it to newly create Refine_<serial> folder
+            # note: the user has to make sure that the ligand file was merged into main file
+            for item in coot_utils_XChem.molecule_number_list():
+                if coot.molecule_name(item).endswith(self.pdb_style):
+                    coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial),'in.pdb'))
+                    break
+                elif coot.molecule_name(item).endswith('dimple.pdb'):
+                    coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial),'in.pdb'))
+                    break
+
+            self.Refine.RunRefmac(self.Serial,self.RefmacParams,self.external_software,self.xce_logfile)
+
 
         self.index+=1
         if self.index >= len(self.Todo):
@@ -1013,7 +1109,7 @@ class GUI(object):
 
     def RefinementParams(self,widget):
         print '\n==> XCE: changing refinement parameters'
-        self.RefmacParams=self.Refine.RefinementParams(self.RefmacParams)
+        self.RefmacParams=XChemRefine.RefineParams(self.project_directory,self.xtalID,self.compoundID,self.data_source).RefmacRefinementParams(self.RefmacParams)
 
     def set_selection_mode(self,widget):
         self.selection_mode=widget.get_active_text()
@@ -1079,8 +1175,36 @@ class GUI(object):
         else:
             print '==> XCE: cannot find '+os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial-1),'molprobity_coot.py')
 
-#    def fit_ligand(self,widget):
-#        print 'fit'
+    def refinementProtocolCallback(self, widget):
+        if widget.get_active():
+            if self.refinementProgramcheckbox.get_active():
+                self.refinementProtocol='pandda_phenix'
+            else:
+                self.refinementProtocol='pandda_refmac'
+            self.PREVbuttonSite.set_sensitive(True)
+            self.NEXTbuttonSite.set_sensitive(True)
+        else:
+            self.refinementProgramcheckbox.set_active(False)
+            self.refinementProtocol='refmac'
+            self.PREVbuttonSite.set_sensitive(False)
+            self.NEXTbuttonSite.set_sensitive(False)
+        print self.refinementProtocol
+
+    def refinementProgramCallback(self, widget):
+        if widget.get_active():
+            if self.refinementProtocolcheckbox.get_active():
+                self.refinementProtocol='pandda_phenix'
+                self.RefinementParamsButton.set_sensitive(False)
+            else:
+                self.refinementProgramcheckbox.set_active(False)
+                self.refinementProtocol='refmac'
+        else:
+            self.RefinementParamsButton.set_sensitive(True)
+            if self.refinementProtocolcheckbox.get_active():
+                self.refinementProtocol='pandda_refmac'
+            else:
+                self.refinementProtocol='refmac'
+        print self.refinementProtocol
 
 if __name__=='__main__':
     GUI().StartGUI()

@@ -1,4 +1,4 @@
-# last edited: 19/04/2017, 18:00
+# last edited: 03/08/2017, 18:00
 
 import os, sys, glob
 from datetime import datetime
@@ -40,7 +40,7 @@ class XChemExplorer(QtGui.QApplication):
     def __init__(self,args):
         QtGui.QApplication.__init__(self,args)
 
-        self.xce_version='v1.0-beta.3.4'
+        self.xce_version='v1.0-beta.4.1'
 
         # general settings
         self.allowed_unitcell_difference_percent=12
@@ -155,7 +155,8 @@ class XChemExplorer(QtGui.QApplication):
                              'max_queue_jobs':                  self.max_queue_jobs,
                              'diffraction_data_directory':      self.diffraction_data_directory,
                              'html_export_directory':           self.html_export_directory,
-                             'group_deposit_directory':         self.group_deposit_directory        }
+                             'group_deposit_directory':         self.group_deposit_directory,
+                             'remote_qsub':                     ''  }
 
 
         #
@@ -249,6 +250,9 @@ class XChemExplorer(QtGui.QApplication):
         else:
             self.restraints_program=''
             self.update_log.insert('No program for generation of ligand coordinates and restraints available!')
+
+        self.using_remote_qsub_submission=False
+        self.remote_qsub_submission="ssh <dls fed ID>@nx.diamond.ac.uk 'module load global/cluster; qsub'"
 
         # start GUI
         self.start_GUI()
@@ -385,8 +389,9 @@ class XChemExplorer(QtGui.QApplication):
         # add proasis menu to main menu
         self.proasis_menu = menu_bar.addMenu('Proasis')
         # connect to soakDB to get proasis info
-        conn = sqlite3.connect(os.path.join(self.database_directory, self.data_source_file))
-        c = conn.cursor()
+        if os.path.isfile(os.path.join(self.database_directory, self.data_source_file)):
+            conn = sqlite3.connect(os.path.join(self.database_directory, self.data_source_file))
+            c = conn.cursor()
 
         # Project details or add project in menu
         counter = 0
@@ -407,12 +412,17 @@ class XChemExplorer(QtGui.QApplication):
                     self.proasis_project = QtGui.QAction(str('Project Name: ' + self.proasis_name), self.window)
                     self.proasis_menu.addAction(self.proasis_project)
         # should catch if project doesnt exitst
+        except AttributeError:
+            self.update_log.insert('cannot find %s' %os.path.join(self.database_directory, self.data_source_file))
+        except UnboundLocalError:
+            self.update_log.insert('cannot find %s' %os.path.join(self.database_directory, self.data_source_file))
         except:
                 # option to create project, action = create_project()
                 self.proasis_project = QtGui.QAction(str('Create Project for ' + self.proasis_name + '...'),
                                                      self.window)
                 self.proasis_project.triggered.connect(lambda: create_project(self.proasis_name))
                 self.proasis_menu.addAction(self.proasis_project)
+
 
         # Lead details or add lead in menu
         counter = 0
@@ -618,7 +628,9 @@ class XChemExplorer(QtGui.QApplication):
                                     'Update datasource with results from pandda.inspect',
                                     'cluster datasets',
                                     'Event Map -> SF',
-                                    'check modelled ligands'    ]
+                                    'check modelled ligands',
+                                    'pre-run for ground state model',
+                                    'Build ground state model' ]
 
         frame_panddas_file_task=QtGui.QFrame()
         frame_panddas_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -663,6 +675,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.refine_file_tasks = [ 'Open COOT',
                                    'Open COOT - new interface',
+                                   'Open COOT for old PanDDA',
                                    'Update Deposition Table',
                                    'Prepare Group Deposition'   ]
 
@@ -1078,6 +1091,10 @@ class XChemExplorer(QtGui.QApplication):
         set_new_reference_button.clicked.connect(self.set_new_reference_if_applicable)
         initial_model_checkbutton_hbox.addWidget(set_new_reference_button)
 
+        refresh_reference_file_list_button=QtGui.QPushButton("Refresh reference file list")
+        refresh_reference_file_list_button.clicked.connect(self.refresh_reference_file_list)
+        initial_model_checkbutton_hbox.addWidget(refresh_reference_file_list_button)
+
         self.reference_file_list=self.get_reference_file_list(' ')
         self.reference_file_selection_combobox = QtGui.QComboBox()
         self.populate_reference_combobox(self.reference_file_selection_combobox)
@@ -1461,14 +1478,14 @@ class XChemExplorer(QtGui.QApplication):
         label=QtGui.QLabel('max_new_datasets')
         self.pandda_analyse_input_params_vbox.addWidget(label)
         self.pandda_max_new_datasets_entry = QtGui.QLineEdit()
-        self.pandda_max_new_datasets_entry.setText('200')
+        self.pandda_max_new_datasets_entry.setText('500')
         self.pandda_max_new_datasets_entry.setFixedWidth(200)
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_max_new_datasets_entry)
 
-        label=QtGui.QLabel('grid_spacing (default=0.6)\nNote: higher values speed up calculations, but maps might be less pretty)')
+        label=QtGui.QLabel('grid_spacing (default=0.5)\nNote: higher values speed up calculations, but maps might be less pretty)')
         self.pandda_analyse_input_params_vbox.addWidget(label)
         self.pandda_grid_spacing_entry = QtGui.QLineEdit()
-        self.pandda_grid_spacing_entry.setText('0.6')
+        self.pandda_grid_spacing_entry.setText('0.5')
         self.pandda_grid_spacing_entry.setFixedWidth(200)
         self.pandda_analyse_input_params_vbox.addWidget(self.pandda_grid_spacing_entry)
 
@@ -1803,11 +1820,38 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_max_queue_jobs.addWidget(adjust_max_queue_jobs)
         vbox.addLayout(settings_hbox_max_queue_jobs)
 
+        settings_hbox_remote_qsub=QtGui.QHBoxLayout()
+        remote_qsub_label=QtGui.QLabel('remote qsub:')
+        settings_hbox_remote_qsub.addWidget(remote_qsub_label)
+        self.remote_qsub_checkbox = QtGui.QCheckBox('use')
+        self.remote_qsub_checkbox.toggled.connect(self.run_qsub_remotely)
+        if self.using_remote_qsub_submission:
+            self.remote_qsub_checkbox.setChecked(True)
+        settings_hbox_remote_qsub.addWidget(self.remote_qsub_checkbox)
+        self.remote_qsub_command = QtGui.QLineEdit()
+        self.remote_qsub_command.setFixedWidth(550)
+        self.remote_qsub_command.setText(self.remote_qsub_submission)
+#        remote_qsub.textChanged[str].connect(self.change_max_queue_jobs)
+        settings_hbox_remote_qsub.addWidget(self.remote_qsub_command)
+        vbox.addLayout(settings_hbox_remote_qsub)
+
 
         preferencesLayout.addLayout(vbox,0,0)
 
         preferences.exec_();
 
+    def run_qsub_remotely(self):
+        self.remote_qsub_submission=str(self.remote_qsub_command.text())
+        if self.remote_qsub_checkbox.isChecked():
+            self.update_log.insert('submitting jobs to remote machine with: %s' %self.remote_qsub_submission)
+            self.external_software['qsub_remote']=self.remote_qsub_submission
+            self.using_remote_qsub_submission=True
+            self.settings['remote_qsub']=self.remote_qsub_submission
+        else:
+            self.update_log.insert('switching off remote job submission')
+            self.external_software['qsub_remote']=''
+            self.settings['remote_qsub']=''
+            self.using_remote_qsub_submission=False
 
     def enter_pdb_codes(self):
         pdbID_entry = QtGui.QMessageBox()
@@ -3128,6 +3172,11 @@ class XChemExplorer(QtGui.QApplication):
         for reference_file in self.reference_file_list:
             combobox.addItem(reference_file[0])
 
+    def refresh_reference_file_list(self):
+        self.reference_file_list=self.get_reference_file_list(' ')
+        self.populate_reference_combobox(self.reference_file_selection_combobox)
+
+
     def populate_refinement_outcome_combobox(self,combobox):
         combobox.clear()
         for stage in self.refinement_stage:
@@ -3984,8 +4033,10 @@ class XChemExplorer(QtGui.QApplication):
             self.create_cif_pdb_png_files('SELECTED')
 
         elif instruction=='pandda.analyse':
-            run_pandda_analyse=True
-            self.cluster_datasets_for_pandda(run_pandda_analyse)
+            self.run_pandda_analyse('production_run')
+
+        elif instruction=='pre-run for ground state model':
+            self.run_pandda_analyse('pre_run')
 
         elif instruction=='pandda.inspect':
             self.run_pandda_inspect()
@@ -4004,7 +4055,7 @@ class XChemExplorer(QtGui.QApplication):
             self.run_pandda_export(update_datasource_only,which_models)
 
         elif instruction=='cluster datasets':
-            self.cluster_datasets_for_pandda(False)
+            self.cluster_datasets_for_pandda()
 
         elif instruction=='Update datasource with results from pandda.inspect':
             update_datasource_only=True
@@ -4020,11 +4071,15 @@ class XChemExplorer(QtGui.QApplication):
         elif instruction=='check modelled ligands':
             self.compare_modelled_ligands_and_panddaTable()
 
-        elif instruction.startswith("Open COOT"):
+        elif instruction.startswith("Open COOT") or instruction=='Build ground state model':
             if not self.coot_running:
                 self.update_log.insert('starting coot...')
                 if instruction=="Open COOT - new interface":
                     interface='new'
+                elif instruction=="Open COOT for old PanDDA":
+                    interface='panddaV1'
+                elif instruction=='Build ground state model':
+                    interface='reference'
                 else:
                     interface='old'
                 self.work_thread=XChemThread.start_COOT(self.settings,interface)
@@ -4053,6 +4108,7 @@ class XChemExplorer(QtGui.QApplication):
 
         for xtal in self.initial_model_dimple_dict:
             reference_file_selection_combobox=self.initial_model_dimple_dict[xtal][1]
+            self.populate_reference_combobox(reference_file_selection_combobox)
             db_dict=self.xtal_db_dict[xtal]
             pg_xtal=db_dict['DataProcessingPointGroup']
             ucVol_xtal=db_dict['DataProcessingUnitCellVolume']
@@ -4165,126 +4221,61 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
-    def run_pandda_analyse(self):
+    def run_pandda_analyse(self,run):
         pandda_params = {
-                'data_dir':             str(self.pandda_input_data_dir_entry.text()),
-                'out_dir':              str(self.pandda_output_data_dir_entry.text()),
-                'submit_mode':          str(self.pandda_submission_mode_selection_combobox.currentText()),
-                'nproc':                str(self.pandda_nproc_entry.text()),
-                'min_build_datasets':   str(self.pandda_min_build_dataset_entry.text()),
-                'pdb_style':            str(self.pandda_pdb_style_entry.text()),
-                'mtz_style':            str(self.pandda_mtz_style_entry.text()),
-                'sort_event':           str(self.pandda_sort_event_combobox.currentText()),
-                'max_new_datasets':     str(self.pandda_max_new_datasets_entry.text()),
-                'grid_spacing':         str(self.pandda_grid_spacing_entry.text()),
-                'pandda_dir_structure': str(self.pandda_input_data_dir_entry.text()),
-                'perform_diffraction_data_scaling': str(self.wilson_checkbox.isChecked())
+                'data_dir':                             str(self.pandda_input_data_dir_entry.text()),
+                'out_dir':                              str(self.pandda_output_data_dir_entry.text()),
+                'submit_mode':                          str(self.pandda_submission_mode_selection_combobox.currentText()),
+                'nproc':                                str(self.pandda_nproc_entry.text()),
+                'min_build_datasets':                   str(self.pandda_min_build_dataset_entry.text()),
+                'pdb_style':                            str(self.pandda_pdb_style_entry.text()),
+                'mtz_style':                            str(self.pandda_mtz_style_entry.text()),
+                'sort_event':                           str(self.pandda_sort_event_combobox.currentText()),
+                'max_new_datasets':                     str(self.pandda_max_new_datasets_entry.text()),
+                'grid_spacing':                         str(self.pandda_grid_spacing_entry.text()),
+                'pandda_dir_structure':                 str(self.pandda_input_data_dir_entry.text()),
+                'perform_diffraction_data_scaling':     str(self.wilson_checkbox.isChecked()),
+                'filter_pdb':                           str(self.pandda_reference_file_selection_combobox.currentText()),
+                'reference_dir':                        self.reference_directory,
+                'appendix':                             '',
+                'N_datasets':                           len(glob.glob(os.path.join(self.initial_model_directory,'*','dimple.pdb'))),
+                'write_mean_map':                       'interesting'
                         }
 
-        pandda_checks=XChemPANDDA.check_if_pandda_can_run(pandda_params,self.xce_logfile,os.path.join(self.database_directory,self.data_source_file))
-
-        cluster_dict=XChemPANDDA.get_names_of_current_clusters(self.xce_logfile,self.panddas_directory)
-
-        added_new_reference_files=False
-        # now need to check for the other reference files in the reference file folder
-        for item in self.reference_file_list:
-            self.update_log.insert('checking which datasets are suitable for '+str(item[0])+' as reference')
-            if not str(item[0]).startswith('.') and str(item[0]) not in cluster_dict:
-                cluster_dict=pandda_checks.get_datasets_which_fit_to_reference_file(str(item[0]),self.reference_directory,cluster_dict,self.allowed_unitcell_difference_percent)
-
-        for key in cluster_dict:
-            self.update_log.insert('cluster {0!s}:   {1!s} datasets'.format(str(key), str(len(cluster_dict[key])-1)))
-
-        reference_ID=str(self.pandda_reference_file_selection_combobox.currentText())
-        if len(cluster_dict) > 1 and not os.path.isfile(os.path.join(self.reference_directory,reference_ID+'.pdb')):
-            msg = (
-                    '*** WARNING ***\n'
-                    'The datasets in your project directory belong to more than one crystal form.\n'
-                    'But you did not select a specific reference file.\n'
-                    'Please select a reference file and try again!\n'
-                )
-            self.update_log.insert(msg)
+        if run=='pre_run':
             msgBox = QtGui.QMessageBox()
-            msgBox.setText(msg)
-            msgBox.exec_()
-            return
-        elif len(cluster_dict) == 1 and reference_file == '...':
-            reference_ID=cluster_dict.keys[0]
-            reference_file=os.path.join(self.reference_directory,reference_ID+'.pdb')
-            filter_pdb=''
-            if os.path.isfile(reference_file):
-                self.update_log.insert('only one crystal form; continuing without reference file')
+            msgBoxLayout = msgBox.layout()
+            vbox = QtGui.QVBoxLayout()
+            vbox.addWidget(QtGui.QLabel(XChemToolTips.pandda_pre_run(self.reference_directory)))
+            hbox=QtGui.QHBoxLayout()
+            hbox.addWidget(QtGui.QLabel('appendix:'))
+            appendix = QtGui.QLineEdit()
+            appendix.setText('pre')
+            appendix.setFixedWidth(200)
+            hbox.addWidget(appendix)
+            vbox.addLayout(hbox)
+
+            msgBoxLayout.addLayout(vbox,0,0)
+            msgBox.addButton(QtGui.QPushButton('Go'), QtGui.QMessageBox.YesRole)
+            msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
+            reply = msgBox.exec_();
+            if reply == 0:
+                pandda_params['appendix']=str(appendix.text())
+                pandda_params['max_new_datasets'] = '100'
+                pandda_params['N_datasets'] = 100
+                pandda_params['write_mean_map'] = 'all'
             else:
-                self.update_log.insert('cannot find {0!s} -> stopping pandda.analyse'.format(reference_file))
-        elif os.path.isfile(os.path.join(self.reference_directory,reference_ID+'.pdb')):
-            reference_file=os.path.join(self.reference_directory,reference_ID+'.pdb')
-            filter_pdb=reference_file
-            self.update_log.insert('using {0!s} as reference file for PanDDA'.format(reference_file))
+                return None
 
-        pandda_params['filter_pdb']=filter_pdb
-
-        self.update_log.insert('checking if PDB files in project directory contain same number of atoms as reference file')
-        n_datasets,mismatch=pandda_checks.compare_number_of_atoms_in_reference_vs_all_datasets(reference_file,cluster_dict[reference_ID])
-        pandda_params['N_datasets']=n_datasets
-
-        error=True
-        if mismatch == [] and n_datasets >= int(pandda_params['min_build_datasets']):
-            error=False
-            self.update_log.insert('found sufficient number of datasets: {0!s}; all PDB files have the same number of atoms ==> OK'.format(str(n_datasets)))
-        elif mismatch != [] and n_datasets >= int(pandda_params['min_build_datasets']):
-            self.update_log.insert('found sufficient number of datasets: {0!s}; but NOT all PDB files have the same number of atoms ==> ERROR'.format(str(n_datasets)))
-        elif mismatch == [] and n_datasets < int(pandda_params['min_build_datasets']):
-            self.update_log.insert('did NOT find sufficient number of datasets: {0!s}; all PDB files have the same number of atoms ==> ERROR'.format(str(n_datasets)))
-        elif mismatch != [] and n_datasets < int(pandda_params['min_build_datasets']):
-            self.update_log.insert('did NOT find sufficient number of datasets: {0!s}; but NOT all PDB files have the same number of atoms ==> ERROR'.format(str(n_datasets)))
-
-        if error:
-            if n_datasets < int(pandda_params['min_build_datasets']):
-                msgBox = QtGui.QMessageBox()
-                msgText = (
-                    'Need {0!s} datasets, but only {1!s} are available\n'.format(str(pandda_params['min_build_datasets']), str(n_datasets))+
-                    'pandda.analyse cannot start!'
-                )
-                self.update_log.insert(msgText)
-                msgBox.setText(msgText)
-                msgBox.exec_();
-                return
-            elif mismatch != []:
-                self.update_log.insert('the following PDB files have a different number of atoms than the reference file:')
-                for dataset in mismatch:
-                    self.update_log.insert(dataset)
-                fraction=round((float(len(mismatch))/float(n_datasets))*100,1)
-                msgBox = QtGui.QMessageBox()
-                msgText = (
-                    'XCE found that {0!s} percent of your datasets contain a different number of atoms than your reference file. '.format(str(fraction))+
-                    'Unfortunately, pandda.analyse cannot run under these circumstances! '
-                    'Please check the terminal output for details about which datasets are affected. '
-                    'Most of the time it will be sufficient to calculate inital maps with the selected reference file again.\n'
-                    'Press "Cancel" if you want to abort the current task.\n'
-                    'Press "GO" to delete all problematic datasets and continue!'
-                )
-                self.update_log.insert(msgText)
-                msgBox.setText(msgText)
-                msgBox.addButton(QtGui.QPushButton('Go'), QtGui.QMessageBox.YesRole)
-                msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
-                reply = msgBox.exec_();
-                if reply == 0:
-                    # may need to find a better solution for that
-                    pandda_checks.remove_dimple_files(mismatch)
-                    # need to run cluster function again, because N_datasets could be too low now.
-                    self.cluster_datasets_for_pandda(True)
-                else:
-                    self.update_log.insert('stopping pandda.analyse...')
-                    return
-            return
         self.update_log.insert('preparing pandda.analyse input script')
-        self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params,self.xce_logfile,cluster_dict[reference_ID],os.path.join(self.database_directory,self.data_source_file))
+        self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params,self.xce_logfile,os.path.join(self.database_directory,self.data_source_file))
+        self.work_thread=XChemPANDDA.run_pandda_analyse(pandda_params,self.xce_logfile,os.path.join(self.database_directory,self.data_source_file))
         self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
 
-    def cluster_datasets_for_pandda(self,run_pandda_analyse):
+    def cluster_datasets_for_pandda(self):
 
         pandda_params = {
                 'out_dir':              str(self.pandda_output_data_dir_entry.text()),
@@ -4297,8 +4288,6 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),self.datasource_menu_reload_samples)
-        if run_pandda_analyse:
-            self.connect(self.work_thread, QtCore.SIGNAL("run_pandda_analyse"),self.run_pandda_analyse)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
@@ -5139,6 +5128,26 @@ class XChemExplorer(QtGui.QApplication):
     def user_update_selected_autoproc_data_collection_summary_table(self):
         for key in self.data_collection_column_three_dict:
             if self.data_collection_column_three_dict[key][0]==self.sender():
+                dbTmp=self.xtal_db_dict[key]
+                stage=dbTmp['RefinementOutcome'].split()[0]
+                print '===>',key,stage
+                if int(stage) > 2:
+                    msgBox = QtGui.QMessageBox()
+                    msgBox.setText("*** WARNING ***\n%s is currently %s\nIt will disappear from the Refinement table,\nwhen you refresh it next time.\nDo you want to continue?" %(key,dbTmp['RefinementOutcome']))
+                    msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.YesRole)
+                    msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.RejectRole)
+                    reply = msgBox.exec_();
+                    if reply == 0:
+                        self.update_log.insert('will not change data processing selection')
+                        # restore previous selection
+                        for n,entry in enumerate(self.data_collection_dict[key]):
+                            print '==>',n
+                            if entry[0]=='logfile':
+                                if entry[8]==True:
+                                    print '===> found:',n
+                                    self.data_collection_column_three_dict[key][0].selectRow(n)
+                        break
+
                 indexes=self.sender().selectionModel().selectedRows()
                 selected_processing_result=1000000
                 for index in sorted(indexes):

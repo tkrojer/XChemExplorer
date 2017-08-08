@@ -1,4 +1,4 @@
-# last edited: 29/03/2017, 15:00
+# last edited: 21/07/2017, 15:00
 
 import sqlite3
 import os,sys,glob
@@ -193,8 +193,10 @@ class data_source:
             ['RefinementStatus',                            'Refinement\nStatus',                           'TEXT',                 1],
 
             ['Deposition_PDB_ID',                           'Deposition_PDB_ID',                            'TEXT',                 1],
+            ['Deposition_PDB_file',                         'Deposition_PDB_file',                          'TEXT',                 0],
             ['Deposition_Date',                             'Deposition_Date',                              'TEXT',                 1],
-
+            ['Deposition_mmCIF_model_file',                 'Deposition_mmCIF_model_file',                  'TEXT',                 0],
+            ['Deposition_mmCIF_SF_file',                    'Deposition_mmCIF_SF_file',                     'TEXT',                 0],
 
             ['AssayIC50',                                   'AssayIC50',                                    'TEXT',                 0],
             ['LastUpdated',                                 'LastUpdated',                                  'TEXT',                 0],
@@ -1314,8 +1316,11 @@ class data_source:
         cursor.execute(sqlite)
         tmp=cursor.fetchall()
         for item in tmp:
-            line=[x.encode('UTF8') for x in list(item)]
-            site_list.append(line)
+#            print item
+#            print str(item[0])
+#            print str(item[1])
+#            line=[x.encode('UTF8') for x in list(item)]
+            site_list.append([str(item[0]),str(item[1])])
 
         return site_list
 

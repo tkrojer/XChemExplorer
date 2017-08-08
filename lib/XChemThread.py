@@ -1,4 +1,4 @@
-# last edited: 06/04/2016, 15:00
+# last edited: 31/07/2017, 10:30
 
 import os, sys, glob
 from datetime import datetime
@@ -313,8 +313,49 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
         # AIMLESS logfile
 
-#        found_logfile=self.find_file(xtal+'.log',xtal)
-#        if found_logfile:
+        # in case the MTZ file which is used for refinement is different to the one used for refinement
+        if os.path.isfile('refine.mtz'):
+            if os.path.isfile(xtal+'.free.mtz'):
+                freeMTZ=mtztools(xtal+'.free.mtz')
+                nREFfree=freeMTZ.get_number_measured_reflections()
+                if os.path.isfile(xtal+'.mtz'):
+                    procMTZ=mtztools(xtal+'.mtz')
+                    nREF=procMTZ.get_number_measured_reflections()
+                    CC,errorMessage=freeMTZ.calculate_correlaton_between_intensities_in_mtzfiles(xtal+'.mtz')
+                    self.Logfile.insert('%s: calculating CC between %s.free.mtz (%s refl) and %s.mtz (%s refl): %s' %(xtal,xtal,str(nREFfree),xtal,str(nREF),str(CC)))
+                    if errorMessage != '':
+                        self.Logfile.insert('pointless failed with the following error: %s' %errorMessage)
+
+                    try:
+                        if float(CC) < 0.999:
+                            self.Logfile.insert('correlation coefficient between the two files is below 0.999; will try to understand from dimple.log which one was used for initial map calculation')
+                            if os.path.isfile('dimple/dimple_rerun_on_selected_file/dimple/dimple.log'):
+                                foundLine=False
+                                mtzin=''
+                                for line in open('dimple/dimple_rerun_on_selected_file/dimple/dimple.log'):
+                                    if foundLine:
+                                        mtzin=line.replace(' ','').replace('\n','').replace('\r','')
+                                        self.Logfile.insert('%s was used for inital map calculation' %mtzin)
+                                        break
+                                    if line.startswith(' --no-cleanup'):
+                                        foundLine=True
+
+                                if os.path.isfile(mtzin):
+                                    self.Logfile.insert('%s: mtzfile used for refinement is not the same as the one chosen from autoprocessing' %xtal)
+                                    self.Logfile.insert('%s: current mtzfile after autoprocessing: %s' %(xtal,os.path.realpath(xtal+'.mtz')))
+                                    self.Logfile.insert('%s: removing links for %s.mtz/%s.log' %(xtal,xtal,xtal))
+                                    os.system('/bin/rm %s.mtz 2> /dev/null' %xtal)
+                                    os.system('/bin/rm %s.log 2> /dev/null' %xtal)
+                                    self.Logfile.insert('linking %s to %s.mtz' %(os.path.relpath(mtzin),xtal))
+                                    os.symlink(os.path.relpath(mtzin),xtal+'.mtz')
+                                    for logfile in glob.glob(os.path.join(mtzin[:mtzin.rfind('/')],'*log')):
+                                        self.Logfile.insert('linking %s to %s.log' %(os.path.relpath(logfile),xtal))
+                                        os.symlink(os.path.relpath(logfile),xtal+'.log')
+                                        break
+
+                    except ValueError:
+                        self.Logfile.insert('something went wrong: calculated CC value does not seem to be a floating point number')
+
         found_logfile=False
         if os.path.isfile(xtal+'.log'):
             found_logfile=True
@@ -394,6 +435,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 #            db_dict['RefinementMTZfree']=os.path.realpath(xtal+'.free.mtz').replace(os.getcwd()+'/','')
         else:
             db_dict['RefinementMTZfree']=''
+            os.system('/bin/rm %s.free.mtz 2> /dev/null' %xtal)
             if os.path.isfile(os.path.join(dimple_path,'prepared2.mtz')):
                 os.symlink(os.path.relpath(os.path.join(dimple_path,'prepared2.mtz')),xtal+'.free.mtz')
 #                db_dict['RefinementMTZfree']=os.path.realpath(xtal+'.free.mtz').replace(os.getcwd()+'/','')
@@ -1099,8 +1141,18 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     '\n'
                     '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(database,xtal,'DimpleStatus','running') +
                     '\n'
-                    'uniqueify %s %s.unique.mtz\n' %(mtzin,xtal)+
-                    'dimple --no-cleanup %s.unique.mtz %s %s %s dimple\n' %(xtal,ref_pdb,ref_mtz,ref_cif) +
+#                    'freerflag hklin %s hklout %s.unique.mtz << eof > freerflag.log\n' %(mtzin,xtal)+
+#                    ' COMPLETE FREE=FreeR_flag\n'
+#                    ' UNIQUE\n'
+#                    ' END\n'
+#                    'eof\n'
+#                    'freerflag hklin %s hklout %s.unique.mtz << eof > freerflag.log\n' %(mtzin,xtal)+
+#                    ' UNIQUE\n'
+#                    ' END\n'
+#                    'eof\n'
+#                    '\n'
+#                    'dimple --no-cleanup %s.unique.mtz %s %s %s dimple\n' %(xtal,ref_pdb,ref_mtz,ref_cif) +
+                    'dimple --no-cleanup %s %s %s %s dimple\n' %(mtzin,ref_pdb,ref_mtz,ref_cif) +
                     '\n'
                     'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc,'dimple') +
                     '\n'
@@ -1640,6 +1692,10 @@ class start_COOT(QtCore.QThread):
             self.pylib='XChemCoot.py'
         elif interface=='new':
             self.pylib='XChemCootNew.py'
+        elif interface=='panddaV1':
+            self.pylib='XChemCootOld.py'
+        elif interface=='reference':
+            self.pylib='XChemCootReference.py'
 
     def run(self):
         cwd=os.getcwd()
