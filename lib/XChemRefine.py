@@ -1,4 +1,4 @@
-# last edited: 07/08/2017, 15:00
+# last edited: 08/08/2017, 15:00
 
 import pygtk, gtk, pango
 import os
@@ -698,7 +698,7 @@ class panddaRefine(object):
         self.prefix = 'refine'
         self.datasource=datasource
 
-    def RunQuickRefine(self,Serial,RefmacParams,external_software,xce_logfile):
+    def RunQuickRefine(self,Serial,RefmacParams,external_software,xce_logfile,refinementProtocol):
         Logfile=XChemLog.updateLog(xce_logfile)
         Logfile.insert('preparing files for giant.quick_refine')
         # panddaSerial because giant.quick_refine writes Refine_0001 instead of Refine_1
@@ -865,6 +865,29 @@ class panddaRefine(object):
             )
 
 
+        if refinementProtocol=='pandda_refmac':
+            refinementProgram='refmac'
+            refinementParams=os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-restraints.refmac.params')+
+            mapCalculation = (
+                'fft hklin refine.mtz mapout 2fofc.map << EOF\n'
+                'labin F1=FWT PHI=PHWT\n'
+                'EOF\n'
+                '\n'
+                'fft hklin refine.mtz mapout fofc.map << EOF\n'
+                'labin F1=DELFWT PHI=PHDELWT\n'
+                'EOF\n'   )
+        elif refinementProtocol=='pandda_phenix':
+            refinementProgram='phenix'
+            refinementParams=os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-restraints.phenix.params')+
+            mapCalculation = (
+                'fft hklin refine.mtz mapout 2fofc.map << EOF\n'
+                'labin F1=2FOFCWT PHI=PH2FOFCWT\n'
+                'EOF\n'
+                '\n'
+                'fft hklin refine.mtz mapout fofc.map << EOF\n'
+                'labin F1=FOFCWT PHI=PHFOFCWT\n'
+                'EOF\n'   )
+
         refmacCmds = (
             '#!'+os.getenv('SHELL')+'\n'
             +pbs_line+
@@ -880,8 +903,8 @@ class panddaRefine(object):
             ' input.pdb=%s' %RefmacParams['XYZIN']+
             ' mtz=%s' %RefmacParams['HKLIN']+
             ' cif=%s' %RefmacParams['LIBIN']+
-            ' program=refmac'
-            ' params=%s' %os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-restraints.refmac.params')+
+            ' program=%s' %refinementProgram +
+            ' params=%s' %refinementParams+
             " dir_prefix='Refine_'"
             " out_prefix='refine_%s'\n" %str(Serial)+
             '\n'
@@ -897,14 +920,8 @@ class panddaRefine(object):
             'ln -s Refine_%s/refine_molprobity.log .\n' %panddaSerial+
             'mmtbx.validation_summary refine.pdb > validation_summary.txt\n'
             '\n'
-            'fft hklin refine.mtz mapout 2fofc.map << EOF\n'
-            'labin F1=FWT PHI=PHWT\n'
-            'EOF\n'
+            + mapCalculation +
             '\n'
-            'fft hklin refine.mtz mapout fofc.map << EOF\n'
-            'labin F1=DELFWT PHI=PHDELWT\n'
-            'EOF\n'
-             '\n'
             '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_after_refinement.py')+
             ' %s %s %s %s\n' %(self.datasource,self.xtalID,self.ProjectPath,os.path.join(self.ProjectPath,self.xtalID,'Refine_'+str(Serial)))+
             '\n'

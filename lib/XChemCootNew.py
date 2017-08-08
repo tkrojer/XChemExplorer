@@ -1,4 +1,4 @@
-# last edited: 07/08/2017 - 15:00
+# last edited: 08/08/2017 - 15:00
 
 import gobject
 import sys
@@ -89,7 +89,7 @@ class GUI(object):
         self.spider_plot=''
         self.ligand_confidence=''
         self.refinement_folder=''
-        self.refinementProtocol='pandda'
+        self.refinementProtocol='pandda_refmac'
 #        self.datasetOutcome=''
 
         self.pdb_style='refine.pdb'
@@ -200,10 +200,19 @@ class GUI(object):
         #################################################################################
         # --- refinement protocol ---
         frame=gtk.Frame()
-        self.refinementProtocolcheckbox = gtk.CheckButton('giant.quick_refine (default for PanDDA refinement)')
+        self.refinementProtocolcheckbox = gtk.CheckButton('giant.quick_refine (REFMAC - default for PanDDA refinement)')
         self.refinementProtocolcheckbox.connect("toggled", self.refinementProtocolCallback)
         self.refinementProtocolcheckbox.set_active(True)
         frame.add(self.refinementProtocolcheckbox)
+        self.vbox.pack_start(frame)
+
+        #################################################################################
+        # --- refinement program ---
+        frame=gtk.Frame()
+        self.refinementProgramcheckbox = gtk.CheckButton('use PHENIX for giant.quick_refine')
+        self.refinementProgramcheckbox.connect("toggled", self.refinementProgramCallback)
+        self.refinementProgramcheckbox.set_active(False)
+        frame.add(self.refinementProgramcheckbox)
         self.vbox.pack_start(frame)
 
         # SPACER
@@ -908,7 +917,7 @@ class GUI(object):
         if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style)):
             os.chdir(os.path.join(self.project_directory,self.xtalID))
 
-        if self.refinementProtocol=='pandda':
+        if self.refinementProtocol.startswith('pandda'):
             if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.ground-state.pdb')):
                 os.chdir(os.path.join(self.project_directory,self.xtalID))
                 coot.set_colour_map_rotation_on_read_pdb(0)
@@ -1047,7 +1056,7 @@ class GUI(object):
 #
 
         #######################################################
-        if self.refinementProtocol=='pandda':
+        if self.refinementProtocol.startswith('pandda'):
 
             #######################################################
             if not os.path.isdir(os.path.join(self.project_directory,self.xtalID,'cootOut')):
@@ -1067,7 +1076,7 @@ class GUI(object):
 #                    coot.write_pdb_file(item,os.path.join(self.project_directory,self.xtalID,'cootOut','Refine_'+str(self.Serial),'refine.modified.pdb'))
 #                    break
 
-            XChemRefine.panddaRefine(self.project_directory,self.xtalID,self.compoundID,self.data_source).RunQuickRefine(self.Serial,self.RefmacParams,self.external_software,self.xce_logfile)
+            XChemRefine.panddaRefine(self.project_directory,self.xtalID,self.compoundID,self.data_source).RunQuickRefine(self.Serial,self.RefmacParams,self.external_software,self.xce_logfile,self.refinementProtocol)
         else:
             #######################################################
             # create folder for new refinement cycle and check if free.mtz exists
@@ -1168,17 +1177,34 @@ class GUI(object):
 
     def refinementProtocolCallback(self, widget):
         if widget.get_active():
-            self.refinementProtocol='pandda'
+            if self.refinementProgramcheckbox.get_active():
+                self.refinementProtocol='pandda_phenix'
+            else:
+                self.refinementProtocol='pandda_refmac'
             self.PREVbuttonSite.set_sensitive(True)
             self.NEXTbuttonSite.set_sensitive(True)
         else:
+            self.refinementProgramcheckbox.set_active(False)
             self.refinementProtocol='refmac'
             self.PREVbuttonSite.set_sensitive(False)
             self.NEXTbuttonSite.set_sensitive(False)
+        print self.refinementProtocol
 
-
-
-
+    def refinementProgramCallback(self, widget):
+        if widget.get_active():
+            if self.refinementProtocolcheckbox.get_active():
+                self.refinementProtocol='pandda_phenix'
+                self.RefinementParamsButton.set_sensitive(False)
+            else:
+                self.refinementProgramcheckbox.set_active(False)
+                self.refinementProtocol='refmac'
+        else:
+            self.RefinementParamsButton.set_sensitive(True)
+            if self.refinementProtocolcheckbox.get_active():
+                self.refinementProtocol='pandda_refmac'
+            else:
+                self.refinementProtocol='refmac'
+        print self.refinementProtocol
 
 if __name__=='__main__':
     GUI().StartGUI()
