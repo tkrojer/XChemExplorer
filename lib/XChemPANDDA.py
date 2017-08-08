@@ -1,4 +1,4 @@
-# last edited: 07/08/2017, 10:25
+# last edited: 08/08/2017, 10:25
 
 import os, sys, glob
 from datetime import datetime
@@ -331,10 +331,7 @@ class run_pandda_export(QtCore.QThread):
             else:
 
                 Cmds = (
-#                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
-#                '\n'
-#                '/dls/science/groups/i04-1/software/pandda-install/ccp4-pandda/bin/pandda.export'
-                    'source /dls/science/groups/i04-1/software/pandda-update/ccp4-7.0/setup-scripts/ccp4.setup-sh\n'
+                    'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
                     'pandda.export'
                     ' pandda_dir=%s' %self.panddas_directory+
                     ' export_dir={0!s}'.format(self.initial_model_directory)+
@@ -452,12 +449,13 @@ class run_pandda_analyse(QtCore.QThread):
                 filter_pdb=''
 
             os.chdir(self.panddas_directory)
+
+            # note: copied latest pandda.setup-sh from XCE2 installation (08/08/2017)
+
             Cmds = (
                 '#!'+os.getenv('SHELL')+'\n'
                 '\n'
-                'yes | module clear' + '\n' +
-                'source /dls/science/groups/i04-1/software/pandda-update/ccp4-7.0/bin/activate \n' +
-                '\n'
+                + source_file +
                 'cd '+self.panddas_directory+'\n'
                 '\n'
                 #'$CCP4/bin/ccp4-python %s %s %s %s\n' %(  os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_pandda_status_flag.py'), self.datasource,crystalString[:-1],'running') +
