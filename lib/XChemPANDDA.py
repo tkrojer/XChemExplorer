@@ -103,7 +103,7 @@ class run_pandda_export(QtCore.QThread):
                         os.chdir(os.path.join(self.initial_model_directory,xtal,'cootOut','Refine_'+str(Serial)))
                     Refine=XChemRefine.panddaRefine(self.initial_model_directory,xtal,compoundID,self.datasource)
                     os.symlink(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb'),xtal+'-ensemble-model.pdb')
-                    Refine.RunQuickRefine(Serial,self.RefmacParams,self.external_software,self.xce_logfile)
+                    Refine.RunQuickRefine(Serial,self.RefmacParams,self.external_software,self.xce_logfile,'pandda_refmac')
             else:
                 self.Logfile.error('%s: cannot start refinement because %s.free.mtz is missing in %s' %(xtal,xtal,os.path.join(self.initial_model_directory,xtal)))
 
