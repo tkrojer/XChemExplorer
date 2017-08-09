@@ -397,7 +397,7 @@ class run_pandda_analyse(QtCore.QThread):
             if os.path.isdir(self.panddas_directory):
                 os.system('/bin/rm -fr %s' %self.panddas_directory)
             os.mkdir(self.panddas_directory)
-            self.select_ground_state_model='$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/select_ground_state_dataset.py %s\n' %self.panddas_directory
+            self.select_ground_state_model='$CCP4/bin/ccp4-python %s %s\n' %(os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','select_ground_state_dataset.py'),self.panddas_directory)
 
     def run(self):
 
@@ -439,7 +439,8 @@ class run_pandda_analyse(QtCore.QThread):
             if os.getenv('SHELL') == '/bin/tcsh' or os.getenv('SHELL') == '/bin/csh':
                 source_file=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-csh\n')
             elif os.getenv('SHELL') == '/bin/bash':
-                source_file=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh\n')
+                source_file='export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
+                source_file+=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh\n')
             else:
                 source_file=''
 
