@@ -745,7 +745,8 @@ class panddaRefine(object):
             Logfile.insert('running giant.make_restraints %s:' %self.xtalID+'-ensemble-model.pdb')
 #            os.system('giant.make_restraints %s' %self.xtalID+'-ensemble-model.pdb')
             cmd = (
-                'source /dls/science/groups/i04-1/software/pandda-update/ccp4-7.0/setup-scripts/ccp4.setup-sh\n'
+                'export XChemExplorer_DIR="%s"\n' %os.getenv('XChemExplorer_DIR')+
+                'source %s\n' %os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh\n') +
                 'giant.make_restraints %s-ensemble-model.pdb' %self.xtalID
             )
             Logfile.insert(cmd+'\n')
@@ -762,7 +763,8 @@ class panddaRefine(object):
                 Logfile.insert('running giant.merge_conformations input.pdb=%s input.pdb=%s' %(ground_state,bound_state))
 #                os.system('giant.merge_conformations input.pdb=%s input.pdb=%s' %(ground_state,bound_state))
                 cmd = (
-                'source /dls/science/groups/i04-1/software/pandda-update/ccp4-7.0/setup-scripts/ccp4.setup-sh\n'
+                'export XChemExplorer_DIR="%s"\n' %os.getenv('XChemExplorer_DIR')+
+                'source %s\n' %os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh\n') +
                 'giant.merge_conformations input.pdb=%s input.pdb=%s' %(ground_state,bound_state)
                 )
                 Logfile.insert(cmd+'\n')
@@ -855,13 +857,13 @@ class panddaRefine(object):
             source = (
                 'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
                 '\n'
-                'source /dls/science/groups/i04-1/software/pandda-update/ccp4-7.0/setup-scripts/ccp4.setup-sh\n'
+                'source %s\n' %os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh\n')
             )
         elif 'csh' in os.getenv('SHELL'):
             source = (
                 'setenv XChemExplorer_DIR '+os.getenv('XChemExplorer_DIR')+'\n'
                 '\n'
-                'source /dls/science/groups/i04-1/software/pandda-update/ccp4-7.0/setup-scripts/ccp4.setup-sh\n'
+                'source %s\n' %os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-csh\n')
             )
 
 
