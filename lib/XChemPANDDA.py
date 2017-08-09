@@ -440,7 +440,7 @@ class run_pandda_analyse(QtCore.QThread):
                 source_file=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-csh\n')
             elif os.getenv('SHELL') == '/bin/bash':
                 source_file='export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
-                source_file+=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh\n')
+                source_file+='source %s\n' %os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh\n')
             else:
                 source_file=''
 
@@ -456,7 +456,7 @@ class run_pandda_analyse(QtCore.QThread):
             Cmds = (
                 '#!'+os.getenv('SHELL')+'\n'
                 '\n'
-                'source %s' %source_file +
+                + source_file +
                 'cd '+self.panddas_directory+'\n'
                 '\n'
                 #'$CCP4/bin/ccp4-python %s %s %s %s\n' %(  os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_pandda_status_flag.py'), self.datasource,crystalString[:-1],'running') +
