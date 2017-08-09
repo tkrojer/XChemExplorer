@@ -68,15 +68,15 @@ class run_pandda_export(QtCore.QThread):
         self.import_samples_into_datasouce()
 
         if not self.update_datasource_only:
-            self.export_models()
+            samples_to_export=self.export_models()
 
 #        self.import_samples_into_datasouce()
 
         if not self.update_datasource_only:
-            self.refine_exported_models()
+            self.refine_exported_models(samples_to_export)
 
 
-    def refine_exported_models(self):
+    def refine_exported_models(self,samples_to_export):
 
         # obselete since RefinementOutcome field is set to 2-... for all the relevant structures during the export_models() function
 #        if self.which_models=='new':
@@ -87,7 +87,7 @@ class run_pandda_export(QtCore.QThread):
         for item in sample_list:
             xtal=str(item[0])
             compoundID=str(item[1])
-            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.free.mtz')):
+            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.free.mtz')) and xtal in samples_to_export:
                 if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb')):
                     self.Logfile.insert('running inital refinement on PANDDA model of '+xtal)
                     Serial=XChemRefine.GetSerial(self.initial_model_directory,xtal)
@@ -343,6 +343,8 @@ class run_pandda_export(QtCore.QThread):
 
             self.Logfile.insert('running pandda.export with the following settings:\n'+Cmds)
             os.system(Cmds)
+
+        return samples_to_export
 
 #        Cmds = (
 #                '#!'+os.getenv('SHELL')+'\n'
