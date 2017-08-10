@@ -1,4 +1,4 @@
-# last edited: 03/08/2017, 18:00
+# last edited: 10/08/2017, 18:00
 
 import os, sys, glob
 from datetime import datetime
@@ -40,7 +40,7 @@ class XChemExplorer(QtGui.QApplication):
     def __init__(self,args):
         QtGui.QApplication.__init__(self,args)
 
-        self.xce_version='v1.0-beta.4.1'
+        self.xce_version='v1.0'
 
         # general settings
         self.allowed_unitcell_difference_percent=12
