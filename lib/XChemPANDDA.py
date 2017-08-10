@@ -1,4 +1,4 @@
-# last edited: 08/08/2017, 10:25
+# last edited: 10/08/2017, 10:25
 
 import os, sys, glob
 from datetime import datetime
@@ -393,6 +393,8 @@ class run_pandda_analyse(QtCore.QThread):
         self.appendix=pandda_params['appendix']
         self.write_mean_maps=pandda_params['write_mean_map']
         self.select_ground_state_model=''
+        projectDir = self.data_directory.replace('/*', '')
+        self.make_ligand_links='$CCP4/bin/ccp4-python %s %s %s\n' %(os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','make_ligand_links_after_pandda.py'),projectDir,self.panddas_directory)
 
         if self.appendix != '':
             self.panddas_directory=os.path.join(self.reference_dir,'pandda_'+self.appendix)
@@ -400,6 +402,7 @@ class run_pandda_analyse(QtCore.QThread):
                 os.system('/bin/rm -fr %s' %self.panddas_directory)
             os.mkdir(self.panddas_directory)
             self.select_ground_state_model='$CCP4/bin/ccp4-python %s %s\n' %(os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','select_ground_state_dataset.py'),self.panddas_directory)
+            self.make_ligand_links=''
 
     def run(self):
 
@@ -489,10 +492,11 @@ class run_pandda_analyse(QtCore.QThread):
 
             #Cmds += '$CCP4/bin/ccp4-python %s %s %s %s\n' %(  os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_pandda_status_flag.py'),    self.datasource,crystalString[:-1],'finished')
             Cmds += self.select_ground_state_model
+            Cmds += self.make_ligand_links
             Cmds += '\n'
 
-            data_dir_string = self.data_directory.replace('/*', '')
-
+#            data_dir_string = self.data_directory.replace('/*', '')
+#
 #            Cmds += str(
 #                        'find ' + data_dir_string +
 #                        '/*/compound -name "*.cif" | while read line; do  echo ${line//"' +
