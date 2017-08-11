@@ -4,9 +4,8 @@ XChemExplorer (XCE) is a data management and workflow tool for the parallel dete
 
 
 # [](#header-1)Download
-A pre-release is currently available for download:
 
-[v1.0-beta.4.1](https://github.com/tkrojer/XChemExplorer/archive/v1.0-beta.4.1.tar.gz)
+[v1.0](https://github.com/tkrojer/XChemExplorer/archive/v1.0.tar.gz)
 
 
 
@@ -81,7 +80,7 @@ That’s it!
 You can now run XCE by typing
 
 ```shell
-/home/tkrojer/software/XChemExplorer-1.0-beta.3.4/XChemExplorer.sh
+/home/tkrojer/software/XChemExplorer-1.0/XChemExplorer.sh
 ```
 
 It may however be easier if you insert an alias into your .bashrc or .cshrc file:
@@ -112,8 +111,7 @@ tobias.krojer@sgc.ox.ac.uk
 
 # Version History
 
-*** under construction ***
-
+v1.0 - 10/08/2017
 
 
 # Links
