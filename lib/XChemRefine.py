@@ -760,12 +760,12 @@ class panddaRefine(object):
                 os.chdir(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
                 ground_state=os.path.join(self.ProjectPath,self.xtalID,'refine.split.ground-state.pdb')
                 bound_state='refine.modified.pdb'
-                Logfile.insert('running giant.merge_conformations input.pdb=%s input.pdb=%s' %(ground_state,bound_state))
+                Logfile.insert('running giant.merge_conformations major=%s minor=%s' %(ground_state,bound_state))
 #                os.system('giant.merge_conformations input.pdb=%s input.pdb=%s' %(ground_state,bound_state))
                 cmd = (
                 'export XChemExplorer_DIR="%s"\n' %os.getenv('XChemExplorer_DIR')+
                 'source %s\n' %os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh\n') +
-                'giant.merge_conformations input.pdb=%s input.pdb=%s' %(ground_state,bound_state)
+                'giant.merge_conformations major=%s minor=%s reset_all_occupancies=False options.major_occupancy=1.0 options.minor_occupancy=1.0' %(ground_state,bound_state)
                 )
                 Logfile.insert(cmd+'\n')
                 os.system(cmd)
@@ -911,6 +911,11 @@ class panddaRefine(object):
             " out_prefix='refine_%s'\n" %str(Serial)+
             '\n'
             'cd '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(panddaSerial)+'\n'
+            'giant.split_conformations'
+            " input.pdb='refine_%s'" %str(Serial)+
+            ' reset_occupancies=True'
+            ' suffix_prefix=output '
+            '\n'
             +spider_plot+
             '\n'
             'phenix.molprobity refine_%s.pdb refine_%s.mtz\n' %(Serial,Serial)+
