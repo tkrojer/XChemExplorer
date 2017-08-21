@@ -367,19 +367,20 @@ class XChemExplorer(QtGui.QApplication):
         # function for adding a new project
         def create_project(name):
             # make relevant project directory in proasis LabXChem folder
+            print(str('Making Proasis project directory: ' + str('mkdir ' + os.path.join(self.proasis_directory, 'LabXChem', name))))
             os.system(str('mkdir ' + os.path.join(self.proasis_directory, 'LabXChem', name)))
-            perm_string = str('chmod u=rw,g=rx,o=rx ' + os.path.join(self.proasis_directory, 'LabXChem', name))
+            perm_string = str('chmod u=rwx,g=rwx,o=r ' + os.path.join(self.proasis_directory, 'LabXChem', name))
             os.system(perm_string)
             # make reference file directory in project directory
             os.system(str('mkdir ' + os.path.join(self.proasis_directory, 'LabXChem', name, 'reference')))
-            perm_string = str('chmod u=rw,g=rx,o=rx ' + os.path.join(self.proasis_directory, 'LabXChem',
+            perm_string = str('chmod u=rwx,g=rwx,o=r ' + os.path.join(self.proasis_directory, 'LabXChem',
                                                                      name, 'reference'))
             os.system(perm_string)
             # create a temporary job to add the project in proasis schedule
             temp_job = open(os.path.join(self.proasis_directory, 'Scripts/scheduled_jobs/temp_jobs',
                                          str(name + '.sh')), 'w')
             perm_string = str(
-                'chmod 770 ' + os.path.join(self.proasis_directory, 'Scripts/scheduled_jobs/temp_jobs', str(name
+                'chmod u=rwx,g=rwx,o=r ' + os.path.join(self.proasis_directory, 'Scripts/scheduled_jobs/temp_jobs', str(name
                                                                                                             + '.sh')))
             os.system(perm_string)
             job_string = str('/usr/local/Proasis2/utils/addnewproject.py -q OtherClasses -p ' + name)
@@ -5506,6 +5507,17 @@ class XChemExplorer(QtGui.QApplication):
         QtGui.qApp.quit()
 
     def add_lead(self):
+        # in case directories don't exist...
+        print(str('Making Proasis project directory: ' + str(
+            'mkdir ' + os.path.join(self.proasis_directory, 'LabXChem', self.proasis_name))))
+        os.system(str('mkdir ' + os.path.join(self.proasis_directory, 'LabXChem', self.proasis_name)))
+        perm_string = str('chmod u=rwx,g=rwx,o=r ' + os.path.join(self.proasis_directory, 'LabXChem', self.proasis_name))
+        os.system(perm_string)
+        # make reference file directory in project directory
+        os.system(str('mkdir ' + os.path.join(self.proasis_directory, 'LabXChem', self.proasis_name, 'reference')))
+        perm_string = str('chmod u=rwx,g=rwx,o=r ' + os.path.join(self.proasis_directory, 'LabXChem',
+                                                                 self.proasis_name, 'reference'))
+
         # copy pandda_analyse_sites.csv to proasis directory for lead build
         os.system(str('cp ' + str(os.path.join(self.panddas_directory, 'analyses/pandda_analyse_sites.csv')) + ' ' +
                       str(os.path.join(self.proasis_directory, 'LabXChem', self.proasis_name, 'reference'))))
@@ -5518,7 +5530,7 @@ class XChemExplorer(QtGui.QApplication):
             'w')
         # change file permissions of job
         perm_string = str(
-            'chmod 770 ' + os.path.join(self.proasis_directory, 'Scripts/scheduled_jobs/temp_jobs',
+            'chmod u=rwx,g=rwx,o=r ' + os.path.join(self.proasis_directory, 'Scripts/scheduled_jobs/temp_jobs',
                                         str(self.proasis_name + '.sh')))
         os.system(perm_string)
         # string to add leads in temp job file
