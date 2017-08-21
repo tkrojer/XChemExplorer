@@ -702,7 +702,7 @@ class panddaRefine(object):
         Logfile=XChemLog.updateLog(xce_logfile)
         Logfile.insert('preparing files for giant.quick_refine')
         # panddaSerial because giant.quick_refine writes Refine_0001 instead of Refine_1
-        panddaSerial=m=(4-len(str(Serial)))*'0'+str(Serial)
+        panddaSerial=(4-len(str(Serial)))*'0'+str(Serial)
 
         # first check if refinement is ongoing and exit if yes
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'REFINEMENT_IN_PROGRESS')):
@@ -796,15 +796,15 @@ class panddaRefine(object):
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-restraints.refmac.params')):
             # add REFMAC keywords to multi-state-restraints.refmac.params
             with open('multi-state-restraints.refmac.params','a') as refmacParams:
-                refmacParams.write(RefmacParams['BREF'])
-                refmacParams.write(RefmacParams['TLS'])
-                refmacParams.write(RefmacParams['TWIN'])
-                refmacParams.write('ncyc '+RefmacParams['NCYCLES'])
+                refmacParams.write(RefmacParams['BREF']+'\n')
+                refmacParams.write(RefmacParams['TLS']+'\n')
+                refmacParams.write(RefmacParams['TWIN']+'\n')
+                refmacParams.write('ncyc '+RefmacParams['NCYCLES']+'\n')
                 if str(RefmacParams['MATRIX_WEIGHT']).lower() == 'auto':
-                    refmacParams.write('weight AUTO')
+                    refmacParams.write('weight AUTO' + '\n')
                 else:
-                    refmacParams.write('weight matrix '+str(RefmacParams['MATRIX_WEIGHT']))
-                refmacParams.write(RefmacParams['TLSADD'])
+                    refmacParams.write('weight matrix '+str(RefmacParams['MATRIX_WEIGHT'])+'\n')
+                refmacParams.write(RefmacParams['TLSADD']+'\n')
         else:
             Logfile.error('cannot find multi-state-restraints.refmac.params in %s; aborting...' %os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
             return None
@@ -908,11 +908,17 @@ class panddaRefine(object):
             ' program=%s' %refinementProgram +
             ' params=%s' %refinementParams+
             " dir_prefix='Refine_'"
-            " out_prefix='refine_%s'\n" %str(Serial)+
+            " out_prefix='refine_%s'" %str(Serial)+
+            " split_conformations='False'"
             '\n'
             'cd '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(panddaSerial)+'\n'
             'giant.split_conformations'
-            " input.pdb='refine_%s'" %str(Serial)+
+            " input.pdb='refine_%s.pdb'" %str(Serial)+
+            ' reset_occupancies=False'
+            ' suffix_prefix=split'
+            '\n'
+            'giant.split_conformations'
+            " input.pdb='refine_%s.pdb'" %str(Serial)+
             ' reset_occupancies=True'
             ' suffix_prefix=output '
             '\n'
@@ -920,17 +926,22 @@ class panddaRefine(object):
             '\n'
             'phenix.molprobity refine_%s.pdb refine_%s.mtz\n' %(Serial,Serial)+
             '/bin/mv molprobity.out refine_molprobity.log\n'
+            'module load phenix\n'
             'mmtbx.validate_ligands refine_%s.pdb refine_%s.mtz LIG > validate_ligands.txt\n' %(Serial,Serial)+
             'cd '+self.ProjectPath+'/'+self.xtalID+'\n'
             '\n'
             'ln -s Refine_%s/validate_ligands.txt .\n' %panddaSerial+
             'ln -s Refine_%s/refine_molprobity.log .\n' %panddaSerial+
+            'ln -s Refine_%s/refine_%s.split.bound-state.pdb ./refine.split.bound-state.pdb\n' %(panddaSerial,Serial)+
+            'ln -s Refine_%s/refine_%s.split.ground-state.pdb ./refine.split.ground-state.pdb\n' %(panddaSerial,Serial)+
+            'ln -s Refine_%s/refine_%s.output.bound-state.pdb ./refine.output.bound-state.pdb\n' %(panddaSerial,Serial)+
+            'ln -s Refine_%s/refine_%s.output.ground-state.pdb ./refine.output.ground-state.pdb\n' %(panddaSerial,Serial)+
             'mmtbx.validation_summary refine.pdb > validation_summary.txt\n'
             '\n'
             + mapCalculation +
             '\n'
             '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_after_refinement.py')+
-            ' %s %s %s %s\n' %(self.datasource,self.xtalID,self.ProjectPath,os.path.join(self.ProjectPath,self.xtalID,'Refine_'+str(Serial)))+
+            ' %s %s %s %s\n' %(self.datasource,self.xtalID,self.ProjectPath,os.path.join(self.ProjectPath,self.xtalID,'Refine_'+str(panddaSerial)))+
             '\n'
             '/bin/rm %s/%s/REFINEMENT_IN_PROGRESS\n' %(self.ProjectPath,self.xtalID)+
             '\n'
