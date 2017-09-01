@@ -1446,23 +1446,32 @@ class ParseFiles:
                 if 'molprobity score' in line.lower():
                     if len(line.split()) >= 4:
                         QualityIndicators['MolprobityScore'] = line.split()[3]
-                        if float(line.split()[3]) < 2:                                 QualityIndicators['MolprobityScoreColor'] = 'green'
-                        if float(line.split()[3]) >= 2 and float(line.split()[3]) < 3: QualityIndicators['MolprobityScoreColor'] = 'orange'
-                        if float(line.split()[3]) >= 3:                                QualityIndicators['MolprobityScoreColor'] = 'red'
+                        try:
+                            if float(line.split()[3]) < 2:                                 QualityIndicators['MolprobityScoreColor'] = 'green'
+                            if float(line.split()[3]) >= 2 and float(line.split()[3]) < 3: QualityIndicators['MolprobityScoreColor'] = 'orange'
+                            if float(line.split()[3]) >= 3:                                QualityIndicators['MolprobityScoreColor'] = 'red'
+                        except ValueError:
+                            pass
 #                if line.lower().startswith('  ramachandran outliers ='):
                 if 'ramachandran outliers' in line.lower():
                     if len(line.split()) >= 4:
                         QualityIndicators['RamachandranOutliers'] = line.split()[3]
-                        if float(line.split()[3]) < 0.3:                                 QualityIndicators['RamachandranOutliersColor'] = 'green'
-                        if float(line.split()[3]) >= 0.3 and float(line.split()[3]) < 1: QualityIndicators['RamachandranOutliersColor'] = 'orange'
-                        if float(line.split()[3]) >= 1:                                  QualityIndicators['RamachandranOutliersColor'] = 'red'
+                        try:
+                            if float(line.split()[3]) < 0.3:                                 QualityIndicators['RamachandranOutliersColor'] = 'green'
+                            if float(line.split()[3]) >= 0.3 and float(line.split()[3]) < 1: QualityIndicators['RamachandranOutliersColor'] = 'orange'
+                            if float(line.split()[3]) >= 1:                                  QualityIndicators['RamachandranOutliersColor'] = 'red'
+                        except ValueError:
+                            pass
 #                if line.startswith('               favored  ='):
                 if 'favored' in line.lower():
                     if len(line.split()) >= 3:
                         QualityIndicators['RamachandranFavored'] = line.split()[2]
-                        if float(line.split()[2]) < 90:                                  QualityIndicators['RamachandranFavoredColor'] = 'red'
-                        if float(line.split()[2]) >= 90 and float(line.split()[2]) < 98: QualityIndicators['RamachandranFavoredColor'] = 'orange'
-                        if float(line.split()[2]) >= 98:                                 QualityIndicators['RamachandranFavoredColor'] = 'green'
+                        try:
+                            if float(line.split()[2]) < 90:                                  QualityIndicators['RamachandranFavoredColor'] = 'red'
+                            if float(line.split()[2]) >= 90 and float(line.split()[2]) < 98: QualityIndicators['RamachandranFavoredColor'] = 'orange'
+                            if float(line.split()[2]) >= 98:                                 QualityIndicators['RamachandranFavoredColor'] = 'green'
+                        except ValueError:
+                            pass
 
         # LigandCC
         if os.path.isfile(self.DataPath+'/'+self.xtalID+'/validate_ligands.txt'):
@@ -2166,6 +2175,67 @@ class pdbtools(object):
             os.system(pdbset)
 
 
+
+class logtools:
+
+    def __init__(self,logfile):
+        self.logfile=logfile
+
+    def phenix_molprobity(self):
+        QualityIndicators = {   'MolprobityScore':              'n/a',
+                                'MolprobityScoreColor':         'gray',
+                                'RamachandranOutliers':         'n/a',
+                                'RamachandranOutliersColor':    'gray',
+                                'RamachandranFavored':          'n/a',
+                                'RamachandranFavoredColor':     'gray'   }
+
+
+        # Molprobity = validation_summary.txt
+        if os.path.isfile(self.logfile):
+            for line in open(self.logfile):
+                if 'molprobity score' in line.lower():
+                    if len(line.split()) >= 4:
+                        QualityIndicators['MolprobityScore'] = line.split()[3]
+                        try:
+                            if float(line.split()[3]) < 2:                                 QualityIndicators['MolprobityScoreColor'] = 'green'
+                            if float(line.split()[3]) >= 2 and float(line.split()[3]) < 3: QualityIndicators['MolprobityScoreColor'] = 'orange'
+                            if float(line.split()[3]) >= 3:                                QualityIndicators['MolprobityScoreColor'] = 'red'
+                        except ValueError:
+                            pass
+#                if line.lower().startswith('  ramachandran outliers ='):
+                if 'ramachandran outliers' in line.lower():
+                    if len(line.split()) >= 4:
+                        QualityIndicators['RamachandranOutliers'] = line.split()[3]
+                        try:
+                            if float(line.split()[3]) < 0.3:                                 QualityIndicators['RamachandranOutliersColor'] = 'green'
+                            if float(line.split()[3]) >= 0.3 and float(line.split()[3]) < 1: QualityIndicators['RamachandranOutliersColor'] = 'orange'
+                            if float(line.split()[3]) >= 1:                                  QualityIndicators['RamachandranOutliersColor'] = 'red'
+                        except ValueError:
+                            pass
+#                if line.startswith('               favored  ='):
+                if 'favored' in line.lower():
+                    if len(line.split()) == 4:
+                        QualityIndicators['RamachandranFavored'] = line.split()[2]
+                        try:
+                            if float(line.split()[2]) < 90:                                  QualityIndicators['RamachandranFavoredColor'] = 'red'
+                            if float(line.split()[2]) >= 90 and float(line.split()[2]) < 98: QualityIndicators['RamachandranFavoredColor'] = 'orange'
+                            if float(line.split()[2]) >= 98:                                 QualityIndicators['RamachandranFavoredColor'] = 'green'
+                        except ValueError:
+                            pass
+
+        return QualityIndicators
+
+
+    def refmac_log(self):
+        QualityIndicators = {   'MatrixWeight':              'n/a'   }
+
+        # Matrix Weight
+        if os.path.isfile(self.logfile):
+            for line in open(self.logfile):
+                if line.startswith(' Weight matrix') and len(line.split())==3:
+                    QualityIndicators['MatrixWeight']=line.split()[2]
+
+        return QualityIndicators
 
 
 

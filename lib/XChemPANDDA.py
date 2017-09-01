@@ -1,5 +1,4 @@
-
-# last eidited: 31/07/2017, 10:25
+# last edited: 07/08/2017, 10:25
 
 import os, sys, glob
 from datetime import datetime
@@ -91,7 +90,7 @@ class run_pandda_export(QtCore.QThread):
             if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.free.mtz')):
                 if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb')):
                     self.Logfile.insert('running inital refinement on PANDDA model of '+xtal)
-					Serial=XChemRefine.GetSerial(self.initial_model_directory,xtal)
+                    Serial=XChemRefine.GetSerial(self.initial_model_directory,xtal)
                     #######################################################
                     if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'cootOut')):
                         os.mkdir(os.path.join(self.initial_model_directory,xtal,'cootOut'))
@@ -369,7 +368,7 @@ class run_pandda_export(QtCore.QThread):
 
 class run_pandda_analyse(QtCore.QThread):
 
-    def __init__(self,pandda_params,xce_logfile,dataset_list,datasource):
+    def __init__(self,pandda_params,xce_logfile,datasource):
         QtCore.QThread.__init__(self)
         self.data_directory=pandda_params['data_dir']
         self.panddas_directory=pandda_params['out_dir']
@@ -386,12 +385,22 @@ class run_pandda_analyse(QtCore.QThread):
         self.number_of_datasets=pandda_params['N_datasets']
         self.max_new_datasets=pandda_params['max_new_datasets']
         self.grid_spacing=pandda_params['grid_spacing']
-        self.filter_pdb=pandda_params['filter_pdb']
+        self.reference_dir=pandda_params['reference_dir']
+        self.filter_pdb=os.path.join(self.reference_dir,pandda_params['filter_pdb'])
         self.wilson_scaling = pandda_params['perform_diffraction_data_scaling']
         self.Logfile=XChemLog.updateLog(xce_logfile)
-        self.dataset_list=dataset_list
         self.datasource=datasource
         self.db=XChemDB.data_source(datasource)
+        self.appendix=pandda_params['appendix']
+        self.write_mean_maps=pandda_params['write_mean_map']
+        self.select_ground_state_model=''
+
+        if self.appendix != '':
+            self.panddas_directory=os.path.join(self.reference_dir,'pandda_'+self.appendix)
+            if os.path.isdir(self.panddas_directory):
+                os.system('/bin/rm -fr %s' %self.panddas_directory)
+            os.mkdir(self.panddas_directory)
+            self.select_ground_state_model='$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/select_ground_state_dataset.py %s\n' %self.panddas_directory
 
     def run(self):
 
@@ -408,12 +417,12 @@ class run_pandda_analyse(QtCore.QThread):
         #
         # 3) Repeat 2) until you don't add any "new" datasets. Then you can build the models as normal.
 
-        crystalString=''
-        for n,dataset in enumerate(self.dataset_list):
-            if n > 0:       # first entry is reference file!
-                crystalString+="'"+dataset+"',"
-        print ("update mainTable set PANDDAStatus = 'started' where CrystalName in ({0!s})".format(crystalString[:-1]))
-        self.db.execute_statement("update mainTable set PANDDAStatus = 'started' where CrystalName in ({0!s})".format(crystalString[:-1]))
+#        crystalString=''
+#        for n,dataset in enumerate(self.dataset_list):
+#            if n > 0:       # first entry is reference file!
+#                crystalString+="'"+dataset+"',"
+#        print ("update mainTable set PANDDAStatus = 'started' where CrystalName in ({0!s})".format(crystalString[:-1]))
+#        self.db.execute_statement("update mainTable set PANDDAStatus = 'started' where CrystalName in ({0!s})".format(crystalString[:-1]))
 
         number_of_cyles=int(self.number_of_datasets)/int(self.max_new_datasets)
         if int(self.number_of_datasets) % int(self.max_new_datasets) != 0:  # modulo gives remainder after integer division
@@ -446,7 +455,8 @@ class run_pandda_analyse(QtCore.QThread):
             Cmds = (
                 '#!'+os.getenv('SHELL')+'\n'
                 '\n'
-                'source '+source_file+'\n'
+                'yes | module clear' + '\n' +
+                'source /dls/science/groups/i04-1/software/pandda-update/ccp4-7.0/bin/activate \n' +
                 '\n'
                 'cd '+self.panddas_directory+'\n'
                 '\n'
@@ -467,38 +477,38 @@ class run_pandda_analyse(QtCore.QThread):
                     ' grid_spacing='+self.grid_spacing+
                     ' cpus='+self.nproc+
                     ' events.order_by='+self.sort_event+
-                    #filter_pdb+
+                    filter_pdb+
                     ' pdb_style='+self.pdb_style+
                     ' mtz_style='+self.mtz_style+
                     ' lig_style=/compound/*.cif'+
-                    ' use_b_factor_scaled_data='+self.wilson_scaling+
+                    ' use_b_factor_scaling='+self.wilson_scaling+
+                    ' write_mean_map='+self.write_mean_maps+
                     '\n'
                     )
 
-            print(self.data_directory)
-
             #Cmds += '$CCP4/bin/ccp4-python %s %s %s %s\n' %(  os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_pandda_status_flag.py'),    self.datasource,crystalString[:-1],'finished')
+            Cmds += self.select_ground_state_model
             Cmds += '\n'
 
             data_dir_string = self.data_directory.replace('/*', '')
 
-            Cmds += str(
-                        'find ' + data_dir_string +
-                        '/*/compound -name "*.cif" | while read line; do  echo ${line//"' +
-                        data_dir_string + '"/"' + self.panddas_directory +
-                        '/processed_datasets/"}| while read line2; do cp $line ${line2//compound/ligand_files}; '
-                        'done; done;')
-
-            Cmds += '\n'
-
-
-
-            Cmds += str(
-                        'find ' + data_dir_string +
-                        '/*/compound -name "*.pdb" | while read line; do  echo ${line//"' +
-                        data_dir_string + '"/"' + self.panddas_directory +
-                        '/processed_datasets/"}| while read line2; do cp $line ${line2//compound/ligand_files}; '
-                        'done; done;')
+#            Cmds += str(
+#                        'find ' + data_dir_string +
+#                        '/*/compound -name "*.cif" | while read line; do  echo ${line//"' +
+#                        data_dir_string + '"/"' + self.panddas_directory +
+#                        '/processed_datasets/"}| while read line2; do cp $line ${line2//compound/ligand_files}; '
+#                        'done; done;')
+#
+#            Cmds += '\n'
+#
+#
+#
+#            Cmds += str(
+#                        'find ' + data_dir_string +
+#                        '/*/compound -name "*.pdb" | while read line; do  echo ${line//"' +
+#                        data_dir_string + '"/"' + self.panddas_directory +
+#                        '/processed_datasets/"}| while read line2; do cp $line ${line2//compound/ligand_files}; '
+#                        'done; done;')
 
             self.Logfile.insert('running pandda.analyse with the following command:\n'+Cmds)
 
@@ -519,7 +529,7 @@ class run_pandda_analyse(QtCore.QThread):
 
 class giant_cluster_datasets(QtCore.QThread):
 
-    def __init__(self,initial_model_directory,pandda_params,xce_logfile,datasource,run_pandda_analyse):
+    def __init__(self,initial_model_directory,pandda_params,xce_logfile,datasource,):
         QtCore.QThread.__init__(self)
         self.panddas_directory=pandda_params['out_dir']
         self.pdb_style=pandda_params['pdb_style']
@@ -527,7 +537,7 @@ class giant_cluster_datasets(QtCore.QThread):
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.initial_model_directory=initial_model_directory
         self.db=XChemDB.data_source(datasource)
-        self.run_pandda_analyse=run_pandda_analyse
+
 
     def run(self):
 
@@ -616,8 +626,6 @@ class giant_cluster_datasets(QtCore.QThread):
         self.emit(QtCore.SIGNAL('update_progress_bar'), 100)
         self.Logfile.insert('finished giant.cluster_mtzs_and_pdbs')
         self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
-        if self.run_pandda_analyse:
-            self.emit(QtCore.SIGNAL('run_pandda_analyse'))
 
 class check_if_pandda_can_run:
 
@@ -860,47 +868,6 @@ class convert_event_map_to_SF:
     def run(self):
         os.chdir(os.path.join(self.project_directory,self.xtalID))
 
-#        if not os.path.isfile(os.path.join(self.project_directory,self.xtalID,'2fofc.map')):
-#            self.Logfile.insert('cannot find 2fofc.map in '+os.path.join(self.project_directory,self.xtalID))
-#            self.Logfile.insert('--> need 2fofc.map to determine grid')
-#            mtzin=''
-#            if os.path.isfile(os.path.join(self.project_directory,self.xtalID,'refine.mtz')):
-#                mtzin='refine.mtz'
-#            elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'dimple.mtz')):
-#                mtzin='dimple.mtz'
-#            if mtzin != '':
-#                self.calculate_electron_density_map(mtzin)
-#            else:
-#                self.Logfile.insert('cannot find refine.mtz or dimple.mtz in '+os.path.join(self.project_directory,self.xtalID))
-#                self.Logfile.insert('cannot calculate structure factors for '+self.event_map)
-#                self.Logfile.insert('stopping')
-#                return None
-#
-#
-#        ElectronDensityMap=XChemUtils.maptools(os.path.join(self.project_directory,self.xtalID,'2fofc.map'))
-#
-#        self.gridElectronDensityMap=ElectronDensityMap.grid_sampling
-#        self.Logfile.insert('using '+str(self.gridElectronDensityMap)+' as grid')
-#
-#        self.space_group_numberElectronDensityMap=ElectronDensityMap.space_group_number
-#        self.Logfile.insert('using '+str(self.space_group_numberElectronDensityMap)+' as space group')
-#
-#        self.space_group=ElectronDensityMap.space_group()
-#        self.Logfile.insert('using '+str(self.space_group)+' as space group')
-#
-#        self.unit_cell=ElectronDensityMap.cell_dimensions
-#        self.Logfile.insert('using '+str(self.unit_cell)+' as cell dimensions')
-#
-#        if not os.path.isfile(self.ligand_pdb):
-#            self.Logfile.insert('cannot find '+self.ligand_pdb)
-#            self.Logfile.insert('stopping')
-#            return None
-#
-#        # prepare input script
-#        self.prepare_conversion_script()
-#
-#        # run script
-#        self.run_conversion_script()
 
         # remove exisiting mtz file
         if os.path.isfile(self.event+'.mtz'):
@@ -1016,8 +983,14 @@ class convert_event_map_to_SF:
     def run_phenix_map_to_structure_factors(self):
         if float(self.resolution) < 1.21:   # program complains if resolution is 1.2 or higher
             self.resolution='1.21'
-        self.Logfile.insert('running phenix.map_to_structure_factors {0!s} d_min={1!s} output_file_name={2!s}.mtz'.format(self.event_map, self.resolution, self.event))
+        self.Logfile.insert('running phenix.map_to_structure_factors {0!s} d_min={1!s} output_file_name={2!s}_tmp.mtz'.format(self.event_map, self.resolution, self.event))
         os.system('phenix.map_to_structure_factors {0!s} d_min={1!s} output_file_name={2!s}_tmp.mtz'.format(self.event_map, self.resolution, self.event))
+
+    def run_cinvfft(self,mtzin):
+        # mtzin is usually refine.mtz
+        self.Logfile.insert('running cinvfft -mapin {0!s} -mtzin {1!s} -mtzout {2!s}_tmp.mtz -colout event'.format(self.event_map, mtzin, self.event))
+        os.system('cinvfft -mapin {0!s} -mtzin {1!s} -mtzout {2!s}_tmp.mtz -colout event'.format(self.event_map, mtzin, self.event))
+
 
     def remove_and_rename_column_labels(self):
 
@@ -1029,6 +1002,18 @@ class convert_event_map_to_SF:
                     'eof\n'
                     '\n' )
         self.Logfile.insert('running CAD: new column labels F_ampl,PHIF')
+        os.system(cmd)
+
+    def remove_and_rename_column_labels_after_cinvfft(self):
+
+        cmd = (     '#!'+os.getenv('SHELL')+'\n'
+                    '\n'
+                    'cad hklin1 %s_tmp.mtz hklout %s.mtz << eof\n' %(self.event,self.event)+
+                    ' labin file_number 1 E1=event.F_phi.F E2=event.F_phi.phi\n'
+                    ' labout file_number 1 E1=F_ampl E2=PHIF\n'
+                    'eof\n'
+                    '\n' )
+        self.Logfile.insert('running CAD: renaming event.F_phi.F -> F_ampl and event.F_phi.phi -> PHIF')
         os.system(cmd)
 
 

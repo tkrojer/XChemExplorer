@@ -1,4 +1,4 @@
-# last edited: 21/07/2017, 15:00
+# last edited: 08/08/2017, 15:00
 
 import pygtk, gtk, pango
 import os
@@ -278,7 +278,7 @@ class Refine(object):
 
 
     def RunRefmac(self,Serial,RefmacParams,external_software,xce_logfile):
-        Logfile=XChemLog.updateLog(xce_logfile)
+        if os.path.isfile(xce_logfile): Logfile=XChemLog.updateLog(xce_logfile)
         Serial=str(Serial)
 
         # first check if refinement is ongoing and exit if yes
@@ -291,8 +291,8 @@ class Refine(object):
         # HKLIN & HKLOUT
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'.free.mtz')):
             RefmacParams['HKLIN']='HKLIN '+os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'.free.mtz \\\n')
-        elif os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz')):
-            RefmacParams['HKLIN']='HKLIN '+os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz \\\n')
+#        elif os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz')):
+#            RefmacParams['HKLIN']='HKLIN '+os.path.join(self.ProjectPath,self.xtalID,self.xtalID+'-pandda-input.mtz \\\n')
         else:
             Logfile.insert('%s: cannot find HKLIN for refinement; aborting...' %self.xtalID)
             return None
@@ -329,6 +329,17 @@ class Refine(object):
         # we write 'REFINEMENT_IN_PROGRESS' immediately to avoid unncessary refiment
         os.chdir(os.path.join(self.ProjectPath,self.xtalID))
         os.system('touch REFINEMENT_IN_PROGRESS')
+
+        #######################################################
+        # Database updates:
+        # no DB will be specified when a reference model is built and refined
+        refinementStatus=''
+        updateDB=''
+        if os.path.isfile(self.datasource):
+            refinementStatus='$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(self.datasource,self.xtalID,'RefinementStatus','running')
+            updateDB = (    '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_after_refinement.py')+
+                            ' %s %s %s %s\n' %(self.datasource,self.xtalID,self.ProjectPath,os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))    )
+
 
         #######################################################
         # clean up!
@@ -377,7 +388,7 @@ class Refine(object):
             +module_load+
             'cd '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'\n'
             '\n'
-            '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(self.datasource,self.xtalID,'RefinementStatus','running') +
+            +refinementStatus+
             '\n'
             +findTLS+
             'refmac5 '
@@ -454,32 +465,31 @@ class Refine(object):
             'labin F1=DELFWT PHI=PHDELWT\n'
             'EOF\n'
              '\n'
-            '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_after_refinement.py')+
-            ' %s %s %s %s\n' %(self.datasource,self.xtalID,self.ProjectPath,os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))+
+            +updateDB+
             '\n'
             '/bin/rm %s/%s/REFINEMENT_IN_PROGRESS\n' %(self.ProjectPath,self.xtalID)+
             '\n'
            )
 
-        Logfile.insert('writing refinement shell script to'+os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refmac.csh'))
+        if os.path.isfile(xce_logfile): Logfile.insert('writing refinement shell script to'+os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refmac.csh'))
         cmd = open(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial,'refmac.csh'),'w')
         cmd.write(refmacCmds)
         cmd.close()
 
         os.chdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
 #        os.system('ssh artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(self.ProjectPath,self.xtalID,Serial))
-        Logfile.insert('changing directory to %s' %(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial)))
+        if os.path.isfile(xce_logfile): Logfile.insert('changing directory to %s' %(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial)))
         if external_software['qsub']:
             Logfile.insert('starting refinement on cluster')
             os.system('qsub -P labxchem refmac.csh')
         elif external_software['qsub_remote'] != '':
-            Logfile.insert('starting refinement on remote cluster')
+            if os.path.isfile(xce_logfile): Logfile.insert('starting refinement on remote cluster')
             remote_command=external_software['qsub_remote'].replace('qsub','cd %s; qsub' %os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
             os.system('%s -P labxchem refmac.csh' %remote_command)
             print '%s -P labxchem refmac.csh' %remote_command
         else:
             os.system('chmod +x refmac.csh')
-            Logfile.insert('starting refinement on local machine')
+            if os.path.isfile(xce_logfile): Logfile.insert('starting refinement on local machine')
             os.system('./refmac.csh &')
 
 
@@ -688,7 +698,7 @@ class panddaRefine(object):
         self.prefix = 'refine'
         self.datasource=datasource
 
-    def RunQuickRefine(self,Serial,RefmacParams,external_software,xce_logfile):
+    def RunQuickRefine(self,Serial,RefmacParams,external_software,xce_logfile,refinementProtocol):
         Logfile=XChemLog.updateLog(xce_logfile)
         Logfile.insert('preparing files for giant.quick_refine')
         # panddaSerial because giant.quick_refine writes Refine_0001 instead of Refine_1
@@ -855,6 +865,29 @@ class panddaRefine(object):
             )
 
 
+        if refinementProtocol=='pandda_refmac':
+            refinementProgram='refmac'
+            refinementParams=os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-restraints.refmac.params')
+            mapCalculation = (
+                'fft hklin refine.mtz mapout 2fofc.map << EOF\n'
+                'labin F1=FWT PHI=PHWT\n'
+                'EOF\n'
+                '\n'
+                'fft hklin refine.mtz mapout fofc.map << EOF\n'
+                'labin F1=DELFWT PHI=PHDELWT\n'
+                'EOF\n'   )
+        elif refinementProtocol=='pandda_phenix':
+            refinementProgram='phenix'
+            refinementParams=os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-restraints.phenix.params')
+            mapCalculation = (
+                'fft hklin refine.mtz mapout 2fofc.map << EOF\n'
+                'labin F1=2FOFCWT PHI=PH2FOFCWT\n'
+                'EOF\n'
+                '\n'
+                'fft hklin refine.mtz mapout fofc.map << EOF\n'
+                'labin F1=FOFCWT PHI=PHFOFCWT\n'
+                'EOF\n'   )
+
         refmacCmds = (
             '#!'+os.getenv('SHELL')+'\n'
             +pbs_line+
@@ -870,8 +903,8 @@ class panddaRefine(object):
             ' input.pdb=%s' %RefmacParams['XYZIN']+
             ' mtz=%s' %RefmacParams['HKLIN']+
             ' cif=%s' %RefmacParams['LIBIN']+
-            ' program=refmac'
-            ' params=%s' %os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-restraints.refmac.params')+
+            ' program=%s' %refinementProgram +
+            ' params=%s' %refinementParams+
             " dir_prefix='Refine_'"
             " out_prefix='refine_%s'\n" %str(Serial)+
             '\n'
@@ -887,14 +920,8 @@ class panddaRefine(object):
             'ln -s Refine_%s/refine_molprobity.log .\n' %panddaSerial+
             'mmtbx.validation_summary refine.pdb > validation_summary.txt\n'
             '\n'
-            'fft hklin refine.mtz mapout 2fofc.map << EOF\n'
-            'labin F1=FWT PHI=PHWT\n'
-            'EOF\n'
+            + mapCalculation +
             '\n'
-            'fft hklin refine.mtz mapout fofc.map << EOF\n'
-            'labin F1=DELFWT PHI=PHDELWT\n'
-            'EOF\n'
-             '\n'
             '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_after_refinement.py')+
             ' %s %s %s %s\n' %(self.datasource,self.xtalID,self.ProjectPath,os.path.join(self.ProjectPath,self.xtalID,'Refine_'+str(Serial)))+
             '\n'
