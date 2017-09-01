@@ -86,6 +86,7 @@ class GUI(object):
 
         self.xtalID=''
         self.compoundID=''
+        self.ground_state_mean_map=''
         self.spider_plot=''
         self.ligand_confidence=''
         self.refinement_folder=''
@@ -502,6 +503,11 @@ class GUI(object):
         outer_frame.add(vbox)
         self.vbox.pack_start(outer_frame)
 
+        # --- ground state mean map ---
+        self.ground_state_mean_map_button = gtk.Button(label="Show ground state mean map")
+        self.ground_state_mean_map_button.connect("clicked",self.show_ground_state_mean_map)
+        self.vbox.add(self.ground_state_mean_map_button)
+
 #        # SPACER
         self.vbox.add(gtk.Label(' '))
 
@@ -862,6 +868,14 @@ class GUI(object):
         self.spider_plot_pic = spider_plot_pic.scale_simple(190, 190, gtk.gdk.INTERP_BILINEAR)
         self.spider_plot_image.set_from_pixbuf(self.spider_plot_pic)
 
+        # reset ground state mean map
+        self.ground_state_mean_map=''
+        self.ground_state_mean_map_button.set_sensitive(False)
+        self.ground_state_mean_map_button.set_label('Show ground state mean map')
+        if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.xtalID+'-ground-state-mean-map.native.ccp4')):
+            self.ground_state_mean_map_button.set_sensitive(True)
+            self.ground_state_mean_map=os.path.join(self.project_directory,self.xtalID,self.xtalID+'-ground-state-mean-map.native.ccp4')
+
         # initialize Refinement library
         self.Refine=XChemRefine.Refine(self.project_directory,self.xtalID,self.compoundID,self.data_source)
         self.Serial=XChemRefine.GetSerial(self.project_directory,self.xtalID)
@@ -1205,6 +1219,29 @@ class GUI(object):
             else:
                 self.refinementProtocol='refmac'
         print self.refinementProtocol
+
+    def show_ground_state_mean_map(self,widget):
+        if widget.get_label().startswith('Show'):
+            loaded=False
+            for imol in coot_utils_XChem.molecule_number_list():
+                if 'ground-state-mean-map' in coot.molecule_name(imol):
+                    coot.set_map_displayed(imol,1)
+                    loaded=True
+                    break
+            if not loaded:
+                coot.set_default_initial_contour_level_for_map(1)
+                coot.handle_read_ccp4_map(self.ground_state_mean_map,0)
+                coot.set_last_map_colour(0.6,0.6,0)
+            widget.set_label('Undisplay ground state mean map')
+        else:
+            for imol in coot_utils_XChem.molecule_number_list():
+                if 'ground-state-mean-map' in coot.molecule_name(imol):
+                    coot.set_map_displayed(imol,0)
+            widget.set_label('Show ground state mean map')
+
+
+
+
 
 if __name__=='__main__':
     GUI().StartGUI()

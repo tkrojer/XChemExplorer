@@ -965,8 +965,12 @@ class create_png_and_cif_of_compound(QtCore.QThread):
                 f.write(smiles)
                 f.close()
 
-            if not os.path.isfile(os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.cif')):
+            if not os.path.isfile(os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.cif')) \
+                    or self.todo=='SELECTED':
+                os.chdir(os.path.join(self.initial_model_directory,sampleID))
+                os.system('/bin/rm -f %s*' %compoundID.replace(' ',''))
                 os.chdir(os.path.join(self.initial_model_directory,sampleID,'compound'))
+
 
                 helpers().make_png( self.initial_model_directory,
                                     sampleID,

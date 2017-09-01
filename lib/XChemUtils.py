@@ -260,6 +260,8 @@ class helpers:
             )
         os.chdir(ccp4_scratch_directory)
         Logfile.insert('creating ACEDRG shell script for {0!s},{1!s} in {2!s}'.format(sample, compoundID, ccp4_scratch_directory))
+        print Cmds
+        print 'ccp4_scratch',ccp4_scratch_directory
         f = open('xce_acedrg_{0!s}.sh'.format(str(counter)),'w')
         f.write(Cmds)
         f.close()
