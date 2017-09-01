@@ -1,4 +1,4 @@
-# last edited: 07/08/2017, 10:25
+# last edited: 10/08/2017, 10:25
 
 import os, sys, glob
 from datetime import datetime
@@ -68,15 +68,15 @@ class run_pandda_export(QtCore.QThread):
         self.import_samples_into_datasouce()
 
         if not self.update_datasource_only:
-            self.export_models()
+            samples_to_export=self.export_models()
 
 #        self.import_samples_into_datasouce()
 
         if not self.update_datasource_only:
-            self.refine_exported_models()
+            self.refine_exported_models(samples_to_export)
 
 
-    def refine_exported_models(self):
+    def refine_exported_models(self,samples_to_export):
 
         # obselete since RefinementOutcome field is set to 2-... for all the relevant structures during the export_models() function
 #        if self.which_models=='new':
@@ -87,7 +87,7 @@ class run_pandda_export(QtCore.QThread):
         for item in sample_list:
             xtal=str(item[0])
             compoundID=str(item[1])
-            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.free.mtz')):
+            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.free.mtz')) and xtal in samples_to_export:
                 if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb')):
                     self.Logfile.insert('running inital refinement on PANDDA model of '+xtal)
                     Serial=XChemRefine.GetSerial(self.initial_model_directory,xtal)
@@ -103,7 +103,7 @@ class run_pandda_export(QtCore.QThread):
                         os.chdir(os.path.join(self.initial_model_directory,xtal,'cootOut','Refine_'+str(Serial)))
                     Refine=XChemRefine.panddaRefine(self.initial_model_directory,xtal,compoundID,self.datasource)
                     os.symlink(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb'),xtal+'-ensemble-model.pdb')
-                    Refine.RunQuickRefine(Serial,self.RefmacParams,self.external_software,self.xce_logfile)
+                    Refine.RunQuickRefine(Serial,self.RefmacParams,self.external_software,self.xce_logfile,'pandda_refmac')
             else:
                 self.Logfile.error('%s: cannot start refinement because %s.free.mtz is missing in %s' %(xtal,xtal,os.path.join(self.initial_model_directory,xtal)))
 
@@ -331,10 +331,7 @@ class run_pandda_export(QtCore.QThread):
             else:
 
                 Cmds = (
-#                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
-#                '\n'
-#                '/dls/science/groups/i04-1/software/pandda-install/ccp4-pandda/bin/pandda.export'
-                    'source /dls/science/groups/i04-1/software/pandda-update/ccp4-7.0/setup-scripts/ccp4.setup-sh\n'
+                    'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
                     'pandda.export'
                     ' pandda_dir=%s' %self.panddas_directory+
                     ' export_dir={0!s}'.format(self.initial_model_directory)+
@@ -346,6 +343,8 @@ class run_pandda_export(QtCore.QThread):
 
             self.Logfile.insert('running pandda.export with the following settings:\n'+Cmds)
             os.system(Cmds)
+
+        return samples_to_export
 
 #        Cmds = (
 #                '#!'+os.getenv('SHELL')+'\n'
@@ -394,13 +393,16 @@ class run_pandda_analyse(QtCore.QThread):
         self.appendix=pandda_params['appendix']
         self.write_mean_maps=pandda_params['write_mean_map']
         self.select_ground_state_model=''
+        projectDir = self.data_directory.replace('/*', '')
+        self.make_ligand_links='$CCP4/bin/ccp4-python %s %s %s\n' %(os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','make_ligand_links_after_pandda.py'),projectDir,self.panddas_directory)
 
         if self.appendix != '':
             self.panddas_directory=os.path.join(self.reference_dir,'pandda_'+self.appendix)
             if os.path.isdir(self.panddas_directory):
                 os.system('/bin/rm -fr %s' %self.panddas_directory)
             os.mkdir(self.panddas_directory)
-            self.select_ground_state_model='$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/select_ground_state_dataset.py %s\n' %self.panddas_directory
+            self.select_ground_state_model='$CCP4/bin/ccp4-python %s %s\n' %(os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','select_ground_state_dataset.py'),self.panddas_directory)
+            self.make_ligand_links=''
 
     def run(self):
 
@@ -440,9 +442,10 @@ class run_pandda_analyse(QtCore.QThread):
             return None
         else:
             if os.getenv('SHELL') == '/bin/tcsh' or os.getenv('SHELL') == '/bin/csh':
-                source_file=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-csh')
+                source_file=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-csh\n')
             elif os.getenv('SHELL') == '/bin/bash':
-                source_file=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')
+                source_file='export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
+                source_file+='source %s\n' %os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh\n')
             else:
                 source_file=''
 
@@ -452,12 +455,13 @@ class run_pandda_analyse(QtCore.QThread):
                 filter_pdb=''
 
             os.chdir(self.panddas_directory)
+
+            # note: copied latest pandda.setup-sh from XCE2 installation (08/08/2017)
+
             Cmds = (
                 '#!'+os.getenv('SHELL')+'\n'
                 '\n'
-                'yes | module clear' + '\n' +
-                'source /dls/science/groups/i04-1/software/pandda-update/ccp4-7.0/bin/activate \n' +
-                '\n'
+                + source_file +
                 'cd '+self.panddas_directory+'\n'
                 '\n'
                 #'$CCP4/bin/ccp4-python %s %s %s %s\n' %(  os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_pandda_status_flag.py'), self.datasource,crystalString[:-1],'running') +
@@ -467,7 +471,7 @@ class run_pandda_analyse(QtCore.QThread):
             for i in range(number_of_cyles):
                 Cmds += (
                     'module load pymol '+
-		    '\n'+
+		            '\n'+
                     'pandda.analyse '+
                     ' data_dirs="'+self.data_directory+'"'
                     ' out_dir="'+self.panddas_directory+'"'
@@ -488,10 +492,11 @@ class run_pandda_analyse(QtCore.QThread):
 
             #Cmds += '$CCP4/bin/ccp4-python %s %s %s %s\n' %(  os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_pandda_status_flag.py'),    self.datasource,crystalString[:-1],'finished')
             Cmds += self.select_ground_state_model
+            Cmds += self.make_ligand_links
             Cmds += '\n'
 
-            data_dir_string = self.data_directory.replace('/*', '')
-
+#            data_dir_string = self.data_directory.replace('/*', '')
+#
 #            Cmds += str(
 #                        'find ' + data_dir_string +
 #                        '/*/compound -name "*.cif" | while read line; do  echo ${line//"' +
