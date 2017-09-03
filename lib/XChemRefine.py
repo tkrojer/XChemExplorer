@@ -751,8 +751,8 @@ class panddaRefine(object):
             )
             Logfile.insert(cmd+'\n')
             os.system(cmd)
-            Logfile.insert('waiting 10 seconds for giant.make_restraints to finish...')
-            time.sleep(10)
+            Logfile.insert('waiting 3 seconds for giant.make_restraints to finish...')
+            time.sleep(3)
         elif os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'refine.split.ground-state.pdb')):
             Logfile.insert('found model of ground state: '+os.path.join(self.ProjectPath,self.xtalID,'refine.split.ground-state.pdb'))
             if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'refine.modified.pdb')):
@@ -769,8 +769,8 @@ class panddaRefine(object):
                 )
                 Logfile.insert(cmd+'\n')
                 os.system(cmd)
-                Logfile.insert('waiting 10 seconds for giant.merge_conformations to finish...')
-                time.sleep(10)
+                Logfile.insert('waiting 3 seconds for giant.merge_conformations to finish...')
+                time.sleep(3)
             else:
                 Logfile.error('cannot find modified version of bound state in %s' %os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
                 return None
