@@ -300,12 +300,12 @@ class XChemExplorer(QtGui.QApplication):
         else:
             os.startfile(file)
 
-    def start_GUI(self):
-
-        # GUI setup
-        self.window = QtGui.QWidget()
-        self.window.setWindowTitle("XChemExplorer")
-        self.screen = QtGui.QDesktopWidget().screenGeometry()
+    def initialise_menu_bar(self):
+        ################################################################################################################
+        #                                                                                                              #
+        #                                              MENU BAR - TOP OF GUI                                           #
+        #                                                                                                              #
+        ################################################################################################################
 
         # initiate menu widget
         menu_bar = QtGui.QMenuBar()
@@ -317,46 +317,50 @@ class XChemExplorer(QtGui.QApplication):
         #                                           [...],
         #                                       ]]
         #             }
-        menu_dict = {'A: file':["&File",
-                         [
-                             ['Open Config File', 'Ctrl+O', 'self.open_config_file'],
-                             ['Save Config File', 'Ctrl+S', 'self.save_config_file'],
-                             ['Quit', 'Ctrl+Q', 'self.quit_xce']
-                         ]],
+        menu_dict = {'A: file': ["&File",
+                                 [
+                                     ['Open Config File', 'Ctrl+O', 'self.open_config_file'],
+                                     ['Save Config File', 'Ctrl+S', 'self.save_config_file'],
+                                     ['Quit', 'Ctrl+Q', 'self.quit_xce']
+                                 ]],
                      'B: datasource': ["&Datasource",
-                                    [
-                                        ['Reload Samples From Datasource', '', 'self.datasource_menu_reload_samples'],
-                                        ['Save Samples to Datasource', '', 'self.datasource_menu_save_samples'],
-                                        ['Import CSV file into Datasource', '', 'self.datasource_menu_import_csv_file'],
-                                        ['Export CSV file from Datasource', '', 'self.datasource_menu_export_csv_file'],
-                                        ['Select columns to show', '', 'self.select_datasource_columns_to_display'],
-                                        ['Create New Datasource (SQLite)', '', 'self.create_new_data_source'],
-                                        ['Export CSV for wonka', '', 'self.export_data_for_WONKA']
-                                    ]],
+                                       [
+                                           ['Reload Samples From Datasource', '',
+                                            'self.datasource_menu_reload_samples'],
+                                           ['Save Samples to Datasource', '', 'self.datasource_menu_save_samples'],
+                                           ['Import CSV file into Datasource', '',
+                                            'self.datasource_menu_import_csv_file'],
+                                           ['Export CSV file from Datasource', '',
+                                            'self.datasource_menu_export_csv_file'],
+                                           ['Select columns to show', '', 'self.select_datasource_columns_to_display'],
+                                           ['Create New Datasource (SQLite)', '', 'self.create_new_data_source'],
+                                           ['Export CSV for wonka', '', 'self.export_data_for_WONKA']
+                                       ]],
                      'C: preferences': ["&Preferences",
-                                     [
-                                         ['Edit preferences', '', 'self.show_preferences']
-                                     ]],
+                                        [
+                                            ['Edit preferences', '', 'self.show_preferences']
+                                        ]],
                      'D: deposition': ["&Deposition",
-                                    [
-                                        ['Edit information', '', 'self.deposition_data'],
-                                        ['Export to HTML', '', 'self.export_to_html'],
-                                        ['Find PanDDA apo structures', '',
-                                         'self.create_missing_apo_records_in_depositTable'],
-                                        ['Update file info of apo structures', '',
-                                         'self.update_file_information_of_apo_records'],
-                                        ['Prepare mmcif for apo structures', '', 'self.prepare_models_for_deposition'],
-                                        # ^ this is added to a dictionary somewhere, so need to check what it interferes
-                                        #  with when code changed
-                                        ['Prepare mmcif for ligand bound structures', '',
-                                         'self.prepare_models_for_deposition'],
-                                        # ^ this is added to a dictionary somewhere, so need to check what it interferes
-                                        #  with when code changed
-                                        ['Copy files to group deposition directory', '',
-                                         'self.prepare_for_group_deposition_upload'],
-                                        ['Update DB with PDB codes', '', 'self.enter_pdb_codes'],
-                                        ['Check SMILES', '', 'self.check_smiles_in_db_and_pdb']
-                                    ]],
+                                       [
+                                           ['Edit information', '', 'self.deposition_data'],
+                                           ['Export to HTML', '', 'self.export_to_html'],
+                                           ['Find PanDDA apo structures', '',
+                                            'self.create_missing_apo_records_in_depositTable'],
+                                           ['Update file info of apo structures', '',
+                                            'self.update_file_information_of_apo_records'],
+                                           ['Prepare mmcif for apo structures', '',
+                                            'self.prepare_models_for_deposition'],
+                                           # ^ this is added to a dictionary somewhere, so need to check what it interferes
+                                           #  with when code changed
+                                           ['Prepare mmcif for ligand bound structures', '',
+                                            'self.prepare_models_for_deposition'],
+                                           # ^ this is added to a dictionary somewhere, so need to check what it interferes
+                                           #  with when code changed
+                                           ['Copy files to group deposition directory', '',
+                                            'self.prepare_for_group_deposition_upload'],
+                                           ['Update DB with PDB codes', '', 'self.enter_pdb_codes'],
+                                           ['Check SMILES', '', 'self.check_smiles_in_db_and_pdb']
+                                       ]],
                      'E: help': ["&Help",
                                  [
                                      ['Open XCE tutorial', '', str(
@@ -367,10 +371,13 @@ class XChemExplorer(QtGui.QApplication):
                                          'xce_troubleshooting.pdf")')]
                                  ]]
 
-                 }
+                     }
 
         # create menu from menu dictionary
         menu_bar = self.setup_menubar(menu_bar, menu_dict)
+
+        # END OF MENU BAR - CODE BELOW: stuff removed from apo structure stuff that appears might have a funky
+        # consequence - work out later.
 
         # self.prepare_mmcif_files_dict = {}
         #
@@ -384,6 +391,25 @@ class XChemExplorer(QtGui.QApplication):
         # prepare_mmcif_files_for_ligand_bound_structures.triggered.connect(self.prepare_models_for_deposition)
         # deposition_menu.addAction(prepare_mmcif_files_for_ligand_bound_structures)
         # self.prepare_mmcif_files_dict['ligand_bound'] = prepare_mmcif_files_for_ligand_bound_structures
+
+        return menu_bar
+
+    def start_GUI(self):
+
+        # GUI setup
+        self.window = QtGui.QWidget()
+        self.window.setWindowTitle("XChemExplorer")
+        self.screen = QtGui.QDesktopWidget().screenGeometry()
+
+        # add menu bar
+        menu_bar = self.initialise_menu_bar()
+
+
+        ################################################################################################################
+        #                                                                                                              #
+        #                                            WORKFLOW TASK CONTAINER                                           #
+        #                                                                                                              #
+        ################################################################################################################
 
         ## workflow task container
         self.workflow = ['Overview',  # 0
