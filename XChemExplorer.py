@@ -245,6 +245,61 @@ class XChemExplorer(QtGui.QApplication):
         self.start_GUI()
         self.exec_()
 
+    # function to update datasource
+    def datasource_menu_reload_samples(self):
+        self.update_log.insert(
+            'reading samples from data source: ' + os.path.join(self.database_directory, self.data_source_file))
+        self.update_status_bar(
+            'reading samples from data source: ' + os.path.join(self.database_directory, self.data_source_file))
+        self.update_header_and_data_from_datasource()
+        self.update_all_tables()
+
+    # function to create new datasource
+    def create_new_data_source(self):
+        file_name = str(QtGui.QFileDialog.getSaveFileName(self.window, 'Save file', self.database_directory))
+        # make sure that the file always has .sqlite extension
+        if file_name.rfind('.') != -1:
+            file_name = file_name[:file_name.rfind('.')] + '.sqlite'
+        else:
+            file_name = file_name + '.sqlite'
+        self.db = XChemDB.data_source(file_name)
+        print('==> XCE: creating new data source')
+        self.db.create_empty_data_source_file()
+        self.db.create_missing_columns()
+        self.database_directory = file_name[:file_name.rfind('/')]
+        self.data_source_file = file_name[file_name.rfind('/') + 1:]
+        self.data_source_file_label.setText(os.path.join(self.database_directory, self.data_source_file))
+        self.settings['database_directory'] = self.database_directory
+        self.settings['data_source'] = self.data_source_file
+        self.data_source_set = True
+        self.datasource_menu_reload_samples()
+
+    # function to add items to top menu bar
+    def setup_menubar(self, menu_bar, menu_items_dict):
+        # use iterkeys to determine order of key by letter
+        for config in sorted(menu_items_dict.iterkeys()):
+            # add current item to menu bar
+            menu = eval('menu_bar.addMenu("' + str(menu_items_dict[config][0]) + '")')
+            # for each configuration item
+            for menu_item in menu_items_dict[config][1]:
+                # add the drop down option
+                action = eval(str('QtGui.QAction("' + str(menu_item[0]) + '", self.window)'))
+                # add a shortcut if defined
+                if len(menu_item[1])>1:
+                    eval(str('action.setShortcut("' + str(menu_item[1]) + '")'))
+                # connect the relevant function and add as an action
+                eval(str('action.triggered.connect(' + menu_item[2] + ')'))
+                menu.addAction(action)
+
+        return menu_bar
+
+    # function for opening help and tutorial files
+    def openFile(self, file):
+        if sys.platform == 'linux2':
+            subprocess.call(["xdg-open", file])
+        else:
+            os.startfile(file)
+
     def start_GUI(self):
 
         # GUI setup
@@ -252,115 +307,84 @@ class XChemExplorer(QtGui.QApplication):
         self.window.setWindowTitle("XChemExplorer")
         self.screen = QtGui.QDesktopWidget().screenGeometry()
 
-        ## menu widget
+        # initiate menu widget
         menu_bar = QtGui.QMenuBar()
 
-        file = menu_bar.addMenu("&File")
-        load = QtGui.QAction("Open Config File", self.window)
-        load.setShortcut('Ctrl+O')
-        load.triggered.connect(self.open_config_file)
-        save = QtGui.QAction("Save Config File", self.window)
-        save.setShortcut('Ctrl+S')
-        save.triggered.connect(self.save_config_file)
-        quit = QtGui.QAction("Quit", self.window)
-        quit.setShortcut('Ctrl+Q')
-        quit.triggered.connect(self.quit_xce)
-        file.addAction(load)
-        file.addAction(save)
-        file.addAction(quit)
+        # dictionary containing config for top menu setup
+        # menu dict = { '<menu_item_name>': ["name_in_menu",
+        #                                       [
+        #                                           ['order letter: text_in_menu', 'shortcut', 'trigger function']],
+        #                                           [...],
+        #                                       ]]
+        #             }
+        menu_dict = {'A: file':["&File",
+                         [
+                             ['Open Config File', 'Ctrl+O', 'self.open_config_file'],
+                             ['Save Config File', 'Ctrl+S', 'self.save_config_file'],
+                             ['Quit', 'Ctrl+Q', 'self.quit_xce']
+                         ]],
+                     'B: datasource': ["&Datasource",
+                                    [
+                                        ['Reload Samples From Datasource', '', 'self.datasource_menu_reload_samples'],
+                                        ['Save Samples to Datasource', '', 'self.datasource_menu_save_samples'],
+                                        ['Import CSV file into Datasource', '', 'self.datasource_menu_import_csv_file'],
+                                        ['Export CSV file from Datasource', '', 'self.datasource_menu_export_csv_file'],
+                                        ['Select columns to show', '', 'self.select_datasource_columns_to_display'],
+                                        ['Create New Datasource (SQLite)', '', 'self.create_new_data_source'],
+                                        ['Export CSV for wonka', '', 'self.export_data_for_WONKA']
+                                    ]],
+                     'C: preferences': ["&Preferences",
+                                     [
+                                         ['Edit preferences', '', 'self.show_preferences']
+                                     ]],
+                     'D: deposition': ["&Deposition",
+                                    [
+                                        ['Edit information', '', 'self.deposition_data'],
+                                        ['Export to HTML', '', 'self.export_to_html'],
+                                        ['Find PanDDA apo structures', '',
+                                         'self.create_missing_apo_records_in_depositTable'],
+                                        ['Update file info of apo structures', '',
+                                         'self.update_file_information_of_apo_records'],
+                                        ['Prepare mmcif for apo structures', '', 'self.prepare_models_for_deposition'],
+                                        # ^ this is added to a dictionary somewhere, so need to check what it interferes
+                                        #  with when code changed
+                                        ['Prepare mmcif for ligand bound structures', '',
+                                         'self.prepare_models_for_deposition'],
+                                        # ^ this is added to a dictionary somewhere, so need to check what it interferes
+                                        #  with when code changed
+                                        ['Copy files to group deposition directory', '',
+                                         'self.prepare_for_group_deposition_upload'],
+                                        ['Update DB with PDB codes', '', 'self.enter_pdb_codes'],
+                                        ['Check SMILES', '', 'self.check_smiles_in_db_and_pdb']
+                                    ]],
+                     'E: help': ["&Help",
+                                 [
+                                     ['Open XCE tutorial', '', str(
+                                         'lambda: self.openFile("/dls/science/groups/i04-1/software/docs/'
+                                         'XChemExplorer.pdf")')],
+                                     ['Troubleshooting', '', str(
+                                         'lambda: self.openFile("/dls/science/groups/i04-1/software/'
+                                         'xce_troubleshooting.pdf")')]
+                                 ]]
 
-        datasource_menu = menu_bar.addMenu("&Data Source")
-        reload_samples_from_datasource = QtGui.QAction('Reload Samples from Datasource', self.window)
-        reload_samples_from_datasource.triggered.connect(self.datasource_menu_reload_samples)
-        save_samples_to_datasource = QtGui.QAction('Save Samples to Datasource', self.window)
-        save_samples_to_datasource.triggered.connect(self.datasource_menu_save_samples)
-        import_csv_file_into_datasource = QtGui.QAction('Import CSV file into Datasource', self.window)
-        import_csv_file_into_datasource.triggered.connect(self.datasource_menu_import_csv_file)
-        export_csv_file_into_datasource = QtGui.QAction('Export CSV file from Datasource', self.window)
-        export_csv_file_into_datasource.triggered.connect(self.datasource_menu_export_csv_file)
-        update_datasource = QtGui.QAction('Update Datasource from file system', self.window)
-        update_datasource.triggered.connect(self.datasource_menu_update_datasource)
-        select_columns_to_show = QtGui.QAction('Select columns to show', self.window)
-        select_columns_to_show.triggered.connect(self.select_datasource_columns_to_display)
-        create_new_data_source = QtGui.QAction('Create New Data Source (SQLite)', self.window)
-        create_new_data_source.triggered.connect(self.create_new_data_source)
-        export_csv_for_WONKA = QtGui.QAction('export CSV for WONKA', self.window)
-        export_csv_for_WONKA.triggered.connect(self.export_data_for_WONKA)
+                 }
 
-        datasource_menu.addAction(reload_samples_from_datasource)
-        datasource_menu.addAction(save_samples_to_datasource)
-        datasource_menu.addAction(import_csv_file_into_datasource)
-        datasource_menu.addAction(export_csv_file_into_datasource)
-        datasource_menu.addAction(update_datasource)
-        datasource_menu.addAction(select_columns_to_show)
-        datasource_menu.addAction(create_new_data_source)
-        datasource_menu.addAction(export_csv_for_WONKA)
+        # create menu from menu dictionary
+        menu_bar = self.setup_menubar(menu_bar, menu_dict)
 
-        preferences_menu = menu_bar.addMenu("&Preferences")
-        show_preferences = QtGui.QAction('Edit Preferences', self.window)
-        show_preferences.triggered.connect(self.show_preferences)
-        preferences_menu.addAction(show_preferences)
+        # self.prepare_mmcif_files_dict = {}
+        #
+        # prepare_mmcif_files_for_apo_structures = QtGui.QAction('prepare mmcif for apo structures', self.window)
+        # prepare_mmcif_files_for_apo_structures.triggered.connect(self.prepare_models_for_deposition)
+        # deposition_menu.addAction(prepare_mmcif_files_for_apo_structures)
+        # self.prepare_mmcif_files_dict['apo'] = prepare_mmcif_files_for_apo_structures
 
-        deposition_menu = menu_bar.addMenu("&Deposition")
-        edit_deposition_info = QtGui.QAction('Edit Information', self.window)
-        edit_deposition_info.triggered.connect(self.deposition_data)
-        deposition_menu.addAction(edit_deposition_info)
-        export_results_to_html = QtGui.QAction('Export to HTML', self.window)
-        export_results_to_html.triggered.connect(self.export_to_html)
-        deposition_menu.addAction(export_results_to_html)
+        # prepare_mmcif_files_for_ligand_bound_structures = QtGui.QAction('prepare mmcif for ligand bound structures',
+        #                                                                 self.window)
+        # prepare_mmcif_files_for_ligand_bound_structures.triggered.connect(self.prepare_models_for_deposition)
+        # deposition_menu.addAction(prepare_mmcif_files_for_ligand_bound_structures)
+        # self.prepare_mmcif_files_dict['ligand_bound'] = prepare_mmcif_files_for_ligand_bound_structures
 
-        find_apo_structures = QtGui.QAction('find PanDDA apo structures', self.window)
-        find_apo_structures.triggered.connect(self.create_missing_apo_records_in_depositTable)
-        deposition_menu.addAction(find_apo_structures)
-
-        update_file_information_of_apo_records = QtGui.QAction('update file info of apo structures', self.window)
-        update_file_information_of_apo_records.triggered.connect(self.update_file_information_of_apo_records)
-        deposition_menu.addAction(update_file_information_of_apo_records)
-
-        self.prepare_mmcif_files_dict = {}
-
-        prepare_mmcif_files_for_apo_structures = QtGui.QAction('prepare mmcif for apo structures', self.window)
-        prepare_mmcif_files_for_apo_structures.triggered.connect(self.prepare_models_for_deposition)
-        deposition_menu.addAction(prepare_mmcif_files_for_apo_structures)
-        self.prepare_mmcif_files_dict['apo'] = prepare_mmcif_files_for_apo_structures
-
-        prepare_mmcif_files_for_ligand_bound_structures = QtGui.QAction('prepare mmcif for ligand bound structures',
-                                                                        self.window)
-        prepare_mmcif_files_for_ligand_bound_structures.triggered.connect(self.prepare_models_for_deposition)
-        deposition_menu.addAction(prepare_mmcif_files_for_ligand_bound_structures)
-        self.prepare_mmcif_files_dict['ligand_bound'] = prepare_mmcif_files_for_ligand_bound_structures
-
-        prepare_for_group_deposition_upload = QtGui.QAction('copy files to group deposition directory', self.window)
-        prepare_for_group_deposition_upload.triggered.connect(self.prepare_for_group_deposition_upload)
-        deposition_menu.addAction(prepare_for_group_deposition_upload)
-
-        enter_pdb_codes = QtGui.QAction('Update DB with PDB codes', self.window)
-        enter_pdb_codes.triggered.connect(self.enter_pdb_codes)
-        deposition_menu.addAction(enter_pdb_codes)
-
-        check_smiles = QtGui.QAction('Check SMILES', self.window)
-        check_smiles.triggered.connect(self.check_smiles_in_db_and_pdb)
-        deposition_menu.addAction(check_smiles)
-
-        # function for opening help and tutorial files
-        def openFile(file):
-            if sys.platform == 'linux2':
-                subprocess.call(["xdg-open", file])
-            else:
-                os.startfile(file)
-
-        # add help menu to menu bar
-        help_menu = menu_bar.addMenu("&Help")
-        load_xce_tutorial = QtGui.QAction('Open XCE tutorial', self.window)
-        file = '/dls/science/groups/i04-1/software/docs/XChemExplorer.pdf'
-        load_xce_tutorial.triggered.connect(lambda: openFile(file))
-        help_menu.addAction(load_xce_tutorial)
-
-        # add troubleshooting menu to menu bar
-        load_xce_troubleshoot = QtGui.QAction('Troubleshooting', self.window)
-        file2 = '/dls/science/groups/i04-1/software/xce_troubleshooting.pdf'
-        load_xce_troubleshoot.triggered.connect(lambda: openFile(file2))
-        help_menu.addAction(load_xce_troubleshoot)
 
         ### RACHAEL'S PROASIS STUFF ###
 
@@ -465,6 +489,8 @@ class XChemExplorer(QtGui.QApplication):
             self.proasis_hits = QtGui.QAction(str('Attempt to add refined hits to proasis...'), self.window)
             self.proasis_hits.triggered.connect(lambda: self.add_hits())
             self.proasis_menu.addAction(self.proasis_hits)
+
+        ### end of proasis shit ###
 
         ## workflow task container
         self.workflow = ['Overview',  # 0
@@ -2978,13 +3004,6 @@ class XChemExplorer(QtGui.QApplication):
 
         print('==> XCE: found ' + str(len(self.xtal_db_dict)) + ' samples')
 
-    def datasource_menu_reload_samples(self):
-        self.update_log.insert(
-            'reading samples from data source: ' + os.path.join(self.database_directory, self.data_source_file))
-        self.update_status_bar(
-            'reading samples from data source: ' + os.path.join(self.database_directory, self.data_source_file))
-        self.update_header_and_data_from_datasource()
-        self.update_all_tables()
 
     def datasource_menu_save_samples(self):
         print('hallo')
@@ -3825,24 +3844,6 @@ class XChemExplorer(QtGui.QApplication):
         self.filename_root = str(text)
         self.settings['filename_root'] = self.filename_root
 
-    def create_new_data_source(self):
-        file_name = str(QtGui.QFileDialog.getSaveFileName(self.window, 'Save file', self.database_directory))
-        # make sure that the file always has .sqlite extension
-        if file_name.rfind('.') != -1:
-            file_name = file_name[:file_name.rfind('.')] + '.sqlite'
-        else:
-            file_name = file_name + '.sqlite'
-        self.db = XChemDB.data_source(file_name)
-        print('==> XCE: creating new data source')
-        self.db.create_empty_data_source_file()
-        self.db.create_missing_columns()
-        self.database_directory = file_name[:file_name.rfind('/')]
-        self.data_source_file = file_name[file_name.rfind('/') + 1:]
-        self.data_source_file_label.setText(os.path.join(self.database_directory, self.data_source_file))
-        self.settings['database_directory'] = self.database_directory
-        self.settings['data_source'] = self.data_source_file
-        self.data_source_set = True
-        self.datasource_menu_reload_samples()
 
     def button_clicked(self):
 
