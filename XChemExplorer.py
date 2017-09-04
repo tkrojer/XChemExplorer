@@ -394,6 +394,55 @@ class XChemExplorer(QtGui.QApplication):
 
         return menu_bar
 
+    def setup_push_button(self, button_dict):
+        # use iterkeys to determine order of key by letter
+        for name in sorted(button_dict.iterkeys()):
+            # add current item to menu bar
+            button = eval('QtGui.QPushButton("' + str(button_dict[name][0]) + '")')
+            # for each configuration item
+            for button_config in button_dict[name][1]:
+                eval(str('button.setToolTip(' + str(button_config[0]) + ')'))
+                eval(str('button.setStyleSheet("' + str(button_config[1] + '")')))
+                if len(button_config[2])>1:
+                    eval(str('button.setFont(' + str(button_config[2]) + ')'))
+                eval(str('button.clicked.connect(' + str(button_config[3]) + ')'))
+
+        return button
+
+    def bottom_box_setup(self, label, dropdown_options, buttons):
+
+        frame = QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+        frame.setStyleSheet("QFrame { border: 1px solid black; border-radius: 1px; padding: 0px; margin: 0px }")
+
+        vbox = QtGui.QVBoxLayout()
+        label = QtGui.QLabel(label)
+        label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
+        label.setFont(self.headlineLabelfont)
+        label.setStyleSheet(
+            " QLabel { border: 1px solid black; border-radius: 1px; background: rgb(240,255,140); "
+            "padding: 0px; margin: 0px }")
+        vbox.addWidget(label)
+
+        hboxAction = QtGui.QHBoxLayout()
+        combobox = QtGui.QComboBox()
+        for task in dropdown_options:
+            combobox.addItem(task)
+        eval('combobox.setToolTip(XChemToolTips.dataset_task_tip())')
+        combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
+        hboxAction.addWidget(combobox)
+
+        vboxButton = QtGui.QVBoxLayout()
+        for button in buttons:
+            vboxButton.addWidget(button)
+        hboxAction.addLayout(vboxButton)
+        vbox.addLayout(hboxAction)
+        vbox.setSpacing(0)
+        vbox.setMargin(0)
+        frame.setLayout(vbox)
+
+        return frame, combobox
+
     def start_GUI(self):
 
         # GUI setup
@@ -403,6 +452,8 @@ class XChemExplorer(QtGui.QApplication):
 
         # add menu bar
         menu_bar = self.initialise_menu_bar()
+
+
 
 
         ################################################################################################################
@@ -431,62 +482,73 @@ class XChemExplorer(QtGui.QApplication):
         self.workflow_widget_dict = {}
 
         # check http://doc.qt.io/qt-4.8/stylesheet-customizing.html#the-box-model
-        headlineLabelfont = QtGui.QFont("Arial", 20, QtGui.QFont.Bold)
+        self.headlineLabelfont = QtGui.QFont("Arial", 20, QtGui.QFont.Bold)
 
-        ## update datasource button
-        update_from_datasource_button = QtGui.QPushButton("Update Tables\nFrom Datasource")
-        update_from_datasource_button.setToolTip(XChemToolTips.update_from_datasource_button_tip())
-        update_from_datasource_button.setStyleSheet(
-            "QPushButton { padding: 1px; margin: 1px; background: rgb(140,140,140) }")
-        update_from_datasource_button.setFont(headlineLabelfont)
-        update_from_datasource_button.clicked.connect(self.datasource_menu_reload_samples)
+        ################################################################################################################
+        #                                                                                                              #
+        #                                                DATASOURCE BUTTON                                             #
+        #                                                                                                              #
+        ################################################################################################################
+        datasource_button_dict = {'datasource_button' : [r"Update Tables\nFrom Datasource",
+                                  [
+                                      ['XChemToolTips.update_from_datasource_button_tip()',  # tooltip
+                                      'QPushButton { padding: 1px; margin: 1px; background: rgb(140,140,140) }',  # stylesheet
+                                      'self.headlineLabelfont',  # font
+                                      'self.datasource_menu_reload_samples']  # action
+                                  ]]}
 
-        ## datasets
-        self.dataset_tasks = ['Get New Results from Autoprocessing',
-                              # 'Save Files from Autoprocessing to Project Folder',
-                              'Run DIMPLE on All Autoprocessing MTZ files',
-                              'Rescore Datasets',
-                              'Read PKL file',
-                              'Run xia2 on selected datasets',
-                              'Run xia2 on selected datasets - overwrite']
+        update_from_datasource_button = self.setup_push_button(datasource_button_dict)
 
-        frame_dataset_task = QtGui.QFrame()
-        frame_dataset_task.setFrameShape(QtGui.QFrame.StyledPanel)
-        frame_dataset_task.setStyleSheet(
-            "QFrame { border: 1px solid black; border-radius: 1px; padding: 0px; margin: 0px }")
-        vboxTask = QtGui.QVBoxLayout()
-        label = QtGui.QLabel('Datasets')
-        label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
-        label.setFont(headlineLabelfont)
-        label.setStyleSheet(
-            " QLabel { border: 1px solid black; border-radius: 1px; background: rgb(240,255,140); padding: 0px; margin: 0px }")
-        vboxTask.addWidget(label)
-        hboxAction = QtGui.QHBoxLayout()
-        self.dataset_tasks_combobox = QtGui.QComboBox()
-        for task in self.dataset_tasks:
-            self.dataset_tasks_combobox.addItem(task)
-        self.dataset_tasks_combobox.setToolTip(XChemToolTips.dataset_task_tip())
-        self.dataset_tasks_combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
-        hboxAction.addWidget(self.dataset_tasks_combobox)
-        vboxButton = QtGui.QVBoxLayout()
-        dataset_task_run_button = QtGui.QPushButton("Run")
-        dataset_task_run_button.setToolTip(XChemToolTips.dataset_task_run_button_tip())
-        dataset_task_run_button.clicked.connect(self.button_clicked)
-        dataset_task_run_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
-        vboxButton.addWidget(dataset_task_run_button)
-        dataset_task_status_button = QtGui.QPushButton("Status")
-        dataset_task_status_button.setToolTip(XChemToolTips.dataset_task_status_button_tip())
-        dataset_task_status_button.clicked.connect(self.button_clicked)
-        dataset_task_status_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
-        vboxButton.addWidget(dataset_task_status_button)
-        hboxAction.addLayout(vboxButton)
-        vboxTask.addLayout(hboxAction)
-        vboxTask.setSpacing(0)
-        vboxTask.setMargin(0)
-        frame_dataset_task.setLayout(vboxTask)
+        ################################################################################################################
+        #                                                                                                              #
+        #                                                   DATASETS BOX                                               #
+        #                                                                                                              #
+        ################################################################################################################
+        dataset_task_run_button_dict = {'dataset_run_button':
+                                            [r"Run",
+                                             [
+                                                ['XChemToolTips.update_from_datasource_button_tip()', # tooltip
+                                                 'QPushButton { padding: 1px; margin: 1px }', # stylesheet
+                                                 '', # font
+                                                 'self.button_clicked'] # action
+                                             ]]}
 
-        self.workflow_widget_dict['Datasets'] = [self.dataset_tasks_combobox, dataset_task_run_button,
-                                                 dataset_task_status_button]
+        self.dataset_task_run_button = self.setup_push_button(dataset_task_run_button_dict)
+
+        dataset_task_status_button_dict = {'dataset_status_button':
+                                               [r"Status",
+                                                [
+                                                  ['XChemToolTips.dataset_task_status_button_tip()',  # tooltip
+                                                   'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
+                                                   '',  # font
+                                                   'self.button_clicked']  # action
+                                                ]]}
+
+        self.dataset_task_status_button = self.setup_push_button(dataset_task_status_button_dict)
+
+        dataset_buttons = [self.dataset_task_run_button, self.dataset_task_status_button]
+
+        dataset_tasks = ['Get New Results from Autoprocessing',
+                         'Run DIMPLE on All Autoprocessing MTZ files',
+                         'Rescore Datasets',
+                         'Read PKL file',
+                         'Run xia2 on selected datasets',
+                         'Run xia2 on selected datasets - overwrite']
+
+        dataset_label = "Datasets"
+
+        frame_dataset_task, self.dataset_tasks_combobox = self.bottom_box_setup(dataset_label,
+                                                                                dataset_tasks, dataset_buttons)
+
+        self.workflow_widget_dict['Datasets'] = [self.dataset_tasks_combobox, self.dataset_task_run_button,
+                                                 self.dataset_task_status_button]
+
+        ################################################################################################################
+        #                                                                                                              #
+        #                                               MAPS & RESTRAINTS BOX                                          #
+        #                                                                                                              #
+        ################################################################################################################
+
 
         ## map and cif files
         self.map_cif_file_tasks = ['Run DIMPLE on selected MTZ files',
@@ -502,7 +564,7 @@ class XChemExplorer(QtGui.QApplication):
         vboxTask = QtGui.QVBoxLayout()
         label = QtGui.QLabel('Maps & Restraints')
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
-        label.setFont(headlineLabelfont)
+        label.setFont(self.headlineLabelfont)
         label.setStyleSheet(
             " QLabel { border: 1px solid black; border-radius: 1px; background: rgb(140,255,150); padding: 0px; margin: 0px }")
         vboxTask.addWidget(label)
@@ -554,7 +616,7 @@ class XChemExplorer(QtGui.QApplication):
         vboxTask = QtGui.QVBoxLayout()
         label = QtGui.QLabel('Hit Identification')
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
-        label.setFont(headlineLabelfont)
+        label.setFont(self.headlineLabelfont)
         label.setStyleSheet(
             " QLabel { border: 1px solid black; border-radius: 1px; background: rgb(140,200,255); padding: 0px; margin: 0px }")
         vboxTask.addWidget(label)
@@ -599,7 +661,7 @@ class XChemExplorer(QtGui.QApplication):
         vboxTask = QtGui.QVBoxLayout()
         label = QtGui.QLabel('Refinement')
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
-        label.setFont(headlineLabelfont)
+        label.setFont(self.headlineLabelfont)
         label.setStyleSheet(
             " QLabel { border: 1px solid black; border-radius: 1px; background: rgb(245,190,255); padding: 0px; margin: 0px }")
         vboxTask.addWidget(label)
@@ -1533,11 +1595,11 @@ class XChemExplorer(QtGui.QApplication):
         vbox_main.addWidget(self.main_tab_widget)
 
         hboxTaskFrames = QtGui.QHBoxLayout()
-        update_from_datasource_button.setMaximumWidth((self.screen.width() - 20) / 5)
-        frame_dataset_task.setMaximumWidth((self.screen.width() - 20) / 5)
-        frame_map_cif_file_task.setMaximumWidth((self.screen.width() - 20) / 5)
-        frame_panddas_file_task.setMaximumWidth((self.screen.width() - 20) / 5)
-        frame_refine_file_task.setMaximumWidth((self.screen.width()) - 20 / 5)
+        # update_from_datasource_button.setMaximumWidth((self.screen.width() - 20) / 5)
+        # frame_dataset_task.setMaximumWidth((self.screen.width() - 20) / 5)
+        # frame_map_cif_file_task.setMaximumWidth((self.screen.width() - 20) / 5)
+        # frame_panddas_file_task.setMaximumWidth((self.screen.width() - 20) / 5)
+        # frame_refine_file_task.setMaximumWidth((self.screen.width()) - 20 / 5)
 
         hboxTaskFrames.addWidget(update_from_datasource_button)
         hboxTaskFrames.addWidget(frame_dataset_task)
@@ -3765,8 +3827,9 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def button_clicked(self):
-
+        print('button clicked!')
         if self.data_source_set == False:
+            print('sender text bit')
             if self.sender().text() == "Create New Data\nSource (SQLite)":
                 file_name = str(QtGui.QFileDialog.getSaveFileName(self.window, 'Save file', self.database_directory))
                 # make sure that the file always has .sqlite extension
@@ -3787,7 +3850,10 @@ class XChemExplorer(QtGui.QApplication):
                     self.data_source_set = True
             else:
                 self.no_data_source_selected()
+                print('No datasource selected')
                 pass
+        else:
+            print'skipped loop!'
 
         # first find out which of the 'Run' or 'Status' buttons is sending
         for item in self.workflow_widget_dict:
