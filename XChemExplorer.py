@@ -53,6 +53,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.current_directory = os.getcwd()
         self.xce_logfile = os.path.join(self.current_directory, 'xce.log')
+
         try:
             XChemLog.startLog(self.xce_logfile).create_logfile(self.xce_version)
         except IOError:
@@ -1731,7 +1732,7 @@ class XChemExplorer(QtGui.QApplication):
         indexes = self.reprocess_datasets_table.selectionModel().selectedRows()
         for index in sorted(indexes):
             xtal = str(self.reprocess_datasets_table.item(index.row(), 1).text())
-            print xtal, self.diffraction_data_table_dict[xtal][0]
+            print(xtal, self.diffraction_data_table_dict[xtal][0])
             self.update_log.insert('{0!s} marked for reprocessing'.format(index.row()))
             self.diffraction_data_table_dict[xtal][0].setChecked(True)
 
@@ -2781,7 +2782,7 @@ class XChemExplorer(QtGui.QApplication):
         self.update_deposit_input()
 
     def load_deposit_from_database(self):
-        print 'hallo'
+        print('hallo')
 
     def save_deposit_to_database(self):
         self.update_deposit_dict()
@@ -3043,7 +3044,7 @@ class XChemExplorer(QtGui.QApplication):
         self.xce_logfile = str(file_name)
         self.xce_logfile_label.setText(str(self.xce_logfile))
         if self.xce_logfile == '' or self.xce_logfile[self.xce_logfile.rfind('/') + 1:] == '':
-            print '==> XCE: invalid file format'
+            print('==> XCE: invalid file format')
         else:
             XChemLog.startLog(self.xce_logfile).create_logfile(self.xce_version)
             self.update_log = XChemLog.updateLog(self.xce_logfile)
@@ -3055,7 +3056,7 @@ class XChemExplorer(QtGui.QApplication):
         try:
             columns_in_data_source = self.db.return_column_list()
         except AttributeError:
-            print '==> XCE: please select a datasource file'
+            print('==> XCE: please select a datasource file')
             self.status_bar.showMessage('please select a datasource file')
             return
 
@@ -3116,7 +3117,7 @@ class XChemExplorer(QtGui.QApplication):
                         db_dict[str(self.header[n])] = str(entry)
                 self.xtal_db_dict[str(line[sampleID_column])] = db_dict
 
-        print '==> XCE: found ' + str(len(self.xtal_db_dict)) + ' samples'
+        print('==> XCE: found ' + str(len(self.xtal_db_dict)) + ' samples')
 
     def datasource_menu_reload_samples(self):
         self.update_log.insert(
@@ -3127,7 +3128,7 @@ class XChemExplorer(QtGui.QApplication):
         self.update_all_tables()
 
     def datasource_menu_save_samples(self):
-        print 'hallo'
+        print('hallo')
 
     def datasource_menu_export_csv_file(self):
         file_name = str(QtGui.QFileDialog.getSaveFileName(self.window, 'Save file', self.database_directory))
@@ -3184,7 +3185,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def show_html_summary_in_firefox(self, xtal):
         html_summary = self.albula_button_dict[xtal][2]
-        print 'html_summary', html_summary
+        print('html_summary', html_summary)
         new = 2
         webbrowser.open(html_summary, new=new)
 
@@ -3194,7 +3195,7 @@ class XChemExplorer(QtGui.QApplication):
         if os.path.isfile(os.path.join(self.database_directory, self.data_source_file)):
             self.load_crystal_form_from_datasource()
             if self.xtalform_dict != {}:
-                print self.xtalform_dict
+                print(self.xtalform_dict)
                 for key in self.xtalform_dict:
                     self.pandda_analyse_crystal_from_selection_combobox.addItem(key)
 
@@ -3349,7 +3350,7 @@ class XChemExplorer(QtGui.QApplication):
         self.target = str(text)
 
     def check_status_rerun_dimple_on_all_autoprocessing_files(self):
-        print 'hallo'
+        print('hallo')
 
     def rerun_dimple_on_all_autoprocessing_files(self):
         job_list = []
@@ -3881,7 +3882,7 @@ class XChemExplorer(QtGui.QApplication):
             self.panddas_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.panddas_directory_label.setText(self.panddas_directory)
             self.pandda_output_data_dir_entry.setText(self.panddas_directory)
-            print 'PANDDA', self.panddas_directory
+            print('PANDDA', self.panddas_directory)
             self.settings['panddas_directory'] = self.panddas_directory
             if os.path.exists(str(self.panddas_directory + '/interesting_datasets')):
                 print('WARNING: USING RESULTS FROM OLD PANDDA ANALYSE! THIS IS NOT FULLY SUPPORTED IN XCE2')
@@ -3972,7 +3973,7 @@ class XChemExplorer(QtGui.QApplication):
         else:
             file_name = file_name + '.sqlite'
         self.db = XChemDB.data_source(file_name)
-        print '==> XCE: creating new data source'
+        print('==> XCE: creating new data source')
         self.db.create_empty_data_source_file()
         self.db.create_missing_columns()
         self.database_directory = file_name[:file_name.rfind('/')]
@@ -3994,7 +3995,7 @@ class XChemExplorer(QtGui.QApplication):
                 else:
                     file_name = file_name + '.sqlite'
                 self.db = XChemDB.data_source(file_name)
-                print '==> XCE: creating new data source'
+                print('==> XCE: creating new data source')
                 self.db.create_empty_data_source_file()
                 self.db.create_missing_columns()
                 if self.data_source_file == '':
@@ -4159,12 +4160,12 @@ class XChemExplorer(QtGui.QApplication):
             self.update_deposition_table()
 
     def set_new_reference_if_applicable(self):
-        print 'hallo'
+        print('hallo')
         reference_root = str(self.reference_file_selection_combobox.currentText())
         pg_ref = ''
         ucVol_ref = 0.0
         for reference in self.reference_file_list:
-            print reference[0], reference_root
+            print(reference[0], reference_root)
             if reference[0] == reference_root:
                 pg_ref = reference[5]
                 ucVol_ref = reference[4]
@@ -4187,7 +4188,7 @@ class XChemExplorer(QtGui.QApplication):
                 continue
 
             if pg_xtal == pg_ref and difference < self.allowed_unitcell_difference_percent:
-                print xtal, pg_xtal, ucVol_xtal
+                print(xtal, pg_xtal, ucVol_xtal)
                 index = reference_file_selection_combobox.findText(reference_root, QtCore.Qt.MatchFixedString)
                 reference_file_selection_combobox.setCurrentIndex(index)
                 self.update_log.insert(xtal + ' -> setting ' + reference_root + ' as input PDB file for DIMPLE')
@@ -4368,7 +4369,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def run_pandda_inspect(self):
         self.settings['panddas_directory'] = str(self.pandda_output_data_dir_entry.text())
-        print '==> XCE: starting pandda.inspect'
+        print('==> XCE: starting pandda.inspect')
         self.work_thread = XChemThread.start_pandda_inspect(self.settings, self.xce_logfile)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
@@ -4524,7 +4525,7 @@ class XChemExplorer(QtGui.QApplication):
     def show_html_summary_and_diffraction_image(self):
         for key in self.albula_button_dict:
             if self.albula_button_dict[key][0] == self.sender():
-                print '==> XCE: showing html summary in firefox'
+                print('==> XCE: showing html summary in firefox')
                 self.show_html_summary_in_firefox(key)
 
     def need_to_switch_main_tab(self, task_index):
@@ -4971,10 +4972,10 @@ class XChemExplorer(QtGui.QApplication):
         self.timer_to_check_for_new_data_collection.timeout.connect(
             lambda: self.check_for_new_autoprocessing_or_rescore(False))
         if state == QtCore.Qt.Checked:
-            print '==> XCE: checking automatically every 120s for new data collection'
+            print('==> XCE: checking automatically every 120s for new data collection')
             self.timer_to_check_for_new_data_collection.start(120000)
         else:
-            print '==> XCE: stopped checking for new data collections'
+            print('==> XCE: stopped checking for new data collections')
             self.timer_to_check_for_new_data_collection.stop()
 
     def populate_data_collection_summary_table(self):
@@ -5224,7 +5225,7 @@ class XChemExplorer(QtGui.QApplication):
             if self.data_collection_column_three_dict[key][0] == self.sender():
                 dbTmp = self.xtal_db_dict[key]
                 stage = dbTmp['RefinementOutcome'].split()[0]
-                print '===>', key, stage
+                print('===>', key, stage)
                 if int(stage) > 2:
                     msgBox = QtGui.QMessageBox()
                     msgBox.setText(
@@ -5237,10 +5238,10 @@ class XChemExplorer(QtGui.QApplication):
                         self.update_log.insert('will not change data processing selection')
                         # restore previous selection
                         for n, entry in enumerate(self.data_collection_dict[key]):
-                            print '==>', n
+                            print('==>', n)
                             if entry[0] == 'logfile':
                                 if entry[8] == True:
-                                    print '===> found:', n
+                                    print('===> found:', n)
                                     self.data_collection_column_three_dict[key][0].selectRow(n)
                         break
 
