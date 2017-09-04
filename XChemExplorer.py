@@ -415,10 +415,10 @@ class XChemExplorer(QtGui.QApplication):
                     self.proasis_project = QtGui.QAction(str('Project Name: ' + self.proasis_name), self.window)
                     self.proasis_menu.addAction(self.proasis_project)
         # should catch if project doesnt exitst
-        except AttributeError:
+        except (AttributeError, UnboundLocalError):
             self.update_log.insert('cannot find %s' % os.path.join(self.database_directory, self.data_source_file))
-        except UnboundLocalError:
-            self.update_log.insert('cannot find %s' % os.path.join(self.database_directory, self.data_source_file))
+        # except UnboundLocalError:
+        #     self.update_log.insert('cannot find %s' % os.path.join(self.database_directory, self.data_source_file))
         except:
             # option to create project, action = create_project()
             self.proasis_project = QtGui.QAction(str('Create Project for ' + self.proasis_name + '...'),
