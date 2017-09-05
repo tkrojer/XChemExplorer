@@ -446,7 +446,26 @@ class XChemExplorer(QtGui.QApplication):
     def initialise_bottom_boxes(self):
         ################################################################################################################
         #                                                                                                              #
-        #                                                   DATASETS BOX                                               #
+        #                                             DATASOURCE BUTTON                                                #
+        #                                                                                                              #
+        ################################################################################################################
+        # config settings fot the 'update datasource' button
+        datasource_button_dict = {'datasource_button': [r"Update Tables\nFrom Datasource",
+                                                        [
+                                                            ['XChemToolTips.update_from_datasource_button_tip()',
+                                                             # tooltip
+                                                             'QPushButton { padding: 1px; margin: 1px; '
+                                                             'background: rgb(140,140,140) }',
+                                                             # stylesheet
+                                                             'self.headlineLabelfont',  # font
+                                                             'self.datasource_menu_reload_samples']  # action
+                                                        ]]}
+        # setup datasource button
+        update_from_datasource_button = self.setup_push_button(datasource_button_dict)
+
+        ################################################################################################################
+        #                                                                                                              #
+        #                                                 DATASETS BOX                                                 #
         #                                                                                                              #
         ################################################################################################################
         # settings for the run button
@@ -673,18 +692,29 @@ class XChemExplorer(QtGui.QApplication):
         self.workflow_widget_dict['Refinement'] = [self.refine_file_tasks_combobox, self.refine_file_task_run_button,
                                                    self.refine_file_task_status_button]
 
-        return frame_dataset_task, frame_map_cif_file_task, frame_panddas_file_task, frame_refine_file_task
+        return update_from_datasource_button, frame_dataset_task, frame_map_cif_file_task, frame_panddas_file_task, \
+               frame_refine_file_task
 
     ################################################# define gui #######################################################
     def start_GUI(self):
+
+        # check http://doc.qt.io/qt-4.8/stylesheet-customizing.html#the-box-model
+        self.headlineLabelfont = QtGui.QFont("Arial", 20, QtGui.QFont.Bold)
+
+        # a dictionary to hold information about combobox, run and status buttons for each box at the bottom of the gui
+        self.workflow_widget_dict = {}
 
         # GUI setup
         self.window = QtGui.QWidget()
         self.window.setWindowTitle("XChemExplorer")
         self.screen = QtGui.QDesktopWidget().screenGeometry()
 
-        # add menu bar
+        # initialise menu bar
         menu_bar = self.initialise_menu_bar()
+
+        # initialise bottom boxes
+        update_from_datasource_button, frame_dataset_task, frame_map_cif_file_task, frame_panddas_file_task, \
+        frame_refine_file_task = self.initialise_bottom_boxes()
 
         ################################################################################################################
         #                                                                                                              #
@@ -710,36 +740,10 @@ class XChemExplorer(QtGui.QApplication):
                               self.workflow[6]: 'Settings',
                               self.workflow[5]: 'Deposition'}
 
-        # a dictionary to hold information about combobox, run and status buttons for each box at the bottom of the gui
-        self.workflow_widget_dict = {}
-
-        # check http://doc.qt.io/qt-4.8/stylesheet-customizing.html#the-box-model
-        self.headlineLabelfont = QtGui.QFont("Arial", 20, QtGui.QFont.Bold)
-
-        ################################################################################################################
-        #                                                                                                              #
-        #                                                DATASOURCE BUTTON                                             #
-        #                                                                                                              #
-        ################################################################################################################
-        # config settings fot the 'update datasource' button
-        datasource_button_dict = {'datasource_button' : [r"Update Tables\nFrom Datasource",
-                                  [
-                                      ['XChemToolTips.update_from_datasource_button_tip()',  # tooltip
-                                      'QPushButton { padding: 1px; margin: 1px; background: rgb(140,140,140) }',  # stylesheet
-                                      'self.headlineLabelfont',  # font
-                                      'self.datasource_menu_reload_samples']  # action
-                                  ]]}
-        # setup datasource button
-        update_from_datasource_button = self.setup_push_button(datasource_button_dict)
-
-        # add bottom boxes
-        frame_dataset_task, frame_map_cif_file_task, frame_panddas_file_task, frame_refine_file_task = \
-            self.initialise_bottom_boxes()
-
+########################################################################################################################
 
         ## tab widget
         self.main_tab_widget = QtGui.QTabWidget()
-        # self.main_tab_widget.setSizePolicy(size_policy)
         self.tab_dict = {}
         for page in self.workflow:
             tab = QtGui.QWidget()
@@ -1640,11 +1644,6 @@ class XChemExplorer(QtGui.QApplication):
         vbox_main.addWidget(self.main_tab_widget)
 
         hboxTaskFrames = QtGui.QHBoxLayout()
-        # update_from_datasource_button.setMaximumWidth((self.screen.width() - 20) / 5)
-        # frame_dataset_task.setMaximumWidth((self.screen.width() - 20) / 5)
-        # frame_map_cif_file_task.setMaximumWidth((self.screen.width() - 20) / 5)
-        # frame_panddas_file_task.setMaximumWidth((self.screen.width() - 20) / 5)
-        # frame_refine_file_task.setMaximumWidth((self.screen.width()) - 20 / 5)
 
         hboxTaskFrames.addWidget(update_from_datasource_button)
         hboxTaskFrames.addWidget(frame_dataset_task)
