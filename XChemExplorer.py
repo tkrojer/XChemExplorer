@@ -127,7 +127,7 @@ class XChemExplorer(QtGui.QApplication):
         ## preferences
 
         self.preferences_data_to_copy = [['aimless logiles and merged mtz only', 'mtz_log_only'], ]
-                                        # ['All Files in the respective auto-processing directory','everything'],
+        # ['All Files in the respective auto-processing directory','everything'],
 
         self.preferences_selection_mechanism = ['IsigI*Comp*UniqueRefl',
                                                 'highest_resolution',
@@ -288,7 +288,7 @@ class XChemExplorer(QtGui.QApplication):
                 # add the drop down option
                 action = eval(str('QtGui.QAction("' + str(menu_item[0]) + '", self.window)'))
                 # add a shortcut if defined
-                if len(menu_item[1])>1:
+                if len(menu_item[1]) > 1:
                     eval(str('action.setShortcut("' + str(menu_item[1]) + '")'))
                 # connect the relevant function and add as an action
                 eval(str('action.triggered.connect(' + menu_item[2] + ')'))
@@ -400,7 +400,7 @@ class XChemExplorer(QtGui.QApplication):
             for button_config in button_dict[name][1]:
                 eval(str('button.setToolTip(' + str(button_config[0]) + ')'))
                 eval(str('button.setStyleSheet("' + str(button_config[1] + '")')))
-                if len(button_config[2])>1:
+                if len(button_config[2]) > 1:
                     eval(str('button.setFont(' + str(button_config[2]) + ')'))
                 eval(str('button.clicked.connect(' + str(button_config[3]) + ')'))
 
@@ -425,7 +425,7 @@ class XChemExplorer(QtGui.QApplication):
         combobox = QtGui.QComboBox()
         for task in dropdown_options:
             combobox.addItem(task)
-        eval('combobox.setToolTip(' + str(dropdown_tooltip) +')')
+        eval('combobox.setToolTip(' + str(dropdown_tooltip) + ')')
         combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
         hboxAction.addWidget(combobox)
 
@@ -440,7 +440,6 @@ class XChemExplorer(QtGui.QApplication):
         frame.setMaximumWidth((self.screen.width() - 20) / 5)
 
         return frame, combobox
-
 
     # function containing setup for bottom boxes
     def initialise_bottom_boxes(self):
@@ -465,17 +464,17 @@ class XChemExplorer(QtGui.QApplication):
 
         ################################################################################################################
         #                                                                                                              #
-        #                                                 DATASETS BOX                                                 #
+        #                                               DATASETS BOX                                                   #
         #                                                                                                              #
         ################################################################################################################
         # settings for the run button
         dataset_task_run_button_dict = {'dataset_run_button':
                                             [r"Run",
                                              [
-                                                ['XChemToolTips.dataset_task_run_button_tip()', # tooltip
-                                                 'QPushButton { padding: 1px; margin: 1px }', # stylesheet
-                                                 '', # font
-                                                 'self.button_clicked'] # action
+                                                 ['XChemToolTips.dataset_task_run_button_tip()',  # tooltip
+                                                  'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
+                                                  '',  # font
+                                                  'self.button_clicked']  # action
                                              ]]}
         # setup the run button with push button function
         self.dataset_task_run_button = self.setup_push_button(dataset_task_run_button_dict)
@@ -484,10 +483,10 @@ class XChemExplorer(QtGui.QApplication):
         dataset_task_status_button_dict = {'dataset_status_button':
                                                [r"Status",
                                                 [
-                                                  ['XChemToolTips.dataset_task_status_button_tip()',  # tooltip
-                                                   'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
-                                                   '',  # font
-                                                   'self.button_clicked']  # action
+                                                    ['XChemToolTips.dataset_task_status_button_tip()',  # tooltip
+                                                     'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
+                                                     '',  # font
+                                                     'self.button_clicked']  # action
                                                 ]]}
         # setup the task button with push button function
         self.dataset_task_status_button = self.setup_push_button(dataset_task_status_button_dict)
@@ -519,35 +518,36 @@ class XChemExplorer(QtGui.QApplication):
 
         ################################################################################################################
         #                                                                                                              #
-        #                                               MAPS & RESTRAINTS BOX                                          #
+        #                                            MAPS & RESTRAINTS BOX                                             #
         #                                                                                                              #
         ################################################################################################################
         # settings for the run button
         map_cif_file_task_run_button_dict = {'dataset_run_button':
-                                            [r"Run",
-                                             [
-                                                 ['XChemToolTips.map_cif_file_task_run_button_tip()',  # tooltip
-                                                  'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
-                                                  '',  # font
-                                                  'self.button_clicked']  # action
-                                             ]]}
+                                                 [r"Run",
+                                                  [
+                                                      ['XChemToolTips.map_cif_file_task_run_button_tip()',  # tooltip
+                                                       'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
+                                                       '',  # font
+                                                       'self.button_clicked']  # action
+                                                  ]]}
         # setup the run button with push button function
         self.map_cif_file_task_run_button = self.setup_push_button(map_cif_file_task_run_button_dict)
 
         # settings for the status button
         map_cif_file_task_status_button_dict = {'dataset_status_button':
-                                               [r"Status",
-                                                [
-                                                    ['XChemToolTips.map_cif_file_task_status_button_tip()',  # tooltip
-                                                     'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
-                                                     '',  # font
-                                                     'self.button_clicked']  # action
-                                                ]]}
+                                                    [r"Status",
+                                                     [
+                                                         ['XChemToolTips.map_cif_file_task_status_button_tip()',
+                                                          # tooltip
+                                                          'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
+                                                          '',  # font
+                                                          'self.button_clicked']  # action
+                                                     ]]}
         # setup the task button with push button function
         self.map_cif_file_task_status_button = self.setup_push_button(map_cif_file_task_status_button_dict)
 
         # array of both button objects to apply to bottom box layout
-        map_cif_file_buttons = [self.map_cif_file_task_run_button , self.map_cif_file_task_status_button]
+        map_cif_file_buttons = [self.map_cif_file_task_run_button, self.map_cif_file_task_status_button]
 
         # items that will appear it the dropdown (combobox)
         map_cif_file_tasks = ['Run DIMPLE on selected MTZ files',
@@ -571,7 +571,6 @@ class XChemExplorer(QtGui.QApplication):
         # define the combobox and buttons in dictionary key to determine behaviour
         self.workflow_widget_dict['Maps'] = [self.map_cif_file_tasks_combobox, self.map_cif_file_task_run_button,
                                              self.map_cif_file_task_status_button]
-
 
         ################################################################################################################
         #                                                                                                              #
@@ -643,26 +642,26 @@ class XChemExplorer(QtGui.QApplication):
         ################################################################################################################
         # settings for the run button
         refine_file_task_run_button_dict = {'dataset_run_button':
-                                                 [r"Run",
-                                                  [
-                                                      ['XChemToolTips.refine_file_task_run_button_tip()',  # tooltip
-                                                       'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
-                                                       '',  # font
-                                                       'self.button_clicked']  # action
-                                                  ]]}
+                                                [r"Run",
+                                                 [
+                                                     ['XChemToolTips.refine_file_task_run_button_tip()',  # tooltip
+                                                      'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
+                                                      '',  # font
+                                                      'self.button_clicked']  # action
+                                                 ]]}
         # setup the run button with push button function
         self.refine_file_task_run_button = self.setup_push_button(refine_file_task_run_button_dict)
 
         # settings for the status button
         refine_file_task_status_button_dict = {'dataset_status_button':
-                                                    [r"Status",
-                                                     [
-                                                         ['XChemToolTips.refine_file_task_status_button_tip()',
-                                                          # tooltip
-                                                          'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
-                                                          '',  # font
-                                                          'self.button_clicked']  # action
-                                                     ]]}
+                                                   [r"Status",
+                                                    [
+                                                        ['XChemToolTips.refine_file_task_status_button_tip()',
+                                                         # tooltip
+                                                         'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
+                                                         '',  # font
+                                                         'self.button_clicked']  # action
+                                                    ]]}
         # setup the task button with push button function
         self.refine_file_task_status_button = self.setup_push_button(refine_file_task_status_button_dict)
 
@@ -695,6 +694,120 @@ class XChemExplorer(QtGui.QApplication):
         return update_from_datasource_button, frame_dataset_task, frame_map_cif_file_task, frame_panddas_file_task, \
                frame_refine_file_task
 
+    ################################################# table stuff ######################################################
+    def define_all_tables(self):
+        # Table column settings
+
+        # functions that use self.overview_datasource_table_columns:
+        #
+        # - select_datasource_columns_to_display() - dropdown in datasource top menu (select columns to show)
+        # - populate_data_source_table()           - appears to be completely unused, so commented out
+        # - populate_and_update_datasource_table() - used within select_datasource_columns_to_display and
+        #                                            update_all_tables()
+
+        self.overview_datasource_table_columns = ['Sample ID',
+                                                  'Compound ID',
+                                                  'Smiles',
+                                                  'Visit',
+                                                  'Resolution\n[Mn<I/sig(I)> = 1.5]',
+                                                  'Refinement\nRfree',
+                                                  'Data Collection\nDate',
+                                                  'Puck',
+                                                  'PuckPosition',
+                                                  'Ligand\nConfidence']
+
+        # functions that use self.datasets_summary_table_columns:
+        #
+        # - populate_data_collection_summary_table() - appears in create_widgets_for_autoprocessing_results_only()
+        # - user_update_selected_autoproc_data_collection_summary_table()
+        #                                            - appears in create_widgets_for_autoprocessing_results_only()
+
+        self.datasets_summary_table_columns = ['Sample ID',
+                                               'Resolution\n[Mn<I/sig(I)> = 1.5]',
+                                               'DataProcessing\nSpaceGroup',
+                                               'DataProcessing\nRfree',
+                                               'SoakDB\nBarcode',
+                                               'GDA\nBarcode',
+                                               'Rmerge\nLow',
+                                               'auto-assigned',
+                                               'DataCollection\nOutcome',
+                                               'img1',
+                                               'img2',
+                                               'img3',
+                                               'img4',
+                                               'img5',
+                                               'Show\nDetails',
+                                               'Show Diffraction\nImage'
+                                               ]
+
+        # functions that use self.datasets_reprocess_columns:
+        #
+        # - update_reprocess_datasets_table() - appears in search_for_datasets()
+
+        self.datasets_reprocess_columns = ['Dataset ID',
+                                           'Sample ID',
+                                           'Run\nxia2',
+                                           'Resolution\n[Mn<I/sig(I)> = 1.5]',
+                                           'Rmerge\nLow',
+                                           'Dimple\nRfree',
+                                           'DataProcessing\nSpaceGroup',
+                                           'DataProcessing\nUnitCell',
+                                           'DataProcessing\nStatus']
+
+        # functions that use self.maps_table_columns:
+        #
+        # - update_reprocess_datasets_table() - appears in create_initial_model_table()
+
+        self.maps_table_columns = ['Sample ID',
+                                   'Select',
+                                   'Compound ID',
+                                   'Smiles',
+                                   'Resolution\n[Mn<I/sig(I)> = 1.5]',
+                                   'Dimple\nRcryst',
+                                   'Dimple\nRfree',
+                                   'DataProcessing\nSpaceGroup',
+                                   'Reference\nSpaceGroup',
+                                   'Difference\nUC Volume (%)',
+                                   'Reference File',
+                                   'DataProcessing\nUnitCell',
+                                   'Dimple\nStatus',
+                                   'Compound\nStatus',
+                                   'LastUpdated']
+
+        # functions that use self.pandda_table_columns:
+        #
+        # - populate_pandda_analyse_input_table() - appears in update_all_tables()
+
+        self.pandda_table_columns = ['Sample ID',
+                                     'Refinement\nSpace Group',
+                                     'Resolution\n[Mn<I/sig(I)> = 1.5]',
+                                     'Dimple\nRcryst',
+                                     'Dimple\nRfree',
+                                     'Crystal Form\nName', ]
+
+        # functions that use self.refinement_table_columns:
+        #
+        # - populate_and_update_refinement_table() - appears in update_all_tables
+
+        self.refinement_table_columns = ['Sample ID',
+                                         'Compound ID',
+                                         'Refinement\nSpace Group',
+                                         'Refinement\nResolution',
+                                         'Refinement\nRcryst',
+                                         'Refinement\nRfree',
+                                         'Refinement\nOutcome',
+                                         'PanDDA site details',
+                                         'Refinement\nStatus']
+
+    ################################################## tab stuff #######################################################
+    def make_tab_dict(self, tab_list, tab_widget, tab_dict):
+        for page in tab_list:
+            tab = QtGui.QWidget()
+            vbox = QtGui.QVBoxLayout(tab)
+            tab_widget.addTab(tab, page)
+            tab_dict[page] = [tab, vbox]
+
+
     ################################################# define gui #######################################################
     def start_GUI(self):
 
@@ -715,6 +828,9 @@ class XChemExplorer(QtGui.QApplication):
         # initialise bottom boxes
         update_from_datasource_button, frame_dataset_task, frame_map_cif_file_task, frame_panddas_file_task, \
         frame_refine_file_task = self.initialise_bottom_boxes()
+
+        # set all table columns
+        self.define_all_tables()
 
         ################################################################################################################
         #                                                                                                              #
@@ -740,15 +856,11 @@ class XChemExplorer(QtGui.QApplication):
                               self.workflow[6]: 'Settings',
                               self.workflow[5]: 'Deposition'}
 
-
         # tab widget
         self.main_tab_widget = QtGui.QTabWidget()
         self.tab_dict = {}
-        for page in self.workflow:
-            tab = QtGui.QWidget()
-            vbox = QtGui.QVBoxLayout(tab)
-            self.main_tab_widget.addTab(tab, page)
-            self.tab_dict[page] = [tab, vbox]
+        self.make_tab_dict(self.workflow, self.main_tab_widget, self.tab_dict)
+
         ################################################################################################################
 
         # Tab layout & content
@@ -776,129 +888,77 @@ class XChemExplorer(QtGui.QApplication):
         # Deposition
         #
         # Settings
+        #
+        # NOTES:-
+        # -------
+        # 1. all table columns are defined by self.define_all_tables()
+        # 2. all table column definitions are named by <tab>_<subtab>_table_columns (subtab omitted if not relevant)
+        # 3. subtabs are created by self.make_tab_dict()
 
-
-
-        # Table column settings
-        self.overview_datasource_table_columns = ['Sample ID',
-                                               'Compound ID',
-                                               'Smiles',
-                                               'Visit',
-                                               'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                                               'Refinement\nRfree',
-                                               'Data Collection\nDate',
-                                               'Puck',
-                                               'PuckPosition',
-                                               'Ligand\nConfidence']
-
-        self.datasets_summary_table_columns = ['Sample ID',
-                                                    'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                                                    'DataProcessing\nSpaceGroup',
-                                                    'DataProcessing\nRfree',
-                                                    'SoakDB\nBarcode',
-                                                    'GDA\nBarcode',
-                                                    'Rmerge\nLow',
-                                                    'auto-assigned',
-                                                    'DataCollection\nOutcome',
-                                                    'img1',
-                                                    'img2',
-                                                    'img3',
-                                                    'img4',
-                                                    'img5',
-                                                    'Show\nDetails',
-                                                    'Show Diffraction\nImage'
-                                                    ]
-
-        self.datasets_reprocess_columns = ['Dataset ID',
-                                               'Sample ID',
-                                               'Run\nxia2',
-                                               'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                                               'Rmerge\nLow',
-                                               'Dimple\nRfree',
-                                               'DataProcessing\nSpaceGroup',
-                                               'DataProcessing\nUnitCell',
-                                               'DataProcessing\nStatus']
-
-        self.maps_table_columns = ['Sample ID',
-                                         'Select',
-                                         'Compound ID',
-                                         'Smiles',
-                                         'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                                         'Dimple\nRcryst',
-                                         'Dimple\nRfree',
-                                         'DataProcessing\nSpaceGroup',
-                                         'Reference\nSpaceGroup',
-                                         'Difference\nUC Volume (%)',
-                                         'Reference File',
-                                         'DataProcessing\nUnitCell',
-                                         'Dimple\nStatus',
-                                         'Compound\nStatus',
-                                         'LastUpdated']
-
-        self.pandda_table_columns = ['Sample ID',
-                                   'Refinement\nSpace Group',
-                                   'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                                   'Dimple\nRcryst',
-                                   'Dimple\nRfree',
-                                   'Crystal Form\nName', ]
-
-        self.refinement_table_columns = ['Sample ID',
-                                    'Compound ID',
-                                    'Refinement\nSpace Group',
-                                    'Refinement\nResolution',
-                                    'Refinement\nRcryst',
-                                    'Refinement\nRfree',
-                                    'Refinement\nOutcome',
-                                    'PanDDA site details',
-                                    'Refinement\nStatus']
-
-        
-
-
-
-        
-
-        
-
-
-
-        ## datasource tab
-        overview_tab_widget = QtGui.QTabWidget()
-        self.tab_dict[self.workflow_dict['Overview']][1].addWidget(overview_tab_widget)
-        overview_tab_list = ['Data Source',
-                             'Summary']
-
+        ################################################################################################################
+        #                                                                                                              #
+        #                                                 OVERVIEW TAB                                                 #
+        #                                                                                                              #
+        ################################################################################################################
+        # define subtab list, widget and dict
+        overview_tab_list = ['Data Source', 'Summary']
+        self.overview_tab_widget = QtGui.QTabWidget()
         self.overview_tab_dict = {}
-        for page in overview_tab_list:
-            tab = QtGui.QWidget()
-            vbox = QtGui.QVBoxLayout(tab)
-            overview_tab_widget.addTab(tab, page)
-            self.overview_tab_dict[page] = [tab, vbox]
 
+        # make subtabs
+        self.make_tab_dict(overview_tab_list, self.overview_tab_widget, self.overview_tab_dict)
 
+        # add overview subtabs to overview tab
+        self.tab_dict[self.workflow_dict['Overview']][1].addWidget(self.overview_tab_widget)
 
-        self.mounted_crystal_table = QtGui.QTableWidget()
-        self.mounted_crystal_table.setSortingEnabled(True)
-        self.mounted_crystal_table.resizeColumnsToContents()
-        self.overview_tab_dict['Data Source'][1].addWidget(self.mounted_crystal_table)
+        # initiate the dable in overview/datasource
+        self.overview_datasource_table = QtGui.QTableWidget()
+        self.overview_datasource_table.setSortingEnabled(True)
+        self.overview_datasource_table.resizeColumnsToContents()
 
-        ## overview graph
+        # add table to datasource subtab
+        self.overview_tab_dict['Data Source'][1].addWidget(self.overview_datasource_table)
+
+        # initiate the graph in overview/summary
         self.overview_figure, self.overview_axes = plt.subplots()
         self.overview_canvas = FigureCanvas(self.overview_figure)
         self.update_summary_plot()
+
+        # add graph to summary tab
         self.overview_tab_dict['Summary'][1].addWidget(self.overview_canvas)
 
-        # dataset data collection tab
-        self.dls_data_collection_vbox = QtGui.QVBoxLayout()
-        self.tab_dict[self.workflow_dict['Datasets']][1].addLayout(self.dls_data_collection_vbox)
+        ################################################################################################################
+        #                                                                                                              #
+        #                                                 DATASETS TAB                                                 #
+        #                                                                                                              #
+        ################################################################################################################
+        # define subtab list, widget and dict
+        datasets_tab_list = ['Summary', 'Reprocess']
+        self.datasets_tab_widget = QtGui.QTabWidget()
+        self.datasets_tab_dict = {}
 
+        # make subtabs
+        self.make_tab_dict(datasets_tab_list, self.datasets_tab_widget, self.datasets_tab_dict)
+
+        # main tab
+        # add a container to hold everythting and add to main tab layout
+        self.datasets_data_collection_vbox = QtGui.QVBoxLayout()
+        self.tab_dict[self.workflow_dict['Datasets']][1].addLayout(self.datasets_data_collection_vbox)
+
+        # add a horizontal box to hold option to autocheck for new data
         hbox = QtGui.QHBoxLayout()
+        
+        # checkbox and function settings
         check_for_new_data_collection = QtGui.QCheckBox('Check for new data collection every two minutes')
         check_for_new_data_collection.toggle()
         check_for_new_data_collection.setChecked(False)
         check_for_new_data_collection.stateChanged.connect(self.continously_check_for_new_data_collection)
         hbox.addWidget(check_for_new_data_collection)
+        
+        # spacer for top bar
         hbox.addWidget(QtGui.QLabel('                                             '))
+        
+        # select target dropdown
         hbox.addWidget(QtGui.QLabel('Select Target: '))
         self.target_selection_combobox = QtGui.QComboBox()
         self.populate_target_selection_combobox(self.target_selection_combobox)
@@ -906,18 +966,8 @@ class XChemExplorer(QtGui.QApplication):
         hbox.addWidget(self.target_selection_combobox)
         self.target = str(self.target_selection_combobox.currentText())
 
-        self.dls_data_collection_vbox.addLayout(hbox)
-
-        dls_tab_widget = QtGui.QTabWidget()
-        dls_tab_list = ['Summary',
-                        'Reprocess']
-
-        self.dls_tab_dict = {}
-        for page in dls_tab_list:
-            tab = QtGui.QWidget()
-            vbox = QtGui.QVBoxLayout(tab)
-            dls_tab_widget.addTab(tab, page)
-            self.dls_tab_dict[page] = [tab, vbox]
+        # # add target dropdown to top bar
+        self.datasets_data_collection_vbox.addLayout(hbox)
 
         ## summary sub-tab
 
@@ -929,16 +979,16 @@ class XChemExplorer(QtGui.QApplication):
 
         # table
         self.data_collection_summarys_vbox_for_table = QtGui.QVBoxLayout()
-        self.dls_tab_dict['Summary'][1].addLayout(self.data_collection_summarys_vbox_for_table)
+        self.datasets_tab_dict['Summary'][1].addLayout(self.data_collection_summarys_vbox_for_table)
 
         # another vbox for details to be shown
         self.data_collection_summarys_vbox_for_details = QtGui.QVBoxLayout()
         self.data_collection_details_currently_on_display = None
-        self.dls_tab_dict['Summary'][1].addLayout(self.data_collection_summarys_vbox_for_details)
+        self.datasets_tab_dict['Summary'][1].addLayout(self.data_collection_summarys_vbox_for_details)
 
         self.data_collection_summarys_vbox_for_table.addWidget(self.data_collection_summary_table)
 
-        self.dls_data_collection_vbox.addWidget(dls_tab_widget)
+        self.datasets_data_collection_vbox.addWidget(self.datasets_tab_widget)
 
         ## dewar sub-tab
         self.dewar_configuration_dict = {}
@@ -1042,8 +1092,6 @@ class XChemExplorer(QtGui.QApplication):
         frame.setLayout(hbox)
         reprocess_vbox.addWidget(frame)
 
-
-
         self.reprocess_datasets_table = QtGui.QTableWidget()
         self.reprocess_datasets_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.reprocess_datasets_table.setSortingEnabled(True)
@@ -1145,7 +1193,49 @@ class XChemExplorer(QtGui.QApplication):
         frame.setLayout(hbox)
         reprocess_vbox.addWidget(frame)
 
-        self.dls_tab_dict['Reprocess'][1].addLayout(reprocess_vbox)
+        self.datasets_tab_dict['Reprocess'][1].addLayout(reprocess_vbox)
+
+        ################################################################################################################
+        #                                                                                                              #
+        #                                                    MAPS TAB                                                  #
+        #                                                                                                              #
+        ################################################################################################################
+
+        ################################################################################################################
+        #                                                                                                              #
+        #                                                   PANDDA TAB                                                 #
+        #                                                                                                              #
+        ################################################################################################################
+        pandda_tab_list = ['pandda.analyse',
+                           'Dataset Summary',
+                           'Processing Output',
+                           'pandda.inspect',
+                           'Statistical Map Summaries']
+
+        self.pandda_tab_widget = QtGui.QTabWidget()
+        self.pandda_tab_dict = {}
+        self.make_tab_dict(pandda_tab_list, self.pandda_tab_widget, self.pandda_tab_dict)
+
+        ################################################################################################################
+        #                                                                                                              #
+        #                                                REFINEMENT TAB                                                #
+        #                                                                                                              #
+        ################################################################################################################
+
+        ################################################################################################################
+        #                                                                                                              #
+        #                                                DEPOSITION TAB                                                #
+        #                                                                                                              #
+        ################################################################################################################
+        
+        
+
+
+
+
+
+
+
 
         ## map files tab
         initial_model_checkbutton_hbox = QtGui.QHBoxLayout()
@@ -1170,7 +1260,6 @@ class XChemExplorer(QtGui.QApplication):
 
         self.tab_dict[self.workflow_dict['Maps']][1].addLayout(initial_model_checkbutton_hbox)
         self.initial_model_vbox_for_table = QtGui.QVBoxLayout()
-
 
         self.initial_model_table = QtGui.QTableWidget()
         self.initial_model_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -1336,20 +1425,7 @@ class XChemExplorer(QtGui.QApplication):
         self.panddas_results_vbox = QtGui.QVBoxLayout()
         self.tab_dict[self.workflow_dict['PANDDAs']][1].addLayout(self.panddas_results_vbox)
 
-        pandda_tab_widget = QtGui.QTabWidget()
-        # pandda_tab_widget.setSizePolicy(size_policy)
-        pandda_tab_list = ['pandda.analyse',
-                           'Dataset Summary',
-                           'Processing Output',
-                           'pandda.inspect',
-                           'Statistical Map Summaries']
 
-        self.pandda_tab_dict = {}
-        for page in pandda_tab_list:
-            tab = QtGui.QWidget()
-            vbox = QtGui.QVBoxLayout(tab)
-            pandda_tab_widget.addTab(tab, page)
-            self.pandda_tab_dict[page] = [tab, vbox]
 
         self.pandda_analyse_hbox = QtGui.QHBoxLayout()
         self.pandda_tab_dict['pandda.analyse'][1].addLayout(self.pandda_analyse_hbox)
@@ -1550,7 +1626,7 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_html.load(QtCore.QUrl(self.pandda_inspect_html_file))
         self.pandda_analyse_html.show()
 
-        self.panddas_results_vbox.addWidget(pandda_tab_widget)
+        self.panddas_results_vbox.addWidget(self.pandda_tab_widget)
         self.show_pandda_html_summary()
 
         ## settings tab
@@ -2235,7 +2311,7 @@ class XChemExplorer(QtGui.QApplication):
         grid = QtGui.QGridLayout()
         grid.addWidget(QtGui.QLabel('Title & Details'), 0, 0)
         note = (
-        'Note: supported wildcards: $ProteinName,$CompoundName; e.g. "Crystal Structure of human JMJD2D in complex with N2317a"')
+            'Note: supported wildcards: $ProteinName,$CompoundName; e.g. "Crystal Structure of human JMJD2D in complex with N2317a"')
         grid.addWidget(QtGui.QLabel(note), 1, 0)
 
         grid.addWidget(QtGui.QLabel('Group deposition title'), 2, 0)
@@ -3049,7 +3125,7 @@ class XChemExplorer(QtGui.QApplication):
                 if column_dict[key].isChecked():
                     columns_to_show_list.append(columns_in_data_source[key][1])
             self.overview_datasource_table_columns = columns_to_show_list
-            self.populate_and_update_data_source_table()
+            self.populate_and_update_datasource_table()
 
     def update_header_and_data_from_datasource(self):
         self.update_log.insert('getting information for all samples from data source...')
@@ -3076,7 +3152,6 @@ class XChemExplorer(QtGui.QApplication):
                 self.xtal_db_dict[str(line[sampleID_column])] = db_dict
 
         print('==> XCE: found ' + str(len(self.xtal_db_dict)) + ' samples')
-
 
     def datasource_menu_save_samples(self):
         print('hallo')
@@ -3742,7 +3817,7 @@ class XChemExplorer(QtGui.QApplication):
         self.reference_file_list = self.get_reference_file_list(' ')
         self.update_log.insert('updating Overview table')
         self.update_status_bar('updating Overview table')
-        self.populate_and_update_data_source_table()
+        self.populate_and_update_datasource_table()
         self.update_log.insert('updating Maps table')
         self.update_status_bar('updating Maps table')
         self.create_initial_model_table()
@@ -3916,7 +3991,6 @@ class XChemExplorer(QtGui.QApplication):
     def change_filename_root(self, text):
         self.filename_root = str(text)
         self.settings['filename_root'] = self.filename_root
-
 
     def button_clicked(self):
         if self.data_source_set == False:
@@ -4662,7 +4736,7 @@ class XChemExplorer(QtGui.QApplication):
                     logfile_found = True
                     if best_file:
                         # we change the selection only if the user did not touch it, assuming that he/she knows best
-                        #if not selection_changed_by_user:
+                        # if not selection_changed_by_user:
                         data_collection_table.selectRow(index)
 
         self.populate_data_collection_summary_table()
@@ -5163,7 +5237,7 @@ class XChemExplorer(QtGui.QApplication):
                     msgBox.setText(
                         "*** WARNING ***\n%s is currently %s\nIt will disappear from the Refinement table,\n"
                         "when you refresh it next time.\nDo you want to continue?" % (
-                        key, dbTmp['RefinementOutcome']))
+                            key, dbTmp['RefinementOutcome']))
                     msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.YesRole)
                     msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.RejectRole)
                     reply = msgBox.exec_();
@@ -5294,42 +5368,42 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.data_collection_summary_table.setItem(row, column, cell_text)
 
-    def populate_data_source_table(self, header, data):
-        self.mounted_crystal_table.setColumnCount(0)
-        self.mounted_crystal_table.setColumnCount(len(self.overview_datasource_table_columns))
-        self.mounted_crystal_table.setRowCount(0)
+    # def populate_data_source_table(self, header, data):
+    #     self.overview_datasource_table.setColumnCount(0)
+    #     self.overview_datasource_table.setColumnCount(len(self.overview_datasource_table_columns))
+    #     self.overview_datasource_table.setRowCount(0)
+    # 
+    #     columns_to_show = self.get_columns_to_show(self.overview_datasource_table_columns, header)
+    #     n_rows = self.get_rows_with_sample_id_not_null(header, data)
+    #     self.overview_datasource_table.setRowCount(n_rows)
+    #     sample_id_column = self.get_columns_to_show(['Sample ID'], header)
+    # 
+    #     x = 0
+    #     for row in data:
+    #         if str(row[sample_id_column[0]]).lower() == 'none' or str(row[sample_id_column[0]]).replace(' ', '') == '':
+    #             continue  # do not show rows where sampleID is null
+    #         for y, item in enumerate(columns_to_show):
+    #             cell_text = QtGui.QTableWidgetItem()
+    #             if row[item] is None:
+    #                 cell_text.setText('')
+    #             else:
+    #                 cell_text.setText(str(row[item]))
+    #             if self.overview_datasource_table_columns[
+    #                 y] == 'Sample ID':  # assumption is that column 0 is always sampleID
+    #                 cell_text.setFlags(QtCore.Qt.ItemIsEnabled)  # and this field cannot be changed
+    #             cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+    #             self.overview_datasource_table.setItem(x, y, cell_text)
+    #         x += 1
+    #     self.overview_datasource_table.setHorizontalHeaderLabels(self.overview_datasource_table_columns)
 
-        columns_to_show = self.get_columns_to_show(self.overview_datasource_table_columns, header)
-        n_rows = self.get_rows_with_sample_id_not_null(header, data)
-        self.mounted_crystal_table.setRowCount(n_rows)
-        sample_id_column = self.get_columns_to_show(['Sample ID'], header)
-
-        x = 0
-        for row in data:
-            if str(row[sample_id_column[0]]).lower() == 'none' or str(row[sample_id_column[0]]).replace(' ', '') == '':
-                continue  # do not show rows where sampleID is null
-            for y, item in enumerate(columns_to_show):
-                cell_text = QtGui.QTableWidgetItem()
-                if row[item] is None:
-                    cell_text.setText('')
-                else:
-                    cell_text.setText(str(row[item]))
-                if self.overview_datasource_table_columns[
-                    y] == 'Sample ID':  # assumption is that column 0 is always sampleID
-                    cell_text.setFlags(QtCore.Qt.ItemIsEnabled)  # and this field cannot be changed
-                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                self.mounted_crystal_table.setItem(x, y, cell_text)
-            x += 1
-        self.mounted_crystal_table.setHorizontalHeaderLabels(self.overview_datasource_table_columns)
-
-    def populate_and_update_data_source_table(self):
-        self.mounted_crystal_table.setColumnCount(len(self.overview_datasource_table_columns))
+    def populate_and_update_datasource_table(self):
+        self.overview_datasource_table.setColumnCount(len(self.overview_datasource_table_columns))
 
         # first get a list of all the samples that are already in the table and which will be updated
         samples_in_table = []
-        current_row = self.mounted_crystal_table.rowCount()
+        current_row = self.overview_datasource_table.rowCount()
         for row in range(current_row):
-            sampleID = str(self.mounted_crystal_table.item(row, 0).text())  # this must be the case
+            sampleID = str(self.overview_datasource_table.item(row, 0).text())  # this must be the case
             samples_in_table.append(sampleID)
 
         columns_to_show = self.get_columns_to_show(self.overview_datasource_table_columns)
@@ -5343,13 +5417,13 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 if not str(row[sample_id_column[0]]) in samples_in_table:
                     # insert row, this is a new sample
-                    x = self.mounted_crystal_table.rowCount()
-                    self.mounted_crystal_table.insertRow(x)
+                    x = self.overview_datasource_table.rowCount()
+                    self.overview_datasource_table.insertRow(x)
                 else:
                     # find row of this sample in data_source_table
-                    for present_rows in range(self.mounted_crystal_table.rowCount()):
+                    for present_rows in range(self.overview_datasource_table.rowCount()):
                         if str(row[sample_id_column[0]]) == str(
-                                self.mounted_crystal_table.item(present_rows, 0).text()):
+                                self.overview_datasource_table.item(present_rows, 0).text()):
                             x = present_rows
                             break
             for y, item in enumerate(columns_to_show):
@@ -5362,8 +5436,8 @@ class XChemExplorer(QtGui.QApplication):
                     y] == 'Sample ID':  # assumption is that column 0 is always sampleID
                     cell_text.setFlags(QtCore.Qt.ItemIsEnabled)  # and this field cannot be changed
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                self.mounted_crystal_table.setItem(x, y, cell_text)
-        self.mounted_crystal_table.setHorizontalHeaderLabels(self.overview_datasource_table_columns)
+                self.overview_datasource_table.setItem(x, y, cell_text)
+        self.overview_datasource_table.setHorizontalHeaderLabels(self.overview_datasource_table_columns)
 
     def populate_pandda_analyse_input_table(self):
 
@@ -5524,7 +5598,7 @@ class XChemExplorer(QtGui.QApplication):
         sample_id_column = self.get_columns_to_show(['Sample ID'])
         n_rows = 0
         for row in self.data:
-            if not str(row[sample_id_column[0]]).lower() != 'none' or not str(row[sample_id_column[0]]).replace\
+            if not str(row[sample_id_column[0]]).lower() != 'none' or not str(row[sample_id_column[0]]).replace \
                         (' ', '') == '':
                 n_rows += 1
         return n_rows
