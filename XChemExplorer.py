@@ -740,9 +740,8 @@ class XChemExplorer(QtGui.QApplication):
                               self.workflow[6]: 'Settings',
                               self.workflow[5]: 'Deposition'}
 
-########################################################################################################################
 
-        ## tab widget
+        # tab widget
         self.main_tab_widget = QtGui.QTabWidget()
         self.tab_dict = {}
         for page in self.workflow:
@@ -750,10 +749,121 @@ class XChemExplorer(QtGui.QApplication):
             vbox = QtGui.QVBoxLayout(tab)
             self.main_tab_widget.addTab(tab, page)
             self.tab_dict[page] = [tab, vbox]
+        ################################################################################################################
+
+        # Tab layout & content
+        # --------------------
+        #
+        # Overview
+        # |- datasource - TABLE
+        # |- summary - GRAPH
+        #
+        # Datasets
+        # |- summary - TABLE
+        # |- reprocess - TABLE
+        #
+        # Maps - TABLE
+        #
+        # PANDDAS
+        # |- pandda.analyse - TABLE
+        # |- Dataset Summary ------------------
+        # |- Processing Output                  |   HTML
+        # |- pandda.inspect                     |
+        # |- Statistical Map Summaries --------
+        #
+        # Refinement - TABLE
+        #
+        # Deposition
+        #
+        # Settings
+
+
+
+        # Table column settings
+        self.overview_datasource_table_columns = ['Sample ID',
+                                               'Compound ID',
+                                               'Smiles',
+                                               'Visit',
+                                               'Resolution\n[Mn<I/sig(I)> = 1.5]',
+                                               'Refinement\nRfree',
+                                               'Data Collection\nDate',
+                                               'Puck',
+                                               'PuckPosition',
+                                               'Ligand\nConfidence']
+
+        self.datasets_summary_table_columns = ['Sample ID',
+                                                    'Resolution\n[Mn<I/sig(I)> = 1.5]',
+                                                    'DataProcessing\nSpaceGroup',
+                                                    'DataProcessing\nRfree',
+                                                    'SoakDB\nBarcode',
+                                                    'GDA\nBarcode',
+                                                    'Rmerge\nLow',
+                                                    'auto-assigned',
+                                                    'DataCollection\nOutcome',
+                                                    'img1',
+                                                    'img2',
+                                                    'img3',
+                                                    'img4',
+                                                    'img5',
+                                                    'Show\nDetails',
+                                                    'Show Diffraction\nImage'
+                                                    ]
+
+        self.datasets_reprocess_columns = ['Dataset ID',
+                                               'Sample ID',
+                                               'Run\nxia2',
+                                               'Resolution\n[Mn<I/sig(I)> = 1.5]',
+                                               'Rmerge\nLow',
+                                               'Dimple\nRfree',
+                                               'DataProcessing\nSpaceGroup',
+                                               'DataProcessing\nUnitCell',
+                                               'DataProcessing\nStatus']
+
+        self.maps_table_columns = ['Sample ID',
+                                         'Select',
+                                         'Compound ID',
+                                         'Smiles',
+                                         'Resolution\n[Mn<I/sig(I)> = 1.5]',
+                                         'Dimple\nRcryst',
+                                         'Dimple\nRfree',
+                                         'DataProcessing\nSpaceGroup',
+                                         'Reference\nSpaceGroup',
+                                         'Difference\nUC Volume (%)',
+                                         'Reference File',
+                                         'DataProcessing\nUnitCell',
+                                         'Dimple\nStatus',
+                                         'Compound\nStatus',
+                                         'LastUpdated']
+
+        self.pandda_table_columns = ['Sample ID',
+                                   'Refinement\nSpace Group',
+                                   'Resolution\n[Mn<I/sig(I)> = 1.5]',
+                                   'Dimple\nRcryst',
+                                   'Dimple\nRfree',
+                                   'Crystal Form\nName', ]
+
+        self.refinement_table_columns = ['Sample ID',
+                                    'Compound ID',
+                                    'Refinement\nSpace Group',
+                                    'Refinement\nResolution',
+                                    'Refinement\nRcryst',
+                                    'Refinement\nRfree',
+                                    'Refinement\nOutcome',
+                                    'PanDDA site details',
+                                    'Refinement\nStatus']
+
+        
+
+
+
+        
+
+        
+
+
 
         ## datasource tab
         overview_tab_widget = QtGui.QTabWidget()
-        # overview_tab_widget.setSizePolicy(size_policy)
         self.tab_dict[self.workflow_dict['Overview']][1].addWidget(overview_tab_widget)
         overview_tab_list = ['Data Source',
                              'Summary']
@@ -765,16 +875,7 @@ class XChemExplorer(QtGui.QApplication):
             overview_tab_widget.addTab(tab, page)
             self.overview_tab_dict[page] = [tab, vbox]
 
-        self.data_source_columns_to_display = ['Sample ID',
-                                               'Compound ID',
-                                               'Smiles',
-                                               'Visit',
-                                               'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                                               'Refinement\nRfree',
-                                               'Data Collection\nDate',
-                                               'Puck',
-                                               'PuckPosition',
-                                               'Ligand\nConfidence']
+
 
         self.mounted_crystal_table = QtGui.QTableWidget()
         self.mounted_crystal_table.setSortingEnabled(True)
@@ -809,7 +910,6 @@ class XChemExplorer(QtGui.QApplication):
 
         dls_tab_widget = QtGui.QTabWidget()
         dls_tab_list = ['Summary',
-                        #                 'Dewar',
                         'Reprocess']
 
         self.dls_tab_dict = {}
@@ -820,29 +920,12 @@ class XChemExplorer(QtGui.QApplication):
             self.dls_tab_dict[page] = [tab, vbox]
 
         ## summary sub-tab
-        self.data_collection_summary_column_name = ['Sample ID',
-                                                    # 'Date',
-                                                    'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                                                    'DataProcessing\nSpaceGroup',
-                                                    'DataProcessing\nRfree',
-                                                    'SoakDB\nBarcode',
-                                                    'GDA\nBarcode',
-                                                    'Rmerge\nLow',
-                                                    'auto-assigned',
-                                                    'DataCollection\nOutcome',
-                                                    'img1',
-                                                    'img2',
-                                                    'img3',
-                                                    'img4',
-                                                    'img5',
-                                                    'Show\nDetails',
-                                                    'Show Diffraction\nImage'
-                                                    ]
+
 
         self.data_collection_summary_table = QtGui.QTableWidget()
-        self.data_collection_summary_table.setColumnCount(len(self.data_collection_summary_column_name))
+        self.data_collection_summary_table.setColumnCount(len(self.datasets_summary_table_columns))
         self.data_collection_summary_table.setSortingEnabled(True)
-        self.data_collection_summary_table.setHorizontalHeaderLabels(self.data_collection_summary_column_name)
+        self.data_collection_summary_table.setHorizontalHeaderLabels(self.datasets_summary_table_columns)
 
         # table
         self.data_collection_summarys_vbox_for_table = QtGui.QVBoxLayout()
@@ -959,21 +1042,13 @@ class XChemExplorer(QtGui.QApplication):
         frame.setLayout(hbox)
         reprocess_vbox.addWidget(frame)
 
-        self.reprocess_datasets_column_list = ['Dataset ID',
-                                               'Sample ID',
-                                               'Run\nxia2',
-                                               'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                                               'Rmerge\nLow',
-                                               'Dimple\nRfree',
-                                               'DataProcessing\nSpaceGroup',
-                                               'DataProcessing\nUnitCell',
-                                               'DataProcessing\nStatus']
+
 
         self.reprocess_datasets_table = QtGui.QTableWidget()
         self.reprocess_datasets_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.reprocess_datasets_table.setSortingEnabled(True)
-        self.reprocess_datasets_table.setColumnCount(len(self.reprocess_datasets_column_list))
-        self.reprocess_datasets_table.setHorizontalHeaderLabels(self.reprocess_datasets_column_list)
+        self.reprocess_datasets_table.setColumnCount(len(self.datasets_reprocess_columns))
+        self.reprocess_datasets_table.setHorizontalHeaderLabels(self.datasets_reprocess_columns)
         reprocess_vbox.addWidget(self.reprocess_datasets_table)
 
         # create context menu
@@ -1095,27 +1170,13 @@ class XChemExplorer(QtGui.QApplication):
 
         self.tab_dict[self.workflow_dict['Maps']][1].addLayout(initial_model_checkbutton_hbox)
         self.initial_model_vbox_for_table = QtGui.QVBoxLayout()
-        self.inital_model_column_list = ['Sample ID',
-                                         'Select',
-                                         'Compound ID',
-                                         'Smiles',
-                                         'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                                         'Dimple\nRcryst',
-                                         'Dimple\nRfree',
-                                         'DataProcessing\nSpaceGroup',
-                                         'Reference\nSpaceGroup',
-                                         'Difference\nUC Volume (%)',
-                                         'Reference File',
-                                         'DataProcessing\nUnitCell',
-                                         'Dimple\nStatus',
-                                         'Compound\nStatus',
-                                         'LastUpdated']
+
 
         self.initial_model_table = QtGui.QTableWidget()
         self.initial_model_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.initial_model_table.setSortingEnabled(True)
-        self.initial_model_table.setColumnCount(len(self.inital_model_column_list))
-        self.initial_model_table.setHorizontalHeaderLabels(self.inital_model_column_list)
+        self.initial_model_table.setColumnCount(len(self.maps_table_columns))
+        self.initial_model_table.setHorizontalHeaderLabels(self.maps_table_columns)
         self.initial_model_vbox_for_table.addWidget(self.initial_model_table)
         self.tab_dict[self.workflow_dict['Maps']][1].addLayout(self.initial_model_vbox_for_table)
 
@@ -1129,20 +1190,12 @@ class XChemExplorer(QtGui.QApplication):
 
         ## refine tab
         self.summary_vbox_for_table = QtGui.QVBoxLayout()
-        self.summary_column_name = ['Sample ID',
-                                    'Compound ID',
-                                    'Refinement\nSpace Group',
-                                    'Refinement\nResolution',
-                                    'Refinement\nRcryst',
-                                    'Refinement\nRfree',
-                                    'Refinement\nOutcome',
-                                    'PanDDA site details',
-                                    'Refinement\nStatus']
+
         self.summary_table = QtGui.QTableWidget()
         self.summary_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.summary_table.setSortingEnabled(True)
-        self.summary_table.setColumnCount(len(self.summary_column_name))
-        self.summary_table.setHorizontalHeaderLabels(self.summary_column_name)
+        self.summary_table.setColumnCount(len(self.refinement_table_columns))
+        self.summary_table.setHorizontalHeaderLabels(self.refinement_table_columns)
         self.summary_vbox_for_table.addWidget(self.summary_table)
         self.tab_dict[self.workflow_dict['Refinement']][1].addLayout(self.summary_vbox_for_table)
 
@@ -1313,18 +1366,13 @@ class XChemExplorer(QtGui.QApplication):
         grid_pandda.setColumnStretch(0, 20)
         grid_pandda.setRowStretch(0, 20)
         # left hand side: table with information about available datasets
-        self.pandda_column_name = ['Sample ID',
-                                   'Refinement\nSpace Group',
-                                   'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                                   'Dimple\nRcryst',
-                                   'Dimple\nRfree',
-                                   'Crystal Form\nName',]
+
 
         self.pandda_analyse_data_table = QtGui.QTableWidget()
         self.pandda_analyse_data_table.setSortingEnabled(True)
         self.pandda_analyse_data_table.resizeColumnsToContents()
-        self.pandda_analyse_data_table.setColumnCount(len(self.pandda_column_name))
-        self.pandda_analyse_data_table.setHorizontalHeaderLabels(self.pandda_column_name)
+        self.pandda_analyse_data_table.setColumnCount(len(self.pandda_table_columns))
+        self.pandda_analyse_data_table.setHorizontalHeaderLabels(self.pandda_table_columns)
 
         frame_pandda = QtGui.QFrame()
         grid_pandda.addWidget(self.pandda_analyse_data_table, 0, 0)
@@ -2982,7 +3030,7 @@ class XChemExplorer(QtGui.QApplication):
             if not columns_in_data_source[entries_added][1] in columns_to_ignore:
                 data_source_column = QtGui.QCheckBox(columns_in_data_source[entries_added][1])
                 column_dict[entries_added] = data_source_column
-                if columns_in_data_source[entries_added][1] in self.data_source_columns_to_display:
+                if columns_in_data_source[entries_added][1] in self.overview_datasource_table_columns:
                     data_source_column.setChecked(True)
                 grid.addWidget(data_source_column, y, x)
                 y += 1
@@ -3000,7 +3048,7 @@ class XChemExplorer(QtGui.QApplication):
             for key in column_dict:
                 if column_dict[key].isChecked():
                     columns_to_show_list.append(columns_in_data_source[key][1])
-            self.data_source_columns_to_display = columns_to_show_list
+            self.overview_datasource_table_columns = columns_to_show_list
             self.populate_and_update_data_source_table()
 
     def update_header_and_data_from_datasource(self):
@@ -3647,7 +3695,7 @@ class XChemExplorer(QtGui.QApplication):
         self.update_log.insert(self.diffraction_data_search_info)
         self.datasource_menu_reload_samples()
         # update table
-        column_name = self.db.translate_xce_column_list_to_sqlite(self.reprocess_datasets_column_list)
+        column_name = self.db.translate_xce_column_list_to_sqlite(self.datasets_reprocess_columns)
         # set rows to 0
         self.reprocess_datasets_table.setRowCount(0)
         for entry in sorted(self.diffraction_data_dict):
@@ -4636,7 +4684,7 @@ class XChemExplorer(QtGui.QApplication):
         return reference_file
 
     def create_initial_model_table(self):
-        column_name = self.db.translate_xce_column_list_to_sqlite(self.inital_model_column_list)
+        column_name = self.db.translate_xce_column_list_to_sqlite(self.maps_table_columns)
 
         for xtal in sorted(self.xtal_db_dict):
             new_xtal = False
@@ -4867,7 +4915,7 @@ class XChemExplorer(QtGui.QApplication):
         self.status_bar.showMessage(
             'Building summary table for data processing results; be patient this may take a while')
         row = self.data_collection_summary_table.rowCount()
-        column_name = self.db.translate_xce_column_list_to_sqlite(self.data_collection_summary_column_name)
+        column_name = self.db.translate_xce_column_list_to_sqlite(self.datasets_summary_table_columns)
 
         pinList = self.db.execute_statement(
             "Select CrystalName,PinBarcode,DataCollectionPinBarcode from mainTable where CrystalName is not ''")
@@ -5175,7 +5223,7 @@ class XChemExplorer(QtGui.QApplication):
                 # update 'Datasets' table
                 column_name = XChemDB.data_source(
                     os.path.join(self.database_directory, self.data_source_file)).translate_xce_column_list_to_sqlite(
-                    self.data_collection_summary_column_name)
+                    self.datasets_summary_table_columns)
                 rows_in_table = self.data_collection_summary_table.rowCount()
                 for row in range(rows_in_table):
                     if self.data_collection_summary_table.item(row, 0).text() == key:
@@ -5227,7 +5275,7 @@ class XChemExplorer(QtGui.QApplication):
         # update 'Datasets' table
         column_name = XChemDB.data_source(
             os.path.join(self.database_directory, self.data_source_file)).translate_xce_column_list_to_sqlite(
-            self.data_collection_summary_column_name)
+            self.datasets_summary_table_columns)
         rows_in_table = self.data_collection_summary_table.rowCount()
         for row in range(rows_in_table):
             if self.data_collection_summary_table.item(row, 0).text() == sample:
@@ -5248,10 +5296,10 @@ class XChemExplorer(QtGui.QApplication):
 
     def populate_data_source_table(self, header, data):
         self.mounted_crystal_table.setColumnCount(0)
-        self.mounted_crystal_table.setColumnCount(len(self.data_source_columns_to_display))
+        self.mounted_crystal_table.setColumnCount(len(self.overview_datasource_table_columns))
         self.mounted_crystal_table.setRowCount(0)
 
-        columns_to_show = self.get_columns_to_show(self.data_source_columns_to_display, header)
+        columns_to_show = self.get_columns_to_show(self.overview_datasource_table_columns, header)
         n_rows = self.get_rows_with_sample_id_not_null(header, data)
         self.mounted_crystal_table.setRowCount(n_rows)
         sample_id_column = self.get_columns_to_show(['Sample ID'], header)
@@ -5266,16 +5314,16 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text.setText('')
                 else:
                     cell_text.setText(str(row[item]))
-                if self.data_source_columns_to_display[
+                if self.overview_datasource_table_columns[
                     y] == 'Sample ID':  # assumption is that column 0 is always sampleID
                     cell_text.setFlags(QtCore.Qt.ItemIsEnabled)  # and this field cannot be changed
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.mounted_crystal_table.setItem(x, y, cell_text)
             x += 1
-        self.mounted_crystal_table.setHorizontalHeaderLabels(self.data_source_columns_to_display)
+        self.mounted_crystal_table.setHorizontalHeaderLabels(self.overview_datasource_table_columns)
 
     def populate_and_update_data_source_table(self):
-        self.mounted_crystal_table.setColumnCount(len(self.data_source_columns_to_display))
+        self.mounted_crystal_table.setColumnCount(len(self.overview_datasource_table_columns))
 
         # first get a list of all the samples that are already in the table and which will be updated
         samples_in_table = []
@@ -5284,7 +5332,7 @@ class XChemExplorer(QtGui.QApplication):
             sampleID = str(self.mounted_crystal_table.item(row, 0).text())  # this must be the case
             samples_in_table.append(sampleID)
 
-        columns_to_show = self.get_columns_to_show(self.data_source_columns_to_display)
+        columns_to_show = self.get_columns_to_show(self.overview_datasource_table_columns)
         n_rows = self.get_rows_with_sample_id_not_null_from_datasource()
         sample_id_column = self.get_columns_to_show(['Sample ID'])
 
@@ -5310,16 +5358,16 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text.setText('')
                 else:
                     cell_text.setText(str(row[item]))
-                if self.data_source_columns_to_display[
+                if self.overview_datasource_table_columns[
                     y] == 'Sample ID':  # assumption is that column 0 is always sampleID
                     cell_text.setFlags(QtCore.Qt.ItemIsEnabled)  # and this field cannot be changed
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.mounted_crystal_table.setItem(x, y, cell_text)
-        self.mounted_crystal_table.setHorizontalHeaderLabels(self.data_source_columns_to_display)
+        self.mounted_crystal_table.setHorizontalHeaderLabels(self.overview_datasource_table_columns)
 
     def populate_pandda_analyse_input_table(self):
 
-        column_name = self.db.translate_xce_column_list_to_sqlite(self.pandda_column_name)
+        column_name = self.db.translate_xce_column_list_to_sqlite(self.pandda_table_columns)
         for xtal in sorted(self.xtal_db_dict):
             new_xtal = False
             db_dict = self.xtal_db_dict[xtal]
@@ -5370,7 +5418,7 @@ class XChemExplorer(QtGui.QApplication):
                 panddaDict[str(item[0])] = []
             panddaDict[str(item[0])].append([str(item[1]), str(item[2]), str(item[3])])
 
-        column_name = self.db.translate_xce_column_list_to_sqlite(self.summary_column_name)
+        column_name = self.db.translate_xce_column_list_to_sqlite(self.refinement_table_columns)
         for xtal in sorted(self.xtal_db_dict):
             new_xtal = False
             db_dict = self.xtal_db_dict[xtal]
