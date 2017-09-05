@@ -409,7 +409,7 @@ class XChemExplorer(QtGui.QApplication):
 
         return button
 
-    def bottom_box_setup(self, label, dropdown_options, buttons):
+    def bottom_box_setup(self, label, dropdown_options, dropdown_tooltip, buttons, colour):
 
         frame = QtGui.QFrame()
         frame.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -419,16 +419,14 @@ class XChemExplorer(QtGui.QApplication):
         label = QtGui.QLabel(label)
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
         label.setFont(self.headlineLabelfont)
-        label.setStyleSheet(
-            " QLabel { border: 1px solid black; border-radius: 1px; background: rgb(240,255,140); "
-            "padding: 0px; margin: 0px }")
+        label.setStyleSheet(str(" QLabel { border: 1px solid black; border-radius: 1px;" + str(colour) + "padding: 0px; margin: 0px }"))
         vbox.addWidget(label)
 
         hboxAction = QtGui.QHBoxLayout()
         combobox = QtGui.QComboBox()
         for task in dropdown_options:
             combobox.addItem(task)
-        eval('combobox.setToolTip(XChemToolTips.dataset_task_tip())')
+        eval('combobox.setToolTip(' + str(dropdown_tooltip) +')')
         combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
         hboxAction.addWidget(combobox)
 
@@ -440,6 +438,7 @@ class XChemExplorer(QtGui.QApplication):
         vbox.setSpacing(0)
         vbox.setMargin(0)
         frame.setLayout(vbox)
+        frame.setMaximumWidth((self.screen.width() - 20) / 5)
 
         return frame, combobox
 
@@ -453,16 +452,13 @@ class XChemExplorer(QtGui.QApplication):
         # add menu bar
         menu_bar = self.initialise_menu_bar()
 
-
-
-
         ################################################################################################################
         #                                                                                                              #
-        #                                            WORKFLOW TASK CONTAINER                                           #
+        # ========================================== WORKFLOW TASK CONTAINER ========================================= #
         #                                                                                                              #
         ################################################################################################################
 
-        ## workflow task container
+        # workflow task container - order of tabs as they appear for the main window
         self.workflow = ['Overview',  # 0
                          'Datasets',  # 1
                          'Maps',  # 2
@@ -471,6 +467,7 @@ class XChemExplorer(QtGui.QApplication):
                          'Deposition',  # 6
                          'Settings']  # 5
 
+        # dictionary with keys corresponding to each stage in the workflow
         self.workflow_dict = {self.workflow[0]: 'Overview',
                               self.workflow[1]: 'Datasets',
                               self.workflow[2]: 'Maps',
@@ -479,6 +476,8 @@ class XChemExplorer(QtGui.QApplication):
                               self.workflow[6]: 'Settings',
                               self.workflow[5]: 'Deposition'}
 
+        # a dictionary to hold information about the combobox, run and status buttons for each box at the bottom of the
+        # gui
         self.workflow_widget_dict = {}
 
         # check http://doc.qt.io/qt-4.8/stylesheet-customizing.html#the-box-model
@@ -489,6 +488,7 @@ class XChemExplorer(QtGui.QApplication):
         #                                                DATASOURCE BUTTON                                             #
         #                                                                                                              #
         ################################################################################################################
+        # config settings fot the 'update datasource' button
         datasource_button_dict = {'datasource_button' : [r"Update Tables\nFrom Datasource",
                                   [
                                       ['XChemToolTips.update_from_datasource_button_tip()',  # tooltip
@@ -496,7 +496,7 @@ class XChemExplorer(QtGui.QApplication):
                                       'self.headlineLabelfont',  # font
                                       'self.datasource_menu_reload_samples']  # action
                                   ]]}
-
+        # setup datasource button
         update_from_datasource_button = self.setup_push_button(datasource_button_dict)
 
         ################################################################################################################
@@ -504,17 +504,19 @@ class XChemExplorer(QtGui.QApplication):
         #                                                   DATASETS BOX                                               #
         #                                                                                                              #
         ################################################################################################################
+        # settings for the run button
         dataset_task_run_button_dict = {'dataset_run_button':
                                             [r"Run",
                                              [
-                                                ['XChemToolTips.update_from_datasource_button_tip()', # tooltip
+                                                ['XChemToolTips.dataset_task_run_button_tip()', # tooltip
                                                  'QPushButton { padding: 1px; margin: 1px }', # stylesheet
                                                  '', # font
                                                  'self.button_clicked'] # action
                                              ]]}
-
+        # setup the run button with push button function
         self.dataset_task_run_button = self.setup_push_button(dataset_task_run_button_dict)
 
+        # settings for the status button
         dataset_task_status_button_dict = {'dataset_status_button':
                                                [r"Status",
                                                 [
@@ -523,11 +525,13 @@ class XChemExplorer(QtGui.QApplication):
                                                    '',  # font
                                                    'self.button_clicked']  # action
                                                 ]]}
-
+        # setup the task button with push button function
         self.dataset_task_status_button = self.setup_push_button(dataset_task_status_button_dict)
 
+        # array of both button objects to apply to bottom box layout
         dataset_buttons = [self.dataset_task_run_button, self.dataset_task_status_button]
 
+        # items that will appear it the dropdown (combobox)
         dataset_tasks = ['Get New Results from Autoprocessing',
                          'Run DIMPLE on All Autoprocessing MTZ files',
                          'Rescore Datasets',
@@ -535,11 +539,17 @@ class XChemExplorer(QtGui.QApplication):
                          'Run xia2 on selected datasets',
                          'Run xia2 on selected datasets - overwrite']
 
+        # label for the bottom box layout
         dataset_label = "Datasets"
 
+        # return the frame and combobox from the bottom box setup function
         frame_dataset_task, self.dataset_tasks_combobox = self.bottom_box_setup(dataset_label,
-                                                                                dataset_tasks, dataset_buttons)
+                                                                                dataset_tasks,
+                                                                                'XChemToolTips.dataset_task_tip()',
+                                                                                dataset_buttons,
+                                                                                'background: rgb(240, 255, 140); ')
 
+        # define the combobox and buttons in dictionary key to determine behaviour
         self.workflow_widget_dict['Datasets'] = [self.dataset_tasks_combobox, self.dataset_task_run_button,
                                                  self.dataset_task_status_button]
 
@@ -548,52 +558,61 @@ class XChemExplorer(QtGui.QApplication):
         #                                               MAPS & RESTRAINTS BOX                                          #
         #                                                                                                              #
         ################################################################################################################
+        # settings for the run button
+        map_cif_file_task_run_button_dict = {'dataset_run_button':
+                                            [r"Run",
+                                             [
+                                                 ['XChemToolTips.map_cif_file_task_run_button_tip()',  # tooltip
+                                                  'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
+                                                  '',  # font
+                                                  'self.button_clicked']  # action
+                                             ]]}
+        # setup the run button with push button function
+        self.map_cif_file_task_run_button = self.setup_push_button(map_cif_file_task_run_button_dict)
+
+        # settings for the status button
+        map_cif_file_task_status_button_dict = {'dataset_status_button':
+                                               [r"Status",
+                                                [
+                                                    ['XChemToolTips.map_cif_file_task_status_button_tip()',  # tooltip
+                                                     'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
+                                                     '',  # font
+                                                     'self.button_clicked']  # action
+                                                ]]}
+        # setup the task button with push button function
+        self.map_cif_file_task_status_button = self.setup_push_button(map_cif_file_task_status_button_dict)
+
+        # array of both button objects to apply to bottom box layout
+        map_cif_file_buttons = [self.map_cif_file_task_run_button , self.map_cif_file_task_status_button]
+
+        # items that will appear it the dropdown (combobox)
+        map_cif_file_tasks = ['Run DIMPLE on selected MTZ files',
+                              'Remove selected DIMPLE PDB/MTZ files',
+                              'Create CIF/PDB/PNG file of ALL compounds',
+                              'Create CIF/PDB/PNG file of NEW compounds',
+                              'Create CIF/PDB/PNG file of SELECTED compounds']
+
+        # label for the bottom box layout
+        map_cif_file_label = "Maps & Restraints"
+
+        # return the frame and combobox from the bottom box setup function
+        frame_map_cif_file_task, self.map_cif_file_tasks_combobox = self.bottom_box_setup(map_cif_file_label,
+                                                                                          map_cif_file_tasks,
+                                                                                          'XChemToolTips.map_cif_file_'
+                                                                                          'task_tip()',
+                                                                                          map_cif_file_buttons,
+                                                                                          'rgb(140, 255, 150); ')
+
+        # define the combobox and buttons in dictionary key to determine behaviour
+        self.workflow_widget_dict['Maps'] = [self.map_cif_file_tasks_combobox, self.map_cif_file_task_run_button,
+                                             self.map_cif_file_task_status_button]
 
 
-        ## map and cif files
-        self.map_cif_file_tasks = ['Run DIMPLE on selected MTZ files',
-                                   'Remove selected DIMPLE PDB/MTZ files',
-                                   'Create CIF/PDB/PNG file of ALL compounds',
-                                   'Create CIF/PDB/PNG file of NEW compounds',
-                                   'Create CIF/PDB/PNG file of SELECTED compounds']
-
-        frame_map_cif_file_task = QtGui.QFrame()
-        frame_map_cif_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
-        frame_map_cif_file_task.setStyleSheet(
-            "QFrame { border: 1px solid black; border-radius: 1px; padding: 0px; margin: 0px }")
-        vboxTask = QtGui.QVBoxLayout()
-        label = QtGui.QLabel('Maps & Restraints')
-        label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
-        label.setFont(self.headlineLabelfont)
-        label.setStyleSheet(
-            " QLabel { border: 1px solid black; border-radius: 1px; background: rgb(140,255,150); padding: 0px; margin: 0px }")
-        vboxTask.addWidget(label)
-        hboxAction = QtGui.QHBoxLayout()
-        self.map_cif_file_tasks_combobox = QtGui.QComboBox()
-        for task in self.map_cif_file_tasks:
-            self.map_cif_file_tasks_combobox.addItem(task)
-        self.map_cif_file_tasks_combobox.setToolTip(XChemToolTips.map_cif_file_task_tip())
-        self.map_cif_file_tasks_combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
-        hboxAction.addWidget(self.map_cif_file_tasks_combobox)
-        vboxButton = QtGui.QVBoxLayout()
-        map_cif_file_task_run_button = QtGui.QPushButton("Run")
-        map_cif_file_task_run_button.setToolTip(XChemToolTips.map_cif_file_task_run_button_tip())
-        map_cif_file_task_run_button.clicked.connect(self.button_clicked)
-        map_cif_file_task_run_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
-        vboxButton.addWidget(map_cif_file_task_run_button)
-        map_cif_file_task_status_button = QtGui.QPushButton("Status")
-        map_cif_file_task_status_button.setToolTip(XChemToolTips.map_cif_file_task_status_button_tip())
-        map_cif_file_task_status_button.clicked.connect(self.button_clicked)
-        map_cif_file_task_status_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
-        vboxButton.addWidget(map_cif_file_task_status_button)
-        hboxAction.addLayout(vboxButton)
-        vboxTask.addLayout(hboxAction)
-        vboxTask.setSpacing(0)
-        vboxTask.setMargin(0)
-        frame_map_cif_file_task.setLayout(vboxTask)
-
-        self.workflow_widget_dict['Maps'] = [self.map_cif_file_tasks_combobox, map_cif_file_task_run_button,
-                                             map_cif_file_task_status_button]
+        ################################################################################################################
+        #                                                                                                              #
+        #                                               HIT IDENTIFICATION BOX                                         #
+        #                                                                                                              #
+        ################################################################################################################
 
         ## PanDDA
         self.panddas_file_tasks = ['pandda.analyse',
@@ -646,6 +665,12 @@ class XChemExplorer(QtGui.QApplication):
 
         self.workflow_widget_dict['PANDDAs'] = [self.panddas_file_tasks_combobox, panddas_file_task_run_button,
                                                 panddas_file_task_status_button]
+
+        ################################################################################################################
+        #                                                                                                              #
+        #                                                      REFINEMENT BOX                                          #
+        #                                                                                                              #
+        ################################################################################################################
 
         ## refine
         self.refine_file_tasks = ['Open COOT',
