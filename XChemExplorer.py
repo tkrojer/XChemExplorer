@@ -807,6 +807,11 @@ class XChemExplorer(QtGui.QApplication):
             tab_widget.addTab(tab, page)
             tab_dict[page] = [tab, vbox]
 
+    def add_checkbox(self, checkbox, function, checkopt=False):
+        checkbox.toggle
+        checkbox.setChecked(checkopt)
+        eval(str('checkbox.stateChanged.connect(' + function + ')'))
+
 
     ################################################# define gui #######################################################
     def start_GUI(self):
@@ -947,13 +952,13 @@ class XChemExplorer(QtGui.QApplication):
 
         # add a horizontal box to hold option to autocheck for new data
         hbox = QtGui.QHBoxLayout()
-        
-        # checkbox and function settings
-        check_for_new_data_collection = QtGui.QCheckBox('Check for new data collection every two minutes')
-        check_for_new_data_collection.toggle()
-        check_for_new_data_collection.setChecked(False)
-        check_for_new_data_collection.stateChanged.connect(self.continously_check_for_new_data_collection)
-        hbox.addWidget(check_for_new_data_collection)
+
+        # checkbox for autocollect
+        self.check_for_new_data_collection = QtGui.QCheckBox('Check for new data collection every two minutes')
+        self.add_checkbox(self.check_for_new_data_collection, 'self.continously_check_for_new_data_collection')
+        hbox.addWidget(self.check_for_new_data_collection)
+
+
         
         # spacer for top bar
         hbox.addWidget(QtGui.QLabel('                                             '))
@@ -1239,11 +1244,12 @@ class XChemExplorer(QtGui.QApplication):
 
         ## map files tab
         initial_model_checkbutton_hbox = QtGui.QHBoxLayout()
-        select_sample_for_dimple = QtGui.QCheckBox('(de-)select all samples for DIMPLE')
-        select_sample_for_dimple.toggle()
-        select_sample_for_dimple.setChecked(False)
-        select_sample_for_dimple.stateChanged.connect(self.set_run_dimple_flag)
-        initial_model_checkbutton_hbox.addWidget(select_sample_for_dimple)
+        
+        self.select_sample_for_dimple = QtGui.QCheckBox('(de-)select all samples for DIMPLE')
+        self.add_checkbox(self.select_sample_for_dimple, 'self.self.set_run_dimple_flag')
+        initial_model_checkbutton_hbox.addWidget(self.select_sample_for_dimple)
+
+
 
         set_new_reference_button = QtGui.QPushButton("Set New Reference (if applicable)")
         set_new_reference_button.clicked.connect(self.set_new_reference_if_applicable)
