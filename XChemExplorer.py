@@ -300,6 +300,7 @@ class XChemExplorer(QtGui.QApplication):
         else:
             os.startfile(file)
 
+    # function to initialise the top menu bar
     def initialise_menu_bar(self):
         ################################################################################################################
         #                                                                                                              #
@@ -380,20 +381,12 @@ class XChemExplorer(QtGui.QApplication):
         # consequence - work out later.
 
         # self.prepare_mmcif_files_dict = {}
-        #
-        # prepare_mmcif_files_for_apo_structures = QtGui.QAction('prepare mmcif for apo structures', self.window)
-        # prepare_mmcif_files_for_apo_structures.triggered.connect(self.prepare_models_for_deposition)
-        # deposition_menu.addAction(prepare_mmcif_files_for_apo_structures)
         # self.prepare_mmcif_files_dict['apo'] = prepare_mmcif_files_for_apo_structures
-
-        # prepare_mmcif_files_for_ligand_bound_structures = QtGui.QAction('prepare mmcif for ligand bound structures',
-        #                                                                 self.window)
-        # prepare_mmcif_files_for_ligand_bound_structures.triggered.connect(self.prepare_models_for_deposition)
-        # deposition_menu.addAction(prepare_mmcif_files_for_ligand_bound_structures)
         # self.prepare_mmcif_files_dict['ligand_bound'] = prepare_mmcif_files_for_ligand_bound_structures
 
         return menu_bar
 
+    # function for datasource, run and status button setup
     def setup_push_button(self, button_dict):
         # use iterkeys to determine order of key by letter
         for name in sorted(button_dict.iterkeys()):
@@ -409,6 +402,7 @@ class XChemExplorer(QtGui.QApplication):
 
         return button
 
+    # function to setup one of the bottom boxes
     def bottom_box_setup(self, label, dropdown_options, dropdown_tooltip, buttons, colour):
 
         frame = QtGui.QFrame()
@@ -419,7 +413,8 @@ class XChemExplorer(QtGui.QApplication):
         label = QtGui.QLabel(label)
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
         label.setFont(self.headlineLabelfont)
-        label.setStyleSheet(str(" QLabel { border: 1px solid black; border-radius: 1px;" + str(colour) + "padding: 0px; margin: 0px }"))
+        label.setStyleSheet(str(" QLabel { border: 1px solid black; border-radius: 1px;" + str(colour) +
+                                "padding: 0px; margin: 0px }"))
         vbox.addWidget(label)
 
         hboxAction = QtGui.QHBoxLayout()
@@ -601,7 +596,8 @@ class XChemExplorer(QtGui.QApplication):
                                                                                           'XChemToolTips.map_cif_file_'
                                                                                           'task_tip()',
                                                                                           map_cif_file_buttons,
-                                                                                          'rgb(140, 255, 150); ')
+                                                                                          'background: rgb(140, 255, '
+                                                                                          '150); ')
 
         # define the combobox and buttons in dictionary key to determine behaviour
         self.workflow_widget_dict['Maps'] = [self.map_cif_file_tasks_combobox, self.map_cif_file_task_run_button,
@@ -613,58 +609,63 @@ class XChemExplorer(QtGui.QApplication):
         #                                               HIT IDENTIFICATION BOX                                         #
         #                                                                                                              #
         ################################################################################################################
+        # settings for the run button
+        panddas_file_task_run_button_dict = {'dataset_run_button':
+                                                 [r"Run",
+                                                  [
+                                                      ['XChemToolTips.panddas_file_task_run_button_tip()',  # tooltip
+                                                       'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
+                                                       '',  # font
+                                                       'self.button_clicked']  # action
+                                                  ]]}
+        # setup the run button with push button function
+        self.panddas_file_task_run_button = self.setup_push_button(panddas_file_task_run_button_dict)
 
-        ## PanDDA
-        self.panddas_file_tasks = ['pandda.analyse',
-                                   'pandda.inspect',
-                                   'run pandda.inspect at home',
-                                   'Export NEW PANDDA models',
-                                   'Export ALL PANDDA models',
-                                   'Show HTML summary',
-                                   'Update datasource with results from pandda.inspect',
-                                   'cluster datasets',
-                                   'Event Map -> SF',
-                                   'check modelled ligands',
-                                   'pre-run for ground state model',
-                                   'Build ground state model']
+        # settings for the status button
+        panddas_file_task_status_button_dict = {'dataset_status_button':
+                                                    [r"Status",
+                                                     [
+                                                         ['XChemToolTips.panddas_file_task_status_button_tip()',
+                                                          # tooltip
+                                                          'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
+                                                          '',  # font
+                                                          'self.button_clicked']  # action
+                                                     ]]}
+        # setup the task button with push button function
+        self.panddas_file_task_status_button = self.setup_push_button(panddas_file_task_status_button_dict)
 
-        frame_panddas_file_task = QtGui.QFrame()
-        frame_panddas_file_task.setFrameShape(QtGui.QFrame.StyledPanel)
-        frame_panddas_file_task.setStyleSheet(
-            "QFrame { border: 1px solid black; border-radius: 1px; padding: 0px; margin: 0px }")
-        vboxTask = QtGui.QVBoxLayout()
-        label = QtGui.QLabel('Hit Identification')
-        label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
-        label.setFont(self.headlineLabelfont)
-        label.setStyleSheet(
-            " QLabel { border: 1px solid black; border-radius: 1px; background: rgb(140,200,255); padding: 0px; margin: 0px }")
-        vboxTask.addWidget(label)
-        hboxAction = QtGui.QHBoxLayout()
-        self.panddas_file_tasks_combobox = QtGui.QComboBox()
-        for task in self.panddas_file_tasks:
-            self.panddas_file_tasks_combobox.addItem(task)
-        self.panddas_file_tasks_combobox.setToolTip(XChemToolTips.panddas_file_task_tip())
-        self.panddas_file_tasks_combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
-        hboxAction.addWidget(self.panddas_file_tasks_combobox)
-        vboxButton = QtGui.QVBoxLayout()
-        panddas_file_task_run_button = QtGui.QPushButton("Run")
-        panddas_file_task_run_button.setToolTip(XChemToolTips.panddas_file_task_run_button_tip())
-        panddas_file_task_run_button.clicked.connect(self.button_clicked)
-        panddas_file_task_run_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
-        vboxButton.addWidget(panddas_file_task_run_button)
-        panddas_file_task_status_button = QtGui.QPushButton("Status")
-        panddas_file_task_status_button.setToolTip(XChemToolTips.panddas_file_task_status_button_tip())
-        panddas_file_task_status_button.clicked.connect(self.button_clicked)
-        panddas_file_task_status_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
-        vboxButton.addWidget(panddas_file_task_status_button)
-        hboxAction.addLayout(vboxButton)
-        vboxTask.addLayout(hboxAction)
-        vboxTask.setSpacing(0)
-        vboxTask.setMargin(0)
-        frame_panddas_file_task.setLayout(vboxTask)
+        # array of both button objects to apply to bottom box layout
+        panddas_file_buttons = [self.panddas_file_task_run_button, self.panddas_file_task_status_button]
 
-        self.workflow_widget_dict['PANDDAs'] = [self.panddas_file_tasks_combobox, panddas_file_task_run_button,
-                                                panddas_file_task_status_button]
+        # items that will appear it the dropdown (combobox)
+        panddas_file_tasks = ['pandda.analyse',
+                              'pandda.inspect',
+                              'run pandda.inspect at home',
+                              'Export NEW PANDDA models',
+                              'Export ALL PANDDA models',
+                              'Show HTML summary',
+                              'Update datasource with results from pandda.inspect',
+                              'cluster datasets',
+                              'Event Map -> SF',
+                              'check modelled ligands',
+                              'pre-run for ground state model',
+                              'Build ground state model']
+
+        # label for the bottom box layout
+        panddas_file_label = "Hit Identification"
+
+        # return the frame and combobox from the bottom box setup function
+        frame_panddas_file_task, self.panddas_file_tasks_combobox = self.bottom_box_setup(panddas_file_label,
+                                                                                          panddas_file_tasks,
+                                                                                          'XChemToolTips.panddas_file_'
+                                                                                          'task_tip()',
+                                                                                          panddas_file_buttons,
+                                                                                          'background: rgb(140,200,255)'
+                                                                                          '; ')
+
+        # define the combobox and buttons in dictionary key to determine behaviour
+        self.workflow_widget_dict['PANDDAs'] = [self.map_cif_file_tasks_combobox, self.map_cif_file_task_run_button,
+                                                self.map_cif_file_task_status_button]
 
         ################################################################################################################
         #                                                                                                              #
@@ -3852,7 +3853,6 @@ class XChemExplorer(QtGui.QApplication):
 
 
     def button_clicked(self):
-        print('button clicked!')
         if self.data_source_set == False:
             print('sender text bit')
             if self.sender().text() == "Create New Data\nSource (SQLite)":
@@ -3877,8 +3877,6 @@ class XChemExplorer(QtGui.QApplication):
                 self.no_data_source_selected()
                 print('No datasource selected')
                 pass
-        else:
-            print'skipped loop!'
 
         # first find out which of the 'Run' or 'Status' buttons is sending
         for item in self.workflow_widget_dict:
