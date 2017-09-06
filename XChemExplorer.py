@@ -829,7 +829,7 @@ class XChemExplorer(QtGui.QApplication):
             self.panddas_directory + '/analyses/html_summaries/' + 'pandda_analyse.html')
         self.pandda_inspect_html_file = str(
             self.panddas_directory + '/analyses/html_summaries/' + 'pandda_inspect.html')
-        self.show_pandda_html_summary()
+
 
     ################################################# define gui #######################################################
     def start_GUI(self):
@@ -3235,7 +3235,8 @@ class XChemExplorer(QtGui.QApplication):
             self.settings['panddas_directory'] = self.panddas_directory
 
             self.pandda_html()
-
+            self.show_pandda_html_summary()
+            
             self.html_export_directory = pickled_settings['html_export_directory']
             self.html_export_directory_label.setText(self.html_export_directory)
             self.settings['html_export_directory'] = self.html_export_directory
@@ -5040,7 +5041,7 @@ class XChemExplorer(QtGui.QApplication):
                         self.datasets_summary_table.setCellWidget(current_row, column,
                                                                          show_data_collection_details_checkbox)
                         self.datasets_summary_dict[xtal].append(show_data_collection_details_checkbox)
-                elif header[0].startswith('SoakDB\nBarcode'):
+                elif header[0].startswith('SoakDB\nBarcode') or header[0].startswith('GDA\nBarcode'):
                     if new_xtal:
                         cell_text = QtGui.QTableWidgetItem()
                         if xtal in pinDict:
@@ -5054,19 +5055,19 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.datasets_summary_table.setItem(current_row, column, cell_text)
 
-                elif header[0].startswith('GDA\nBarcode'):
-                    if new_xtal:
-                        cell_text = QtGui.QTableWidgetItem()
-                        if xtal in pinDict:
-                            cell_text.setText(str(pinDict[xtal][1]))
-                            if pinDict[xtal][0] == 'NULL' or pinDict[xtal][1] == 'NULL':
-                                cell_text.setBackground(QtGui.QColor(255, 215, 0))
-                            elif pinDict[xtal][0] != pinDict[xtal][1]:
-                                cell_text.setBackground(QtGui.QColor(255, 0, 0))
-                        else:
-                            cell_text.setText('')
-                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                        self.datasets_summary_table.setItem(current_row, column, cell_text)
+                # elif header[0].startswith('GDA\nBarcode'):
+                #     if new_xtal:
+                #         cell_text = QtGui.QTableWidgetItem()
+                #         if xtal in pinDict:
+                #             cell_text.setText(str(pinDict[xtal][1]))
+                #             if pinDict[xtal][0] == 'NULL' or pinDict[xtal][1] == 'NULL':
+                #                 cell_text.setBackground(QtGui.QColor(255, 215, 0))
+                #             elif pinDict[xtal][0] != pinDict[xtal][1]:
+                #                 cell_text.setBackground(QtGui.QColor(255, 0, 0))
+                #         else:
+                #             cell_text.setText('')
+                #         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                #         self.datasets_summary_table.setItem(current_row, column, cell_text)
 
 
 
