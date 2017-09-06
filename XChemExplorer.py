@@ -79,7 +79,7 @@ class XChemExplorer(QtGui.QApplication):
             self.reference_directory = os.path.join(self.labxchem_directory, 'processing', 'reference')
             self.database_directory = os.path.join(self.labxchem_directory, 'processing', 'database')
             self.panddas_directory = os.path.join(self.labxchem_directory, 'processing', 'analysis', 'panddas')
-            self.data_collection_summary_file = os.path.join(self.database_directory,
+            self.datasets_summary_file = os.path.join(self.database_directory,
                                                              str(os.getcwd().split('/')[5]) + '_summary.pkl')
             self.data_source_file = ''
             self.html_export_directory = os.path.join(self.labxchem_directory, 'processing', 'html')
@@ -121,7 +121,7 @@ class XChemExplorer(QtGui.QApplication):
             self.data_source_file = ''
             self.ccp4_scratch_directory = os.getenv('CCP4_SCR')
             self.panddas_directory = self.current_directory
-            self.data_collection_summary_file = ''
+            self.datasets_summary_file = ''
             self.group_deposit_directory = self.current_directory
 
         ## preferences
@@ -140,7 +140,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.settings = {'current_directory': self.current_directory,
                          'beamline_directory': self.beamline_directory,
-                         'data_collection_summary': self.data_collection_summary_file,
+                         'datasets_summary': self.datasets_summary_file,
                          'initial_model_directory': self.initial_model_directory,
                          'panddas_directory': self.panddas_directory,
                          'reference_directory': self.reference_directory,
@@ -184,9 +184,9 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_table_dict = {}  # contains the dataset table
         self.data_collection_image_dict = {}
         self.data_collection_column_three_dict = {}
-        self.data_collection_summary_dict = {}
+        self.datasets_summary_dict = {}
         self.diffraction_data_table_dict = {}
-        self.summary_table_dict = {}
+        self.refinement_table_dict = {}
         self.main_data_collection_table_exists = False
         self.timer_to_check_for_new_data_collection = QtCore.QTimer()
 
@@ -718,8 +718,8 @@ class XChemExplorer(QtGui.QApplication):
 
         # functions that use self.datasets_summary_table_columns:
         #
-        # - populate_data_collection_summary_table() - appears in create_widgets_for_autoprocessing_results_only()
-        # - user_update_selected_autoproc_data_collection_summary_table()
+        # - populate_datasets_summary_table() - appears in create_widgets_for_autoprocessing_results_only()
+        # - user_update_selected_autoproc_datasets_summary_table()
         #                                            - appears in create_widgets_for_autoprocessing_results_only()
 
         self.datasets_summary_table_columns = ['Sample ID',
@@ -742,7 +742,7 @@ class XChemExplorer(QtGui.QApplication):
 
         # functions that use self.datasets_reprocess_columns:
         #
-        # - update_reprocess_datasets_table() - appears in search_for_datasets()
+        # - update_datasets_reprocess_table() - appears in search_for_datasets()
 
         self.datasets_reprocess_columns = ['Dataset ID',
                                            'Sample ID',
@@ -756,7 +756,7 @@ class XChemExplorer(QtGui.QApplication):
 
         # functions that use self.maps_table_columns:
         #
-        # - update_reprocess_datasets_table() - appears in create_initial_model_table()
+        # - update_datasets_reprocess_table() - appears in create_maps_table()
 
         self.maps_table_columns = ['Sample ID',
                                    'Select',
@@ -808,9 +808,14 @@ class XChemExplorer(QtGui.QApplication):
             tab_dict[page] = [tab, vbox]
 
     def add_checkbox(self, checkbox, function, checkopt=False):
-        checkbox.toggle
+        checkbox.toggle()
         checkbox.setChecked(checkopt)
         eval(str('checkbox.stateChanged.connect(' + function + ')'))
+
+    def table_setup(self, table, table_columns, sortingopt=True):
+        table.setColumnCount(len(table_columns))
+        table.setSortingEnabled(sortingopt)
+        table.setHorizontalHeaderLabels(table_columns)
 
 
     ################################################# define gui #######################################################
@@ -946,6 +951,7 @@ class XChemExplorer(QtGui.QApplication):
         self.make_tab_dict(datasets_tab_list, self.datasets_tab_widget, self.datasets_tab_dict)
 
         # main tab
+
         # add a container to hold everythting and add to main tab layout
         self.datasets_data_collection_vbox = QtGui.QVBoxLayout()
         self.tab_dict[self.workflow_dict['Datasets']][1].addLayout(self.datasets_data_collection_vbox)
@@ -958,8 +964,6 @@ class XChemExplorer(QtGui.QApplication):
         self.add_checkbox(self.check_for_new_data_collection, 'self.continously_check_for_new_data_collection')
         hbox.addWidget(self.check_for_new_data_collection)
 
-
-        
         # spacer for top bar
         hbox.addWidget(QtGui.QLabel('                                             '))
         
@@ -971,75 +975,26 @@ class XChemExplorer(QtGui.QApplication):
         hbox.addWidget(self.target_selection_combobox)
         self.target = str(self.target_selection_combobox.currentText())
 
-        # # add target dropdown to top bar
+        # add target dropdown to top bar
         self.datasets_data_collection_vbox.addLayout(hbox)
 
-        ## summary sub-tab
-
-
-        self.data_collection_summary_table = QtGui.QTableWidget()
-        self.data_collection_summary_table.setColumnCount(len(self.datasets_summary_table_columns))
-        self.data_collection_summary_table.setSortingEnabled(True)
-        self.data_collection_summary_table.setHorizontalHeaderLabels(self.datasets_summary_table_columns)
+        # summary sub-tab
 
         # table
-        self.data_collection_summarys_vbox_for_table = QtGui.QVBoxLayout()
-        self.datasets_tab_dict['Summary'][1].addLayout(self.data_collection_summarys_vbox_for_table)
+        self.datasets_summary_table = QtGui.QTableWidget()
+        self.table_setup(self.datasets_summary_table, self.datasets_summary_table_columns)
+        self.datasets_summarys_vbox_for_table = QtGui.QVBoxLayout()
+        self.datasets_tab_dict['Summary'][1].addLayout(self.datasets_summarys_vbox_for_table)
 
         # another vbox for details to be shown
-        self.data_collection_summarys_vbox_for_details = QtGui.QVBoxLayout()
+        self.datasets_summarys_vbox_for_details = QtGui.QVBoxLayout()
         self.data_collection_details_currently_on_display = None
-        self.datasets_tab_dict['Summary'][1].addLayout(self.data_collection_summarys_vbox_for_details)
-
-        self.data_collection_summarys_vbox_for_table.addWidget(self.data_collection_summary_table)
-
+        self.datasets_tab_dict['Summary'][1].addLayout(self.datasets_summarys_vbox_for_details)
+        self.datasets_summarys_vbox_for_table.addWidget(self.datasets_summary_table)
         self.datasets_data_collection_vbox.addWidget(self.datasets_tab_widget)
 
-        ## dewar sub-tab
-        self.dewar_configuration_dict = {}
-        self.dewar_sample_configuration_dict = {}
-        self.dewar_label_active = ''
-        self.dewar_configuration_layout = QtGui.QGridLayout()
+        # reprocessing sub-tab
 
-        # create context menu
-        self.popMenu = QtGui.QMenu()
-        recollect = QtGui.QAction("recollect", self.window)
-        recollect.triggered.connect(self.flag_sample_for_recollection)
-        undo_recollect = QtGui.QAction("undo", self.window)
-        undo_recollect.triggered.connect(self.undo_flag_sample_for_recollection)
-        self.popMenu.addAction(recollect)
-        self.popMenu.addAction(undo_recollect)
-
-        for puck in range(38):
-            for position in range(17):
-                frame = QtGui.QFrame()
-                frame.setFrameShape(QtGui.QFrame.StyledPanel)
-                vbox_for_frame = QtGui.QVBoxLayout()
-                if puck == 0 and position == 0:
-                    label = QtGui.QLabel('')
-                    vbox_for_frame.addWidget(label)
-                    frame.setLayout(vbox_for_frame)
-                elif puck == 0 and position != 0:
-                    label = QtGui.QLabel(str(position))
-                    vbox_for_frame.addWidget(label)
-                    frame.setLayout(vbox_for_frame)
-                elif position == 0 and puck != 0:
-                    label = QtGui.QLabel(str(puck))
-                    vbox_for_frame.addWidget(label)
-                    frame.setLayout(vbox_for_frame)
-                else:
-                    frame = QtGui.QPushButton('')
-                    frame.setStyleSheet("font-size:5px;border-width: 0px")
-                    frame.clicked.connect(self.show_html_summary_in_firefox)
-                    # how to right click on button
-                    self.dewar_configuration_dict[str(puck) + '-' + str(position)] = frame
-                    self.dewar_sample_configuration_dict[str(puck) + '-' + str(position)] = []
-                    frame.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-                    frame.customContextMenuRequested.connect(self.on_context_menu)
-
-                self.dewar_configuration_layout.addWidget(frame, position, puck)
-
-        ## reprocessing sub-tab
         reprocess_vbox = QtGui.QVBoxLayout()
 
         frame = QtGui.QFrame()
@@ -1048,9 +1003,11 @@ class XChemExplorer(QtGui.QApplication):
 
         frame_select = QtGui.QFrame()
         frame_select.setFrameShape(QtGui.QFrame.StyledPanel)
+
         hbox_select = QtGui.QHBoxLayout()
         label = QtGui.QLabel('Data collection directory:')
         hbox_select.addWidget(label)
+
         dir_frame = QtGui.QFrame()
         dir_frame.setFrameShape(QtGui.QFrame.StyledPanel)
         dir_label_box = QtGui.QVBoxLayout()
@@ -1058,17 +1015,20 @@ class XChemExplorer(QtGui.QApplication):
         dir_label_box.addWidget(self.diffraction_data_dir_label)
         dir_frame.setLayout(dir_label_box)
         hbox_select.addWidget(dir_frame)
+
         button = QtGui.QPushButton("Select")
         button.clicked.connect(self.select_diffraction_data_directory)
         hbox_select.addWidget(button)
         frame_select.setLayout(hbox_select)
         hbox.addWidget(frame_select)
+
         frame_search = QtGui.QFrame()
         frame_search.setFrameShape(QtGui.QFrame.StyledPanel)
         hbox_search = QtGui.QHBoxLayout()
         button = QtGui.QPushButton("Search Datasets")
         button.clicked.connect(self.search_for_datasets)
         hbox_search.addWidget(button)
+
         frame_search_info = QtGui.QFrame()
         frame_search_info.setFrameShape(QtGui.QFrame.StyledPanel)
         hbox_search_info = QtGui.QHBoxLayout()
@@ -1097,20 +1057,18 @@ class XChemExplorer(QtGui.QApplication):
         frame.setLayout(hbox)
         reprocess_vbox.addWidget(frame)
 
-        self.reprocess_datasets_table = QtGui.QTableWidget()
-        self.reprocess_datasets_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.reprocess_datasets_table.setSortingEnabled(True)
-        self.reprocess_datasets_table.setColumnCount(len(self.datasets_reprocess_columns))
-        self.reprocess_datasets_table.setHorizontalHeaderLabels(self.datasets_reprocess_columns)
-        reprocess_vbox.addWidget(self.reprocess_datasets_table)
+        # table
+        self.datasets_reprocess_table = QtGui.QTableWidget()
+        self.table_setup(self.datasets_reprocess_table, self.datasets_reprocess_columns)
+        reprocess_vbox.addWidget(self.datasets_reprocess_table)
 
         # create context menu
-        self.popMenu_for_reprocess_datasets_table = QtGui.QMenu()
+        self.popMenu_for_datasets_reprocess_table = QtGui.QMenu()
         run_xia2_on_selected = QtGui.QAction("mark selected for reprocessing", self.window)
         run_xia2_on_selected.triggered.connect(self.select_sample_for_xia2)
-        self.popMenu_for_reprocess_datasets_table.addAction(run_xia2_on_selected)
-        self.reprocess_datasets_table.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.reprocess_datasets_table.customContextMenuRequested.connect(self.on_context_menu_reprocess_data)
+        self.popMenu_for_datasets_reprocess_table.addAction(run_xia2_on_selected)
+        self.datasets_reprocess_table.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.datasets_reprocess_table.customContextMenuRequested.connect(self.on_context_menu_reprocess_data)
 
         frame = QtGui.QFrame()
         frame.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -1205,51 +1163,11 @@ class XChemExplorer(QtGui.QApplication):
         #                                                    MAPS TAB                                                  #
         #                                                                                                              #
         ################################################################################################################
-
-        ################################################################################################################
-        #                                                                                                              #
-        #                                                   PANDDA TAB                                                 #
-        #                                                                                                              #
-        ################################################################################################################
-        pandda_tab_list = ['pandda.analyse',
-                           'Dataset Summary',
-                           'Processing Output',
-                           'pandda.inspect',
-                           'Statistical Map Summaries']
-
-        self.pandda_tab_widget = QtGui.QTabWidget()
-        self.pandda_tab_dict = {}
-        self.make_tab_dict(pandda_tab_list, self.pandda_tab_widget, self.pandda_tab_dict)
-
-        ################################################################################################################
-        #                                                                                                              #
-        #                                                REFINEMENT TAB                                                #
-        #                                                                                                              #
-        ################################################################################################################
-
-        ################################################################################################################
-        #                                                                                                              #
-        #                                                DEPOSITION TAB                                                #
-        #                                                                                                              #
-        ################################################################################################################
-        
-        
-
-
-
-
-
-
-
-
-        ## map files tab
         initial_model_checkbutton_hbox = QtGui.QHBoxLayout()
-        
-        self.select_sample_for_dimple = QtGui.QCheckBox('(de-)select all samples for DIMPLE')
-        self.add_checkbox(self.select_sample_for_dimple, 'self.self.set_run_dimple_flag')
-        initial_model_checkbutton_hbox.addWidget(self.select_sample_for_dimple)
 
-
+        self.select_sample_for_dimple_box = QtGui.QCheckBox('(de-)select all samples for DIMPLE')
+        self.add_checkbox(self.select_sample_for_dimple_box, 'self.set_run_dimple_flag')
+        initial_model_checkbutton_hbox.addWidget(self.select_sample_for_dimple_box)
 
         set_new_reference_button = QtGui.QPushButton("Set New Reference (if applicable)")
         set_new_reference_button.clicked.connect(self.set_new_reference_if_applicable)
@@ -1267,34 +1185,254 @@ class XChemExplorer(QtGui.QApplication):
         self.tab_dict[self.workflow_dict['Maps']][1].addLayout(initial_model_checkbutton_hbox)
         self.initial_model_vbox_for_table = QtGui.QVBoxLayout()
 
-        self.initial_model_table = QtGui.QTableWidget()
-        self.initial_model_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.initial_model_table.setSortingEnabled(True)
-        self.initial_model_table.setColumnCount(len(self.maps_table_columns))
-        self.initial_model_table.setHorizontalHeaderLabels(self.maps_table_columns)
-        self.initial_model_vbox_for_table.addWidget(self.initial_model_table)
+        # table
+        self.maps_table = QtGui.QTableWidget()
+        self.table_setup(self.maps_table, self.maps_table_columns)
+        self.initial_model_vbox_for_table.addWidget(self.maps_table)
         self.tab_dict[self.workflow_dict['Maps']][1].addLayout(self.initial_model_vbox_for_table)
 
         # create context menu
-        self.popMenu_for_initial_model_table = QtGui.QMenu()
+        self.popMenu_for_maps_table = QtGui.QMenu()
         run_dimple = QtGui.QAction("mark selected for dimple run", self.window)
         run_dimple.triggered.connect(self.select_sample_for_dimple)
-        self.popMenu_for_initial_model_table.addAction(run_dimple)
-        self.initial_model_table.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.initial_model_table.customContextMenuRequested.connect(self.on_context_menu_initial_model)
+        self.popMenu_for_maps_table.addAction(run_dimple)
+        self.maps_table.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.maps_table.customContextMenuRequested.connect(self.on_context_menu_initial_model)
 
-        ## refine tab
+        ################################################################################################################
+        #                                                                                                              #
+        #                                                   PANDDA TAB                                                 #
+        #                                                                                                              #
+        ################################################################################################################
+        pandda_tab_list = ['pandda.analyse',
+                           'Dataset Summary',
+                           'Processing Output',
+                           'pandda.inspect',
+                           'Statistical Map Summaries']
+
+        self.pandda_tab_widget = QtGui.QTabWidget()
+        self.pandda_tab_dict = {}
+        self.make_tab_dict(pandda_tab_list, self.pandda_tab_widget, self.pandda_tab_dict)
+
+        ## PanDDA tab
+        self.panddas_results_vbox = QtGui.QVBoxLayout()
+        self.tab_dict[self.workflow_dict['PANDDAs']][1].addLayout(self.panddas_results_vbox)
+
+        self.pandda_analyse_hbox = QtGui.QHBoxLayout()
+        self.pandda_tab_dict['pandda.analyse'][1].addLayout(self.pandda_analyse_hbox)
+        self.pandda_map_layout = QtGui.QVBoxLayout()
+        self.pandda_map_list = QtGui.QComboBox()
+        self.pandda_maps_html = QtWebKit.QWebView()
+        self.pandda_map_layout.addWidget(self.pandda_map_list)
+        self.pandda_map_layout.addWidget(self.pandda_maps_html)
+
+        self.pandda_tab_dict['Statistical Map Summaries'][1].addLayout(self.pandda_map_layout)
+        self.pandda_maps_html.show()
+
+        grid_pandda = QtGui.QGridLayout()
+        grid_pandda.setColumnStretch(0, 20)
+        grid_pandda.setRowStretch(0, 20)
+        # left hand side: table with information about available datasets
+
+        # table
+        self.pandda_analyse_data_table = QtGui.QTableWidget()
+        self.table_setup(self.pandda_analyse_data_table, self.pandda_table_columns)
+
+        frame_pandda = QtGui.QFrame()
+        grid_pandda.addWidget(self.pandda_analyse_data_table, 0, 0)
+
+        self.pandda_status = 'UNKNOWN'
+        self.pandda_status_label = QtGui.QLabel()
+        if os.path.exists(str(self.panddas_directory + '/pandda.done')):
+            self.pandda_status = 'Finished!'
+            self.pandda_status_label.setStyleSheet('color: green')
+        if os.path.exists(str(self.panddas_directory + '/pandda.running')):
+            self.pandda_status = 'Running...'
+            self.pandda_status_label.setStyleSheet('color: orange')
+        if os.path.exists(str(self.panddas_directory + '/pandda.errored')):
+            self.pandda_status = 'Error encountered... please check the log files for pandda!'
+            self.pandda_status_label.setStyleSheet('color: red')
+        self.pandda_status_label.setText(str('STATUS: ' + self.pandda_status))
+        self.pandda_status_label.setFont(QtGui.QFont("Arial", 25, QtGui.QFont.Bold))
+        grid_pandda.addWidget(self.pandda_status_label, 3, 0)
+
+        # right hand side: input parameters for PANDDAs run
+        frame_right = QtGui.QFrame()
+        frame_right.setFrameShape(QtGui.QFrame.StyledPanel)
+
+        self.pandda_analyse_input_params_vbox = QtGui.QVBoxLayout()
+
+        pandda_input_dir_hbox = QtGui.QHBoxLayout()
+        label = QtGui.QLabel('data directory')
+        self.pandda_analyse_input_params_vbox.addWidget(label)
+        self.pandda_input_data_dir_entry = QtGui.QLineEdit()
+        self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory, '*'))
+        self.pandda_input_data_dir_entry.setFixedWidth(300)
+        pandda_input_dir_hbox.addWidget(self.pandda_input_data_dir_entry)
+        self.select_pandda_input_dir_button = QtGui.QPushButton("Select Input Template")
+        self.select_pandda_input_dir_button.setMaximumWidth(200)
+        self.select_pandda_input_dir_button.clicked.connect(self.select_pandda_input_template)
+        pandda_input_dir_hbox.addWidget(self.select_pandda_input_dir_button)
+        self.pandda_analyse_input_params_vbox.addLayout(pandda_input_dir_hbox)
+
+        pandda_pdb_style_hbox = QtGui.QHBoxLayout()
+        label = QtGui.QLabel('pdb style')
+        pandda_pdb_style_hbox.addWidget(label)
+        self.pandda_pdb_style_entry = QtGui.QLineEdit()
+        self.pandda_pdb_style_entry.setText('dimple.pdb')
+        self.pandda_pdb_style_entry.setFixedWidth(200)
+        pandda_pdb_style_hbox.addWidget(self.pandda_pdb_style_entry)
+        self.pandda_analyse_input_params_vbox.addLayout(pandda_pdb_style_hbox)
+
+        pandda_mtz_style_hbox = QtGui.QHBoxLayout()
+        label = QtGui.QLabel('mtz style')
+        pandda_mtz_style_hbox.addWidget(label)
+        self.pandda_mtz_style_entry = QtGui.QLineEdit()
+        self.pandda_mtz_style_entry.setText('dimple.mtz')
+        self.pandda_mtz_style_entry.setFixedWidth(200)
+        pandda_mtz_style_hbox.addWidget(self.pandda_mtz_style_entry)
+        self.pandda_analyse_input_params_vbox.addLayout(pandda_mtz_style_hbox)
+
+        pandda_output_dir_hbox = QtGui.QHBoxLayout()
+        label = QtGui.QLabel('output directory')
+        self.pandda_analyse_input_params_vbox.addWidget(label)
+        self.pandda_output_data_dir_entry = QtGui.QLineEdit()
+        self.pandda_output_data_dir_entry.setText(self.panddas_directory)
+        self.pandda_output_data_dir_entry.setFixedWidth(300)
+        pandda_output_dir_hbox.addWidget(self.pandda_output_data_dir_entry)
+        self.select_pandda_output_dir_button = QtGui.QPushButton("Select PANNDAs Directory")
+        self.select_pandda_output_dir_button.setMaximumWidth(200)
+        self.select_pandda_output_dir_button.clicked.connect(self.settings_button_clicked)
+        pandda_output_dir_hbox.addWidget(self.select_pandda_output_dir_button)
+        self.pandda_analyse_input_params_vbox.addLayout(pandda_output_dir_hbox)
+
+        # qstat or local machine
+        label = QtGui.QLabel('submit')
+        self.pandda_analyse_input_params_vbox.addWidget(label)
+        self.pandda_submission_mode_selection_combobox = QtGui.QComboBox()
+        if self.external_software['qsub']:
+            self.pandda_submission_mode_selection_combobox.addItem('qsub')
+        self.pandda_submission_mode_selection_combobox.addItem('local machine')
+        self.pandda_submission_mode_selection_combobox.setMaximumWidth(200)
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_submission_mode_selection_combobox)
+
+        label = QtGui.QLabel('number of processors')
+        self.pandda_analyse_input_params_vbox.addWidget(label)
+        self.pandda_nproc = multiprocessing.cpu_count() - 1
+        self.pandda_nproc_entry = QtGui.QLineEdit()
+        self.pandda_nproc_entry.setText(str(self.pandda_nproc).replace(' ', ''))
+        self.pandda_nproc_entry.setFixedWidth(200)
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_nproc_entry)
+
+        label = QtGui.QLabel('order events by:')
+        self.pandda_analyse_input_params_vbox.addWidget(label)
+        self.pandda_sort_event_combobox = QtGui.QComboBox()
+        self.pandda_sort_event_combobox.addItem('cluster_size')
+        self.pandda_sort_event_combobox.addItem('z_peak')
+        self.pandda_sort_event_combobox.setMaximumWidth(200)
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_sort_event_combobox)
+
+        # crystal form option
+        label = QtGui.QLabel('Use space group of reference file as filter:')
+        self.pandda_analyse_input_params_vbox.addWidget(label)
+        # reference file combobox, label with spg display
+        hbox = QtGui.QHBoxLayout()
+        self.reference_file_list = self.get_reference_file_list(' ')
+        self.pandda_reference_file_selection_combobox = QtGui.QComboBox()
+        self.populate_reference_combobox(self.pandda_reference_file_selection_combobox)
+        self.pandda_reference_file_selection_combobox.activated[str].connect(self.change_pandda_spg_label)
+        hbox.addWidget(self.pandda_reference_file_selection_combobox)
+        self.pandda_reference_file_spg_label = QtGui.QLabel()
+        hbox.addWidget(self.pandda_reference_file_spg_label)
+        self.pandda_analyse_input_params_vbox.addLayout(hbox)
+
+        label = QtGui.QLabel('\nExpert Parameters (only change if you know what you are doing!):')
+        self.pandda_analyse_input_params_vbox.addWidget(label)
+
+        self.wilson_checkbox = QtGui.QCheckBox('Wilson B-factor Scaling')
+        self.add_checkbox(self.wilson_checkbox, 'self.set_run_dimple_flag')
+
+        # minimum number of datasets
+        label = QtGui.QLabel('min_build_datasets')
+        self.pandda_analyse_input_params_vbox.addWidget(label)
+        self.pandda_min_build_dataset_entry = QtGui.QLineEdit()
+        self.pandda_min_build_dataset_entry.setText('40')
+        self.pandda_min_build_dataset_entry.setFixedWidth(200)
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_min_build_dataset_entry)
+
+        label = QtGui.QLabel('max_new_datasets')
+        self.pandda_analyse_input_params_vbox.addWidget(label)
+        self.pandda_max_new_datasets_entry = QtGui.QLineEdit()
+        self.pandda_max_new_datasets_entry.setText('500')
+        self.pandda_max_new_datasets_entry.setFixedWidth(200)
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_max_new_datasets_entry)
+
+        label = QtGui.QLabel(
+            'grid_spacing (default=0.5)\nNote: higher values speed up calculations, but maps might be less pretty)')
+        self.pandda_analyse_input_params_vbox.addWidget(label)
+        self.pandda_grid_spacing_entry = QtGui.QLineEdit()
+        self.pandda_grid_spacing_entry.setText('0.5')
+        self.pandda_grid_spacing_entry.setFixedWidth(200)
+        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_grid_spacing_entry)
+
+        self.pandda_analyse_input_params_vbox.addStretch(1)
+
+        frame_right.setSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Minimum)
+        frame_right.setLayout(self.pandda_analyse_input_params_vbox)
+
+        grid_pandda.addWidget(frame_right, 0, 1, 5, 5)
+        frame_pandda.setLayout(grid_pandda)
+        self.pandda_analyse_hbox.addWidget(frame_pandda)
+
+        # next three blocks display html documents created by pandda.analyse
+        if os.path.exists(str(self.panddas_directory + '/interesting_datasets')):
+            print('WARNING: USING RESULTS FROM OLD PANDDA ANALYSE! THIS IS NOT FULLY SUPPORTED IN XCE2')
+            print('PLEASE CHANGE YOUR PANDDA DIRECTORY TO A NEW RUN, OR USE THE OLD VERSION OF XCE!')
+            self.pandda_initial_html_file = str(self.panddas_directory + '/results_summareis/pandda_initial.html')
+            self.pandda_analyse_html_file = str(self.panddas_directory + '/results_summaries/pandda_analyse.html')
+        self.pandda_initial_html_file = str(
+            self.panddas_directory + '/analyses/html_summaries/' + 'pandda_initial.html')
+        self.pandda_analyse_html_file = str(
+            self.panddas_directory + '/analyses/html_summaries/' + 'pandda_analyse.html')
+        self.pandda_inspect_html_file = str(
+            self.panddas_directory + '/analyses/html_summaries/' + 'pandda_inspect.html')
+
+        self.pandda_initial_html = QtWebKit.QWebView()
+        self.pandda_tab_dict['Dataset Summary'][1].addWidget(self.pandda_initial_html)
+        self.pandda_initial_html.load(QtCore.QUrl(self.pandda_initial_html_file))
+        self.pandda_initial_html.show()
+
+        self.pandda_analyse_html = QtWebKit.QWebView()
+        self.pandda_tab_dict['Processing Output'][1].addWidget(self.pandda_analyse_html)
+        self.pandda_analyse_html.load(QtCore.QUrl(self.pandda_analyse_html_file))
+        self.pandda_analyse_html.show()
+
+        self.pandda_inspect_html = QtWebKit.QWebView()
+        self.pandda_tab_dict['pandda.inspect'][1].addWidget(self.pandda_inspect_html)
+        self.pandda_analyse_html.load(QtCore.QUrl(self.pandda_inspect_html_file))
+        self.pandda_analyse_html.show()
+
+        self.panddas_results_vbox.addWidget(self.pandda_tab_widget)
+        self.show_pandda_html_summary()
+
+        ################################################################################################################
+        #                                                                                                              #
+        #                                                REFINEMENT TAB                                                #
+        #                                                                                                              #
+        ################################################################################################################
         self.summary_vbox_for_table = QtGui.QVBoxLayout()
 
-        self.summary_table = QtGui.QTableWidget()
-        self.summary_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.summary_table.setSortingEnabled(True)
-        self.summary_table.setColumnCount(len(self.refinement_table_columns))
-        self.summary_table.setHorizontalHeaderLabels(self.refinement_table_columns)
-        self.summary_vbox_for_table.addWidget(self.summary_table)
+        # table
+        self.refinement_table = QtGui.QTableWidget()
+        self.table_setup(self.refinement_table, self.refinement_table_columns)
+        self.summary_vbox_for_table.addWidget(self.refinement_table)
         self.tab_dict[self.workflow_dict['Refinement']][1].addLayout(self.summary_vbox_for_table)
 
-        ## deposition tab
+        ################################################################################################################
+        #                                                                                                              #
+        #                                                DEPOSITION TAB                                                #
+        #                                                                                                              #
+        ################################################################################################################
         self.deposition_vbox = QtGui.QVBoxLayout()
 
         scroll = QtGui.QScrollArea()
@@ -1427,215 +1565,11 @@ class XChemExplorer(QtGui.QApplication):
         scroll.setWidget(scrollContent)
         self.tab_dict[self.workflow_dict['Deposition']][1].addLayout(self.deposition_vbox)
 
-        ## PanDDA tab
-        self.panddas_results_vbox = QtGui.QVBoxLayout()
-        self.tab_dict[self.workflow_dict['PANDDAs']][1].addLayout(self.panddas_results_vbox)
-
-
-
-        self.pandda_analyse_hbox = QtGui.QHBoxLayout()
-        self.pandda_tab_dict['pandda.analyse'][1].addLayout(self.pandda_analyse_hbox)
-        self.pandda_map_layout = QtGui.QVBoxLayout()
-        self.pandda_map_list = QtGui.QComboBox()
-        self.pandda_maps_html = QtWebKit.QWebView()
-        self.pandda_map_layout.addWidget(self.pandda_map_list)
-        self.pandda_map_layout.addWidget(self.pandda_maps_html)
-
-        self.pandda_tab_dict['Statistical Map Summaries'][1].addLayout(self.pandda_map_layout)
-        self.pandda_maps_html.show()
-
-        grid_pandda = QtGui.QGridLayout()
-        grid_pandda.setColumnStretch(0, 20)
-        grid_pandda.setRowStretch(0, 20)
-        # left hand side: table with information about available datasets
-
-
-        self.pandda_analyse_data_table = QtGui.QTableWidget()
-        self.pandda_analyse_data_table.setSortingEnabled(True)
-        self.pandda_analyse_data_table.resizeColumnsToContents()
-        self.pandda_analyse_data_table.setColumnCount(len(self.pandda_table_columns))
-        self.pandda_analyse_data_table.setHorizontalHeaderLabels(self.pandda_table_columns)
-
-        frame_pandda = QtGui.QFrame()
-        grid_pandda.addWidget(self.pandda_analyse_data_table, 0, 0)
-
-        self.pandda_status = 'UNKNOWN'
-        self.pandda_status_label = QtGui.QLabel()
-        if os.path.exists(str(self.panddas_directory + '/pandda.done')):
-            self.pandda_status = 'Finished!'
-            self.pandda_status_label.setStyleSheet('color: green')
-        if os.path.exists(str(self.panddas_directory + '/pandda.running')):
-            self.pandda_status = 'Running...'
-            self.pandda_status_label.setStyleSheet('color: orange')
-        if os.path.exists(str(self.panddas_directory + '/pandda.errored')):
-            self.pandda_status = 'Error encountered... please check the log files for pandda!'
-            self.pandda_status_label.setStyleSheet('color: red')
-        self.pandda_status_label.setText(str('STATUS: ' + self.pandda_status))
-        self.pandda_status_label.setFont(QtGui.QFont("Arial", 25, QtGui.QFont.Bold))
-        grid_pandda.addWidget(self.pandda_status_label, 3, 0)
-
-        # right hand side: input parameters for PANDDAs run
-        frame_right = QtGui.QFrame()
-        frame_right.setFrameShape(QtGui.QFrame.StyledPanel)
-
-        self.pandda_analyse_input_params_vbox = QtGui.QVBoxLayout()
-
-        pandda_input_dir_hbox = QtGui.QHBoxLayout()
-        label = QtGui.QLabel('data directory')
-        self.pandda_analyse_input_params_vbox.addWidget(label)
-        self.pandda_input_data_dir_entry = QtGui.QLineEdit()
-        self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory, '*'))
-        self.pandda_input_data_dir_entry.setFixedWidth(300)
-        pandda_input_dir_hbox.addWidget(self.pandda_input_data_dir_entry)
-        self.select_pandda_input_dir_button = QtGui.QPushButton("Select Input Template")
-        self.select_pandda_input_dir_button.setMaximumWidth(200)
-        self.select_pandda_input_dir_button.clicked.connect(self.select_pandda_input_template)
-        pandda_input_dir_hbox.addWidget(self.select_pandda_input_dir_button)
-        self.pandda_analyse_input_params_vbox.addLayout(pandda_input_dir_hbox)
-
-        pandda_pdb_style_hbox = QtGui.QHBoxLayout()
-        label = QtGui.QLabel('pdb style')
-        pandda_pdb_style_hbox.addWidget(label)
-        self.pandda_pdb_style_entry = QtGui.QLineEdit()
-        self.pandda_pdb_style_entry.setText('dimple.pdb')
-        self.pandda_pdb_style_entry.setFixedWidth(200)
-        pandda_pdb_style_hbox.addWidget(self.pandda_pdb_style_entry)
-        self.pandda_analyse_input_params_vbox.addLayout(pandda_pdb_style_hbox)
-
-        pandda_mtz_style_hbox = QtGui.QHBoxLayout()
-        label = QtGui.QLabel('mtz style')
-        pandda_mtz_style_hbox.addWidget(label)
-        self.pandda_mtz_style_entry = QtGui.QLineEdit()
-        self.pandda_mtz_style_entry.setText('dimple.mtz')
-        self.pandda_mtz_style_entry.setFixedWidth(200)
-        pandda_mtz_style_hbox.addWidget(self.pandda_mtz_style_entry)
-        self.pandda_analyse_input_params_vbox.addLayout(pandda_mtz_style_hbox)
-
-        pandda_output_dir_hbox = QtGui.QHBoxLayout()
-        label = QtGui.QLabel('output directory')
-        self.pandda_analyse_input_params_vbox.addWidget(label)
-        self.pandda_output_data_dir_entry = QtGui.QLineEdit()
-        self.pandda_output_data_dir_entry.setText(self.panddas_directory)
-        self.pandda_output_data_dir_entry.setFixedWidth(300)
-        pandda_output_dir_hbox.addWidget(self.pandda_output_data_dir_entry)
-        self.select_pandda_output_dir_button = QtGui.QPushButton("Select PANNDAs Directory")
-        self.select_pandda_output_dir_button.setMaximumWidth(200)
-        self.select_pandda_output_dir_button.clicked.connect(self.settings_button_clicked)
-        pandda_output_dir_hbox.addWidget(self.select_pandda_output_dir_button)
-        self.pandda_analyse_input_params_vbox.addLayout(pandda_output_dir_hbox)
-
-        # qstat or local machine
-        label = QtGui.QLabel('submit')
-        self.pandda_analyse_input_params_vbox.addWidget(label)
-        self.pandda_submission_mode_selection_combobox = QtGui.QComboBox()
-        if self.external_software['qsub']:
-            self.pandda_submission_mode_selection_combobox.addItem('qsub')
-        self.pandda_submission_mode_selection_combobox.addItem('local machine')
-        self.pandda_submission_mode_selection_combobox.setMaximumWidth(200)
-        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_submission_mode_selection_combobox)
-
-        label = QtGui.QLabel('number of processors')
-        self.pandda_analyse_input_params_vbox.addWidget(label)
-        self.pandda_nproc = multiprocessing.cpu_count() - 1
-        self.pandda_nproc_entry = QtGui.QLineEdit()
-        self.pandda_nproc_entry.setText(str(self.pandda_nproc).replace(' ', ''))
-        self.pandda_nproc_entry.setFixedWidth(200)
-        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_nproc_entry)
-
-        label = QtGui.QLabel('order events by:')
-        self.pandda_analyse_input_params_vbox.addWidget(label)
-        self.pandda_sort_event_combobox = QtGui.QComboBox()
-        self.pandda_sort_event_combobox.addItem('cluster_size')
-        self.pandda_sort_event_combobox.addItem('z_peak')
-        self.pandda_sort_event_combobox.setMaximumWidth(200)
-        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_sort_event_combobox)
-
-        # crystal form option
-        label = QtGui.QLabel('Use space group of reference file as filter:')
-        self.pandda_analyse_input_params_vbox.addWidget(label)
-        # reference file combobox, label with spg display
-        hbox = QtGui.QHBoxLayout()
-        self.reference_file_list = self.get_reference_file_list(' ')
-        self.pandda_reference_file_selection_combobox = QtGui.QComboBox()
-        self.populate_reference_combobox(self.pandda_reference_file_selection_combobox)
-        self.pandda_reference_file_selection_combobox.activated[str].connect(self.change_pandda_spg_label)
-        hbox.addWidget(self.pandda_reference_file_selection_combobox)
-        self.pandda_reference_file_spg_label = QtGui.QLabel()
-        hbox.addWidget(self.pandda_reference_file_spg_label)
-        self.pandda_analyse_input_params_vbox.addLayout(hbox)
-
-        label = QtGui.QLabel('\nExpert Parameters (only change if you know what you are doing!):')
-        self.pandda_analyse_input_params_vbox.addWidget(label)
-
-        self.wilson_checkbox = QtGui.QCheckBox('Wilson B-factor Scaling')
-        self.wilson_checkbox.toggle()
-        self.wilson_checkbox.setChecked(False)
-        self.pandda_analyse_input_params_vbox.addWidget(self.wilson_checkbox)
-
-        # minimum number of datasets
-        label = QtGui.QLabel('min_build_datasets')
-        self.pandda_analyse_input_params_vbox.addWidget(label)
-        self.pandda_min_build_dataset_entry = QtGui.QLineEdit()
-        self.pandda_min_build_dataset_entry.setText('40')
-        self.pandda_min_build_dataset_entry.setFixedWidth(200)
-        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_min_build_dataset_entry)
-
-        label = QtGui.QLabel('max_new_datasets')
-        self.pandda_analyse_input_params_vbox.addWidget(label)
-        self.pandda_max_new_datasets_entry = QtGui.QLineEdit()
-        self.pandda_max_new_datasets_entry.setText('500')
-        self.pandda_max_new_datasets_entry.setFixedWidth(200)
-        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_max_new_datasets_entry)
-
-        label = QtGui.QLabel(
-            'grid_spacing (default=0.5)\nNote: higher values speed up calculations, but maps might be less pretty)')
-        self.pandda_analyse_input_params_vbox.addWidget(label)
-        self.pandda_grid_spacing_entry = QtGui.QLineEdit()
-        self.pandda_grid_spacing_entry.setText('0.5')
-        self.pandda_grid_spacing_entry.setFixedWidth(200)
-        self.pandda_analyse_input_params_vbox.addWidget(self.pandda_grid_spacing_entry)
-
-        self.pandda_analyse_input_params_vbox.addStretch(1)
-
-        frame_right.setSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Minimum)
-        frame_right.setLayout(self.pandda_analyse_input_params_vbox)
-
-        grid_pandda.addWidget(frame_right, 0, 1, 5, 5)
-        frame_pandda.setLayout(grid_pandda)
-        self.pandda_analyse_hbox.addWidget(frame_pandda)
-
-        # next three blocks display html documents created by pandda.analyse
-        if os.path.exists(str(self.panddas_directory + '/interesting_datasets')):
-            print('WARNING: USING RESULTS FROM OLD PANDDA ANALYSE! THIS IS NOT FULLY SUPPORTED IN XCE2')
-            print('PLEASE CHANGE YOUR PANDDA DIRECTORY TO A NEW RUN, OR USE THE OLD VERSION OF XCE!')
-            self.pandda_initial_html_file = str(self.panddas_directory + '/results_summareis/pandda_initial.html')
-            self.pandda_analyse_html_file = str(self.panddas_directory + '/results_summaries/pandda_analyse.html')
-        self.pandda_initial_html_file = str(
-            self.panddas_directory + '/analyses/html_summaries/' + 'pandda_initial.html')
-        self.pandda_analyse_html_file = str(
-            self.panddas_directory + '/analyses/html_summaries/' + 'pandda_analyse.html')
-        self.pandda_inspect_html_file = str(
-            self.panddas_directory + '/analyses/html_summaries/' + 'pandda_inspect.html')
-
-        self.pandda_initial_html = QtWebKit.QWebView()
-        self.pandda_tab_dict['Dataset Summary'][1].addWidget(self.pandda_initial_html)
-        self.pandda_initial_html.load(QtCore.QUrl(self.pandda_initial_html_file))
-        self.pandda_initial_html.show()
-
-        self.pandda_analyse_html = QtWebKit.QWebView()
-        self.pandda_tab_dict['Processing Output'][1].addWidget(self.pandda_analyse_html)
-        self.pandda_analyse_html.load(QtCore.QUrl(self.pandda_analyse_html_file))
-        self.pandda_analyse_html.show()
-
-        self.pandda_inspect_html = QtWebKit.QWebView()
-        self.pandda_tab_dict['pandda.inspect'][1].addWidget(self.pandda_inspect_html)
-        self.pandda_analyse_html.load(QtCore.QUrl(self.pandda_inspect_html_file))
-        self.pandda_analyse_html.show()
-
-        self.panddas_results_vbox.addWidget(self.pandda_tab_widget)
-        self.show_pandda_html_summary()
-
-        ## settings tab
+        ################################################################################################################
+        #                                                                                                              #
+        #                                                 SETTINGS TAB                                                 #
+        #                                                                                                              #
+        ################################################################################################################
         self.settings_container = QtGui.QWidget()
         self.buttons_etc = QtGui.QWidget()
         self.settings_vbox = QtGui.QVBoxLayout()
@@ -1699,18 +1633,18 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_beamline_directory.addWidget(settings_buttoon_beamline_directory)
         settings_beamline_vbox.addLayout(settings_hbox_beamline_directory)
 
-        settings_hbox_data_collection_summary_file = QtGui.QHBoxLayout()
-        self.data_collection_summary_file_label = QtGui.QLabel(self.data_collection_summary_file)
-        settings_hbox_data_collection_summary_file.addWidget(self.data_collection_summary_file_label)
-        settings_button_data_collection_summary_file = QtGui.QPushButton('Select Existing\nCollection Summary File')
-        settings_button_data_collection_summary_file.clicked.connect(self.settings_button_clicked)
-        settings_hbox_data_collection_summary_file.addWidget(settings_button_data_collection_summary_file)
+        settings_hbox_datasets_summary_file = QtGui.QHBoxLayout()
+        self.datasets_summary_file_label = QtGui.QLabel(self.datasets_summary_file)
+        settings_hbox_datasets_summary_file.addWidget(self.datasets_summary_file_label)
+        settings_button_datasets_summary_file = QtGui.QPushButton('Select Existing\nCollection Summary File')
+        settings_button_datasets_summary_file.clicked.connect(self.settings_button_clicked)
+        settings_hbox_datasets_summary_file.addWidget(settings_button_datasets_summary_file)
 
-        settings_button_new_data_collection_summary_file = QtGui.QPushButton('Assign New\nCollection Summary File')
-        settings_button_new_data_collection_summary_file.clicked.connect(self.settings_button_clicked)
-        settings_hbox_data_collection_summary_file.addWidget(settings_button_new_data_collection_summary_file)
+        settings_button_new_datasets_summary_file = QtGui.QPushButton('Assign New\nCollection Summary File')
+        settings_button_new_datasets_summary_file.clicked.connect(self.settings_button_clicked)
+        settings_hbox_datasets_summary_file.addWidget(settings_button_new_datasets_summary_file)
 
-        settings_beamline_vbox.addLayout(settings_hbox_data_collection_summary_file)
+        settings_beamline_vbox.addLayout(settings_hbox_datasets_summary_file)
 
         settings_beamline_frame.setLayout(settings_beamline_vbox)
         self.data_collection_vbox_for_settings.addWidget(settings_beamline_frame)
@@ -1757,7 +1691,11 @@ class XChemExplorer(QtGui.QApplication):
         self.buttons_etc.resize(self.screen.width() - 100, self.buttons_etc.sizeHint().height())
         self.tab_dict[self.workflow_dict['Settings']][1].addLayout(self.settings_vbox)
 
-        ## status bar
+        ################################################################################################################
+        #                                                                                                              #
+        #                                                  STATUS BAR                                                  #
+        #                                                                                                              #
+        ################################################################################################################
         self.status_bar = QtGui.QStatusBar()
         self.progress_bar = QtGui.QProgressBar()
         self.progress_bar.setMaximum(100)
@@ -1795,17 +1733,18 @@ class XChemExplorer(QtGui.QApplication):
             if not write_enabled:
                 self.data_source_set = False
 
+    ######################################### sort stuff below here ####################################################
     def select_sample_for_dimple(self):
-        indexes = self.initial_model_table.selectionModel().selectedRows()
+        indexes = self.maps_table.selectionModel().selectedRows()
         for index in sorted(indexes):
-            xtal = str(self.initial_model_table.item(index.row(), 0).text())
+            xtal = str(self.maps_table.item(index.row(), 0).text())
             self.update_log.insert('{0!s} is marked for DIMPLE'.format(index.row()))
             self.initial_model_dimple_dict[xtal][0].setChecked(True)
 
     def select_sample_for_xia2(self):
-        indexes = self.reprocess_datasets_table.selectionModel().selectedRows()
+        indexes = self.datasets_reprocess_table.selectionModel().selectedRows()
         for index in sorted(indexes):
-            xtal = str(self.reprocess_datasets_table.item(index.row(), 1).text())
+            xtal = str(self.datasets_reprocess_table.item(index.row(), 1).text())
             print(xtal, self.diffraction_data_table_dict[xtal][0])
             self.update_log.insert('{0!s} marked for reprocessing'.format(index.row()))
             self.diffraction_data_table_dict[xtal][0].setChecked(True)
@@ -2447,11 +2386,9 @@ class XChemExplorer(QtGui.QApplication):
         frame.setFrameShape(QtGui.QFrame.StyledPanel)
 
         grid = QtGui.QGridLayout()
-        set_primary_citation_authors = QtGui.QCheckBox('same as deposition authors')
-        set_primary_citation_authors.toggle()
-        set_primary_citation_authors.setChecked(False)
-        set_primary_citation_authors.stateChanged.connect(self.set_primary_citation_as_structure_authors)
-        grid.addWidget(set_primary_citation_authors, 0, 0)
+        self.set_primary_citation_authors = QtGui.QCheckBox('same as deposition authors')
+        self.add_checkbox(self.set_primary_citation_authors, 'self.set_primary_citation_as_structure_authors')
+        grid.addWidget(self.set_primary_citation_authors, 0, 0)
 
         self.primary_citation_author_name_List = []
 
@@ -3203,11 +3140,11 @@ class XChemExplorer(QtGui.QApplication):
 
     def on_context_menu_initial_model(self, point):
         # show context menu
-        self.popMenu_for_initial_model_table.exec_(self.sender().mapToGlobal(point))
+        self.popMenu_for_maps_table.exec_(self.sender().mapToGlobal(point))
 
     def on_context_menu_reprocess_data(self, point):
         # show context menu
-        self.popMenu_for_reprocess_datasets_table.exec_(self.sender().mapToGlobal(point))
+        self.popMenu_for_datasets_reprocess_table.exec_(self.sender().mapToGlobal(point))
 
     def flag_sample_for_recollection(self):
         self.dewar_configuration_dict[self.dewar_label_active].setStyleSheet("background-color: yellow")
@@ -3317,8 +3254,8 @@ class XChemExplorer(QtGui.QApplication):
             self.database_directory = pickled_settings['database_directory']
             self.settings['database_directory'] = self.database_directory
 
-            self.data_collection_summary_file = pickled_settings['data_collection_summary']
-            self.data_collection_summary_file_label.setText(self.data_collection_summary_file)
+            self.datasets_summary_file = pickled_settings['datasets_summary']
+            self.datasets_summary_file_label.setText(self.datasets_summary_file)
 
             self.data_source_file = pickled_settings['data_source']
             if self.data_source_file != '':
@@ -3529,10 +3466,10 @@ class XChemExplorer(QtGui.QApplication):
             cc_half.append(str(self.reprocess_cc_half_combobox.currentText()))
 
         run_dict = {}
-        allRows = self.reprocess_datasets_table.rowCount()
+        allRows = self.datasets_reprocess_table.rowCount()
         for row in xrange(0, allRows):
-            dataset_id = str(self.reprocess_datasets_table.item(row, 0).text())
-            sample_id = str(self.reprocess_datasets_table.item(row, 1).text())
+            dataset_id = str(self.datasets_reprocess_table.item(row, 0).text())
+            sample_id = str(self.datasets_reprocess_table.item(row, 1).text())
             if self.diffraction_data_table_dict[dataset_id][0].isChecked():
                 run_dict[sample_id] = self.diffraction_data_dict[dataset_id]
 
@@ -3561,9 +3498,9 @@ class XChemExplorer(QtGui.QApplication):
             self.update_status_bar('please select datasets and/ or data processing protocol')
 
     def update_reprocessing_table(self):
-        allRows = self.reprocess_datasets_table.rowCount()
+        allRows = self.datasets_reprocess_table.rowCount()
         for row in xrange(0, allRows):
-            sample_id = str(self.reprocess_datasets_table.item(row, 1).text())
+            sample_id = str(self.datasets_reprocess_table.item(row, 1).text())
             if sample_id in self.xtal_db_dict:
                 db_dict = self.xtal_db_dict[sample_id]
                 cell_text = QtGui.QTableWidgetItem()
@@ -3577,7 +3514,7 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text.setBackground(QtGui.QColor(230, 240, 110))
                 elif db_dict['DataProcessingStatus'] == 'finished':
                     cell_text.setBackground(QtGui.QColor(255, 255, 255))
-                self.reprocess_datasets_table.setItem(row, 7, cell_text)
+                self.datasets_reprocess_table.setItem(row, 7, cell_text)
 
     def get_job_list_for_dimple_rerun(self, xtal, job_list, db_dict, entry):
         self.status_bar.showMessage('checking: ' + str(
@@ -3707,8 +3644,8 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-        self.connect(self.work_thread, QtCore.SIGNAL("update_reprocess_datasets_table"),
-                     self.update_reprocess_datasets_table)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_datasets_reprocess_table"),
+                     self.update_datasets_reprocess_table)
         self.work_thread.start()
 
     def translate_datasetID_to_sampleID(self):
@@ -3734,15 +3671,15 @@ class XChemExplorer(QtGui.QApplication):
                         new_sample_id = line.split(',')[1]
                         trans_dict[dataset] = new_sample_id
                 if len(trans_dict) >= 1:
-                    allRows = self.reprocess_datasets_table.rowCount()
+                    allRows = self.datasets_reprocess_table.rowCount()
                     for row in xrange(0, allRows):
-                        dataset_id = str(self.reprocess_datasets_table.item(row, 0).text())
-                        sample_id = str(self.reprocess_datasets_table.item(row, 1).text())
+                        dataset_id = str(self.datasets_reprocess_table.item(row, 0).text())
+                        sample_id = str(self.datasets_reprocess_table.item(row, 1).text())
                         if dataset_id in trans_dict:
                             cell_text = QtGui.QTableWidgetItem()
                             cell_text.setText(trans_dict[dataset_id])
                             cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                            self.reprocess_datasets_table.setItem(row, 1, cell_text)
+                            self.datasets_reprocess_table.setItem(row, 1, cell_text)
                             self.update_log.insert('dataset: {0!s} -> changing sampleID to: {1!s}'.format(dataset_id,
                                                                                                           trans_dict[
                                                                                                               dataset_id]))
@@ -3766,7 +3703,7 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 self.update_log.insert('this does not seem to be a mtz file: ' + file_name)
 
-    def update_reprocess_datasets_table(self, data_dict):
+    def update_datasets_reprocess_table(self, data_dict):
         self.update_log.insert('updating reprocess datasets table')
         self.diffraction_data_table_dict = {}
         self.diffraction_data_dict = data_dict
@@ -3778,25 +3715,25 @@ class XChemExplorer(QtGui.QApplication):
         # update table
         column_name = self.db.translate_xce_column_list_to_sqlite(self.datasets_reprocess_columns)
         # set rows to 0
-        self.reprocess_datasets_table.setRowCount(0)
+        self.datasets_reprocess_table.setRowCount(0)
         for entry in sorted(self.diffraction_data_dict):
             self.update_log.insert(str(self.diffraction_data_dict[entry]))
             if entry in self.xtal_db_dict:
                 db_dict = self.xtal_db_dict[entry]
             else:
                 db_dict = {}
-            row = self.reprocess_datasets_table.rowCount()
-            self.reprocess_datasets_table.insertRow(row)
+            row = self.datasets_reprocess_table.rowCount()
+            self.datasets_reprocess_table.insertRow(row)
             for column, header in enumerate(column_name):
                 if header[0] == 'Dataset ID' or header[0] == 'Sample ID':
                     cell_text = QtGui.QTableWidgetItem()
                     cell_text.setText(str(entry))
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                    self.reprocess_datasets_table.setItem(row, column, cell_text)
+                    self.datasets_reprocess_table.setItem(row, column, cell_text)
                 elif header[0] == 'Run\nxia2':
                     run_xia2 = QtGui.QCheckBox()
                     run_xia2.toggle()
-                    self.reprocess_datasets_table.setCellWidget(row, column, run_xia2)
+                    self.datasets_reprocess_table.setCellWidget(row, column, run_xia2)
                     run_xia2.setChecked(False)
                     self.diffraction_data_table_dict[entry] = [run_xia2]
                 else:
@@ -3815,7 +3752,7 @@ class XChemExplorer(QtGui.QApplication):
                     else:
                         cell_text.setText('')
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                    self.reprocess_datasets_table.setItem(row, column, cell_text)
+                    self.datasets_reprocess_table.setItem(row, column, cell_text)
 
     def update_all_tables(self):
         self.update_log.insert('checking for new reference files')
@@ -3826,7 +3763,7 @@ class XChemExplorer(QtGui.QApplication):
         self.populate_and_update_datasource_table()
         self.update_log.insert('updating Maps table')
         self.update_status_bar('updating Maps table')
-        self.create_initial_model_table()
+        self.create_maps_table()
         self.update_log.insert('updating PANDDA table')
         self.update_status_bar('updating PANDDA table')
         self.populate_pandda_analyse_input_table()
@@ -3878,24 +3815,24 @@ class XChemExplorer(QtGui.QApplication):
             self.settings['beamline_directory'] = self.beamline_directory
 
         if self.sender().text() == 'Select Existing\nCollection Summary File':
-            if self.data_collection_summary_file != '':
+            if self.datasets_summary_file != '':
                 filepath_temp = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window, 'Select File',
-                                                                           self.data_collection_summary_file[
-                                                                           :self.data_collection_summary_file.rfind(
+                                                                           self.datasets_summary_file[
+                                                                           :self.datasets_summary_file.rfind(
                                                                                '/')], '*.pkl')
             else:
                 filepath_temp = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window, 'Select File', os.getcwd(),
                                                                            '*.pkl')
             filepath = str(tuple(filepath_temp)[0])
-            self.data_collection_summary_file = filepath
-            self.data_collection_summary_file_label.setText(self.data_collection_summary_file)
-            self.settings['data_collection_summary'] = self.data_collection_summary_file
+            self.datasets_summary_file = filepath
+            self.datasets_summary_file_label.setText(self.datasets_summary_file)
+            self.settings['datasets_summary'] = self.datasets_summary_file
 
         if self.sender().text() == 'Assign New\nCollection Summary File':
-            if self.data_collection_summary_file != '':
+            if self.datasets_summary_file != '':
                 file_name = str(QtGui.QFileDialog.getSaveFileName(self.window, 'New file',
-                                                                  self.data_collection_summary_file[
-                                                                  :self.data_collection_summary_file.rfind('/')]))
+                                                                  self.datasets_summary_file[
+                                                                  :self.datasets_summary_file.rfind('/')]))
             else:
                 file_name = str(QtGui.QFileDialog.getSaveFileName(self.window, 'New file', self.current_directory))
             # make sure that the file always has .pkl extension
@@ -3903,9 +3840,9 @@ class XChemExplorer(QtGui.QApplication):
                 file_name = file_name[:file_name.rfind('.')] + '.pkl'
             else:
                 file_name = file_name + '.pkl'
-            self.data_collection_summary_file = file_name
-            self.data_collection_summary_file_label.setText(self.data_collection_summary_file)
-            self.settings['data_collection_summary'] = self.data_collection_summary_file
+            self.datasets_summary_file = file_name
+            self.datasets_summary_file_label.setText(self.datasets_summary_file)
+            self.settings['datasets_summary'] = self.datasets_summary_file
 
         if self.sender().text() == 'Select CCP4_SCR Directory':
             self.ccp4_scratch_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
@@ -4089,7 +4026,7 @@ class XChemExplorer(QtGui.QApplication):
             self.check_for_new_autoprocessing_or_rescore(True)
 
         elif instruction == "Read PKL file":
-            summary = pickle.load(open(self.data_collection_summary_file, "rb"))
+            summary = pickle.load(open(self.datasets_summary_file, "rb"))
             self.create_widgets_for_autoprocessing_results_only(summary)
 
         elif instruction == 'Run xia2 on selected datasets':
@@ -4274,7 +4211,7 @@ class XChemExplorer(QtGui.QApplication):
                                                                                  self.database_directory,
                                                                                  self.data_collection_dict,
                                                                                  self.preferences,
-                                                                                 self.data_collection_summary_file,
+                                                                                 self.datasets_summary_file,
                                                                                  self.initial_model_directory,
                                                                                  rescore_only,
                                                                                  self.acceptable_low_resolution_limit_for_data,
@@ -4298,7 +4235,7 @@ class XChemExplorer(QtGui.QApplication):
                                                                            self.data_source_file,
                                                                            self.initial_model_directory,
                                                                            self.preferences,
-                                                                           self.data_collection_summary_file)
+                                                                           self.datasets_summary_file)
         self.explorer_active = 1
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
@@ -4729,7 +4666,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.data_collection_table_dict[xtal].append(
                     ['logfile', entry[1], entry[2], entry[3], entry[4]])  # 'logfile' is just added to have
                 # same index numbers between lists
-            data_collection_table.cellClicked.connect(self.user_update_selected_autoproc_data_collection_summary_table)
+            data_collection_table.cellClicked.connect(self.user_update_selected_autoproc_datasets_summary_table)
 
             # select best resolution file + set data collection outcome
             # the assumption is that index in data_collection_dict and row number are identical
@@ -4745,7 +4682,7 @@ class XChemExplorer(QtGui.QApplication):
                         # if not selection_changed_by_user:
                         data_collection_table.selectRow(index)
 
-        self.populate_data_collection_summary_table()
+        self.populate_datasets_summary_table()
 
     def find_suitable_reference_file(self, db_dict):
         reference_file = []
@@ -4763,7 +4700,7 @@ class XChemExplorer(QtGui.QApplication):
                     continue
         return reference_file
 
-    def create_initial_model_table(self):
+    def create_maps_table(self):
         column_name = self.db.translate_xce_column_list_to_sqlite(self.maps_table_columns)
 
         for xtal in sorted(self.xtal_db_dict):
@@ -4772,14 +4709,14 @@ class XChemExplorer(QtGui.QApplication):
             if str(db_dict['DataCollectionOutcome']).lower().startswith('success'):
                 reference_file = self.find_suitable_reference_file(db_dict)
                 smallest_uc_difference = min(reference_file, key=lambda x: x[1])
-                row = self.initial_model_table.rowCount()
+                row = self.maps_table.rowCount()
                 if xtal not in self.initial_model_dimple_dict:
-                    self.initial_model_table.insertRow(row)
+                    self.maps_table.insertRow(row)
                     current_row = row
                     new_xtal = True
                 else:
                     for table_row in range(row):
-                        if self.initial_model_table.item(table_row, 0).text() == xtal:
+                        if self.maps_table.item(table_row, 0).text() == xtal:
                             current_row = table_row
                             break
                 for column, header in enumerate(column_name):
@@ -4787,24 +4724,24 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text = QtGui.QTableWidgetItem()
                         cell_text.setText(str(xtal))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                        self.initial_model_table.setItem(current_row, column, cell_text)
+                        self.maps_table.setItem(current_row, column, cell_text)
                     elif header[0] == 'Select':
                         if new_xtal:
                             run_dimple = QtGui.QCheckBox()
                             run_dimple.toggle()
-                            self.initial_model_table.setCellWidget(current_row, column, run_dimple)
+                            self.maps_table.setCellWidget(current_row, column, run_dimple)
                             run_dimple.setChecked(False)
                     elif header[0] == 'Reference\nSpaceGroup':
                         cell_text = QtGui.QTableWidgetItem()
                         cell_text.setText(str(smallest_uc_difference[0][1]))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                        self.initial_model_table.setItem(current_row, column, cell_text)
+                        self.maps_table.setItem(current_row, column, cell_text)
                     elif header[0] == 'Difference\nUC Volume (%)':
                         cell_text = QtGui.QTableWidgetItem()
                         smallest_uc_difference = min(reference_file, key=lambda x: x[1])
                         cell_text.setText(str(round(float(smallest_uc_difference[1]), 1)))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                        self.initial_model_table.setItem(current_row, column, cell_text)
+                        self.maps_table.setItem(current_row, column, cell_text)
                     elif header[0] == 'Reference File':
                         if new_xtal:
                             reference_file_selection_combobox = QtGui.QComboBox()
@@ -4815,7 +4752,7 @@ class XChemExplorer(QtGui.QApplication):
                                 reference_file_selection_combobox.setCurrentIndex(index)
                             else:
                                 reference_file_selection_combobox.setCurrentIndex(0)
-                            self.initial_model_table.setCellWidget(current_row, column,
+                            self.maps_table.setCellWidget(current_row, column,
                                                                    reference_file_selection_combobox)
                         else:
                             reference_file_selection_combobox = self.initial_model_dimple_dict[xtal][1]
@@ -4852,7 +4789,7 @@ class XChemExplorer(QtGui.QApplication):
                                 cell_text.setBackground(QtGui.QColor(255, 0, 0))
                             elif str(db_dict[header[1]]) == 'missing smiles':
                                 cell_text.setBackground(QtGui.QColor(240, 150, 20))
-                        self.initial_model_table.setItem(current_row, column, cell_text)
+                        self.maps_table.setItem(current_row, column, cell_text)
             if new_xtal:
                 self.initial_model_dimple_dict[xtal] = [run_dimple, reference_file_selection_combobox]
 
@@ -4873,8 +4810,8 @@ class XChemExplorer(QtGui.QApplication):
         self.update_log.insert('will use {0!s} for generation of ligand coordinates and restraints'.format(text))
 
     def refinement_outcome_combobox_changed(self):
-        for xtal in self.summary_table_dict:
-            if self.sender() == self.summary_table_dict[xtal]:
+        for xtal in self.refinement_table_dict:
+            if self.sender() == self.refinement_table_dict[xtal]:
                 db_dict = {}
                 db_dict['RefinementOutcome'] = str(self.sender().currentText())
                 self.db.create_or_remove_missing_records_in_depositTable(self.xce_logfile, xtal, 'ligand_bound',
@@ -4963,23 +4900,23 @@ class XChemExplorer(QtGui.QApplication):
             self.data_collection_details_currently_on_display = None
 
         tmp = []
-        allRows = self.data_collection_summary_table.rowCount()
+        allRows = self.datasets_summary_table.rowCount()
         for table_row in range(allRows):
-            tmp.append([self.data_collection_summary_table.item(table_row, 0).text(), table_row])
+            tmp.append([self.datasets_summary_table.item(table_row, 0).text(), table_row])
 
-        for key in self.data_collection_summary_dict:
-            if self.data_collection_summary_dict[key][3] == self.sender():
+        for key in self.datasets_summary_dict:
+            if self.datasets_summary_dict[key][3] == self.sender():
                 if self.sender().isChecked():
                     for item in tmp:
                         if item[0] == key:
-                            self.data_collection_summary_table.selectRow(item[1])
+                            self.datasets_summary_table.selectRow(item[1])
                     self.data_collection_details_currently_on_display = self.data_collection_column_three_dict[key][0]
-                    self.data_collection_summarys_vbox_for_details.addWidget(
+                    self.datasets_summarys_vbox_for_details.addWidget(
                         self.data_collection_details_currently_on_display)
                     self.data_collection_details_currently_on_display.show()
             else:
                 # un-check all other ones
-                self.data_collection_summary_dict[key][3].setChecked(False)
+                self.datasets_summary_dict[key][3].setChecked(False)
 
     def continously_check_for_new_data_collection(self, state):
         self.timer_to_check_for_new_data_collection.timeout.connect(
@@ -4991,10 +4928,10 @@ class XChemExplorer(QtGui.QApplication):
             print('==> XCE: stopped checking for new data collections')
             self.timer_to_check_for_new_data_collection.stop()
 
-    def populate_data_collection_summary_table(self):
+    def populate_datasets_summary_table(self):
         self.status_bar.showMessage(
             'Building summary table for data processing results; be patient this may take a while')
-        row = self.data_collection_summary_table.rowCount()
+        row = self.datasets_summary_table.rowCount()
         column_name = self.db.translate_xce_column_list_to_sqlite(self.datasets_summary_table_columns)
 
         pinList = self.db.execute_statement(
@@ -5005,10 +4942,10 @@ class XChemExplorer(QtGui.QApplication):
 
         for xtal in sorted(self.data_collection_dict):
             new_xtal = False
-            if xtal not in self.data_collection_summary_dict:
-                row = self.data_collection_summary_table.rowCount()
-                self.data_collection_summary_table.insertRow(row)
-                self.data_collection_summary_dict[xtal] = []
+            if xtal not in self.datasets_summary_dict:
+                row = self.datasets_summary_table.rowCount()
+                self.datasets_summary_table.insertRow(row)
+                self.datasets_summary_dict[xtal] = []
                 new_xtal = True
 
             # check for dataset outcome
@@ -5044,23 +4981,23 @@ class XChemExplorer(QtGui.QApplication):
 
             new_run_for_exisiting_crystal_or_new_sample = True
             if new_xtal:
-                self.data_collection_summary_dict[xtal] = [outcome, db_dict, latest_run]
+                self.datasets_summary_dict[xtal] = [outcome, db_dict, latest_run]
             else:
                 # check if newer run appeared
-                old_run_timestamp = self.data_collection_summary_dict[xtal][2][3]
+                old_run_timestamp = self.datasets_summary_dict[xtal][2][3]
                 new_run_timestamp = latest_run[3]
                 if old_run_timestamp == new_run_timestamp:
                     new_run_for_exisiting_crystal_or_new_sample = False
                 else:
-                    checkbox_for_details = self.data_collection_summary_dict[xtal][3]
-                    self.data_collection_summary_dict[xtal] = [outcome, db_dict, latest_run, checkbox_for_details]
+                    checkbox_for_details = self.datasets_summary_dict[xtal][3]
+                    self.datasets_summary_dict[xtal] = [outcome, db_dict, latest_run, checkbox_for_details]
 
             if new_xtal:
                 current_row = row
             else:
-                allRows = self.data_collection_summary_table.rowCount()
+                allRows = self.datasets_summary_table.rowCount()
                 for table_row in range(allRows):
-                    if self.data_collection_summary_table.item(table_row, 0).text() == xtal:
+                    if self.datasets_summary_table.item(table_row, 0).text() == xtal:
                         current_row = table_row
                         break
 
@@ -5070,13 +5007,13 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text = QtGui.QTableWidgetItem()
                     cell_text.setText(str(xtal))
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                    self.data_collection_summary_table.setItem(current_row, column, cell_text)
+                    self.datasets_summary_table.setItem(current_row, column, cell_text)
                 elif header[0] == 'DataCollection\nOutcome':
                     if new_xtal:
                         dataset_outcome_combobox = QtGui.QComboBox()
                         for outcomeItem in self.dataset_outcome:
                             dataset_outcome_combobox.addItem(outcomeItem)
-                        self.data_collection_summary_table.setCellWidget(current_row, column, dataset_outcome_combobox)
+                        self.datasets_summary_table.setCellWidget(current_row, column, dataset_outcome_combobox)
                         dataset_outcome_combobox.activated[str].connect(self.dataset_outcome_combobox_change_outcome)
                         self.dataset_outcome_combobox_dict[xtal] = dataset_outcome_combobox
                     index = self.dataset_outcome_combobox_dict[xtal].findText(str(outcome), QtCore.Qt.MatchFixedString)
@@ -5093,7 +5030,7 @@ class XChemExplorer(QtGui.QApplication):
                         image = QtGui.QLabel()
                         image.resize(128, 80)
                         image.setPixmap(pixmap.scaled(image.size(), QtCore.Qt.KeepAspectRatio))
-                        self.data_collection_summary_table.setCellWidget(current_row, column, image)
+                        self.datasets_summary_table.setCellWidget(current_row, column, image)
                         image_number += 1
 
                 elif header[0].startswith('Show Diffraction\nImage'):
@@ -5108,7 +5045,7 @@ class XChemExplorer(QtGui.QApplication):
                             start_albula_button = QtGui.QPushButton('Show: \n' + diffraction_image_name)
                             start_albula_button.clicked.connect(self.show_html_summary_and_diffraction_image)
                             self.albula_button_dict[xtal] = [start_albula_button, diffraction_image, html_summary]
-                            self.data_collection_summary_table.setCellWidget(current_row, column, start_albula_button)
+                            self.datasets_summary_table.setCellWidget(current_row, column, start_albula_button)
                         else:
                             self.albula_button_dict[xtal][1] = diffraction_image
                 elif header[0].startswith('Show\nDetails'):
@@ -5117,9 +5054,9 @@ class XChemExplorer(QtGui.QApplication):
                         show_data_collection_details_checkbox.toggle()
                         show_data_collection_details_checkbox.setChecked(False)
                         show_data_collection_details_checkbox.stateChanged.connect(self.show_data_collection_details)
-                        self.data_collection_summary_table.setCellWidget(current_row, column,
+                        self.datasets_summary_table.setCellWidget(current_row, column,
                                                                          show_data_collection_details_checkbox)
-                        self.data_collection_summary_dict[xtal].append(show_data_collection_details_checkbox)
+                        self.datasets_summary_dict[xtal].append(show_data_collection_details_checkbox)
                 elif header[0].startswith('SoakDB\nBarcode'):
                     if new_xtal:
                         cell_text = QtGui.QTableWidgetItem()
@@ -5132,7 +5069,7 @@ class XChemExplorer(QtGui.QApplication):
                         else:
                             cell_text.setText('')
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                        self.data_collection_summary_table.setItem(current_row, column, cell_text)
+                        self.datasets_summary_table.setItem(current_row, column, cell_text)
 
                 elif header[0].startswith('GDA\nBarcode'):
                     if new_xtal:
@@ -5146,7 +5083,7 @@ class XChemExplorer(QtGui.QApplication):
                         else:
                             cell_text.setText('')
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                        self.data_collection_summary_table.setItem(current_row, column, cell_text)
+                        self.datasets_summary_table.setItem(current_row, column, cell_text)
 
 
 
@@ -5168,12 +5105,12 @@ class XChemExplorer(QtGui.QApplication):
                         else:
                             cell_text.setText('')
                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                    self.data_collection_summary_table.setItem(current_row, column, cell_text)
+                    self.datasets_summary_table.setItem(current_row, column, cell_text)
 
             row += 1
 
-        self.data_collection_summary_table.resizeRowsToContents()
-        self.data_collection_summary_table.resizeColumnsToContents()
+        self.datasets_summary_table.resizeRowsToContents()
+        self.datasets_summary_table.resizeColumnsToContents()
 
         self.status_bar.showMessage('updating Overview table')
 
@@ -5224,15 +5161,15 @@ class XChemExplorer(QtGui.QApplication):
                     self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: red")
                 self.dewar_configuration_dict[puck_position].setStyleSheet("font-size:7px;border-width: 0px")
 
-    def update_outcome_data_collection_summary_table(self, sample, outcome):
-        rows_in_table = self.data_collection_summary_table.rowCount()
+    def update_outcome_datasets_summary_table(self, sample, outcome):
+        rows_in_table = self.datasets_summary_table.rowCount()
         for row in range(rows_in_table):
-            if self.data_collection_summary_table.item(row, 0).text() == sample:
+            if self.datasets_summary_table.item(row, 0).text() == sample:
                 cell_text = QtGui.QTableWidgetItem()
                 cell_text.setText(outcome)
-                self.data_collection_summary_table.setItem(row, 3, cell_text)
+                self.datasets_summary_table.setItem(row, 3, cell_text)
 
-    def user_update_selected_autoproc_data_collection_summary_table(self):
+    def user_update_selected_autoproc_datasets_summary_table(self):
         for key in self.data_collection_column_three_dict:
             if self.data_collection_column_three_dict[key][0] == self.sender():
                 dbTmp = self.xtal_db_dict[key]
@@ -5304,9 +5241,9 @@ class XChemExplorer(QtGui.QApplication):
                 column_name = XChemDB.data_source(
                     os.path.join(self.database_directory, self.data_source_file)).translate_xce_column_list_to_sqlite(
                     self.datasets_summary_table_columns)
-                rows_in_table = self.data_collection_summary_table.rowCount()
+                rows_in_table = self.datasets_summary_table.rowCount()
                 for row in range(rows_in_table):
-                    if self.data_collection_summary_table.item(row, 0).text() == key:
+                    if self.datasets_summary_table.item(row, 0).text() == key:
                         for column, header in enumerate(column_name):
                             if header[0] == 'Sample ID':
                                 continue
@@ -5321,11 +5258,11 @@ class XChemExplorer(QtGui.QApplication):
                                 try:
                                     cell_text.setText(str(db_dict_current[header[1]]))
                                     cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                                    self.data_collection_summary_table.setItem(row, column, cell_text)
+                                    self.datasets_summary_table.setItem(row, column, cell_text)
                                 except KeyError:
                                     pass
 
-    def update_selected_autoproc_data_collection_summary_table(self):
+    def update_selected_autoproc_datasets_summary_table(self):
         for key in self.data_collection_column_three_dict:
             if self.data_collection_column_three_dict[key][0] == self.sender():
                 sample = key
@@ -5356,9 +5293,9 @@ class XChemExplorer(QtGui.QApplication):
         column_name = XChemDB.data_source(
             os.path.join(self.database_directory, self.data_source_file)).translate_xce_column_list_to_sqlite(
             self.datasets_summary_table_columns)
-        rows_in_table = self.data_collection_summary_table.rowCount()
+        rows_in_table = self.datasets_summary_table.rowCount()
         for row in range(rows_in_table):
-            if self.data_collection_summary_table.item(row, 0).text() == sample:
+            if self.datasets_summary_table.item(row, 0).text() == sample:
                 for column, header in enumerate(column_name):
                     if header[0] == 'Sample ID':
                         continue
@@ -5372,7 +5309,7 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text = QtGui.QTableWidgetItem()
                         cell_text.setText(str(db_dict[header[1]]))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                        self.data_collection_summary_table.setItem(row, column, cell_text)
+                        self.datasets_summary_table.setItem(row, column, cell_text)
 
     # def populate_data_source_table(self, header, data):
     #     self.overview_datasource_table.setColumnCount(0)
@@ -5511,14 +5448,14 @@ class XChemExplorer(QtGui.QApplication):
                 stage = 0
 
             if stage >= 3:
-                row = self.summary_table.rowCount()
-                if xtal not in self.summary_table_dict:
-                    self.summary_table.insertRow(row)
+                row = self.refinement_table.rowCount()
+                if xtal not in self.refinement_table_dict:
+                    self.refinement_table.insertRow(row)
                     current_row = row
                     new_xtal = True
                 else:
                     for table_row in range(row):
-                        if self.summary_table.item(table_row, 0).text() == xtal:
+                        if self.refinement_table.item(table_row, 0).text() == xtal:
                             current_row = table_row
                             break
                 for column, header in enumerate(column_name):
@@ -5526,15 +5463,15 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text = QtGui.QTableWidgetItem()
                         cell_text.setText(str(xtal))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                        self.summary_table.setItem(current_row, column, cell_text)
+                        self.refinement_table.setItem(current_row, column, cell_text)
 
                     elif header[0] == 'Refinement\nOutcome':
                         if new_xtal:
                             refinement_outcome_combobox = QtGui.QComboBox()
                             self.populate_refinement_outcome_combobox(refinement_outcome_combobox)
-                            self.summary_table.setCellWidget(current_row, column, refinement_outcome_combobox)
+                            self.refinement_table.setCellWidget(current_row, column, refinement_outcome_combobox)
                         else:
-                            refinement_outcome_combobox = self.summary_table_dict[xtal]
+                            refinement_outcome_combobox = self.refinement_table_dict[xtal]
                         index = refinement_outcome_combobox.findText(refinementStage, QtCore.Qt.MatchFixedString)
                         refinement_outcome_combobox.setCurrentIndex(index)
                         refinement_outcome_combobox.currentIndexChanged.connect(
@@ -5555,12 +5492,12 @@ class XChemExplorer(QtGui.QApplication):
                                     frame.setLayout(vbox)
                                     grid.addWidget(frame, y, x)
                             outerFrame.setLayout(grid)
-                            self.summary_table.setCellWidget(current_row, column, outerFrame)
+                            self.refinement_table.setCellWidget(current_row, column, outerFrame)
                         except KeyError:
                             cell_text = QtGui.QTableWidgetItem()
                             cell_text.setText('*** N/A ***')
                             cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                            self.summary_table.setItem(current_row, column, cell_text)
+                            self.refinement_table.setItem(current_row, column, cell_text)
                     else:
                         cell_text = QtGui.QTableWidgetItem()
                         cell_text.setText(str(db_dict[header[1]]))
@@ -5576,12 +5513,12 @@ class XChemExplorer(QtGui.QApplication):
                             elif 'problem' in str(db_dict[header[1]]):
                                 cell_text.setBackground(QtGui.QColor(255, 0, 0))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                        self.summary_table.setItem(current_row, column, cell_text)
+                        self.refinement_table.setItem(current_row, column, cell_text)
             if new_xtal:
-                self.summary_table_dict[xtal] = refinement_outcome_combobox
+                self.refinement_table_dict[xtal] = refinement_outcome_combobox
 
-        self.summary_table.resizeColumnsToContents()
-        self.summary_table.resizeRowsToContents()
+        self.refinement_table.resizeColumnsToContents()
+        self.refinement_table.resizeRowsToContents()
 
     def get_columns_to_show(self, column_list):
         # maybe I coded some garbage before, but I need to find out which column name in the
@@ -5615,9 +5552,9 @@ class XChemExplorer(QtGui.QApplication):
     def quit_xce(self):
         # save pkl file
         if self.data_collection_dict != {}:
-            if os.path.isfile(self.data_collection_summary_file):
+            if os.path.isfile(self.datasets_summary_file):
                 self.update_log.insert('saving results to PKL file')
-                pickle.dump(self.data_collection_dict, open(self.data_collection_summary_file, 'wb'))
+                pickle.dump(self.data_collection_dict, open(self.datasets_summary_file, 'wb'))
         self.update_log.insert('quitting XCE... bye,bye!')
         QtGui.qApp.quit()
 
