@@ -817,6 +817,19 @@ class XChemExplorer(QtGui.QApplication):
         table.setSortingEnabled(sortingopt)
         table.setHorizontalHeaderLabels(table_columns)
 
+    def pandda_html(self):
+        if os.path.exists(str(self.panddas_directory + '/interesting_datasets')):
+            print('WARNING: USING RESULTS FROM OLD PANDDA ANALYSE! THIS IS NOT FULLY SUPPORTED IN XCE2')
+            print('PLEASE CHANGE YOUR PANDDA DIRECTORY TO A NEW RUN, OR USE THE OLD VERSION OF XCE!')
+            self.pandda_initial_html_file = str(self.panddas_directory + '/results_summareis/pandda_initial.html')
+            self.pandda_analyse_html_file = str(self.panddas_directory + '/results_summaries/pandda_analyse.html')
+        self.pandda_initial_html_file = str(
+            self.panddas_directory + '/analyses/html_summaries/' + 'pandda_initial.html')
+        self.pandda_analyse_html_file = str(
+            self.panddas_directory + '/analyses/html_summaries/' + 'pandda_analyse.html')
+        self.pandda_inspect_html_file = str(
+            self.panddas_directory + '/analyses/html_summaries/' + 'pandda_inspect.html')
+        self.show_pandda_html_summary()
 
     ################################################# define gui #######################################################
     def start_GUI(self):
@@ -1385,17 +1398,7 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_hbox.addWidget(frame_pandda)
 
         # next three blocks display html documents created by pandda.analyse
-        if os.path.exists(str(self.panddas_directory + '/interesting_datasets')):
-            print('WARNING: USING RESULTS FROM OLD PANDDA ANALYSE! THIS IS NOT FULLY SUPPORTED IN XCE2')
-            print('PLEASE CHANGE YOUR PANDDA DIRECTORY TO A NEW RUN, OR USE THE OLD VERSION OF XCE!')
-            self.pandda_initial_html_file = str(self.panddas_directory + '/results_summareis/pandda_initial.html')
-            self.pandda_analyse_html_file = str(self.panddas_directory + '/results_summaries/pandda_analyse.html')
-        self.pandda_initial_html_file = str(
-            self.panddas_directory + '/analyses/html_summaries/' + 'pandda_initial.html')
-        self.pandda_analyse_html_file = str(
-            self.panddas_directory + '/analyses/html_summaries/' + 'pandda_analyse.html')
-        self.pandda_inspect_html_file = str(
-            self.panddas_directory + '/analyses/html_summaries/' + 'pandda_inspect.html')
+        self.pandda_html()
 
         self.pandda_initial_html = QtWebKit.QWebView()
         self.pandda_tab_dict['Dataset Summary'][1].addWidget(self.pandda_initial_html)
@@ -3230,19 +3233,8 @@ class XChemExplorer(QtGui.QApplication):
 
             self.panddas_directory = pickled_settings['panddas_directory']
             self.settings['panddas_directory'] = self.panddas_directory
-            if os.path.exists(str(self.panddas_directory + '/interesting_datasets')):
-                print('WARNING: USING RESULTS FROM OLD PANDDA ANALYSE! THIS IS NOT FULLY SUPPORTED IN XCE2')
-                print('PLEASE CHANGE YOUR PANDDA DIRECTORY TO A NEW RUN, OR USE THE OLD VERSION OF XCE!')
-                self.pandda_initial_html_file = str(self.panddas_directory + '/results_summareis/pandda_initial.html')
-                self.pandda_analyse_html_file = str(self.panddas_directory + '/results_summaries/pandda_analyse.html')
-            self.pandda_initial_html_file = str(
-                self.panddas_directory + '/analyses/html_summaries/' + 'pandda_initial.html')
-            self.pandda_analyse_html_file = str(
-                self.panddas_directory + '/analyses/html_summaries/' + 'pandda_analyse.html')
 
-            self.pandda_inspect_html_file = str(
-                self.panddas_directory + '/analyses/html_summaries/' + 'pandda_inspect.html')
-            self.show_pandda_html_summary()
+            self.pandda_html()
 
             self.html_export_directory = pickled_settings['html_export_directory']
             self.html_export_directory_label.setText(self.html_export_directory)
@@ -3854,17 +3846,8 @@ class XChemExplorer(QtGui.QApplication):
             self.pandda_output_data_dir_entry.setText(self.panddas_directory)
             print('PANDDA', self.panddas_directory)
             self.settings['panddas_directory'] = self.panddas_directory
-            if os.path.exists(str(self.panddas_directory + '/interesting_datasets')):
-                print('WARNING: USING RESULTS FROM OLD PANDDA ANALYSE! THIS IS NOT FULLY SUPPORTED IN XCE2')
-                print('PLEASE CHANGE YOUR PANDDA DIRECTORY TO A NEW RUN, OR USE THE OLD VERSION OF XCE!')
-                self.pandda_initial_html_file = str(self.panddas_directory + '/results_summareis/pandda_initial.html')
-                self.pandda_analyse_html_file = str(self.panddas_directory + '/results_summaries/pandda_analyse.html')
-            self.pandda_initial_html_file = str(
-                self.panddas_directory + '/analyses/html_summaries/' + 'pandda_initial.html')
-            self.pandda_analyse_html_file = str(
-                self.panddas_directory + '/analyses/html_summaries/' + 'pandda_analyse.html')
-            self.pandda_inspect_html_file = str(
-                self.panddas_directory + '/analyses/html_summaries/' + 'pandda_inspect.html')
+
+            self.pandda_html()
 
             # update add lead option for proasis if pandda directory is changed
             if os.path.isfile(os.path.join(self.panddas_directory, 'analyses/pandda_analyse_sites.csv')):
