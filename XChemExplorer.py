@@ -35,7 +35,6 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 
 class XChemExplorer(QtGui.QApplication):
-    ################################## init function - filepaths and run settings ######################################
     def __init__(self, args):
         # init a QApplication object to hold XCE
         QtGui.QApplication.__init__(self, args)
@@ -277,31 +276,6 @@ class XChemExplorer(QtGui.QApplication):
         self.data_source_set = True
         self.datasource_menu_reload_samples()
 
-    # function to add items to top menu bar
-    def setup_menubar(self, menu_bar, menu_items_dict):
-        # use iterkeys to determine order of key by letter
-        for config in sorted(menu_items_dict.iterkeys()):
-            # add current item to menu bar
-            menu = eval('menu_bar.addMenu("' + str(menu_items_dict[config][0]) + '")')
-            # for each configuration item
-            for menu_item in menu_items_dict[config][1]:
-                # add the drop down option
-                action = eval(str('QtGui.QAction("' + str(menu_item[0]) + '", self.window)'))
-                # add a shortcut if defined
-                if len(menu_item[1]) > 1:
-                    eval(str('action.setShortcut("' + str(menu_item[1]) + '")'))
-                # connect the relevant function and add as an action
-                eval(str('action.triggered.connect(' + menu_item[2] + ')'))
-                menu.addAction(action)
-
-        return menu_bar
-
-    # function for opening help and tutorial files
-    def openFile(self, file):
-        if sys.platform == 'linux2':
-            subprocess.call(["xdg-open", file])
-        else:
-            os.startfile(file)
 
     # function to initialise the top menu bar
     def initialise_menu_bar(self):
@@ -388,58 +362,6 @@ class XChemExplorer(QtGui.QApplication):
         # self.prepare_mmcif_files_dict['ligand_bound'] = prepare_mmcif_files_for_ligand_bound_structures
 
         return menu_bar
-
-    ##################################### bottom boxes settings and functions ##########################################
-    # function for datasource, run and status button setup
-    def setup_push_button(self, button_dict):
-        # use iterkeys to determine order of key by letter
-        for name in sorted(button_dict.iterkeys()):
-            # add current item to menu bar
-            button = eval('QtGui.QPushButton("' + str(button_dict[name][0]) + '")')
-            # for each configuration item
-            for button_config in button_dict[name][1]:
-                eval(str('button.setToolTip(' + str(button_config[0]) + ')'))
-                eval(str('button.setStyleSheet("' + str(button_config[1] + '")')))
-                if len(button_config[2]) > 1:
-                    eval(str('button.setFont(' + str(button_config[2]) + ')'))
-                eval(str('button.clicked.connect(' + str(button_config[3]) + ')'))
-
-        return button
-
-    # function to setup one of the bottom boxes
-    def bottom_box_setup(self, label, dropdown_options, dropdown_tooltip, buttons, colour):
-
-        frame = QtGui.QFrame()
-        frame.setFrameShape(QtGui.QFrame.StyledPanel)
-        frame.setStyleSheet("QFrame { border: 1px solid black; border-radius: 1px; padding: 0px; margin: 0px }")
-
-        vbox = QtGui.QVBoxLayout()
-        label = QtGui.QLabel(label)
-        label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
-        label.setFont(self.headlineLabelfont)
-        label.setStyleSheet(str(" QLabel { border: 1px solid black; border-radius: 1px;" + str(colour) +
-                                "padding: 0px; margin: 0px }"))
-        vbox.addWidget(label)
-
-        hboxAction = QtGui.QHBoxLayout()
-        combobox = QtGui.QComboBox()
-        for task in dropdown_options:
-            combobox.addItem(task)
-        eval('combobox.setToolTip(' + str(dropdown_tooltip) + ')')
-        combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
-        hboxAction.addWidget(combobox)
-
-        vboxButton = QtGui.QVBoxLayout()
-        for button in buttons:
-            vboxButton.addWidget(button)
-        hboxAction.addLayout(vboxButton)
-        vbox.addLayout(hboxAction)
-        vbox.setSpacing(0)
-        vbox.setMargin(0)
-        frame.setLayout(vbox)
-        frame.setMaximumWidth((self.screen.width() - 20) / 5)
-
-        return frame, combobox
 
     # function containing setup for bottom boxes
     def initialise_bottom_boxes(self):
@@ -799,52 +721,7 @@ class XChemExplorer(QtGui.QApplication):
                                          'PanDDA site details',
                                          'Refinement\nStatus']
 
-    ################################################## tab stuff #######################################################
-    def make_tab_dict(self, tab_list, tab_widget, tab_dict):
-        for page in tab_list:
-            tab = QtGui.QWidget()
-            vbox = QtGui.QVBoxLayout(tab)
-            tab_widget.addTab(tab, page)
-            tab_dict[page] = [tab, vbox]
-
-    def add_checkbox(self, checkbox, function, checkopt=False):
-        checkbox.toggle()
-        checkbox.setChecked(checkopt)
-        eval(str('checkbox.stateChanged.connect(' + function + ')'))
-
-    def table_setup(self, table, table_columns, sortingopt=True):
-        table.setColumnCount(len(table_columns))
-        table.setSortingEnabled(sortingopt)
-        table.setHorizontalHeaderLabels(table_columns)
-
-    def pandda_html(self):
-        if os.path.exists(str(self.panddas_directory + '/interesting_datasets')):
-            print('WARNING: USING RESULTS FROM OLD PANDDA ANALYSE! THIS IS NOT FULLY SUPPORTED IN XCE2')
-            print('PLEASE CHANGE YOUR PANDDA DIRECTORY TO A NEW RUN, OR USE THE OLD VERSION OF XCE!')
-            self.pandda_initial_html_file = str(self.panddas_directory + '/results_summareis/pandda_initial.html')
-            self.pandda_analyse_html_file = str(self.panddas_directory + '/results_summaries/pandda_analyse.html')
-        self.pandda_initial_html_file = str(
-            self.panddas_directory + '/analyses/html_summaries/' + 'pandda_initial.html')
-        self.pandda_analyse_html_file = str(
-            self.panddas_directory + '/analyses/html_summaries/' + 'pandda_analyse.html')
-        self.pandda_inspect_html_file = str(
-            self.panddas_directory + '/analyses/html_summaries/' + 'pandda_inspect.html')
-
-
-    ################################################# define gui #######################################################
-    def start_GUI(self):
-
-        # check http://doc.qt.io/qt-4.8/stylesheet-customizing.html#the-box-model
-        self.headlineLabelfont = QtGui.QFont("Arial", 20, QtGui.QFont.Bold)
-
-        # a dictionary to hold information about combobox, run and status buttons for each box at the bottom of the gui
-        self.workflow_widget_dict = {}
-
-        # GUI setup
-        self.window = QtGui.QWidget()
-        self.window.setWindowTitle("XChemExplorer")
-        self.screen = QtGui.QDesktopWidget().screenGeometry()
-
+    def main_layout(self):
         # initialise menu bar
         menu_bar = self.initialise_menu_bar()
 
@@ -854,37 +731,6 @@ class XChemExplorer(QtGui.QApplication):
 
         # set all table columns
         self.define_all_tables()
-
-        ################################################################################################################
-        #                                                                                                              #
-        # ========================================== WORKFLOW TASK CONTAINER ========================================= #
-        #                                                                                                              #
-        ################################################################################################################
-
-        # workflow task container - order of tabs as they appear for the main window
-        self.workflow = ['Overview',  # 0
-                         'Datasets',  # 1
-                         'Maps',  # 2
-                         'PANDDAs',  # 3
-                         'Refinement',  # 4
-                         'Deposition',  # 6
-                         'Settings']  # 5
-
-        # dictionary with keys corresponding to each stage in the workflow
-        self.workflow_dict = {self.workflow[0]: 'Overview',
-                              self.workflow[1]: 'Datasets',
-                              self.workflow[2]: 'Maps',
-                              self.workflow[3]: 'PANDDAs',
-                              self.workflow[4]: 'Refinement',
-                              self.workflow[6]: 'Settings',
-                              self.workflow[5]: 'Deposition'}
-
-        # tab widget
-        self.main_tab_widget = QtGui.QTabWidget()
-        self.tab_dict = {}
-        self.make_tab_dict(self.workflow, self.main_tab_widget, self.tab_dict)
-
-        ################################################################################################################
 
         # Tab layout & content
         # --------------------
@@ -979,7 +825,7 @@ class XChemExplorer(QtGui.QApplication):
 
         # spacer for top bar
         hbox.addWidget(QtGui.QLabel('                                             '))
-        
+
         # select target dropdown
         hbox.addWidget(QtGui.QLabel('Select Target: '))
         self.target_selection_combobox = QtGui.QComboBox()
@@ -1735,6 +1581,165 @@ class XChemExplorer(QtGui.QApplication):
             write_enabled = self.check_write_permissions_of_data_source()
             if not write_enabled:
                 self.data_source_set = False
+
+    ################################################## layout functions ################################################
+    def make_tab_dict(self, tab_list, tab_widget, tab_dict):
+        for page in tab_list:
+            tab = QtGui.QWidget()
+            vbox = QtGui.QVBoxLayout(tab)
+            tab_widget.addTab(tab, page)
+            tab_dict[page] = [tab, vbox]
+
+    def add_checkbox(self, checkbox, function, checkopt=False):
+        checkbox.toggle()
+        checkbox.setChecked(checkopt)
+        eval(str('checkbox.stateChanged.connect(' + function + ')'))
+
+    def table_setup(self, table, table_columns, sortingopt=True):
+        table.setColumnCount(len(table_columns))
+        table.setSortingEnabled(sortingopt)
+        table.setHorizontalHeaderLabels(table_columns)
+
+    def pandda_html(self):
+        if os.path.exists(str(self.panddas_directory + '/interesting_datasets')):
+            print('WARNING: USING RESULTS FROM OLD PANDDA ANALYSE! THIS IS NOT FULLY SUPPORTED IN XCE2')
+            print('PLEASE CHANGE YOUR PANDDA DIRECTORY TO A NEW RUN, OR USE THE OLD VERSION OF XCE!')
+            self.pandda_initial_html_file = str(self.panddas_directory + '/results_summareis/pandda_initial.html')
+            self.pandda_analyse_html_file = str(self.panddas_directory + '/results_summaries/pandda_analyse.html')
+        self.pandda_initial_html_file = str(
+            self.panddas_directory + '/analyses/html_summaries/' + 'pandda_initial.html')
+        self.pandda_analyse_html_file = str(
+            self.panddas_directory + '/analyses/html_summaries/' + 'pandda_analyse.html')
+        self.pandda_inspect_html_file = str(
+            self.panddas_directory + '/analyses/html_summaries/' + 'pandda_inspect.html')
+
+    # function for datasource, run and status button setup
+    def setup_push_button(self, button_dict):
+        # use iterkeys to determine order of key by letter
+        for name in sorted(button_dict.iterkeys()):
+            # add current item to menu bar
+            button = eval('QtGui.QPushButton("' + str(button_dict[name][0]) + '")')
+            # for each configuration item
+            for button_config in button_dict[name][1]:
+                eval(str('button.setToolTip(' + str(button_config[0]) + ')'))
+                eval(str('button.setStyleSheet("' + str(button_config[1] + '")')))
+                if len(button_config[2]) > 1:
+                    eval(str('button.setFont(' + str(button_config[2]) + ')'))
+                eval(str('button.clicked.connect(' + str(button_config[3]) + ')'))
+
+        return button
+
+    # function to setup one of the bottom boxes
+    def bottom_box_setup(self, label, dropdown_options, dropdown_tooltip, buttons, colour):
+
+        frame = QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+        frame.setStyleSheet("QFrame { border: 1px solid black; border-radius: 1px; padding: 0px; margin: 0px }")
+
+        vbox = QtGui.QVBoxLayout()
+        label = QtGui.QLabel(label)
+        label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
+        label.setFont(self.headlineLabelfont)
+        label.setStyleSheet(str(" QLabel { border: 1px solid black; border-radius: 1px;" + str(colour) +
+                                "padding: 0px; margin: 0px }"))
+        vbox.addWidget(label)
+
+        hboxAction = QtGui.QHBoxLayout()
+        combobox = QtGui.QComboBox()
+        for task in dropdown_options:
+            combobox.addItem(task)
+        eval('combobox.setToolTip(' + str(dropdown_tooltip) + ')')
+        combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
+        hboxAction.addWidget(combobox)
+
+        vboxButton = QtGui.QVBoxLayout()
+        for button in buttons:
+            vboxButton.addWidget(button)
+        hboxAction.addLayout(vboxButton)
+        vbox.addLayout(hboxAction)
+        vbox.setSpacing(0)
+        vbox.setMargin(0)
+        frame.setLayout(vbox)
+        frame.setMaximumWidth((self.screen.width() - 20) / 5)
+
+        return frame, combobox
+
+    # function to add items to top menu bar
+    def setup_menubar(self, menu_bar, menu_items_dict):
+        # use iterkeys to determine order of key by letter
+        for config in sorted(menu_items_dict.iterkeys()):
+            # add current item to menu bar
+            menu = eval('menu_bar.addMenu("' + str(menu_items_dict[config][0]) + '")')
+            # for each configuration item
+            for menu_item in menu_items_dict[config][1]:
+                # add the drop down option
+                action = eval(str('QtGui.QAction("' + str(menu_item[0]) + '", self.window)'))
+                # add a shortcut if defined
+                if len(menu_item[1]) > 1:
+                    eval(str('action.setShortcut("' + str(menu_item[1]) + '")'))
+                # connect the relevant function and add as an action
+                eval(str('action.triggered.connect(' + menu_item[2] + ')'))
+                menu.addAction(action)
+
+        return menu_bar
+
+    # function for opening help and tutorial files
+    def openFile(self, file):
+        if sys.platform == 'linux2':
+            subprocess.call(["xdg-open", file])
+        else:
+            os.startfile(file)
+
+
+    ################################################# define gui #######################################################
+    def start_GUI(self):
+
+        # check http://doc.qt.io/qt-4.8/stylesheet-customizing.html#the-box-model
+        self.headlineLabelfont = QtGui.QFont("Arial", 20, QtGui.QFont.Bold)
+
+        # a dictionary to hold information about combobox, run and status buttons for each box at the bottom of the gui
+        self.workflow_widget_dict = {}
+
+        # GUI setup
+        self.window = QtGui.QWidget()
+        self.window.setWindowTitle("XChemExplorer")
+        self.screen = QtGui.QDesktopWidget().screenGeometry()
+
+
+
+        ################################################################################################################
+        #                                                                                                              #
+        # ========================================== WORKFLOW TASK CONTAINER ========================================= #
+        #                                                                                                              #
+        ################################################################################################################
+
+        # workflow task container - order of tabs as they appear for the main window
+        self.workflow = ['Overview',  # 0
+                         'Datasets',  # 1
+                         'Maps',  # 2
+                         'PANDDAs',  # 3
+                         'Refinement',  # 4
+                         'Deposition',  # 6
+                         'Settings']  # 5
+
+        # dictionary with keys corresponding to each stage in the workflow
+        self.workflow_dict = {self.workflow[0]: 'Overview',
+                              self.workflow[1]: 'Datasets',
+                              self.workflow[2]: 'Maps',
+                              self.workflow[3]: 'PANDDAs',
+                              self.workflow[4]: 'Refinement',
+                              self.workflow[6]: 'Settings',
+                              self.workflow[5]: 'Deposition'}
+
+        # tab widget
+        self.main_tab_widget = QtGui.QTabWidget()
+        self.tab_dict = {}
+        self.make_tab_dict(self.workflow, self.main_tab_widget, self.tab_dict)
+
+        self.main_layout()
+
+        ################################################################################################################
+
 
     ######################################### sort stuff below here ####################################################
     def select_sample_for_dimple(self):
@@ -3236,7 +3241,7 @@ class XChemExplorer(QtGui.QApplication):
 
             self.pandda_html()
             self.show_pandda_html_summary()
-            
+
             self.html_export_directory = pickled_settings['html_export_directory']
             self.html_export_directory_label.setText(self.html_export_directory)
             self.settings['html_export_directory'] = self.html_export_directory
