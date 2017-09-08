@@ -813,7 +813,7 @@ class XChemExplorer(QtGui.QApplication):
         # make subtabs
         self.make_tab_dict(datasets_tab_list, self.datasets_tab_widget, self.datasets_tab_dict)
 
-        # main tab
+        # main body - things that are always displayed
 
         # add a container to hold everythting and add to main tab layout
         self.datasets_data_collection_vbox = QtGui.QVBoxLayout()
@@ -860,9 +860,6 @@ class XChemExplorer(QtGui.QApplication):
         # top options
         reprocess_vbox = QtGui.QVBoxLayout()  # box to hold reprocessing subtab content
 
-        frame = QtGui.QFrame()  # frame for all content
-        hbox = QtGui.QHBoxLayout()  # horizontal box for data collection directory options
-
         frame_select = QtGui.QFrame()  # frame to hold top options box
         self.hbox_select = QtGui.QHBoxLayout()  # top options box
         
@@ -890,16 +887,11 @@ class XChemExplorer(QtGui.QApplication):
 
         self.add_to_box(self.hbox_select, self.hbox_select_widgets)
 
-        frame.setLayout(hbox)
-        reprocess_vbox.addWidget(frame)
-
         frame_select.setLayout(self.hbox_select)
-        hbox.addWidget(frame_select)
 
         # table
         self.datasets_reprocess_table = QtGui.QTableWidget()
         self.table_setup(self.datasets_reprocess_table, self.datasets_reprocess_columns)
-        reprocess_vbox.addWidget(self.datasets_reprocess_table)
 
         # create context menu
         self.popMenu_for_datasets_reprocess_table = QtGui.QMenu()
@@ -911,7 +903,7 @@ class XChemExplorer(QtGui.QApplication):
 
         frame = QtGui.QFrame()
         frame.setFrameShape(QtGui.QFrame.StyledPanel)
-        hbox = QtGui.QHBoxLayout()
+        data_protocol_hbox = QtGui.QHBoxLayout()
 
         frame_options = QtGui.QFrame()
         frame_options.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -925,7 +917,6 @@ class XChemExplorer(QtGui.QApplication):
         self.xia2_dials_checkbox = QtGui.QCheckBox('Dials')
         hbox_options.addWidget(self.xia2_dials_checkbox)
         frame_options.setLayout(hbox_options)
-        hbox.addWidget(frame_options)
 
         frame_sg = QtGui.QFrame()
         frame_sg.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -938,7 +929,6 @@ class XChemExplorer(QtGui.QApplication):
             self.reprocess_space_group_comboxbox.addItem(sg)
         hbox_sg.addWidget(self.reprocess_space_group_comboxbox)
         frame_sg.setLayout(hbox_sg)
-        hbox.addWidget(frame_sg)
 
         frame_ref = QtGui.QFrame()
         frame_ref.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -956,7 +946,6 @@ class XChemExplorer(QtGui.QApplication):
         button.clicked.connect(self.select_reprocess_reference_mtz)
         hbox_ref.addWidget(button)
         frame_ref.setLayout(hbox_ref)
-        hbox.addWidget(frame_ref)
 
         frame_isigma = QtGui.QFrame()
         frame_isigma.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -972,7 +961,6 @@ class XChemExplorer(QtGui.QApplication):
         self.reprocess_isigma_combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
         vbox_isigma.addWidget(self.reprocess_isigma_combobox)
         frame_isigma.setLayout(vbox_isigma)
-        hbox.addWidget(frame_isigma)
 
         frame_cc_half = QtGui.QFrame()
         frame_cc_half.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -988,12 +976,14 @@ class XChemExplorer(QtGui.QApplication):
         self.reprocess_cc_half_combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
         vbox_cc_half.addWidget(self.reprocess_cc_half_combobox)
         frame_cc_half.setLayout(vbox_cc_half)
-        hbox.addWidget(frame_cc_half)
 
-        hbox.addStretch(0)
+        data_ptotocol_hbox_widgets = [frame_options, frame_sg, frame_ref, frame_isigma, frame_cc_half]
+        self.add_to_box(data_protocol_hbox, data_ptotocol_hbox_widgets)
 
-        frame.setLayout(hbox)
-        reprocess_vbox.addWidget(frame)
+        frame.setLayout(data_protocol_hbox)
+
+        self.reprocess_hbox_widgets = [frame_select, self.datasets_reprocess_table, frame]
+        self.add_to_box(reprocess_vbox, self.reprocess_hbox_widgets)
 
         self.datasets_tab_dict['Reprocess'][1].addLayout(reprocess_vbox)
 
@@ -1610,6 +1600,8 @@ class XChemExplorer(QtGui.QApplication):
         table.setColumnCount(len(table_columns))
         table.setSortingEnabled(sortingopt)
         table.setHorizontalHeaderLabels(table_columns)
+        table.resizeRowsToContents()
+        table.resizeColumnsToContents()
 
     def pandda_html(self):
         if os.path.exists(str(self.panddas_directory + '/interesting_datasets')):
