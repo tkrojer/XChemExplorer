@@ -1,5 +1,9 @@
 # last edited: 10/08/2017, 18:00
 
+# solve gtk startup error
+import gtk
+gtk.set_interactive(False)
+
 import base64
 import getpass
 import glob
@@ -816,105 +820,81 @@ class XChemExplorer(QtGui.QApplication):
         self.tab_dict[self.workflow_dict['Datasets']][1].addLayout(self.datasets_data_collection_vbox)
 
         # add a horizontal box to hold option to autocheck for new data
-        hbox = QtGui.QHBoxLayout()
+        self.autocheck_hbox = QtGui.QHBoxLayout()
 
         # checkbox for autocollect
         self.check_for_new_data_collection = QtGui.QCheckBox('Check for new data collection every two minutes')
         self.add_checkbox(self.check_for_new_data_collection, 'self.continously_check_for_new_data_collection')
-        hbox.addWidget(self.check_for_new_data_collection)
-
-        # spacer for top bar
-        hbox.addWidget(QtGui.QLabel('                                             '))
 
         # select target dropdown
-        hbox.addWidget(QtGui.QLabel('Select Target: '))
+        select_target_label = QtGui.QLabel('Select Target: ')
+        select_target_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
         self.target_selection_combobox = QtGui.QComboBox()
         self.populate_target_selection_combobox(self.target_selection_combobox)
         self.target_selection_combobox.activated[str].connect(self.target_selection_combobox_activated)
-        hbox.addWidget(self.target_selection_combobox)
         self.target = str(self.target_selection_combobox.currentText())
 
+        self.autocheck_hbox_widgets = [self.check_for_new_data_collection, select_target_label,
+                                       self.target_selection_combobox]
+
+        self.add_to_box(self.autocheck_hbox, self.autocheck_hbox_widgets)
+
         # add target dropdown to top bar
-        self.datasets_data_collection_vbox.addLayout(hbox)
+        self.datasets_data_collection_vbox.addLayout(self.autocheck_hbox)
 
         # summary sub-tab
 
         # table
         self.datasets_summary_table = QtGui.QTableWidget()
-        self.table_setup(self.datasets_summary_table, self.datasets_summary_table_columns)
-        self.datasets_summarys_vbox_for_table = QtGui.QVBoxLayout()
-        self.datasets_tab_dict['Summary'][1].addLayout(self.datasets_summarys_vbox_for_table)
+        self.table_setup(self.datasets_summary_table, self.datasets_summary_table_columns)  # setup table
+        self.datasets_summarys_vbox_for_table = QtGui.QVBoxLayout()  # setup layout to hold table
+        self.datasets_summarys_vbox_for_table.addWidget(self.datasets_summary_table)  # add table to layout
+        self.datasets_tab_dict['Summary'][1].addLayout(self.datasets_summarys_vbox_for_table)  # add layout to tab
+        self.datasets_summarys_vbox_for_details = QtGui.QVBoxLayout()  # vbox for details
+        self.data_collection_details_currently_on_display = None  # switch for displaying/updating table
+        self.datasets_tab_dict['Summary'][1].addLayout(self.datasets_summarys_vbox_for_details)  # add details
 
-        # another vbox for details to be shown
-        self.datasets_summarys_vbox_for_details = QtGui.QVBoxLayout()
-        self.data_collection_details_currently_on_display = None
-        self.datasets_tab_dict['Summary'][1].addLayout(self.datasets_summarys_vbox_for_details)
-        self.datasets_summarys_vbox_for_table.addWidget(self.datasets_summary_table)
-        self.datasets_data_collection_vbox.addWidget(self.datasets_tab_widget)
+        self.datasets_data_collection_vbox.addWidget(self.datasets_tab_widget)  # add subtabs to main tab
 
         # reprocessing sub-tab
+        # top options
+        reprocess_vbox = QtGui.QVBoxLayout()  # box to hold reprocessing subtab content
 
-        reprocess_vbox = QtGui.QVBoxLayout()
+        frame = QtGui.QFrame()  # frame for all content
+        hbox = QtGui.QHBoxLayout()  # horizontal box for data collection directory options
 
-        frame = QtGui.QFrame()
-        frame.setFrameShape(QtGui.QFrame.StyledPanel)
-        hbox = QtGui.QHBoxLayout()
-
-        frame_select = QtGui.QFrame()
-        frame_select.setFrameShape(QtGui.QFrame.StyledPanel)
-
-        hbox_select = QtGui.QHBoxLayout()
-        label = QtGui.QLabel('Data collection directory:')
-        hbox_select.addWidget(label)
-
-        dir_frame = QtGui.QFrame()
-        dir_frame.setFrameShape(QtGui.QFrame.StyledPanel)
-        dir_label_box = QtGui.QVBoxLayout()
+        frame_select = QtGui.QFrame()  # frame to hold top options box
+        self.hbox_select = QtGui.QHBoxLayout()  # top options box
+        
+        dc_label = QtGui.QLabel('Data collection directory: ')
+        dc_label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
         self.diffraction_data_dir_label = QtGui.QLabel(self.diffraction_data_directory)
-        dir_label_box.addWidget(self.diffraction_data_dir_label)
-        dir_frame.setLayout(dir_label_box)
-        hbox_select.addWidget(dir_frame)
+        self.diffraction_data_dir_label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
 
-        button = QtGui.QPushButton("Select")
-        button.clicked.connect(self.select_diffraction_data_directory)
-        hbox_select.addWidget(button)
-        frame_select.setLayout(hbox_select)
-        hbox.addWidget(frame_select)
+        select_button = QtGui.QPushButton("Select")
+        select_button.clicked.connect(self.select_diffraction_data_directory)
 
-        frame_search = QtGui.QFrame()
-        frame_search.setFrameShape(QtGui.QFrame.StyledPanel)
-        hbox_search = QtGui.QHBoxLayout()
-        button = QtGui.QPushButton("Search Datasets")
-        button.clicked.connect(self.search_for_datasets)
-        hbox_search.addWidget(button)
+        search_button = QtGui.QPushButton("Search Datasets")
+        search_button.clicked.connect(self.search_for_datasets)
 
-        frame_search_info = QtGui.QFrame()
-        frame_search_info.setFrameShape(QtGui.QFrame.StyledPanel)
-        hbox_search_info = QtGui.QHBoxLayout()
         self.diffraction_data_search_label = QtGui.QLabel(self.diffraction_data_search_info)
-        hbox_search_info.addWidget(self.diffraction_data_search_label)
-        frame_search_info.setLayout(hbox_search_info)
-        hbox_search.addWidget(frame_search_info)
-        frame_search.setLayout(hbox_search)
-        hbox.addWidget(frame_search)
 
-        frame_translate = QtGui.QFrame()
-        frame_translate.setFrameShape(QtGui.QFrame.StyledPanel)
-        vbox_translate = QtGui.QVBoxLayout()
-        label = QtGui.QLabel('translate:\ndatasetID -> sampleID')
-        label.setAlignment(QtCore.Qt.AlignCenter)
-        vbox_translate.addWidget(label)
-        button = QtGui.QPushButton('Open CSV')
-        button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
-        button.clicked.connect(self.translate_datasetID_to_sampleID)
-        vbox_translate.addWidget(button)
-        frame_translate.setLayout(vbox_translate)
-        hbox.addWidget(frame_translate)
+        translate_label = QtGui.QLabel('translate: datasetID -> sampleID')
+        translate_label.setAlignment(QtCore.Qt.AlignCenter)
+        csv_button = QtGui.QPushButton('Open CSV')
+        csv_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
+        csv_button.clicked.connect(self.translate_datasetID_to_sampleID)
 
-        hbox.addStretch(0)
+        self.hbox_select_widgets = [dc_label, select_button, search_button, self.diffraction_data_search_label,
+                                    translate_label, csv_button]
+
+        self.add_to_box(self.hbox_select, self.hbox_select_widgets)
 
         frame.setLayout(hbox)
         reprocess_vbox.addWidget(frame)
+
+        frame_select.setLayout(self.hbox_select)
+        hbox.addWidget(frame_select)
 
         # table
         self.datasets_reprocess_table = QtGui.QTableWidget()
@@ -1582,6 +1562,37 @@ class XChemExplorer(QtGui.QApplication):
             if not write_enabled:
                 self.data_source_set = False
 
+    def workflow(self):
+        ################################################################################################################
+        #                                                                                                              #
+        # ========================================== WORKFLOW TASK CONTAINER ========================================= #
+        #                                                                                                              #
+        ################################################################################################################
+        self.workflow_widget_dict = {}
+
+        # workflow task container - order of tabs as they appear for the main window
+        self.workflow = ['Overview',  # 0
+                         'Datasets',  # 1
+                         'Maps',  # 2
+                         'PANDDAs',  # 3
+                         'Refinement',  # 4
+                         'Deposition',  # 6
+                         'Settings']  # 5
+
+        # dictionary with keys corresponding to each stage in the workflow
+        self.workflow_dict = {self.workflow[0]: 'Overview',
+                              self.workflow[1]: 'Datasets',
+                              self.workflow[2]: 'Maps',
+                              self.workflow[3]: 'PANDDAs',
+                              self.workflow[4]: 'Refinement',
+                              self.workflow[6]: 'Settings',
+                              self.workflow[5]: 'Deposition'}
+
+        # tab widget
+        self.main_tab_widget = QtGui.QTabWidget()
+        self.tab_dict = {}
+        self.make_tab_dict(self.workflow, self.main_tab_widget, self.tab_dict)
+
     ################################################## layout functions ################################################
     def make_tab_dict(self, tab_list, tab_widget, tab_dict):
         for page in tab_list:
@@ -1690,6 +1701,10 @@ class XChemExplorer(QtGui.QApplication):
         else:
             os.startfile(file)
 
+    def add_to_box(self, frame, widgets_list):
+        for widget in widgets_list:
+            frame.addWidget(widget)
+
 
     ################################################# define gui #######################################################
     def start_GUI(self):
@@ -1698,44 +1713,13 @@ class XChemExplorer(QtGui.QApplication):
         self.headlineLabelfont = QtGui.QFont("Arial", 20, QtGui.QFont.Bold)
 
         # a dictionary to hold information about combobox, run and status buttons for each box at the bottom of the gui
-        self.workflow_widget_dict = {}
+
 
         # GUI setup
         self.window = QtGui.QWidget()
         self.window.setWindowTitle("XChemExplorer")
         self.screen = QtGui.QDesktopWidget().screenGeometry()
-
-
-
-        ################################################################################################################
-        #                                                                                                              #
-        # ========================================== WORKFLOW TASK CONTAINER ========================================= #
-        #                                                                                                              #
-        ################################################################################################################
-
-        # workflow task container - order of tabs as they appear for the main window
-        self.workflow = ['Overview',  # 0
-                         'Datasets',  # 1
-                         'Maps',  # 2
-                         'PANDDAs',  # 3
-                         'Refinement',  # 4
-                         'Deposition',  # 6
-                         'Settings']  # 5
-
-        # dictionary with keys corresponding to each stage in the workflow
-        self.workflow_dict = {self.workflow[0]: 'Overview',
-                              self.workflow[1]: 'Datasets',
-                              self.workflow[2]: 'Maps',
-                              self.workflow[3]: 'PANDDAs',
-                              self.workflow[4]: 'Refinement',
-                              self.workflow[6]: 'Settings',
-                              self.workflow[5]: 'Deposition'}
-
-        # tab widget
-        self.main_tab_widget = QtGui.QTabWidget()
-        self.tab_dict = {}
-        self.make_tab_dict(self.workflow, self.main_tab_widget, self.tab_dict)
-
+        self.workflow()
         self.main_layout()
 
         ################################################################################################################
