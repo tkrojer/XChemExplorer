@@ -17,6 +17,8 @@ import sys
 import webbrowser
 from datetime import datetime
 
+from gui_setup import *
+
 from PyQt4 import QtGui, QtCore, QtWebKit
 
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'lib'))
@@ -36,7 +38,6 @@ import XChemWeb
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-
 
 class XChemExplorer(QtGui.QApplication):
     def __init__(self, args):
@@ -620,110 +621,7 @@ class XChemExplorer(QtGui.QApplication):
         return update_from_datasource_button, frame_dataset_task, frame_map_cif_file_task, frame_panddas_file_task, \
                frame_refine_file_task
 
-    ################################################# table stuff ######################################################
-    def define_all_tables(self):
-        # Table column settings
 
-        # functions that use self.overview_datasource_table_columns:
-        #
-        # - select_datasource_columns_to_display() - dropdown in datasource top menu (select columns to show)
-        # - populate_data_source_table()           - appears to be completely unused, so commented out
-        # - populate_and_update_datasource_table() - used within select_datasource_columns_to_display and
-        #                                            update_all_tables()
-
-        self.overview_datasource_table_columns = ['Sample ID',
-                                                  'Compound ID',
-                                                  'Smiles',
-                                                  'Visit',
-                                                  'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                                                  'Refinement\nRfree',
-                                                  'Data Collection\nDate',
-                                                  'Puck',
-                                                  'PuckPosition',
-                                                  'Ligand\nConfidence']
-
-        # functions that use self.datasets_summary_table_columns:
-        #
-        # - populate_datasets_summary_table() - appears in create_widgets_for_autoprocessing_results_only()
-        # - user_update_selected_autoproc_datasets_summary_table()
-        #                                            - appears in create_widgets_for_autoprocessing_results_only()
-
-        self.datasets_summary_table_columns = ['Sample ID',
-                                               'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                                               'DataProcessing\nSpaceGroup',
-                                               'DataProcessing\nRfree',
-                                               'SoakDB\nBarcode',
-                                               'GDA\nBarcode',
-                                               'Rmerge\nLow',
-                                               'auto-assigned',
-                                               'DataCollection\nOutcome',
-                                               'img1',
-                                               'img2',
-                                               'img3',
-                                               'img4',
-                                               'img5',
-                                               'Show\nDetails',
-                                               'Show Diffraction\nImage'
-                                               ]
-
-        # functions that use self.datasets_reprocess_columns:
-        #
-        # - update_datasets_reprocess_table() - appears in search_for_datasets()
-
-        self.datasets_reprocess_columns = ['Dataset ID',
-                                           'Sample ID',
-                                           'Run\nxia2',
-                                           'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                                           'Rmerge\nLow',
-                                           'Dimple\nRfree',
-                                           'DataProcessing\nSpaceGroup',
-                                           'DataProcessing\nUnitCell',
-                                           'DataProcessing\nStatus']
-
-        # functions that use self.maps_table_columns:
-        #
-        # - update_datasets_reprocess_table() - appears in create_maps_table()
-
-        self.maps_table_columns = ['Sample ID',
-                                   'Select',
-                                   'Compound ID',
-                                   'Smiles',
-                                   'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                                   'Dimple\nRcryst',
-                                   'Dimple\nRfree',
-                                   'DataProcessing\nSpaceGroup',
-                                   'Reference\nSpaceGroup',
-                                   'Difference\nUC Volume (%)',
-                                   'Reference File',
-                                   'DataProcessing\nUnitCell',
-                                   'Dimple\nStatus',
-                                   'Compound\nStatus',
-                                   'LastUpdated']
-
-        # functions that use self.pandda_table_columns:
-        #
-        # - populate_pandda_analyse_input_table() - appears in update_all_tables()
-
-        self.pandda_table_columns = ['Sample ID',
-                                     'Refinement\nSpace Group',
-                                     'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                                     'Dimple\nRcryst',
-                                     'Dimple\nRfree',
-                                     'Crystal Form\nName', ]
-
-        # functions that use self.refinement_table_columns:
-        #
-        # - populate_and_update_refinement_table() - appears in update_all_tables
-
-        self.refinement_table_columns = ['Sample ID',
-                                         'Compound ID',
-                                         'Refinement\nSpace Group',
-                                         'Refinement\nResolution',
-                                         'Refinement\nRcryst',
-                                         'Refinement\nRfree',
-                                         'Refinement\nOutcome',
-                                         'PanDDA site details',
-                                         'Refinement\nStatus']
 
     def main_layout(self):
         # initialise menu bar
@@ -734,7 +632,7 @@ class XChemExplorer(QtGui.QApplication):
         frame_refine_file_task = self.initialise_bottom_boxes()
 
         # set all table columns
-        self.define_all_tables()
+        #self.define_all_tables()
 
         # Tab layout & content
         # --------------------
@@ -862,7 +760,7 @@ class XChemExplorer(QtGui.QApplication):
 
         frame_select = QtGui.QFrame()  # frame to hold top options box
         self.hbox_select = QtGui.QHBoxLayout()  # top options box
-        
+
         dc_label = QtGui.QLabel('Data collection directory: ')
         dc_label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
         self.diffraction_data_dir_label = QtGui.QLabel(self.diffraction_data_directory)
@@ -908,9 +806,9 @@ class XChemExplorer(QtGui.QApplication):
         frame_options = QtGui.QFrame()
         frame_options.setFrameShape(QtGui.QFrame.StyledPanel)
         hbox_options = QtGui.QHBoxLayout()
-        label = QtGui.QLabel('Data processing protocol:')
+        label = QtGui.QLabel('Data processing protocol: ')
         hbox_options.addWidget(label)
-        self.xia2_3d_checkbox = QtGui.QCheckBox(' xia2 3d')
+        self.xia2_3d_checkbox = QtGui.QCheckBox('xia2 3d')
         hbox_options.addWidget(self.xia2_3d_checkbox)
         self.xia2_3dii_checkbox = QtGui.QCheckBox('xia2 3dii')
         hbox_options.addWidget(self.xia2_3dii_checkbox)
@@ -1711,6 +1609,9 @@ class XChemExplorer(QtGui.QApplication):
         self.window = QtGui.QWidget()
         self.window.setWindowTitle("XChemExplorer")
         self.screen = QtGui.QDesktopWidget().screenGeometry()
+
+        tables().setup(self)
+
         self.workflow()
         self.main_layout()
 
@@ -5280,12 +5181,12 @@ class XChemExplorer(QtGui.QApplication):
     #     self.overview_datasource_table.setColumnCount(0)
     #     self.overview_datasource_table.setColumnCount(len(self.overview_datasource_table_columns))
     #     self.overview_datasource_table.setRowCount(0)
-    # 
+    #
     #     columns_to_show = self.get_columns_to_show(self.overview_datasource_table_columns, header)
     #     n_rows = self.get_rows_with_sample_id_not_null(header, data)
     #     self.overview_datasource_table.setRowCount(n_rows)
     #     sample_id_column = self.get_columns_to_show(['Sample ID'], header)
-    # 
+    #
     #     x = 0
     #     for row in data:
     #         if str(row[sample_id_column[0]]).lower() == 'none' or str(row[sample_id_column[0]]).replace(' ', '') == '':
