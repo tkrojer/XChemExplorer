@@ -11,18 +11,18 @@ import math
 import multiprocessing
 import pickle
 import subprocess
-import sys
+import sys, os
 import webbrowser
 from datetime import datetime
-
-from gui_setup import *
-
 from PyQt4 import QtGui, QtCore, QtWebKit
 
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'lib'))
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'web'))
+sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'gui_scripts'))
+
+from gui_setup import *
+from layout import *
 from XChemUtils import parse
-from XChemUtils import external_software
 import XChemThread
 import XChemDB
 import XChemPANDDA
@@ -98,62 +98,62 @@ class XChemExplorer(QtGui.QApplication):
         #             }
         menu_dict = {'A: file': ["&File",
                                  [
-                                     ['Open Config File', 'Ctrl+O', 'self.open_config_file'],
-                                     ['Save Config File', 'Ctrl+S', 'self.save_config_file'],
-                                     ['Quit', 'Ctrl+Q', 'self.quit_xce']
+                                     ['Open Config File', 'Ctrl+O', 'object.open_config_file'],
+                                     ['Save Config File', 'Ctrl+S', 'object.save_config_file'],
+                                     ['Quit', 'Ctrl+Q', 'object.quit_xce']
                                  ]],
                      'B: datasource': ["&Datasource",
                                        [
                                            ['Reload Samples From Datasource', '',
-                                            'self.datasource_menu_reload_samples'],
-                                           ['Save Samples to Datasource', '', 'self.datasource_menu_save_samples'],
+                                            'object.datasource_menu_reload_samples'],
+                                           ['Save Samples to Datasource', '', 'object.datasource_menu_save_samples'],
                                            ['Import CSV file into Datasource', '',
-                                            'self.datasource_menu_import_csv_file'],
+                                            'object.datasource_menu_import_csv_file'],
                                            ['Export CSV file from Datasource', '',
-                                            'self.datasource_menu_export_csv_file'],
-                                           ['Select columns to show', '', 'self.select_datasource_columns_to_display'],
-                                           ['Create New Datasource (SQLite)', '', 'self.create_new_data_source'],
-                                           ['Export CSV for wonka', '', 'self.export_data_for_WONKA']
+                                            'object.datasource_menu_export_csv_file'],
+                                           ['Select columns to show', '', 'object.select_datasource_columns_to_display'],
+                                           ['Create New Datasource (SQLite)', '', 'object.create_new_data_source'],
+                                           ['Export CSV for wonka', '', 'object.export_data_for_WONKA']
                                        ]],
                      'C: preferences': ["&Preferences",
                                         [
-                                            ['Edit preferences', '', 'self.show_preferences']
+                                            ['Edit preferences', '', 'object.show_preferences']
                                         ]],
                      'D: deposition': ["&Deposition",
                                        [
-                                           ['Edit information', '', 'self.deposition_data'],
-                                           ['Export to HTML', '', 'self.export_to_html'],
+                                           ['Edit information', '', 'object.deposition_data'],
+                                           ['Export to HTML', '', 'object.export_to_html'],
                                            ['Find PanDDA apo structures', '',
-                                            'self.create_missing_apo_records_in_depositTable'],
+                                            'object.create_missing_apo_records_in_depositTable'],
                                            ['Update file info of apo structures', '',
-                                            'self.update_file_information_of_apo_records'],
+                                            'object.update_file_information_of_apo_records'],
                                            ['Prepare mmcif for apo structures', '',
-                                            'self.prepare_models_for_deposition'],
+                                            'object.prepare_models_for_deposition'],
                                            # ^ this is added to a dictionary somewhere, so need to check what it interferes
                                            #  with when code changed
                                            ['Prepare mmcif for ligand bound structures', '',
-                                            'self.prepare_models_for_deposition'],
+                                            'object.prepare_models_for_deposition'],
                                            # ^ this is added to a dictionary somewhere, so need to check what it interferes
                                            #  with when code changed
                                            ['Copy files to group deposition directory', '',
-                                            'self.prepare_for_group_deposition_upload'],
-                                           ['Update DB with PDB codes', '', 'self.enter_pdb_codes'],
-                                           ['Check SMILES', '', 'self.check_smiles_in_db_and_pdb']
+                                            'object.prepare_for_group_deposition_upload'],
+                                           ['Update DB with PDB codes', '', 'object.enter_pdb_codes'],
+                                           ['Check SMILES', '', 'object.check_smiles_in_db_and_pdb']
                                        ]],
                      'E: help': ["&Help",
                                  [
                                      ['Open XCE tutorial', '', str(
-                                         'lambda: self.openFile("/dls/science/groups/i04-1/software/docs/'
+                                         'lambda: object.layout_funcs.openFile("/dls/science/groups/i04-1/software/docs/'
                                          'XChemExplorer.pdf")')],
                                      ['Troubleshooting', '', str(
-                                         'lambda: self.openFile("/dls/science/groups/i04-1/software/'
+                                         'lambda: object.layout_funcs.openFile("/dls/science/groups/i04-1/software/'
                                          'xce_troubleshooting.pdf")')]
                                  ]]
 
                      }
 
         # create menu from menu dictionary
-        menu_bar = self.setup_menubar(menu_bar, menu_dict)
+        menu_bar = self.layout_funcs.setup_menubar(self, menu_bar, menu_dict)
 
         # END OF MENU BAR - CODE BELOW: stuff removed from apo structure stuff that appears might have a funky
         # consequence - work out later.
@@ -179,11 +179,11 @@ class XChemExplorer(QtGui.QApplication):
                                                              'QPushButton { padding: 1px; margin: 1px; '
                                                              'background: rgb(140,140,140) }',
                                                              # stylesheet
-                                                             'self.headlineLabelfont',  # font
-                                                             'self.datasource_menu_reload_samples']  # action
+                                                             'object.headlineLabelfont',  # font
+                                                             'object.datasource_menu_reload_samples']  # action
                                                         ]]}
         # setup datasource button
-        update_from_datasource_button = self.setup_push_button(datasource_button_dict)
+        update_from_datasource_button = self.layout_funcs.setup_push_button(self, datasource_button_dict)
 
         ################################################################################################################
         #                                                                                                              #
@@ -197,10 +197,10 @@ class XChemExplorer(QtGui.QApplication):
                                                  ['XChemToolTips.dataset_task_run_button_tip()',  # tooltip
                                                   'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
                                                   '',  # font
-                                                  'self.button_clicked']  # action
+                                                  'object.button_clicked']  # action
                                              ]]}
         # setup the run button with push button function
-        self.dataset_task_run_button = self.setup_push_button(dataset_task_run_button_dict)
+        self.dataset_task_run_button = self.layout_funcs.setup_push_button(self, dataset_task_run_button_dict)
 
         # settings for the status button
         dataset_task_status_button_dict = {'dataset_status_button':
@@ -209,10 +209,10 @@ class XChemExplorer(QtGui.QApplication):
                                                     ['XChemToolTips.dataset_task_status_button_tip()',  # tooltip
                                                      'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
                                                      '',  # font
-                                                     'self.button_clicked']  # action
+                                                     'object.button_clicked']  # action
                                                 ]]}
         # setup the task button with push button function
-        self.dataset_task_status_button = self.setup_push_button(dataset_task_status_button_dict)
+        self.dataset_task_status_button = self.layout_funcs.setup_push_button(self, dataset_task_status_button_dict)
 
         # array of both button objects to apply to bottom box layout
         dataset_buttons = [self.dataset_task_run_button, self.dataset_task_status_button]
@@ -229,7 +229,7 @@ class XChemExplorer(QtGui.QApplication):
         dataset_label = "Datasets"
 
         # return the frame and combobox from the bottom box setup function
-        frame_dataset_task, self.dataset_tasks_combobox = self.bottom_box_setup(dataset_label,
+        frame_dataset_task, self.dataset_tasks_combobox = self.layout_funcs.bottom_box_setup(self, dataset_label,
                                                                                 dataset_tasks,
                                                                                 'XChemToolTips.dataset_task_tip()',
                                                                                 dataset_buttons,
@@ -251,10 +251,10 @@ class XChemExplorer(QtGui.QApplication):
                                                       ['XChemToolTips.map_cif_file_task_run_button_tip()',  # tooltip
                                                        'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
                                                        '',  # font
-                                                       'self.button_clicked']  # action
+                                                       'object.button_clicked']  # action
                                                   ]]}
         # setup the run button with push button function
-        self.map_cif_file_task_run_button = self.setup_push_button(map_cif_file_task_run_button_dict)
+        self.map_cif_file_task_run_button = self.layout_funcs.setup_push_button(self, map_cif_file_task_run_button_dict)
 
         # settings for the status button
         map_cif_file_task_status_button_dict = {'dataset_status_button':
@@ -264,10 +264,10 @@ class XChemExplorer(QtGui.QApplication):
                                                           # tooltip
                                                           'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
                                                           '',  # font
-                                                          'self.button_clicked']  # action
+                                                          'object.button_clicked']  # action
                                                      ]]}
         # setup the task button with push button function
-        self.map_cif_file_task_status_button = self.setup_push_button(map_cif_file_task_status_button_dict)
+        self.map_cif_file_task_status_button = self.layout_funcs.setup_push_button(self, map_cif_file_task_status_button_dict)
 
         # array of both button objects to apply to bottom box layout
         map_cif_file_buttons = [self.map_cif_file_task_run_button, self.map_cif_file_task_status_button]
@@ -283,7 +283,7 @@ class XChemExplorer(QtGui.QApplication):
         map_cif_file_label = "Maps & Restraints"
 
         # return the frame and combobox from the bottom box setup function
-        frame_map_cif_file_task, self.map_cif_file_tasks_combobox = self.bottom_box_setup(map_cif_file_label,
+        frame_map_cif_file_task, self.map_cif_file_tasks_combobox = self.layout_funcs.bottom_box_setup(self, map_cif_file_label,
                                                                                           map_cif_file_tasks,
                                                                                           'XChemToolTips.map_cif_file_'
                                                                                           'task_tip()',
@@ -307,10 +307,10 @@ class XChemExplorer(QtGui.QApplication):
                                                       ['XChemToolTips.panddas_file_task_run_button_tip()',  # tooltip
                                                        'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
                                                        '',  # font
-                                                       'self.button_clicked']  # action
+                                                       'object.button_clicked']  # action
                                                   ]]}
         # setup the run button with push button function
-        self.panddas_file_task_run_button = self.setup_push_button(panddas_file_task_run_button_dict)
+        self.panddas_file_task_run_button = self.layout_funcs.setup_push_button(self, panddas_file_task_run_button_dict)
 
         # settings for the status button
         panddas_file_task_status_button_dict = {'dataset_status_button':
@@ -320,10 +320,10 @@ class XChemExplorer(QtGui.QApplication):
                                                           # tooltip
                                                           'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
                                                           '',  # font
-                                                          'self.button_clicked']  # action
+                                                          'object.button_clicked']  # action
                                                      ]]}
         # setup the task button with push button function
-        self.panddas_file_task_status_button = self.setup_push_button(panddas_file_task_status_button_dict)
+        self.panddas_file_task_status_button = self.layout_funcs.setup_push_button(self, panddas_file_task_status_button_dict)
 
         # array of both button objects to apply to bottom box layout
         panddas_file_buttons = [self.panddas_file_task_run_button, self.panddas_file_task_status_button]
@@ -346,7 +346,7 @@ class XChemExplorer(QtGui.QApplication):
         panddas_file_label = "Hit Identification"
 
         # return the frame and combobox from the bottom box setup function
-        frame_panddas_file_task, self.panddas_file_tasks_combobox = self.bottom_box_setup(panddas_file_label,
+        frame_panddas_file_task, self.panddas_file_tasks_combobox = self.layout_funcs.bottom_box_setup(self, panddas_file_label,
                                                                                           panddas_file_tasks,
                                                                                           'XChemToolTips.panddas_file_'
                                                                                           'task_tip()',
@@ -370,10 +370,10 @@ class XChemExplorer(QtGui.QApplication):
                                                      ['XChemToolTips.refine_file_task_run_button_tip()',  # tooltip
                                                       'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
                                                       '',  # font
-                                                      'self.button_clicked']  # action
+                                                      'object.button_clicked']  # action
                                                  ]]}
         # setup the run button with push button function
-        self.refine_file_task_run_button = self.setup_push_button(refine_file_task_run_button_dict)
+        self.refine_file_task_run_button = self.layout_funcs.setup_push_button(self, refine_file_task_run_button_dict)
 
         # settings for the status button
         refine_file_task_status_button_dict = {'dataset_status_button':
@@ -383,10 +383,10 @@ class XChemExplorer(QtGui.QApplication):
                                                          # tooltip
                                                          'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
                                                          '',  # font
-                                                         'self.button_clicked']  # action
+                                                         'object.button_clicked']  # action
                                                     ]]}
         # setup the task button with push button function
-        self.refine_file_task_status_button = self.setup_push_button(refine_file_task_status_button_dict)
+        self.refine_file_task_status_button = self.layout_funcs.setup_push_button(self, refine_file_task_status_button_dict)
 
         # array of both button objects to apply to bottom box layout
         refine_file_buttons = [self.refine_file_task_run_button, self.refine_file_task_status_button]
@@ -402,7 +402,7 @@ class XChemExplorer(QtGui.QApplication):
         refine_file_label = "Refinement"
 
         # return the frame and combobox from the bottom box setup function
-        frame_refine_file_task, self.refine_file_tasks_combobox = self.bottom_box_setup(refine_file_label,
+        frame_refine_file_task, self.refine_file_tasks_combobox = self.layout_funcs.bottom_box_setup(self, refine_file_label,
                                                                                         refine_file_tasks,
                                                                                         'XChemToolTips.refine_file_task'
                                                                                         '_tip()',
@@ -460,7 +460,7 @@ class XChemExplorer(QtGui.QApplication):
         # -------
         # 1. all table columns are defined by self.define_all_tables()
         # 2. all table column definitions are named by <tab>_<subtab>_table_columns (subtab omitted if not relevant)
-        # 3. subtabs are created by self.make_tab_dict()
+        # 3. subtabs are created by self.layout_funcs.make_tab_dict()
 
         ################################################################################################################
         #                                                                                                              #
@@ -473,12 +473,12 @@ class XChemExplorer(QtGui.QApplication):
         self.overview_tab_dict = {}
 
         # make subtabs
-        self.make_tab_dict(overview_tab_list, self.overview_tab_widget, self.overview_tab_dict)
+        self.layout_funcs.make_tab_dict(overview_tab_list, self.overview_tab_widget, self.overview_tab_dict)
 
         # add overview subtabs to overview tab
         self.tab_dict[self.workflow_dict['Overview']][1].addWidget(self.overview_tab_widget)
 
-        # initiate the dable in overview/datasource
+        # initiate the table in overview/datasource
         self.overview_datasource_table = QtGui.QTableWidget()
         self.overview_datasource_table.setSortingEnabled(True)
         self.overview_datasource_table.resizeColumnsToContents()
@@ -505,7 +505,7 @@ class XChemExplorer(QtGui.QApplication):
         self.datasets_tab_dict = {}
 
         # make subtabs
-        self.make_tab_dict(datasets_tab_list, self.datasets_tab_widget, self.datasets_tab_dict)
+        self.layout_funcs.make_tab_dict(datasets_tab_list, self.datasets_tab_widget, self.datasets_tab_dict)
 
         # main body - things that are always displayed
 
@@ -518,7 +518,7 @@ class XChemExplorer(QtGui.QApplication):
 
         # checkbox for autocollect
         self.check_for_new_data_collection = QtGui.QCheckBox('Check for new data collection every two minutes')
-        self.add_checkbox(self.check_for_new_data_collection, 'self.continously_check_for_new_data_collection')
+        self.layout_funcs.add_checkbox(self, self.check_for_new_data_collection, 'object.continously_check_for_new_data_collection')
 
         # select target dropdown
         select_target_label = QtGui.QLabel('Select Target: ')
@@ -531,7 +531,7 @@ class XChemExplorer(QtGui.QApplication):
         self.autocheck_hbox_widgets = [self.check_for_new_data_collection, select_target_label,
                                        self.target_selection_combobox]
 
-        self.add_to_box(self.autocheck_hbox, self.autocheck_hbox_widgets)
+        self.layout_funcs.add_to_box(self.autocheck_hbox, self.autocheck_hbox_widgets)
 
         # add target dropdown to top bar
         self.datasets_data_collection_vbox.addLayout(self.autocheck_hbox)
@@ -540,7 +540,7 @@ class XChemExplorer(QtGui.QApplication):
 
         # table
         self.datasets_summary_table = QtGui.QTableWidget()
-        self.table_setup(self.datasets_summary_table, self.datasets_summary_table_columns)  # setup table
+        self.layout_funcs.table_setup(self.datasets_summary_table, self.datasets_summary_table_columns)  # setup table
         self.datasets_summarys_vbox_for_table = QtGui.QVBoxLayout()  # setup layout to hold table
         self.datasets_summarys_vbox_for_table.addWidget(self.datasets_summary_table)  # add table to layout
         self.datasets_tab_dict['Summary'][1].addLayout(self.datasets_summarys_vbox_for_table)  # add layout to tab
@@ -579,13 +579,13 @@ class XChemExplorer(QtGui.QApplication):
         self.hbox_select_widgets = [dc_label, select_button, search_button, self.diffraction_data_search_label,
                                     translate_label, csv_button]
 
-        self.add_to_box(self.hbox_select, self.hbox_select_widgets)
+        self.layout_funcs.add_to_box(self.hbox_select, self.hbox_select_widgets)
 
         frame_select.setLayout(self.hbox_select)
 
         # table
         self.datasets_reprocess_table = QtGui.QTableWidget()
-        self.table_setup(self.datasets_reprocess_table, self.datasets_reprocess_columns)
+        self.layout_funcs.table_setup(self.datasets_reprocess_table, self.datasets_reprocess_columns)
 
         # create context menu
         self.popMenu_for_datasets_reprocess_table = QtGui.QMenu()
@@ -672,12 +672,12 @@ class XChemExplorer(QtGui.QApplication):
         frame_cc_half.setLayout(vbox_cc_half)
 
         data_ptotocol_hbox_widgets = [frame_options, frame_sg, frame_ref, frame_isigma, frame_cc_half]
-        self.add_to_box(data_protocol_hbox, data_ptotocol_hbox_widgets)
+        self.layout_funcs.add_to_box(data_protocol_hbox, data_ptotocol_hbox_widgets)
 
         frame.setLayout(data_protocol_hbox)
 
         self.reprocess_hbox_widgets = [frame_select, self.datasets_reprocess_table, frame]
-        self.add_to_box(reprocess_vbox, self.reprocess_hbox_widgets)
+        self.layout_funcs.add_to_box(reprocess_vbox, self.reprocess_hbox_widgets)
 
         self.datasets_tab_dict['Reprocess'][1].addLayout(reprocess_vbox)
 
@@ -689,7 +689,7 @@ class XChemExplorer(QtGui.QApplication):
         initial_model_checkbutton_hbox = QtGui.QHBoxLayout()
 
         self.select_sample_for_dimple_box = QtGui.QCheckBox('(de-)select all samples for DIMPLE')
-        self.add_checkbox(self.select_sample_for_dimple_box, 'self.set_run_dimple_flag')
+        self.layout_funcs.add_checkbox(self, self.select_sample_for_dimple_box, 'object.set_run_dimple_flag')
         initial_model_checkbutton_hbox.addWidget(self.select_sample_for_dimple_box)
 
         set_new_reference_button = QtGui.QPushButton("Set New Reference (if applicable)")
@@ -710,7 +710,7 @@ class XChemExplorer(QtGui.QApplication):
 
         # table
         self.maps_table = QtGui.QTableWidget()
-        self.table_setup(self.maps_table, self.maps_table_columns)
+        self.layout_funcs.table_setup(self.maps_table, self.maps_table_columns)
         self.initial_model_vbox_for_table.addWidget(self.maps_table)
         self.tab_dict[self.workflow_dict['Maps']][1].addLayout(self.initial_model_vbox_for_table)
 
@@ -735,7 +735,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.pandda_tab_widget = QtGui.QTabWidget()
         self.pandda_tab_dict = {}
-        self.make_tab_dict(pandda_tab_list, self.pandda_tab_widget, self.pandda_tab_dict)
+        self.layout_funcs.make_tab_dict(pandda_tab_list, self.pandda_tab_widget, self.pandda_tab_dict)
 
         ## PanDDA tab
         self.panddas_results_vbox = QtGui.QVBoxLayout()
@@ -759,7 +759,7 @@ class XChemExplorer(QtGui.QApplication):
 
         # table
         self.pandda_analyse_data_table = QtGui.QTableWidget()
-        self.table_setup(self.pandda_analyse_data_table, self.pandda_table_columns)
+        self.layout_funcs.table_setup(self.pandda_analyse_data_table, self.pandda_table_columns)
 
         frame_pandda = QtGui.QFrame()
         grid_pandda.addWidget(self.pandda_analyse_data_table, 0, 0)
@@ -873,7 +873,7 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_input_params_vbox.addWidget(label)
 
         self.wilson_checkbox = QtGui.QCheckBox('Wilson B-factor Scaling')
-        self.add_checkbox(self.wilson_checkbox, 'self.set_run_dimple_flag')
+        self.layout_funcs.add_checkbox(self, self.wilson_checkbox, 'object.set_run_dimple_flag')
 
         # minimum number of datasets
         label = QtGui.QLabel('min_build_datasets')
@@ -908,7 +908,7 @@ class XChemExplorer(QtGui.QApplication):
         self.pandda_analyse_hbox.addWidget(frame_pandda)
 
         # next three blocks display html documents created by pandda.analyse
-        self.pandda_html()
+        self.layout_funcs.pandda_html(self)
 
         self.pandda_initial_html = QtWebKit.QWebView()
         self.pandda_tab_dict['Dataset Summary'][1].addWidget(self.pandda_initial_html)
@@ -937,7 +937,7 @@ class XChemExplorer(QtGui.QApplication):
 
         # table
         self.refinement_table = QtGui.QTableWidget()
-        self.table_setup(self.refinement_table, self.refinement_table_columns)
+        self.layout_funcs.table_setup(self.refinement_table, self.refinement_table_columns)
         self.summary_vbox_for_table.addWidget(self.refinement_table)
         self.tab_dict[self.workflow_dict['Refinement']][1].addLayout(self.summary_vbox_for_table)
 
@@ -1275,121 +1275,9 @@ class XChemExplorer(QtGui.QApplication):
         # tab widget
         self.main_tab_widget = QtGui.QTabWidget()
         self.tab_dict = {}
-        self.make_tab_dict(self.workflow, self.main_tab_widget, self.tab_dict)
+        self.layout_funcs.make_tab_dict(self.workflow, self.main_tab_widget, self.tab_dict)
 
     ################################################## layout functions ################################################
-    def make_tab_dict(self, tab_list, tab_widget, tab_dict):
-        for page in tab_list:
-            tab = QtGui.QWidget()
-            vbox = QtGui.QVBoxLayout(tab)
-            tab_widget.addTab(tab, page)
-            tab_dict[page] = [tab, vbox]
-
-    def add_checkbox(self, checkbox, function, checkopt=False):
-        checkbox.toggle()
-        checkbox.setChecked(checkopt)
-        eval(str('checkbox.stateChanged.connect(' + function + ')'))
-
-    def table_setup(self, table, table_columns, sortingopt=True):
-        table.setColumnCount(len(table_columns))
-        table.setSortingEnabled(sortingopt)
-        table.setHorizontalHeaderLabels(table_columns)
-        table.resizeRowsToContents()
-        table.resizeColumnsToContents()
-
-    def pandda_html(self):
-        if os.path.exists(str(self.panddas_directory + '/interesting_datasets')):
-            print('WARNING: USING RESULTS FROM OLD PANDDA ANALYSE! THIS IS NOT FULLY SUPPORTED IN XCE2')
-            print('PLEASE CHANGE YOUR PANDDA DIRECTORY TO A NEW RUN, OR USE THE OLD VERSION OF XCE!')
-            self.pandda_initial_html_file = str(self.panddas_directory + '/results_summareis/pandda_initial.html')
-            self.pandda_analyse_html_file = str(self.panddas_directory + '/results_summaries/pandda_analyse.html')
-        self.pandda_initial_html_file = str(
-            self.panddas_directory + '/analyses/html_summaries/' + 'pandda_initial.html')
-        self.pandda_analyse_html_file = str(
-            self.panddas_directory + '/analyses/html_summaries/' + 'pandda_analyse.html')
-        self.pandda_inspect_html_file = str(
-            self.panddas_directory + '/analyses/html_summaries/' + 'pandda_inspect.html')
-
-    # function for datasource, run and status button setup
-    def setup_push_button(self, button_dict):
-        # use iterkeys to determine order of key by letter
-        for name in sorted(button_dict.iterkeys()):
-            # add current item to menu bar
-            button = eval('QtGui.QPushButton("' + str(button_dict[name][0]) + '")')
-            # for each configuration item
-            for button_config in button_dict[name][1]:
-                eval(str('button.setToolTip(' + str(button_config[0]) + ')'))
-                eval(str('button.setStyleSheet("' + str(button_config[1] + '")')))
-                if len(button_config[2]) > 1:
-                    eval(str('button.setFont(' + str(button_config[2]) + ')'))
-                eval(str('button.clicked.connect(' + str(button_config[3]) + ')'))
-
-        return button
-
-    # function to setup one of the bottom boxes
-    def bottom_box_setup(self, label, dropdown_options, dropdown_tooltip, buttons, colour):
-
-        frame = QtGui.QFrame()
-        frame.setFrameShape(QtGui.QFrame.StyledPanel)
-        frame.setStyleSheet("QFrame { border: 1px solid black; border-radius: 1px; padding: 0px; margin: 0px }")
-
-        vbox = QtGui.QVBoxLayout()
-        label = QtGui.QLabel(label)
-        label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
-        label.setFont(self.headlineLabelfont)
-        label.setStyleSheet(str(" QLabel { border: 1px solid black; border-radius: 1px;" + str(colour) +
-                                "padding: 0px; margin: 0px }"))
-        vbox.addWidget(label)
-
-        hboxAction = QtGui.QHBoxLayout()
-        combobox = QtGui.QComboBox()
-        for task in dropdown_options:
-            combobox.addItem(task)
-        eval('combobox.setToolTip(' + str(dropdown_tooltip) + ')')
-        combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
-        hboxAction.addWidget(combobox)
-
-        vboxButton = QtGui.QVBoxLayout()
-        for button in buttons:
-            vboxButton.addWidget(button)
-        hboxAction.addLayout(vboxButton)
-        vbox.addLayout(hboxAction)
-        vbox.setSpacing(0)
-        vbox.setMargin(0)
-        frame.setLayout(vbox)
-        frame.setMaximumWidth((self.screen.width() - 20) / 5)
-
-        return frame, combobox
-
-    # function to add items to top menu bar
-    def setup_menubar(self, menu_bar, menu_items_dict):
-        # use iterkeys to determine order of key by letter
-        for config in sorted(menu_items_dict.iterkeys()):
-            # add current item to menu bar
-            menu = eval('menu_bar.addMenu("' + str(menu_items_dict[config][0]) + '")')
-            # for each configuration item
-            for menu_item in menu_items_dict[config][1]:
-                # add the drop down option
-                action = eval(str('QtGui.QAction("' + str(menu_item[0]) + '", self.window)'))
-                # add a shortcut if defined
-                if len(menu_item[1]) > 1:
-                    eval(str('action.setShortcut("' + str(menu_item[1]) + '")'))
-                # connect the relevant function and add as an action
-                eval(str('action.triggered.connect(' + menu_item[2] + ')'))
-                menu.addAction(action)
-
-        return menu_bar
-
-    # function for opening help and tutorial files
-    def openFile(self, file):
-        if sys.platform == 'linux2':
-            subprocess.call(["xdg-open", file])
-        else:
-            os.startfile(file)
-
-    def add_to_box(self, frame, widgets_list):
-        for widget in widgets_list:
-            frame.addWidget(widget)
 
 
     ################################################# define gui #######################################################
@@ -1399,26 +1287,15 @@ class XChemExplorer(QtGui.QApplication):
         self.headlineLabelfont = QtGui.QFont("Arial", 20, QtGui.QFont.Bold)
 
         setup().settings(self)
-
-        print(dir(self))
-
         setup().preferences(self)
         setup().tables(self)
-
-        # try to open a logfile instance
-        try:
-            XChemLog.startLog(self.xce_logfile).create_logfile(self.xce_version)
-        except IOError:
-            self.xce_logfile = os.path.join(self.current_directory, 'xce_' + getpass.getuser() + '.log')
-            XChemLog.startLog(self.xce_logfile).create_logfile(self.xce_version)
-
+        
+        self.layout_funcs = LayoutFuncs()
 
         # GUI setup
         self.window = QtGui.QWidget()
         self.window.setWindowTitle("XChemExplorer")
         self.screen = QtGui.QDesktopWidget().screenGeometry()
-
-
 
         self.workflow()
         self.main_layout()
@@ -2080,7 +1957,7 @@ class XChemExplorer(QtGui.QApplication):
 
         grid = QtGui.QGridLayout()
         self.set_primary_citation_authors = QtGui.QCheckBox('same as deposition authors')
-        self.add_checkbox(self.set_primary_citation_authors, 'self.set_primary_citation_as_structure_authors')
+        self.layout_funcs.add_checkbox(self, self.set_primary_citation_authors, 'object.set_primary_citation_as_structure_authors')
         grid.addWidget(self.set_primary_citation_authors, 0, 0)
 
         self.primary_citation_author_name_List = []
@@ -2924,7 +2801,7 @@ class XChemExplorer(QtGui.QApplication):
             self.panddas_directory = pickled_settings['panddas_directory']
             self.settings['panddas_directory'] = self.panddas_directory
 
-            self.pandda_html()
+            self.layout_funcs.pandda_html(self)
             self.show_pandda_html_summary()
 
             self.html_export_directory = pickled_settings['html_export_directory']
@@ -3538,7 +3415,7 @@ class XChemExplorer(QtGui.QApplication):
             print('PANDDA', self.panddas_directory)
             self.settings['panddas_directory'] = self.panddas_directory
 
-            self.pandda_html()
+            self.layout_funcs.pandda_html(self)
 
             # update add lead option for proasis if pandda directory is changed
             if os.path.isfile(os.path.join(self.panddas_directory, 'analyses/pandda_analyse_sites.csv')):
@@ -4792,48 +4669,48 @@ class XChemExplorer(QtGui.QApplication):
 
         self.save_files_to_initial_model_folder()
 
-        self.update_dewar_configuration_tab()
+        #self.update_dewar_configuration_tab()
 
-    def update_dewar_configuration_tab(self):
-
-        # sample status and color code:
-        # 1 -   green:    collected and 'good' data
-        # 2 -   orange:   collected and some data
-        # 3 -   red:      collected, but no logfile
-        # 4 -   blue:     sample in dewar, but not yet collected
-        # 5 -   grey:     no sample in respective dewar position
-        # 6 -   yellow:   flagged for re-collection
-
-        # first find out what is currently in the dewar
-
-        occupied_positions = []
-        for puck_position in self.dewar_sample_configuration_dict:
-            sample = self.dewar_sample_configuration_dict[puck_position]
-            if sample == []:
-                self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: gray")
-                continue
-            elif sample not in self.data_collection_dict:
-                self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: blue")
-                # color and name respective button
-            else:
-                logfile_found = False
-                for entry in self.data_collection_dict[sample]:
-                    if entry[0] == 'logfile':
-                        logfile_found = True
-                        if entry[8]:  # if this was auto-selected best resolution file
-                            db_dict = entry[6]
-                            resolution_high = db_dict['DataProcessingResolutionHigh']
-                if not logfile_found:
-                    resolution_high = 'no logfile'
-                self.dewar_configuration_dict[puck_position].setText(sample + '\n' + resolution_high + 'A')
-                outcome = str(self.dataset_outcome_combobox_dict[sample].currentText())
-                if outcome == "success":
-                    self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: green")
-                elif outcome == "Failed - low resolution":
-                    self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: orange")
-                else:
-                    self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: red")
-                self.dewar_configuration_dict[puck_position].setStyleSheet("font-size:7px;border-width: 0px")
+    # def update_dewar_configuration_tab(self):
+    #
+    #     # sample status and color code:
+    #     # 1 -   green:    collected and 'good' data
+    #     # 2 -   orange:   collected and some data
+    #     # 3 -   red:      collected, but no logfile
+    #     # 4 -   blue:     sample in dewar, but not yet collected
+    #     # 5 -   grey:     no sample in respective dewar position
+    #     # 6 -   yellow:   flagged for re-collection
+    #
+    #     # first find out what is currently in the dewar
+    #
+    #     occupied_positions = []
+    #     for puck_position in self.dewar_sample_configuration_dict:
+    #         sample = self.dewar_sample_configuration_dict[puck_position]
+    #         if sample == []:
+    #             self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: gray")
+    #             continue
+    #         elif sample not in self.data_collection_dict:
+    #             self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: blue")
+    #             # color and name respective button
+    #         else:
+    #             logfile_found = False
+    #             for entry in self.data_collection_dict[sample]:
+    #                 if entry[0] == 'logfile':
+    #                     logfile_found = True
+    #                     if entry[8]:  # if this was auto-selected best resolution file
+    #                         db_dict = entry[6]
+    #                         resolution_high = db_dict['DataProcessingResolutionHigh']
+    #             if not logfile_found:
+    #                 resolution_high = 'no logfile'
+    #             self.dewar_configuration_dict[puck_position].setText(sample + '\n' + resolution_high + 'A')
+    #             outcome = str(self.dataset_outcome_combobox_dict[sample].currentText())
+    #             if outcome == "success":
+    #                 self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: green")
+    #             elif outcome == "Failed - low resolution":
+    #                 self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: orange")
+    #             else:
+    #                 self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: red")
+    #             self.dewar_configuration_dict[puck_position].setStyleSheet("font-size:7px;border-width: 0px")
 
     def update_outcome_datasets_summary_table(self, sample, outcome):
         rows_in_table = self.datasets_summary_table.rowCount()

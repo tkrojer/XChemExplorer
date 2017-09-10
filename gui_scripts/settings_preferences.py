@@ -3,6 +3,7 @@ from PyQt4 import QtCore, QtGui
 
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'lib'))
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'web'))
+
 from XChemUtils import *
 import XChemDB
 import XChemMain
@@ -14,8 +15,8 @@ class setup():
         pass
 
     def set_xce_logfile(self, object):
-        XChemLog.startLog(object.xce_logfile).create_logfile(object.xce_version)
-        object.update_log = XChemLog.updateLog(object.xce_logfile)
+        # XChemLog.startLog(object.xce_logfile).create_logfile(object.xce_version)
+        object.update_log = XChemLog.updateLog()
 
     def settings(self, object):
         # set XCE version
@@ -156,11 +157,20 @@ class setup():
                                    '5 - Deposition ready',
                                    '6 - Deposited']
 
-        self.set_xce_logfile(object)
+        # self.set_xce_logfile(object)
 
         ## external software packages
+        object.using_remote_qsub_submission = False
+        object.remote_qsub_submission = "ssh <dls fed ID>@nx.diamond.ac.uk 'module load global/cluster; qsub'"
 
+        object.update_log = XChemLog.updateLog(object.xce_logfile)
+        object.update_log.insert('new session started')
+        object.diffraction_data_directory = object.current_directory
+        object.diffraction_data_search_info = 'n/a'
+        object.diffraction_data_reference_mtz = 'ignore'
+        object.html_export_directory = os.getcwd()
         object.external_software = external_software(object.xce_logfile).check()
+
         if object.external_software['acedrg']:
             object.restraints_program = 'acedrg'
             object.update_log.insert('will use ACEDRG for generation of ligand coordinates and restraints')
@@ -174,19 +184,6 @@ class setup():
             object.restraints_program = ''
             object.update_log.insert('No program for generation of ligand coordinates and restraints available!')
 
-        object.using_remote_qsub_submission = False
-        object.remote_qsub_submission = "ssh <dls fed ID>@nx.diamond.ac.uk 'module load global/cluster; qsub'"
-
-        object.update_log = XChemLog.updateLog(object.xce_logfile)
-        object.update_log.insert('new session started')
-        object.diffraction_data_directory = object.current_directory
-        object.diffraction_data_search_info = 'n/a'
-        object.diffraction_data_reference_mtz = 'ignore'
-        object.html_export_directory = os.getcwd()
-
-        print(object.diffraction_data_directory)
-
-
     def preferences(self, object):
         ## preferences
 
@@ -194,33 +191,33 @@ class setup():
         # ['All Files in the respective auto-processing directory','everything'],
 
         object.preferences_selection_mechanism = ['IsigI*Comp*UniqueRefl',
-                                                'highest_resolution',
-                                                'lowest_Rfree']
+                                                  'highest_resolution',
+                                                  'lowest_Rfree']
 
         object.preferences = {'processed_data_to_copy': 'mtz_log_only',
-                            'dataset_selection_mechanism': 'IsigI*Comp*UniqueRefl'}
+                              'dataset_selection_mechanism': 'IsigI*Comp*UniqueRefl'}
 
         ## settings
 
         object.settings = {'current_directory': object.current_directory,
-                         'beamline_directory': object.beamline_directory,
-                         'datasets_summary': object.datasets_summary_file,
-                         'initial_model_directory': object.initial_model_directory,
-                         'panddas_directory': object.panddas_directory,
-                         'reference_directory': object.reference_directory,
-                         'database_directory': object.database_directory,
-                         'data_source': os.path.join(object.database_directory, object.data_source_file),
-                         'ccp4_scratch': object.ccp4_scratch_directory,
-                         'unitcell_difference': object.allowed_unitcell_difference_percent,
-                         'too_low_resolution_data': object.acceptable_low_resolution_limit_for_data,
-                         'filename_root': object.filename_root,
-                         'preferences': object.preferences,
-                         'xce_logfile': object.xce_logfile,
-                         'max_queue_jobs': object.max_queue_jobs,
-                         'diffraction_data_directory': object.diffraction_data_directory,
-                         'html_export_directory': object.html_export_directory,
-                         'group_deposit_directory': object.group_deposit_directory,
-                         'remote_qsub': ''}
+                           'beamline_directory': object.beamline_directory,
+                           'datasets_summary': object.datasets_summary_file,
+                           'initial_model_directory': object.initial_model_directory,
+                           'panddas_directory': object.panddas_directory,
+                           'reference_directory': object.reference_directory,
+                           'database_directory': object.database_directory,
+                           'data_source': os.path.join(object.database_directory, object.data_source_file),
+                           'ccp4_scratch': object.ccp4_scratch_directory,
+                           'unitcell_difference': object.allowed_unitcell_difference_percent,
+                           'too_low_resolution_data': object.acceptable_low_resolution_limit_for_data,
+                           'filename_root': object.filename_root,
+                           'preferences': object.preferences,
+                           'xce_logfile': object.xce_logfile,
+                           'max_queue_jobs': object.max_queue_jobs,
+                           'diffraction_data_directory': object.diffraction_data_directory,
+                           'html_export_directory': object.html_export_directory,
+                           'group_deposit_directory': object.group_deposit_directory,
+                           'remote_qsub': ''}
 
     def tables(self, object):
         # Table column settings
@@ -233,15 +230,15 @@ class setup():
         #                                            update_all_tables()
 
         object.overview_datasource_table_columns = ['Sample ID',
-                                                  'Compound ID',
-                                                  'Smiles',
-                                                  'Visit',
-                                                  'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                                                  'Refinement\nRfree',
-                                                  'Data Collection\nDate',
-                                                  'Puck',
-                                                  'PuckPosition',
-                                                  'Ligand\nConfidence']
+                                                    'Compound ID',
+                                                    'Smiles',
+                                                    'Visit',
+                                                    'Resolution\n[Mn<I/sig(I)> = 1.5]',
+                                                    'Refinement\nRfree',
+                                                    'Data Collection\nDate',
+                                                    'Puck',
+                                                    'PuckPosition',
+                                                    'Ligand\nConfidence']
 
         # functions that use tables.datasets_summary_table_columns:
         #
@@ -250,78 +247,82 @@ class setup():
         #                                            - appears in create_widgets_for_autoprocessing_results_only()
 
         object.datasets_summary_table_columns = ['Sample ID',
-                                               'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                                               'DataProcessing\nSpaceGroup',
-                                               'DataProcessing\nRfree',
-                                               'SoakDB\nBarcode',
-                                               'GDA\nBarcode',
-                                               'Rmerge\nLow',
-                                               'auto-assigned',
-                                               'DataCollection\nOutcome',
-                                               'img1',
-                                               'img2',
-                                               'img3',
-                                               'img4',
-                                               'img5',
-                                               'Show\nDetails',
-                                               'Show Diffraction\nImage'
-                                               ]
+                                                 'Resolution\n[Mn<I/sig(I)> = 1.5]',
+                                                 'DataProcessing\nSpaceGroup',
+                                                 'DataProcessing\nRfree',
+                                                 'SoakDB\nBarcode',
+                                                 'GDA\nBarcode',
+                                                 'Rmerge\nLow',
+                                                 'auto-assigned',
+                                                 'DataCollection\nOutcome',
+                                                 'img1',
+                                                 'img2',
+                                                 'img3',
+                                                 'img4',
+                                                 'img5',
+                                                 'Show\nDetails',
+                                                 'Show Diffraction\nImage'
+                                                 ]
 
         # functions that use tables.datasets_reprocess_columns:
         #
         # - update_datasets_reprocess_table() - appears in search_for_datasets()
 
         object.datasets_reprocess_columns = ['Dataset ID',
-                                           'Sample ID',
-                                           'Run\nxia2',
-                                           'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                                           'Rmerge\nLow',
-                                           'Dimple\nRfree',
-                                           'DataProcessing\nSpaceGroup',
-                                           'DataProcessing\nUnitCell',
-                                           'DataProcessing\nStatus']
+                                             'Sample ID',
+                                             'Run\nxia2',
+                                             'Resolution\n[Mn<I/sig(I)> = 1.5]',
+                                             'Rmerge\nLow',
+                                             'Dimple\nRfree',
+                                             'DataProcessing\nSpaceGroup',
+                                             'DataProcessing\nUnitCell',
+                                             'DataProcessing\nStatus']
 
         # functions that use tables.maps_table_columns:
         #
         # - update_datasets_reprocess_table() - appears in create_maps_table()
 
         object.maps_table_columns = ['Sample ID',
-                                   'Select',
-                                   'Compound ID',
-                                   'Smiles',
-                                   'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                                   'Dimple\nRcryst',
-                                   'Dimple\nRfree',
-                                   'DataProcessing\nSpaceGroup',
-                                   'Reference\nSpaceGroup',
-                                   'Difference\nUC Volume (%)',
-                                   'Reference File',
-                                   'DataProcessing\nUnitCell',
-                                   'Dimple\nStatus',
-                                   'Compound\nStatus',
-                                   'LastUpdated']
+                                     'Select',
+                                     'Compound ID',
+                                     'Smiles',
+                                     'Resolution\n[Mn<I/sig(I)> = 1.5]',
+                                     'Dimple\nRcryst',
+                                     'Dimple\nRfree',
+                                     'DataProcessing\nSpaceGroup',
+                                     'Reference\nSpaceGroup',
+                                     'Difference\nUC Volume (%)',
+                                     'Reference File',
+                                     'DataProcessing\nUnitCell',
+                                     'Dimple\nStatus',
+                                     'Compound\nStatus',
+                                     'LastUpdated']
 
         # functions that use tables.pandda_table_columns:
         #
         # - populate_pandda_analyse_input_table() - appears in update_all_tables()
 
         object.pandda_table_columns = ['Sample ID',
-                                     'Refinement\nSpace Group',
-                                     'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                                     'Dimple\nRcryst',
-                                     'Dimple\nRfree',
-                                     'Crystal Form\nName', ]
+                                       'Refinement\nSpace Group',
+                                       'Resolution\n[Mn<I/sig(I)> = 1.5]',
+                                       'Dimple\nRcryst',
+                                       'Dimple\nRfree',
+                                       'Crystal Form\nName', ]
 
         # functions that use tables.refinement_table_columns:
         #
         # - populate_and_update_refinement_table() - appears in update_all_tables
 
         object.refinement_table_columns = ['Sample ID',
-                                         'Compound ID',
-                                         'Refinement\nSpace Group',
-                                         'Refinement\nResolution',
-                                         'Refinement\nRcryst',
-                                         'Refinement\nRfree',
-                                         'Refinement\nOutcome',
-                                         'PanDDA site details',
-                                         'Refinement\nStatus']
+                                           'Compound ID',
+                                           'Refinement\nSpace Group',
+                                           'Refinement\nResolution',
+                                           'Refinement\nRcryst',
+                                           'Refinement\nRfree',
+                                           'Refinement\nOutcome',
+                                           'PanDDA site details',
+                                           'Refinement\nStatus']
+
+
+if __name__ != "__main__":
+    pass
