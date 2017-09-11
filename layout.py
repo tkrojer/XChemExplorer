@@ -476,7 +476,8 @@ class LayoutObjects():
 
         # checkbox for autocollect
         object.check_for_new_data_collection = QtGui.QCheckBox('Check for new data collection every two minutes')
-        self.layout_funcs.add_checkbox(object, object.check_for_new_data_collection, 'object.continously_check_for_new_data_collection')
+        self.layout_funcs.add_checkbox(object, object.check_for_new_data_collection,
+                                       'object.continously_check_for_new_data_collection')
 
         # select target dropdown
         select_target_label = QtGui.QLabel('Select Target: ')
@@ -487,9 +488,9 @@ class LayoutObjects():
         object.target = str(object.target_selection_combobox.currentText())
 
         object.autocheck_hbox_widgets = [object.check_for_new_data_collection, select_target_label,
-                                       object.target_selection_combobox]
+                                       object.target_selection_combobox]  # array defining order of objects to be added
 
-        self.layout_funcs.add_to_box(object.autocheck_hbox, object.autocheck_hbox_widgets)
+        self.layout_funcs.add_to_box(object.autocheck_hbox, object.autocheck_hbox_widgets)  # add objects in order
 
         # add target dropdown to top bar
         object.datasets_data_collection_vbox.addLayout(object.autocheck_hbox)
@@ -515,35 +516,35 @@ class LayoutObjects():
         frame_select = QtGui.QFrame()  # frame to hold top options box
         object.hbox_select = QtGui.QHBoxLayout()  # top options box
 
-        dc_label = QtGui.QLabel('Data collection directory: ')
-        dc_label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
-        object.diffraction_data_dir_label = QtGui.QLabel(object.diffraction_data_directory)
-        object.diffraction_data_dir_label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+        dc_label = QtGui.QLabel('Data collection directory: ')  # data collection label
+        dc_label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter) # align left and centre of container
+        object.diffraction_data_dir_label = QtGui.QLabel(object.diffraction_data_directory)  # add directory as text
+        object.diffraction_data_dir_label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)  # align as above
 
-        select_button = QtGui.QPushButton("Select")
-        select_button.clicked.connect(object.select_diffraction_data_directory)
+        select_button = QtGui.QPushButton("Select")  # select label
+        select_button.clicked.connect(object.select_diffraction_data_directory)  # attach file open dialogue
 
-        search_button = QtGui.QPushButton("Search Datasets")
-        search_button.clicked.connect(object.search_for_datasets)
+        search_button = QtGui.QPushButton("Search Datasets")  # search button
+        search_button.clicked.connect(object.search_for_datasets)  # search for datasets in the selected directory
 
-        object.diffraction_data_search_label = QtGui.QLabel(object.diffraction_data_search_info)
+        object.diffraction_data_search_label = QtGui.QLabel(object.diffraction_data_search_info)  # search info
 
-        translate_label = QtGui.QLabel('translate: datasetID -> sampleID')
-        translate_label.setAlignment(QtCore.Qt.AlignCenter)
-        csv_button = QtGui.QPushButton('Open CSV')
+        translate_label = QtGui.QLabel('translate: datasetID -> sampleID')  # label
+        translate_label.setAlignment(QtCore.Qt.AlignCenter)  # align in centre of container
+        csv_button = QtGui.QPushButton('Open CSV')  # CSV button
         csv_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
-        csv_button.clicked.connect(object.translate_datasetID_to_sampleID)
+        csv_button.clicked.connect(object.translate_datasetID_to_sampleID)  # open the relevant csv file
 
         object.hbox_select_widgets = [dc_label, select_button, search_button, object.diffraction_data_search_label,
-                                    translate_label, csv_button]
+                                    translate_label, csv_button]  # array defining order of objects to be added
 
-        self.layout_funcs.add_to_box(object.hbox_select, object.hbox_select_widgets)
+        self.layout_funcs.add_to_box(object.hbox_select, object.hbox_select_widgets)  # add objects in order
 
-        frame_select.setLayout(object.hbox_select)
+        frame_select.setLayout(object.hbox_select)  # apply to containing frame
 
         # table
         object.datasets_reprocess_table = QtGui.QTableWidget()
-        self.layout_funcs.table_setup(object.datasets_reprocess_table, object.datasets_reprocess_columns)
+        self.layout_funcs.table_setup(object.datasets_reprocess_table, object.datasets_reprocess_columns)  # setup
 
         # create context menu
         object.popMenu_for_datasets_reprocess_table = QtGui.QMenu()

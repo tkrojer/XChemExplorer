@@ -20,7 +20,7 @@ sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'lib'))
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'web'))
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'gui_scripts'))
 
-from gui_setup import *
+from settings_preferences import *
 from layout import *
 from XChemUtils import parse
 import XChemThread

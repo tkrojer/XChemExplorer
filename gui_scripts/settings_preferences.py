@@ -4,7 +4,7 @@ from PyQt4 import QtCore, QtGui
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'lib'))
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'web'))
 
-from XChemUtils import *
+import XChemUtils
 import XChemDB
 import XChemMain
 import XChemLog
@@ -15,8 +15,8 @@ class setup():
         pass
 
     def set_xce_logfile(self, object):
-        # XChemLog.startLog(object.xce_logfile).create_logfile(object.xce_version)
-        object.update_log = XChemLog.updateLog()
+        XChemLog.startLog(object.xce_logfile).create_logfile(object.xce_version)
+        object.update_log = XChemLog.updateLog(object.xce_logfile)
 
     def settings(self, object):
         # set XCE version
@@ -157,7 +157,7 @@ class setup():
                                    '5 - Deposition ready',
                                    '6 - Deposited']
 
-        # self.set_xce_logfile(object)
+        self.set_xce_logfile(object)
 
         ## external software packages
         object.using_remote_qsub_submission = False
@@ -169,7 +169,7 @@ class setup():
         object.diffraction_data_search_info = 'n/a'
         object.diffraction_data_reference_mtz = 'ignore'
         object.html_export_directory = os.getcwd()
-        object.external_software = external_software(object.xce_logfile).check()
+        object.external_software = XChemUtils.external_software(object.xce_logfile).check()
 
         if object.external_software['acedrg']:
             object.restraints_program = 'acedrg'
@@ -322,7 +322,3 @@ class setup():
                                            'Refinement\nOutcome',
                                            'PanDDA site details',
                                            'Refinement\nStatus']
-
-
-if __name__ != "__main__":
-    pass
