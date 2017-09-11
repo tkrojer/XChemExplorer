@@ -60,24 +60,15 @@ class setup():
 
             object.ccp4_scratch_directory = os.path.join(object.labxchem_directory, 'processing', 'tmp')
 
-            if not os.path.isdir(object.beamline_directory):
-                os.mkdir(object.beamline_directory)
-            if not os.path.isdir(os.path.join(object.labxchem_directory, 'processing', 'analysis')):
-                os.mkdir(os.path.join(object.labxchem_directory, 'processing', 'analysis'))
-            if not os.path.isdir(object.initial_model_directory):
-                os.mkdir(object.initial_model_directory)
-            if not os.path.isdir(object.panddas_directory):
-                os.mkdir(object.panddas_directory)
-            if not os.path.isdir(object.reference_directory):
-                os.mkdir(object.reference_directory)
-            if not os.path.isdir(object.database_directory):
-                os.mkdir(object.database_directory)
-            if not os.path.isdir(object.ccp4_scratch_directory):
-                os.mkdir(object.ccp4_scratch_directory)
-            if not os.path.isdir(object.html_export_directory):
-                os.mkdir(object.html_export_directory)
-            if not os.path.isdir(object.group_deposit_directory):
-                os.mkdir(object.group_deposit_directory)
+            directory_list = [object.beamline_directory, os.path.join(object.labxchem_directory,
+                                                                      'processing', 'analysis'),
+                              object.initial_model_directory, object.panddas_directory, object.reference_directory,
+                              object.database_directory, object.ccp4_scratch_directory, object.html_export_directory,
+                              object.group_deposit_directory]
+
+            for directory in directory_list:
+                if not os.path.isdir(directory):
+                    os.mkdir(directory)
 
         # otherwise, use the current working directory
         else:
