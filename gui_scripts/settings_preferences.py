@@ -378,3 +378,92 @@ class setup():
                                  ]]
 
                      }
+
+    def bottom_box_buttons(self, object):
+        object.datasource_button_dict = {'datasource_button': [r"Update Tables\nFrom Datasource",
+                                                        [
+                                                            ['XChemToolTips.update_from_datasource_button_tip()',
+                                                             # tooltip
+                                                             'QPushButton { padding: 1px; margin: 1px; '
+                                                             'background: rgb(140,140,140) }',
+                                                             # stylesheet
+                                                             'object.headlineLabelfont',  # font
+                                                             'object.datasource_menu_reload_samples']  # action
+                                                        ]]}
+
+        object.dataset_task_run_button_dict = {'dataset_run_button':
+                                            [r"Run",
+                                             [
+                                                 ['XChemToolTips.dataset_task_run_button_tip()',  # tooltip
+                                                  'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
+                                                  '',  # font
+                                                  'object.button_clicked']  # action
+                                             ]]}
+
+        object.dataset_task_status_button_dict = {'dataset_status_button':
+                                               [r"Status",
+                                                [
+                                                    ['XChemToolTips.dataset_task_status_button_tip()',  # tooltip
+                                                     'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
+                                                     '',  # font
+                                                     'object.button_clicked']  # action
+                                                ]]}
+
+        object.map_cif_file_task_run_button_dict = {'dataset_run_button':
+                                                 [r"Run",
+                                                  [
+                                                      ['XChemToolTips.map_cif_file_task_run_button_tip()',  # tooltip
+                                                       'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
+                                                       '',  # font
+                                                       'object.button_clicked']  # action
+                                                  ]]}
+
+        object.map_cif_file_task_status_button_dict = {'dataset_status_button':
+                                                    [r"Status",
+                                                     [
+                                                         ['XChemToolTips.map_cif_file_task_status_button_tip()',
+                                                          # tooltip
+                                                          'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
+                                                          '',  # font
+                                                          'object.button_clicked']  # action
+                                                     ]]}
+
+        object.panddas_file_task_run_button_dict = {'dataset_run_button':
+                                                 [r"Run",
+                                                  [
+                                                      ['XChemToolTips.panddas_file_task_run_button_tip()',  # tooltip
+                                                       'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
+                                                       '',  # font
+                                                       'object.button_clicked']  # action
+                                                  ]]}
+
+        object.panddas_file_task_status_button_dict = {'dataset_status_button':
+                                                    [r"Status",
+                                                     [
+                                                         ['XChemToolTips.panddas_file_task_status_button_tip()',
+                                                          # tooltip
+                                                          'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
+                                                          '',  # font
+                                                          'object.button_clicked']  # action
+                                                     ]]}
+
+        object.refine_file_task_run_button_dict = {'dataset_run_button':
+                                                [r"Run",
+                                                 [
+                                                     ['XChemToolTips.refine_file_task_run_button_tip()',  # tooltip
+                                                      'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
+                                                      '',  # font
+                                                      'object.button_clicked']  # action
+                                                 ]]}
+
+        object.refine_file_task_status_button_dict = {'dataset_status_button':
+                                                   [r"Status",
+                                                    [
+                                                        ['XChemToolTips.refine_file_task_status_button_tip()',
+                                                         # tooltip
+                                                         'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
+                                                         '',  # font
+                                                         'object.button_clicked']  # action
+                                                    ]]}
+
+

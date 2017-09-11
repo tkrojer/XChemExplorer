@@ -63,24 +63,8 @@ class LayoutObjects():
 
     # function containing setup for bottom boxes
     def initialise_bottom_boxes(self, object):
-        ################################################################################################################
-        #                                                                                                              #
-        #                                             DATASOURCE BUTTON                                                #
-        #                                                                                                              #
-        ################################################################################################################
-        # config settings fot the 'update datasource' button
-        datasource_button_dict = {'datasource_button': [r"Update Tables\nFrom Datasource",
-                                                        [
-                                                            ['XChemToolTips.update_from_datasource_button_tip()',
-                                                             # tooltip
-                                                             'QPushButton { padding: 1px; margin: 1px; '
-                                                             'background: rgb(140,140,140) }',
-                                                             # stylesheet
-                                                             'object.headlineLabelfont',  # font
-                                                             'object.datasource_menu_reload_samples']  # action
-                                                        ]]}
         # setup datasource button
-        update_from_datasource_button = self.layout_funcs.setup_push_button(object, datasource_button_dict)
+        update_from_datasource_button = self.layout_funcs.setup_push_button(object, object.datasource_button_dict)
 
         ################################################################################################################
         #                                                                                                              #
@@ -88,28 +72,14 @@ class LayoutObjects():
         #                                                                                                              #
         ################################################################################################################
         # settings for the run button
-        dataset_task_run_button_dict = {'dataset_run_button':
-                                            [r"Run",
-                                             [
-                                                 ['XChemToolTips.dataset_task_run_button_tip()',  # tooltip
-                                                  'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
-                                                  '',  # font
-                                                  'object.button_clicked']  # action
-                                             ]]}
-        # setup the run button with push button function
-        object.dataset_task_run_button = self.layout_funcs.setup_push_button(object, dataset_task_run_button_dict)
 
-        # settings for the status button
-        dataset_task_status_button_dict = {'dataset_status_button':
-                                               [r"Status",
-                                                [
-                                                    ['XChemToolTips.dataset_task_status_button_tip()',  # tooltip
-                                                     'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
-                                                     '',  # font
-                                                     'object.button_clicked']  # action
-                                                ]]}
+        # setup the run button with push button function
+        object.dataset_task_run_button = self.layout_funcs.setup_push_button(object,
+                                                                             object.dataset_task_run_button_dict)
+
         # setup the task button with push button function
-        object.dataset_task_status_button = self.layout_funcs.setup_push_button(object, dataset_task_status_button_dict)
+        object.dataset_task_status_button = self.layout_funcs.setup_push_button(object,
+                                                                                object.dataset_task_status_button_dict)
 
         # array of both button objects to apply to bottom box layout
         dataset_buttons = [object.dataset_task_run_button, object.dataset_task_status_button]
@@ -128,9 +98,11 @@ class LayoutObjects():
         # return the frame and combobox from the bottom box setup function
         frame_dataset_task, object.dataset_tasks_combobox = self.layout_funcs.bottom_box_setup(object, dataset_label,
                                                                                              dataset_tasks,
-                                                                                             'XChemToolTips.dataset_task_tip()',
+                                                                                             'XChemToolTips.'
+                                                                                             'dataset_task_tip()',
                                                                                              dataset_buttons,
-                                                                                             'background: rgb(240, 255, 140); ')
+                                                                                             'background: '
+                                                                                             'rgb(240, 255, 140); ')
 
         # define the combobox and buttons in dictionary key to determine behaviour
         object.workflow_widget_dict['Datasets'] = [object.dataset_tasks_combobox, object.dataset_task_run_button,
@@ -142,30 +114,16 @@ class LayoutObjects():
         #                                                                                                              #
         ################################################################################################################
         # settings for the run button
-        map_cif_file_task_run_button_dict = {'dataset_run_button':
-                                                 [r"Run",
-                                                  [
-                                                      ['XChemToolTips.map_cif_file_task_run_button_tip()',  # tooltip
-                                                       'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
-                                                       '',  # font
-                                                       'object.button_clicked']  # action
-                                                  ]]}
+
         # setup the run button with push button function
-        object.map_cif_file_task_run_button = self.layout_funcs.setup_push_button(object, map_cif_file_task_run_button_dict)
+        object.map_cif_file_task_run_button = self.layout_funcs.setup_push_button(object,
+                                                                                  object.map_cif_file_task_run_button_dict)
 
         # settings for the status button
-        map_cif_file_task_status_button_dict = {'dataset_status_button':
-                                                    [r"Status",
-                                                     [
-                                                         ['XChemToolTips.map_cif_file_task_status_button_tip()',
-                                                          # tooltip
-                                                          'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
-                                                          '',  # font
-                                                          'object.button_clicked']  # action
-                                                     ]]}
+
         # setup the task button with push button function
         object.map_cif_file_task_status_button = self.layout_funcs.setup_push_button(object,
-                                                                                   map_cif_file_task_status_button_dict)
+                                                                                     object.map_cif_file_task_status_button_dict)
 
         # array of both button objects to apply to bottom box layout
         map_cif_file_buttons = [object.map_cif_file_task_run_button, object.map_cif_file_task_status_button]
@@ -200,30 +158,15 @@ class LayoutObjects():
         #                                                                                                              #
         ################################################################################################################
         # settings for the run button
-        panddas_file_task_run_button_dict = {'dataset_run_button':
-                                                 [r"Run",
-                                                  [
-                                                      ['XChemToolTips.panddas_file_task_run_button_tip()',  # tooltip
-                                                       'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
-                                                       '',  # font
-                                                       'object.button_clicked']  # action
-                                                  ]]}
+
         # setup the run button with push button function
-        object.panddas_file_task_run_button = self.layout_funcs.setup_push_button(object, panddas_file_task_run_button_dict)
+        object.panddas_file_task_run_button = self.layout_funcs.setup_push_button(object, object.panddas_file_task_run_button_dict)
 
         # settings for the status button
-        panddas_file_task_status_button_dict = {'dataset_status_button':
-                                                    [r"Status",
-                                                     [
-                                                         ['XChemToolTips.panddas_file_task_status_button_tip()',
-                                                          # tooltip
-                                                          'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
-                                                          '',  # font
-                                                          'object.button_clicked']  # action
-                                                     ]]}
+
         # setup the task button with push button function
         object.panddas_file_task_status_button = self.layout_funcs.setup_push_button(object,
-                                                                                   panddas_file_task_status_button_dict)
+                                                                                     object.panddas_file_task_status_button_dict)
 
         # array of both button objects to apply to bottom box layout
         panddas_file_buttons = [object.panddas_file_task_run_button, object.panddas_file_task_status_button]
@@ -265,29 +208,14 @@ class LayoutObjects():
         #                                                                                                              #
         ################################################################################################################
         # settings for the run button
-        refine_file_task_run_button_dict = {'dataset_run_button':
-                                                [r"Run",
-                                                 [
-                                                     ['XChemToolTips.refine_file_task_run_button_tip()',  # tooltip
-                                                      'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
-                                                      '',  # font
-                                                      'object.button_clicked']  # action
-                                                 ]]}
+
         # setup the run button with push button function
-        object.refine_file_task_run_button = self.layout_funcs.setup_push_button(object, refine_file_task_run_button_dict)
+        object.refine_file_task_run_button = self.layout_funcs.setup_push_button(object, object.refine_file_task_run_button_dict)
 
         # settings for the status button
-        refine_file_task_status_button_dict = {'dataset_status_button':
-                                                   [r"Status",
-                                                    [
-                                                        ['XChemToolTips.refine_file_task_status_button_tip()',
-                                                         # tooltip
-                                                         'QPushButton { padding: 1px; margin: 1px }',  # stylesheet
-                                                         '',  # font
-                                                         'object.button_clicked']  # action
-                                                    ]]}
+
         # setup the task button with push button function
-        object.refine_file_task_status_button = self.layout_funcs.setup_push_button(object, refine_file_task_status_button_dict)
+        object.refine_file_task_status_button = self.layout_funcs.setup_push_button(object, object.refine_file_task_status_button_dict)
 
         # array of both button objects to apply to bottom box layout
         refine_file_buttons = [object.refine_file_task_run_button, object.refine_file_task_status_button]
