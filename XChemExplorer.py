@@ -98,8 +98,8 @@ class XChemExplorer(QtGui.QApplication):
         self.window.setWindowTitle("XChemExplorer")
         self.screen = QtGui.QDesktopWidget().screenGeometry()
 
-        self.workflow()
-        self.main_layout()
+        LayoutObjects(self).workflow(self)
+        LayoutObjects(self).main_layout(self)
 
         ################################################################################################################
 
