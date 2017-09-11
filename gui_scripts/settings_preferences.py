@@ -162,18 +162,16 @@ class setup():
         object.html_export_directory = os.getcwd()
         object.external_software = XChemUtils.external_software(object.xce_logfile).check()
 
-        if object.external_software['acedrg']:
-            object.restraints_program = 'acedrg'
-            object.update_log.insert('will use ACEDRG for generation of ligand coordinates and restraints')
-        elif object.external_software['phenix.elbow']:
-            object.restraints_program = 'phenix.elbow'
-            object.update_log.insert('will use PHENIX.ELBOW for generation of ligand coordinates and restraints')
-        elif object.external_software['grade']:
-            object.restraints_program = 'grade'
-            object.update_log.insert('will use GRADE for generation of ligand coordinates and restraints')
-        else:
-            object.restraints_program = ''
-            object.update_log.insert('No program for generation of ligand coordinates and restraints available!')
+        software_list = ['acedrg', 'phenix.elbow', 'grade']
+
+        for software in software_list:
+            if object.external_software[software]:
+                object.restraints_program = str(software)
+                object.update_log.insert('will use ' + str(software) + ' for generation of ligand coordinates and'
+                                                                       ' restraints')
+            else:
+                object.restraints_program = ''
+                object.update_log.insert('No program for generation of ligand coordinates and restraints available!')
 
     def preferences(self, object):
         ## preferences
