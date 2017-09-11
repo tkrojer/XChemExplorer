@@ -322,3 +322,68 @@ class setup():
                                            'Refinement\nOutcome',
                                            'PanDDA site details',
                                            'Refinement\nStatus']
+
+    def top_menu_dict(self, object):
+        # dictionary containing config for top menu setup
+        # menu dict = { 'order letter: menu_item_name': ["name_in_menu",
+        #                                       [
+        #                                           ['text_in_menu', 'shortcut', 'trigger function']],
+        #                                           [...],
+        #                                       ]]
+        #             }
+        object.menu_dict = {'A: file': ["&File",
+                                 [
+                                     ['Open Config File', 'Ctrl+O', 'object.open_config_file'],
+                                     ['Save Config File', 'Ctrl+S', 'object.save_config_file'],
+                                     ['Quit', 'Ctrl+Q', 'object.quit_xce']
+                                 ]],
+                     'B: datasource': ["&Datasource",
+                                       [
+                                           ['Reload Samples From Datasource', '',
+                                            'object.datasource_menu_reload_samples'],
+                                           ['Save Samples to Datasource', '', 'object.datasource_menu_save_samples'],
+                                           ['Import CSV file into Datasource', '',
+                                            'object.datasource_menu_import_csv_file'],
+                                           ['Export CSV file from Datasource', '',
+                                            'object.datasource_menu_export_csv_file'],
+                                           ['Select columns to show', '',
+                                            'object.select_datasource_columns_to_display'],
+                                           ['Create New Datasource (SQLite)', '', 'object.create_new_data_source'],
+                                           ['Export CSV for wonka', '', 'object.export_data_for_WONKA']
+                                       ]],
+                     'C: preferences': ["&Preferences",
+                                        [
+                                            ['Edit preferences', '', 'object.show_preferences']
+                                        ]],
+                     'D: deposition': ["&Deposition",
+                                       [
+                                           ['Edit information', '', 'object.deposition_data'],
+                                           ['Export to HTML', '', 'object.export_to_html'],
+                                           ['Find PanDDA apo structures', '',
+                                            'object.create_missing_apo_records_in_depositTable'],
+                                           ['Update file info of apo structures', '',
+                                            'object.update_file_information_of_apo_records'],
+                                           ['Prepare mmcif for apo structures', '',
+                                            'object.prepare_models_for_deposition'],
+                                           # ^ this is added to a dictionary somewhere, so need to check what it interferes
+                                           #  with when code changed
+                                           ['Prepare mmcif for ligand bound structures', '',
+                                            'object.prepare_models_for_deposition'],
+                                           # ^ this is added to a dictionary somewhere, so need to check what it interferes
+                                           #  with when code changed
+                                           ['Copy files to group deposition directory', '',
+                                            'object.prepare_for_group_deposition_upload'],
+                                           ['Update DB with PDB codes', '', 'object.enter_pdb_codes'],
+                                           ['Check SMILES', '', 'object.check_smiles_in_db_and_pdb']
+                                       ]],
+                     'E: help': ["&Help",
+                                 [
+                                     ['Open XCE tutorial', '', str(
+                                         'lambda: self.layout_funcs.openFile("/dls/science/groups/i04-1/software/docs/'
+                                         'XChemExplorer.pdf")')],
+                                     ['Troubleshooting', '', str(
+                                         'lambda: self.layout_funcs.openFile("/dls/science/groups/i04-1/software/'
+                                         'xce_troubleshooting.pdf")')]
+                                 ]]
+
+                     }
