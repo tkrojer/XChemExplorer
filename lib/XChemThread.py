@@ -867,7 +867,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
                     if xtal+'/Refine_' in os.path.realpath(os.path.join(self.initial_model_directory,xtal,'refine.pdb')):
                         tmp=os.path.realpath(os.path.join(self.initial_model_directory,xtal,'refine.pdb'))
-                        spider_plot=os.path.join(tmp[:tmp.rfind('/')],'residue_plots',residue_name+'-'+residue_chain+'-'+residue_number+'.png')
+                        spider_plot=os.path.join(tmp[:tmp.rfind('/')],'residue_plots',residue_chain+'-'+residue_number+'.png').replace(' ','')
                         if os.path.isfile(spider_plot):
                             db_pandda_dict['PANDDA_site_spider_plot']=os.path.realpath(spider_plot)
                         if os.path.isfile(os.path.join(tmp[:tmp.rfind('/')],'residue_scores.csv')):
@@ -875,7 +875,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                                 csv_dict = csv.DictReader(csv_import)
                                 for i, line in enumerate(csv_dict):
                                     residueNameChainNumber = line['']
-                                    if residueNameChainNumber == residue_name+'-'+residue_chain+'-'+residue_number:
+                                    if residueNameChainNumber == residue_chain+'-'+residue_number:
                                         db_pandda_dict['PANDDA_site_occupancy'] = line['Occupancy']
                                         db_pandda_dict['PANDDA_site_B_average'] = line['Average B-factor (Residue)']
                                         db_pandda_dict['PANDDA_site_B_ratio_residue_surroundings'] = line['Surroundings B-factor Ratio']
