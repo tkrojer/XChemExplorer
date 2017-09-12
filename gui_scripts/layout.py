@@ -12,7 +12,6 @@ from settings_preferences import *
 import XChemToolTips
 import XChemMain
 
-
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
@@ -239,12 +238,6 @@ class LayoutObjects():
         # Deposition
         #
         # Settings
-        #
-        # NOTES:-
-        # -------
-        # 1. all table columns are defined by object.define_all_tables()
-        # 2. all table column definitions are named by <tab>_<subtab>_table_columns (subtab omitted if not relevant)
-        # 3. subtabs are created by self.layout_funcs.make_tab_dict()
 
         ################################################################################################################
         #                                                                                                              #
@@ -331,7 +324,7 @@ class LayoutObjects():
         object.data_collection_details_currently_on_display = None  # switch for displaying/updating table
         object.datasets_tab_dict['Summary'][1].addLayout(object.datasets_summarys_vbox_for_details)  # add details
 
-        object.datasets_data_collection_vbox.addWidget(object.datasets_tab_widget)  # add subtabs to main tab
+        object.datasets_data_collection_vbox.addWidget(object.datasets_tab_widget)  # add subtab to main tab
 
         # reprocessing sub-tab
         # top options
@@ -414,8 +407,8 @@ class LayoutObjects():
 
         # define order of widgets to be added to options hbox
         hbox_options_widgets = [label, object.xia2_3d_checkbox, object.xia2_3dii_checkbox,
-                                       object.xia2_dials_checkbox, sg_label, object.reprocess_space_group_comboxbox,
-                                       mtz_label, object.reprocess_reference_mtz_file_label, select_button]
+                                object.xia2_dials_checkbox, sg_label, object.reprocess_space_group_comboxbox,
+                                mtz_label, object.reprocess_reference_mtz_file_label, select_button]
 
         # create hbox, add everything to it and then put it in a frame
         hbox_options = QtGui.QHBoxLayout()
