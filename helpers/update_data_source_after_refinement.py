@@ -1,6 +1,7 @@
 # last edited: 27/07/2016, 17:00
 
 import os,sys
+import glob
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 
 from XChemUtils import parse
@@ -41,17 +42,19 @@ def parse_mtz(inital_model_directory,xtal,db_dict):
     return db_dict
 
 def check_refmac_matrix_weight(refinement_directory,db_dict):
-    if os.path.isfile(os.path.join(refinement_directory,'refmac.log')):
-        for line in open(os.path.join(refinement_directory,'refmac.log')):
+    for logFile in glob.glob(os.path.join(refinement_directory,'*refine.log')):
+        for line in open(logFile):
             if line.startswith(' Weight matrix') and len(line.split()) == 3:
                 db_dict['RefinementMatrixWeight'] = line.split()[2]
+        break
     return db_dict
 
 def check_refmac_logfile(refinement_directory,db_dict):
-    if os.path.isfile(os.path.join(refinement_directory,'refmac.log')):
-        for line in open(os.path.join(refinement_directory,'refmac.log')):
+    for logFile in glob.glob(os.path.join(refinement_directory,'*refine.log')):
+        for line in open(logFile):
             if 'Your coordinate file has a ligand which has either minimum or no description in the library' in line:
                 db_dict['RefinementStatus'] = 'CIF problem'
+        break
     return db_dict
 
 def parse_molprobity_output(inital_model_directory,xtal,db_dict):
