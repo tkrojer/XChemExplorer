@@ -42,19 +42,31 @@ def parse_mtz(inital_model_directory,xtal,db_dict):
     return db_dict
 
 def check_refmac_matrix_weight(refinement_directory,db_dict):
-    for logFile in glob.glob(os.path.join(refinement_directory,'*refine.log')):
+    if os.path.isfile(os.path.join(refinement_directory,'refmac.log')):
+        logFile=os.path.join(refinement_directory,'refmac.log')
+    else:
+        logFile=''
+        for files in glob.glob(os.path.join(refinement_directory,'*refine.log')):
+            logFile=files
+            break
+    if os.path.isfile(logFile):
         for line in open(logFile):
             if line.startswith(' Weight matrix') and len(line.split()) == 3:
                 db_dict['RefinementMatrixWeight'] = line.split()[2]
-        break
     return db_dict
 
 def check_refmac_logfile(refinement_directory,db_dict):
-    for logFile in glob.glob(os.path.join(refinement_directory,'*refine.log')):
+    if os.path.isfile(os.path.join(refinement_directory,'refmac.log')):
+        logFile=os.path.join(refinement_directory,'refmac.log')
+    else:
+        logFile=''
+        for files in glob.glob(os.path.join(refinement_directory,'*refine.log')):
+            logFile=files
+            break
+    if os.path.isfile(logFile):
         for line in open(logFile):
             if 'Your coordinate file has a ligand which has either minimum or no description in the library' in line:
                 db_dict['RefinementStatus'] = 'CIF problem'
-        break
     return db_dict
 
 def parse_molprobity_output(inital_model_directory,xtal,db_dict):
