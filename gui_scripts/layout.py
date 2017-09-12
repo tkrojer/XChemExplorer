@@ -558,15 +558,17 @@ class LayoutObjects():
 
         object.pandda_status = 'UNKNOWN'
         object.pandda_status_label = QtGui.QLabel()
-        if os.path.exists(str(object.panddas_directory + '/pandda.done')):
-            object.pandda_status = 'Finished!'
-            object.pandda_status_label.setStyleSheet('color: green')
-        if os.path.exists(str(object.panddas_directory + '/pandda.running')):
-            object.pandda_status = 'Running...'
-            object.pandda_status_label.setStyleSheet('color: orange')
-        if os.path.exists(str(object.panddas_directory + '/pandda.errored')):
-            object.pandda_status = 'Error encountered... please check the log files for pandda!'
-            object.pandda_status_label.setStyleSheet('color: red')
+
+        pandda_status_options = [['/pandda.done', 'Finished!', 'color: green'],
+                                 ['/pandda.running', 'Running...', 'color: orange'],
+                                 ['/pandda.errored', 'Error encountered... please check the log files for pandda!',
+                                  'color: red']]
+
+        for option in pandda_status_options:
+            if os.path.exists(str(object.panddas_directory + option[0])):
+                object.pandda_status = option[1]
+                object.pandda_status_label.setStyleSheet(option[2])
+
         object.pandda_status_label.setText(str('STATUS: ' + object.pandda_status))
         object.pandda_status_label.setFont(QtGui.QFont("Arial", 25, QtGui.QFont.Bold))
         grid_pandda.addWidget(object.pandda_status_label, 3, 0)
