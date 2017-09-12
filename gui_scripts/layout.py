@@ -1,13 +1,6 @@
-import base64
-import getpass
-import glob
-import math
 import multiprocessing
-import pickle
 import subprocess
 import sys, os
-import webbrowser
-from datetime import datetime
 from PyQt4 import QtGui, QtCore, QtWebKit
 
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'lib'))
@@ -16,20 +9,13 @@ sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'gui_scripts'))
 
 from settings_preferences import *
 
-from XChemUtils import parse
-import XChemThread
-import XChemDB
-import XChemPANDDA
 import XChemToolTips
 import XChemMain
-import XChemPlots
-import XChemLog
-import XChemProcess
-import XChemDeposit
-import XChemWeb
+
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+
 
 class LayoutObjects():
     def __init__(self, object):
@@ -63,6 +49,10 @@ class LayoutObjects():
 
     # function containing setup for bottom boxes
     def initialise_bottom_boxes(self, object):
+
+        # import all buttons
+        setup().bottom_box_buttons(object)
+
         # setup datasource button
         update_from_datasource_button = self.layout_funcs.setup_push_button(object, object.datasource_button_dict)
 
@@ -71,7 +61,6 @@ class LayoutObjects():
         #                                               DATASETS BOX                                                   #
         #                                                                                                              #
         ################################################################################################################
-        # settings for the run button
 
         # setup the run button with push button function
         object.dataset_task_run_button = self.layout_funcs.setup_push_button(object,
@@ -84,29 +73,21 @@ class LayoutObjects():
         # array of both button objects to apply to bottom box layout
         dataset_buttons = [object.dataset_task_run_button, object.dataset_task_status_button]
 
-        # items that will appear it the dropdown (combobox)
-        dataset_tasks = ['Get New Results from Autoprocessing',
-                         'Run DIMPLE on All Autoprocessing MTZ files',
-                         'Rescore Datasets',
-                         'Read PKL file',
-                         'Run xia2 on selected datasets',
-                         'Run xia2 on selected datasets - overwrite']
-
         # label for the bottom box layout
         dataset_label = "Datasets"
 
         # return the frame and combobox from the bottom box setup function
         frame_dataset_task, object.dataset_tasks_combobox = self.layout_funcs.bottom_box_setup(object, dataset_label,
-                                                                                             dataset_tasks,
-                                                                                             'XChemToolTips.'
-                                                                                             'dataset_task_tip()',
-                                                                                             dataset_buttons,
-                                                                                             'background: '
-                                                                                             'rgb(240, 255, 140); ')
+                                                                                               object.dataset_tasks,
+                                                                                               'XChemToolTips.'
+                                                                                               'dataset_task_tip()',
+                                                                                               dataset_buttons,
+                                                                                               'background: '
+                                                                                               'rgb(240, 255, 140); ')
 
         # define the combobox and buttons in dictionary key to determine behaviour
         object.workflow_widget_dict['Datasets'] = [object.dataset_tasks_combobox, object.dataset_task_run_button,
-                                                 object.dataset_task_status_button]
+                                                   object.dataset_task_status_button]
 
         ################################################################################################################
         #                                                                                                              #
@@ -116,41 +97,35 @@ class LayoutObjects():
         # settings for the run button
 
         # setup the run button with push button function
-        object.map_cif_file_task_run_button = self.layout_funcs.setup_push_button(object,
-                                                                                  object.map_cif_file_task_run_button_dict)
-
-        # settings for the status button
+        object.map_cif_file_task_run_button = \
+            self.layout_funcs.setup_push_button(object,
+                                                object.map_cif_file_task_run_button_dict)
 
         # setup the task button with push button function
-        object.map_cif_file_task_status_button = self.layout_funcs.setup_push_button(object,
-                                                                                     object.map_cif_file_task_status_button_dict)
+        object.map_cif_file_task_status_button = \
+            self.layout_funcs.setup_push_button(object,
+                                                object.map_cif_file_task_status_button_dict)
 
         # array of both button objects to apply to bottom box layout
         map_cif_file_buttons = [object.map_cif_file_task_run_button, object.map_cif_file_task_status_button]
-
-        # items that will appear it the dropdown (combobox)
-        map_cif_file_tasks = ['Run DIMPLE on selected MTZ files',
-                              'Remove selected DIMPLE PDB/MTZ files',
-                              'Create CIF/PDB/PNG file of ALL compounds',
-                              'Create CIF/PDB/PNG file of NEW compounds',
-                              'Create CIF/PDB/PNG file of SELECTED compounds']
 
         # label for the bottom box layout
         map_cif_file_label = "Maps & Restraints"
 
         # return the frame and combobox from the bottom box setup function
-        frame_map_cif_file_task, object.map_cif_file_tasks_combobox = self.layout_funcs.bottom_box_setup(object,
-                                                                                                       map_cif_file_label,
-                                                                                                       map_cif_file_tasks,
-                                                                                                       'XChemToolTips.map_cif_file_'
-                                                                                                       'task_tip()',
-                                                                                                       map_cif_file_buttons,
-                                                                                                       'background: rgb(140, 255, '
-                                                                                                       '150); ')
+        frame_map_cif_file_task, object.map_cif_file_tasks_combobox = \
+            self.layout_funcs.bottom_box_setup(object,
+                                               map_cif_file_label,
+                                               object.map_cif_file_tasks,
+                                               'XChemToolTips.map_cif_file_'
+                                               'task_tip()',
+                                               map_cif_file_buttons,
+                                               'background: rgb(140, 255, '
+                                               '150); ')
 
         # define the combobox and buttons in dictionary key to determine behaviour
         object.workflow_widget_dict['Maps'] = [object.map_cif_file_tasks_combobox, object.map_cif_file_task_run_button,
-                                             object.map_cif_file_task_status_button]
+                                               object.map_cif_file_task_status_button]
 
         ################################################################################################################
         #                                                                                                              #
@@ -160,47 +135,36 @@ class LayoutObjects():
         # settings for the run button
 
         # setup the run button with push button function
-        object.panddas_file_task_run_button = self.layout_funcs.setup_push_button(object, object.panddas_file_task_run_button_dict)
-
-        # settings for the status button
+        object.panddas_file_task_run_button = \
+            self.layout_funcs.setup_push_button(object,
+                                                object.panddas_file_task_run_button_dict)
 
         # setup the task button with push button function
-        object.panddas_file_task_status_button = self.layout_funcs.setup_push_button(object,
-                                                                                     object.panddas_file_task_status_button_dict)
+        object.panddas_file_task_status_button = \
+            self.layout_funcs.setup_push_button(object,
+                                                object.panddas_file_task_status_button_dict)
 
         # array of both button objects to apply to bottom box layout
         panddas_file_buttons = [object.panddas_file_task_run_button, object.panddas_file_task_status_button]
-
-        # items that will appear it the dropdown (combobox)
-        panddas_file_tasks = ['pandda.analyse',
-                              'pandda.inspect',
-                              'run pandda.inspect at home',
-                              'Export NEW PANDDA models',
-                              'Export ALL PANDDA models',
-                              'Show HTML summary',
-                              'Update datasource with results from pandda.inspect',
-                              'cluster datasets',
-                              'Event Map -> SF',
-                              'check modelled ligands',
-                              'pre-run for ground state model',
-                              'Build ground state model']
 
         # label for the bottom box layout
         panddas_file_label = "Hit Identification"
 
         # return the frame and combobox from the bottom box setup function
-        frame_panddas_file_task, object.panddas_file_tasks_combobox = self.layout_funcs.bottom_box_setup(object,
-                                                                                                       panddas_file_label,
-                                                                                                       panddas_file_tasks,
-                                                                                                       'XChemToolTips.panddas_file_'
-                                                                                                       'task_tip()',
-                                                                                                       panddas_file_buttons,
-                                                                                                       'background: rgb(140,200,255)'
-                                                                                                       '; ')
+        frame_panddas_file_task, object.panddas_file_tasks_combobox = \
+            self.layout_funcs.bottom_box_setup(object,
+                                               panddas_file_label,
+                                               object.panddas_file_tasks,
+                                               'XChemToolTips.panddas_file_'
+                                               'task_tip()',
+                                               panddas_file_buttons,
+                                               'background: rgb(140,200,255)'
+                                               '; ')
 
         # define the combobox and buttons in dictionary key to determine behaviour
-        object.workflow_widget_dict['PANDDAs'] = [object.panddas_file_tasks_combobox, object.panddas_file_task_run_button,
-                                                object.panddas_file_task_status_button]
+        object.workflow_widget_dict['PANDDAs'] = [object.panddas_file_tasks_combobox,
+                                                  object.panddas_file_task_run_button,
+                                                  object.panddas_file_task_status_button]
 
         ################################################################################################################
         #                                                                                                              #
@@ -210,39 +174,34 @@ class LayoutObjects():
         # settings for the run button
 
         # setup the run button with push button function
-        object.refine_file_task_run_button = self.layout_funcs.setup_push_button(object, object.refine_file_task_run_button_dict)
-
-        # settings for the status button
+        object.refine_file_task_run_button = \
+            self.layout_funcs.setup_push_button(object, object.refine_file_task_run_button_dict)
 
         # setup the task button with push button function
-        object.refine_file_task_status_button = self.layout_funcs.setup_push_button(object, object.refine_file_task_status_button_dict)
+        object.refine_file_task_status_button = \
+            self.layout_funcs.setup_push_button(object, object.refine_file_task_status_button_dict)
 
         # array of both button objects to apply to bottom box layout
         refine_file_buttons = [object.refine_file_task_run_button, object.refine_file_task_status_button]
-
-        # items that will appear it the dropdown (combobox)
-        refine_file_tasks = ['Open COOT',
-                             'Open COOT - new interface',
-                             'Open COOT for old PanDDA',
-                             'Update Deposition Table',
-                             'Prepare Group Deposition']
 
         # label for the bottom box layout
         refine_file_label = "Refinement"
 
         # return the frame and combobox from the bottom box setup function
-        frame_refine_file_task, object.refine_file_tasks_combobox = self.layout_funcs.bottom_box_setup(object,
-                                                                                                     refine_file_label,
-                                                                                                     refine_file_tasks,
-                                                                                                     'XChemToolTips.refine_file_task'
-                                                                                                     '_tip()',
-                                                                                                     refine_file_buttons,
-                                                                                                     'background: rgb(245, 190, 255)'
-                                                                                                     ';')
+        frame_refine_file_task, object.refine_file_tasks_combobox = \
+            self.layout_funcs.bottom_box_setup(object,
+                                               refine_file_label,
+                                               object.refine_file_tasks,
+                                               'XChemToolTips.refine_file_task'
+                                               '_tip()',
+                                               refine_file_buttons,
+                                               'background: rgb(245, 190, 255)'
+                                               ';')
 
         # define the combobox and buttons in dictionary key to determine behaviour
-        object.workflow_widget_dict['Refinement'] = [object.refine_file_tasks_combobox, object.refine_file_task_run_button,
-                                                   object.refine_file_task_status_button]
+        object.workflow_widget_dict['Refinement'] = [object.refine_file_tasks_combobox,
+                                                     object.refine_file_task_run_button,
+                                                     object.refine_file_task_status_button]
 
         return update_from_datasource_button, frame_dataset_task, frame_map_cif_file_task, frame_panddas_file_task, \
                frame_refine_file_task
@@ -254,9 +213,6 @@ class LayoutObjects():
         # initialise bottom boxes
         update_from_datasource_button, frame_dataset_task, frame_map_cif_file_task, frame_panddas_file_task, \
         frame_refine_file_task = self.initialise_bottom_boxes(object)
-
-        # set all table columns
-        #object.define_all_tables()
 
         # Tab layout & content
         # --------------------
@@ -336,7 +292,6 @@ class LayoutObjects():
         self.layout_funcs.make_tab_dict(datasets_tab_list, object.datasets_tab_widget, object.datasets_tab_dict)
 
         # main body - things that are always displayed
-
         # add a container to hold everythting and add to main tab layout
         object.datasets_data_collection_vbox = QtGui.QVBoxLayout()
         object.tab_dict[object.workflow_dict['Datasets']][1].addLayout(object.datasets_data_collection_vbox)
@@ -358,7 +313,7 @@ class LayoutObjects():
         object.target = str(object.target_selection_combobox.currentText())
 
         object.autocheck_hbox_widgets = [object.check_for_new_data_collection, select_target_label,
-                                       object.target_selection_combobox]  # array defining order of objects to be added
+                                         object.target_selection_combobox]  # array defining order of objects to add
 
         self.layout_funcs.add_to_box(object.autocheck_hbox, object.autocheck_hbox_widgets)  # add objects in order
 
@@ -366,10 +321,9 @@ class LayoutObjects():
         object.datasets_data_collection_vbox.addLayout(object.autocheck_hbox)
 
         # summary sub-tab
-
         # table
         object.datasets_summary_table = QtGui.QTableWidget()
-        self.layout_funcs.table_setup(object.datasets_summary_table, object.datasets_summary_table_columns)  # setup table
+        self.layout_funcs.table_setup(object.datasets_summary_table, object.datasets_summary_table_columns)
         object.datasets_summarys_vbox_for_table = QtGui.QVBoxLayout()  # setup layout to hold table
         object.datasets_summarys_vbox_for_table.addWidget(object.datasets_summary_table)  # add table to layout
         object.datasets_tab_dict['Summary'][1].addLayout(object.datasets_summarys_vbox_for_table)  # add layout to tab
@@ -381,42 +335,47 @@ class LayoutObjects():
 
         # reprocessing sub-tab
         # top options
-        reprocess_vbox = QtGui.QVBoxLayout()  # box to hold reprocessing subtab content
-
-        frame_select = QtGui.QFrame()  # frame to hold top options box
-        object.hbox_select = QtGui.QHBoxLayout()  # top options box
-
-        dc_label = QtGui.QLabel('Data collection directory: ')  # data collection label
-        dc_label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter) # align left and centre of container
+        # data collection label
+        dc_label = QtGui.QLabel('Data collection directory: ')
+        dc_label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)  # align left and centre of container
         object.diffraction_data_dir_label = QtGui.QLabel(object.diffraction_data_directory)  # add directory as text
         object.diffraction_data_dir_label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)  # align as above
 
-        select_button = QtGui.QPushButton("Select")  # select label
+        # select label
+        select_button = QtGui.QPushButton("Select")
         select_button.clicked.connect(object.select_diffraction_data_directory)  # attach file open dialogue
 
-        search_button = QtGui.QPushButton("Search Datasets")  # search button
+        # search button
+        search_button = QtGui.QPushButton("Search Datasets")
         search_button.clicked.connect(object.search_for_datasets)  # search for datasets in the selected directory
 
-        object.diffraction_data_search_label = QtGui.QLabel(object.diffraction_data_search_info)  # search info
+        # search info
+        object.diffraction_data_search_label = QtGui.QLabel(object.diffraction_data_search_info)
 
-        translate_label = QtGui.QLabel('translate: datasetID -> sampleID')  # label
+        # translate label
+        translate_label = QtGui.QLabel('translate: datasetID -> sampleID')
         translate_label.setAlignment(QtCore.Qt.AlignCenter)  # align in centre of container
-        csv_button = QtGui.QPushButton('Open CSV')  # CSV button
+
+        # CSV button
+        csv_button = QtGui.QPushButton('Open CSV')
         csv_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
         csv_button.clicked.connect(object.translate_datasetID_to_sampleID)  # open the relevant csv file
 
+        # create hbox to hold everything and add widgets to it
+        object.hbox_select = QtGui.QHBoxLayout()  # top options box
         object.hbox_select_widgets = [dc_label, select_button, search_button, object.diffraction_data_search_label,
-                                    translate_label, csv_button]  # array defining order of objects to be added
-
+                                      translate_label, csv_button]  # array defining order of objects to be added
         self.layout_funcs.add_to_box(object.hbox_select, object.hbox_select_widgets)  # add objects in order
 
+        # frame to hold everything
+        frame_select = QtGui.QFrame()
         frame_select.setLayout(object.hbox_select)  # apply to containing frame
 
-        # table
+        # table - main body
         object.datasets_reprocess_table = QtGui.QTableWidget()
         self.layout_funcs.table_setup(object.datasets_reprocess_table, object.datasets_reprocess_columns)  # setup
 
-        # create context menu
+        # create context menu - no idea where this lives...
         object.popMenu_for_datasets_reprocess_table = QtGui.QMenu()
         run_xia2_on_selected = QtGui.QAction("mark selected for reprocessing", object.window)
         run_xia2_on_selected.triggered.connect(object.select_sample_for_xia2)
@@ -424,88 +383,99 @@ class LayoutObjects():
         object.datasets_reprocess_table.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         object.datasets_reprocess_table.customContextMenuRequested.connect(object.on_context_menu_reprocess_data)
 
-        frame = QtGui.QFrame()
-        frame.setFrameShape(QtGui.QFrame.StyledPanel)
-        data_protocol_hbox = QtGui.QHBoxLayout()
-
-        frame_options = QtGui.QFrame()
-        frame_options.setFrameShape(QtGui.QFrame.StyledPanel)
-        hbox_options = QtGui.QHBoxLayout()
+        # options at bottom of tab
+        # data processing label
         label = QtGui.QLabel('Data processing protocol: ')
-        hbox_options.addWidget(label)
-        object.xia2_3d_checkbox = QtGui.QCheckBox('xia2 3d')
-        hbox_options.addWidget(object.xia2_3d_checkbox)
-        object.xia2_3dii_checkbox = QtGui.QCheckBox('xia2 3dii')
-        hbox_options.addWidget(object.xia2_3dii_checkbox)
-        object.xia2_dials_checkbox = QtGui.QCheckBox('Dials')
-        hbox_options.addWidget(object.xia2_dials_checkbox)
-        frame_options.setLayout(hbox_options)
+        label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
 
-        frame_sg = QtGui.QFrame()
-        frame_sg.setFrameShape(QtGui.QFrame.StyledPanel)
-        hbox_sg = QtGui.QHBoxLayout()
-        label = QtGui.QLabel('Space Group:')
-        hbox_sg.addWidget(label)
+        # option checkboxes
+        object.xia2_3d_checkbox = QtGui.QCheckBox('xia2 3d')
+        object.xia2_3dii_checkbox = QtGui.QCheckBox('xia2 3dii')
+        object.xia2_dials_checkbox = QtGui.QCheckBox('Dials')
+
+        # spacegroup label
+        sg_label = QtGui.QLabel('Space Group:')
+
+        # spacegroup dropdown menu
         object.reprocess_space_group_comboxbox = QtGui.QComboBox()
         object.reprocess_space_group_comboxbox.addItem('ignore')
         for sg in XChemMain.space_group_list():
             object.reprocess_space_group_comboxbox.addItem(sg)
-        hbox_sg.addWidget(object.reprocess_space_group_comboxbox)
-        frame_sg.setLayout(hbox_sg)
 
-        frame_ref = QtGui.QFrame()
-        frame_ref.setFrameShape(QtGui.QFrame.StyledPanel)
-        hbox_ref = QtGui.QHBoxLayout()
-        label = QtGui.QLabel('Reference MTZ:')
-        hbox_ref.addWidget(label)
-        frame_ref_info = QtGui.QFrame()
-        frame_ref_info.setFrameShape(QtGui.QFrame.StyledPanel)
-        hbox_frame_ref_info = QtGui.QHBoxLayout()
+        # mtz label
+        mtz_label = QtGui.QLabel('Reference MTZ:')
+
+        # file label
         object.reprocess_reference_mtz_file_label = QtGui.QLabel(object.diffraction_data_reference_mtz)
-        hbox_frame_ref_info.addWidget(object.reprocess_reference_mtz_file_label)
-        frame_ref_info.setLayout(hbox_frame_ref_info)
-        hbox_ref.addWidget(frame_ref_info)
-        button = QtGui.QPushButton("Select")
-        button.clicked.connect(object.select_reprocess_reference_mtz)
-        hbox_ref.addWidget(button)
-        frame_ref.setLayout(hbox_ref)
 
-        frame_isigma = QtGui.QFrame()
-        frame_isigma.setFrameShape(QtGui.QFrame.StyledPanel)
-        vbox_isigma = QtGui.QVBoxLayout()
+        # select button
+        select_button = QtGui.QPushButton("Select")
+        select_button.clicked.connect(object.select_reprocess_reference_mtz)
+
+        # define order of widgets to be added to options hbox
+        hbox_options_widgets = [label, object.xia2_3d_checkbox, object.xia2_3dii_checkbox,
+                                       object.xia2_dials_checkbox, sg_label, object.reprocess_space_group_comboxbox,
+                                       mtz_label, object.reprocess_reference_mtz_file_label, select_button]
+
+        # create hbox, add everything to it and then put it in a frame
+        hbox_options = QtGui.QHBoxLayout()
+        self.layout_funcs.add_to_box(hbox_options, hbox_options_widgets)
+
+        frame_options = QtGui.QFrame()
+        frame_options.setLayout(hbox_options)
+
+        # following are contained in vboxes
+        # res limit isig label
         label = QtGui.QLabel('Resolution\nLimit:\nMn<I/sig(I)>')
         label.setAlignment(QtCore.Qt.AlignCenter)
-        vbox_isigma.addWidget(label)
+
+        # res limit isig dropdown menu
         object.reprocess_isigma_combobox = QtGui.QComboBox()
         misigma = ['default', '4', '3', '2.5', '2', '1.5', '1', '0.5']
         for item in misigma:
             object.reprocess_isigma_combobox.addItem(item)
         object.reprocess_isigma_combobox.setCurrentIndex(0)
         object.reprocess_isigma_combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
-        vbox_isigma.addWidget(object.reprocess_isigma_combobox)
+
+        # create vertical box to add labels and dropdowns to, create box and put in frame
+        vbox_isigma = QtGui.QVBoxLayout()
+        vbox_isigma_widgets = [label, object.reprocess_isigma_combobox]
+        self.layout_funcs.add_to_box(vbox_isigma, vbox_isigma_widgets)
+        frame_isigma = QtGui.QFrame()
         frame_isigma.setLayout(vbox_isigma)
 
-        frame_cc_half = QtGui.QFrame()
-        frame_cc_half.setFrameShape(QtGui.QFrame.StyledPanel)
-        vbox_cc_half = QtGui.QVBoxLayout()
-        label = QtGui.QLabel('Resolution\nLimit:\nCC 1/2')
+        # res limit cc half label
+        res_cc_label = QtGui.QLabel('Resolution\nLimit:\nCC 1/2')
         label.setAlignment(QtCore.Qt.AlignCenter)
-        vbox_cc_half.addWidget(label)
+
+        # res limit cc half dropdown
         object.reprocess_cc_half_combobox = QtGui.QComboBox()
         cc_half = ['default', '0.9', '0.8', '0.7', '0.6', '0.5', '0.4', '0.3', '0.2', '0.1']
         for item in cc_half:
             object.reprocess_cc_half_combobox.addItem(item)
         object.reprocess_cc_half_combobox.setCurrentIndex(0)
         object.reprocess_cc_half_combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
-        vbox_cc_half.addWidget(object.reprocess_cc_half_combobox)
+
+        # create a vbox for label and dropdown, and add items to it
+        vbox_cc_half = QtGui.QVBoxLayout()
+        vbox_cc_half_widgets = [res_cc_label, object.reprocess_cc_half_combobox]
+        self.layout_funcs.add_to_box(vbox_cc_half, vbox_cc_half_widgets)
+
+        # create frame to hold everything and add vbox
+        frame_cc_half = QtGui.QFrame()
         frame_cc_half.setLayout(vbox_cc_half)
 
-        data_ptotocol_hbox_widgets = [frame_options, frame_sg, frame_ref, frame_isigma, frame_cc_half]
-        self.layout_funcs.add_to_box(data_protocol_hbox, data_ptotocol_hbox_widgets)
+        # create a hbox to hold the bottom frames and add everything
+        data_protocol_hbox = QtGui.QHBoxLayout()
+        data_protocol_hbox_widgets = [frame_options, frame_isigma, frame_cc_half]
+        self.layout_funcs.add_to_box(data_protocol_hbox, data_protocol_hbox_widgets)
 
-        frame.setLayout(data_protocol_hbox)
+        bottom_options_frame = QtGui.QFrame()  # create frame to hold everything (horizontal)
+        bottom_options_frame.setLayout(data_protocol_hbox)
 
-        object.reprocess_hbox_widgets = [frame_select, object.datasets_reprocess_table, frame]
+        # code below sets final layout for whole subtab
+        reprocess_vbox = QtGui.QVBoxLayout()  # box to hold reprocessing subtab content
+        object.reprocess_hbox_widgets = [frame_select, object.datasets_reprocess_table, bottom_options_frame]
         self.layout_funcs.add_to_box(reprocess_vbox, object.reprocess_hbox_widgets)
 
         object.datasets_tab_dict['Reprocess'][1].addLayout(reprocess_vbox)
@@ -951,7 +921,8 @@ class LayoutObjects():
         object.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nData Source: - REQUIRED -'))
         settings_hbox_data_source_file = QtGui.QHBoxLayout()
         if object.data_source_file != '':
-            object.data_source_file_label = QtGui.QLabel(os.path.join(object.database_directory, object.data_source_file))
+            object.data_source_file_label = QtGui.QLabel(
+                os.path.join(object.database_directory, object.data_source_file))
         else:
             object.data_source_file_label = QtGui.QLabel('')
         settings_hbox_data_source_file.addWidget(object.data_source_file_label)
@@ -1085,26 +1056,27 @@ class LayoutObjects():
 
         # workflow task container - order of tabs as they appear for the main window
         object.workflow = ['Overview',  # 0
-                         'Datasets',  # 1
-                         'Maps',  # 2
-                         'PANDDAs',  # 3
-                         'Refinement',  # 4
-                         'Deposition',  # 6
-                         'Settings']  # 5
+                           'Datasets',  # 1
+                           'Maps',  # 2
+                           'PANDDAs',  # 3
+                           'Refinement',  # 4
+                           'Deposition',  # 6
+                           'Settings']  # 5
 
         # dictionary with keys corresponding to each stage in the workflow
         object.workflow_dict = {object.workflow[0]: 'Overview',
-                              object.workflow[1]: 'Datasets',
-                              object.workflow[2]: 'Maps',
-                              object.workflow[3]: 'PANDDAs',
-                              object.workflow[4]: 'Refinement',
-                              object.workflow[6]: 'Settings',
-                              object.workflow[5]: 'Deposition'}
+                                object.workflow[1]: 'Datasets',
+                                object.workflow[2]: 'Maps',
+                                object.workflow[3]: 'PANDDAs',
+                                object.workflow[4]: 'Refinement',
+                                object.workflow[6]: 'Settings',
+                                object.workflow[5]: 'Deposition'}
 
         # tab widget
         object.main_tab_widget = QtGui.QTabWidget()
         object.tab_dict = {}
         self.layout_funcs.make_tab_dict(object.workflow, object.main_tab_widget, object.tab_dict)
+
 
 class LayoutFuncs():
     def __init__(self):
@@ -1211,13 +1183,6 @@ class LayoutFuncs():
                 menu.addAction(action)
 
         return menu_bar
-
-    # function for opening help and tutorial files
-    def openFile(self, file):
-        if sys.platform == 'linux2':
-            subprocess.call(["xdg-open", file])
-        else:
-            os.startfile(file)
 
     def add_to_box(self, frame, widgets_list):
         for widget in widgets_list:

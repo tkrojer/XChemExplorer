@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, subprocess
 from PyQt4 import QtCore, QtGui
 
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'lib'))
@@ -13,6 +13,12 @@ import XChemLog
 class setup():
     def __init__(self):
         pass
+
+    def openFile(self, file):
+        if sys.platform == 'linux2':
+            subprocess.call(["xdg-open", file])
+        else:
+            os.startfile(file)
 
     def set_xce_logfile(self, object):
         XChemLog.startLog(object.xce_logfile).create_logfile(object.xce_version)
@@ -368,16 +374,18 @@ class setup():
                      'E: help': ["&Help",
                                  [
                                      ['Open XCE tutorial', '', str(
-                                         'lambda: self.layout_funcs.openFile("/dls/science/groups/i04-1/software/docs/'
+                                         'lambda: setup().openFile("/dls/science/groups/i04-1/software/docs/'
                                          'XChemExplorer.pdf")')],
                                      ['Troubleshooting', '', str(
-                                         'lambda: self.layout_funcs.openFile("/dls/science/groups/i04-1/software/'
+                                         'lambda: setup().openFile("/dls/science/groups/i04-1/software/'
                                          'xce_troubleshooting.pdf")')]
                                  ]]
 
                      }
 
     def bottom_box_buttons(self, object):
+        self.dropdown_items(object)
+
         object.datasource_button_dict = {'datasource_button': [r"Update Tables\nFrom Datasource",
                                                         [
                                                             ['XChemToolTips.update_from_datasource_button_tip()',
@@ -463,5 +471,40 @@ class setup():
                                                          '',  # font
                                                          'object.button_clicked']  # action
                                                     ]]}
+
+    def dropdown_items(self, object):
+        object.dataset_tasks = ['Get New Results from Autoprocessing',
+                         'Run DIMPLE on All Autoprocessing MTZ files',
+                         'Rescore Datasets',
+                         'Read PKL file',
+                         'Run xia2 on selected datasets',
+                         'Run xia2 on selected datasets - overwrite']
+
+        object.map_cif_file_tasks = ['Run DIMPLE on selected MTZ files',
+                              'Remove selected DIMPLE PDB/MTZ files',
+                              'Create CIF/PDB/PNG file of ALL compounds',
+                              'Create CIF/PDB/PNG file of NEW compounds',
+                              'Create CIF/PDB/PNG file of SELECTED compounds']
+
+        object.panddas_file_tasks = ['pandda.analyse',
+                              'pandda.inspect',
+                              'run pandda.inspect at home',
+                              'Export NEW PANDDA models',
+                              'Export ALL PANDDA models',
+                              'Show HTML summary',
+                              'Update datasource with results from pandda.inspect',
+                              'cluster datasets',
+                              'Event Map -> SF',
+                              'check modelled ligands',
+                              'pre-run for ground state model',
+                              'Build ground state model']
+
+        object.refine_file_tasks = ['Open COOT',
+                             'Open COOT - new interface',
+                             'Open COOT for old PanDDA',
+                             'Update Deposition Table',
+                             'Prepare Group Deposition']
+
+
 
 
