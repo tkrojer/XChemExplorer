@@ -45,6 +45,7 @@ class RefineParams(object):
         self.prefix = 'refine'
         self.datasource=datasource
 
+
     def RefmacRefinementParams(self,RefmacParams):
         self.RefmacParams=RefmacParams
         self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
@@ -172,6 +173,22 @@ class RefineParams(object):
 
         if os.path.isfile(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(Serial)+'/refmac.csh'):
             for line in open(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(Serial)+'/refmac.csh'):
+                if line.startswith('refi tlsc'):
+                    RefmacParams['TLS']=line
+                if line.startswith('TLSO'):
+                    RefmacParams['TLSADD']=line
+                if line.startswith('NCSR LOCAL'):
+                    RefmacParams['NCS']=line
+                if line.startswith('    bref '):
+                    RefmacParams['BREF']=line
+                if line.startswith('ncyc'):
+                    RefmacParams['Ncycles'] = line.split()[1]
+                if line.startswith('weight'):
+                    RefmacParams['MATRIX_WEIGHT'] = line.split()[len(line.split())-1]
+                if line.startswith('TWIN'):
+                    RefmacParams['TWIN']=line
+        elif os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'refmac.csh')):
+            for line in open(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'refmac.csh')):
                 if line.startswith('refi tlsc'):
                     RefmacParams['TLS']=line
                 if line.startswith('TLSO'):
@@ -634,6 +651,22 @@ class Refine(object):
                 if line.startswith('weight'):
                     RefmacParams['MATRIX_WEIGHT'] = line.split()[len(line.split())-1]
                 if line.startswith('TWIN'):
+                    RefmacParams['TWIN']=line
+        elif os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-restraints.refmac.params')):
+            for line in open(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-restraints.refmac.params')):
+                if 'refi tlsc' in line:
+                    RefmacParams['TLS']=line
+                if 'TLSO' in line:
+                    RefmacParams['TLSADD']=line
+                if 'NCSR LOCAL' in line:
+                    RefmacParams['NCS']=line
+                if 'bref' in line:
+                    RefmacParams['BREF']=line
+                if 'ncyc' in line:
+                    RefmacParams['Ncycles'] = line.split()[1]
+                if 'weight' in line:
+                    RefmacParams['MATRIX_WEIGHT'] = line.split()[len(line.split())-1]
+                if 'TWIN' in line:
                     RefmacParams['TWIN']=line
 
         return RefmacParams

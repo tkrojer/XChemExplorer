@@ -904,6 +904,7 @@ class GUI(object):
 #        self.hbox_for_info_graphics.remove(self.canvas)
         if self.Serial > 1:
             self.RefmacParams=self.Refine.ParamsFromPreviousCycle(self.Serial-1)
+            print '==> REFMAC params:',self.RefmacParams
 #            refinement_cycle,Rfree,Rcryst=self.Refine.GetRefinementHistory()
 #            self.canvas = FigureCanvas(self.update_plot(refinement_cycle,Rfree,Rcryst))
 #        else:
