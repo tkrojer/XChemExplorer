@@ -425,10 +425,10 @@ class LayoutObjects():
         # res limit isig dropdown menu
         object.reprocess_isigma_combobox = QtGui.QComboBox()
         misigma = ['default', '4', '3', '2.5', '2', '1.5', '1', '0.5']
-        for item in misigma:
-            object.reprocess_isigma_combobox.addItem(item)
+        self.layout_funcs.populate_combobox(misigma, object.reprocess_isigma_combobox)
         object.reprocess_isigma_combobox.setCurrentIndex(0)
         object.reprocess_isigma_combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
+
 
         # create vertical box to add labels and dropdowns to, create box and put in frame
         vbox_isigma = QtGui.QVBoxLayout()
@@ -444,8 +444,7 @@ class LayoutObjects():
         # res limit cc half dropdown
         object.reprocess_cc_half_combobox = QtGui.QComboBox()
         cc_half = ['default', '0.9', '0.8', '0.7', '0.6', '0.5', '0.4', '0.3', '0.2', '0.1']
-        for item in cc_half:
-            object.reprocess_cc_half_combobox.addItem(item)
+        self.layout_funcs.populate_combobox(cc_half, object.reprocess_cc_half_combobox)
         object.reprocess_cc_half_combobox.setCurrentIndex(0)
         object.reprocess_cc_half_combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
 
@@ -478,35 +477,44 @@ class LayoutObjects():
         #                                                    MAPS TAB                                                  #
         #                                                                                                              #
         ################################################################################################################
-        initial_model_checkbutton_hbox = QtGui.QHBoxLayout()
-
+        # select box for dimple
         object.select_sample_for_dimple_box = QtGui.QCheckBox('(de-)select all samples for DIMPLE')
         self.layout_funcs.add_checkbox(object, object.select_sample_for_dimple_box, 'object.set_run_dimple_flag')
-        initial_model_checkbutton_hbox.addWidget(object.select_sample_for_dimple_box)
 
+        # set new reference button
         set_new_reference_button = QtGui.QPushButton("Set New Reference (if applicable)")
         set_new_reference_button.clicked.connect(object.set_new_reference_if_applicable)
-        initial_model_checkbutton_hbox.addWidget(set_new_reference_button)
 
+        # refresh button
         refresh_reference_file_list_button = QtGui.QPushButton("Refresh reference file list")
         refresh_reference_file_list_button.clicked.connect(object.refresh_reference_file_list)
-        initial_model_checkbutton_hbox.addWidget(refresh_reference_file_list_button)
 
+        # list and populate reference files
         object.reference_file_list = object.get_reference_file_list(' ')
         object.reference_file_selection_combobox = QtGui.QComboBox()
         object.populate_reference_combobox(object.reference_file_selection_combobox)
-        initial_model_checkbutton_hbox.addWidget(object.reference_file_selection_combobox)
 
-        object.tab_dict[object.workflow_dict['Maps']][1].addLayout(initial_model_checkbutton_hbox)
-        object.initial_model_vbox_for_table = QtGui.QVBoxLayout()
+        # setup hbox to hold everything and add widgets
+        maps_checkbutton_hbox = QtGui.QHBoxLayout()
+        maps_checkbutton_widgets = [object.select_sample_for_dimple_box, set_new_reference_button,
+                                    refresh_reference_file_list_button, object.reference_file_selection_combobox]
 
-        # table
+        self.layout_funcs.add_to_box(maps_checkbutton_hbox, maps_checkbutton_widgets)
+
+        # add box to tab
+        object.tab_dict[object.workflow_dict['Maps']][1].addLayout(maps_checkbutton_hbox)
+
+
+        # table setup
         object.maps_table = QtGui.QTableWidget()
         self.layout_funcs.table_setup(object.maps_table, object.maps_table_columns)
+
+        # box for table, add to box, add to tab
+        object.initial_model_vbox_for_table = QtGui.QVBoxLayout()
         object.initial_model_vbox_for_table.addWidget(object.maps_table)
         object.tab_dict[object.workflow_dict['Maps']][1].addLayout(object.initial_model_vbox_for_table)
 
-        # create context menu
+        # create context menu... no idea where this lives again.
         object.popMenu_for_maps_table = QtGui.QMenu()
         run_dimple = QtGui.QAction("mark selected for dimple run", object.window)
         run_dimple.triggered.connect(object.select_sample_for_dimple)
@@ -519,51 +527,43 @@ class LayoutObjects():
         #                                                   PANDDA TAB                                                 #
         #                                                                                                              #
         ################################################################################################################
+        # list of subtabs in PanDDA tab
         pandda_tab_list = ['pandda.analyse',
                            'Dataset Summary',
                            'Processing Output',
                            'pandda.inspect',
                            'Statistical Map Summaries']
 
+        # setup tab widget, set up tab dict, and make tab dict
         object.pandda_tab_widget = QtGui.QTabWidget()
         object.pandda_tab_dict = {}
         self.layout_funcs.make_tab_dict(pandda_tab_list, object.pandda_tab_widget, object.pandda_tab_dict)
 
-        ## PanDDA tab
-        object.panddas_results_vbox = QtGui.QVBoxLayout()
-        object.tab_dict[object.workflow_dict['PANDDAs']][1].addLayout(object.panddas_results_vbox)
-
-        object.pandda_analyse_hbox = QtGui.QHBoxLayout()
-        object.pandda_tab_dict['pandda.analyse'][1].addLayout(object.pandda_analyse_hbox)
-        object.pandda_map_layout = QtGui.QVBoxLayout()
-        object.pandda_map_list = QtGui.QComboBox()
-        object.pandda_maps_html = QtWebKit.QWebView()
-        object.pandda_map_layout.addWidget(object.pandda_map_list)
-        object.pandda_map_layout.addWidget(object.pandda_maps_html)
-
-        object.pandda_tab_dict['Statistical Map Summaries'][1].addLayout(object.pandda_map_layout)
-        object.pandda_maps_html.show()
-
+        # pandda analyse subtab
+        # setup a grid to hold everything
         grid_pandda = QtGui.QGridLayout()
         grid_pandda.setColumnStretch(0, 20)
         grid_pandda.setRowStretch(0, 20)
-        # left hand side: table with information about available datasets
 
-        # table
+        # table - left
         object.pandda_analyse_data_table = QtGui.QTableWidget()
         self.layout_funcs.table_setup(object.pandda_analyse_data_table, object.pandda_table_columns)
 
+        # add table to grid
         frame_pandda = QtGui.QFrame()
         grid_pandda.addWidget(object.pandda_analyse_data_table, 0, 0)
 
+        # status of pandda job - under table
         object.pandda_status = 'UNKNOWN'
         object.pandda_status_label = QtGui.QLabel()
 
+        # status options [filename, test to output, colour of text]
         pandda_status_options = [['/pandda.done', 'Finished!', 'color: green'],
                                  ['/pandda.running', 'Running...', 'color: orange'],
                                  ['/pandda.errored', 'Error encountered... please check the log files for pandda!',
                                   'color: red']]
 
+        # enumerate text options and set text under table
         for option in pandda_status_options:
             if os.path.exists(str(object.panddas_directory + option[0])):
                 object.pandda_status = option[1]
@@ -573,21 +573,18 @@ class LayoutObjects():
         object.pandda_status_label.setFont(QtGui.QFont("Arial", 25, QtGui.QFont.Bold))
         grid_pandda.addWidget(object.pandda_status_label, 3, 0)
 
-        # right hand side: input parameters for PANDDAs run
+        # input parameters for PANDDAs run - right
         frame_right = QtGui.QFrame()
-        frame_right.setFrameShape(QtGui.QFrame.StyledPanel)
 
         object.pandda_analyse_input_params_vbox = QtGui.QVBoxLayout()
 
         pandda_input_dir_hbox = QtGui.QHBoxLayout()
-        label = QtGui.QLabel('data directory')
+        label = QtGui.QLabel('Data directory:')
         object.pandda_analyse_input_params_vbox.addWidget(label)
         object.pandda_input_data_dir_entry = QtGui.QLineEdit()
         object.pandda_input_data_dir_entry.setText(os.path.join(object.initial_model_directory, '*'))
-        object.pandda_input_data_dir_entry.setFixedWidth(300)
         pandda_input_dir_hbox.addWidget(object.pandda_input_data_dir_entry)
         object.select_pandda_input_dir_button = QtGui.QPushButton("Select Input Template")
-        object.select_pandda_input_dir_button.setMaximumWidth(200)
         object.select_pandda_input_dir_button.clicked.connect(object.select_pandda_input_template)
         pandda_input_dir_hbox.addWidget(object.select_pandda_input_dir_button)
         object.pandda_analyse_input_params_vbox.addLayout(pandda_input_dir_hbox)
@@ -597,7 +594,7 @@ class LayoutObjects():
         pandda_pdb_style_hbox.addWidget(label)
         object.pandda_pdb_style_entry = QtGui.QLineEdit()
         object.pandda_pdb_style_entry.setText('dimple.pdb')
-        object.pandda_pdb_style_entry.setFixedWidth(200)
+        #object.pandda_pdb_style_entry.setFixedWidth(200)
         pandda_pdb_style_hbox.addWidget(object.pandda_pdb_style_entry)
         object.pandda_analyse_input_params_vbox.addLayout(pandda_pdb_style_hbox)
 
@@ -606,19 +603,16 @@ class LayoutObjects():
         pandda_mtz_style_hbox.addWidget(label)
         object.pandda_mtz_style_entry = QtGui.QLineEdit()
         object.pandda_mtz_style_entry.setText('dimple.mtz')
-        object.pandda_mtz_style_entry.setFixedWidth(200)
         pandda_mtz_style_hbox.addWidget(object.pandda_mtz_style_entry)
         object.pandda_analyse_input_params_vbox.addLayout(pandda_mtz_style_hbox)
 
         pandda_output_dir_hbox = QtGui.QHBoxLayout()
-        label = QtGui.QLabel('output directory')
+        label = QtGui.QLabel('Output directory:')
         object.pandda_analyse_input_params_vbox.addWidget(label)
         object.pandda_output_data_dir_entry = QtGui.QLineEdit()
         object.pandda_output_data_dir_entry.setText(object.panddas_directory)
-        object.pandda_output_data_dir_entry.setFixedWidth(300)
         pandda_output_dir_hbox.addWidget(object.pandda_output_data_dir_entry)
         object.select_pandda_output_dir_button = QtGui.QPushButton("Select PANNDAs Directory")
-        object.select_pandda_output_dir_button.setMaximumWidth(200)
         object.select_pandda_output_dir_button.clicked.connect(object.settings_button_clicked)
         pandda_output_dir_hbox.addWidget(object.select_pandda_output_dir_button)
         object.pandda_analyse_input_params_vbox.addLayout(pandda_output_dir_hbox)
@@ -630,23 +624,20 @@ class LayoutObjects():
         if object.external_software['qsub']:
             object.pandda_submission_mode_selection_combobox.addItem('qsub')
         object.pandda_submission_mode_selection_combobox.addItem('local machine')
-        object.pandda_submission_mode_selection_combobox.setMaximumWidth(200)
         object.pandda_analyse_input_params_vbox.addWidget(object.pandda_submission_mode_selection_combobox)
 
-        label = QtGui.QLabel('number of processors')
+        label = QtGui.QLabel('Number of processors')
         object.pandda_analyse_input_params_vbox.addWidget(label)
         object.pandda_nproc = multiprocessing.cpu_count() - 1
         object.pandda_nproc_entry = QtGui.QLineEdit()
         object.pandda_nproc_entry.setText(str(object.pandda_nproc).replace(' ', ''))
-        object.pandda_nproc_entry.setFixedWidth(200)
         object.pandda_analyse_input_params_vbox.addWidget(object.pandda_nproc_entry)
 
-        label = QtGui.QLabel('order events by:')
+        label = QtGui.QLabel('Nrder events by:')
         object.pandda_analyse_input_params_vbox.addWidget(label)
         object.pandda_sort_event_combobox = QtGui.QComboBox()
-        object.pandda_sort_event_combobox.addItem('cluster_size')
-        object.pandda_sort_event_combobox.addItem('z_peak')
-        object.pandda_sort_event_combobox.setMaximumWidth(200)
+        pandda_events = ['cluster_size', 'z_peak']
+        self.layout_funcs.populate_combobox(pandda_events, object.pandda_sort_event_combobox)
         object.pandda_analyse_input_params_vbox.addWidget(object.pandda_sort_event_combobox)
 
         # crystal form option
@@ -674,14 +665,14 @@ class LayoutObjects():
         object.pandda_analyse_input_params_vbox.addWidget(label)
         object.pandda_min_build_dataset_entry = QtGui.QLineEdit()
         object.pandda_min_build_dataset_entry.setText('40')
-        object.pandda_min_build_dataset_entry.setFixedWidth(200)
+        #object.pandda_min_build_dataset_entry.setFixedWidth(200)
         object.pandda_analyse_input_params_vbox.addWidget(object.pandda_min_build_dataset_entry)
 
         label = QtGui.QLabel('max_new_datasets')
         object.pandda_analyse_input_params_vbox.addWidget(label)
         object.pandda_max_new_datasets_entry = QtGui.QLineEdit()
         object.pandda_max_new_datasets_entry.setText('500')
-        object.pandda_max_new_datasets_entry.setFixedWidth(200)
+        #object.pandda_max_new_datasets_entry.setFixedWidth(200)
         object.pandda_analyse_input_params_vbox.addWidget(object.pandda_max_new_datasets_entry)
 
         label = QtGui.QLabel(
@@ -689,7 +680,7 @@ class LayoutObjects():
         object.pandda_analyse_input_params_vbox.addWidget(label)
         object.pandda_grid_spacing_entry = QtGui.QLineEdit()
         object.pandda_grid_spacing_entry.setText('0.5')
-        object.pandda_grid_spacing_entry.setFixedWidth(200)
+        #object.pandda_grid_spacing_entry.setFixedWidth(200)
         object.pandda_analyse_input_params_vbox.addWidget(object.pandda_grid_spacing_entry)
 
         object.pandda_analyse_input_params_vbox.addStretch(1)
@@ -699,6 +690,20 @@ class LayoutObjects():
 
         grid_pandda.addWidget(frame_right, 0, 1, 5, 5)
         frame_pandda.setLayout(grid_pandda)
+
+        # these are still currently populated in XCE.py - change
+        object.pandda_map_list = QtGui.QComboBox()
+        object.pandda_maps_html = QtWebKit.QWebView()
+
+        # statistical map summaries vbox, add to vbox and add to layout
+        object.pandda_map_layout = QtGui.QVBoxLayout()
+        pandda_map_layout_widgets = [object.pandda_map_list, object.pandda_maps_html]
+        self.layout_funcs.add_to_box(object.pandda_map_layout, pandda_map_layout_widgets)
+        object.pandda_tab_dict['Statistical Map Summaries'][1].addLayout(object.pandda_map_layout)
+        object.pandda_maps_html.show()
+
+        object.pandda_analyse_hbox = QtGui.QHBoxLayout()
+        object.pandda_tab_dict['pandda.analyse'][1].addLayout(object.pandda_analyse_hbox)
         object.pandda_analyse_hbox.addWidget(frame_pandda)
 
         # next three blocks display html documents created by pandda.analyse
@@ -719,6 +724,8 @@ class LayoutObjects():
         object.pandda_analyse_html.load(QtCore.QUrl(object.pandda_inspect_html_file))
         object.pandda_analyse_html.show()
 
+        object.panddas_results_vbox = QtGui.QVBoxLayout()
+        object.tab_dict[object.workflow_dict['PANDDAs']][1].addLayout(object.panddas_results_vbox)
         object.panddas_results_vbox.addWidget(object.pandda_tab_widget)
         object.show_pandda_html_summary()
 
@@ -1182,3 +1189,7 @@ class LayoutFuncs():
     def add_to_box(self, frame, widgets_list):
         for widget in widgets_list:
             frame.addWidget(widget)
+
+    def populate_combobox(self, combobox_list, combobox):
+        for item in combobox_list:
+            combobox.addItem(item)
