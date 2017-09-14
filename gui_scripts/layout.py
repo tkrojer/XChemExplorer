@@ -252,24 +252,15 @@ class LayoutObjects():
         # make subtabs
         self.layout_funcs.make_tab_dict(overview_tab_list, object.overview_tab_widget, object.overview_tab_dict)
 
-        # add overview subtabs to overview tab
-        object.tab_dict[object.workflow_dict['Overview']][1].addWidget(object.overview_tab_widget)
-
         # initiate the table in overview/datasource
         object.overview_datasource_table = QtGui.QTableWidget()
         object.overview_datasource_table.setSortingEnabled(True)
         object.overview_datasource_table.resizeColumnsToContents()
 
-        # add table to datasource subtab
-        object.overview_tab_dict['Data Source'][1].addWidget(object.overview_datasource_table)
-
         # initiate the graph in overview/summary
         object.overview_figure, object.overview_axes = plt.subplots()
         object.overview_canvas = FigureCanvas(object.overview_figure)
         object.update_summary_plot()
-
-        # add graph to summary tab
-        object.overview_tab_dict['Summary'][1].addWidget(object.overview_canvas)
 
         ################################################################################################################
         #                                                                                                              #
@@ -287,7 +278,6 @@ class LayoutObjects():
         # main body - things that are always displayed
         # add a container to hold everythting and add to main tab layout
         object.datasets_data_collection_vbox = QtGui.QVBoxLayout()
-        object.tab_dict[object.workflow_dict['Datasets']][1].addLayout(object.datasets_data_collection_vbox)
 
         # add a horizontal box to hold option to autocheck for new data
         object.autocheck_hbox = QtGui.QHBoxLayout()
@@ -319,10 +309,8 @@ class LayoutObjects():
         self.layout_funcs.table_setup(object.datasets_summary_table, object.datasets_summary_table_columns)
         object.datasets_summarys_vbox_for_table = QtGui.QVBoxLayout()  # setup layout to hold table
         object.datasets_summarys_vbox_for_table.addWidget(object.datasets_summary_table)  # add table to layout
-        object.datasets_tab_dict['Summary'][1].addLayout(object.datasets_summarys_vbox_for_table)  # add layout to tab
         object.datasets_summarys_vbox_for_details = QtGui.QVBoxLayout()  # vbox for details
         object.data_collection_details_currently_on_display = None  # switch for displaying/updating table
-        object.datasets_tab_dict['Summary'][1].addLayout(object.datasets_summarys_vbox_for_details)  # add details
 
         object.datasets_data_collection_vbox.addWidget(object.datasets_tab_widget)  # add subtab to main tab
 
@@ -470,8 +458,6 @@ class LayoutObjects():
         object.reprocess_hbox_widgets = [frame_select, object.datasets_reprocess_table, bottom_options_frame]
         self.layout_funcs.add_to_box(reprocess_vbox, object.reprocess_hbox_widgets)
 
-        object.datasets_tab_dict['Reprocess'][1].addLayout(reprocess_vbox)
-
         ################################################################################################################
         #                                                                                                              #
         #                                                    MAPS TAB                                                  #
@@ -501,10 +487,6 @@ class LayoutObjects():
 
         self.layout_funcs.add_to_box(maps_checkbutton_hbox, maps_checkbutton_widgets)
 
-        # add box to tab
-        object.tab_dict[object.workflow_dict['Maps']][1].addLayout(maps_checkbutton_hbox)
-
-
         # table setup
         object.maps_table = QtGui.QTableWidget()
         self.layout_funcs.table_setup(object.maps_table, object.maps_table_columns)
@@ -512,7 +494,6 @@ class LayoutObjects():
         # box for table, add to box, add to tab
         object.initial_model_vbox_for_table = QtGui.QVBoxLayout()
         object.initial_model_vbox_for_table.addWidget(object.maps_table)
-        object.tab_dict[object.workflow_dict['Maps']][1].addLayout(object.initial_model_vbox_for_table)
 
         # create context menu... no idea where this lives again.
         object.popMenu_for_maps_table = QtGui.QMenu()
@@ -699,33 +680,27 @@ class LayoutObjects():
         object.pandda_map_layout = QtGui.QVBoxLayout()
         pandda_map_layout_widgets = [object.pandda_map_list, object.pandda_maps_html]
         self.layout_funcs.add_to_box(object.pandda_map_layout, pandda_map_layout_widgets)
-        object.pandda_tab_dict['Statistical Map Summaries'][1].addLayout(object.pandda_map_layout)
         object.pandda_maps_html.show()
 
         object.pandda_analyse_hbox = QtGui.QHBoxLayout()
-        object.pandda_tab_dict['pandda.analyse'][1].addLayout(object.pandda_analyse_hbox)
         object.pandda_analyse_hbox.addWidget(frame_pandda)
 
         # next three blocks display html documents created by pandda.analyse
         self.layout_funcs.pandda_html(object)
 
         object.pandda_initial_html = QtWebKit.QWebView()
-        object.pandda_tab_dict['Dataset Summary'][1].addWidget(object.pandda_initial_html)
         object.pandda_initial_html.load(QtCore.QUrl(object.pandda_initial_html_file))
         object.pandda_initial_html.show()
 
         object.pandda_analyse_html = QtWebKit.QWebView()
-        object.pandda_tab_dict['Processing Output'][1].addWidget(object.pandda_analyse_html)
         object.pandda_analyse_html.load(QtCore.QUrl(object.pandda_analyse_html_file))
         object.pandda_analyse_html.show()
 
         object.pandda_inspect_html = QtWebKit.QWebView()
-        object.pandda_tab_dict['pandda.inspect'][1].addWidget(object.pandda_inspect_html)
         object.pandda_analyse_html.load(QtCore.QUrl(object.pandda_inspect_html_file))
         object.pandda_analyse_html.show()
 
         object.panddas_results_vbox = QtGui.QVBoxLayout()
-        object.tab_dict[object.workflow_dict['PANDDAs']][1].addLayout(object.panddas_results_vbox)
         object.panddas_results_vbox.addWidget(object.pandda_tab_widget)
         object.show_pandda_html_summary()
 
@@ -740,7 +715,6 @@ class LayoutObjects():
         object.refinement_table = QtGui.QTableWidget()
         self.layout_funcs.table_setup(object.refinement_table, object.refinement_table_columns)
         object.summary_vbox_for_table.addWidget(object.refinement_table)
-        object.tab_dict[object.workflow_dict['Refinement']][1].addLayout(object.summary_vbox_for_table)
 
         ################################################################################################################
         #                                                                                                              #
@@ -877,7 +851,6 @@ class LayoutObjects():
         scrollLayout.addWidget(QtGui.QLabel('\n'))
         scrollLayout.addStretch(1)
         scroll.setWidget(scrollContent)
-        object.tab_dict[object.workflow_dict['Deposition']][1].addLayout(object.deposition_vbox)
 
         ################################################################################################################
         #                                                                                                              #
@@ -1004,7 +977,6 @@ class LayoutObjects():
         object.data_collection_vbox_for_settings.setContentsMargins(30, 0, 0, 0)
 
         object.buttons_etc.resize(object.screen.width() - 100, object.buttons_etc.sizeHint().height())
-        object.tab_dict[object.workflow_dict['Settings']][1].addLayout(object.settings_vbox)
 
         ################################################################################################################
         #                                                                                                              #
@@ -1047,6 +1019,34 @@ class LayoutObjects():
             write_enabled = object.check_write_permissions_of_data_source()
             if not write_enabled:
                 object.data_source_set = False
+
+
+
+        tab_add_widget = [[object.tab_dict[object.workflow_dict['Overview']][1], object.overview_tab_widget],
+                          [object.overview_tab_dict['Data Source'][1], object.overview_datasource_table],
+                          [object.overview_tab_dict['Summary'][1], object.overview_canvas],
+                          [object.pandda_tab_dict['Dataset Summary'][1], object.pandda_initial_html],
+                          [object.pandda_tab_dict['Processing Output'][1], object.pandda_analyse_html],
+                          [object.pandda_tab_dict['pandda.inspect'][1], object.pandda_inspect_html]]
+
+        tab_add_layout = [[object.tab_dict[object.workflow_dict['Datasets']][1], object.datasets_data_collection_vbox],
+                          [object.datasets_tab_dict['Summary'][1], object.datasets_summarys_vbox_for_table],
+                          [object.datasets_tab_dict['Summary'][1], object.datasets_summarys_vbox_for_details],
+                          [object.datasets_tab_dict['Reprocess'][1], reprocess_vbox],
+                          [object.tab_dict[object.workflow_dict['Maps']][1], maps_checkbutton_hbox],
+                          [object.tab_dict[object.workflow_dict['Maps']][1], object.initial_model_vbox_for_table],
+                          [object.pandda_tab_dict['Statistical Map Summaries'][1], object.pandda_map_layout],
+                          [object.pandda_tab_dict['pandda.analyse'][1], object.pandda_analyse_hbox],
+                          [object.tab_dict[object.workflow_dict['PANDDAs']][1], object.panddas_results_vbox],
+                          [object.tab_dict[object.workflow_dict['Refinement']][1], object.summary_vbox_for_table],
+                          [object.tab_dict[object.workflow_dict['Deposition']][1], object.deposition_vbox],
+                          [object.tab_dict[object.workflow_dict['Settings']][1], object.settings_vbox]]
+
+        for item in tab_add_widget:
+            item[0].addWidget(item[1])
+
+        for item in tab_add_layout:
+            item[0].addLayout(item[1])
 
     def workflow(self, object):
         ################################################################################################################
