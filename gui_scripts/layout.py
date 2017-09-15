@@ -17,11 +17,11 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 
 class LayoutObjects():
-    def __init__(self, object):
+    def __init__(self, xce_object):
         self.layout_funcs = LayoutFuncs()
 
     # function to initialise the top menu bar
-    def initialise_menu_bar(self, object):
+    def initialise_menu_bar(self, xce_object):
         ################################################################################################################
         #                                                                                                              #
         #                                              MENU BAR - TOP OF GUI                                           #
@@ -35,25 +35,25 @@ class LayoutObjects():
         setup().top_menu_dict(self)
 
         # create menu from menu dictionary
-        menu_bar = self.layout_funcs.setup_menubar(object, menu_bar, self.menu_dict)
+        menu_bar = self.layout_funcs.setup_menubar(xce_object, menu_bar, self.menu_dict)
 
         # END OF MENU BAR - CODE BELOW: stuff removed from apo structure stuff that appears might have a funky
         # consequence - work out later.
 
-        # object.prepare_mmcif_files_dict = {}
-        # object.prepare_mmcif_files_dict['apo'] = prepare_mmcif_files_for_apo_structures
-        # object.prepare_mmcif_files_dict['ligand_bound'] = prepare_mmcif_files_for_ligand_bound_structures
+        # xce_object.prepare_mmcif_files_dict = {}
+        # xce_object.prepare_mmcif_files_dict['apo'] = prepare_mmcif_files_for_apo_structures
+        # xce_object.prepare_mmcif_files_dict['ligand_bound'] = prepare_mmcif_files_for_ligand_bound_structures
 
         return menu_bar
 
     # function containing setup for bottom boxes
-    def initialise_bottom_boxes(self, object):
+    def initialise_bottom_boxes(self, xce_object):
 
         # import all buttons
-        setup().bottom_box_buttons(object)
+        setup().bottom_box_buttons(xce_object)
 
         # setup datasource button
-        update_from_datasource_button = self.layout_funcs.setup_push_button(object, object.datasource_button_dict)
+        update_from_datasource_button = self.layout_funcs.setup_push_button(xce_object, xce_object.datasource_button_dict)
 
         ################################################################################################################
         #                                                                                                              #
@@ -62,22 +62,22 @@ class LayoutObjects():
         ################################################################################################################
 
         # setup the run button with push button function
-        object.dataset_task_run_button = self.layout_funcs.setup_push_button(object,
-                                                                             object.dataset_task_run_button_dict)
+        xce_object.dataset_task_run_button = self.layout_funcs.setup_push_button(xce_object,
+                                                                             xce_object.dataset_task_run_button_dict)
 
         # setup the task button with push button function
-        object.dataset_task_status_button = self.layout_funcs.setup_push_button(object,
-                                                                                object.dataset_task_status_button_dict)
+        xce_object.dataset_task_status_button = self.layout_funcs.setup_push_button(xce_object,
+                                                                                xce_object.dataset_task_status_button_dict)
 
-        # array of both button objects to apply to bottom box layout
-        dataset_buttons = [object.dataset_task_run_button, object.dataset_task_status_button]
+        # array of both button xce_objects to apply to bottom box layout
+        dataset_buttons = [xce_object.dataset_task_run_button, xce_object.dataset_task_status_button]
 
         # label for the bottom box layout
         dataset_label = "Datasets"
 
         # return the frame and combobox from the bottom box setup function
-        frame_dataset_task, object.dataset_tasks_combobox = self.layout_funcs.bottom_box_setup(object, dataset_label,
-                                                                                               object.dataset_tasks,
+        frame_dataset_task, xce_object.dataset_tasks_combobox = self.layout_funcs.bottom_box_setup(xce_object, dataset_label,
+                                                                                               xce_object.dataset_tasks,
                                                                                                'XChemToolTips.'
                                                                                                'dataset_task_tip()',
                                                                                                dataset_buttons,
@@ -85,8 +85,8 @@ class LayoutObjects():
                                                                                                'rgb(240, 255, 140); ')
 
         # define the combobox and buttons in dictionary key to determine behaviour
-        object.workflow_widget_dict['Datasets'] = [object.dataset_tasks_combobox, object.dataset_task_run_button,
-                                                   object.dataset_task_status_button]
+        xce_object.workflow_widget_dict['Datasets'] = [xce_object.dataset_tasks_combobox, xce_object.dataset_task_run_button,
+                                                   xce_object.dataset_task_status_button]
 
         ################################################################################################################
         #                                                                                                              #
@@ -96,26 +96,26 @@ class LayoutObjects():
         # settings for the run button
 
         # setup the run button with push button function
-        object.map_cif_file_task_run_button = \
-            self.layout_funcs.setup_push_button(object,
-                                                object.map_cif_file_task_run_button_dict)
+        xce_object.map_cif_file_task_run_button = \
+            self.layout_funcs.setup_push_button(xce_object,
+                                                xce_object.map_cif_file_task_run_button_dict)
 
         # setup the task button with push button function
-        object.map_cif_file_task_status_button = \
-            self.layout_funcs.setup_push_button(object,
-                                                object.map_cif_file_task_status_button_dict)
+        xce_object.map_cif_file_task_status_button = \
+            self.layout_funcs.setup_push_button(xce_object,
+                                                xce_object.map_cif_file_task_status_button_dict)
 
-        # array of both button objects to apply to bottom box layout
-        map_cif_file_buttons = [object.map_cif_file_task_run_button, object.map_cif_file_task_status_button]
+        # array of both button xce_objects to apply to bottom box layout
+        map_cif_file_buttons = [xce_object.map_cif_file_task_run_button, xce_object.map_cif_file_task_status_button]
 
         # label for the bottom box layout
         map_cif_file_label = "Maps & Restraints"
 
         # return the frame and combobox from the bottom box setup function
-        frame_map_cif_file_task, object.map_cif_file_tasks_combobox = \
-            self.layout_funcs.bottom_box_setup(object,
+        frame_map_cif_file_task, xce_object.map_cif_file_tasks_combobox = \
+            self.layout_funcs.bottom_box_setup(xce_object,
                                                map_cif_file_label,
-                                               object.map_cif_file_tasks,
+                                               xce_object.map_cif_file_tasks,
                                                'XChemToolTips.map_cif_file_'
                                                'task_tip()',
                                                map_cif_file_buttons,
@@ -123,8 +123,8 @@ class LayoutObjects():
                                                '150); ')
 
         # define the combobox and buttons in dictionary key to determine behaviour
-        object.workflow_widget_dict['Maps'] = [object.map_cif_file_tasks_combobox, object.map_cif_file_task_run_button,
-                                               object.map_cif_file_task_status_button]
+        xce_object.workflow_widget_dict['Maps'] = [xce_object.map_cif_file_tasks_combobox, xce_object.map_cif_file_task_run_button,
+                                               xce_object.map_cif_file_task_status_button]
 
         ################################################################################################################
         #                                                                                                              #
@@ -134,26 +134,26 @@ class LayoutObjects():
         # settings for the run button
 
         # setup the run button with push button function
-        object.panddas_file_task_run_button = \
-            self.layout_funcs.setup_push_button(object,
-                                                object.panddas_file_task_run_button_dict)
+        xce_object.panddas_file_task_run_button = \
+            self.layout_funcs.setup_push_button(xce_object,
+                                                xce_object.panddas_file_task_run_button_dict)
 
         # setup the task button with push button function
-        object.panddas_file_task_status_button = \
-            self.layout_funcs.setup_push_button(object,
-                                                object.panddas_file_task_status_button_dict)
+        xce_object.panddas_file_task_status_button = \
+            self.layout_funcs.setup_push_button(xce_object,
+                                                xce_object.panddas_file_task_status_button_dict)
 
-        # array of both button objects to apply to bottom box layout
-        panddas_file_buttons = [object.panddas_file_task_run_button, object.panddas_file_task_status_button]
+        # array of both button xce_objects to apply to bottom box layout
+        panddas_file_buttons = [xce_object.panddas_file_task_run_button, xce_object.panddas_file_task_status_button]
 
         # label for the bottom box layout
         panddas_file_label = "Hit Identification"
 
         # return the frame and combobox from the bottom box setup function
-        frame_panddas_file_task, object.panddas_file_tasks_combobox = \
-            self.layout_funcs.bottom_box_setup(object,
+        frame_panddas_file_task, xce_object.panddas_file_tasks_combobox = \
+            self.layout_funcs.bottom_box_setup(xce_object,
                                                panddas_file_label,
-                                               object.panddas_file_tasks,
+                                               xce_object.panddas_file_tasks,
                                                'XChemToolTips.panddas_file_'
                                                'task_tip()',
                                                panddas_file_buttons,
@@ -161,9 +161,9 @@ class LayoutObjects():
                                                '; ')
 
         # define the combobox and buttons in dictionary key to determine behaviour
-        object.workflow_widget_dict['PANDDAs'] = [object.panddas_file_tasks_combobox,
-                                                  object.panddas_file_task_run_button,
-                                                  object.panddas_file_task_status_button]
+        xce_object.workflow_widget_dict['PANDDAs'] = [xce_object.panddas_file_tasks_combobox,
+                                                  xce_object.panddas_file_task_run_button,
+                                                  xce_object.panddas_file_task_status_button]
 
         ################################################################################################################
         #                                                                                                              #
@@ -173,24 +173,24 @@ class LayoutObjects():
         # settings for the run button
 
         # setup the run button with push button function
-        object.refine_file_task_run_button = \
-            self.layout_funcs.setup_push_button(object, object.refine_file_task_run_button_dict)
+        xce_object.refine_file_task_run_button = \
+            self.layout_funcs.setup_push_button(xce_object, xce_object.refine_file_task_run_button_dict)
 
         # setup the task button with push button function
-        object.refine_file_task_status_button = \
-            self.layout_funcs.setup_push_button(object, object.refine_file_task_status_button_dict)
+        xce_object.refine_file_task_status_button = \
+            self.layout_funcs.setup_push_button(xce_object, xce_object.refine_file_task_status_button_dict)
 
-        # array of both button objects to apply to bottom box layout
-        refine_file_buttons = [object.refine_file_task_run_button, object.refine_file_task_status_button]
+        # array of both button xce_objects to apply to bottom box layout
+        refine_file_buttons = [xce_object.refine_file_task_run_button, xce_object.refine_file_task_status_button]
 
         # label for the bottom box layout
         refine_file_label = "Refinement"
 
         # return the frame and combobox from the bottom box setup function
-        frame_refine_file_task, object.refine_file_tasks_combobox = \
-            self.layout_funcs.bottom_box_setup(object,
+        frame_refine_file_task, xce_object.refine_file_tasks_combobox = \
+            self.layout_funcs.bottom_box_setup(xce_object,
                                                refine_file_label,
-                                               object.refine_file_tasks,
+                                               xce_object.refine_file_tasks,
                                                'XChemToolTips.refine_file_task'
                                                '_tip()',
                                                refine_file_buttons,
@@ -198,20 +198,20 @@ class LayoutObjects():
                                                ';')
 
         # define the combobox and buttons in dictionary key to determine behaviour
-        object.workflow_widget_dict['Refinement'] = [object.refine_file_tasks_combobox,
-                                                     object.refine_file_task_run_button,
-                                                     object.refine_file_task_status_button]
+        xce_object.workflow_widget_dict['Refinement'] = [xce_object.refine_file_tasks_combobox,
+                                                     xce_object.refine_file_task_run_button,
+                                                     xce_object.refine_file_task_status_button]
 
         return update_from_datasource_button, frame_dataset_task, frame_map_cif_file_task, frame_panddas_file_task, \
                frame_refine_file_task
 
-    def main_layout(self, object):
+    def main_layout(self, xce_object):
         # initialise menu bar
-        menu_bar = self.initialise_menu_bar(object)
+        menu_bar = self.initialise_menu_bar(xce_object)
 
         # initialise bottom boxes
         update_from_datasource_button, frame_dataset_task, frame_map_cif_file_task, frame_panddas_file_task, \
-        frame_refine_file_task = self.initialise_bottom_boxes(object)
+        frame_refine_file_task = self.initialise_bottom_boxes(xce_object)
 
         # Tab layout & content
         # --------------------
@@ -246,21 +246,21 @@ class LayoutObjects():
         ################################################################################################################
         # define subtab list, widget and dict
         overview_tab_list = ['Data Source', 'Summary']
-        object.overview_tab_widget = QtGui.QTabWidget()
-        object.overview_tab_dict = {}
+        xce_object.overview_tab_widget = QtGui.QTabWidget()
+        xce_object.overview_tab_dict = {}
 
         # make subtabs
-        self.layout_funcs.make_tab_dict(overview_tab_list, object.overview_tab_widget, object.overview_tab_dict)
+        self.layout_funcs.make_tab_dict(overview_tab_list, xce_object.overview_tab_widget, xce_object.overview_tab_dict)
 
         # initiate the table in overview/datasource
-        object.overview_datasource_table = QtGui.QTableWidget()
-        object.overview_datasource_table.setSortingEnabled(True)
-        object.overview_datasource_table.resizeColumnsToContents()
+        xce_object.overview_datasource_table = QtGui.QTableWidget()
+        xce_object.overview_datasource_table.setSortingEnabled(True)
+        xce_object.overview_datasource_table.resizeColumnsToContents()
 
         # initiate the graph in overview/summary
-        object.overview_figure, object.overview_axes = plt.subplots()
-        object.overview_canvas = FigureCanvas(object.overview_figure)
-        object.update_summary_plot()
+        xce_object.overview_figure, xce_object.overview_axes = plt.subplots()
+        xce_object.overview_canvas = FigureCanvas(xce_object.overview_figure)
+        xce_object.update_summary_plot()
 
         ################################################################################################################
         #                                                                                                              #
@@ -269,69 +269,69 @@ class LayoutObjects():
         ################################################################################################################
         # define subtab list, widget and dict
         datasets_tab_list = ['Summary', 'Reprocess']
-        object.datasets_tab_widget = QtGui.QTabWidget()
-        object.datasets_tab_dict = {}
+        xce_object.datasets_tab_widget = QtGui.QTabWidget()
+        xce_object.datasets_tab_dict = {}
 
         # make subtabs
-        self.layout_funcs.make_tab_dict(datasets_tab_list, object.datasets_tab_widget, object.datasets_tab_dict)
+        self.layout_funcs.make_tab_dict(datasets_tab_list, xce_object.datasets_tab_widget, xce_object.datasets_tab_dict)
 
         # main body - things that are always displayed
         # add a container to hold everythting and add to main tab layout
-        object.datasets_data_collection_vbox = QtGui.QVBoxLayout()
+        xce_object.datasets_data_collection_vbox = QtGui.QVBoxLayout()
 
         # add a horizontal box to hold option to autocheck for new data
-        object.autocheck_hbox = QtGui.QHBoxLayout()
+        xce_object.autocheck_hbox = QtGui.QHBoxLayout()
 
         # checkbox for autocollect
-        object.check_for_new_data_collection = QtGui.QCheckBox('Check for new data collection every two minutes')
-        self.layout_funcs.add_checkbox(object, object.check_for_new_data_collection,
-                                       'object.continously_check_for_new_data_collection')
+        xce_object.check_for_new_data_collection = QtGui.QCheckBox('Check for new data collection every two minutes')
+        self.layout_funcs.add_checkbox(xce_object, xce_object.check_for_new_data_collection,
+                                       'xce_object.continously_check_for_new_data_collection')
 
         # select target dropdown
         select_target_label = QtGui.QLabel('Select Target: ')
         select_target_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
-        object.target_selection_combobox = QtGui.QComboBox()
-        object.populate_target_selection_combobox(object.target_selection_combobox)
-        object.target_selection_combobox.activated[str].connect(object.target_selection_combobox_activated)
-        object.target = str(object.target_selection_combobox.currentText())
+        xce_object.target_selection_combobox = QtGui.QComboBox()
+        xce_object.populate_target_selection_combobox(xce_object.target_selection_combobox)
+        xce_object.target_selection_combobox.activated[str].connect(xce_object.target_selection_combobox_activated)
+        xce_object.target = str(xce_object.target_selection_combobox.currentText())
 
-        object.autocheck_hbox_widgets = [object.check_for_new_data_collection, select_target_label,
-                                         object.target_selection_combobox]  # array defining order of objects to add
+        xce_object.autocheck_hbox_widgets = [xce_object.check_for_new_data_collection, select_target_label,
+                                         xce_object.target_selection_combobox]  # array defining order of xce_objects to add
 
-        self.layout_funcs.add_to_box(object.autocheck_hbox, object.autocheck_hbox_widgets)  # add objects in order
+        self.layout_funcs.add_to_box(xce_object.autocheck_hbox, xce_object.autocheck_hbox_widgets)  # add xce_objects in order
 
         # add target dropdown to top bar
-        object.datasets_data_collection_vbox.addLayout(object.autocheck_hbox)
+        xce_object.datasets_data_collection_vbox.addLayout(xce_object.autocheck_hbox)
 
         # summary sub-tab
         # table
-        object.datasets_summary_table = QtGui.QTableWidget()
-        self.layout_funcs.table_setup(object.datasets_summary_table, object.datasets_summary_table_columns)
-        object.datasets_summarys_vbox_for_table = QtGui.QVBoxLayout()  # setup layout to hold table
-        object.datasets_summarys_vbox_for_table.addWidget(object.datasets_summary_table)  # add table to layout
-        object.datasets_summarys_vbox_for_details = QtGui.QVBoxLayout()  # vbox for details
-        object.data_collection_details_currently_on_display = None  # switch for displaying/updating table
+        xce_object.datasets_summary_table = QtGui.QTableWidget()
+        self.layout_funcs.table_setup(xce_object.datasets_summary_table, xce_object.datasets_summary_table_columns)
+        xce_object.datasets_summarys_vbox_for_table = QtGui.QVBoxLayout()  # setup layout to hold table
+        xce_object.datasets_summarys_vbox_for_table.addWidget(xce_object.datasets_summary_table)  # add table to layout
+        xce_object.datasets_summarys_vbox_for_details = QtGui.QVBoxLayout()  # vbox for details
+        xce_object.data_collection_details_currently_on_display = None  # switch for displaying/updating table
 
-        object.datasets_data_collection_vbox.addWidget(object.datasets_tab_widget)  # add subtab to main tab
+        xce_object.datasets_data_collection_vbox.addWidget(xce_object.datasets_tab_widget)  # add subtab to main tab
 
         # reprocessing sub-tab
         # top options
         # data collection label
         dc_label = QtGui.QLabel('Data collection directory: ')
         dc_label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)  # align left and centre of container
-        object.diffraction_data_dir_label = QtGui.QLabel(object.diffraction_data_directory)  # add directory as text
-        object.diffraction_data_dir_label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)  # align as above
+        xce_object.diffraction_data_dir_label = QtGui.QLabel(xce_object.diffraction_data_directory)  # add directory as text
+        xce_object.diffraction_data_dir_label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)  # align as above
 
         # select label
         select_button = QtGui.QPushButton("Select")
-        select_button.clicked.connect(object.select_diffraction_data_directory)  # attach file open dialogue
+        select_button.clicked.connect(xce_object.select_diffraction_data_directory)  # attach file open dialogue
 
         # search button
         search_button = QtGui.QPushButton("Search Datasets")
-        search_button.clicked.connect(object.search_for_datasets)  # search for datasets in the selected directory
+        search_button.clicked.connect(xce_object.search_for_datasets)  # search for datasets in the selected directory
 
         # search info
-        object.diffraction_data_search_label = QtGui.QLabel(object.diffraction_data_search_info)
+        xce_object.diffraction_data_search_label = QtGui.QLabel(xce_object.diffraction_data_search_info)
 
         # translate label
         translate_label = QtGui.QLabel('translate: datasetID -> sampleID')
@@ -340,29 +340,29 @@ class LayoutObjects():
         # CSV button
         csv_button = QtGui.QPushButton('Open CSV')
         csv_button.setStyleSheet("QPushButton { padding: 1px; margin: 1px }")
-        csv_button.clicked.connect(object.translate_datasetID_to_sampleID)  # open the relevant csv file
+        csv_button.clicked.connect(xce_object.translate_datasetID_to_sampleID)  # open the relevant csv file
 
         # create hbox to hold everything and add widgets to it
-        object.hbox_select = QtGui.QHBoxLayout()  # top options box
-        object.hbox_select_widgets = [dc_label, select_button, search_button, object.diffraction_data_search_label,
-                                      translate_label, csv_button]  # array defining order of objects to be added
-        self.layout_funcs.add_to_box(object.hbox_select, object.hbox_select_widgets)  # add objects in order
+        xce_object.hbox_select = QtGui.QHBoxLayout()  # top options box
+        xce_object.hbox_select_widgets = [dc_label, select_button, search_button, xce_object.diffraction_data_search_label,
+                                      translate_label, csv_button]  # array defining order of xce_objects to be added
+        self.layout_funcs.add_to_box(xce_object.hbox_select, xce_object.hbox_select_widgets)  # add xce_objects in order
 
         # frame to hold everything
         frame_select = QtGui.QFrame()
-        frame_select.setLayout(object.hbox_select)  # apply to containing frame
+        frame_select.setLayout(xce_object.hbox_select)  # apply to containing frame
 
         # table - main body
-        object.datasets_reprocess_table = QtGui.QTableWidget()
-        self.layout_funcs.table_setup(object.datasets_reprocess_table, object.datasets_reprocess_columns)  # setup
+        xce_object.datasets_reprocess_table = QtGui.QTableWidget()
+        self.layout_funcs.table_setup(xce_object.datasets_reprocess_table, xce_object.datasets_reprocess_columns)  # setup
 
         # create context menu - no idea where this lives...
-        object.popMenu_for_datasets_reprocess_table = QtGui.QMenu()
-        run_xia2_on_selected = QtGui.QAction("mark selected for reprocessing", object.window)
-        run_xia2_on_selected.triggered.connect(object.select_sample_for_xia2)
-        object.popMenu_for_datasets_reprocess_table.addAction(run_xia2_on_selected)
-        object.datasets_reprocess_table.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        object.datasets_reprocess_table.customContextMenuRequested.connect(object.on_context_menu_reprocess_data)
+        xce_object.popMenu_for_datasets_reprocess_table = QtGui.QMenu()
+        run_xia2_on_selected = QtGui.QAction("mark selected for reprocessing", xce_object.window)
+        run_xia2_on_selected.triggered.connect(xce_object.select_sample_for_xia2)
+        xce_object.popMenu_for_datasets_reprocess_table.addAction(run_xia2_on_selected)
+        xce_object.datasets_reprocess_table.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        xce_object.datasets_reprocess_table.customContextMenuRequested.connect(xce_object.on_context_menu_reprocess_data)
 
         # options at bottom of tab
         # data processing label
@@ -370,33 +370,33 @@ class LayoutObjects():
         label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
 
         # option checkboxes
-        object.xia2_3d_checkbox = QtGui.QCheckBox('xia2 3d')
-        object.xia2_3dii_checkbox = QtGui.QCheckBox('xia2 3dii')
-        object.xia2_dials_checkbox = QtGui.QCheckBox('Dials')
+        xce_object.xia2_3d_checkbox = QtGui.QCheckBox('xia2 3d')
+        xce_object.xia2_3dii_checkbox = QtGui.QCheckBox('xia2 3dii')
+        xce_object.xia2_dials_checkbox = QtGui.QCheckBox('Dials')
 
         # spacegroup label
         sg_label = QtGui.QLabel('Space Group:')
 
         # spacegroup dropdown menu
-        object.reprocess_space_group_comboxbox = QtGui.QComboBox()
-        object.reprocess_space_group_comboxbox.addItem('ignore')
+        xce_object.reprocess_space_group_comboxbox = QtGui.QComboBox()
+        xce_object.reprocess_space_group_comboxbox.addItem('ignore')
         for sg in XChemMain.space_group_list():
-            object.reprocess_space_group_comboxbox.addItem(sg)
+            xce_object.reprocess_space_group_comboxbox.addItem(sg)
 
         # mtz label
         mtz_label = QtGui.QLabel('Reference MTZ:')
 
         # file label
-        object.reprocess_reference_mtz_file_label = QtGui.QLabel(object.diffraction_data_reference_mtz)
+        xce_object.reprocess_reference_mtz_file_label = QtGui.QLabel(xce_object.diffraction_data_reference_mtz)
 
         # select button
         select_button = QtGui.QPushButton("Select")
-        select_button.clicked.connect(object.select_reprocess_reference_mtz)
+        select_button.clicked.connect(xce_object.select_reprocess_reference_mtz)
 
         # define order of widgets to be added to options hbox
-        hbox_options_widgets = [label, object.xia2_3d_checkbox, object.xia2_3dii_checkbox,
-                                object.xia2_dials_checkbox, sg_label, object.reprocess_space_group_comboxbox,
-                                mtz_label, object.reprocess_reference_mtz_file_label, select_button]
+        hbox_options_widgets = [label, xce_object.xia2_3d_checkbox, xce_object.xia2_3dii_checkbox,
+                                xce_object.xia2_dials_checkbox, sg_label, xce_object.reprocess_space_group_comboxbox,
+                                mtz_label, xce_object.reprocess_reference_mtz_file_label, select_button]
 
         # create hbox, add everything to it and then put it in a frame
         hbox_options = QtGui.QHBoxLayout()
@@ -411,16 +411,15 @@ class LayoutObjects():
         label.setAlignment(QtCore.Qt.AlignCenter)
 
         # res limit isig dropdown menu
-        object.reprocess_isigma_combobox = QtGui.QComboBox()
+        xce_object.reprocess_isigma_combobox = QtGui.QComboBox()
         misigma = ['default', '4', '3', '2.5', '2', '1.5', '1', '0.5']
-        self.layout_funcs.populate_combobox(misigma, object.reprocess_isigma_combobox)
-        object.reprocess_isigma_combobox.setCurrentIndex(0)
-        object.reprocess_isigma_combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
-
+        self.layout_funcs.populate_combobox(misigma, xce_object.reprocess_isigma_combobox)
+        xce_object.reprocess_isigma_combobox.setCurrentIndex(0)
+        xce_object.reprocess_isigma_combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
 
         # create vertical box to add labels and dropdowns to, create box and put in frame
         vbox_isigma = QtGui.QVBoxLayout()
-        vbox_isigma_widgets = [label, object.reprocess_isigma_combobox]
+        vbox_isigma_widgets = [label, xce_object.reprocess_isigma_combobox]
         self.layout_funcs.add_to_box(vbox_isigma, vbox_isigma_widgets)
         frame_isigma = QtGui.QFrame()
         frame_isigma.setLayout(vbox_isigma)
@@ -430,15 +429,15 @@ class LayoutObjects():
         label.setAlignment(QtCore.Qt.AlignCenter)
 
         # res limit cc half dropdown
-        object.reprocess_cc_half_combobox = QtGui.QComboBox()
+        xce_object.reprocess_cc_half_combobox = QtGui.QComboBox()
         cc_half = ['default', '0.9', '0.8', '0.7', '0.6', '0.5', '0.4', '0.3', '0.2', '0.1']
-        self.layout_funcs.populate_combobox(cc_half, object.reprocess_cc_half_combobox)
-        object.reprocess_cc_half_combobox.setCurrentIndex(0)
-        object.reprocess_cc_half_combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
+        self.layout_funcs.populate_combobox(cc_half, xce_object.reprocess_cc_half_combobox)
+        xce_object.reprocess_cc_half_combobox.setCurrentIndex(0)
+        xce_object.reprocess_cc_half_combobox.setStyleSheet(" QComboBox { padding: 1px; margin: 1px }")
 
         # create a vbox for label and dropdown, and add items to it
         vbox_cc_half = QtGui.QVBoxLayout()
-        vbox_cc_half_widgets = [res_cc_label, object.reprocess_cc_half_combobox]
+        vbox_cc_half_widgets = [res_cc_label, xce_object.reprocess_cc_half_combobox]
         self.layout_funcs.add_to_box(vbox_cc_half, vbox_cc_half_widgets)
 
         # create frame to hold everything and add vbox
@@ -454,9 +453,9 @@ class LayoutObjects():
         bottom_options_frame.setLayout(data_protocol_hbox)
 
         # code below sets final layout for whole subtab
-        reprocess_vbox = QtGui.QVBoxLayout()  # box to hold reprocessing subtab content
-        object.reprocess_hbox_widgets = [frame_select, object.datasets_reprocess_table, bottom_options_frame]
-        self.layout_funcs.add_to_box(reprocess_vbox, object.reprocess_hbox_widgets)
+        xce_object.reprocess_vbox = QtGui.QVBoxLayout()  # box to hold reprocessing subtab content
+        xce_object.reprocess_hbox_widgets = [frame_select, xce_object.datasets_reprocess_table, bottom_options_frame]
+        self.layout_funcs.add_to_box(xce_object.reprocess_vbox, xce_object.reprocess_hbox_widgets)
 
         ################################################################################################################
         #                                                                                                              #
@@ -464,44 +463,45 @@ class LayoutObjects():
         #                                                                                                              #
         ################################################################################################################
         # select box for dimple
-        object.select_sample_for_dimple_box = QtGui.QCheckBox('(de-)select all samples for DIMPLE')
-        self.layout_funcs.add_checkbox(object, object.select_sample_for_dimple_box, 'object.set_run_dimple_flag')
+        xce_object.select_sample_for_dimple_box = QtGui.QCheckBox('(de-)select all samples for DIMPLE')
+        self.layout_funcs.add_checkbox(xce_object, xce_object.select_sample_for_dimple_box,
+                                       'xce_object.set_run_dimple_flag')
 
         # set new reference button
         set_new_reference_button = QtGui.QPushButton("Set New Reference (if applicable)")
-        set_new_reference_button.clicked.connect(object.set_new_reference_if_applicable)
+        set_new_reference_button.clicked.connect(xce_object.set_new_reference_if_applicable)
 
         # refresh button
         refresh_reference_file_list_button = QtGui.QPushButton("Refresh reference file list")
-        refresh_reference_file_list_button.clicked.connect(object.refresh_reference_file_list)
+        refresh_reference_file_list_button.clicked.connect(xce_object.refresh_reference_file_list)
 
         # list and populate reference files
-        object.reference_file_list = object.get_reference_file_list(' ')
-        object.reference_file_selection_combobox = QtGui.QComboBox()
-        object.populate_reference_combobox(object.reference_file_selection_combobox)
+        xce_object.reference_file_list = xce_object.get_reference_file_list(' ')
+        xce_object.reference_file_selection_combobox = QtGui.QComboBox()
+        xce_object.populate_reference_combobox(xce_object.reference_file_selection_combobox)
 
         # setup hbox to hold everything and add widgets
-        maps_checkbutton_hbox = QtGui.QHBoxLayout()
-        maps_checkbutton_widgets = [object.select_sample_for_dimple_box, set_new_reference_button,
-                                    refresh_reference_file_list_button, object.reference_file_selection_combobox]
+        xce_object.maps_checkbutton_hbox = QtGui.QHBoxLayout()
+        maps_checkbutton_widgets = [xce_object.select_sample_for_dimple_box, set_new_reference_button,
+                                    refresh_reference_file_list_button, xce_object.reference_file_selection_combobox]
 
-        self.layout_funcs.add_to_box(maps_checkbutton_hbox, maps_checkbutton_widgets)
+        self.layout_funcs.add_to_box(xce_object.maps_checkbutton_hbox, maps_checkbutton_widgets)
 
         # table setup
-        object.maps_table = QtGui.QTableWidget()
-        self.layout_funcs.table_setup(object.maps_table, object.maps_table_columns)
+        xce_object.maps_table = QtGui.QTableWidget()
+        self.layout_funcs.table_setup(xce_object.maps_table, xce_object.maps_table_columns)
 
         # box for table, add to box, add to tab
-        object.initial_model_vbox_for_table = QtGui.QVBoxLayout()
-        object.initial_model_vbox_for_table.addWidget(object.maps_table)
+        xce_object.initial_model_vbox_for_table = QtGui.QVBoxLayout()
+        xce_object.initial_model_vbox_for_table.addWidget(xce_object.maps_table)
 
         # create context menu... no idea where this lives again.
-        object.popMenu_for_maps_table = QtGui.QMenu()
-        run_dimple = QtGui.QAction("mark selected for dimple run", object.window)
-        run_dimple.triggered.connect(object.select_sample_for_dimple)
-        object.popMenu_for_maps_table.addAction(run_dimple)
-        object.maps_table.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        object.maps_table.customContextMenuRequested.connect(object.on_context_menu_initial_model)
+        xce_object.popMenu_for_maps_table = QtGui.QMenu()
+        run_dimple = QtGui.QAction("mark selected for dimple run", xce_object.window)
+        run_dimple.triggered.connect(xce_object.select_sample_for_dimple)
+        xce_object.popMenu_for_maps_table.addAction(run_dimple)
+        xce_object.maps_table.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        xce_object.maps_table.customContextMenuRequested.connect(xce_object.on_context_menu_initial_model)
 
         ################################################################################################################
         #                                                                                                              #
@@ -516,9 +516,9 @@ class LayoutObjects():
                            'Statistical Map Summaries']
 
         # setup tab widget, set up tab dict, and make tab dict
-        object.pandda_tab_widget = QtGui.QTabWidget()
-        object.pandda_tab_dict = {}
-        self.layout_funcs.make_tab_dict(pandda_tab_list, object.pandda_tab_widget, object.pandda_tab_dict)
+        xce_object.pandda_tab_widget = QtGui.QTabWidget()
+        xce_object.pandda_tab_dict = {}
+        self.layout_funcs.make_tab_dict(pandda_tab_list, xce_object.pandda_tab_widget, xce_object.pandda_tab_dict)
 
         # pandda analyse subtab
         # setup a grid to hold everything
@@ -527,16 +527,16 @@ class LayoutObjects():
         grid_pandda.setRowStretch(0, 20)
 
         # table - left
-        object.pandda_analyse_data_table = QtGui.QTableWidget()
-        self.layout_funcs.table_setup(object.pandda_analyse_data_table, object.pandda_table_columns)
+        xce_object.pandda_analyse_data_table = QtGui.QTableWidget()
+        self.layout_funcs.table_setup(xce_object.pandda_analyse_data_table, xce_object.pandda_table_columns)
 
         # add table to grid
         frame_pandda = QtGui.QFrame()
-        grid_pandda.addWidget(object.pandda_analyse_data_table, 0, 0)
+        grid_pandda.addWidget(xce_object.pandda_analyse_data_table, 0, 0)
 
         # status of pandda job - under table
-        object.pandda_status = 'UNKNOWN'
-        object.pandda_status_label = QtGui.QLabel()
+        xce_object.pandda_status = 'UNKNOWN'
+        xce_object.pandda_status_label = QtGui.QLabel()
 
         # status options [filename, test to output, colour of text]
         pandda_status_options = [['/pandda.done', 'Finished!', 'color: green'],
@@ -546,309 +546,406 @@ class LayoutObjects():
 
         # enumerate text options and set text under table
         for option in pandda_status_options:
-            if os.path.exists(str(object.panddas_directory + option[0])):
-                object.pandda_status = option[1]
-                object.pandda_status_label.setStyleSheet(option[2])
+            if os.path.exists(str(xce_object.panddas_directory + option[0])):
+                xce_object.pandda_status = option[1]
+                xce_object.pandda_status_label.setStyleSheet(option[2])
 
-        object.pandda_status_label.setText(str('STATUS: ' + object.pandda_status))
-        object.pandda_status_label.setFont(QtGui.QFont("Arial", 25, QtGui.QFont.Bold))
-        grid_pandda.addWidget(object.pandda_status_label, 3, 0)
+        xce_object.pandda_status_label.setText(str('STATUS: ' + xce_object.pandda_status))
+        xce_object.pandda_status_label.setFont(QtGui.QFont("Arial", 25, QtGui.QFont.Bold))
+        grid_pandda.addWidget(xce_object.pandda_status_label, 3, 0)
 
         # input parameters for PANDDAs run - right
         frame_right = QtGui.QFrame()
 
-        object.pandda_analyse_input_params_vbox = QtGui.QVBoxLayout()
+        xce_object.pandda_analyse_input_params_vbox = QtGui.QVBoxLayout()
 
+        # data directory section
         pandda_input_dir_hbox = QtGui.QHBoxLayout()
         label = QtGui.QLabel('Data directory:')
-        object.pandda_analyse_input_params_vbox.addWidget(label)
-        object.pandda_input_data_dir_entry = QtGui.QLineEdit()
-        object.pandda_input_data_dir_entry.setText(os.path.join(object.initial_model_directory, '*'))
-        pandda_input_dir_hbox.addWidget(object.pandda_input_data_dir_entry)
-        object.select_pandda_input_dir_button = QtGui.QPushButton("Select Input Template")
-        object.select_pandda_input_dir_button.clicked.connect(object.select_pandda_input_template)
-        pandda_input_dir_hbox.addWidget(object.select_pandda_input_dir_button)
-        object.pandda_analyse_input_params_vbox.addLayout(pandda_input_dir_hbox)
+        xce_object.pandda_analyse_input_params_vbox.addWidget(label)
+        xce_object.pandda_input_data_dir_entry = QtGui.QLineEdit()
+        xce_object.pandda_input_data_dir_entry.setText(os.path.join(xce_object.initial_model_directory, '*'))
+        pandda_input_dir_hbox.addWidget(xce_object.pandda_input_data_dir_entry)
+        xce_object.select_pandda_input_dir_button = QtGui.QPushButton("Select Input Template")
+        xce_object.select_pandda_input_dir_button.clicked.connect(xce_object.select_pandda_input_template)
+        pandda_input_dir_hbox.addWidget(xce_object.select_pandda_input_dir_button)
+        xce_object.pandda_analyse_input_params_vbox.addLayout(pandda_input_dir_hbox)
 
+        # pdb style section
         pandda_pdb_style_hbox = QtGui.QHBoxLayout()
         label = QtGui.QLabel('pdb style')
         pandda_pdb_style_hbox.addWidget(label)
-        object.pandda_pdb_style_entry = QtGui.QLineEdit()
-        object.pandda_pdb_style_entry.setText('dimple.pdb')
-        #object.pandda_pdb_style_entry.setFixedWidth(200)
-        pandda_pdb_style_hbox.addWidget(object.pandda_pdb_style_entry)
-        object.pandda_analyse_input_params_vbox.addLayout(pandda_pdb_style_hbox)
+        xce_object.pandda_pdb_style_entry = QtGui.QLineEdit()
+        xce_object.pandda_pdb_style_entry.setText('dimple.pdb')
+        pandda_pdb_style_hbox.addWidget(xce_object.pandda_pdb_style_entry)
+        xce_object.pandda_analyse_input_params_vbox.addLayout(pandda_pdb_style_hbox)
 
+        # mtz style section
         pandda_mtz_style_hbox = QtGui.QHBoxLayout()
         label = QtGui.QLabel('mtz style')
         pandda_mtz_style_hbox.addWidget(label)
-        object.pandda_mtz_style_entry = QtGui.QLineEdit()
-        object.pandda_mtz_style_entry.setText('dimple.mtz')
-        pandda_mtz_style_hbox.addWidget(object.pandda_mtz_style_entry)
-        object.pandda_analyse_input_params_vbox.addLayout(pandda_mtz_style_hbox)
+        xce_object.pandda_mtz_style_entry = QtGui.QLineEdit()
+        xce_object.pandda_mtz_style_entry.setText('dimple.mtz')
+        pandda_mtz_style_hbox.addWidget(xce_object.pandda_mtz_style_entry)
+        xce_object.pandda_analyse_input_params_vbox.addLayout(pandda_mtz_style_hbox)
 
+        # spacer to separate out sections
+        spacer = QtGui.QLabel(' ')
+        xce_object.pandda_analyse_input_params_vbox.addWidget(spacer)
+
+        # output directory section
         pandda_output_dir_hbox = QtGui.QHBoxLayout()
         label = QtGui.QLabel('Output directory:')
-        object.pandda_analyse_input_params_vbox.addWidget(label)
-        object.pandda_output_data_dir_entry = QtGui.QLineEdit()
-        object.pandda_output_data_dir_entry.setText(object.panddas_directory)
-        pandda_output_dir_hbox.addWidget(object.pandda_output_data_dir_entry)
-        object.select_pandda_output_dir_button = QtGui.QPushButton("Select PANNDAs Directory")
-        object.select_pandda_output_dir_button.clicked.connect(object.settings_button_clicked)
-        pandda_output_dir_hbox.addWidget(object.select_pandda_output_dir_button)
-        object.pandda_analyse_input_params_vbox.addLayout(pandda_output_dir_hbox)
+        xce_object.pandda_analyse_input_params_vbox.addWidget(label)
+        xce_object.pandda_output_data_dir_entry = QtGui.QLineEdit()
+        xce_object.pandda_output_data_dir_entry.setText(xce_object.panddas_directory)
+        pandda_output_dir_hbox.addWidget(xce_object.pandda_output_data_dir_entry)
+        xce_object.select_pandda_output_dir_button = QtGui.QPushButton("Select PANNDAs Directory")
+        xce_object.select_pandda_output_dir_button.clicked.connect(xce_object.settings_button_clicked)
+        pandda_output_dir_hbox.addWidget(xce_object.select_pandda_output_dir_button)
+        xce_object.pandda_analyse_input_params_vbox.addLayout(pandda_output_dir_hbox)
+
+        xce_object.pandda_analyse_input_params_vbox.addWidget(spacer)
 
         # qstat or local machine
-        label = QtGui.QLabel('submit')
-        object.pandda_analyse_input_params_vbox.addWidget(label)
-        object.pandda_submission_mode_selection_combobox = QtGui.QComboBox()
-        if object.external_software['qsub']:
-            object.pandda_submission_mode_selection_combobox.addItem('qsub')
-        object.pandda_submission_mode_selection_combobox.addItem('local machine')
-        object.pandda_analyse_input_params_vbox.addWidget(object.pandda_submission_mode_selection_combobox)
+        label = QtGui.QLabel('Submit:')
+        xce_object.pandda_analyse_input_params_vbox.addWidget(label)
+        xce_object.pandda_submission_mode_selection_combobox = QtGui.QComboBox()
+        if xce_object.external_software['qsub']:
+            xce_object.pandda_submission_mode_selection_combobox.addItem('qsub')
+        xce_object.pandda_submission_mode_selection_combobox.addItem('local machine')
+        xce_object.pandda_analyse_input_params_vbox.addWidget(xce_object.pandda_submission_mode_selection_combobox)
 
-        label = QtGui.QLabel('Number of processors')
-        object.pandda_analyse_input_params_vbox.addWidget(label)
-        object.pandda_nproc = multiprocessing.cpu_count() - 1
-        object.pandda_nproc_entry = QtGui.QLineEdit()
-        object.pandda_nproc_entry.setText(str(object.pandda_nproc).replace(' ', ''))
-        object.pandda_analyse_input_params_vbox.addWidget(object.pandda_nproc_entry)
+        # number of processors section
+        label = QtGui.QLabel('Number of processors:')
+        xce_object.pandda_analyse_input_params_vbox.addWidget(label)
+        xce_object.pandda_nproc = multiprocessing.cpu_count() - 1
+        xce_object.pandda_nproc_entry = QtGui.QLineEdit()
+        xce_object.pandda_nproc_entry.setText(str(xce_object.pandda_nproc).replace(' ', ''))
+        xce_object.pandda_analyse_input_params_vbox.addWidget(xce_object.pandda_nproc_entry)
 
-        label = QtGui.QLabel('Nrder events by:')
-        object.pandda_analyse_input_params_vbox.addWidget(label)
-        object.pandda_sort_event_combobox = QtGui.QComboBox()
+        xce_object.pandda_analyse_input_params_vbox.addWidget(spacer)
+
+        # how to order events
+        label = QtGui.QLabel('Order events by:')
+        xce_object.pandda_analyse_input_params_vbox.addWidget(label)
+        xce_object.pandda_sort_event_combobox = QtGui.QComboBox()
         pandda_events = ['cluster_size', 'z_peak']
-        self.layout_funcs.populate_combobox(pandda_events, object.pandda_sort_event_combobox)
-        object.pandda_analyse_input_params_vbox.addWidget(object.pandda_sort_event_combobox)
+        self.layout_funcs.populate_combobox(pandda_events, xce_object.pandda_sort_event_combobox)
+        xce_object.pandda_analyse_input_params_vbox.addWidget(xce_object.pandda_sort_event_combobox)
 
         # crystal form option
         label = QtGui.QLabel('Use space group of reference file as filter:')
-        object.pandda_analyse_input_params_vbox.addWidget(label)
+        xce_object.pandda_analyse_input_params_vbox.addWidget(label)
         # reference file combobox, label with spg display
         hbox = QtGui.QHBoxLayout()
-        object.reference_file_list = object.get_reference_file_list(' ')
-        object.pandda_reference_file_selection_combobox = QtGui.QComboBox()
-        object.populate_reference_combobox(object.pandda_reference_file_selection_combobox)
-        object.pandda_reference_file_selection_combobox.activated[str].connect(object.change_pandda_spg_label)
-        hbox.addWidget(object.pandda_reference_file_selection_combobox)
-        object.pandda_reference_file_spg_label = QtGui.QLabel()
-        hbox.addWidget(object.pandda_reference_file_spg_label)
-        object.pandda_analyse_input_params_vbox.addLayout(hbox)
+        xce_object.reference_file_list = xce_object.get_reference_file_list(' ')
+        xce_object.pandda_reference_file_selection_combobox = QtGui.QComboBox()
+        xce_object.populate_reference_combobox(xce_object.pandda_reference_file_selection_combobox)
+        xce_object.pandda_reference_file_selection_combobox.activated[str].connect(xce_object.change_pandda_spg_label)
+        hbox.addWidget(xce_object.pandda_reference_file_selection_combobox)
+        xce_object.pandda_reference_file_spg_label = QtGui.QLabel()
+        hbox.addWidget(xce_object.pandda_reference_file_spg_label)
+        xce_object.pandda_analyse_input_params_vbox.addLayout(hbox)
 
-        label = QtGui.QLabel('\nExpert Parameters (only change if you know what you are doing!):')
-        object.pandda_analyse_input_params_vbox.addWidget(label)
+        xce_object.pandda_analyse_input_params_vbox.addWidget(spacer)
 
-        object.wilson_checkbox = QtGui.QCheckBox('Wilson B-factor Scaling')
-        self.layout_funcs.add_checkbox(object, object.wilson_checkbox, 'object.set_run_dimple_flag')
+        # Expert parameters
+        label = QtGui.QLabel('Expert Parameters (only change if you know what you are doing!):')
+        xce_object.pandda_analyse_input_params_vbox.addWidget(label)
+
+        xce_object.pandda_analyse_input_params_vbox.addWidget(spacer)
+
+        xce_object.wilson_checkbox = QtGui.QCheckBox('Wilson B-factor Scaling')
+        self.layout_funcs.add_checkbox(xce_object, xce_object.wilson_checkbox, 'xce_object.set_run_dimple_flag')
 
         # minimum number of datasets
         label = QtGui.QLabel('min_build_datasets')
-        object.pandda_analyse_input_params_vbox.addWidget(label)
-        object.pandda_min_build_dataset_entry = QtGui.QLineEdit()
-        object.pandda_min_build_dataset_entry.setText('40')
-        #object.pandda_min_build_dataset_entry.setFixedWidth(200)
-        object.pandda_analyse_input_params_vbox.addWidget(object.pandda_min_build_dataset_entry)
+        xce_object.pandda_analyse_input_params_vbox.addWidget(label)
+        xce_object.pandda_min_build_dataset_entry = QtGui.QLineEdit()
+        xce_object.pandda_min_build_dataset_entry.setText('40')
+        xce_object.pandda_analyse_input_params_vbox.addWidget(xce_object.pandda_min_build_dataset_entry)
 
+        # maximum number of datasets
         label = QtGui.QLabel('max_new_datasets')
-        object.pandda_analyse_input_params_vbox.addWidget(label)
-        object.pandda_max_new_datasets_entry = QtGui.QLineEdit()
-        object.pandda_max_new_datasets_entry.setText('500')
-        #object.pandda_max_new_datasets_entry.setFixedWidth(200)
-        object.pandda_analyse_input_params_vbox.addWidget(object.pandda_max_new_datasets_entry)
+        xce_object.pandda_analyse_input_params_vbox.addWidget(label)
+        xce_object.pandda_max_new_datasets_entry = QtGui.QLineEdit()
+        xce_object.pandda_max_new_datasets_entry.setText('500')
+        xce_object.pandda_analyse_input_params_vbox.addWidget(xce_object.pandda_max_new_datasets_entry)
 
+        # grid spacing
         label = QtGui.QLabel(
             'grid_spacing (default=0.5)\nNote: higher values speed up calculations, but maps might be less pretty)')
-        object.pandda_analyse_input_params_vbox.addWidget(label)
-        object.pandda_grid_spacing_entry = QtGui.QLineEdit()
-        object.pandda_grid_spacing_entry.setText('0.5')
-        #object.pandda_grid_spacing_entry.setFixedWidth(200)
-        object.pandda_analyse_input_params_vbox.addWidget(object.pandda_grid_spacing_entry)
-
-        object.pandda_analyse_input_params_vbox.addStretch(1)
-
-        frame_right.setSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Minimum)
-        frame_right.setLayout(object.pandda_analyse_input_params_vbox)
+        xce_object.pandda_analyse_input_params_vbox.addWidget(label)
+        xce_object.pandda_grid_spacing_entry = QtGui.QLineEdit()
+        xce_object.pandda_grid_spacing_entry.setText('0.5')
+        xce_object.pandda_analyse_input_params_vbox.addWidget(xce_object.pandda_grid_spacing_entry)
+        frame_right.setLayout(xce_object.pandda_analyse_input_params_vbox)
 
         grid_pandda.addWidget(frame_right, 0, 1, 5, 5)
         frame_pandda.setLayout(grid_pandda)
 
         # these are still currently populated in XCE.py - change
-        object.pandda_map_list = QtGui.QComboBox()
-        object.pandda_maps_html = QtWebKit.QWebView()
+        xce_object.pandda_map_list = QtGui.QComboBox()
+        xce_object.pandda_maps_html = QtWebKit.QWebView()
 
         # statistical map summaries vbox, add to vbox and add to layout
-        object.pandda_map_layout = QtGui.QVBoxLayout()
-        pandda_map_layout_widgets = [object.pandda_map_list, object.pandda_maps_html]
-        self.layout_funcs.add_to_box(object.pandda_map_layout, pandda_map_layout_widgets)
-        object.pandda_maps_html.show()
+        xce_object.pandda_map_layout = QtGui.QVBoxLayout()
+        pandda_map_layout_widgets = [xce_object.pandda_map_list, xce_object.pandda_maps_html]
+        self.layout_funcs.add_to_box(xce_object.pandda_map_layout, pandda_map_layout_widgets)
+        xce_object.pandda_maps_html.show()
 
-        object.pandda_analyse_hbox = QtGui.QHBoxLayout()
-        object.pandda_analyse_hbox.addWidget(frame_pandda)
+        xce_object.pandda_analyse_hbox = QtGui.QHBoxLayout()
+        xce_object.pandda_analyse_hbox.addWidget(frame_pandda)
 
         # next three blocks display html documents created by pandda.analyse
-        self.layout_funcs.pandda_html(object)
+        self.layout_funcs.pandda_html(xce_object)
 
-        object.pandda_initial_html = QtWebKit.QWebView()
-        object.pandda_initial_html.load(QtCore.QUrl(object.pandda_initial_html_file))
-        object.pandda_initial_html.show()
+        xce_object.pandda_initial_html = QtWebKit.QWebView()
+        xce_object.pandda_initial_html.load(QtCore.QUrl(xce_object.pandda_initial_html_file))
+        xce_object.pandda_initial_html.show()
 
-        object.pandda_analyse_html = QtWebKit.QWebView()
-        object.pandda_analyse_html.load(QtCore.QUrl(object.pandda_analyse_html_file))
-        object.pandda_analyse_html.show()
+        xce_object.pandda_analyse_html = QtWebKit.QWebView()
+        xce_object.pandda_analyse_html.load(QtCore.QUrl(xce_object.pandda_analyse_html_file))
+        xce_object.pandda_analyse_html.show()
 
-        object.pandda_inspect_html = QtWebKit.QWebView()
-        object.pandda_analyse_html.load(QtCore.QUrl(object.pandda_inspect_html_file))
-        object.pandda_analyse_html.show()
+        xce_object.pandda_inspect_html = QtWebKit.QWebView()
+        xce_object.pandda_analyse_html.load(QtCore.QUrl(xce_object.pandda_inspect_html_file))
+        xce_object.pandda_analyse_html.show()
 
-        object.panddas_results_vbox = QtGui.QVBoxLayout()
-        object.panddas_results_vbox.addWidget(object.pandda_tab_widget)
-        object.show_pandda_html_summary()
+        xce_object.panddas_results_vbox = QtGui.QVBoxLayout()
+        xce_object.panddas_results_vbox.addWidget(xce_object.pandda_tab_widget)
+        xce_object.show_pandda_html_summary()
 
         ################################################################################################################
         #                                                                                                              #
         #                                                REFINEMENT TAB                                                #
         #                                                                                                              #
         ################################################################################################################
-        object.summary_vbox_for_table = QtGui.QVBoxLayout()
+        xce_object.summary_vbox_for_table = QtGui.QVBoxLayout()
 
         # table
-        object.refinement_table = QtGui.QTableWidget()
-        self.layout_funcs.table_setup(object.refinement_table, object.refinement_table_columns)
-        object.summary_vbox_for_table.addWidget(object.refinement_table)
+        xce_object.refinement_table = QtGui.QTableWidget()
+        self.layout_funcs.table_setup(xce_object.refinement_table, xce_object.refinement_table_columns)
+        xce_object.summary_vbox_for_table.addWidget(xce_object.refinement_table)
 
         ################################################################################################################
         #                                                                                                              #
         #                                                DEPOSITION TAB                                                #
         #                                                                                                              #
         ################################################################################################################
-        object.deposition_vbox = QtGui.QVBoxLayout()
+        xce_object.deposition_vbox = QtGui.QVBoxLayout()
 
         scroll = QtGui.QScrollArea()
-        object.deposition_vbox.addWidget(scroll)
+        xce_object.deposition_vbox.addWidget(scroll)
         scrollContent = QtGui.QWidget(scroll)
-
         scrollLayout = QtGui.QVBoxLayout(scrollContent)
         scrollContent.setLayout(scrollLayout)
 
-        label_title = QtGui.QLabel('HTML export & ZENODO upload')
-        label_title.setStyleSheet("font: 30pt Comic Sans MS")
-        scrollLayout.addWidget(label_title)
+        # deposition page heading
+        deposition_page_heading = QtGui.QLabel('HTML export & ZENODO upload')
+        deposition_page_heading.setStyleSheet("font: 30pt Arial Bold")
+        scrollLayout.addWidget(deposition_page_heading)
+
+        # spacer
         scrollLayout.addWidget(QtGui.QLabel(''))
-        label_text = QtGui.QLabel(XChemToolTips.html_summary_introduction())
-        label_text.setStyleSheet("font: 17pt Arial")
-        scrollLayout.addWidget(label_text)
+
+        # introduction text
+        introduction_text = QtGui.QLabel(XChemToolTips.html_summary_introduction())
+        introduction_text.setStyleSheet("font: 17pt Arial")
+        scrollLayout.addWidget(introduction_text)
+
+        # spacer
         scrollLayout.addWidget(QtGui.QLabel(''))
-        image = QtGui.QLabel()
-        pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'), 'image', 'html_summary_page.png'))
-        image.setPixmap(pixmap)
-        scrollLayout.addWidget(image)
+
+        # zenodo example image
+        zenodo_image = QtGui.QLabel()
+        zenodo_pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'), 'image', 'html_summary_page.png'))
+        zenodo_image.setPixmap(zenodo_pixmap)
+        scrollLayout.addWidget(zenodo_image)
+
+        # spaer
         scrollLayout.addWidget(QtGui.QLabel(''))
-        label_heading = QtGui.QLabel('1. Specify HTML export directory in the settings tab')
-        label_heading.setStyleSheet("font: bold 20pt Arial")
-        scrollLayout.addWidget(label_heading)
-        label_text = QtGui.QLabel(XChemToolTips.html_export_directory_background())
-        label_text.setStyleSheet("font: 17pt Arial")
-        scrollLayout.addWidget(label_text)
+
+        # export html directory heading
+        export_html_heading = QtGui.QLabel('1. Specify HTML export directory in the settings tab')
+        export_html_heading.setStyleSheet("font: bold 20pt Arial")
+        scrollLayout.addWidget(export_html_heading)
+
+        # export html directory text
+        export_html_text = QtGui.QLabel(XChemToolTips.html_export_directory_background())
+        export_html_text.setStyleSheet("font: 17pt Arial")
+        scrollLayout.addWidget(export_html_text)
+
+        # default for dls
         if os.getcwd().startswith('/dls'):
-            label_text = QtGui.QLabel(
+            dls_dir_text = QtGui.QLabel(
                 'Note: default for labxchem project at DLS is <labxchem_directory>/processing/html.')
-            label_text.setStyleSheet("font: 17pt Arial")
-            scrollLayout.addWidget(label_text)
-            label_text = QtGui.QLabel('In your case: ' + object.html_export_directory)
-            label_text.setStyleSheet("font: 17pt Arial")
-            scrollLayout.addWidget(label_text)
-        scrollLayout.addWidget(QtGui.QLabel('\n'))
-        label_heading = QtGui.QLabel("2. Prepare files for HTML export")
-        label_heading.setStyleSheet("font: bold 20pt Arial")
-        scrollLayout.addWidget(label_heading)
-        label_text = QtGui.QLabel(XChemToolTips.html_export_step())
-        label_text.setStyleSheet("font: 17pt Arial")
-        scrollLayout.addWidget(label_text)
-        button = QtGui.QPushButton('Export to HTML')
-        button.clicked.connect(object.export_to_html)
-        button.setMaximumWidth(200)
-        scrollLayout.addWidget(button)
-        scrollLayout.addWidget(QtGui.QLabel('\n'))
-        label_heading = QtGui.QLabel("3. Prepare ICB files")
-        label_heading.setStyleSheet("font: bold 20pt Arial")
-        scrollLayout.addWidget(label_heading)
+            dls_dir_text.setStyleSheet("font: 17pt Arial")
+            scrollLayout.addWidget(dls_dir_text)
 
-        label_text = QtGui.QLabel(XChemToolTips.icb_file_background())
-        label_text.setStyleSheet("font: 17pt Arial")
-        scrollLayout.addWidget(label_text)
+            # user specific directory
+            usr_dir_text = QtGui.QLabel('In your case: ' + xce_object.html_export_directory)
+            usr_dir_text.setStyleSheet("font: 17pt Arial")
+            scrollLayout.addWidget(usr_dir_text)
 
-        label_text = QtGui.QLabel(XChemToolTips.prepare_ICB_files())
-        label_text.setStyleSheet("font: 17pt Arial")
-        scrollLayout.addWidget(label_text)
-        button = QtGui.QPushButton('Open ICM-pro')
-        button.clicked.connect(object.open_icm)
-        button.setMaximumWidth(200)
-        scrollLayout.addWidget(button)
+        # spacer
+        scrollLayout.addWidget(QtGui.QLabel('\n'))
+
+        # html prep heading
+        html_prep_heading = QtGui.QLabel("2. Prepare files for HTML export")
+        html_prep_heading.setStyleSheet("font: bold 20pt Arial")
+        scrollLayout.addWidget(html_prep_heading)
+
+        # html prep test
+        html_prep_text = QtGui.QLabel(XChemToolTips.html_export_step())
+        html_prep_text.setStyleSheet("font: 17pt Arial")
+        scrollLayout.addWidget(html_prep_text)
+
+        # html export button
+        html_export_button = QtGui.QPushButton('Export to HTML')
+        html_export_button.clicked.connect(xce_object.export_to_html)
+        html_export_button.setMaximumWidth(200)
+        scrollLayout.addWidget(html_export_button)
+
+        # spacer
+        scrollLayout.addWidget(QtGui.QLabel('\n'))
+
+        # prepare ICM heading
+        ICM_heading = QtGui.QLabel("3. Prepare ICM files")
+        ICM_heading.setStyleSheet("font: bold 20pt Arial")
+        scrollLayout.addWidget(ICM_heading)
+
+        # ICM background text
+        ICM_bgr_text = QtGui.QLabel(XChemToolTips.icb_file_background())
+        ICM_bgr_text.setStyleSheet("font: 17pt Arial")
+        scrollLayout.addWidget(ICM_bgr_text)
+
+        # ICM prep text
+        ICM_prep_text = QtGui.QLabel(XChemToolTips.prepare_ICB_files())
+        ICM_prep_text.setStyleSheet("font: 17pt Arial")
+        scrollLayout.addWidget(ICM_prep_text)
+
+        # Open ICM button
+        ICM_button = QtGui.QPushButton('Open ICM-pro')
+        ICM_button.clicked.connect(xce_object.open_icm)
+        ICM_button.setMaximumWidth(200)
+        scrollLayout.addWidget(ICM_button)
+
+        # spacer
         scrollLayout.addWidget(QtGui.QLabel(''))
-        image = QtGui.QLabel()
-        pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'), 'image', 'drag_and_drop_icb_file.png'))
-        image.setPixmap(pixmap)
-        scrollLayout.addWidget(image)
+
+        # ICM loading image
+        ICM_image = QtGui.QLabel()
+        ICM_pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'), 'image', 'drag_and_drop_icb_file.png'))
+        ICM_image.setPixmap(ICM_pixmap)
+        scrollLayout.addWidget(ICM_image)
+
+        # spacer
         scrollLayout.addWidget(QtGui.QLabel(''))
-        image = QtGui.QLabel()
-        pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'), 'image', 'run_icm_script.png'))
-        image.setPixmap(pixmap)
-        scrollLayout.addWidget(image)
+
+        # ICM run image
+        ICM_run_image = QtGui.QLabel()
+        ICM_run_pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'), 'image', 'run_icm_script.png'))
+        ICM_run_image.setPixmap(ICM_run_pixmap)
+        scrollLayout.addWidget(ICM_run_image)
+
+        # spacer
         scrollLayout.addWidget(QtGui.QLabel('\n'))
-        label_heading = QtGui.QLabel("4. Prepare files for ZENODO upload")
-        label_heading.setStyleSheet("font: bold 20pt Arial")
-        scrollLayout.addWidget(label_heading)
-        label_text = QtGui.QLabel(XChemToolTips.zenodo_upload_start(object.html_export_directory))
-        label_text.setStyleSheet("font: 17pt Arial")
-        scrollLayout.addWidget(label_text)
-        button = QtGui.QPushButton('prepare files')
-        button.clicked.connect(object.prepare_files_for_zenodo_upload)
-        button.setMaximumWidth(200)
-        scrollLayout.addWidget(button)
+
+        # zenodo upload heading 1
+        zenodo_upload_heading = QtGui.QLabel("4. Prepare files for ZENODO upload")
+        zenodo_upload_heading.setStyleSheet("font: bold 20pt Arial")
+        scrollLayout.addWidget(zenodo_upload_heading)
+
+        # zenodo upload text 1
+        zenodo_upload_text = QtGui.QLabel(XChemToolTips.zenodo_upload_start(xce_object.html_export_directory))
+        zenodo_upload_text.setStyleSheet("font: 17pt Arial")
+        scrollLayout.addWidget(zenodo_upload_text)
+
+        # prepare files button
+        prep_files_button = QtGui.QPushButton('prepare files')
+        prep_files_button.clicked.connect(xce_object.prepare_files_for_zenodo_upload)
+        prep_files_button.setMaximumWidth(200)
+        scrollLayout.addWidget(prep_files_button)
+
+        # spacer
         scrollLayout.addWidget(QtGui.QLabel('\n'))
-        label_heading = QtGui.QLabel("5. ZENODO")
-        label_heading.setStyleSheet("font: bold 20pt Arial")
-        scrollLayout.addWidget(label_heading)
-        label_text = QtGui.QLabel(XChemToolTips.zenodo_upload_part_one(object.html_export_directory))
-        label_text.setStyleSheet("font: 17pt Arial")
-        scrollLayout.addWidget(label_text)
-        image = QtGui.QLabel()
-        pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'), 'image', 'new_zenodo_upload.png'))
-        image.setPixmap(pixmap)
-        scrollLayout.addWidget(image)
+
+        # zenodo upload heading 2
+        zenodo_upload_heading2 = QtGui.QLabel("5. ZENODO")
+        zenodo_upload_heading2.setStyleSheet("font: bold 20pt Arial")
+        scrollLayout.addWidget(zenodo_upload_heading2)
+
+        # zenodo upload text 2
+        zenodo_upload_text2 = QtGui.QLabel(XChemToolTips.zenodo_upload_part_one(xce_object.html_export_directory))
+        zenodo_upload_text2.setStyleSheet("font: 17pt Arial")
+        scrollLayout.addWidget(zenodo_upload_text2)
+
+        # zenodo upload image
+        zenodo_upload_image = QtGui.QLabel()
+        zenodo_upload_pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'), 'image',
+                                                          'new_zenodo_upload.png'))
+        zenodo_upload_image.setPixmap(zenodo_upload_pixmap)
+        scrollLayout.addWidget(zenodo_upload_image)
+
+        # spacer
         scrollLayout.addWidget(QtGui.QLabel('\n'))
-        label_heading = QtGui.QLabel("5. ZENODO upload ID")
-        label_heading.setStyleSheet("font: bold 20pt Arial")
-        scrollLayout.addWidget(label_heading)
-        label_text = QtGui.QLabel(XChemToolTips.zenodo_upload_part_two())
-        label_text.setStyleSheet("font: 17pt Arial")
-        scrollLayout.addWidget(label_text)
-        image = QtGui.QLabel()
-        pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'), 'image', 'zenodo_upload_id.png'))
-        image.setPixmap(pixmap)
-        scrollLayout.addWidget(image)
-        label_text = QtGui.QLabel(XChemToolTips.zenodo_upload_part_three())
-        label_text.setStyleSheet("font: 17pt Arial")
-        scrollLayout.addWidget(label_text)
+
+        # zenodo upload ID heading
+        zenodo_upload_ID_heading = QtGui.QLabel("5. ZENODO upload ID")
+        zenodo_upload_ID_heading.setStyleSheet("font: bold 20pt Arial")
+        scrollLayout.addWidget(zenodo_upload_ID_heading)
+
+        # zenodo upload ID text
+        zenodo_upload_ID_text = QtGui.QLabel(XChemToolTips.zenodo_upload_part_two())
+        zenodo_upload_ID_text.setStyleSheet("font: 17pt Arial")
+        scrollLayout.addWidget(zenodo_upload_ID_text)
+
+        # zenodo upload ID image
+        zenodo_upload_image = QtGui.QLabel()
+        zenodo_upload_pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'), 'image',
+                                                          'zenodo_upload_id.png'))
+        zenodo_upload_image.setPixmap(zenodo_upload_pixmap)
+        scrollLayout.addWidget(zenodo_upload_image)
+
+        # zenodo upload ID text 2
+        zenodo_upload_ID_text2 = QtGui.QLabel(XChemToolTips.zenodo_upload_part_three())
+        zenodo_upload_ID_text2.setStyleSheet("font: 17pt Arial")
+        scrollLayout.addWidget(zenodo_upload_ID_text2)
+
+        # zenodo upload ID entry box
         hbox_zenodo_upload_id = QtGui.QHBoxLayout()
         hbox_zenodo_upload_id.addWidget(QtGui.QLabel('upload ID:'))
-        object.zenodo_upload_id_entry = QtGui.QLineEdit()
-        object.zenodo_upload_id_entry.setFixedWidth(200)
-        hbox_zenodo_upload_id.addWidget(object.zenodo_upload_id_entry)
+        xce_object.zenodo_upload_id_entry = QtGui.QLineEdit()
+        xce_object.zenodo_upload_id_entry.setFixedWidth(200)
+        hbox_zenodo_upload_id.addWidget(xce_object.zenodo_upload_id_entry)
         hbox_zenodo_upload_id.addStretch(1)
         scrollLayout.addLayout(hbox_zenodo_upload_id)
-        button = QtGui.QPushButton('update html files with upload ID')
-        button.clicked.connect(object.update_html_for_zenodo_upload)
-        button.setMaximumWidth(300)
-        scrollLayout.addWidget(button)
+
+        # update html button
+        update_html_button = QtGui.QPushButton('update html files with upload ID')
+        update_html_button.clicked.connect(xce_object.update_html_for_zenodo_upload)
+        update_html_button.setMaximumWidth(300)
+        scrollLayout.addWidget(update_html_button)
+
+        # spacer
         scrollLayout.addWidget(QtGui.QLabel('\n'))
-        label_heading = QtGui.QLabel("6. ZENODO upload HTML files")
-        label_heading.setStyleSheet("font: bold 20pt Arial")
-        scrollLayout.addWidget(label_heading)
-        label_text = QtGui.QLabel(XChemToolTips.zenodo_upload_part_four(object.html_export_directory))
-        label_text.setStyleSheet("font: 17pt Arial")
-        scrollLayout.addWidget(label_text)
+
+        # zenodo upload html files heading
+        upload_html_heading = QtGui.QLabel("6. ZENODO upload HTML files")
+        upload_html_heading.setStyleSheet("font: bold 20pt Arial")
+        scrollLayout.addWidget(upload_html_heading)
+
+        # zenodo upload html text
+        upload_html_text = QtGui.QLabel(XChemToolTips.zenodo_upload_part_four(xce_object.html_export_directory))
+        upload_html_text.setStyleSheet("font: 17pt Arial")
+        scrollLayout.addWidget(upload_html_text)
+
+        # spacer
         scrollLayout.addWidget(QtGui.QLabel('\n'))
+
+        # container settings
         scrollLayout.addStretch(1)
         scroll.setWidget(scrollContent)
 
@@ -857,146 +954,146 @@ class LayoutObjects():
         #                                                 SETTINGS TAB                                                 #
         #                                                                                                              #
         ################################################################################################################
-        object.settings_container = QtGui.QWidget()
-        object.buttons_etc = QtGui.QWidget()
-        object.settings_vbox = QtGui.QVBoxLayout()
+        xce_object.settings_container = QtGui.QWidget()
+        xce_object.buttons_etc = QtGui.QWidget()
+        xce_object.settings_vbox = QtGui.QVBoxLayout()
 
-        object.scroll = QtGui.QScrollArea(object.settings_container)
-        object.settings_vbox.addWidget(object.scroll)
+        xce_object.scroll = QtGui.QScrollArea(xce_object.settings_container)
+        xce_object.settings_vbox.addWidget(xce_object.scroll)
         scrollContent_settings = QtGui.QWidget(scroll)
 
         scrollLayout_settings = QtGui.QVBoxLayout(scrollContent_settings)
         scrollContent_settings.setLayout(scrollLayout_settings)
 
         # Settings Tab
-        object.data_collection_vbox_for_settings = QtGui.QVBoxLayout()
+        xce_object.data_collection_vbox_for_settings = QtGui.QVBoxLayout()
 
-        object.buttons_etc.setLayout(object.data_collection_vbox_for_settings)
-        object.scroll.setWidget(object.buttons_etc)
+        xce_object.buttons_etc.setLayout(xce_object.data_collection_vbox_for_settings)
+        xce_object.scroll.setWidget(xce_object.buttons_etc)
 
-        object.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nProject Directory: - REQUIRED -'))
+        xce_object.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nProject Directory: - REQUIRED -'))
         settings_hbox_initial_model_directory = QtGui.QHBoxLayout()
-        object.initial_model_directory_label = QtGui.QLabel(object.initial_model_directory)
-        settings_hbox_initial_model_directory.addWidget(object.initial_model_directory_label)
+        xce_object.initial_model_directory_label = QtGui.QLabel(xce_object.initial_model_directory)
+        settings_hbox_initial_model_directory.addWidget(xce_object.initial_model_directory_label)
         settings_buttoon_initial_model_directory = QtGui.QPushButton('Select Project Directory')
-        settings_buttoon_initial_model_directory.clicked.connect(object.settings_button_clicked)
+        settings_buttoon_initial_model_directory.clicked.connect(xce_object.settings_button_clicked)
         settings_hbox_initial_model_directory.addWidget(settings_buttoon_initial_model_directory)
-        object.data_collection_vbox_for_settings.addLayout(settings_hbox_initial_model_directory)
+        xce_object.data_collection_vbox_for_settings.addLayout(settings_hbox_initial_model_directory)
 
-        object.data_collection_vbox_for_settings.addWidget(
+        xce_object.data_collection_vbox_for_settings.addWidget(
             QtGui.QLabel('\n\nReference Structure Directory: - OPTIONAL -'))
         settings_hbox_reference_directory = QtGui.QHBoxLayout()
-        object.reference_directory_label = QtGui.QLabel(object.reference_directory)
-        settings_hbox_reference_directory.addWidget(object.reference_directory_label)
+        xce_object.reference_directory_label = QtGui.QLabel(xce_object.reference_directory)
+        settings_hbox_reference_directory.addWidget(xce_object.reference_directory_label)
         settings_buttoon_reference_directory = QtGui.QPushButton('Select Reference Structure Directory')
-        settings_buttoon_reference_directory.clicked.connect(object.settings_button_clicked)
+        settings_buttoon_reference_directory.clicked.connect(xce_object.settings_button_clicked)
         settings_hbox_reference_directory.addWidget(settings_buttoon_reference_directory)
-        object.data_collection_vbox_for_settings.addLayout(settings_hbox_reference_directory)
+        xce_object.data_collection_vbox_for_settings.addLayout(settings_hbox_reference_directory)
 
-        object.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nData Source: - REQUIRED -'))
+        xce_object.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nData Source: - REQUIRED -'))
         settings_hbox_data_source_file = QtGui.QHBoxLayout()
-        if object.data_source_file != '':
-            object.data_source_file_label = QtGui.QLabel(
-                os.path.join(object.database_directory, object.data_source_file))
+        if xce_object.data_source_file != '':
+            xce_object.data_source_file_label = QtGui.QLabel(
+                os.path.join(xce_object.database_directory, xce_object.data_source_file))
         else:
-            object.data_source_file_label = QtGui.QLabel('')
-        settings_hbox_data_source_file.addWidget(object.data_source_file_label)
+            xce_object.data_source_file_label = QtGui.QLabel('')
+        settings_hbox_data_source_file.addWidget(xce_object.data_source_file_label)
         settings_buttoon_data_source_file = QtGui.QPushButton('Select Data Source File')
-        settings_buttoon_data_source_file.clicked.connect(object.settings_button_clicked)
+        settings_buttoon_data_source_file.clicked.connect(xce_object.settings_button_clicked)
         settings_hbox_data_source_file.addWidget(settings_buttoon_data_source_file)
-        object.data_collection_vbox_for_settings.addLayout(settings_hbox_data_source_file)
+        xce_object.data_collection_vbox_for_settings.addLayout(settings_hbox_data_source_file)
 
         ## Data Collection
-        object.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nData Collection Directory: - OPTIONAL -'))
+        xce_object.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nData Collection Directory: - OPTIONAL -'))
 
         settings_beamline_frame = QtGui.QFrame()
         settings_beamline_frame.setFrameShape(QtGui.QFrame.StyledPanel)
         settings_beamline_vbox = QtGui.QVBoxLayout()
 
         settings_hbox_beamline_directory = QtGui.QHBoxLayout()
-        object.beamline_directory_label = QtGui.QLabel(object.beamline_directory)
-        settings_hbox_beamline_directory.addWidget(object.beamline_directory_label)
+        xce_object.beamline_directory_label = QtGui.QLabel(xce_object.beamline_directory)
+        settings_hbox_beamline_directory.addWidget(xce_object.beamline_directory_label)
         settings_buttoon_beamline_directory = QtGui.QPushButton('Select Data Collection Directory')
-        settings_buttoon_beamline_directory.clicked.connect(object.settings_button_clicked)
+        settings_buttoon_beamline_directory.clicked.connect(xce_object.settings_button_clicked)
         settings_hbox_beamline_directory.addWidget(settings_buttoon_beamline_directory)
         settings_beamline_vbox.addLayout(settings_hbox_beamline_directory)
 
         settings_hbox_datasets_summary_file = QtGui.QHBoxLayout()
-        object.datasets_summary_file_label = QtGui.QLabel(object.datasets_summary_file)
-        settings_hbox_datasets_summary_file.addWidget(object.datasets_summary_file_label)
+        xce_object.datasets_summary_file_label = QtGui.QLabel(xce_object.datasets_summary_file)
+        settings_hbox_datasets_summary_file.addWidget(xce_object.datasets_summary_file_label)
         settings_button_datasets_summary_file = QtGui.QPushButton('Select Existing\nCollection Summary File')
-        settings_button_datasets_summary_file.clicked.connect(object.settings_button_clicked)
+        settings_button_datasets_summary_file.clicked.connect(xce_object.settings_button_clicked)
         settings_hbox_datasets_summary_file.addWidget(settings_button_datasets_summary_file)
 
         settings_button_new_datasets_summary_file = QtGui.QPushButton('Assign New\nCollection Summary File')
-        settings_button_new_datasets_summary_file.clicked.connect(object.settings_button_clicked)
+        settings_button_new_datasets_summary_file.clicked.connect(xce_object.settings_button_clicked)
         settings_hbox_datasets_summary_file.addWidget(settings_button_new_datasets_summary_file)
 
         settings_beamline_vbox.addLayout(settings_hbox_datasets_summary_file)
 
         settings_beamline_frame.setLayout(settings_beamline_vbox)
-        object.data_collection_vbox_for_settings.addWidget(settings_beamline_frame)
+        xce_object.data_collection_vbox_for_settings.addWidget(settings_beamline_frame)
 
-        object.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nCCP4_SCR Directory: - OPTIONAL -'))
+        xce_object.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nCCP4_SCR Directory: - OPTIONAL -'))
         settings_hbox_ccp4_scratch_directory = QtGui.QHBoxLayout()
-        object.ccp4_scratch_directory_label = QtGui.QLabel(object.ccp4_scratch_directory)
-        settings_hbox_ccp4_scratch_directory.addWidget(object.ccp4_scratch_directory_label)
+        xce_object.ccp4_scratch_directory_label = QtGui.QLabel(xce_object.ccp4_scratch_directory)
+        settings_hbox_ccp4_scratch_directory.addWidget(xce_object.ccp4_scratch_directory_label)
         settings_buttoon_ccp4_scratch_directory = QtGui.QPushButton('Select CCP4_SCR Directory')
-        settings_buttoon_ccp4_scratch_directory.clicked.connect(object.settings_button_clicked)
+        settings_buttoon_ccp4_scratch_directory.clicked.connect(xce_object.settings_button_clicked)
         settings_hbox_ccp4_scratch_directory.addWidget(settings_buttoon_ccp4_scratch_directory)
-        object.data_collection_vbox_for_settings.addLayout(settings_hbox_ccp4_scratch_directory)
+        xce_object.data_collection_vbox_for_settings.addLayout(settings_hbox_ccp4_scratch_directory)
 
-        object.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nPANDDAs directory: - OPTIONAL -'))
+        xce_object.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nPANDDAs directory: - OPTIONAL -'))
         settings_hbox_panddas_directory = QtGui.QHBoxLayout()
-        object.panddas_directory_label = QtGui.QLabel(object.panddas_directory)
-        settings_hbox_panddas_directory.addWidget(object.panddas_directory_label)
+        xce_object.panddas_directory_label = QtGui.QLabel(xce_object.panddas_directory)
+        settings_hbox_panddas_directory.addWidget(xce_object.panddas_directory_label)
         settings_button_panddas_directory = QtGui.QPushButton('Select PANNDAs Directory')
-        settings_button_panddas_directory.clicked.connect(object.settings_button_clicked)
+        settings_button_panddas_directory.clicked.connect(xce_object.settings_button_clicked)
         settings_hbox_panddas_directory.addWidget(settings_button_panddas_directory)
-        object.data_collection_vbox_for_settings.addLayout(settings_hbox_panddas_directory)
+        xce_object.data_collection_vbox_for_settings.addLayout(settings_hbox_panddas_directory)
 
-        object.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nHTML export directory: - OPTIONAL -'))
+        xce_object.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nHTML export directory: - OPTIONAL -'))
         settings_hbox_html_export_directory = QtGui.QHBoxLayout()
-        object.html_export_directory_label = QtGui.QLabel(object.html_export_directory)
-        settings_hbox_html_export_directory.addWidget(object.html_export_directory_label)
+        xce_object.html_export_directory_label = QtGui.QLabel(xce_object.html_export_directory)
+        settings_hbox_html_export_directory.addWidget(xce_object.html_export_directory_label)
         settings_button_html_export_directory = QtGui.QPushButton('Select HTML Export Directory')
-        settings_button_html_export_directory.clicked.connect(object.settings_button_clicked)
+        settings_button_html_export_directory.clicked.connect(xce_object.settings_button_clicked)
         settings_hbox_html_export_directory.addWidget(settings_button_html_export_directory)
-        object.data_collection_vbox_for_settings.addLayout(settings_hbox_html_export_directory)
+        xce_object.data_collection_vbox_for_settings.addLayout(settings_hbox_html_export_directory)
 
-        object.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nGroup deposition directory: - OPTIONAL -'))
+        xce_object.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nGroup deposition directory: - OPTIONAL -'))
         settings_hbox_group_deposition_directory = QtGui.QHBoxLayout()
-        object.group_deposition_directory_label = QtGui.QLabel(object.group_deposit_directory)
-        settings_hbox_group_deposition_directory.addWidget(object.group_deposition_directory_label)
+        xce_object.group_deposition_directory_label = QtGui.QLabel(xce_object.group_deposit_directory)
+        settings_hbox_group_deposition_directory.addWidget(xce_object.group_deposition_directory_label)
         settings_button_group_deposition_directory = QtGui.QPushButton('Select Group deposition Directory')
-        settings_button_group_deposition_directory.clicked.connect(object.settings_button_clicked)
+        settings_button_group_deposition_directory.clicked.connect(xce_object.settings_button_clicked)
         settings_hbox_group_deposition_directory.addWidget(settings_button_group_deposition_directory)
-        object.data_collection_vbox_for_settings.addLayout(settings_hbox_group_deposition_directory)
+        xce_object.data_collection_vbox_for_settings.addLayout(settings_hbox_group_deposition_directory)
 
-        object.data_collection_vbox_for_settings.setSpacing(0)
-        object.data_collection_vbox_for_settings.setContentsMargins(30, 0, 0, 0)
+        xce_object.data_collection_vbox_for_settings.setSpacing(0)
+        xce_object.data_collection_vbox_for_settings.setContentsMargins(30, 0, 0, 0)
 
-        object.buttons_etc.resize(object.screen.width() - 100, object.buttons_etc.sizeHint().height())
+        xce_object.buttons_etc.resize(xce_object.screen.width() - 100, xce_object.buttons_etc.sizeHint().height())
 
         ################################################################################################################
         #                                                                                                              #
         #                                                  STATUS BAR                                                  #
         #                                                                                                              #
         ################################################################################################################
-        object.status_bar = QtGui.QStatusBar()
-        object.progress_bar = QtGui.QProgressBar()
-        object.progress_bar.setMaximum(100)
-        object.status_bar.setMaximumWidth(object.screen.width())
-        object.progress_bar.setMaximumWidth(object.screen.width())
+        xce_object.status_bar = QtGui.QStatusBar()
+        xce_object.progress_bar = QtGui.QProgressBar()
+        xce_object.progress_bar.setMaximum(100)
+        xce_object.status_bar.setMaximumWidth(xce_object.screen.width())
+        xce_object.progress_bar.setMaximumWidth(xce_object.screen.width())
         hbox_status = QtGui.QHBoxLayout()
-        hbox_status.addWidget(object.status_bar)
-        hbox_status.addWidget(object.progress_bar)
+        hbox_status.addWidget(xce_object.status_bar)
+        hbox_status.addWidget(xce_object.progress_bar)
 
         vbox_main = QtGui.QVBoxLayout()
-        menu_bar.setMaximumWidth(object.screen.width())
+        menu_bar.setMaximumWidth(xce_object.screen.width())
         vbox_main.addWidget(menu_bar)
-        object.main_tab_widget.setMaximumSize(object.screen.width(), object.screen.height() - 245)
-        vbox_main.addWidget(object.main_tab_widget)
+        xce_object.main_tab_widget.setMaximumSize(xce_object.screen.width(), xce_object.screen.height() - 245)
+        vbox_main.addWidget(xce_object.main_tab_widget)
 
         hboxTaskFrames = QtGui.QHBoxLayout()
 
@@ -1010,54 +1107,26 @@ class LayoutObjects():
 
         vbox_main.addLayout(hbox_status)
 
-        object.window.setLayout(vbox_main)
+        xce_object.window.setLayout(vbox_main)
 
-        object.status_bar.showMessage('Ready')
-        object.window.show()
+        xce_object.status_bar.showMessage('Ready')
+        xce_object.window.show()
 
-        if object.data_source_file != '':
-            write_enabled = object.check_write_permissions_of_data_source()
+        if xce_object.data_source_file != '':
+            write_enabled = xce_object.check_write_permissions_of_data_source()
             if not write_enabled:
-                object.data_source_set = False
+                xce_object.data_source_set = False
 
-
-
-        tab_add_widget = [[object.tab_dict[object.workflow_dict['Overview']][1], object.overview_tab_widget],
-                          [object.overview_tab_dict['Data Source'][1], object.overview_datasource_table],
-                          [object.overview_tab_dict['Summary'][1], object.overview_canvas],
-                          [object.pandda_tab_dict['Dataset Summary'][1], object.pandda_initial_html],
-                          [object.pandda_tab_dict['Processing Output'][1], object.pandda_analyse_html],
-                          [object.pandda_tab_dict['pandda.inspect'][1], object.pandda_inspect_html]]
-
-        tab_add_layout = [[object.tab_dict[object.workflow_dict['Datasets']][1], object.datasets_data_collection_vbox],
-                          [object.datasets_tab_dict['Summary'][1], object.datasets_summarys_vbox_for_table],
-                          [object.datasets_tab_dict['Summary'][1], object.datasets_summarys_vbox_for_details],
-                          [object.datasets_tab_dict['Reprocess'][1], reprocess_vbox],
-                          [object.tab_dict[object.workflow_dict['Maps']][1], maps_checkbutton_hbox],
-                          [object.tab_dict[object.workflow_dict['Maps']][1], object.initial_model_vbox_for_table],
-                          [object.pandda_tab_dict['Statistical Map Summaries'][1], object.pandda_map_layout],
-                          [object.pandda_tab_dict['pandda.analyse'][1], object.pandda_analyse_hbox],
-                          [object.tab_dict[object.workflow_dict['PANDDAs']][1], object.panddas_results_vbox],
-                          [object.tab_dict[object.workflow_dict['Refinement']][1], object.summary_vbox_for_table],
-                          [object.tab_dict[object.workflow_dict['Deposition']][1], object.deposition_vbox],
-                          [object.tab_dict[object.workflow_dict['Settings']][1], object.settings_vbox]]
-
-        for item in tab_add_widget:
-            item[0].addWidget(item[1])
-
-        for item in tab_add_layout:
-            item[0].addLayout(item[1])
-
-    def workflow(self, object):
+    def workflow(self, xce_object):
         ################################################################################################################
         #                                                                                                              #
         # ========================================== WORKFLOW TASK CONTAINER ========================================= #
         #                                                                                                              #
         ################################################################################################################
-        object.workflow_widget_dict = {}
+        xce_object.workflow_widget_dict = {}
 
         # workflow task container - order of tabs as they appear for the main window
-        object.workflow = ['Overview',  # 0
+        xce_object.workflow = ['Overview',  # 0
                            'Datasets',  # 1
                            'Maps',  # 2
                            'PANDDAs',  # 3
@@ -1066,18 +1135,18 @@ class LayoutObjects():
                            'Settings']  # 5
 
         # dictionary with keys corresponding to each stage in the workflow
-        object.workflow_dict = {object.workflow[0]: 'Overview',
-                                object.workflow[1]: 'Datasets',
-                                object.workflow[2]: 'Maps',
-                                object.workflow[3]: 'PANDDAs',
-                                object.workflow[4]: 'Refinement',
-                                object.workflow[6]: 'Settings',
-                                object.workflow[5]: 'Deposition'}
+        xce_object.workflow_dict = {xce_object.workflow[0]: 'Overview',
+                                xce_object.workflow[1]: 'Datasets',
+                                xce_object.workflow[2]: 'Maps',
+                                xce_object.workflow[3]: 'PANDDAs',
+                                xce_object.workflow[4]: 'Refinement',
+                                xce_object.workflow[6]: 'Settings',
+                                xce_object.workflow[5]: 'Deposition'}
 
         # tab widget
-        object.main_tab_widget = QtGui.QTabWidget()
-        object.tab_dict = {}
-        self.layout_funcs.make_tab_dict(object.workflow, object.main_tab_widget, object.tab_dict)
+        xce_object.main_tab_widget = QtGui.QTabWidget()
+        xce_object.tab_dict = {}
+        self.layout_funcs.make_tab_dict(xce_object.workflow, xce_object.main_tab_widget, xce_object.tab_dict)
 
 
 class LayoutFuncs():
@@ -1091,7 +1160,7 @@ class LayoutFuncs():
             tab_widget.addTab(tab, page)
             tab_dict[page] = [tab, vbox]
 
-    def add_checkbox(self, object, checkbox, function, checkopt=False):
+    def add_checkbox(self, xce_object, checkbox, function, checkopt=False):
         checkbox.toggle()
         checkbox.setChecked(checkopt)
         eval(str('checkbox.stateChanged.connect(' + function + ')'))
@@ -1103,21 +1172,21 @@ class LayoutFuncs():
         table.resizeRowsToContents()
         table.resizeColumnsToContents()
 
-    def pandda_html(self, object):
-        if os.path.exists(str(object.panddas_directory + '/interesting_datasets')):
+    def pandda_html(self, xce_object):
+        if os.path.exists(str(xce_object.panddas_directory + '/interesting_datasets')):
             print('WARNING: USING RESULTS FROM OLD PANDDA ANALYSE! THIS IS NOT FULLY SUPPORTED IN XCE2')
             print('PLEASE CHANGE YOUR PANDDA DIRECTORY TO A NEW RUN, OR USE THE OLD VERSION OF XCE!')
-            object.pandda_initial_html_file = str(object.panddas_directory + '/results_summareis/pandda_initial.html')
-            object.pandda_analyse_html_file = str(object.panddas_directory + '/results_summaries/pandda_analyse.html')
-        object.pandda_initial_html_file = str(
-            object.panddas_directory + '/analyses/html_summaries/' + 'pandda_initial.html')
-        object.pandda_analyse_html_file = str(
-            object.panddas_directory + '/analyses/html_summaries/' + 'pandda_analyse.html')
-        object.pandda_inspect_html_file = str(
-            object.panddas_directory + '/analyses/html_summaries/' + 'pandda_inspect.html')
+            xce_object.pandda_initial_html_file = str(xce_object.panddas_directory + '/results_summareis/pandda_initial.html')
+            xce_object.pandda_analyse_html_file = str(xce_object.panddas_directory + '/results_summaries/pandda_analyse.html')
+        xce_object.pandda_initial_html_file = str(
+            xce_object.panddas_directory + '/analyses/html_summaries/' + 'pandda_initial.html')
+        xce_object.pandda_analyse_html_file = str(
+            xce_object.panddas_directory + '/analyses/html_summaries/' + 'pandda_analyse.html')
+        xce_object.pandda_inspect_html_file = str(
+            xce_object.panddas_directory + '/analyses/html_summaries/' + 'pandda_inspect.html')
 
     # function for datasource, run and status button setup
-    def setup_push_button(self, object, button_dict):
+    def setup_push_button(self, xce_object, button_dict):
         # use iterkeys to determine order of key by letter
         for name in sorted(button_dict.iterkeys()):
             # add current item to menu bar
@@ -1133,7 +1202,7 @@ class LayoutFuncs():
         return button
 
     # function to setup one of the bottom boxes
-    def bottom_box_setup(self, object, label, dropdown_options, dropdown_tooltip, buttons, colour):
+    def bottom_box_setup(self, xce_object, label, dropdown_options, dropdown_tooltip, buttons, colour):
 
         frame = QtGui.QFrame()
         frame.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -1142,7 +1211,7 @@ class LayoutFuncs():
         vbox = QtGui.QVBoxLayout()
         label = QtGui.QLabel(label)
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
-        label.setFont(object.headlineLabelfont)
+        label.setFont(xce_object.headlineLabelfont)
         label.setStyleSheet(str(" QLabel { border: 1px solid black; border-radius: 1px;" + str(colour) +
                                 "padding: 0px; margin: 0px }"))
         vbox.addWidget(label)
@@ -1163,12 +1232,12 @@ class LayoutFuncs():
         vbox.setSpacing(0)
         vbox.setMargin(0)
         frame.setLayout(vbox)
-        frame.setMaximumWidth((object.screen.width() - 20) / 5)
+        frame.setMaximumWidth((xce_object.screen.width() - 20) / 5)
 
         return frame, combobox
 
     # function to add items to top menu bar
-    def setup_menubar(self, object, menu_bar, menu_items_dict):
+    def setup_menubar(self, xce_object, menu_bar, menu_items_dict):
         # use iterkeys to determine order of key by letter
         for config in sorted(menu_items_dict.iterkeys()):
             # add current item to menu bar
@@ -1176,7 +1245,7 @@ class LayoutFuncs():
             # for each configuration item
             for menu_item in menu_items_dict[config][1]:
                 # add the drop down option
-                action = eval(str('QtGui.QAction("' + str(menu_item[0]) + '", object.window)'))
+                action = eval(str('QtGui.QAction("' + str(menu_item[0]) + '", xce_object.window)'))
                 # add a shortcut if defined
                 if len(menu_item[1]) > 1:
                     eval(str('action.setShortcut("' + str(menu_item[1]) + '")'))
@@ -1193,3 +1262,32 @@ class LayoutFuncs():
     def populate_combobox(self, combobox_list, combobox):
         for item in combobox_list:
             combobox.addItem(item)
+
+    def add_widgets_layouts(self, xce_object):
+        tab_add_widget = [
+            [xce_object.tab_dict[xce_object.workflow_dict['Overview']][1], xce_object.overview_tab_widget],
+            [xce_object.overview_tab_dict['Data Source'][1], xce_object.overview_datasource_table],
+            [xce_object.overview_tab_dict['Summary'][1], xce_object.overview_canvas],
+            [xce_object.pandda_tab_dict['Dataset Summary'][1], xce_object.pandda_initial_html],
+            [xce_object.pandda_tab_dict['Processing Output'][1], xce_object.pandda_analyse_html],
+            [xce_object.pandda_tab_dict['pandda.inspect'][1], xce_object.pandda_inspect_html]]
+
+        tab_add_layout = [
+            [xce_object.tab_dict[xce_object.workflow_dict['Datasets']][1], xce_object.datasets_data_collection_vbox],
+            [xce_object.datasets_tab_dict['Summary'][1], xce_object.datasets_summarys_vbox_for_table],
+            [xce_object.datasets_tab_dict['Summary'][1], xce_object.datasets_summarys_vbox_for_details],
+            [xce_object.datasets_tab_dict['Reprocess'][1], xce_object.reprocess_vbox],
+            [xce_object.tab_dict[xce_object.workflow_dict['Maps']][1], xce_object.maps_checkbutton_hbox],
+            [xce_object.tab_dict[xce_object.workflow_dict['Maps']][1], xce_object.initial_model_vbox_for_table],
+            [xce_object.pandda_tab_dict['Statistical Map Summaries'][1], xce_object.pandda_map_layout],
+            [xce_object.pandda_tab_dict['pandda.analyse'][1], xce_object.pandda_analyse_hbox],
+            [xce_object.tab_dict[xce_object.workflow_dict['PANDDAs']][1], xce_object.panddas_results_vbox],
+            [xce_object.tab_dict[xce_object.workflow_dict['Refinement']][1], xce_object.summary_vbox_for_table],
+            [xce_object.tab_dict[xce_object.workflow_dict['Deposition']][1], xce_object.deposition_vbox],
+            [xce_object.tab_dict[xce_object.workflow_dict['Settings']][1], xce_object.settings_vbox]]
+
+        for item in tab_add_widget:
+            item[0].addWidget(item[1])
+
+        for item in tab_add_layout:
+            item[0].addLayout(item[1])

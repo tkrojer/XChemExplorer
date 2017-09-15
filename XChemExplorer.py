@@ -100,6 +100,7 @@ class XChemExplorer(QtGui.QApplication):
 
         LayoutObjects(self).workflow(self)
         LayoutObjects(self).main_layout(self)
+        LayoutFuncs().add_widgets_layouts(self)
 
         ################################################################################################################
 
