@@ -916,13 +916,15 @@ class LayoutObjects():
         xce_object.buttons_etc.setLayout(xce_object.data_collection_vbox_for_settings)
         xce_object.scroll.setWidget(xce_object.buttons_etc)
 
-        self.layout_funcs.settings_section_setup(xce_object.data_collection_vbox_for_settings,
+        xce_object.initial_model_directory_label = self.layout_funcs.settings_section_setup\
+            (xce_object.data_collection_vbox_for_settings,
                                                  '\n\nProject Directory: - REQUIRED -',
                                                  xce_object.initial_model_directory,
                                                  'Select Project Directory',
                                                  xce_object.settings_button_clicked)
 
-        self.layout_funcs.settings_section_setup(xce_object.data_collection_vbox_for_settings,
+        xce_object.reference_directory_label = self.layout_funcs.settings_section_setup\
+            (xce_object.data_collection_vbox_for_settings,
                                                  '\n\nReference Structure Directory: - OPTIONAL -',
                                                  xce_object.reference_directory,
                                                  'Select Reference Structure Directory',
@@ -974,25 +976,29 @@ class LayoutObjects():
         settings_beamline_frame.setLayout(settings_beamline_vbox)
         xce_object.data_collection_vbox_for_settings.addWidget(settings_beamline_frame)
 
-        self.layout_funcs.settings_section_setup(xce_object.data_collection_vbox_for_settings,
+        xce_object.ccp4_scratch_directory_label = self.layout_funcs.settings_section_setup\
+            (xce_object.data_collection_vbox_for_settings,
                                                  '\n\nCCP4_SCR Directory: - OPTIONAL -',
                                                  xce_object.ccp4_scratch_directory,
                                                  'Select CCP4_SCR Directory',
                                                  xce_object.settings_button_clicked)
 
-        self.layout_funcs.settings_section_setup(xce_object.data_collection_vbox_for_settings,
+        xce_object.panddas_directory_label = \
+            self.layout_funcs.settings_section_setup(xce_object.data_collection_vbox_for_settings,
                                                  '\n\nPANDDAs directory: - OPTIONAL -',
                                                  xce_object.panddas_directory,
                                                  'Select PANNDAs Directory',
                                                  xce_object.settings_button_clicked)
 
-        self.layout_funcs.settings_section_setup(xce_object.data_collection_vbox_for_settings,
+        xce_object.html_export_directory_label = self.layout_funcs.settings_section_setup\
+            (xce_object.data_collection_vbox_for_settings,
                                                  '\n\nHTML export directory: - OPTIONAL -',
                                                  xce_object.html_export_directory,
                                                  'Select HTML Export Directory',
                                                  xce_object.settings_button_clicked)
 
-        self.layout_funcs.settings_section_setup(xce_object.data_collection_vbox_for_settings,
+        xce_object.group_deposition_directory_label = self.layout_funcs.settings_section_setup\
+            (xce_object.data_collection_vbox_for_settings,
                                                  '\n\nGroup deposition directory: - OPTIONAL -',
                                                  xce_object.group_deposit_directory,
                                                  'Select Group deposition Directory',
@@ -1215,6 +1221,8 @@ class LayoutFuncs():
         button.clicked.connect(button_function)
         hbox.addWidget(button)
         vbox.addLayout(hbox)
+
+        return directory_label
 
     def add_widgets_layouts(self, xce_object):
         tab_add_widget = [
