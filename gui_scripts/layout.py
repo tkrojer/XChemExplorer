@@ -916,39 +916,30 @@ class LayoutObjects():
         xce_object.buttons_etc.setLayout(xce_object.data_collection_vbox_for_settings)
         xce_object.scroll.setWidget(xce_object.buttons_etc)
 
-        xce_object.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nProject Directory: - REQUIRED -'))
-        settings_hbox_initial_model_directory = QtGui.QHBoxLayout()
-        xce_object.initial_model_directory_label = QtGui.QLabel(xce_object.initial_model_directory)
-        settings_hbox_initial_model_directory.addWidget(xce_object.initial_model_directory_label)
-        settings_buttoon_initial_model_directory = QtGui.QPushButton('Select Project Directory')
-        settings_buttoon_initial_model_directory.clicked.connect(xce_object.settings_button_clicked)
-        settings_hbox_initial_model_directory.addWidget(settings_buttoon_initial_model_directory)
-        xce_object.data_collection_vbox_for_settings.addLayout(settings_hbox_initial_model_directory)
+        self.layout_funcs.settings_section_setup(xce_object.data_collection_vbox_for_settings,
+                                                 '\n\nProject Directory: - REQUIRED -',
+                                                 xce_object.initial_model_directory,
+                                                 'Select Project Directory',
+                                                 xce_object.settings_button_clicked)
 
-        xce_object.data_collection_vbox_for_settings.addWidget(
-            QtGui.QLabel('\n\nReference Structure Directory: - OPTIONAL -'))
-        settings_hbox_reference_directory = QtGui.QHBoxLayout()
-        xce_object.reference_directory_label = QtGui.QLabel(xce_object.reference_directory)
-        settings_hbox_reference_directory.addWidget(xce_object.reference_directory_label)
-        settings_buttoon_reference_directory = QtGui.QPushButton('Select Reference Structure Directory')
-        settings_buttoon_reference_directory.clicked.connect(xce_object.settings_button_clicked)
-        settings_hbox_reference_directory.addWidget(settings_buttoon_reference_directory)
-        xce_object.data_collection_vbox_for_settings.addLayout(settings_hbox_reference_directory)
+        self.layout_funcs.settings_section_setup(xce_object.data_collection_vbox_for_settings,
+                                                 '\n\nReference Structure Directory: - OPTIONAL -',
+                                                 xce_object.reference_directory,
+                                                 'Select Reference Structure Directory',
+                                                 xce_object.settings_button_clicked)
 
-        xce_object.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nData Source: - REQUIRED -'))
-        settings_hbox_data_source_file = QtGui.QHBoxLayout()
         if xce_object.data_source_file != '':
-            xce_object.data_source_file_label = QtGui.QLabel(
-                os.path.join(xce_object.database_directory, xce_object.data_source_file))
+            xce_object.data_source_file_label_text = os.path.join(xce_object.database_directory,
+                                                                  xce_object.data_source_file)
         else:
-            xce_object.data_source_file_label = QtGui.QLabel('')
-        settings_hbox_data_source_file.addWidget(xce_object.data_source_file_label)
-        settings_buttoon_data_source_file = QtGui.QPushButton('Select Data Source File')
-        settings_buttoon_data_source_file.clicked.connect(xce_object.settings_button_clicked)
-        settings_hbox_data_source_file.addWidget(settings_buttoon_data_source_file)
-        xce_object.data_collection_vbox_for_settings.addLayout(settings_hbox_data_source_file)
+            xce_object.data_source_file_label_text = ''
 
-        ## Data Collection
+        self.layout_funcs.settings_section_setup(xce_object.data_collection_vbox_for_settings,
+                                                 '\n\nData Source: - REQUIRED -',
+                                                 xce_object.data_source_file_label_text,
+                                                 'Select Data Source File',
+                                                 xce_object.settings_button_clicked)
+
         xce_object.data_collection_vbox_for_settings.addWidget(
             QtGui.QLabel('\n\nData Collection Directory: - OPTIONAL -'))
 
@@ -959,20 +950,23 @@ class LayoutObjects():
         settings_hbox_beamline_directory = QtGui.QHBoxLayout()
         xce_object.beamline_directory_label = QtGui.QLabel(xce_object.beamline_directory)
         settings_hbox_beamline_directory.addWidget(xce_object.beamline_directory_label)
-        settings_buttoon_beamline_directory = QtGui.QPushButton('Select Data Collection Directory')
-        settings_buttoon_beamline_directory.clicked.connect(xce_object.settings_button_clicked)
-        settings_hbox_beamline_directory.addWidget(settings_buttoon_beamline_directory)
+        settings_button_beamline_directory = QtGui.QPushButton('Select Data Collection Directory')
+        settings_button_beamline_directory.setMaximumWidth(500)
+        settings_button_beamline_directory.clicked.connect(xce_object.settings_button_clicked)
+        settings_hbox_beamline_directory.addWidget(settings_button_beamline_directory)
         settings_beamline_vbox.addLayout(settings_hbox_beamline_directory)
 
         settings_hbox_datasets_summary_file = QtGui.QHBoxLayout()
         xce_object.datasets_summary_file_label = QtGui.QLabel(xce_object.datasets_summary_file)
         settings_hbox_datasets_summary_file.addWidget(xce_object.datasets_summary_file_label)
         settings_button_datasets_summary_file = QtGui.QPushButton('Select Existing\nCollection Summary File')
+        settings_button_datasets_summary_file.setMaximumWidth(247)
         settings_button_datasets_summary_file.clicked.connect(xce_object.settings_button_clicked)
         settings_hbox_datasets_summary_file.addWidget(settings_button_datasets_summary_file)
 
         settings_button_new_datasets_summary_file = QtGui.QPushButton('Assign New\nCollection Summary File')
         settings_button_new_datasets_summary_file.clicked.connect(xce_object.settings_button_clicked)
+        settings_button_new_datasets_summary_file.setMaximumWidth(247)
         settings_hbox_datasets_summary_file.addWidget(settings_button_new_datasets_summary_file)
 
         settings_beamline_vbox.addLayout(settings_hbox_datasets_summary_file)
@@ -980,42 +974,29 @@ class LayoutObjects():
         settings_beamline_frame.setLayout(settings_beamline_vbox)
         xce_object.data_collection_vbox_for_settings.addWidget(settings_beamline_frame)
 
-        xce_object.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nCCP4_SCR Directory: - OPTIONAL -'))
-        settings_hbox_ccp4_scratch_directory = QtGui.QHBoxLayout()
-        xce_object.ccp4_scratch_directory_label = QtGui.QLabel(xce_object.ccp4_scratch_directory)
-        settings_hbox_ccp4_scratch_directory.addWidget(xce_object.ccp4_scratch_directory_label)
-        settings_buttoon_ccp4_scratch_directory = QtGui.QPushButton('Select CCP4_SCR Directory')
-        settings_buttoon_ccp4_scratch_directory.clicked.connect(xce_object.settings_button_clicked)
-        settings_hbox_ccp4_scratch_directory.addWidget(settings_buttoon_ccp4_scratch_directory)
-        xce_object.data_collection_vbox_for_settings.addLayout(settings_hbox_ccp4_scratch_directory)
+        self.layout_funcs.settings_section_setup(xce_object.data_collection_vbox_for_settings,
+                                                 '\n\nCCP4_SCR Directory: - OPTIONAL -',
+                                                 xce_object.ccp4_scratch_directory,
+                                                 'Select CCP4_SCR Directory',
+                                                 xce_object.settings_button_clicked)
 
-        xce_object.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nPANDDAs directory: - OPTIONAL -'))
-        settings_hbox_panddas_directory = QtGui.QHBoxLayout()
-        xce_object.panddas_directory_label = QtGui.QLabel(xce_object.panddas_directory)
-        settings_hbox_panddas_directory.addWidget(xce_object.panddas_directory_label)
-        settings_button_panddas_directory = QtGui.QPushButton('Select PANNDAs Directory')
-        settings_button_panddas_directory.clicked.connect(xce_object.settings_button_clicked)
-        settings_hbox_panddas_directory.addWidget(settings_button_panddas_directory)
-        xce_object.data_collection_vbox_for_settings.addLayout(settings_hbox_panddas_directory)
+        self.layout_funcs.settings_section_setup(xce_object.data_collection_vbox_for_settings,
+                                                 '\n\nPANDDAs directory: - OPTIONAL -',
+                                                 xce_object.panddas_directory,
+                                                 'Select PANNDAs Directory',
+                                                 xce_object.settings_button_clicked)
 
-        xce_object.data_collection_vbox_for_settings.addWidget(QtGui.QLabel('\n\nHTML export directory: - OPTIONAL -'))
-        settings_hbox_html_export_directory = QtGui.QHBoxLayout()
-        xce_object.html_export_directory_label = QtGui.QLabel(xce_object.html_export_directory)
-        settings_hbox_html_export_directory.addWidget(xce_object.html_export_directory_label)
-        settings_button_html_export_directory = QtGui.QPushButton('Select HTML Export Directory')
-        settings_button_html_export_directory.clicked.connect(xce_object.settings_button_clicked)
-        settings_hbox_html_export_directory.addWidget(settings_button_html_export_directory)
-        xce_object.data_collection_vbox_for_settings.addLayout(settings_hbox_html_export_directory)
+        self.layout_funcs.settings_section_setup(xce_object.data_collection_vbox_for_settings,
+                                                 '\n\nHTML export directory: - OPTIONAL -',
+                                                 xce_object.html_export_directory,
+                                                 'Select HTML Export Directory',
+                                                 xce_object.settings_button_clicked)
 
-        xce_object.data_collection_vbox_for_settings.addWidget(
-            QtGui.QLabel('\n\nGroup deposition directory: - OPTIONAL -'))
-        settings_hbox_group_deposition_directory = QtGui.QHBoxLayout()
-        xce_object.group_deposition_directory_label = QtGui.QLabel(xce_object.group_deposit_directory)
-        settings_hbox_group_deposition_directory.addWidget(xce_object.group_deposition_directory_label)
-        settings_button_group_deposition_directory = QtGui.QPushButton('Select Group deposition Directory')
-        settings_button_group_deposition_directory.clicked.connect(xce_object.settings_button_clicked)
-        settings_hbox_group_deposition_directory.addWidget(settings_button_group_deposition_directory)
-        xce_object.data_collection_vbox_for_settings.addLayout(settings_hbox_group_deposition_directory)
+        self.layout_funcs.settings_section_setup(xce_object.data_collection_vbox_for_settings,
+                                                 '\n\nGroup deposition directory: - OPTIONAL -',
+                                                 xce_object.group_deposit_directory,
+                                                 'Select Group deposition Directory',
+                                                 xce_object.settings_button_clicked)
 
         xce_object.data_collection_vbox_for_settings.setSpacing(0)
         xce_object.data_collection_vbox_for_settings.setContentsMargins(30, 0, 0, 0)
@@ -1223,6 +1204,17 @@ class LayoutFuncs():
         out_text.setStyleSheet("font: 17pt Arial")
 
         return out_text
+
+    def settings_section_setup(self, vbox, label_text, directory, button_text, button_function):
+        vbox.addWidget(QtGui.QLabel(label_text))
+        hbox = QtGui.QHBoxLayout()
+        directory_label = QtGui.QLabel(directory)
+        hbox.addWidget(directory_label)
+        button = QtGui.QPushButton(button_text)
+        button.setMaximumWidth(500)
+        button.clicked.connect(button_function)
+        hbox.addWidget(button)
+        vbox.addLayout(hbox)
 
     def add_widgets_layouts(self, xce_object):
         tab_add_widget = [

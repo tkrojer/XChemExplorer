@@ -2,6 +2,7 @@
 
 # solve gtk startup error
 import gtk
+
 gtk.set_interactive(False)
 
 import base64
@@ -36,6 +37,7 @@ import XChemWeb
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+
 
 class XChemExplorer(QtGui.QApplication):
     def __init__(self, args):
@@ -77,7 +79,6 @@ class XChemExplorer(QtGui.QApplication):
         self.data_source_set = True
         self.datasource_menu_reload_samples()
 
-
     ################################################## layout functions ################################################
 
 
@@ -90,7 +91,7 @@ class XChemExplorer(QtGui.QApplication):
         setup().settings(self)
         setup().preferences(self)
         setup().tables(self)
-        
+
         self.layout_funcs = LayoutFuncs()
 
         # GUI setup
@@ -103,7 +104,6 @@ class XChemExplorer(QtGui.QApplication):
         LayoutFuncs().add_widgets_layouts(self)
 
         ################################################################################################################
-
 
     ######################################### sort stuff below here ####################################################
     def select_sample_for_dimple(self):
@@ -759,7 +759,8 @@ class XChemExplorer(QtGui.QApplication):
 
         grid = QtGui.QGridLayout()
         self.set_primary_citation_authors = QtGui.QCheckBox('same as deposition authors')
-        self.layout_funcs.add_checkbox(self, self.set_primary_citation_authors, 'object.set_primary_citation_as_structure_authors')
+        self.layout_funcs.add_checkbox(self, self.set_primary_citation_authors,
+                                       'object.set_primary_citation_as_structure_authors')
         grid.addWidget(self.set_primary_citation_authors, 0, 0)
 
         self.primary_citation_author_name_List = []
@@ -3106,7 +3107,7 @@ class XChemExplorer(QtGui.QApplication):
                             else:
                                 reference_file_selection_combobox.setCurrentIndex(0)
                             self.maps_table.setCellWidget(current_row, column,
-                                                                   reference_file_selection_combobox)
+                                                          reference_file_selection_combobox)
                         else:
                             reference_file_selection_combobox = self.initial_model_dimple_dict[xtal][1]
                             self.populate_reference_combobox(reference_file_selection_combobox)
@@ -3408,7 +3409,7 @@ class XChemExplorer(QtGui.QApplication):
                         show_data_collection_details_checkbox.setChecked(False)
                         show_data_collection_details_checkbox.stateChanged.connect(self.show_data_collection_details)
                         self.datasets_summary_table.setCellWidget(current_row, column,
-                                                                         show_data_collection_details_checkbox)
+                                                                  show_data_collection_details_checkbox)
                         self.datasets_summary_dict[xtal].append(show_data_collection_details_checkbox)
                 elif header[0].startswith('SoakDB\nBarcode') or header[0].startswith('GDA\nBarcode'):
                     if new_xtal:
@@ -3471,7 +3472,7 @@ class XChemExplorer(QtGui.QApplication):
 
         self.save_files_to_initial_model_folder()
 
-        #self.update_dewar_configuration_tab()
+        # self.update_dewar_configuration_tab()
 
     # def update_dewar_configuration_tab(self):
     #
