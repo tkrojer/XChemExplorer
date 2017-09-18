@@ -29,10 +29,13 @@ def parse_pdb(inital_model_directory,xtal,db_dict):
         db_dict['RefinementStatus'] =               'finished'
     else:
         db_dict['RefinementStatus'] =               'failed'
+
     if os.path.isfile(os.path.join(inital_model_directory,xtal,'refine.bound.pdb')):
         db_dict['RefinementBoundConformation']=os.path.realpath(os.path.join(inital_model_directory,xtal,'refine.bound.pdb'))
     elif os.path.isfile(os.path.join(inital_model_directory,xtal,'refine.split.bound-state.pdb')):
         db_dict['RefinementBoundConformation']=os.path.realpath(os.path.join(inital_model_directory,xtal,'refine.split.bound-state.pdb'))
+
+    print db_dict
 
     return db_dict
 
@@ -200,6 +203,9 @@ def update_data_source(db_dict):
         db.execute_statement(sqlite)
 
 if __name__=='__main__':
+
+    print 'hallo'
+
     db_file=sys.argv[1]
     xtal=sys.argv[2]
     inital_model_directory=sys.argv[3]
