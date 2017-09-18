@@ -1,8 +1,8 @@
 import sys, os
+from PyQt4 import QtGui, QtCore, QtWebKit
 
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'gui_scripts'))
 
-from settings_preferences import *
 import layout
 
 import matplotlib.pyplot as plt

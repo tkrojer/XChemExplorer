@@ -1,9 +1,13 @@
 import sys, os
+from PyQt4 import QtGui, QtCore, QtWebKit
 
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'gui_scripts'))
+sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'lib'))
 
-from settings_preferences import *
 import layout
+
+import XChemMain
+
 
 class DatasetsTab():
     def __init__(self):
