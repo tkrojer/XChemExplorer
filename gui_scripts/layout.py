@@ -19,6 +19,7 @@ from overview_tab import OverviewTab
 from datasets_tab import DatasetsTab
 from maps_tab import MapsTab
 from pandda_tab import PanddaTab
+from refinement_tab import RefinementTab
 
 
 class LayoutObjects():
@@ -253,22 +254,13 @@ class LayoutObjects():
         DatasetsTab().setup(xce_object)
         MapsTab().setup(xce_object)
         PanddaTab().setup(xce_object)
+        RefinementTab().setup(xce_object)
 
 
 
 
 
-        ################################################################################################################
-        #                                                                                                              #
-        #                                                REFINEMENT TAB                                                #
-        #                                                                                                              #
-        ################################################################################################################
-        xce_object.summary_vbox_for_table = QtGui.QVBoxLayout()
 
-        # table
-        xce_object.refinement_table = QtGui.QTableWidget()
-        self.layout_funcs.table_setup(xce_object.refinement_table, xce_object.refinement_table_columns)
-        xce_object.summary_vbox_for_table.addWidget(xce_object.refinement_table)
 
         ################################################################################################################
         #                                                                                                              #
