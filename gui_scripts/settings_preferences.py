@@ -8,7 +8,7 @@ import XChemUtils
 import XChemDB
 import XChemMain
 import XChemLog
-
+import XChemDeposit
 
 class setup():
     def __init__(self):
@@ -362,13 +362,9 @@ class setup():
                                                   ['Update file info of apo structures', '',
                                                    'xce_object.update_file_information_of_apo_records'],
                                                   ['Prepare mmcif for apo structures', '',
-                                                   'xce_object.prepare_models_for_deposition'],
-                                                  # ^ this is added to a dictionary somewhere, so need to check what it interferes
-                                                  #  with when code changed
+                                                   'xce_object.prepare_models_for_deposition_apo'],
                                                   ['Prepare mmcif for ligand bound structures', '',
-                                                   'xce_object.prepare_models_for_deposition'],
-                                                  # ^ this is added to a dictionary somewhere, so need to check what it interferes
-                                                  #  with when code changed
+                                                   'xce_object.prepare_models_for_deposition_ligand_bound'],
                                                   ['Copy files to group deposition directory', '',
                                                    'xce_object.prepare_for_group_deposition_upload'],
                                                   ['Update DB with PDB codes', '', 'xce_object.enter_pdb_codes'],

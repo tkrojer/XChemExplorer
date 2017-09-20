@@ -396,11 +396,26 @@ class XChemExplorer(QtGui.QApplication):
             os.path.join(self.database_directory, self.data_source_file), self.initial_model_directory,
             self.xce_logfile)
 
-    def prepare_models_for_deposition(self):
+    def prepare_models_for_deposition_ligand_bound(self):
 
-        for key in self.prepare_mmcif_files_dict:
-            if self.sender() == self.prepare_mmcif_files_dict[key]:
-                structureType = key
+        structureType = "ligand_bound"
+
+        overwrite_existing_mmcif = True
+        self.work_thread = XChemDeposit.prepare_mmcif_files_for_deposition(
+            os.path.join(self.database_directory, self.data_source_file),
+            self.xce_logfile,
+            overwrite_existing_mmcif,
+            self.initial_model_directory,
+            structureType)
+        self.explorer_active = 1
+        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.work_thread.start()
+
+    def prepare_models_for_deposition_apo(self):
+
+        structureType = "apo"
 
         overwrite_existing_mmcif = True
         self.work_thread = XChemDeposit.prepare_mmcif_files_for_deposition(
