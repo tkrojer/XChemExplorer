@@ -168,7 +168,7 @@ class DatasetsTab():
 
         # following are contained in vboxes
         # res limit isig label
-        label = QtGui.QLabel('<b>Resolution\nLimit:</b>\nMn<I/sig(I)>')
+        label = QtGui.QLabel('<b>Res.\nLimit:</b>\nMn<I/sig(I)>')
         label.setAlignment(QtCore.Qt.AlignCenter)
 
         # res limit isig dropdown menu
@@ -186,7 +186,7 @@ class DatasetsTab():
         frame_isigma.setLayout(vbox_isigma)
 
         # res limit cc half label
-        res_cc_label = QtGui.QLabel('<b>Resolution\nLimit:</b>\nCC 1/2')
+        res_cc_label = QtGui.QLabel('<b>Res.\nLimit:</b>\nCC 1/2')
         res_cc_label.setAlignment(QtCore.Qt.AlignCenter)
 
         # res limit cc half dropdown
@@ -217,3 +217,9 @@ class DatasetsTab():
         xce_object.reprocess_vbox = QtGui.QVBoxLayout()  # box to hold reprocessing subtab content
         xce_object.reprocess_hbox_widgets = [frame_select, xce_object.datasets_reprocess_table, bottom_options_frame]
         self.layout_funcs.add_to_box(xce_object.reprocess_vbox, xce_object.reprocess_hbox_widgets)
+
+
+
+
+
+

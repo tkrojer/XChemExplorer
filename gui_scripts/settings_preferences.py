@@ -119,7 +119,7 @@ class setup():
         xce_object.diffraction_data_table_dict = {}
         xce_object.refinement_table_dict = {}
         xce_object.main_data_collection_table_exists = False
-        xce_object.timer_to_check_for_new_data_collection = QtCore.QTimer()
+        #xce_object.timer_to_check_for_new_data_collection = QtCore.QTimer()
 
         xce_object.target_list, xce_object.visit_list = XChemMain.get_target_and_visit_list(xce_object.beamline_directory)
 
