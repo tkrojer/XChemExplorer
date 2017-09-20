@@ -1,3 +1,19 @@
+########################################################################################################################
+# DEVELOPER README:                                                                                                    #
+# This is the main script, where the GUI is initialised from. All of the main layout objects live in their own scripts #
+# under ./gui_scripts (i.e. the tab content). The settings and preferences script sets up all of the directory paths   #
+# and contains dictionaries defining the top menu, push buttons and the tables held in the main tabs. The layout       #
+# script contains functions for performing simple layout tasks, such as adding a combobox, and contains init.          #
+# functions for all of the main layout functions.                                                                      #
+#                                                                                                                      #
+# In the future, the functions associated with buttons and frames etc. should be moved into the relevant script, but   #
+# this is a bit more complicated. For now, they are separated out into sections within this script. The only GUI stuff #
+# going on in here is calling the initialisation functions. To change the layout of a tab, edit it in it's own script, #
+# and add any new functions in this script, in the relevant section. (If there is one yet)                             #
+#                                                                                                                      #
+# There's still a lot of cleaning up to be done in the future...                                                       #
+########################################################################################################################
+
 # solve gtk startup error
 import gtk
 
@@ -47,6 +63,7 @@ class XChemExplorer(QtGui.QApplication):
         # start GUI
         self.start_GUI()
 
+        # set stylesheet - how the gui looks
         set_stylesheet(self)
 
         self.exec_()
@@ -464,8 +481,6 @@ class XChemExplorer(QtGui.QApplication):
             self.update_log.insert('{0!s} is marked for DIMPLE'.format(index.row()))
             self.initial_model_dimple_dict[xtal][0].setChecked(True)
 
-
-
     def update_summary_plot(self):
         if self.data_source_set:
             XChemPlots.summary_plot(os.path.join(self.database_directory, self.data_source_file),
@@ -625,12 +640,6 @@ class XChemExplorer(QtGui.QApplication):
         vbox.addLayout(hbox)
         pdbID_entryLayout.addLayout(vbox, 0, 0)
         pdbID_entry.exec_();
-
-
-
-
-
-
 
     def create_missing_apo_records_in_depositTable(self):
         self.db.create_missing_apo_records_for_all_structures_in_depositTable(self.initial_model_directory,
@@ -3353,8 +3362,6 @@ class XChemExplorer(QtGui.QApplication):
                 # un-check all other ones
                 self.datasets_summary_dict[key][3].setChecked(False)
 
-
-
     def populate_datasets_summary_table(self):
         self.status_bar.showMessage(
             'Building summary table for data processing results; be patient this may take a while')
@@ -3497,23 +3504,6 @@ class XChemExplorer(QtGui.QApplication):
                             cell_text.setText('')
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.datasets_summary_table.setItem(current_row, column, cell_text)
-
-                # elif header[0].startswith('GDA\nBarcode'):
-                #     if new_xtal:
-                #         cell_text = QtGui.QTableWidgetItem()
-                #         if xtal in pinDict:
-                #             cell_text.setText(str(pinDict[xtal][1]))
-                #             if pinDict[xtal][0] == 'NULL' or pinDict[xtal][1] == 'NULL':
-                #                 cell_text.setBackground(QtGui.QColor(255, 215, 0))
-                #             elif pinDict[xtal][0] != pinDict[xtal][1]:
-                #                 cell_text.setBackground(QtGui.QColor(255, 0, 0))
-                #         else:
-                #             cell_text.setText('')
-                #         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                #         self.datasets_summary_table.setItem(current_row, column, cell_text)
-
-
-
                 else:
                     cell_text = QtGui.QTableWidgetItem()
                     # in case data collection failed for whatever reason
@@ -3544,49 +3534,6 @@ class XChemExplorer(QtGui.QApplication):
         self.status_bar.showMessage('idle')
 
         self.save_files_to_initial_model_folder()
-
-        # self.update_dewar_configuration_tab()
-
-    # def update_dewar_configuration_tab(self):
-    #
-    #     # sample status and color code:
-    #     # 1 -   green:    collected and 'good' data
-    #     # 2 -   orange:   collected and some data
-    #     # 3 -   red:      collected, but no logfile
-    #     # 4 -   blue:     sample in dewar, but not yet collected
-    #     # 5 -   grey:     no sample in respective dewar position
-    #     # 6 -   yellow:   flagged for re-collection
-    #
-    #     # first find out what is currently in the dewar
-    #
-    #     occupied_positions = []
-    #     for puck_position in self.dewar_sample_configuration_dict:
-    #         sample = self.dewar_sample_configuration_dict[puck_position]
-    #         if sample == []:
-    #             self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: gray")
-    #             continue
-    #         elif sample not in self.data_collection_dict:
-    #             self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: blue")
-    #             # color and name respective button
-    #         else:
-    #             logfile_found = False
-    #             for entry in self.data_collection_dict[sample]:
-    #                 if entry[0] == 'logfile':
-    #                     logfile_found = True
-    #                     if entry[8]:  # if this was auto-selected best resolution file
-    #                         db_dict = entry[6]
-    #                         resolution_high = db_dict['DataProcessingResolutionHigh']
-    #             if not logfile_found:
-    #                 resolution_high = 'no logfile'
-    #             self.dewar_configuration_dict[puck_position].setText(sample + '\n' + resolution_high + 'A')
-    #             outcome = str(self.dataset_outcome_combobox_dict[sample].currentText())
-    #             if outcome == "success":
-    #                 self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: green")
-    #             elif outcome == "Failed - low resolution":
-    #                 self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: orange")
-    #             else:
-    #                 self.dewar_configuration_dict[puck_position].setStyleSheet("background-color: red")
-    #             self.dewar_configuration_dict[puck_position].setStyleSheet("font-size:7px;border-width: 0px")
 
     def update_outcome_datasets_summary_table(self, sample, outcome):
         rows_in_table = self.datasets_summary_table.rowCount()
