@@ -36,7 +36,6 @@ import XChemWeb
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
-
 class XChemExplorer(QtGui.QApplication):
     def __init__(self, args):
 
@@ -123,6 +122,26 @@ class XChemExplorer(QtGui.QApplication):
         QtGui.qApp.setStyle('Cleanlooks')
         self.exec_()
 
+    def start_GUI(self):
+
+        # check http://doc.qt.io/qt-4.8/stylesheet-customizing.html#the-box-model
+        self.headlineLabelfont = QtGui.QFont("Arial", 20, QtGui.QFont.Bold)
+
+        setup().settings(self)
+        setup().preferences(self)
+        setup().tables(self)
+
+        self.layout_funcs = LayoutFuncs()
+
+        # GUI setup
+        self.window = QtGui.QWidget()
+        self.window.setWindowTitle("XChemExplorer")
+        self.screen = QtGui.QDesktopWidget().screenGeometry()
+
+        LayoutObjects(self).workflow(self)
+        LayoutObjects(self).main_layout(self)
+        LayoutFuncs().add_widgets_layouts(self)
+
     # function to update datasource
     def datasource_menu_reload_samples(self):
         self.update_log.insert(
@@ -153,25 +172,7 @@ class XChemExplorer(QtGui.QApplication):
         self.data_source_set = True
         self.datasource_menu_reload_samples()
 
-    def start_GUI(self):
 
-        # check http://doc.qt.io/qt-4.8/stylesheet-customizing.html#the-box-model
-        self.headlineLabelfont = QtGui.QFont("Arial", 20, QtGui.QFont.Bold)
-
-        setup().settings(self)
-        setup().preferences(self)
-        setup().tables(self)
-
-        self.layout_funcs = LayoutFuncs()
-
-        # GUI setup
-        self.window = QtGui.QWidget()
-        self.window.setWindowTitle("XChemExplorer")
-        self.screen = QtGui.QDesktopWidget().screenGeometry()
-
-        LayoutObjects(self).workflow(self)
-        LayoutObjects(self).main_layout(self)
-        LayoutFuncs().add_widgets_layouts(self)
 
     ######################################### sort stuff below here ####################################################
     def select_sample_for_dimple(self):
