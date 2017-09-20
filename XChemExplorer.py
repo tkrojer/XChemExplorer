@@ -472,8 +472,6 @@ class XChemExplorer(QtGui.QApplication):
             self.group_deposition_directory_label.setText(self.group_deposit_directory)
             self.settings['group_deposit_directory'] = self.group_deposit_directory
 
-
-
     ######################################### sort stuff below here ####################################################
     def select_sample_for_dimple(self):
         indexes = self.maps_table.selectionModel().selectedRows()
