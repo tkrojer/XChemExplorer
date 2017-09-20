@@ -35,14 +35,14 @@ class SettingsTab():
 
         xce_object.initial_model_directory_label = self.layout_funcs.settings_section_setup \
             (xce_object.data_collection_vbox_for_settings,
-             '\n\nProject Directory: - REQUIRED -',
+             '\n\n<b>Project Directory: - REQUIRED -</b>',
              xce_object.initial_model_directory,
              'Select Project Directory',
              xce_object.settings_button_clicked)
 
         xce_object.reference_directory_label = self.layout_funcs.settings_section_setup \
             (xce_object.data_collection_vbox_for_settings,
-             '\n\nReference Structure Directory: - OPTIONAL -',
+             '\n\n<b>Reference Structure Directory: - OPTIONAL -</b>',
              xce_object.reference_directory,
              'Select Reference Structure Directory',
              xce_object.settings_button_clicked)
@@ -55,13 +55,13 @@ class SettingsTab():
 
             self.data_source_file_label = self.layout_funcs.settings_section_setup \
                 (xce_object.data_collection_vbox_for_settings,
-                 '\n\nData Source: - REQUIRED -',
+                 '\n\n<b>Data Source: - REQUIRED -</b>',
                  xce_object.data_source_file_label_text,
                  'Select Data Source File',
                  xce_object.settings_button_clicked)
 
         xce_object.data_collection_vbox_for_settings.addWidget(
-            QtGui.QLabel('\n\nData Collection Directory: - OPTIONAL -'))
+            QtGui.QLabel('\n\n<b>Data Collection Directory: - OPTIONAL -</b>'))
 
         settings_beamline_frame = QtGui.QFrame()
         settings_beamline_frame.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -96,28 +96,28 @@ class SettingsTab():
 
         xce_object.ccp4_scratch_directory_label = self.layout_funcs.settings_section_setup \
             (xce_object.data_collection_vbox_for_settings,
-             '\n\nCCP4_SCR Directory: - OPTIONAL -',
+             '\n\n<b>CCP4_SCR Directory: - OPTIONAL -</b>',
              xce_object.ccp4_scratch_directory,
              'Select CCP4_SCR Directory',
              xce_object.settings_button_clicked)
 
         xce_object.panddas_directory_label = self.layout_funcs.settings_section_setup \
             (xce_object.data_collection_vbox_for_settings,
-             '\n\nPANDDAs directory: - OPTIONAL -',
+             '\n\n<b>PANDDAs directory: - OPTIONAL -</b>',
              xce_object.panddas_directory,
              'Select PANNDAs Directory',
              xce_object.settings_button_clicked)
 
         xce_object.html_export_directory_label = self.layout_funcs.settings_section_setup \
             (xce_object.data_collection_vbox_for_settings,
-             '\n\nHTML export directory: - OPTIONAL -',
+             '\n\n<b>HTML export directory: - OPTIONAL -</b>',
              xce_object.html_export_directory,
              'Select HTML Export Directory',
              xce_object.settings_button_clicked)
 
         xce_object.group_deposition_directory_label = self.layout_funcs.settings_section_setup \
             (xce_object.data_collection_vbox_for_settings,
-             '\n\nGroup deposition directory: - OPTIONAL -',
+             '\n\n<b>Group deposition directory: - OPTIONAL -</b>',
              xce_object.group_deposit_directory,
              'Select Group deposition Directory',
              xce_object.settings_button_clicked)

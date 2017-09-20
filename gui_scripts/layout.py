@@ -52,10 +52,13 @@ class LayoutObjects():
         # xce_object.prepare_mmcif_files_dict['apo'] = prepare_mmcif_files_for_apo_structures
         # xce_object.prepare_mmcif_files_dict['ligand_bound'] = prepare_mmcif_files_for_ligand_bound_structures
 
+
         return menu_bar
 
     # function containing setup for bottom boxes
     def initialise_bottom_boxes(self, xce_object):
+
+        icons_directory = os.path.join((os.getenv('XChemExplorer_DIR')), 'icons')
 
         # import all buttons
         setup().bottom_box_buttons(xce_object)
@@ -81,8 +84,9 @@ class LayoutObjects():
         # array of both button xce_objects to apply to bottom box layout
         dataset_buttons = [xce_object.dataset_task_run_button, xce_object.dataset_task_status_button]
 
+
         # label for the bottom box layout
-        dataset_label = "Datasets"
+        dataset_label = str("<html><img src='" + str(icons_directory) + "/004-database-configuration.png'></html> Datasets")
 
         # return the frame and combobox from the bottom box setup function
         frame_dataset_task, xce_object.dataset_tasks_combobox = self.layout_funcs.bottom_box_setup(xce_object,
@@ -92,7 +96,7 @@ class LayoutObjects():
                                                                                                    'dataset_task_tip()',
                                                                                                    dataset_buttons,
                                                                                                    'background: '
-                                                                                                   'rgb(240, 255, 140); ')
+                                                                                                   'rgb(240, 255, 140);')
 
         # define the combobox and buttons in dictionary key to determine behaviour
         xce_object.workflow_widget_dict['Datasets'] = [xce_object.dataset_tasks_combobox,
@@ -120,7 +124,7 @@ class LayoutObjects():
         map_cif_file_buttons = [xce_object.map_cif_file_task_run_button, xce_object.map_cif_file_task_status_button]
 
         # label for the bottom box layout
-        map_cif_file_label = "Maps & Restraints"
+        map_cif_file_label = str("<html><img src='" + str(icons_directory) + "/003-internet.png'></html> Maps & Restraints")
 
         # return the frame and combobox from the bottom box setup function
         frame_map_cif_file_task, xce_object.map_cif_file_tasks_combobox = \
@@ -159,7 +163,7 @@ class LayoutObjects():
         panddas_file_buttons = [xce_object.panddas_file_task_run_button, xce_object.panddas_file_task_status_button]
 
         # label for the bottom box layout
-        panddas_file_label = "Hit Identification"
+        panddas_file_label = str("<html><img src='" + str(icons_directory) + "/002-chinese-panda-bear.png'></html> Hit Identification")
 
         # return the frame and combobox from the bottom box setup function
         frame_panddas_file_task, xce_object.panddas_file_tasks_combobox = \
@@ -196,7 +200,7 @@ class LayoutObjects():
         refine_file_buttons = [xce_object.refine_file_task_run_button, xce_object.refine_file_task_status_button]
 
         # label for the bottom box layout
-        refine_file_label = "Refinement"
+        refine_file_label = str("<html><img src='" + str(icons_directory) + "/001-ducky.png'></html> Refinement")
 
         # return the frame and combobox from the bottom box setup function
         frame_refine_file_task, xce_object.refine_file_tasks_combobox = \
@@ -393,14 +397,15 @@ class LayoutFuncs():
 
         frame = QtGui.QFrame()
         frame.setFrameShape(QtGui.QFrame.StyledPanel)
-        frame.setStyleSheet("QFrame { border: 1px solid black; border-radius: 1px; padding: 0px; margin: 0px }")
+        frame.setStyleSheet("QFrame {  "
+                            "border-radius: 1px; padding: 0px; margin: 0px; background-color: rgb(255, 255, 255); }")
 
         vbox = QtGui.QVBoxLayout()
         label = QtGui.QLabel(label)
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
-        label.setFont(xce_object.headlineLabelfont)
-        label.setStyleSheet(str(" QLabel { border: 1px solid black; border-radius: 1px;" + str(colour) +
-                                "padding: 0px; margin: 0px }"))
+        # label.setFont(xce_object.headlineLabelfont)
+        label.setStyleSheet(str(" QLabel { border: 1px solid rgb(184, 192, 210); border-radius: 1px;" + str(colour) +
+                                "padding: 3px; margin: 0px; font: bold 14pt}"))
         vbox.addWidget(label)
 
         hboxAction = QtGui.QHBoxLayout()
@@ -464,6 +469,7 @@ class LayoutFuncs():
 
     def settings_section_setup(self, vbox, label_text, directory, button_text, button_function):
         vbox.addWidget(QtGui.QLabel(label_text))
+
         hbox = QtGui.QHBoxLayout()
         directory_label = QtGui.QLabel(directory)
         hbox.addWidget(directory_label)
@@ -471,7 +477,10 @@ class LayoutFuncs():
         button.setMaximumWidth(500)
         button.clicked.connect(button_function)
         hbox.addWidget(button)
+
         vbox.addLayout(hbox)
+        vbox.addWidget(QtGui.QLabel(' '))
+        vbox.addWidget(QtGui.QLabel(' '))
 
         return directory_label
 

@@ -36,11 +36,12 @@ class DatasetsTab():
 
         # checkbox for autocollect
         xce_object.check_for_new_data_collection = QtGui.QCheckBox('Check for new data collection every two minutes')
+        xce_object.check_for_new_data_collection = QtGui.QCheckBox('Check for new data collection every two minutes')
         self.layout_funcs.add_checkbox(xce_object, xce_object.check_for_new_data_collection,
                                        'xce_object.continously_check_for_new_data_collection')
 
         # select target dropdown
-        select_target_label = QtGui.QLabel('Select Target: ')
+        select_target_label = QtGui.QLabel('<b>Select Target: </b>')
         select_target_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
         xce_object.target_selection_combobox = QtGui.QComboBox()
         xce_object.populate_target_selection_combobox(xce_object.target_selection_combobox)
@@ -71,7 +72,7 @@ class DatasetsTab():
         # reprocessing sub-tab
         # top options
         # data collection label
-        dc_label = QtGui.QLabel('Data collection directory: ')
+        dc_label = QtGui.QLabel('<b>Data collection directory: </b>')
         dc_label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)  # align left and centre of container
         xce_object.diffraction_data_dir_label = QtGui.QLabel(
             xce_object.diffraction_data_directory)  # add directory as text
@@ -90,7 +91,7 @@ class DatasetsTab():
         xce_object.diffraction_data_search_label = QtGui.QLabel(xce_object.diffraction_data_search_info)
 
         # translate label
-        translate_label = QtGui.QLabel('translate: datasetID -> sampleID')
+        translate_label = QtGui.QLabel('<b>Translate:</b> datasetID -> sampleID')
         translate_label.setAlignment(QtCore.Qt.AlignCenter)  # align in centre of container
 
         # CSV button
@@ -126,7 +127,7 @@ class DatasetsTab():
 
         # options at bottom of tab
         # data processing label
-        label = QtGui.QLabel('Data processing protocol: ')
+        label = QtGui.QLabel('<b>Data processing protocol: </b>')
         label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
 
         # option checkboxes
@@ -135,7 +136,7 @@ class DatasetsTab():
         xce_object.xia2_dials_checkbox = QtGui.QCheckBox('Dials')
 
         # spacegroup label
-        sg_label = QtGui.QLabel('Space Group:')
+        sg_label = QtGui.QLabel('<b>Space Group:</b>')
 
         # spacegroup dropdown menu
         xce_object.reprocess_space_group_comboxbox = QtGui.QComboBox()
@@ -144,7 +145,7 @@ class DatasetsTab():
             xce_object.reprocess_space_group_comboxbox.addItem(sg)
 
         # mtz label
-        mtz_label = QtGui.QLabel('Reference MTZ:')
+        mtz_label = QtGui.QLabel('<b>Reference MTZ:</b>')
 
         # file label
         xce_object.reprocess_reference_mtz_file_label = QtGui.QLabel(xce_object.diffraction_data_reference_mtz)
@@ -167,7 +168,7 @@ class DatasetsTab():
 
         # following are contained in vboxes
         # res limit isig label
-        label = QtGui.QLabel('Resolution\nLimit:\nMn<I/sig(I)>')
+        label = QtGui.QLabel('<b>Resolution\nLimit:</b>\nMn<I/sig(I)>')
         label.setAlignment(QtCore.Qt.AlignCenter)
 
         # res limit isig dropdown menu
@@ -185,8 +186,8 @@ class DatasetsTab():
         frame_isigma.setLayout(vbox_isigma)
 
         # res limit cc half label
-        res_cc_label = QtGui.QLabel('Resolution\nLimit:\nCC 1/2')
-        label.setAlignment(QtCore.Qt.AlignCenter)
+        res_cc_label = QtGui.QLabel('<b>Resolution\nLimit:</b>\nCC 1/2')
+        res_cc_label.setAlignment(QtCore.Qt.AlignCenter)
 
         # res limit cc half dropdown
         xce_object.reprocess_cc_half_combobox = QtGui.QComboBox()

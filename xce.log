@@ -1,0 +1,38 @@
+2017-09-19 14:19:02 ==> XCE: 
+
+     ######################################################################
+     #                                                                    #
+     # XCHEMEXPLORER - multi dataset analysis                             #
+     #                                                                    #
+     # Version: v1.0                                                      #
+     #                                                                    #
+     # Date:                                                              #
+     #                                                                    #
+     # Author: Tobias Krojer, Structural Genomics Consortium, Oxford, UK  #
+     #         tobias.krojer@sgc.ox.ac.uk                                 #
+     #                                                                    #
+     ######################################################################
+
+creating new logfile for the current XChemExplorer (v1.0) session:
+/home/uzw12877/XCE_rachael_branch/XChemExplorer/xce.log
+
+2017-09-19 14:19:02 ==> XCE: Searching for external software...
+2017-09-19 14:19:02 ==> XCE: checking for qsub:                                 found     
+2017-09-19 14:19:02 ==> XCE: checking for array qsub:                           found     
+2017-09-19 14:19:02 ==> XCE: checking for refmac5:                              found     
+2017-09-19 14:19:04 ==> XCE: checking for phenix.molprobity:                    found     
+2017-09-19 14:19:05 ==> XCE: checking for phenix.find_tls_groups:               found     
+2017-09-19 14:19:06 ==> XCE: checking for mmtbx.validate_ligands:               found     
+2017-09-19 14:19:07 ==> XCE: checking for acedrg:                               found     
+2017-09-19 14:19:09 ==> XCE: checking for phenix.elbow:                         found     
+2017-09-19 14:19:09 ==> XCE: checking for grade:                                found     
+2017-09-19 14:19:09 ==> XCE: checking for giant.create_occupancy_params:        found     
+2017-09-19 14:19:02 ==> XCE: new session started
+2017-09-19 14:19:09 ==> XCE: will use acedrg for generation of ligand coordinates and restraints
+2017-09-19 14:19:09 ==> XCE: will use phenix.elbow for generation of ligand coordinates and restraints
+2017-09-19 14:19:09 ==> XCE: will use grade for generation of ligand coordinates and restraints
+2017-09-19 14:19:09 ==> XCE: reference file 0: ['...', '', '', '', 0, '0']
+2017-09-19 14:19:09 ==> XCE: reference file 0: ['...', '', '', '', 0, '0']
+2017-09-19 14:20:07 ==> XCE: reading samples from data source: /home/uzw12877/XCE_rachael_branch/XChemExplorer/
+2017-09-19 14:20:07 ==> XCE: getting information for all samples from data source...
+2017-09-19 14:20:07 ==> XCE: creating missing columns in data source

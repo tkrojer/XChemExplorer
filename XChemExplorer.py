@@ -1,5 +1,3 @@
-# last edited: 10/08/2017, 18:00
-
 # solve gtk startup error
 import gtk
 
@@ -47,9 +45,84 @@ class XChemExplorer(QtGui.QApplication):
 
         # start GUI
         self.start_GUI()
+
+        palette = QtGui.QPalette()
+
+        palette.setColor(QtGui.QPalette.Background, QtGui.QColor("#ececec"))
+        self.setPalette(palette)
+
+        icons_directory = os.path.join((os.getenv('XChemExplorer_DIR')), 'icons')
+
+        self.setStyleSheet("""
+        QApplication {
+        padding: 0px;
+        }
+        QMenuBar {
+        background-color: rgb(236, 236, 236);
+        } 
+        QMenuBar::item {
+        background-color: rgb(236, 236, 236);
+        }
+        QMenu {
+        background-color: rgb(236, 236, 236);
+        border: 1px solid rgb(184, 192, 210);
+        }
+        QMenu::item::selected {
+        background-color: rgb(28, 105, 241);
+        color: rgb(255, 255, 255);
+        }
+        QComboBox {
+        background-color: rgb(255, 255, 255);
+        selection-background-color: rgb(28, 105, 241);
+        border: 1px solid rgb(184, 192, 210);
+        }
+        QComboBox QAbstractItemView {
+        background: rgb(255, 255, 255);
+        border: 1px solid rgb(184, 192, 210);
+        }
+        QComboBox::down-arrow {
+        image: url(""" + icons_directory + """/drop-down.png);
+        background-color: rgb(255, 255, 255);
+        }
+        QComboBox::drop-down {
+        background-color: rgb(255, 255, 255);
+        }
+        QPushButton {
+        background-color: rgb(214, 230, 244);
+        border: 1px solid rgb(184, 192, 210);
+        padding: 3px;
+        }
+        QFrame {
+        background-color: rgb(236, 236, 236);
+        }
+        QTableWidget {
+        background-color: rgb(255, 255, 255);
+        }
+        QHeaderView::section {
+        background-color: rgb(236, 236, 236);
+        border: 1px solid rgb(184, 192, 210);
+        }
+        QTabWidget::pane {
+        border-top: 1px solid rgb(184, 192, 210);
+        }
+        QTabBar::tab {
+        background-color: rgb(236, 236, 236);
+        border: 1px solid rgb(184, 192, 210);
+        padding: 3px;
+        }
+        QTabBar::tab::selected {
+        background-color: rgb(214, 230, 244);
+        border: 1px solid rgb(184, 192, 210);
+        padding: 3px;
+        }
+        QScrollBar {
+        background:  rgb(236, 236, 236);
+        }
+        """)
+
+        QtGui.qApp.setStyle('Cleanlooks')
         self.exec_()
 
-    ##################################### top menu bar settings and functions ##########################################
     # function to update datasource
     def datasource_menu_reload_samples(self):
         self.update_log.insert(
@@ -58,6 +131,7 @@ class XChemExplorer(QtGui.QApplication):
             'reading samples from data source: ' + os.path.join(self.database_directory, self.data_source_file))
         self.update_header_and_data_from_datasource()
         self.update_all_tables()
+        self.overview_datasource_table.resizeColumnsToContents()
 
     # function to create new datasource
     def create_new_data_source(self):
@@ -79,10 +153,6 @@ class XChemExplorer(QtGui.QApplication):
         self.data_source_set = True
         self.datasource_menu_reload_samples()
 
-    ################################################## layout functions ################################################
-
-
-    ################################################# define gui #######################################################
     def start_GUI(self):
 
         # check http://doc.qt.io/qt-4.8/stylesheet-customizing.html#the-box-model
@@ -102,8 +172,6 @@ class XChemExplorer(QtGui.QApplication):
         LayoutObjects(self).workflow(self)
         LayoutObjects(self).main_layout(self)
         LayoutFuncs().add_widgets_layouts(self)
-
-        ################################################################################################################
 
     ######################################### sort stuff below here ####################################################
     def select_sample_for_dimple(self):
@@ -3972,3 +4040,9 @@ class XChemExplorer(QtGui.QApplication):
 
 if __name__ == "__main__":
     app = XChemExplorer(sys.argv[1:])
+
+
+# "Debugging is twice as hard as writing the code in the first
+#  place. Therefore, if you write the code as cleverly as
+#  possible, you are, by definition, not smart enough to debug it."
+#  -- Brian W. Kernighan

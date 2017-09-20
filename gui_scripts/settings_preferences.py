@@ -394,7 +394,7 @@ class setup():
                                                                    ['XChemToolTips.update_from_datasource_button_tip()',
                                                                     # tooltip
                                                                     'QPushButton { padding: 1px; margin: 1px; '
-                                                                    'background: rgb(140,140,140) }',
+                                                                    'background: rgb(197,197,197) }',
                                                                     # stylesheet
                                                                     'xce_object.headlineLabelfont',  # font
                                                                     'xce_object.datasource_menu_reload_samples']  # action
