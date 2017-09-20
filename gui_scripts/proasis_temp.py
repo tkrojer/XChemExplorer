@@ -103,3 +103,62 @@
             self.proasis_menu.addAction(self.proasis_hits)
 
         ### end of proasis shit ###
+
+
+def add_lead(self):
+    # in case directories don't exist...
+    print(str('Making Proasis project directory: ' + str(
+        'mkdir ' + os.path.join(self.proasis_directory, 'LabXChem', self.proasis_name))))
+    os.system(str('mkdir ' + os.path.join(self.proasis_directory, 'LabXChem', self.proasis_name)))
+    perm_string = str(
+        'chmod u=rwx,g=rwx,o=r ' + os.path.join(self.proasis_directory, 'LabXChem', self.proasis_name))
+    os.system(perm_string)
+    # make reference file directory in project directory
+    os.system(str('mkdir ' + os.path.join(self.proasis_directory, 'LabXChem', self.proasis_name, 'reference')))
+    perm_string = str('chmod u=rwx,g=rwx,o=r ' + os.path.join(self.proasis_directory, 'LabXChem',
+                                                              self.proasis_name, 'reference'))
+
+    # copy pandda_analyse_sites.csv to proasis directory for lead build
+    os.system(str('cp ' + str(os.path.join(self.panddas_directory, 'analyses/pandda_analyse_sites.csv')) + ' ' +
+                  str(os.path.join(self.proasis_directory, 'LabXChem', self.proasis_name, 'reference'))))
+    # copy reference pdb (from pandda directory to make sure same as in sites file)
+    os.system(str('cp ' + str(os.path.join(self.panddas_directory, 'reference/reference.pdb')) + ' ' +
+                  str(os.path.join(self.proasis_directory, 'LabXChem', self.proasis_name, 'reference'))))
+    # open a temporary job file to write to for proasis scheduling
+    temp_job = open(
+        os.path.join(self.proasis_directory, 'Scripts/scheduled_jobs/temp_jobs', str(self.proasis_name + '.sh')),
+        'w')
+    # change file permissions of job
+    perm_string = str(
+        'chmod u=rwx,g=rwx,o=r ' + os.path.join(self.proasis_directory, 'Scripts/scheduled_jobs/temp_jobs',
+                                                str(self.proasis_name + '.sh')))
+    os.system(perm_string)
+    # string to add leads in temp job file
+    job_string = str('/dls/science/groups/proasis/Scripts/generate_leads.py -n ' + self.proasis_name
+                     + ' -r '
+                     + str(
+        os.path.join(self.proasis_directory, 'LabXChem', self.proasis_name, 'reference/reference.pdb'))
+                     + ' -p '
+                     + str(os.path.join(self.proasis_directory, 'LabXChem', self.proasis_name,
+                                        'reference/pandda_analyse_sites.csv'))
+                     + ' -d '
+                     + str(self.current_directory))
+
+    temp_job.write(str(job_string))
+    temp_job.close()
+    # remove option from menu so lead can't be added multiple times
+    self.proasis_lead.setVisible(False)
+
+
+def add_hits(self):
+    # open the list of pernament jobs to append
+    perm_job = open(os.path.join(self.proasis_directory, 'Scripts/scheduled_jobs/test.sh'), 'a')
+    # string for job to add and update hits in proasis
+    job_string = (str(os.path.join(self.proasis_directory, 'Scripts/populate_hits.py') + ' -d ' +
+                      self.current_directory + ' > ' + os.path.join(self.proasis_directory,
+                                                                    'Scripts/scheduled_jobs_logs',
+                                                                    str(self.proasis_name + '_proasis.out'))))
+    perm_job.write(job_string)
+    perm_job.close()
+    # remove option from menu so job is not added multiple times
+    self.proasis_hits.setVisible(False)
