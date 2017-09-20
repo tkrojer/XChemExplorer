@@ -71,6 +71,7 @@ class XChemExplorer(QtGui.QApplication):
     def start_GUI(self):
 
         # check http://doc.qt.io/qt-4.8/stylesheet-customizing.html#the-box-model
+        # This needs moving somewhere more appropriate...
         self.headlineLabelfont = QtGui.QFont("Arial", 20, QtGui.QFont.Bold)
 
         setup().settings(self)
