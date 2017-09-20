@@ -3748,34 +3748,6 @@ class XChemExplorer(QtGui.QApplication):
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                         self.datasets_summary_table.setItem(row, column, cell_text)
 
-    # def populate_data_source_table(self, header, data):
-    #     self.overview_datasource_table.setColumnCount(0)
-    #     self.overview_datasource_table.setColumnCount(len(self.overview_datasource_table_columns))
-    #     self.overview_datasource_table.setRowCount(0)
-    #
-    #     columns_to_show = self.get_columns_to_show(self.overview_datasource_table_columns, header)
-    #     n_rows = self.get_rows_with_sample_id_not_null(header, data)
-    #     self.overview_datasource_table.setRowCount(n_rows)
-    #     sample_id_column = self.get_columns_to_show(['Sample ID'], header)
-    #
-    #     x = 0
-    #     for row in data:
-    #         if str(row[sample_id_column[0]]).lower() == 'none' or str(row[sample_id_column[0]]).replace(' ', '') == '':
-    #             continue  # do not show rows where sampleID is null
-    #         for y, item in enumerate(columns_to_show):
-    #             cell_text = QtGui.QTableWidgetItem()
-    #             if row[item] is None:
-    #                 cell_text.setText('')
-    #             else:
-    #                 cell_text.setText(str(row[item]))
-    #             if self.overview_datasource_table_columns[
-    #                 y] == 'Sample ID':  # assumption is that column 0 is always sampleID
-    #                 cell_text.setFlags(QtCore.Qt.ItemIsEnabled)  # and this field cannot be changed
-    #             cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-    #             self.overview_datasource_table.setItem(x, y, cell_text)
-    #         x += 1
-    #     self.overview_datasource_table.setHorizontalHeaderLabels(self.overview_datasource_table_columns)
-
     def populate_and_update_datasource_table(self):
         self.overview_datasource_table.setColumnCount(len(self.overview_datasource_table_columns))
 
