@@ -42,6 +42,7 @@ class startLog:
         else:
             message+='writing into existing logfile for current XChemExplorer ('+version+') session:\n'+self.logfile+'\n'
         updateLog(self.logfile).insert(message)
+        #print(message)
 
 class depositLog:
 
