@@ -1,8 +1,8 @@
 #!/bin/bash
 
-export XChemExplorer_DIR="~/mounting_dir"
+export XChemExplorer_DIR="."
 source $XChemExplorer_DIR/setup-scripts/xce.setup-sh
 #module unload ccp4
-source /Applications/ccp4-7.0/setup-scripts/ccp4.setup-sh
+source ccp4/bin/ccp4.setup-sh
 
 ccp4-python $XChemExplorer_DIR/XChemExplorer.py
