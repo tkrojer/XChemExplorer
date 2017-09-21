@@ -15,9 +15,9 @@
 ########################################################################################################################
 
 # solve gtk startup error
-import gtk
+#import gtk
 
-gtk.set_interactive(False)
+#gtk.set_interactive(False)
 
 import base64
 import getpass
@@ -1917,6 +1917,41 @@ class XChemExplorer(QtGui.QApplication):
         file_name_temp = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window, 'Open file', self.current_directory,
                                                                     '*.conf')
         file_name = tuple(file_name_temp)[0]
+
+        try:
+            pickled_settings = pickle.load(open(file_name, 'rb'))
+
+        except:
+             print('==> XCE: failed to open config file...')
+
+        key_list = {#'beamline_directory': 'beamline_directory',
+                    'initial_model_directory': 'initial_model_directory',
+                   'panddas_directory': 'panddas_directory',
+                   'html_export_directory': 'html_export_directory',
+                    'group_deposit_directory': 'group_deposit_directory',
+                   'database_directory': 'database_directory',
+                   'datasets_summary_file': 'datasets_summary',
+                   #"'data_source_file': 'data_source',
+                   'ccp4_scratch_directory': 'ccp4_scratch',
+                    'allowed_unitcell_difference_percent': 'unitcell_difference',
+                   'acceptable_low_resolution_limit_for_data': 'too_low_resolution_data',
+                   #'reference_directory_temp': 'reference_directory'
+                     }
+
+        for current_key in key_list:
+            try:
+                command = str('self.' + current_key + " = pickled_settings['" + key_list[current_key] +"']")
+                exec(command)
+                command = str('self.settings["' + key_list[current_key]+ '"]= self.' + current_key)
+                exec(command)
+                print('==> XCE: found ' + key_list[current_key])
+            except:
+                print('==> XCE: WARNING: Failed to find settings for: ' + key_list[current_key] + ' Error type: '
+                      + str(sys.exc_info()[0]))
+                exec(str(current_key + " = ''"))
+                continue
+
+
         try:
             pickled_settings = pickle.load(open(file_name, "rb"))
             if pickled_settings['beamline_directory'] != self.beamline_directory:
@@ -1925,26 +1960,14 @@ class XChemExplorer(QtGui.QApplication):
                 self.settings['beamline_directory'] = self.beamline_directory
                 self.populate_target_selection_combobox(self.target_selection_combobox)
 
-            self.initial_model_directory = pickled_settings['initial_model_directory']
-            self.settings['initial_model_directory'] = self.initial_model_directory
-
-            self.panddas_directory = pickled_settings['panddas_directory']
-            self.settings['panddas_directory'] = self.panddas_directory
 
             self.layout_funcs.pandda_html(self)
             self.show_pandda_html_summary()
 
-            self.html_export_directory = pickled_settings['html_export_directory']
             self.html_export_directory_label.setText(self.html_export_directory)
-            self.settings['html_export_directory'] = self.html_export_directory
-            self.group_deposit_directory = pickled_settings['group_deposit_directory']
+
             self.group_deposition_directory_label.setText(self.group_deposit_directory)
-            self.settings['group_deposit_directory'] = self.group_deposit_directory
 
-            self.database_directory = pickled_settings['database_directory']
-            self.settings['database_directory'] = self.database_directory
-
-            self.datasets_summary_file = pickled_settings['datasets_summary']
             self.datasets_summary_file_label.setText(self.datasets_summary_file)
 
             self.data_source_file = pickled_settings['data_source']
@@ -1963,12 +1986,6 @@ class XChemExplorer(QtGui.QApplication):
                         self.db = XChemDB.data_source(os.path.join(self.database_directory, self.data_source_file))
                         self.datasource_menu_reload_samples()
 
-            self.ccp4_scratch_directory = pickled_settings['ccp4_scratch']
-            self.settings['ccp4_scratch'] = self.ccp4_scratch_directory
-
-            self.allowed_unitcell_difference_percent = pickled_settings['unitcell_difference']
-            self.acceptable_low_resolution_limit_for_data = pickled_settings['too_low_resolution_data']
-
             reference_directory_temp = pickled_settings['reference_directory']
             if reference_directory_temp != self.reference_directory:
                 self.reference_directory = reference_directory_temp
@@ -1986,10 +2003,15 @@ class XChemExplorer(QtGui.QApplication):
             self.ccp4_scratch_directory_label.setText(self.ccp4_scratch_directory)
             self.reference_file_list = self.get_reference_file_list(' ')
 
+            self.update_all_tables()
 
         except KeyError:
             self.update_status_bar('Sorry, this is not a XChemExplorer config file!')
             self.update_log.insert('Sorry, this is not a XChemExplorer config file!')
+
+        except:
+            print "Unexpected error:", sys.exc_info()[0]
+            raise
 
     def save_config_file(self):
         file_name = str(QtGui.QFileDialog.getSaveFileName(self.window, 'Save file', self.current_directory))

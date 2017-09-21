@@ -50,10 +50,16 @@ class SettingsTab():
         if xce_object.data_source_file != '':
             xce_object.data_source_file_label_text = os.path.join(xce_object.database_directory,
                                                                   xce_object.data_source_file)
+            xce_object.data_source_file_label = self.layout_funcs.settings_section_setup \
+                (xce_object.data_collection_vbox_for_settings,
+                 '\n\n<b>Data Source: - REQUIRED -</b>',
+                 xce_object.data_source_file_label_text,
+                 'Select Data Source File',
+                 xce_object.settings_button_clicked)
         else:
             xce_object.data_source_file_label_text = ''
 
-            self.data_source_file_label = self.layout_funcs.settings_section_setup \
+            xce_object.data_source_file_label = self.layout_funcs.settings_section_setup \
                 (xce_object.data_collection_vbox_for_settings,
                  '\n\n<b>Data Source: - REQUIRED -</b>',
                  xce_object.data_source_file_label_text,
