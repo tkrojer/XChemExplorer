@@ -312,7 +312,7 @@ class LayoutObjects():
         # ========================================== WORKFLOW TASK CONTAINER ========================================= #
         #                                                                                                              #
         ################################################################################################################
-        xce_object.workflow_widget_dict = {}
+
 
         # workflow task container - order of tabs as they appear for the main window
         xce_object.workflow = ['Overview',  # 0
@@ -331,6 +331,8 @@ class LayoutObjects():
                                     xce_object.workflow[4]: 'Refinement',
                                     xce_object.workflow[6]: 'Settings',
                                     xce_object.workflow[5]: 'Deposition'}
+
+        xce_object.workflow_widget_dict = {}
 
         # tab widget
         xce_object.main_tab_widget = QtGui.QTabWidget()
