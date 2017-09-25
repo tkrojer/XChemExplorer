@@ -448,19 +448,19 @@ class XChemExplorer(QtGui.QApplication):
             self.layout_funcs.pandda_html(self)
 
             # update add lead option for proasis if pandda directory is changed
-            if os.path.isfile(os.path.join(self.panddas_directory, 'analyses/pandda_analyse_sites.csv')):
-                # hide old menu info
-                self.proasis_lead.setVisible(False)
-                # enable lead adding if pandda_analyse_sites.csv now exists
-                self.proasis_lead = QtGui.QAction(str('Create lead from pandda sites...'), self.window)
-                self.proasis_lead.triggered.connect(lambda: self.add_lead())
-                self.proasis_menu.addAction(self.proasis_lead)
-            else:
-                # otherwise, keep same as old menu
-                self.proasis_lead = QtGui.QAction(
-                    str('Site info not found... please run pandda analyse before adding lead'),
-                    self.window)
-                self.proasis_menu.addAction(self.proasis_lead)
+            # if os.path.isfile(os.path.join(self.panddas_directory, 'analyses/pandda_analyse_sites.csv')):
+            #     # hide old menu info
+            #     self.proasis_lead.setVisible(False)
+            #     # enable lead adding if pandda_analyse_sites.csv now exists
+            #     self.proasis_lead = QtGui.QAction(str('Create lead from pandda sites...'), self.window)
+            #     self.proasis_lead.triggered.connect(lambda: self.add_lead())
+            #     self.proasis_menu.addAction(self.proasis_lead)
+            # else:
+            #     # otherwise, keep same as old menu
+            #     self.proasis_lead = QtGui.QAction(
+            #         str('Site info not found... please run pandda analyse before adding lead'),
+            #         self.window)
+            #     self.proasis_menu.addAction(self.proasis_lead)
 
         if self.sender().text() == 'Select HTML Export Directory':
             self.html_export_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
@@ -1096,7 +1096,7 @@ class XChemExplorer(QtGui.QApplication):
         grid = QtGui.QGridLayout()
         self.set_primary_citation_authors = QtGui.QCheckBox('same as deposition authors')
         self.layout_funcs.add_checkbox(self, self.set_primary_citation_authors,
-                                       'object.set_primary_citation_as_structure_authors')
+                                       'xce_object.set_primary_citation_as_structure_authors')
         grid.addWidget(self.set_primary_citation_authors, 0, 0)
 
         self.primary_citation_author_name_List = []
