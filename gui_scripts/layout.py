@@ -321,8 +321,7 @@ class LayoutObjects():
                                'PANDDAs',  # 3
                                'Refinement',  # 4
                                'Deposition',  # 6
-                               'Settings',
-                               'Proasis']  # 5
+                               'Settings']  # 5
 
         # dictionary with keys corresponding to each stage in the workflow
         xce_object.workflow_dict = {xce_object.workflow[0]: 'Overview',
@@ -331,8 +330,7 @@ class LayoutObjects():
                                     xce_object.workflow[3]: 'PANDDAs',
                                     xce_object.workflow[4]: 'Refinement',
                                     xce_object.workflow[6]: 'Settings',
-                                    xce_object.workflow[5]: 'Deposition',
-                                    xce_object.workflow[7]: 'Proasis'}
+                                    xce_object.workflow[5]: 'Deposition'}
 
         # tab widget
         xce_object.main_tab_widget = QtGui.QTabWidget()
