@@ -228,6 +228,47 @@ class XChemExplorer(QtGui.QApplication):
         else:
             start_thread = True
 
+        if start_thread:
+            if self.target == '=== SELECT TARGET ===':
+                msgBox = QtGui.QMessageBox()
+                warning = ('*** WARNING ***\n'
+                           'You did not select a target!\n'
+                           'In this case we will only parse the project directory!\n'
+                           'Please note that this option is usually only useful in case you reprocessed your data.\n'
+                           'Do you want to continue?')
+                msgBox.setText(warning)
+                msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.YesRole)
+                msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.RejectRole)
+                reply = msgBox.exec_();
+                if reply == 0:
+                    start_thread = True
+                else:
+                    start_thread = False
+            else:
+                start_thread = True
+
+        if start_thread:
+            self.work_thread = XChemThread.read_autoprocessing_results_from_disc(self.visit_list,
+                                                                                 self.target,
+                                                                                 self.reference_file_list,
+                                                                                 self.database_directory,
+                                                                                 self.data_collection_dict,
+                                                                                 self.preferences,
+                                                                                 self.datasets_summary_file,
+                                                                                 self.initial_model_directory,
+                                                                                 rescore_only,
+                                                                                 self.acceptable_low_resolution_limit_for_data,
+                                                                                 os.path.join(self.database_directory,
+                                                                                              self.data_source_file),
+                                                                                 self.xce_logfile)
+            self.explorer_active = 1
+            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.connect(self.work_thread, QtCore.SIGNAL("create_widgets_for_autoprocessing_results_only"),
+                         self.create_widgets_for_autoprocessing_results_only)
+            self.work_thread.start()
+
     ####################################################################################################################
     #                                                                                                                  #
     #                                                 MAPS TAB                                                         #
