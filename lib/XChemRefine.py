@@ -1,6 +1,10 @@
 # last edited: 08/08/2017, 15:00
 
-import pygtk, gtk, pango
+import pygtk
+
+pygtk.require('2.0')
+import gtk, pango
+
 import os
 import glob
 import sys
