@@ -118,6 +118,7 @@ class templates:
             '_pdbx_deposit_group.group_id	   UNNAMED\n'
             '_pdbx_deposit_group.group_description  "%s"\n'                                     %depositDict['group_description']+
             '_pdbx_deposit_group.group_title        "{0!s}"\n'.format(depositDict['group_title'])+
+            '_pdbx_deposit_group.group_type         "{0!s}"\n'.format(depositDict['group_type'])+
             '#\n'
             '_exptl_crystal_grow.crystal_id      1\n'
             "_exptl_crystal_grow.method          '%s'\n"                                        %depositDict['crystallization_method']+
@@ -528,14 +529,17 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 data_template_dict['protein_chains']+=item+','
             data_template_dict['protein_chains']=data_template_dict['protein_chains'][:-1]
 
+            data_template_dict['group_type'] = ''
             if self.structureType=='ligand_bound':
                 self.Logfile.insert('creating {0!s} file for ligand bound structure of {1!s}'.format(self.data_template_bound, xtal))
+                data_template_dict['group_type'] = 'changed state'
                 data_template=templates().data_template_cif(data_template_dict)
                 site_details=self.make_site_description(xtal)
                 data_template+=site_details
                 f=open(os.path.join(self.projectDir,xtal,self.data_template_bound),'w')
             elif self.structureType=='apo':
                 self.Logfile.insert('creating {0!s} file for apo structure of {1!s}'.format(self.data_template_apo, xtal))
+                data_template_dict['group_type'] = 'ground state'
                 data_template=templates().data_template_cif(data_template_dict)
                 site_details=self.make_site_description(xtal)
                 data_template+=site_details
