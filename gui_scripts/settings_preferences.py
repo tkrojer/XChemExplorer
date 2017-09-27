@@ -1,8 +1,12 @@
 import os, sys, subprocess
 from PyQt4 import QtCore, QtGui
+import sqlite3
 
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'lib'))
+sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'gui_scripts'))
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'web'))
+
+from proasis_functions import Proasis
 
 import XChemUtils
 import XChemDB
@@ -13,6 +17,7 @@ import XChemDeposit
 class setup():
     def __init__(self):
         pass
+
 
     def openFile(self, file):
         if sys.platform == 'linux2':
@@ -320,6 +325,8 @@ class setup():
                                            'Refinement\nStatus']
 
     def top_menu_dict(self, xce_object):
+
+
         # dictionary containing config for top menu setup
         # menu dict = { 'order letter: menu_item_name': ["name_in_menu",
         #                                       [
@@ -329,55 +336,59 @@ class setup():
         #             }
         xce_object.menu_dict = {'A: file': ["&File",
                                         [
-                                            ['Open Config File', 'Ctrl+O', 'xce_object.open_config_file'],
-                                            ['Save Config File', 'Ctrl+S', 'xce_object.save_config_file'],
-                                            ['Quit', 'Ctrl+Q', 'xce_object.quit_xce']
+                                            ['Open Config File', 'Ctrl+O', xce_object.open_config_file],
+                                            ['Save Config File', 'Ctrl+S', xce_object.save_config_file],
+                                            ['Quit', 'Ctrl+Q', xce_object.quit_xce]
                                         ]],
                             'B: datasource': ["&Datasource",
                                               [
                                                   ['Reload Samples From Datasource', '',
-                                                   'xce_object.datasource_menu_reload_samples'],
+                                                   xce_object.datasource_menu_reload_samples],
                                                   ['Save Samples to Datasource', '',
-                                                   'xce_object.datasource_menu_save_samples'],
+                                                   xce_object.datasource_menu_save_samples],
                                                   ['Import CSV file into Datasource', '',
-                                                   'xce_object.datasource_menu_import_csv_file'],
+                                                   xce_object.datasource_menu_import_csv_file],
                                                   ['Export CSV file from Datasource', '',
-                                                   'xce_object.datasource_menu_export_csv_file'],
+                                                   xce_object.datasource_menu_export_csv_file],
                                                   ['Select columns to show', '',
-                                                   'xce_object.select_datasource_columns_to_display'],
+                                                   xce_object.select_datasource_columns_to_display],
                                                   ['Create New Datasource (SQLite)', '',
-                                                   'xce_object.create_new_data_source'],
-                                                  ['Export CSV for wonka', '', 'xce_object.export_data_for_WONKA']
+                                                   xce_object.create_new_data_source],
+                                                  ['Export CSV for wonka', '', xce_object.export_data_for_WONKA]
                                               ]],
                             'C: preferences': ["&Preferences",
                                                [
-                                                   ['Edit preferences', '', 'xce_object.show_preferences']
+                                                   ['Edit preferences', '', xce_object.show_preferences]
                                                ]],
                             'D: deposition': ["&Deposition",
                                               [
-                                                  ['Edit information', '', 'xce_object.deposition_data'],
-                                                  ['Export to HTML', '', 'xce_object.export_to_html'],
+                                                  ['Edit information', '', xce_object.deposition_data],
+                                                  ['Export to HTML', '', xce_object.export_to_html],
                                                   ['Find PanDDA apo structures', '',
-                                                   'xce_object.create_missing_apo_records_in_depositTable'],
+                                                   xce_object.create_missing_apo_records_in_depositTable],
                                                   ['Update file info of apo structures', '',
-                                                   'xce_object.update_file_information_of_apo_records'],
+                                                   xce_object.update_file_information_of_apo_records],
                                                   ['Prepare mmcif for apo structures', '',
-                                                   'xce_object.prepare_models_for_deposition_apo'],
+                                                   xce_object.prepare_models_for_deposition_apo],
                                                   ['Prepare mmcif for ligand bound structures', '',
-                                                   'xce_object.prepare_models_for_deposition_ligand_bound'],
+                                                   xce_object.prepare_models_for_deposition_ligand_bound],
                                                   ['Copy files to group deposition directory', '',
-                                                   'xce_object.prepare_for_group_deposition_upload'],
-                                                  ['Update DB with PDB codes', '', 'xce_object.enter_pdb_codes'],
-                                                  ['Check SMILES', '', 'xce_object.check_smiles_in_db_and_pdb']
+                                                   xce_object.prepare_for_group_deposition_upload],
+                                                  ['Update DB with PDB codes', '', xce_object.enter_pdb_codes],
+                                                  ['Check SMILES', '', xce_object.check_smiles_in_db_and_pdb]
                                               ]],
-                            'E: help': ["&Help",
+                            'E: proasis': ["Proasis",
+                                              [
+                                                  [str(xce_object.proasis_project_label), '', xce_object.proasis_project_function],
+                                                  [str(xce_object.proasis_lead_label), '', xce_object.proasis_lead_function],
+                                                  [str(xce_object.proasis_hits_label), '', xce_object.proasis_hits_function]
+                                              ]],
+                            'F: help': ["&Help",
                                         [
-                                            ['Open XCE tutorial', '', str(
-                                                'lambda: setup().openFile("/dls/science/groups/i04-1/software/docs/'
-                                                'XChemExplorer.pdf")')],
-                                            ['Troubleshooting', '', str(
-                                                'lambda: setup().openFile("/dls/science/groups/i04-1/software/'
-                                                'xce_troubleshooting.pdf")')]
+                                            ['Open XCE tutorial', '',
+                                                lambda: setup().openFile("/dls/science/groups/i04-1/software/docs/XChemExplorer.pdf")],
+                                            ['Troubleshooting', '',
+                                                lambda: setup().openFile("/dls/science/groups/i04-1/software/xce_troubleshooting.pdf")]
                                         ]]
 
                             }
@@ -509,3 +520,5 @@ class setup():
                                     'Open COOT for old PanDDA',
                                     'Update Deposition Table',
                                     'Prepare Group Deposition']
+
+
