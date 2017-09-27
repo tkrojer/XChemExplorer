@@ -1,6 +1,7 @@
 import os, sys, subprocess
 from PyQt4 import QtCore, QtGui
-import sqlite3
+from functools import partial
+import webbrowser
 
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'lib'))
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'gui_scripts'))
@@ -381,7 +382,8 @@ class setup():
                                               [
                                                   [str(xce_object.proasis_project_label), '', xce_object.proasis_project_function],
                                                   [str(xce_object.proasis_lead_label), '', xce_object.proasis_lead_function],
-                                                  [str(xce_object.proasis_hits_label), '', xce_object.proasis_hits_function]
+                                                  [str(xce_object.proasis_hits_label), '', xce_object.proasis_hits_function],
+                                                  ['Launch Proasis in browser', '', partial(webbrowser.open, url='http://cs04r-sc-vserv-137.diamond.ac.uk/Proasis4_2017/' )]
                                               ]],
                             'F: help': ["&Help",
                                         [
