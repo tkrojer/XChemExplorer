@@ -15,9 +15,9 @@
 ########################################################################################################################
 
 # solve gtk startup error
-#import gtk
+import gtk
 
-#gtk.set_interactive(False)
+gtk.set_interactive(False)
 
 import base64
 import getpass
@@ -38,6 +38,8 @@ sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'gui_scripts'))
 from settings_preferences import *
 from layout import *
 from stylesheet import set_stylesheet
+from proasis_functions import Proasis
+
 
 from XChemUtils import parse
 import XChemThread
@@ -77,6 +79,7 @@ class XChemExplorer(QtGui.QApplication):
         setup().settings(self)
         setup().preferences(self)
         setup().tables(self)
+        Proasis().proasis_menu(self)
 
         self.layout_funcs = LayoutFuncs()
 
@@ -512,6 +515,8 @@ class XChemExplorer(QtGui.QApplication):
             self.group_deposit_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.group_deposition_directory_label.setText(self.group_deposit_directory)
             self.settings['group_deposit_directory'] = self.group_deposit_directory
+
+
 
     ######################################### sort stuff below here ####################################################
     def select_sample_for_dimple(self):

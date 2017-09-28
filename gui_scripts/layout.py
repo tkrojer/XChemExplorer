@@ -2,6 +2,7 @@ import multiprocessing
 import subprocess
 import sys, os
 from PyQt4 import QtGui, QtCore, QtWebKit
+from functools import partial
 
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'lib'))
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'web'))
@@ -9,6 +10,7 @@ sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'gui_scripts'))
 
 from settings_preferences import setup
 
+from proasis_functions import Proasis
 import XChemToolTips
 import XChemMain
 
@@ -40,10 +42,10 @@ class LayoutObjects():
         menu_bar = QtGui.QMenuBar()
 
         # import menu bar dictionary
-        setup().top_menu_dict(self)
+        setup().top_menu_dict(xce_object)
 
         # create menu from menu dictionary
-        menu_bar = self.layout_funcs.setup_menubar(xce_object, menu_bar, self.menu_dict)
+        menu_bar = self.layout_funcs.setup_menubar(xce_object, menu_bar, xce_object.menu_dict)
 
         # END OF MENU BAR - CODE BELOW: stuff removed from apo structure stuff that appears might have a funky
         # consequence - work out later.
@@ -444,8 +446,12 @@ class LayoutFuncs():
                 if len(menu_item[1]) > 1:
                     eval(str('action.setShortcut("' + str(menu_item[1]) + '")'))
                 # connect the relevant function and add as an action
-                eval(str('action.triggered.connect(' + menu_item[2] + ')'))
-                menu.addAction(action)
+                try:
+                    action.triggered.connect(menu_item[2])
+                    menu.addAction(action)
+                except:
+                    print(menu_item[2])
+                    raise
 
         return menu_bar
 
