@@ -351,6 +351,8 @@ class setup():
                                                    xce_object.datasource_menu_import_csv_file],
                                                   ['Export CSV file from Datasource', '',
                                                    xce_object.datasource_menu_export_csv_file],
+                                                  ['Update datasource from file system', '',
+                                                   xce_object.datasource_menu_update_datasource],
                                                   ['Select columns to show', '',
                                                    xce_object.select_datasource_columns_to_display],
                                                   ['Create New Datasource (SQLite)', '',
