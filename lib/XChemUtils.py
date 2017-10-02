@@ -31,7 +31,7 @@ class process:
         self.fileroot_in=dimple['fileroot_in']
         self.mtz_free=self.fileroot_in+'.free.mtz'
         self.mtz_in=self.fileroot_in+'.mtz'
-        # need to set $CCP4_SCR, because the default directory in /home/zqr16691/tmp fills up easily 
+        # need to set $CCP4_SCR, because the default directory in /home/zqr16691/tmp fills up easily
         # and then dimple will not run
 #        if not os.path.isdir(self.project_directory[:self.project_directory.find('processing')+11]+'/tmp'):
 #            os.mkdir(self.project_directory[:self.project_directory.find('processing')+11]+'/tmp')
@@ -233,44 +233,54 @@ class helpers:
             else:
                 software+='grade -resname LIG -nomogul "{0!s}" -ocif {1!s}.cif -opdb {2!s}.pdb\n'\
                     .format(smiles, compoundID.replace(' ',''), compoundID.replace(' ',''))
-        # Removal of the hyrogena toms in PDB files is required for REFMAC 5 run. With Hydrogens some ligands fail to
-        # pass the external restraitns in pandda.giant.make_restraints.
-        # Copy the file with hydrogens as a base class
+        # Removal of the hyrogen atoms in PDB files is required for REFMAC 5 run. With Hydrogens some ligands fail to
+        # pass the external restraints in pandda.giant.make_restraints.
+        # Copy the file with hydrogens to retain in case needed
 
-        copy_with_hydrogens = "cp {0!s}.pdb {0!s}_with_H.pdb".format(compoundID.replace(' ', '')))
+        copy_with_hydrogens = 'cp {0!s}.pdb {0!s}_with_H.pdb'.format(compoundID.replace(' ', ''))
 
-        strip_hydrogens = "phenix.reduce {0!s}.pdb -trim {0!s}.pdb".format(compoundID.replace(' ', ''))
+        strip_hydrogens = 'phenix.reduce {0!s}.pdb -trim {0!s}.pdb'.format(compoundID.replace(' ', ''))
 
+        print software + '\n' + copy_with_hydrogens + '\n' + strip_hydrogens
 
         Cmds = (
-                    header+
-                    '\n'
-                    'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
-                    '\n'
-                    'source $XChemExplorer_DIR/setup-scripts/xce.setup-sh\n'
-                    '\n'
-                    '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(os.path.join(database_directory,data_source_file),sample,'RefinementCIFStatus','running') +
-                    '\n'
-                    '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','create_png_of_compound.py')+
-                    ' "{0!s}" {1!s} {2!s} {3!s}\n'.format(smiles, compoundID.replace(' ',''), sample, initial_model_directory)+
-                    '\n'
-                    'cd '+os.path.join(initial_model_directory,sample,'compound')+'\n'
-                    '\n'
-                    +software+
-                    +copy_with_hydrogens+
-                    +strip_hydrogens+
-                    '\n'
-                    'cd '+os.path.join(initial_model_directory,sample)+'\n'
-                    '\n'
-                    'ln -s compound/%s.cif .\n' %compoundID.replace(' ','')+
-                    'ln -s compound/{0!s}.pdb .\n'.format(compoundID.replace(' ',''))+
-                    'ln -s compound/{0!s}.png .\n'.format(compoundID.replace(' ',''))+
-                    '\n'
-                    '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_for_new_cif_files.py')+
-                    ' {0!s} {1!s} {2!s} {3!s}\n'.format(os.path.join(database_directory,data_source_file), sample, initial_model_directory, compoundID.replace(' ','') )+
-                    '\n'
-                    '/bin/rm compound/RESTRAINTS_IN_PROGRESS\n'
-            )
+
+            header +
+            '\n'
+            'export XChemExplorer_DIR="' + os.getenv('XChemExplorer_DIR') + '"' +
+            '\n'
+            'source $XChemExplorer_DIR/setup-scripts/xce.setup-sh'
+            '\n'
+            '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py {0!s} {1!s} {2!s} {3!s}'
+            .format(os.path.join(database_directory, data_source_file), sample, 'RefinementCIFStatus', 'running') +
+            '\n'
+            '$CCP4/bin/ccp4-python {0!s} {1!s} {2!s} {3!s} {4!s}\n'
+            .format(os.path.join(os.getenv('XChemExplorer_DIR'), 'helpers','create_png_of_compound.py'),smiles,
+                    compoundID.replace(' ', ''), sample, initial_model_directory) +
+            '\n'
+            'cd ' + os.path.join(initial_model_directory, sample, 'compound') +
+            '\n'
+            + software +
+            '\n'
+            + copy_with_hydrogens +
+            '\n'
+            + strip_hydrogens +
+            '\n'
+            'cd ' + os.path.join(initial_model_directory, sample) +
+            '\n'
+            'ln -s compound/%s.cif .\n' % compoundID.replace(' ', '') +
+            'ln -s compound/{0!s}.pdb .\n'.format(compoundID.replace(' ', '')) +
+            'ln -s compound/{0!s}.png .\n'.format(compoundID.replace(' ', '')) +
+            '\n'
+            '$CCP4/bin/ccp4-python ' + os.path.join(os.getenv('XChemExplorer_DIR'), 'helpers',
+                                                    'update_data_source_for_new_cif_files.py') +
+            ' {0!s} {1!s} {2!s} {3!s}\n'.format(os.path.join(database_directory, data_source_file), sample,
+                                                initial_model_directory, compoundID.replace(' ', '')) +
+            '\n'
+            '/bin/rm compound/RESTRAINTS_IN_PROGRESS\n'
+        )
+
+
         os.chdir(ccp4_scratch_directory)
         Logfile.insert('creating ACEDRG shell script for {0!s},{1!s} in {2!s}'.format(sample, compoundID, ccp4_scratch_directory))
         print Cmds
@@ -793,8 +803,8 @@ class parse:
                                                                                  math.radians(float(gamma)),
                                                                                  PDBinfo['Lattice'])
 
-                    
-                    
+
+
         return PDBinfo
 
 
@@ -880,7 +890,7 @@ class parse:
         db.update_data_source(xtal,db_dict)
 
 class mtztools:
-    
+
     def __init__(self,mtzfile):
         self.mtzfile=mtzfile
         self.space_group_dict=   {  'triclinic':    [1],
@@ -1041,7 +1051,7 @@ class mtztools:
         mtzdmp=subprocess.Popen(['mtzdmp',self.mtzfile],stdout=subprocess.PIPE)
         for n,line in enumerate(iter(mtzdmp.stdout.readline,'')):
             if line.startswith(' * Space group ='):
-                spg=line[line.find("'")+1:line.rfind("'")]        
+                spg=line[line.find("'")+1:line.rfind("'")]
         return spg
 
     def get_bravais_lattice_from_mtz(self):
@@ -1089,7 +1099,7 @@ class mtztools:
             if n==resolution_line and len(line.split())==8:
                 resolution_high=line.split()[5]
         return resolution_high
-        
+
     def get_low_resolution_from_mtz(self):
         resolution_low='n/a'
         resolution_line=1000000
