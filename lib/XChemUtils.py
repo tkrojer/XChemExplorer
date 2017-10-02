@@ -239,7 +239,7 @@ class helpers:
 
         copy_with_hydrogens = "cp {0!s}.pdb {0!s}_with_H.pdb".format(compoundID.replace(' ', '')))
 
-        strip_hydrogens = "phenix.reduce {0!s}.pdb -trim {0!s}.pdb".format(compoundID.replace(' ', '')))
+        strip_hydrogens = "phenix.reduce {0!s}.pdb -trim {0!s}.pdb".format(compoundID.replace(' ', ''))
 
 
         Cmds = (
