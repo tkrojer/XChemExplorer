@@ -2579,6 +2579,8 @@ class XChemExplorer(QtGui.QApplication):
 
         if instruction == 'Get New Results from Autoprocessing':
             self.check_for_new_autoprocessing_or_rescore(False)
+            self.update_header_and_data_from_datasource()
+            self.update_all_tables()
 
         elif instruction == 'Rescore Datasets':
             self.check_for_new_autoprocessing_or_rescore(True)
