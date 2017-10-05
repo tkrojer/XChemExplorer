@@ -520,7 +520,6 @@ class setup():
                                      'Build ground state model']
 
         xce_object.refine_file_tasks = ['Open COOT',
-                                    'Open COOT - new interface',
                                     'Open COOT for old PanDDA',
                                     'Update Deposition Table',
                                     'Prepare Group Deposition']
