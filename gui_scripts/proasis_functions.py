@@ -9,7 +9,7 @@ class Proasis:
 
     def proasis_menu(self, xce_object):
 
-
+	xce_object.proasis_directory = '/dls/science/groups/proasis/'
         if not os.path.isfile(os.path.join(xce_object.database_directory, xce_object.data_source_file)):
             xce_object.proasis_directory = '/dls/science/groups/proasis/'
             xce_object.proasis_project_label = 'No project found'
