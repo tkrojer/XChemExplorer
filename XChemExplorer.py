@@ -2655,7 +2655,7 @@ class XChemExplorer(QtGui.QApplication):
         elif instruction.startswith("Open COOT") or instruction == 'Build ground state model':
             if not self.coot_running:
                 self.update_log.insert('starting coot...')
-                if instruction == "Open COOT - new interface":
+                if instruction == "Open COOT":
                     interface = 'new'
                 elif instruction == "Open COOT for old PanDDA":
                     interface = 'panddaV1'
