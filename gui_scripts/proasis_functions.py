@@ -9,7 +9,7 @@ class Proasis:
 
     def proasis_menu(self, xce_object):
 
-	xce_object.proasis_directory = '/dls/science/groups/proasis/'
+        xce_object.proasis_directory = '/dls/science/groups/proasis/'
         if not os.path.isfile(os.path.join(xce_object.database_directory, xce_object.data_source_file)):
             xce_object.proasis_directory = '/dls/science/groups/proasis/'
             xce_object.proasis_project_label = 'No project found'
@@ -115,60 +115,56 @@ class Proasis:
         # make relevant project directory in proasis LabXChem folder
         print(str('Making Proasis project directory: ' + str(
             'mkdir ' + os.path.join(xce_object.proasis_directory, 'LabXChem', name))))
-        os.system(str('mkdir ' + os.path.join(xce_object.proasis_directory, 'LabXChem', name)))
-        perm_string = str('chmod u=rwx,g=rwx,o=r ' + os.path.join(xce_object.proasis_directory, 'LabXChem', name))
-        os.system(perm_string)
+        filename = os.path.join(xce_object.labxchem_directory, 'processing/proasis_tmp.sh')
+        if os.path.isfile(filename):
+            print('==> XCE: There are already jobs in the queue, please try again later...')
+            return None
+        f = open(filename, 'a')
+        f.write(str('mkdir ' + os.path.join(xce_object.proasis_directory, 'LabXChem', name) + ' \n'))
+        perm_string = str('chmod u=rwx,g=rwx,o=r ' + os.path.join(xce_object.proasis_directory, 'LabXChem', name) + '\n')
+        f.write(perm_string)
+
         # make reference file directory in project directory
-        os.system(str('mkdir ' + os.path.join(xce_object.proasis_directory, 'LabXChem', name, 'reference')))
+        f.write(str('mkdir ' + os.path.join(xce_object.proasis_directory, 'LabXChem', name, 'reference') + ' \n'))
         perm_string = str('chmod u=rwx,g=rwx,o=r ' + os.path.join(xce_object.proasis_directory, 'LabXChem',
-                                                                  name, 'reference'))
-        os.system(perm_string)
-        # create a temporary job to add the project in proasis schedule
-        temp_job = open(os.path.join(xce_object.proasis_directory, 'Scripts/scheduled_jobs/temp_jobs',
-                                     str(name + '.sh')), 'w')
-        perm_string = str(
-            'chmod u=rwx,g=rwx,o=r ' + os.path.join(xce_object.proasis_directory, 'Scripts/scheduled_jobs/temp_jobs',
-                                                    str(name
-                                                        + '.sh')))
-        os.system(perm_string)
-        job_string = str('/usr/local/Proasis2/utils/addnewproject.py -q OtherClasses -p ' + name)
-        temp_job.write(str(job_string))
-        temp_job.close()
-        print('==> XCE: Added job to queue... please restart XCE...')
-        print('==> XCE: Exiting!')
-        xce_object.quit_xce()
+                                                                  name, 'reference') + ' \n')
+        f.write(perm_string)
+
+        job_string = str('/usr/local/Proasis2/utils/addnewproject.py -q OtherClasses -p ' + name + ' \n')
+        f.write(str(job_string))
+        f.close()
+        os.system(str('chmod 755 ' + filename))
+        print('==> XCE: Added job to queue... please check proasis for your project: ' + str(name))
+
 
     def add_lead(self, xce_object):
         if hasattr(xce_object, 'leadadded'):
-            print('The lead has already been added,, please reload XCE to check status')
+            print('The lead has already been added, please reload XCE to check status')
         # in case directories don't exist...
         print(str('Making Proasis project directory: ' + str(
             'mkdir ' + os.path.join(xce_object.proasis_directory, 'LabXChem', xce_object.proasis_name))))
-        os.system(str('mkdir ' + os.path.join(xce_object.proasis_directory, 'LabXChem', xce_object.proasis_name)))
+        filename = os.path.join(xce_object.labxchem_directory, 'processing/proasis_tmp.sh')
+        if os.path.isfile(filename):
+            print('==> XCE: There are already jobs in the queue, please try again later...')
+            return None
+        f = open(filename, 'a')
+        f.write(str('mkdir ' + os.path.join(xce_object.proasis_directory, 'LabXChem', xce_object.proasis_name)+ ' \n'))
         perm_string = str(
-            'chmod u=rwx,g=rwx,o=r ' + os.path.join(xce_object.proasis_directory, 'LabXChem', xce_object.proasis_name))
-        os.system(perm_string)
+            'chmod u=rwx,g=rwx,o=r ' + os.path.join(xce_object.proasis_directory, 'LabXChem', xce_object.proasis_name)+ ' \n')
+        f.write(perm_string)
         # make reference file directory in project directory
-        os.system(str('mkdir ' + os.path.join(xce_object.proasis_directory, 'LabXChem', xce_object.proasis_name, 'reference')))
+        f.write(str('mkdir ' + os.path.join(xce_object.proasis_directory, 'LabXChem', xce_object.proasis_name, 'reference')+ ' \n'))
         perm_string = str('chmod u=rwx,g=rwx,o=r ' + os.path.join(xce_object.proasis_directory, 'LabXChem',
-                                                                  xce_object.proasis_name, 'reference'))
+                                                                  xce_object.proasis_name, 'reference')+ ' \n')
+        f.write(perm_string)
 
         # copy pandda_analyse_sites.csv to proasis directory for lead build
-        os.system(str('cp ' + str(os.path.join(xce_object.panddas_directory, 'analyses/pandda_analyse_sites.csv')) + ' ' +
-                      str(os.path.join(xce_object.proasis_directory, 'LabXChem', xce_object.proasis_name, 'reference'))))
+        f.write(str('cp ' + str(os.path.join(xce_object.panddas_directory, 'analyses/pandda_analyse_sites.csv')) + ' ' +
+                      str(os.path.join(xce_object.proasis_directory, 'LabXChem', xce_object.proasis_name, 'reference'))+ ' \n'))
         # copy reference pdb (from pandda directory to make sure same as in sites file)
-        os.system(str('cp ' + str(os.path.join(xce_object.panddas_directory, 'reference/reference.pdb')) + ' ' +
-                      str(os.path.join(xce_object.proasis_directory, 'LabXChem', xce_object.proasis_name, 'reference'))))
-        # open a temporary job file to write to for proasis scheduling
-        temp_job = open(
-            os.path.join(xce_object.proasis_directory, 'Scripts/scheduled_jobs/temp_jobs', str(xce_object.proasis_name + '.sh')),
-            'w')
-        # change file permissions of job
-        perm_string = str(
-            'chmod u=rwx,g=rwx,o=r ' + os.path.join(xce_object.proasis_directory, 'Scripts/scheduled_jobs/temp_jobs',
-                                                    str(xce_object.proasis_name + '.sh')))
-        os.system(perm_string)
-        # string to add leads in temp job file
+        f.write(str('cp ' + str(os.path.join(xce_object.panddas_directory, 'reference/reference.pdb')) + ' ' +
+                      str(os.path.join(xce_object.proasis_directory, 'LabXChem', xce_object.proasis_name, 'reference'))+ ' \n'))
+
         job_string = str('/dls/science/groups/proasis/Scripts/generate_leads.py -n ' + xce_object.proasis_name
                          + ' -r '
                          + str(
@@ -177,29 +173,36 @@ class Proasis:
                          + str(os.path.join(xce_object.proasis_directory, 'LabXChem', xce_object.proasis_name,
                                             'reference/pandda_analyse_sites.csv'))
                          + ' -d '
-                         + str(xce_object.current_directory))
+                         + str(xce_object.current_directory + ' \n'))
 
-        temp_job.write(str(job_string))
-        temp_job.close()
+        f.write(str(job_string))
+        f.close()
+        os.system(str('chmod 755 ' + filename))
         # remove option from menu so lead can't be added multiple times
         xce_object.leadadded=True
-        print('==> XCE: Added job to queue... please restart XCE...')
-        print('==> XCE: Exiting!')
-        xce_object.quit_xce()
+        print('==> XCE: Added job to queue...')
+
 
     def add_hits(self, xce_object):
         # open the list of pernament jobs to append
-        perm_job = open(os.path.join(xce_object.proasis_directory, 'Scripts/scheduled_jobs/test.sh'), 'a')
+        filename = os.path.join(xce_object.labxchem_directory, 'processing/proasis_tmp.sh')
+        if os.path.isfile(filename):
+            print('==> XCE: There are already jobs in the queue, please try again later...')
+            return None
+        f = open(filename, 'a')
         # string for job to add and update hits in proasis
-        job_string = (str(os.path.join(xce_object.proasis_directory, 'Scripts/populate_hits.py') + ' -d ' +
-                          xce_object.current_directory + ' > ' + os.path.join(xce_object.proasis_directory,
-                                                                        'Scripts/scheduled_jobs_logs',
-                                                                        str(xce_object.proasis_name + '_proasis.out'))))
-        perm_job.write(job_string)
-        perm_job.close()
-        print('==> XCE: Added job to queue... please restart XCE...')
-        print('==> XCE: Exiting!')
-        xce_object.quit_xce()
+        job_string = (str('echo "' + os.path.join(xce_object.proasis_directory, 'Scripts/populate_hits.py') + ' -d ' +
+                          xce_object.current_directory +
+                          ' > ' +
+                          os.path.join(xce_object.proasis_directory,
+                                       'Scripts/scheduled_jobs_logs',str(xce_object.proasis_name +
+                                                                         '_proasis_\$(date +\"%m%d%Y%H%M\").out')) +
+                          '" >> /dls/science/groups/proasis/Scripts/scheduled_jobs/test.sh \n'))
+        f.write(job_string)
+        f.close()
+        os.system(str('chmod 755 ' + filename))
+        print('==> XCE: Added job to queue...')
+
 
 
     def blank(self):
