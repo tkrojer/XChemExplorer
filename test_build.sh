@@ -12,7 +12,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 	tar -xf ccp4-osx-clang-latest.tar -C ./ccp4 --strip-components=1
 fi
 cd ccp4
-yes y| ./BINARY.setup
+yes y| ./BINARY.setup > /dev/null
 source bin/ccp4.setup-sh
 yes y | ccp4-python -m pip uninstall panddas
 ccp4-python -m pip install panddas
