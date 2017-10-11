@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
         wget http://devtools.fg.oisin.rc-harwell.ac.uk/nightly/ccp4-linux64-latest.tar.bz2
 	bunzip2 ccp4-linux64-latest.tar.bz2
