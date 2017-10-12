@@ -1,2 +1,4 @@
-language: python
-install: ./test_build.sh
+sudo: required
+services: docker
+install: docker build -t reskyner/XChemExplorer .
+script: docker run reskyner/XChemExplorer /bin/bash -c "run_tests"
