@@ -1,4 +1,4 @@
 sudo: required
 services: docker
-install: docker build -t reskyner/XChemExplorer .
-script: docker run reskyner/XChemExplorer /bin/bash -c "run_tests"
+install: docker build -t reskyner/xce .
+script: docker run reskyner/xce /bin/bash -c "run_tests"
