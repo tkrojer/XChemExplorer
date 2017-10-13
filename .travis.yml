@@ -1,4 +1,4 @@
 sudo: required
 services: docker
 install: docker build -t reskyner/xce .
-script: docker run reskyner/xce /bin/sh -c "run_tests"
+script: docker run reskyner/xce /bin/sh -c "./run_tests"
