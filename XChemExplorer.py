@@ -518,6 +518,8 @@ class XChemExplorer(QtGui.QApplication):
 
 
 
+
+
     ######################################### sort stuff below here ####################################################
     def select_sample_for_dimple(self):
         indexes = self.maps_table.selectionModel().selectedRows()
