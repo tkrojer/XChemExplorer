@@ -414,6 +414,7 @@ class XChemExplorer(QtGui.QApplication):
         if self.sender().text() == 'Select Project Directory':
             self.initial_model_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.initial_model_directory_label.setText(self.initial_model_directory)
+            self.pandda_input_data_dir_entry.setText(self.initial_model_directory)
             self.settings['initial_model_directory'] = self.initial_model_directory
         if self.sender().text() == 'Select Reference Structure Directory':
             reference_directory_temp = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
@@ -516,7 +517,7 @@ class XChemExplorer(QtGui.QApplication):
             self.group_deposition_directory_label.setText(self.group_deposit_directory)
             self.settings['group_deposit_directory'] = self.group_deposit_directory
 
-
+        #self.datasource_menu_reload_samples()
 
 
 
@@ -1985,6 +1986,7 @@ class XChemExplorer(QtGui.QApplication):
                    'acceptable_low_resolution_limit_for_data': 'too_low_resolution_data',
                    #'reference_directory_temp': 'reference_directory'
                      }
+        self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory, '*'))
 
         for current_key in key_list:
             try:
