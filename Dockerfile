@@ -3,5 +3,5 @@ FROM reskyner/ccp4
 ADD ./run_tests .
 ADD ./compile_test.py .
 RUN mkdir XChemExplorer
-ADD * ./XChemExplorer
+ADD * /XChemExplorer/
 #CMD ccp4-python ./compile_tests.py
