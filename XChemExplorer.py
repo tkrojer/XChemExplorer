@@ -3568,7 +3568,10 @@ class XChemExplorer(QtGui.QApplication):
                     if new_xtal:
                         cell_text = QtGui.QTableWidgetItem()
                         if xtal in pinDict:
-                            cell_text.setText(str(pinDict[xtal][0]))
+                            if header[0].startswith('SoakDB\nBarcode'):
+                                cell_text.setText(str(pinDict[xtal][0]))
+                            elif header[0].startswith('GDA\nBarcode'):
+                                cell_text.setText(str(pinDict[xtal][1]))
                             if pinDict[xtal][0] == 'NULL' or pinDict[xtal][1] == 'NULL':
                                 cell_text.setBackground(QtGui.QColor(255, 215, 0))
                             elif pinDict[xtal][0] != pinDict[xtal][1]:
