@@ -15,9 +15,9 @@
 ########################################################################################################################
 
 # solve gtk startup error
-#import gtk
+import gtk
 
-#gtk.set_interactive(False)
+gtk.set_interactive(False)
 
 import base64
 import getpass
@@ -38,6 +38,8 @@ sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'gui_scripts'))
 from settings_preferences import *
 from layout import *
 from stylesheet import set_stylesheet
+from proasis_functions import Proasis
+
 
 from XChemUtils import parse
 import XChemThread
@@ -77,6 +79,7 @@ class XChemExplorer(QtGui.QApplication):
         setup().settings(self)
         setup().preferences(self)
         setup().tables(self)
+        Proasis().proasis_menu(self)
 
         self.layout_funcs = LayoutFuncs()
 
@@ -411,6 +414,7 @@ class XChemExplorer(QtGui.QApplication):
         if self.sender().text() == 'Select Project Directory':
             self.initial_model_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.initial_model_directory_label.setText(self.initial_model_directory)
+            self.pandda_input_data_dir_entry.setText(self.initial_model_directory)
             self.settings['initial_model_directory'] = self.initial_model_directory
         if self.sender().text() == 'Select Reference Structure Directory':
             reference_directory_temp = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
@@ -512,6 +516,10 @@ class XChemExplorer(QtGui.QApplication):
             self.group_deposit_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.group_deposition_directory_label.setText(self.group_deposit_directory)
             self.settings['group_deposit_directory'] = self.group_deposit_directory
+
+        #self.datasource_menu_reload_samples()
+
+
 
     ######################################### sort stuff below here ####################################################
     def select_sample_for_dimple(self):
@@ -1978,6 +1986,7 @@ class XChemExplorer(QtGui.QApplication):
                    'acceptable_low_resolution_limit_for_data': 'too_low_resolution_data',
                    #'reference_directory_temp': 'reference_directory'
                      }
+        self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory, '*'))
 
         for current_key in key_list:
             try:
@@ -2574,6 +2583,8 @@ class XChemExplorer(QtGui.QApplication):
 
         if instruction == 'Get New Results from Autoprocessing':
             self.check_for_new_autoprocessing_or_rescore(False)
+            self.update_header_and_data_from_datasource()
+            self.update_all_tables()
 
         elif instruction == 'Rescore Datasets':
             self.check_for_new_autoprocessing_or_rescore(True)
@@ -2648,7 +2659,7 @@ class XChemExplorer(QtGui.QApplication):
         elif instruction.startswith("Open COOT") or instruction == 'Build ground state model':
             if not self.coot_running:
                 self.update_log.insert('starting coot...')
-                if instruction == "Open COOT - new interface":
+                if instruction == "Open COOT":
                     interface = 'new'
                 elif instruction == "Open COOT for old PanDDA":
                     interface = 'panddaV1'
@@ -3557,7 +3568,10 @@ class XChemExplorer(QtGui.QApplication):
                     if new_xtal:
                         cell_text = QtGui.QTableWidgetItem()
                         if xtal in pinDict:
-                            cell_text.setText(str(pinDict[xtal][0]))
+                            if header[0].startswith('SoakDB\nBarcode'):
+                                cell_text.setText(str(pinDict[xtal][0]))
+                            elif header[0].startswith('GDA\nBarcode'):
+                                cell_text.setText(str(pinDict[xtal][1]))
                             if pinDict[xtal][0] == 'NULL' or pinDict[xtal][1] == 'NULL':
                                 cell_text.setBackground(QtGui.QColor(255, 215, 0))
                             elif pinDict[xtal][0] != pinDict[xtal][1]:
