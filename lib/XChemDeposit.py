@@ -361,14 +361,21 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 panddaSites=self.db.execute_statement(sqlite)
                 self.Logfile.insert('found '+str(len(panddaSites))+' ligands')
                 for site in panddaSites:
-                    if str(site[1]).startswith('5'):
-                        self.Logfile.insert('site is ready for deposition')
+                    if os.path.isfile(str(site[2])):
+                        self.Logfile.insert('found mtz file of  event map for site')
                         eventMtz.append(str(site[2]))
                     else:
-                        self.Logfile.insert('site is NOT ready for deposition')
+                        self.Logfile.insert('missing mtz file of  event map for site')
                         self.updateFailureDict(xtal,'at least one PanDDA site is not ready for deposition')
-                        eventMtz.append(str(site[2]))
                         preparation_can_go_ahead=False
+#                    if str(site[1]).startswith('5'):
+#                        self.Logfile.insert('site is ready for deposition')
+#                        eventMtz.append(str(site[2]))
+#                    else:
+#                        self.Logfile.insert('site is NOT ready for deposition')
+#                        self.updateFailureDict(xtal,'at least one PanDDA site is not ready for deposition')
+#                        eventMtz.append(str(site[2]))
+#                        preparation_can_go_ahead=False
 
             n_eventMtz = len(eventMtz)
             if preparation_can_go_ahead:
@@ -505,8 +512,10 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             self.depositLog.text('group title: '+data_template_dict['group_title'])
             if self.structureType=='ligand_bound':
                 title=data_template_dict['structure_title'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID)
+                data_template_dict['group_title']='PanDDA analysis group deposition of models with modelled events (e.g. bound ligands)'
             if self.structureType=='apo':
                 title=data_template_dict['structure_title_apo'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID).replace('$n',str(self.counter))
+                data_template_dict['group_title']='PanDDA analysis group deposition of models of ground state datasets'
                 self.counter+=1
             data_template_dict['group_description']=data_template_dict['group_description'].replace('$ProteinName',data_template_dict['Source_organism_gene'])
             data_template_dict['title']=data_template_dict['group_title']+' -- '+title
