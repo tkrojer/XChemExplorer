@@ -149,14 +149,19 @@ class XChemExplorer(QtGui.QApplication):
 
     def search_for_datasets(self):
         self.update_log.insert('search diffraction data directory for datasets...')
+        print('will search ' + str(self.diffraction_data_directory))
         self.work_thread = XChemMain.find_diffraction_image_directory_fast(self.diffraction_data_directory)
         self.explorer_active = 1
+
+        self.connect(self.work_thread, QtCore.SIGNAL("update_datasets_reprocess_table"),
+                     self.update_datasets_reprocess_table)
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-        self.connect(self.work_thread, QtCore.SIGNAL("update_datasets_reprocess_table"),
-                     self.update_datasets_reprocess_table)
+
         self.work_thread.start()
+
+        #self.work_thread = self.update_datasets_reprocess_table(self.diffraction_data_directory)
 
     def translate_datasetID_to_sampleID(self):
         translate = QtGui.QMessageBox()
@@ -2380,6 +2385,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def update_datasets_reprocess_table(self, data_dict):
         self.update_log.insert('updating reprocess datasets table')
+        print('updating reprocess datasets table')
         self.diffraction_data_table_dict = {}
         self.diffraction_data_dict = data_dict
 
