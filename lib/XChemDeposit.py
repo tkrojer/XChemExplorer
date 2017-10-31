@@ -383,6 +383,14 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 if self.structureType=='ligand_bound':
                     ModelData=self.db.execute_statement("select RefinementPDB_latest,RefinementMTZ_latest,RefinementCIF,DataProcessingPathToLogfile,RefinementProgram,CompoundCode,CompoundSMILES,RefinementMTZfree from mainTable where CrystalName is '{0!s}'".format(xtal))
                     pdb=str(ModelData[0][0])
+
+                    # check occupancies
+                    errorMsg=pdbtools(pdb).check_occupancies()
+                    if errorMsg[0] != '':
+                        self.Logfile.insert('problem with occpancies for '+xtal+'; skipping => ERROR\nDetails:\n'+errorMsg[0])
+                        self.depositLog.text('problem with occpancies for '+xtal+'; skipping => ERROR\nDetails:\n'+errorMsg[0])
+                        self.updateFailureDict(xtal,'occupancies of at least one residue with alternative conformations add up to > 1.00')
+                        continue
                     mtzFinal=str(ModelData[0][1])
                     if not os.path.isfile(mtzFinal):
                         self.Logfile.insert('cannot find refine.mtz for bound structure of '+xtal+'; skipping => ERROR')
