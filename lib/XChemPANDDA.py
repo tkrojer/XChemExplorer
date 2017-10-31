@@ -803,9 +803,9 @@ class convert_all_event_maps_in_database(QtCore.QThread):
             'from panddaTable '
             'where PANDDA_site_event_map not like "event%"'
         )
-
+        print sqlite
         query=self.db.execute_statement(sqlite)
-
+        print query
         progress_step=1
         if len(query) != 0:
             progress_step=100/float(len(query))
@@ -815,6 +815,7 @@ class convert_all_event_maps_in_database(QtCore.QThread):
         self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
         for item in query:
+            print item
             xtalID=str(item[0])
             event_map=str(item[1])
             resname=str(item[2])
@@ -878,6 +879,12 @@ class convert_event_map_to_SF:
         if os.path.isfile(self.event+'.mtz'):
             self.Logfile.insert('removing existing '+self.event+'.mtz')
             os.system('/bin/rm '+self.event+'.mtz')
+
+        # event maps generated with pandda v0.2 or higher have the same symmetry as the crystal
+        # but phenix.map_to_structure_facors only accepts maps in spg P1
+        # therefore map is first expanded to full unit cell and spg of map then set tp p1
+        # other conversion option like cinvfft give for whatever reason  uninterpretable maps
+        self.convert_map_to_p1()
 
         # run phenix.map_to_structure_factors
         self.run_phenix_map_to_structure_factors()
@@ -985,11 +992,21 @@ class convert_event_map_to_SF:
         self.Logfile.insert('running conversion script...')
         os.system('./eventMap2sf.sh')
 
+    def convert_map_to_p1(self):
+        self.Logfile.insert('running mapmask -> converting map to p1...')
+        cmd = (     '#!'+os.getenv('SHELL')+'\n'
+                    '\n'
+                    'mapmask mapin %s mapout %s_p1.map << eof\n' %(self.event_map,self.event) +
+                    'xyzlin cell\n'
+                    'symmetry p1\n' )
+        self.Logfile.insert('mapmask command:\n%s' %cmd)
+        os.system(cmd)
+
     def run_phenix_map_to_structure_factors(self):
         if float(self.resolution) < 1.21:   # program complains if resolution is 1.2 or higher
             self.resolution='1.21'
-        self.Logfile.insert('running phenix.map_to_structure_factors {0!s} d_min={1!s} output_file_name={2!s}_tmp.mtz'.format(self.event_map, self.resolution, self.event))
-        os.system('phenix.map_to_structure_factors {0!s} d_min={1!s} output_file_name={2!s}_tmp.mtz'.format(self.event_map, self.resolution, self.event))
+        self.Logfile.insert('running phenix.map_to_structure_factors {0!s}_p1.map d_min={1!s} output_file_name={2!s}_tmp.mtz'.format(self.event, self.resolution, self.event))
+        os.system('phenix.map_to_structure_factors {0!s}_p1.map d_min={1!s} output_file_name={2!s}_tmp.mtz'.format(self.event, self.resolution, self.event))
 
     def run_cinvfft(self,mtzin):
         # mtzin is usually refine.mtz
