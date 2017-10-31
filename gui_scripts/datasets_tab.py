@@ -101,7 +101,7 @@ class DatasetsTab():
 
         # create hbox to hold everything and add widgets to it
         xce_object.hbox_select = QtGui.QHBoxLayout()  # top options box
-        xce_object.hbox_select_widgets = [dc_label, select_button, search_button,
+        xce_object.hbox_select_widgets = [dc_label, xce_object.diffraction_data_dir_label, select_button, search_button,
                                           xce_object.diffraction_data_search_label,
                                           translate_label,
                                           csv_button]  # array defining order of xce_objects to be added
