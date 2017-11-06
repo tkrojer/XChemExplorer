@@ -775,6 +775,17 @@ class panddaRefine(object):
                 os.system(cmd)
                 Logfile.insert('waiting 3 seconds for giant.merge_conformations to finish...')
                 time.sleep(3)
+
+                # Run wrapper function for around merge conformations
+                cmd = (
+                   '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/wrapper_merge_confs.py {} {} {}'.format('input.pdb = multi-state-model.pdb',
+                                                                                                             'input.refmac_params_file = multi-state-restraints.refmac.params'
+                                                                                                             'output.pdb = multi-state-model.pdb')
+                )
+                Logfile.insert(cmd+'\n')
+                os.system(cmd)
+                Logfile.insert('waiting 2 seconds for wrapper_merge_confs to run')
+                time.sleep(2)
             else:
                 Logfile.error('cannot find modified version of bound state in %s' %os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
                 return None
