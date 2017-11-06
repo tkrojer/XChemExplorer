@@ -501,7 +501,7 @@ class run_pandda_analyse(QtCore.QThread):
                         'find ' + data_dir_string +
                         '/*/compound -name "*.cif" | while read line; do  echo ${line//"' +
                         data_dir_string + '"/"' + self.panddas_directory +
-                        '/processed_datasets/"}| while read line2; do cp $line ${line2//compound/ligand_files}; '
+                        '/processed_datasets/"}| while read line2; do cp $line ${line2//compound/ligand_files} > /dev/null 2>&1; '
                         'done; done;')
 
             Cmds += '\n'
@@ -512,7 +512,7 @@ class run_pandda_analyse(QtCore.QThread):
                         'find ' + data_dir_string +
                         '/*/compound -name "*.pdb" | while read line; do  echo ${line//"' +
                         data_dir_string + '"/"' + self.panddas_directory +
-                        '/processed_datasets/"}| while read line2; do cp $line ${line2//compound/ligand_files}; '
+                        '/processed_datasets/"}| while read line2; do cp $line ${line2//compound/ligand_files} > /dev/null 2>&1; '
                         'done; done;')
 
             self.Logfile.insert('running pandda.analyse with the following command:\n'+Cmds)
