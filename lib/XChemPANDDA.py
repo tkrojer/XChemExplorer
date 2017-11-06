@@ -376,6 +376,7 @@ class run_pandda_analyse(QtCore.QThread):
 #            self.nproc=pandda_params['nproc']
 #        else:
 #            self.nproc='7'
+        self.pandda_analyse_data_table = pandda_params['pandda_table']
         self.nproc=pandda_params['nproc']
         self.min_build_datasets=pandda_params['min_build_datasets']
         self.pdb_style=pandda_params['pdb_style']
@@ -468,6 +469,44 @@ class run_pandda_analyse(QtCore.QThread):
                 '\n'
                 )
 
+            ignore = []
+            char = []
+            zmap = []
+
+            for i in range(0, self.pandda_analyse_data_table.rowCount()):
+                ignore_all_checkbox = self.pandda_analyse_data_table.cellWidget(i, 6)
+                ignore_characterisation_checkbox = self.pandda_analyse_data_table.cellWidget(i, 7)
+                ignore_zmap_checkbox = self.pandda_analyse_data_table.cellWidget(i, 8)
+
+                if ignore_all_checkbox.isChecked():
+                    ignore.append(str(self.pandda_analyse_data_table.item(i, 0).text()))
+                if ignore_characterisation_checkbox.isChecked():
+                    char.append(str(self.pandda_analyse_data_table.item(i, 0).text()))
+                if ignore_zmap_checkbox.isChecked():
+                    zmap.append(str(self.pandda_analyse_data_table.item(i, 0).text()))
+
+            print ignore
+
+            def append_to_ignore_string(datasets_list, append_string):
+                if len(datasets_list)==0:
+                    append_string = ''
+                for i in range(0, len(datasets_list)):
+                    if i < len(datasets_list)-1:
+                        append_string += str(datasets_list[i] + ', ')
+                    else:
+                        append_string += str(datasets_list[i] +'"')
+                print(append_string)
+                return append_string
+
+            ignore_string = 'ignore_datasets="'
+            ignore_string = append_to_ignore_string(ignore, ignore_string)
+
+            char_string = 'exclude_from_characterisation="'
+            char_string = append_to_ignore_string(char, char_string)
+
+            zmap_string = 'exclude_from_zmap_analysis="'
+            zmap_string = append_to_ignore_string(zmap, zmap_string)
+
             for i in range(number_of_cyles):
                 Cmds += (
                     'module load pymol '+
@@ -486,7 +525,10 @@ class run_pandda_analyse(QtCore.QThread):
                     ' mtz_style='+self.mtz_style+
                     ' lig_style=/compound/*.cif'+
                     ' use_b_factor_scaling='+self.wilson_scaling+
-                    ' write_mean_map='+self.write_mean_maps+
+                    ' write_mean_map='+self.write_mean_maps+' '+
+                    ignore_string +' '+
+                    char_string +' '+
+                    zmap_string +' '+
                     '\n'
                     )
 
@@ -516,6 +558,8 @@ class run_pandda_analyse(QtCore.QThread):
                         'done; done;')
 
             self.Logfile.insert('running pandda.analyse with the following command:\n'+Cmds)
+
+
 
             f = open('pandda.sh','w')
             f.write(Cmds)

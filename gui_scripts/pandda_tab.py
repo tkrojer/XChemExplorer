@@ -184,7 +184,8 @@ class PanddaTab():
 
         xce_object.wilson_checkbox = QtGui.QCheckBox('Wilson B-factor Scaling')
         self.layout_funcs.add_checkbox(xce_object, xce_object.wilson_checkbox, 'xce_object.set_run_dimple_flag')
-	xce_object.pandda_analyse_input_params_vbox.addWidget(xce_object.wilson_checkbox)
+        xce_object.pandda_analyse_input_params_vbox.addWidget(xce_object.wilson_checkbox)
+
         # minimum number of datasets
         label = QtGui.QLabel('min_build_datasets')
         xce_object.pandda_analyse_input_params_vbox.addWidget(label)
