@@ -602,8 +602,10 @@ class XChemExplorer(QtGui.QApplication):
         vbox_restraints.addWidget(QtGui.QLabel('Restraints generation program:'))
         self.preferences_restraints_generation_combobox = QtGui.QComboBox()
         program_list = []
-        self.restraints_program = 'acedrg'
-        if self.external_software['acedrg']:       program_list.append('acedrg')
+
+        if self.external_software['acedrg']:
+            program_list.append('acedrg')
+            self.restraints_program = 'acedrg'
         if self.external_software['phenix.elbow']: program_list.append('phenix.elbow')
         if self.external_software['grade']:        program_list.append('grade')
         for item in program_list:
