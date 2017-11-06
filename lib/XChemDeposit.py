@@ -118,6 +118,7 @@ class templates:
             '_pdbx_deposit_group.group_id	   UNNAMED\n'
             '_pdbx_deposit_group.group_description  "%s"\n'                                     %depositDict['group_description']+
             '_pdbx_deposit_group.group_title        "{0!s}"\n'.format(depositDict['group_title'])+
+            '_pdbx_deposit_group.group_type         "{0!s}"\n'.format(depositDict['group_type'])+
             '#\n'
             '_exptl_crystal_grow.crystal_id      1\n'
             "_exptl_crystal_grow.method          '%s'\n"                                        %depositDict['crystallization_method']+
@@ -360,14 +361,21 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 panddaSites=self.db.execute_statement(sqlite)
                 self.Logfile.insert('found '+str(len(panddaSites))+' ligands')
                 for site in panddaSites:
-                    if str(site[1]).startswith('5'):
-                        self.Logfile.insert('site is ready for deposition')
+                    if os.path.isfile(str(site[2])):
+                        self.Logfile.insert('found mtz file of  event map for site')
                         eventMtz.append(str(site[2]))
                     else:
-                        self.Logfile.insert('site is NOT ready for deposition')
+                        self.Logfile.insert('missing mtz file of  event map for site')
                         self.updateFailureDict(xtal,'at least one PanDDA site is not ready for deposition')
-                        eventMtz.append(str(site[2]))
                         preparation_can_go_ahead=False
+#                    if str(site[1]).startswith('5'):
+#                        self.Logfile.insert('site is ready for deposition')
+#                        eventMtz.append(str(site[2]))
+#                    else:
+#                        self.Logfile.insert('site is NOT ready for deposition')
+#                        self.updateFailureDict(xtal,'at least one PanDDA site is not ready for deposition')
+#                        eventMtz.append(str(site[2]))
+#                        preparation_can_go_ahead=False
 
             n_eventMtz = len(eventMtz)
             if preparation_can_go_ahead:
@@ -375,6 +383,14 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 if self.structureType=='ligand_bound':
                     ModelData=self.db.execute_statement("select RefinementPDB_latest,RefinementMTZ_latest,RefinementCIF,DataProcessingPathToLogfile,RefinementProgram,CompoundCode,CompoundSMILES,RefinementMTZfree from mainTable where CrystalName is '{0!s}'".format(xtal))
                     pdb=str(ModelData[0][0])
+
+                    # check occupancies
+                    errorMsg=pdbtools(pdb).check_occupancies()
+                    if errorMsg[0] != '':
+                        self.Logfile.insert('problem with occpancies for '+xtal+'; skipping => ERROR\nDetails:\n'+errorMsg[0])
+                        self.depositLog.text('problem with occpancies for '+xtal+'; skipping => ERROR\nDetails:\n'+errorMsg[0])
+                        self.updateFailureDict(xtal,'occupancies of at least one residue with alternative conformations add up to > 1.00')
+                        continue
                     mtzFinal=str(ModelData[0][1])
                     if not os.path.isfile(mtzFinal):
                         self.Logfile.insert('cannot find refine.mtz for bound structure of '+xtal+'; skipping => ERROR')
@@ -504,8 +520,10 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             self.depositLog.text('group title: '+data_template_dict['group_title'])
             if self.structureType=='ligand_bound':
                 title=data_template_dict['structure_title'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID)
+                data_template_dict['group_title']='PanDDA analysis group deposition of models with modelled events (e.g. bound ligands)'
             if self.structureType=='apo':
                 title=data_template_dict['structure_title_apo'].replace('$ProteinName',data_template_dict['Source_organism_gene']).replace('$CompoundName',compoundID).replace('$n',str(self.counter))
+                data_template_dict['group_title']='PanDDA analysis group deposition of models of ground state datasets'
                 self.counter+=1
             data_template_dict['group_description']=data_template_dict['group_description'].replace('$ProteinName',data_template_dict['Source_organism_gene'])
             data_template_dict['title']=data_template_dict['group_title']+' -- '+title
@@ -528,14 +546,17 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 data_template_dict['protein_chains']+=item+','
             data_template_dict['protein_chains']=data_template_dict['protein_chains'][:-1]
 
+            data_template_dict['group_type'] = ''
             if self.structureType=='ligand_bound':
                 self.Logfile.insert('creating {0!s} file for ligand bound structure of {1!s}'.format(self.data_template_bound, xtal))
+                data_template_dict['group_type'] = 'changed state'
                 data_template=templates().data_template_cif(data_template_dict)
                 site_details=self.make_site_description(xtal)
                 data_template+=site_details
                 f=open(os.path.join(self.projectDir,xtal,self.data_template_bound),'w')
             elif self.structureType=='apo':
                 self.Logfile.insert('creating {0!s} file for apo structure of {1!s}'.format(self.data_template_apo, xtal))
+                data_template_dict['group_type'] = 'ground state'
                 data_template=templates().data_template_cif(data_template_dict)
                 site_details=self.make_site_description(xtal)
                 data_template+=site_details
