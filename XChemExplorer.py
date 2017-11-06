@@ -2787,7 +2787,8 @@ class XChemExplorer(QtGui.QApplication):
             'reference_dir': self.reference_directory,
             'appendix': '',
             'N_datasets': len(glob.glob(os.path.join(self.initial_model_directory, '*', 'dimple.pdb'))),
-            'write_mean_map': 'interesting'
+            'write_mean_map': 'interesting',
+            'pandda_table': self.pandda_analyse_data_table
         }
 
         if run == 'pre_run':
@@ -2820,8 +2821,8 @@ class XChemExplorer(QtGui.QApplication):
                                                           os.path.join(self.database_directory, self.data_source_file))
         self.work_thread = XChemPANDDA.run_pandda_analyse(pandda_params, self.xce_logfile,
                                                           os.path.join(self.database_directory, self.data_source_file))
-        self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),
-                     self.datasource_menu_reload_samples)
+        #self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),
+                     #self.datasource_menu_reload_samples)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
@@ -3806,16 +3807,29 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text.setText('')
                 else:
                     cell_text.setText(str(row[item]))
-                if self.overview_datasource_table_columns[
-                    y] == 'Sample ID':  # assumption is that column 0 is always sampleID
+                if self.overview_datasource_table_columns[y] == 'Sample ID':  # assumption is that column 0 is always sampleID
                     cell_text.setFlags(QtCore.Qt.ItemIsEnabled)  # and this field cannot be changed
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.overview_datasource_table.setItem(x, y, cell_text)
         self.overview_datasource_table.setHorizontalHeaderLabels(self.overview_datasource_table_columns)
 
+    def kill_other_pandda_options(self):
+        for i in range(0, self.pandda_analyse_data_table.rowCount()):
+            checkbox1 = self.pandda_analyse_data_table.cellWidget(i,6)
+            checkbox2 = self.pandda_analyse_data_table.cellWidget(i,7)
+            checkbox3 = self.pandda_analyse_data_table.cellWidget(i,8)
+            if checkbox1.isChecked():
+                checkbox2.setChecked(False)
+                checkbox3.setChecked(False)
+            if checkbox1.isChecked() and checkbox2.isChecked() or checkbox3.isChecked():
+                checkbox1.setChecked(False)
+            if checkbox2.isChecked() or checkbox3.isChecked():
+                checkbox1.setChecked(False)
+
     def populate_pandda_analyse_input_table(self):
 
         column_name = self.db.translate_xce_column_list_to_sqlite(self.pandda_table_columns)
+        print(column_name)
         for xtal in sorted(self.xtal_db_dict):
             new_xtal = False
             db_dict = self.xtal_db_dict[xtal]
@@ -3831,7 +3845,17 @@ class XChemExplorer(QtGui.QApplication):
                             current_row = table_row
                             break
                 for column, header in enumerate(column_name):
-                    if header[0] == 'Sample ID':
+                    if header[0]=='Exclude':
+                        deselect_button = QtGui.QCheckBox()
+                        deselect_button.stateChanged.connect(self.kill_other_pandda_options)
+                        self.pandda_analyse_data_table.setCellWidget(current_row, column, deselect_button)
+
+                    elif header[0]=='Ignore':
+                        deselect_button = QtGui.QCheckBox()
+                        deselect_button.stateChanged.connect(self.kill_other_pandda_options)
+                        self.pandda_analyse_data_table.setCellWidget(current_row, column, deselect_button)
+
+                    elif header[0] == 'Sample ID':
                         cell_text = QtGui.QTableWidgetItem()
                         cell_text.setText(str(xtal))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)

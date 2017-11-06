@@ -1264,6 +1264,10 @@ class data_source:
     def translate_xce_column_list_to_sqlite(self,column_list):
         out_list=[]
         for item in column_list:
+            if item.startswith('Exclude'):
+                out_list.append(['Exclude'])
+            if item.startswith('Ignore'):
+                out_list.append(['Ignore'])
             if item.startswith('img'):
                 out_list.append([item,item])
                 continue
