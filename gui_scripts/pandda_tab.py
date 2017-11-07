@@ -109,6 +109,14 @@ class PanddaTab():
             data_dir_string + '"/"' + xce_object.panddas_directory +
             '/processed_datasets/"}| while read line2; do cp $line ${line2//compound/ligand_files} > /dev/null 2>&1; '
             'done; done;'))
+
+            os.system(str(
+                'find ' + data_dir_string +
+                '/*/compound -name "*.pdb" | while read line; do  echo ${line//"' +
+                data_dir_string + '"/"' + xce_object.panddas_directory +
+                '/processed_datasets/"}| while read line2; do cp $line ${line2//compound/ligand_files} > /dev/null 2>&1; '
+                'done; done;'))
+
             print('==> XCE: Copied ligand restraints over')
 
         pandda_add_ligands_button = QtGui.QPushButton('Copy Ligand restraints for PanDDA')
