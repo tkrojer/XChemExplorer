@@ -445,7 +445,7 @@ class run_pandda_analyse(QtCore.QThread):
                     append_string = ''
                 for i in range(0, len(datasets_list)):
                     if i < len(datasets_list)-1:
-                        append_string += str(datasets_list[i] + ', ')
+                        append_string += str(datasets_list[i] + ',')
                     else:
                         append_string += str(datasets_list[i] +'"')
                 print(append_string)
