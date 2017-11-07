@@ -28,10 +28,7 @@ def get_names_of_current_clusters(xce_logfile,panddas_directory):
                         cluster_dict[out_dir].append(os.path.join(panddas_directory,'cluster_analysis',out_dir,'pdbs',xtal,xtal+'.pdb'))
                         found_first_pdb=True
                 cluster_dict[out_dir].append(xtal)
-#    for key in cluster_dict:
-#        Logfile.insert('cluster %s:   %s datasets' %(str(key),str(len(cluster_dict[key])-1)))
     return cluster_dict
-
 
 
 class run_pandda_export(QtCore.QThread):
@@ -70,19 +67,11 @@ class run_pandda_export(QtCore.QThread):
         if not self.update_datasource_only:
             samples_to_export=self.export_models()
 
-#        self.import_samples_into_datasouce()
-
         if not self.update_datasource_only:
             self.refine_exported_models(samples_to_export)
 
 
     def refine_exported_models(self,samples_to_export):
-
-        # obselete since RefinementOutcome field is set to 2-... for all the relevant structures during the export_models() function
-#        if self.which_models=='new':
-#            sample_list=self.db.execute_statement("select CrystalName,CompoundCode from mainTable where RefinementOutcome='2 - PANDDA model';")
-#        elif self.which_models=='all':
-#            sample_list=self.db.execute_statement("select CrystalName,CompoundCode from mainTable where RefinementOutcome='2 - PANDDA model' or RefinementOutcome='3 - In Refinement';")
         sample_list=self.db.execute_statement("select CrystalName,CompoundCode from mainTable where RefinementOutcome='2 - PANDDA model';")
         for item in sample_list:
             xtal=str(item[0])
@@ -113,7 +102,6 @@ class run_pandda_export(QtCore.QThread):
         # first make a note of all the datasets which were used in pandda directory
         os.chdir(os.path.join(self.panddas_directory,'processed_datasets'))
         for xtal in glob.glob('*'):
-#            self.Logfile.insert("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'False',DimplePANDDApath='%s' where CrystalName is '%s'" %(self.panddas_directory,xtal))
             self.db.execute_statement("update mainTable set DimplePANDDAwasRun = 'True',DimplePANDDAreject = 'False',DimplePANDDApath='{0!s}' where CrystalName is '{1!s}'".format(self.panddas_directory, xtal))
         # do the same as before, but look for rejected datasets
 
@@ -153,8 +141,6 @@ class run_pandda_export(QtCore.QThread):
             for i,line in enumerate(csv_dict):
                 db_dict={}
                 sampleID=line['dtag']
-#                if sampleID == 'JMJD2DA-x393':
-#                    print line
                 if sampleID not in pandda_hit_list:
                     pandda_hit_list.append(sampleID)
                 site_index=line['site_idx']
@@ -213,12 +199,10 @@ class run_pandda_export(QtCore.QThread):
                 db_dict['PANDDA_site_initial_model']        =   pandda_model
                 db_dict['PANDDA_site_initial_mtz']          =   inital_mtz
                 db_dict['PANDDA_site_spider_plot']          =   ''
-#                db_dict['RefinementOutcome']            =   '2 - PANDDA model'
 
                 # find apo structures which were used
                 # XXX missing XXX
 
-#                self.db.update_insert_panddaTable(sampleID,db_dict)
                 self.db.update_insert_site_event_panddaTable(sampleID,db_dict)
 
                 # this is necessary, otherwise RefinementOutcome will be reset for samples that are actually already in refinement
@@ -259,7 +243,6 @@ class run_pandda_export(QtCore.QThread):
         #       because only if the model was updated in pandda.inspect will it be exported and refined
         dbModelsDict={}
         if queryModels != '':
-#            print "select CrystalName,DatePanDDAModelCreated from mainTable where CrystalName in ("+queryModels[:-1]+") and (RefinementOutcome like '3%' or RefinementOutcome like '4%' or RefinementOutcome like '5%')"
             dbEntries=self.db.execute_statement("select CrystalName,DatePanDDAModelCreated from mainTable where CrystalName in ("+queryModels[:-1]+") and (RefinementOutcome like '3%' or RefinementOutcome like '4%' or RefinementOutcome like '5%')")
             for item in dbEntries:
                 xtal=str(item[0])
@@ -317,9 +300,7 @@ class run_pandda_export(QtCore.QThread):
             if os.path.isdir(os.path.join(self.panddas_directory,'rejected_datasets')):
 
                 Cmds = (
-#                'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
-#                '\n'
-#                '/dls/science/groups/i04-1/software/pandda-install/ccp4-pandda/bin/pandda.export'
+
                     'pandda.export'
                     ' pandda_dir=%s' %self.panddas_directory+
                     ' export_dir={0!s}'.format(self.initial_model_directory)+
@@ -346,24 +327,6 @@ class run_pandda_export(QtCore.QThread):
 
         return samples_to_export
 
-#        Cmds = (
-#                '#!'+os.getenv('SHELL')+'\n'
-#                'unset PYTHONPATH\n'
-#                'module load ccp4\n'
-#                '$CCP4/bin/pandda.export'
-#                ' pandda_dir=%s' %self.panddas_directory+
-#                ' export_dir=%s' %self.initial_model_directory+
-#                ' export_ligands=False'
-#                ' generate_occupancy_groupings=True\n'
-#                )
-#        os.system(Cmds)
-#        os.system('pandda.export pandda_dir=%s export_dir=%s export_ligands=False generate_occupancy_groupings=True' %(self.panddas_directory,self.initial_model_directory))
-#        self.Logfile.insert('ran pandda.export with the following command:\n'+Cmds)
-#        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'running pandda.export: check terminal for details')
-
-
-
-
 
 class run_pandda_analyse(QtCore.QThread):
 
@@ -372,10 +335,7 @@ class run_pandda_analyse(QtCore.QThread):
         self.data_directory=pandda_params['data_dir']
         self.panddas_directory=pandda_params['out_dir']
         self.submit_mode=pandda_params['submit_mode']
-#        if self.submit_mode == 'local machine':
-#            self.nproc=pandda_params['nproc']
-#        else:
-#            self.nproc='7'
+
         self.pandda_analyse_data_table = pandda_params['pandda_table']
         self.nproc=pandda_params['nproc']
         self.min_build_datasets=pandda_params['min_build_datasets']
@@ -420,12 +380,6 @@ class run_pandda_analyse(QtCore.QThread):
         #
         # 3) Repeat 2) until you don't add any "new" datasets. Then you can build the models as normal.
 
-#        crystalString=''
-#        for n,dataset in enumerate(self.dataset_list):
-#            if n > 0:       # first entry is reference file!
-#                crystalString+="'"+dataset+"',"
-#        print ("update mainTable set PANDDAStatus = 'started' where CrystalName in ({0!s})".format(crystalString[:-1]))
-#        self.db.execute_statement("update mainTable set PANDDAStatus = 'started' where CrystalName in ({0!s})".format(crystalString[:-1]))
 
         number_of_cyles=int(self.number_of_datasets)/int(self.max_new_datasets)
         if int(self.number_of_datasets) % int(self.max_new_datasets) != 0:  # modulo gives remainder after integer division
@@ -465,7 +419,6 @@ class run_pandda_analyse(QtCore.QThread):
                 + source_file +
                 'cd '+self.panddas_directory+'\n'
                 '\n'
-                #'$CCP4/bin/ccp4-python %s %s %s %s\n' %(  os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_pandda_status_flag.py'), self.datasource,crystalString[:-1],'running') +
                 '\n'
                 )
 
@@ -532,7 +485,6 @@ class run_pandda_analyse(QtCore.QThread):
                     '\n'
                     )
 
-            #Cmds += '$CCP4/bin/ccp4-python %s %s %s %s\n' %(  os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_pandda_status_flag.py'),    self.datasource,crystalString[:-1],'finished')
             Cmds += self.select_ground_state_model
             Cmds += self.make_ligand_links
             Cmds += '\n'
@@ -738,14 +690,7 @@ class check_if_pandda_can_run:
             datasetStructure=XChemUtils.pdbtools(dataset)
             symmDataset=datasetStructure.get_spg_number_from_pdb()
             ucVolDataset=datasetStructure.calc_unitcell_volume_from_pdb()
-#            if 'DCP' in ref:
-#                print ref,os.path.join(reference_directory,ref+'.pdb')
-#                if os.path.isfile(os.path.join(reference_directory,ref+'.pdb')):
-#                    print 'found ref'
-#                    print 'hallo'
-#            if 'DCP' in ref: print dataset, ucVolDataset
-#            if 'DCP' in ref: print symmRef, symmDataset
-#            if 'DCP' in ref: print ucVolRef, ucVolDataset
+
             if symmDataset == symmRef:
                 try:
                     difference=math.fabs(1-(float(ucVolRef)/float(ucVolDataset)))*100
@@ -807,11 +752,6 @@ class check_if_pandda_can_run:
             message=self.warning_messages()
         return message
 
-#    def analyse_amplitude_and_phase_labels(self):
-
-
-#    def analyse_all_input_parameter(self):
-#        print 'hallo'
 
     def warning_messages(self):
         message=''
@@ -910,9 +850,7 @@ class convert_event_map_to_SF:
         self.event_map=event_map
         self.ligand_pdb=ligand_pdb
         self.event=event_map[event_map.rfind('/')+1:].replace('.map','').replace('.ccp4','')
-#        self.resolution=resolution
         self.db=XChemDB.data_source(db_file)
-#        self.db_file=db_file
         self.resolution=resolution
 
     def run(self):
@@ -943,8 +881,6 @@ class convert_event_map_to_SF:
             # update datasource with event_map_mtz information
             self.update_database()
 
-#        # remove all temporary files
-#        self.clean_output_directory()
 
 
     def calculate_electron_density_map(self,mtzin):
@@ -994,14 +930,12 @@ class convert_event_map_to_SF:
             '\n'
             'ncsmask XYZIN mask_ligand.pdb MSKOUT mask_ligand.msk << eof\n'
             ' GRID %s\n' %(' '.join(self.gridElectronDensityMap))+
-#            ' AXIS Z    X    Y\n'
             ' RADIUS 10\n'
             ' PEAK 1\n'
             'eof\n'
             '\n'
             'mapmask MAPIN %s MAPOUT onecell_event_map.map << eof\n' %self.event_map+
             ' XYZLIM CELL\n'
-#            ' AXIS Z    X    Y\n'
             'eof\n'
             '\n'
             'maprot MAPIN onecell_event_map.map MSKIN mask_ligand.msk WRKOUT masked_event_map.map << eof\n'
@@ -1014,7 +948,6 @@ class convert_event_map_to_SF:
             '\n'
             'mapmask MAPIN masked_event_map.map MAPOUT masked_event_map_fullcell.map << eof\n'
             ' XYZLIM CELL\n'
-#            ' AXIS Z    X    Y\n'
             ' PAD 0.0\n'
             'eof\n'
             '\n'
@@ -1280,7 +1213,6 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                     ligands[n].append(residue_xyz)
                     foundLigand=False
                     if xtal in dbDict:
-#                        self.Logfile.insert(str(dbDict[xtal]))
                         for entry in dbDict[xtal]:
                             resnameTable=entry[4]
                             chainTable=entry[5]
@@ -1299,31 +1231,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                     self.Logfile.error('{0!s}: refine.pdb contains a ligand that is not assigned in the panddaTable: {1!s} {2!s} {3!s} {4!s}'.format(xtal, entry[0], entry[1], entry[2], entry[3]))
 
                 for site in ligands_not_in_panddaTable:
-#                    self.Logfile.insert('%s: making copy of refine.pdb' %xtal)
-#                    os.system('/bin/cp %s/refine.pdb %s/tmp.pdb' %(xtal,xtal))
-#
-#                    if os.path.isfile(os.path.join(xtal,xtal+'-ensemble-model.pdb.original')):
-#                        os.system('/bin/cp %s %s' %(os.path.join(xtal,xtal+'-ensemble-model.pdb.original'),os.path.join(xtal,xtal+'-ensemble-model.pdb')))
-##                    if not os.path.isfile(os.path.join(xtal,xtal+'-ensemble-model.pdb.original')):
-##                        self.Logfile.warning(xtal+': making copy of original pandda ensemble model: '+xtal+'-ensemble-model.pdb.original')
-##                        os.system('/bin/cp %s %s' %(os.path.join(xtal,xtal+'-ensemble-model.pdb'),os.path.join(xtal,xtal+'-ensemble-model.pdb.original')))
-#
-#                    if not made_sym_copies:
-#                        self.Logfile.insert('%s: making symmetry equivalent copies of ligand molecules' %xtal)
-#                        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), xtal+': generating symmetry equivalent PDB files for ligand')
-#                        XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_ligands_to_pdb_to_directory(os.path.join(self.project_directory,xtal,'xceTmp'))
-#                        ligandFiles=[]
-#                        # seems redundant, but want to avoid that glob includes newly generated sym equivalents
-#                        for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*.pdb')):
-#                            ligandFiles.append(files)
-#                        symEquivalents=[]
-#                        for files in ligandFiles:
-#                            pdbList=XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_sym_equivalents_of_ligands_in_pdb_as_one_file_per_ligand(files)
-#                            symEquivalents+=pdbList
-#                        for files in symEquivalents:
-#                            XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).save_surounding_unit_cells(files)
-#                        made_sym_copies=True
-#
+
                     for files in glob.glob(os.path.join(self.project_directory,xtal,'xceTmp','ligand_*_*.pdb')):
                         mol_xyz = XChemUtils.pdbtools(files).get_center_of_gravity_of_molecule_ish()
                         # now need to check if there is a unassigned entry in panddaTable that is close
@@ -1332,64 +1240,6 @@ class check_number_of_modelled_ligands(QtCore.QThread):
                             self.Logfile.insert('{0!s}: {1!s} {2!s} {3!s} <---> {4!s} {5!s} {6!s}'.format(xtal, mol_xyz[0], mol_xyz[1], mol_xyz[2], entry[1], entry[2], entry[3]))
                             self.Logfile.insert('{0!s}: symm equivalent molecule: {1!s}'.format(xtal, files))
                             self.Logfile.insert('{0!s}: distance: {1!s}'.format(xtal, str(distance)))
-
-
-
-
-#                        distance = XChemUtils.misc().calculate_distance_between_coordinates(mol_xyz[0], mol_xyz[1],mol_xyz[2],site[5][0], site[5][1],site[5][2])
-#                        self.Logfile.insert('%s: symm equivalent molecule: %s' %(xtal,files))
-#                        self.Logfile.insert('%s: distance: %s' %(xtal,str(distance)))
-#                        if distance == 0 and site[3] == '':
-#                            self.Logfile.warning(xtal+': ligand was not modelled with pandda.inspect -> %s %s %s' %(str(site[0]),str(site[1]),str(site[2])))
-#                            self.update_errorDict(xtal,'%s %s %s was not modelled with pandda.inpect' %(str(site[0]),str(site[1]),str(site[2])))
-#                            self.Logfile.insert('searching for ligands in refine.pdb which are within 10A of this ligand')
-#                            for ligand in ligands:
-#                                if ligand[3] == 'D':
-#                                    ligand_xyz=ligand[5]
-#                                    distance = XChemUtils.misc().calculate_distance_between_coordinates(ligand_xyz[0], ligand_xyz[1],ligand_xyz[2],site[5][0], site[5][1],site[5][2])
-#                                    self.Logfile.insert('distance to %s %s %s: %s' %(str(ligand[0]),str(ligand[1]),str(ligand[2]),distance)  )
-#                                    if distance < 15:
-#                                        self.Logfile.insert('ligand %s %s %s is within 15A' %(str(ligand[0]),str(ligand[1]),str(ligand[2])))
-#                                        self.Logfile.insert('using occupancy: '+str(ligand[4]))
-#
-#                                        self.Logfile.insert(xtal+': updating refine.pdb -> setting altLoc to D and occupancy to %s' %(str(ligand[4])))
-#                                        XChemUtils.pdbtools(os.path.join(xtal,'tmp.pdb')).update_residue(site[0],site[1],site[2],site[3],site[4], site[0],site[1],site[2],'D',ligand[4])
-#
-#                                        self.Logfile.insert('saving modifies ligand into pdb file: ligand_%s_%s_%s_%s.pdb' %(site[0],site[1],site[2],'D'))
-#                                        XChemUtils.pdbtools(os.path.join(xtal,'tmp.pdb')).save_specific_ligands_to_pdb(site[0],site[1],site[2],'D')
-#
-#                                        self.Logfile.insert('merging modified ligand into ensemble model')
-#                                        XChemUtils.pdbtools(os.path.join(xtal,xtal+'-ensemble-model.pdb')).merge_pdb_file('%s/ligand_%s_%s_%s_%s.pdb' %(xtal,site[0],site[1],site[2],'D'))
-#
-#                                        self.Logfile.warning(xtal+': inserting %s %s %s in panddaTable' %(site[0],site[1],site[2]))
-#                                        self.insert_new_row_in_panddaTable(xtal,ligand,site,dbDict)
-#
-#                                        self.update_errorDict(xtal,'Please check current model')
-#
-#                                        break
-#                            break
-#                        elif distance == 0 and site[3] != '':
-#                            self.update_errorDict(xtal,'found site')
-#                            self.Logfile.insert(xtal+' found site with distance '+str(distance)+' -> '+str(site))
-#
-#
-#
-#                            break
-
-
-#                        for site in dbDict[xtal]:
-#                            n_site=site[1]
-#                            site_x=site[1]
-#                            site_y=site[2]
-#                            site_z=site[3]
-##                                   print site_x,site_y,site_z,mol_xyz
-
-
-
-#                        self.Logfile.insert('%s: refine.pdb contains a ligand that is not assigned in panddaTable: %s %s %s' %(xtal,item[0],item[1],item[2]))
-#
-#                    else:
-#                        self.Logfile.insert('%s: found ligand in refine.pdb and panddaTable: %s %s %s' %(xtal,item[0],item[1],item[2]))
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
