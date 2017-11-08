@@ -36,7 +36,7 @@ def get_names_of_current_clusters(xce_logfile,panddas_directory):
 
 class run_pandda_export(QtCore.QThread):
 
-    def __init__(self,panddas_directory,datasource,initial_model_directory,xce_logfile,update_datasource_only,which_models):
+    def __init__(self,panddas_directory,datasource,initial_model_directory,xce_logfile,update_datasource_only,which_models,selected_samples):
         QtCore.QThread.__init__(self)
         self.panddas_directory=panddas_directory
         self.datasource=datasource
@@ -50,6 +50,8 @@ class run_pandda_export(QtCore.QThread):
         self.update_datasource_only=update_datasource_only
         self.which_models=which_models
         self.already_exported_models=[]
+        self.selected_samples=selected_samples
+
 
         self.RefmacParams={ 'HKLIN':            '',                 'HKLOUT': '',
                             'XYZIN':            '',                 'XYZOUT': '',
@@ -104,8 +106,10 @@ class run_pandda_export(QtCore.QThread):
                     Refine=XChemRefine.panddaRefine(self.initial_model_directory,xtal,compoundID,self.datasource)
                     os.symlink(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb'),xtal+'-ensemble-model.pdb')
                     Refine.RunQuickRefine(Serial,self.RefmacParams,self.external_software,self.xce_logfile,'pandda_refmac')
-            else:
+            elif xtal in samples_to_export and not os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.free.mtz')):
                 self.Logfile.error('%s: cannot start refinement because %s.free.mtz is missing in %s' %(xtal,xtal,os.path.join(self.initial_model_directory,xtal)))
+            else:
+                self.Logfile.insert('%s: nothing to refine' %(xtal))
 
 
     def import_samples_into_datasouce(self):
@@ -277,6 +281,13 @@ class run_pandda_export(QtCore.QThread):
             if self.which_models=='all':
                 self.Logfile.insert('exporting '+sample)
                 samples_to_export[sample]=fileModelsDict[sample]
+            elif self.which_models=='selected':
+                for item in self.selected_samples:
+                    print 'hererererere',item
+                    if item == sample:
+                        self.Logfile.insert('exporting '+sample)
+                        samples_to_export[sample]=fileModelsDict[sample]
+                        break
             else:
                 if sample in dbModelsDict:
                     try:

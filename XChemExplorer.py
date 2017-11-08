@@ -2645,6 +2645,11 @@ class XChemExplorer(QtGui.QApplication):
             which_models = 'all'
             self.run_pandda_export(update_datasource_only, which_models)
 
+        elif instruction == 'Export SELECTED PANDDA models':
+            update_datasource_only = False
+            which_models = 'selected'
+            self.run_pandda_export(update_datasource_only, which_models)
+
         elif instruction == 'cluster datasets':
             self.cluster_datasets_for_pandda()
 
@@ -2883,6 +2888,7 @@ class XChemExplorer(QtGui.QApplication):
         self.work_thread.start()
 
     def run_pandda_export(self, update_datasource_only, which_models):
+        modelList=[]
         self.settings['panddas_directory'] = str(self.pandda_output_data_dir_entry.text())
         if update_datasource_only:
             self.update_log.insert('updating data source with results from pandda.inspect')
@@ -2906,6 +2912,31 @@ class XChemExplorer(QtGui.QApplication):
                 start_thread = True
             else:
                 start_thread = False
+
+        elif which_models == 'selected':
+            self.update_log.insert('exporting selected models -> please enter comma separated samplesIDs')
+            msgBox = QtGui.QMessageBox()
+            msgBoxLayout = msgBox.layout()
+            msgBox.setText(
+                "exporting selected models\nplease enter comma separated samplesIDs\ne.g. test-x001,test-x002...")
+            vbox = QtGui.QVBoxLayout()
+            sampleEntry = QtGui.QLineEdit()
+            sampleEntry.setFixedWidth(200)
+            vbox.addWidget(sampleEntry)
+            msgBoxLayout.addLayout(vbox, 0, 0)
+            msgBox.addButton(QtGui.QPushButton('Go'), QtGui.QMessageBox.YesRole)
+            msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
+            reply = msgBox.exec_();
+            if reply == 0:
+                for item in str(sampleEntry.text()).split(','):
+                    self.update_log.insert('trying to export: '+item.replace(' ',''))
+                    modelList.append(item.replace(' ',''))
+                start_thread = True
+            else:
+                start_thread = False
+
+
+
         else:
             self.update_log.insert('exporting new models only')
             start_thread = True
@@ -2915,7 +2946,7 @@ class XChemExplorer(QtGui.QApplication):
                                                              os.path.join(self.database_directory,
                                                                           self.data_source_file),
                                                              self.initial_model_directory, self.xce_logfile,
-                                                             update_datasource_only, which_models)
+                                                             update_datasource_only, which_models,modelList)
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.work_thread.start()
 

@@ -511,6 +511,7 @@ class setup():
                                      'run pandda.inspect at home',
                                      'Export NEW PANDDA models',
                                      'Export ALL PANDDA models',
+                                     'Export SELECTED PANDDA models',
                                      'Show HTML summary',
                                      'Update datasource with results from pandda.inspect',
                                      'cluster datasets',
