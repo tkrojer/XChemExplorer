@@ -159,7 +159,8 @@ def alter_pdb_occupancy_not_in_occ_group(pdb,all_over_one_occ,all_occ_group_resi
                     ag.atoms().set_occ(flex.double(ag.atoms().size(), new_occ))
 
         # Write output pdb file
-        pdb_in.hierarchy.write_pdb_file(file_name=output_pdb)
+        pdb_in.hierarchy.write_pdb_file(file_name=output_pdb,
+                                        crystal_symmetry=pdb_in.input.crystal_symmetry())
 
 def replace_occupancies(pdb, refmac_params_file, output_pdb):
     """"Generate PDB file with occupancies reduced to 1/altlocs for residues not refined"""
