@@ -497,21 +497,6 @@ class XChemExplorer(QtGui.QApplication):
 
             self.layout_funcs.pandda_html(self)
 
-            # update add lead option for proasis if pandda directory is changed
-            # if os.path.isfile(os.path.join(self.panddas_directory, 'analyses/pandda_analyse_sites.csv')):
-            #     # hide old menu info
-            #     self.proasis_lead.setVisible(False)
-            #     # enable lead adding if pandda_analyse_sites.csv now exists
-            #     self.proasis_lead = QtGui.QAction(str('Create lead from pandda sites...'), self.window)
-            #     self.proasis_lead.triggered.connect(lambda: self.add_lead())
-            #     self.proasis_menu.addAction(self.proasis_lead)
-            # else:
-            #     # otherwise, keep same as old menu
-            #     self.proasis_lead = QtGui.QAction(
-            #         str('Site info not found... please run pandda analyse before adding lead'),
-            #         self.window)
-            #     self.proasis_menu.addAction(self.proasis_lead)
-
         if self.sender().text() == 'Select HTML Export Directory':
             self.html_export_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.html_export_directory_label.setText(self.html_export_directory)
@@ -641,7 +626,8 @@ class XChemExplorer(QtGui.QApplication):
         remote_qsub_label = QtGui.QLabel('remote qsub:')
         settings_hbox_remote_qsub.addWidget(remote_qsub_label)
         self.remote_qsub_checkbox = QtGui.QCheckBox('use')
-        self.remote_qsub_checkbox.toggled.connect(self.run_qsub_remotely)
+        #self.remote_qsub_checkbox.toggled.connect(self.run_qsub_remotely)
+
         if self.using_remote_qsub_submission:
             self.remote_qsub_checkbox.setChecked(True)
         settings_hbox_remote_qsub.addWidget(self.remote_qsub_checkbox)
@@ -653,10 +639,23 @@ class XChemExplorer(QtGui.QApplication):
 
         preferencesLayout.addLayout(vbox, 0, 0)
 
+        if self.remote_qsub_checkbox.isChecked():
+            self.remote_qsub_submission = str(self.remote_qsub_command.text())
+            self.update_log.insert('submitting jobs to remote machine with: %s' % self.remote_qsub_submission)
+            self.external_software['qsub_remote'] = self.remote_qsub_submission
+            self.using_remote_qsub_submission = True
+            self.settings['remote_qsub'] = self.remote_qsub_submission
+        else:
+            self.update_log.insert('switching off remote job submission')
+            self.external_software['qsub_remote'] = ''
+            self.settings['remote_qsub'] = ''
+            self.using_remote_qsub_submission = False
+
         preferences.exec_();
 
     def run_qsub_remotely(self):
         self.remote_qsub_submission = str(self.remote_qsub_command.text())
+        print(str(self.remote_qsub_submission))
         if self.remote_qsub_checkbox.isChecked():
             self.update_log.insert('submitting jobs to remote machine with: %s' % self.remote_qsub_submission)
             self.external_software['qsub_remote'] = self.remote_qsub_submission
