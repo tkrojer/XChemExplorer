@@ -1044,7 +1044,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
         self.xce_logfile=xce_logfile
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.pipeline='dimple'
-        self.using_remote_qsub_sumbission = remote_submission
+        self.using_remote_qsub_submission = remote_submission
 
 
     def run(self):
