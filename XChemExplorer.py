@@ -2353,7 +2353,7 @@ class XChemExplorer(QtGui.QApplication):
                                                                                   self.max_queue_jobs,
                                                                                   self.xce_logfile,
                                                                                   self.using_remote_qsub_submission,
-                                                                                  self.remote_qsub_submissions)
+                                                                                  self.remote_qsub_submission)
             self.explorer_active = 1
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
