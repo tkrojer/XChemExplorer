@@ -2536,7 +2536,7 @@ class XChemExplorer(QtGui.QApplication):
                     if self.main_tab_widget.currentIndex() == task_index:
                         if self.explorer_active == 0 and self.data_source_set == True:
                             if action == 'Run':
-                                print('==> XCE: Remote submission status = ' + str(self.remote_qsub_submission))
+                                print('==> XCE: Remote submission status = ' + str(self.using_remote_qsub_submission))
                                 self.prepare_and_run_task(instruction)
                             elif action == 'Status':
                                 self.get_status_of_workflow_milestone(instruction)
