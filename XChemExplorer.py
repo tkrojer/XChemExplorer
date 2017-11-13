@@ -637,19 +637,12 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_remote_qsub.addWidget(self.remote_qsub_command)
         vbox.addLayout(settings_hbox_remote_qsub)
 
-        preferencesLayout.addLayout(vbox, 0, 0)
+        apply_button = QtGui.QPushButton('Apply')
+        apply_button.clicked.connect(self.run_qsub_remotely)
+        settings_hbox_remote_qsub.addWidget(apply_button)
 
-        if self.remote_qsub_checkbox.isChecked():
-            self.remote_qsub_submission = str(self.remote_qsub_command.text())
-            self.update_log.insert('submitting jobs to remote machine with: %s' % self.remote_qsub_submission)
-            self.external_software['qsub_remote'] = self.remote_qsub_submission
-            self.using_remote_qsub_submission = True
-            self.settings['remote_qsub'] = self.remote_qsub_submission
-        else:
-            self.update_log.insert('switching off remote job submission')
-            self.external_software['qsub_remote'] = ''
-            self.settings['remote_qsub'] = ''
-            self.using_remote_qsub_submission = False
+
+        preferencesLayout.addLayout(vbox, 0, 0)
 
         preferences.exec_();
 
