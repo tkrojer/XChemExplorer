@@ -1031,7 +1031,7 @@ class create_png_and_cif_of_compound(QtCore.QThread):
         self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
 
 class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
-    def __init__(self,sample_list,initial_model_directory,external_software,ccp4_scratch_directory,database_directory,data_source_file,max_queue_jobs,xce_logfile, remote_submission):
+    def __init__(self,sample_list,initial_model_directory,external_software,ccp4_scratch_directory,database_directory,data_source_file,max_queue_jobs,xce_logfile, remote_submission, remote_submission_string):
         QtCore.QThread.__init__(self)
         self.sample_list=sample_list
         self.initial_model_directory=initial_model_directory
@@ -1045,6 +1045,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.pipeline='dimple'
         self.using_remote_qsub_submission = remote_submission
+        self.remote_qsub_submission = remote_submission_string
 
 
     def run(self):
