@@ -149,14 +149,19 @@ class XChemExplorer(QtGui.QApplication):
 
     def search_for_datasets(self):
         self.update_log.insert('search diffraction data directory for datasets...')
+        print('will search ' + str(self.diffraction_data_directory))
         self.work_thread = XChemMain.find_diffraction_image_directory_fast(self.diffraction_data_directory)
         self.explorer_active = 1
+
+        self.connect(self.work_thread, QtCore.SIGNAL("update_datasets_reprocess_table"),
+                     self.update_datasets_reprocess_table)
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-        self.connect(self.work_thread, QtCore.SIGNAL("update_datasets_reprocess_table"),
-                     self.update_datasets_reprocess_table)
+
         self.work_thread.start()
+
+        #self.work_thread = self.update_datasets_reprocess_table(self.diffraction_data_directory)
 
     def translate_datasetID_to_sampleID(self):
         translate = QtGui.QMessageBox()
@@ -414,6 +419,7 @@ class XChemExplorer(QtGui.QApplication):
         if self.sender().text() == 'Select Project Directory':
             self.initial_model_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.initial_model_directory_label.setText(self.initial_model_directory)
+            self.pandda_input_data_dir_entry.setText(self.initial_model_directory)
             self.settings['initial_model_directory'] = self.initial_model_directory
         if self.sender().text() == 'Select Reference Structure Directory':
             reference_directory_temp = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
@@ -516,6 +522,8 @@ class XChemExplorer(QtGui.QApplication):
             self.group_deposition_directory_label.setText(self.group_deposit_directory)
             self.settings['group_deposit_directory'] = self.group_deposit_directory
 
+        #self.datasource_menu_reload_samples()
+
 
 
     ######################################### sort stuff below here ####################################################
@@ -594,7 +602,10 @@ class XChemExplorer(QtGui.QApplication):
         vbox_restraints.addWidget(QtGui.QLabel('Restraints generation program:'))
         self.preferences_restraints_generation_combobox = QtGui.QComboBox()
         program_list = []
-        if self.external_software['acedrg']:       program_list.append('acedrg')
+
+        if self.external_software['acedrg']:
+            program_list.append('acedrg')
+            self.restraints_program = 'acedrg'
         if self.external_software['phenix.elbow']: program_list.append('phenix.elbow')
         if self.external_software['grade']:        program_list.append('grade')
         for item in program_list:
@@ -1983,6 +1994,7 @@ class XChemExplorer(QtGui.QApplication):
                    'acceptable_low_resolution_limit_for_data': 'too_low_resolution_data',
                    #'reference_directory_temp': 'reference_directory'
                      }
+        self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory, '*'))
 
         for current_key in key_list:
             try:
@@ -2376,6 +2388,7 @@ class XChemExplorer(QtGui.QApplication):
 
     def update_datasets_reprocess_table(self, data_dict):
         self.update_log.insert('updating reprocess datasets table')
+        print('updating reprocess datasets table')
         self.diffraction_data_table_dict = {}
         self.diffraction_data_dict = data_dict
 
@@ -2579,6 +2592,8 @@ class XChemExplorer(QtGui.QApplication):
 
         if instruction == 'Get New Results from Autoprocessing':
             self.check_for_new_autoprocessing_or_rescore(False)
+            self.update_header_and_data_from_datasource()
+            self.update_all_tables()
 
         elif instruction == 'Rescore Datasets':
             self.check_for_new_autoprocessing_or_rescore(True)
@@ -2653,7 +2668,7 @@ class XChemExplorer(QtGui.QApplication):
         elif instruction.startswith("Open COOT") or instruction == 'Build ground state model':
             if not self.coot_running:
                 self.update_log.insert('starting coot...')
-                if instruction == "Open COOT - new interface":
+                if instruction == "Open COOT":
                     interface = 'new'
                 elif instruction == "Open COOT for old PanDDA":
                     interface = 'panddaV1'
@@ -2772,7 +2787,8 @@ class XChemExplorer(QtGui.QApplication):
             'reference_dir': self.reference_directory,
             'appendix': '',
             'N_datasets': len(glob.glob(os.path.join(self.initial_model_directory, '*', 'dimple.pdb'))),
-            'write_mean_map': 'interesting'
+            'write_mean_map': 'interesting',
+            'pandda_table': self.pandda_analyse_data_table
         }
 
         if run == 'pre_run':
@@ -2805,8 +2821,8 @@ class XChemExplorer(QtGui.QApplication):
                                                           os.path.join(self.database_directory, self.data_source_file))
         self.work_thread = XChemPANDDA.run_pandda_analyse(pandda_params, self.xce_logfile,
                                                           os.path.join(self.database_directory, self.data_source_file))
-        self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),
-                     self.datasource_menu_reload_samples)
+        #self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),
+                     #self.datasource_menu_reload_samples)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
@@ -3562,7 +3578,10 @@ class XChemExplorer(QtGui.QApplication):
                     if new_xtal:
                         cell_text = QtGui.QTableWidgetItem()
                         if xtal in pinDict:
-                            cell_text.setText(str(pinDict[xtal][0]))
+                            if header[0].startswith('SoakDB\nBarcode'):
+                                cell_text.setText(str(pinDict[xtal][0]))
+                            elif header[0].startswith('GDA\nBarcode'):
+                                cell_text.setText(str(pinDict[xtal][1]))
                             if pinDict[xtal][0] == 'NULL' or pinDict[xtal][1] == 'NULL':
                                 cell_text.setBackground(QtGui.QColor(255, 215, 0))
                             elif pinDict[xtal][0] != pinDict[xtal][1]:
@@ -3788,16 +3807,29 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text.setText('')
                 else:
                     cell_text.setText(str(row[item]))
-                if self.overview_datasource_table_columns[
-                    y] == 'Sample ID':  # assumption is that column 0 is always sampleID
+                if self.overview_datasource_table_columns[y] == 'Sample ID':  # assumption is that column 0 is always sampleID
                     cell_text.setFlags(QtCore.Qt.ItemIsEnabled)  # and this field cannot be changed
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.overview_datasource_table.setItem(x, y, cell_text)
         self.overview_datasource_table.setHorizontalHeaderLabels(self.overview_datasource_table_columns)
 
+    def kill_other_pandda_options(self):
+        for i in range(0, self.pandda_analyse_data_table.rowCount()):
+            checkbox1 = self.pandda_analyse_data_table.cellWidget(i,6)
+            checkbox2 = self.pandda_analyse_data_table.cellWidget(i,7)
+            checkbox3 = self.pandda_analyse_data_table.cellWidget(i,8)
+            if checkbox1.isChecked():
+                checkbox2.setChecked(False)
+                checkbox3.setChecked(False)
+            if checkbox1.isChecked() and checkbox2.isChecked() or checkbox3.isChecked():
+                checkbox1.setChecked(False)
+            if checkbox2.isChecked() or checkbox3.isChecked():
+                checkbox1.setChecked(False)
+
     def populate_pandda_analyse_input_table(self):
 
         column_name = self.db.translate_xce_column_list_to_sqlite(self.pandda_table_columns)
+        print(column_name)
         for xtal in sorted(self.xtal_db_dict):
             new_xtal = False
             db_dict = self.xtal_db_dict[xtal]
@@ -3813,7 +3845,17 @@ class XChemExplorer(QtGui.QApplication):
                             current_row = table_row
                             break
                 for column, header in enumerate(column_name):
-                    if header[0] == 'Sample ID':
+                    if header[0]=='Exclude':
+                        deselect_button = QtGui.QCheckBox()
+                        deselect_button.stateChanged.connect(self.kill_other_pandda_options)
+                        self.pandda_analyse_data_table.setCellWidget(current_row, column, deselect_button)
+
+                    elif header[0]=='Ignore':
+                        deselect_button = QtGui.QCheckBox()
+                        deselect_button.stateChanged.connect(self.kill_other_pandda_options)
+                        self.pandda_analyse_data_table.setCellWidget(current_row, column, deselect_button)
+
+                    elif header[0] == 'Sample ID':
                         cell_text = QtGui.QTableWidgetItem()
                         cell_text.setText(str(xtal))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)

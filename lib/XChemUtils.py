@@ -1869,6 +1869,62 @@ class pdbtools(object):
         return residueList
 
 
+    def check_occupancies(self):
+        errorText=''
+        warningText=''
+        residueDict = {}
+        for line in open(self.pdb):
+            if line.startswith('ATOM') or line.startswith('HETATM'):
+                atomname=str(line[12:16]).replace(' ','')
+                resname=str(line[17:20]).replace(' ','')
+                chainID=str(line[21:22]).replace(' ','')
+                resseq=str(line[22:26]).replace(' ','')
+                altLoc=str(line[16:17]).replace(' ','')
+                occupancy=str(line[56:60]).replace(' ','')
+                if resname+'-'+chainID+'-'+resseq not in residueDict:
+                    residueDict[resname+'-'+chainID+'-'+resseq] = []
+                if altLoc == '':
+                    altLoc='0'
+                residueDict[resname+'-'+chainID+'-'+resseq].append([altLoc,occupancy,atomname,resname,chainID,resseq])
+        for item in residueDict:
+            altLocDict={}
+            for atom in residueDict[item]:
+                altLoc=atom[0]
+                occupancy=atom[1]
+                atomname=atom[2]
+                resname=atom[3]
+                chainID=atom[4]
+                resseq=atom[5]
+                if altLoc not in altLocDict:
+                    altLocDict[altLoc]=[]
+                altLocDict[altLoc].append([occupancy,atomname,resname,chainID,resseq])
+                if float(occupancy) > 1:
+                    errorText+='ERROR: %s %s %s (%s) %s: occupancy is %s\n' %(chainID,resname,resseq,altLoc,atomname,occupancy)
+            occupancySumList=[]
+            for altLoc in altLocDict:
+                occupancySum=0.0
+                nAtom=float(len(altLocDict[altLoc]))
+                for n,atom in enumerate(altLocDict[altLoc]):
+                    occupancy=atom[0]
+                    occupancySum+=float(occupancy)
+                    atomname=atom[1]
+                    resname=atom[2]
+                    chainID=atom[3]
+                    resseq=atom[4]
+                    if n==0:
+                        occStart=occupancy
+                    else:
+                        if occupancy != occStart:
+                            warningText+='%s %s %s (%s) %s: occupancy differs for altLoc -> %s\n' %(chainID,resname,resseq,altLoc,atomname,occupancy)
+                occupancySumList.append(occupancySum/nAtom)
+            occAdd=0.0
+            for entry in occupancySumList:
+                occAdd+=entry
+            if occAdd > 1:
+                errorText+='ERROR: '+item+' -> summarised occupanies of alternative conformations are > 1.0 ('+str(occupancySumList)+')\n'
+            
+        return errorText,warningText
+
     def get_xyz_coordinated_of_residue(self,chain,number):
         X=0.0
         Y=0.0

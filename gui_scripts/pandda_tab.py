@@ -2,8 +2,10 @@ import sys, os, multiprocessing
 from PyQt4 import QtGui, QtCore, QtWebKit
 
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'gui_scripts'))
+sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'lib'))
 
 import layout
+import XChemPANDDA
 
 
 class PanddaTab():
@@ -97,6 +99,30 @@ class PanddaTab():
         pandda_mtz_style_hbox.addWidget(xce_object.pandda_mtz_style_entry)
         xce_object.pandda_analyse_input_params_vbox.addLayout(pandda_mtz_style_hbox)
 
+        print(xce_object.initial_model_directory)
+        data_dir_string = xce_object.initial_model_directory.replace('/*', '')
+
+        def copy_ligands(obj):
+            os.system(str(
+            'find ' + data_dir_string +
+            '/*/compound -name "*.cif" | while read line; do  echo ${line//"' +
+            data_dir_string + '"/"' + xce_object.panddas_directory +
+            '/processed_datasets/"}| while read line2; do cp $line ${line2//compound/ligand_files} > /dev/null 2>&1; '
+            'done; done;'))
+
+            os.system(str(
+                'find ' + data_dir_string +
+                '/*/compound -name "*.pdb" | while read line; do  echo ${line//"' +
+                data_dir_string + '"/"' + xce_object.panddas_directory +
+                '/processed_datasets/"}| while read line2; do cp $line ${line2//compound/ligand_files} > /dev/null 2>&1; '
+                'done; done;'))
+
+            print('==> XCE: Copied ligand restraints over')
+
+        pandda_add_ligands_button = QtGui.QPushButton('Copy Ligand restraints for PanDDA')
+        pandda_add_ligands_button.clicked.connect(lambda: copy_ligands(xce_object))
+        xce_object.pandda_analyse_input_params_vbox.addWidget(pandda_add_ligands_button)
+
         # spacer to separate out sections
         spacer = QtGui.QLabel(' ')
         xce_object.pandda_analyse_input_params_vbox.addWidget(spacer)
@@ -166,6 +192,7 @@ class PanddaTab():
 
         xce_object.wilson_checkbox = QtGui.QCheckBox('Wilson B-factor Scaling')
         self.layout_funcs.add_checkbox(xce_object, xce_object.wilson_checkbox, 'xce_object.set_run_dimple_flag')
+        xce_object.pandda_analyse_input_params_vbox.addWidget(xce_object.wilson_checkbox)
 
         # minimum number of datasets
         label = QtGui.QLabel('min_build_datasets')

@@ -867,7 +867,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
                     if xtal+'/Refine_' in os.path.realpath(os.path.join(self.initial_model_directory,xtal,'refine.pdb')):
                         tmp=os.path.realpath(os.path.join(self.initial_model_directory,xtal,'refine.pdb'))
-                        spider_plot=os.path.join(tmp[:tmp.rfind('/')],'residue_plots',residue_name+'-'+residue_chain+'-'+residue_number+'.png')
+                        spider_plot=os.path.join(tmp[:tmp.rfind('/')],'residue_plots',residue_chain+'-'+residue_number+'.png').replace(' ','')
                         if os.path.isfile(spider_plot):
                             db_pandda_dict['PANDDA_site_spider_plot']=os.path.realpath(spider_plot)
                         if os.path.isfile(os.path.join(tmp[:tmp.rfind('/')],'residue_scores.csv')):
@@ -875,7 +875,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                                 csv_dict = csv.DictReader(csv_import)
                                 for i, line in enumerate(csv_dict):
                                     residueNameChainNumber = line['']
-                                    if residueNameChainNumber == residue_name+'-'+residue_chain+'-'+residue_number:
+                                    if residueNameChainNumber == residue_chain+'-'+residue_number:
                                         db_pandda_dict['PANDDA_site_occupancy'] = line['Occupancy']
                                         db_pandda_dict['PANDDA_site_B_average'] = line['Average B-factor (Residue)']
                                         db_pandda_dict['PANDDA_site_B_ratio_residue_surroundings'] = line['Surroundings B-factor Ratio']
@@ -1130,8 +1130,6 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             else:
                 additional_cmds=''
 
-
-
             Cmds = (
                     '{0!s}\n'.format(top_line)+
                     '\n'
@@ -1156,7 +1154,21 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
 #                    'eof\n'
 #                    '\n'
 #                    'dimple --no-cleanup %s.unique.mtz %s %s %s dimple\n' %(xtal,ref_pdb,ref_mtz,ref_cif) +
-                    'dimple --no-cleanup %s %s %s %s dimple\n' %(mtzin,ref_pdb,ref_mtz,ref_cif) +
+                    'unique hklout unique.mtz << eof\n'
+                    ' cell %s\n' %str(mtztools(mtzin).get_unit_cell_from_mtz()).replace("'",'').replace('[','').replace(']','').replace(',','')+
+                    ' symmetry %s\n' %mtztools(mtzin).get_spg_number_from_mtz()+
+                    ' resolution %s\n' %mtztools(mtzin).get_high_resolution_from_mtz()+
+                    'eof\n'
+                    '\n'
+                    'cad hklin1 %s hklin2 unique.mtz hklout %s.999A.mtz << eof\n' %(mtzin,xtal) +
+                    ' monitor BRIEF\n'
+                    ' labin file 1 ALL\n'
+                    ' labin file 2 E1=F E2=SIGF\n'
+                    ' labout file 2 E1=F_unique E2=SIGF_unique\n'
+                    ' resolution file 1 999.0 %s\n' %mtztools(mtzin).get_high_resolution_from_mtz()+
+                    'eof\n'
+                    '\n'
+                    'dimple --no-cleanup %s.999A.mtz %s %s %s dimple\n' %(xtal,ref_pdb,ref_mtz,ref_cif) +
                     '\n'
                     'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc,'dimple') +
                     '\n'
@@ -1654,6 +1666,9 @@ class remove_selected_dimple_files(QtCore.QThread):
 
         for n,xtal in enumerate(self.sample_list):
             db_dict={}
+            if not os.path.isdir(os.path.join(self.initial_model_directory,xtal)):
+                self.Logfile.insert('{0!s}: directory does not exist'.format(xtal))
+                continue
             os.chdir(os.path.join(self.initial_model_directory,xtal))
             self.Logfile.insert('{0!s}: removing dimple.pdb/dimple.mtz'.format(xtal))
             os.system('/bin/rm dimple.pdb 2> /dev/null')
@@ -2835,7 +2850,7 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
             progress=0
 
             gda_pin_dict={}
-            for files in glob.glob(os.path.join('/dls_sw',beamline,'logs','gda_server*')):
+            for files in glob.glob(os.path.join('/dls_sw',beamline,'logs','gda*','gda*')):
                 self.Logfile.insert('parsing '+files+' for sampleID and pinID')
                 gda_pin_dict=XChemMain.append_dict_of_gda_barcodes(gda_pin_dict,files,self.xce_logfile)
                 progress += progress_step

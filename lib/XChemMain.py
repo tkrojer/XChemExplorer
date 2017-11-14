@@ -406,7 +406,7 @@ def append_dict_of_gda_barcodes(out_dict,files,xce_logfile):
     Logfile=XChemLog.updateLog(xce_logfile)
     found_barcode_entry=False
     gda_log= files[files.rfind('/')+1:]
-    if gda_log.startswith('gda_server.') and gda_log.endswith('.gz'):
+    if gda_log.startswith('gda_server.') or gda_log.startswith('gda-server.') and gda_log.endswith('.gz'):
         with gzip.open(files,'r') as f:
             for line in f:
                 if 'BART SampleChanger - getBarcode() returning' in line:
@@ -418,7 +418,7 @@ def append_dict_of_gda_barcodes(out_dict,files,xce_logfile):
                         out_dict[sampleID]=barcode
                         Logfile.insert('found: sample={0!s}, barcode={1!s}, file={2!s}'.format(sampleID, barcode, files))
                         found_barcode_entry=False
-    elif gda_log.startswith('gda_server') and gda_log.endswith('log'):
+    elif gda_log.startswith('gda_server') or gda_log.startswith('gda-server') and gda_log.endswith('txt'):
         for line in open(files):
             if 'BART SampleChanger - getBarcode() returning' in line:
                 barcode=line.split()[len(line.split())-1]
@@ -590,7 +590,7 @@ class find_diffraction_image_directory(QtCore.QThread):
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
-        self.emit(QtCore.SIGNAL('update_reprocess_datasets_table'), self.data_dict)
+        self.emit(QtCore.SIGNAL('update_datasets_reprocess_table'), self.data_dict)
 
 class find_diffraction_image_directory_fast(QtCore.QThread):
     def __init__(self,diffraction_data_directory):
@@ -601,6 +601,7 @@ class find_diffraction_image_directory_fast(QtCore.QThread):
 #        self.datasetID_to_sampleID_conversion='*'
 
     def run(self):
+        print('Running diffraction image search in ' + str(self.diffraction_data_directory))
         os.chdir(self.diffraction_data_directory)
         if len(glob.glob(os.path.join(self.diffraction_data_directory,'*'))) != 0:
             progress_step=100/float(len(glob.glob(os.path.join(self.diffraction_data_directory,'*'))))
@@ -611,6 +612,7 @@ class find_diffraction_image_directory_fast(QtCore.QThread):
 
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'searching diffraction data directory')
         for xtal in glob.glob('*'):
+            #print xtal
             if 'screening' in xtal:
                 continue
             self.data_dict[xtal]=[]
@@ -647,5 +649,5 @@ class find_diffraction_image_directory_fast(QtCore.QThread):
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
-        self.emit(QtCore.SIGNAL('update_reprocess_datasets_table'), self.data_dict)
+        self.emit(QtCore.SIGNAL('update_datasets_reprocess_table'), self.data_dict)
 
