@@ -1,8 +1,9 @@
 import re
+import libtbx.phil
+import sys
+
 from iotbx.pdb import hierarchy
 from scitbx.array_family import flex
-import libtbx.phil
-
 ############################################################################
 
 PROGRAM = 'wrapper_merge_confs'
@@ -23,7 +24,7 @@ input {
         .help = 'The params file that contains the occupancy groups to be compared to' 
         .type = str
     pdb = 'multi-state-model.pdb'
-        .help = 'Input pdb file that conatins residues with occupancy over 1.0
+        .help = 'Input pdb file that conatins residues with occupancy over 1.0'
         .type = str
 }
 output {
@@ -133,7 +134,8 @@ def alter_pdb_occupancy_not_in_occ_group(pdb,all_over_one_occ,all_occ_group_resi
     """ Generate PDB file with occupancies reduced to 1/altlocs for residues not refined
         
         Take input pdb file path, output pdb file path, and two sets of 
-        residue/chain pairs,and alter occupancy of residues in one set """
+        residue/chain pairs,and alter occupancy of residues in difference 
+        between the sets """
 
     if all_over_one_occ - all_occ_group_residues:
         pdb_in = hierarchy.input(file_name = pdb)
@@ -141,18 +143,14 @@ def alter_pdb_occupancy_not_in_occ_group(pdb,all_over_one_occ,all_occ_group_resi
         sel_cache = pdb_in.hierarchy.atom_selection_cache()
         for residue in all_over_one_occ - all_occ_group_residues:
             altlocs = []
-            print residue[0], residue[1]
             over_one_not_occ_group = sel_cache.selection("resseq {} and chain {}".format(residue[1],residue[0]))
             residue_hier = pdb_in.hierarchy.select(over_one_not_occ_group)
 
-            print residue_hier.show()
 
             for ag in residue_hier.atom_groups():
                 altlocs.append(ag.altloc)
 
-            print altlocs
             new_occ = 1.0/len(altlocs)
-            print new_occ
 
             for ag in pdb_in.hierarchy.atom_groups():
                 if ag.parent().resseq == residue[1]:
@@ -174,7 +172,7 @@ def replace_occupancies(pdb, refmac_params_file, output_pdb):
 def run(params):
     replace_occupancies(pdb = params.input.pdb,
                         refmac_params_file = params.input.refmac_params_file,
-                        output_pdb = params.output.pdb):
+                        output_pdb = params.output.pdb)
 #######################################################################
 
 if __name__=='__main__':

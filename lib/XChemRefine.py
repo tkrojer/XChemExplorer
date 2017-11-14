@@ -778,9 +778,9 @@ class panddaRefine(object):
 
                 # Run wrapper function for around merge conformations
                 cmd = (
-                   '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/wrapper_merge_confs.py {} {} {}'.format('input.pdb = multi-state-model.pdb',
-                                                                                                             'input.refmac_params_file = multi-state-restraints.refmac.params'
-                                                                                                             'output.pdb = multi-state-model.pdb')
+                   '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/wrapper_merge_confs.py {} {} {}'.format('input.pdb=multi-state-model.pdb',
+                                                                                                             'input.refmac_params_file=multi-state-restraints.refmac.params',
+                                                                                                             'output.pdb=multi-state-model.pdb')
                 )
                 Logfile.insert(cmd+'\n')
                 os.system(cmd)
