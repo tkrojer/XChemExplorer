@@ -1145,17 +1145,6 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     '\n'
                     '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(database,xtal,'DimpleStatus','running') +
                     '\n'
-#                    'freerflag hklin %s hklout %s.unique.mtz << eof > freerflag.log\n' %(mtzin,xtal)+
-#                    ' COMPLETE FREE=FreeR_flag\n'
-#                    ' UNIQUE\n'
-#                    ' END\n'
-#                    'eof\n'
-#                    'freerflag hklin %s hklout %s.unique.mtz << eof > freerflag.log\n' %(mtzin,xtal)+
-#                    ' UNIQUE\n'
-#                    ' END\n'
-#                    'eof\n'
-#                    '\n'
-#                    'dimple --no-cleanup %s.unique.mtz %s %s %s dimple\n' %(xtal,ref_pdb,ref_mtz,ref_cif) +
                     'unique hklout unique.mtz << eof\n'
                     ' cell %s\n' %str(mtztools(mtzin).get_unit_cell_from_mtz()).replace("'",'').replace('[','').replace(']','').replace(',','')+
                     ' symmetry %s\n' %mtztools(mtzin).get_spg_number_from_mtz()+
@@ -1209,7 +1198,6 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
         # submit job
         self.Logfile.insert('created input scripts for '+str(n+1)+' in '+self.ccp4_scratch_directory)
         os.chdir(self.ccp4_scratch_directory)
-#        if os.getcwd().startswith('/dls'):
         if os.path.isdir('/dls'):
             if self.external_software['qsub_array']:
                 Cmds = (
@@ -1223,6 +1211,8 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                 self.Logfile.insert('using the following command:')
                 self.Logfile.insert('qsub -P labxchem -t 1:{0!s} -tc {1!s} dimple_master.sh'.format(str(n+1), self.max_queue_jobs))
                 if self.using_remote_qsub_submission:
+                    print(str(self.remote_qsub_submission).replace("qsub'", 'qsub -P labxchem -t 1:{0!s} -tc {1!s} dimple_master.sh'
+                                                                   .format(str(n+1), self.max_queue_jobs)) + "'")
                     os.system(str(str(self.remote_qsub_submission) + str('-P labxchem -t 1:{0!s} -tc {1!s} dimple_master.sh'.format(str(n+1)))), self.max_queue_jobs)
                 os.system('qsub -P labxchem -t 1:{0!s} -tc {1!s} dimple_master.sh'.format(str(n+1), self.max_queue_jobs))
             else:
