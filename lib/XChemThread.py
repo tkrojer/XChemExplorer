@@ -1207,6 +1207,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                 f = open('dimple_master.sh','w')
                 f.write(Cmds)
                 f.close()
+                print(os.getcwd())
                 self.Logfile.insert('submitting array job with maximal 100 jobs running on cluster')
                 self.Logfile.insert('using the following command:')
                 self.Logfile.insert('qsub -P labxchem -t 1:{0!s} -tc {1!s} dimple_master.sh'.format(str(n+1), self.max_queue_jobs))
