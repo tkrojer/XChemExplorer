@@ -1031,7 +1031,7 @@ class create_png_and_cif_of_compound(QtCore.QThread):
         self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
 
 class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
-    def __init__(self,sample_list,initial_model_directory,external_software,ccp4_scratch_directory,database_directory,data_source_file,max_queue_jobs,xce_logfile):
+    def __init__(self,sample_list,initial_model_directory,external_software,ccp4_scratch_directory,database_directory,data_source_file,max_queue_jobs,xce_logfile, remote_submission, remote_submission_string):
         QtCore.QThread.__init__(self)
         self.sample_list=sample_list
         self.initial_model_directory=initial_model_directory
@@ -1044,6 +1044,8 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
         self.xce_logfile=xce_logfile
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.pipeline='dimple'
+        self.using_remote_qsub_submission = remote_submission
+        self.remote_qsub_submission = remote_submission_string
 
 
     def run(self):
@@ -1143,17 +1145,6 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     '\n'
                     '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(database,xtal,'DimpleStatus','running') +
                     '\n'
-#                    'freerflag hklin %s hklout %s.unique.mtz << eof > freerflag.log\n' %(mtzin,xtal)+
-#                    ' COMPLETE FREE=FreeR_flag\n'
-#                    ' UNIQUE\n'
-#                    ' END\n'
-#                    'eof\n'
-#                    'freerflag hklin %s hklout %s.unique.mtz << eof > freerflag.log\n' %(mtzin,xtal)+
-#                    ' UNIQUE\n'
-#                    ' END\n'
-#                    'eof\n'
-#                    '\n'
-#                    'dimple --no-cleanup %s.unique.mtz %s %s %s dimple\n' %(xtal,ref_pdb,ref_mtz,ref_cif) +
                     'unique hklout unique.mtz << eof\n'
                     ' cell %s\n' %str(mtztools(mtzin).get_unit_cell_from_mtz()).replace("'",'').replace('[','').replace(']','').replace(',','')+
                     ' symmetry %s\n' %mtztools(mtzin).get_spg_number_from_mtz()+
@@ -1207,7 +1198,6 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
         # submit job
         self.Logfile.insert('created input scripts for '+str(n+1)+' in '+self.ccp4_scratch_directory)
         os.chdir(self.ccp4_scratch_directory)
-#        if os.getcwd().startswith('/dls'):
         if os.path.isdir('/dls'):
             if self.external_software['qsub_array']:
                 Cmds = (
@@ -1217,10 +1207,16 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                 f = open('dimple_master.sh','w')
                 f.write(Cmds)
                 f.close()
+                print(os.getcwd())
                 self.Logfile.insert('submitting array job with maximal 100 jobs running on cluster')
                 self.Logfile.insert('using the following command:')
                 self.Logfile.insert('qsub -P labxchem -t 1:{0!s} -tc {1!s} dimple_master.sh'.format(str(n+1), self.max_queue_jobs))
-                os.system('qsub -P labxchem -t 1:{0!s} -tc {1!s} dimple_master.sh'.format(str(n+1), self.max_queue_jobs))
+                if self.using_remote_qsub_submission:
+                    os.system(str(self.remote_qsub_submission).replace("qsub'", str('cd ' + str(os.getcwd()) + '; ' + 'qsub -P labxchem -t 1:{0!s} -tc {1!s} dimple_master.sh'
+                                                                  .format(str(n+1), self.max_queue_jobs))) + "'")
+
+                else:
+                    os.system('qsub -P labxchem -t 1:{0!s} -tc {1!s} dimple_master.sh'.format(str(n+1), self.max_queue_jobs))
             else:
                 self.Logfile.insert("cannot start ARRAY job: make sure that 'module load global/cluster' is in your .bashrc or .cshrc file")
         elif self.external_software['qsub']:
