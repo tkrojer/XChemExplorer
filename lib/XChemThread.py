@@ -1212,8 +1212,8 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                 self.Logfile.insert('using the following command:')
                 self.Logfile.insert('qsub -P labxchem -t 1:{0!s} -tc {1!s} dimple_master.sh'.format(str(n+1), self.max_queue_jobs))
                 if self.using_remote_qsub_submission:
-                    os.system(str(self.remote_qsub_submission).replace("qsub'", 'qsub -P labxchem -t 1:{0!s} -tc {1!s} dimple_master.sh'
-                                                                  .format(str(n+1), self.max_queue_jobs)) + "'")
+                    os.system(str(self.remote_qsub_submission).replace("qsub'", str('cd ' + str(os.getcwd()) + '; ' + 'qsub -P labxchem -t 1:{0!s} -tc {1!s} dimple_master.sh'
+                                                                  .format(str(n+1), self.max_queue_jobs))) + "'")
 
                 else:
                     os.system('qsub -P labxchem -t 1:{0!s} -tc {1!s} dimple_master.sh'.format(str(n+1), self.max_queue_jobs))
