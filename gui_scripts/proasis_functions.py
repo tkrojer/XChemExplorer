@@ -197,7 +197,7 @@ class Proasis:
                           os.path.join(xce_object.proasis_directory,
                                        'Scripts/scheduled_jobs_logs',str(xce_object.proasis_name +
                                                                          '_proasis_\$(date +\"%m%d%Y%H%M\").out')) +
-                          '" >> /dls/science/groups/proasis/Scripts/scheduled_jobs/test.sh \n'))
+                          '" >> /dls/science/groups/proasis/Scripts/scheduled_jobs/perm_jobs.sh \n'))
         f.write(job_string)
         f.close()
         os.system(str('chmod 755 ' + filename))
