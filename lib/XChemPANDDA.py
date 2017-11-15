@@ -1,6 +1,6 @@
 # last edited: 10/08/2017, 10:25
 
-import os, sys, glob
+import os, sys, glob, subprocess
 from datetime import datetime
 from PyQt4 import QtGui, QtCore
 import math
@@ -355,10 +355,12 @@ class run_pandda_analyse(QtCore.QThread):
         self.write_mean_maps=pandda_params['write_mean_map']
         self.select_ground_state_model=''
         projectDir = self.data_directory.replace('/*', '')
-        self.make_ligand_links='$CCP4/bin/ccp4-python %s %s %s\n' %(os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','make_ligand_links_after_pandda.py'),projectDir,self.panddas_directory)
+        self.make_ligand_links='$CCP4/bin/ccp4-python %s %s %s\n' %(os.path.join(os.getenv('XChemExplorer_DIR'),
+                                                                                 'helpers',
+                                                                                 'make_ligand_links_after_pandda.py')
+                                                                    ,projectDir,self.panddas_directory)
         self.use_remote = pandda_params['use_remote']
         self.remote_string = pandda_params['remote_string']
-
 
         if self.appendix != '':
             self.panddas_directory=os.path.join(self.reference_dir,'pandda_'+self.appendix)
@@ -401,7 +403,7 @@ class run_pandda_analyse(QtCore.QThread):
         else:
             if os.getenv('SHELL') == '/bin/tcsh' or os.getenv('SHELL') == '/bin/csh':
                 source_file=os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-csh\n')
-            elif os.getenv('SHELL') == '/bin/bash':
+            elif os.getenv('SHELL') == '/bin/bash' or self.use_remote:
                 source_file='export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
                 source_file+='source %s\n' %os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh\n')
             else:
@@ -410,7 +412,18 @@ class run_pandda_analyse(QtCore.QThread):
             if os.path.isfile(self.filter_pdb):
                 filter_pdb=' filter.pdb='+self.filter_pdb
             else:
-                filter_pdb=''
+                if self.use_remote:
+                    stat_command = self.remote_string.replace("qsub'", str('stat ' + self.filter_pdb + "'"))
+                    output = subprocess.Popen(stat_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    out, err = output.communicate()
+                    print out
+                    if 'cannot stat' in out:
+                        filter_pdb = ''
+                    else:
+                        filter_pdb = ' filter.pdb=' + self.filter_pdb
+
+                else:
+                    filter_pdb=''
 
             os.chdir(self.panddas_directory)
 
@@ -523,6 +536,14 @@ class run_pandda_analyse(QtCore.QThread):
                 self.Logfile.insert('running PANDDA on local machine')
                 os.system('chmod +x pandda.sh')
                 os.system('./pandda.sh &')
+            elif self.use_remote:
+                submission_string = self.remote_string.replace("qsub'",
+                                                               str('cd ' +
+                                                                   self.panddas_directory +
+                                                                   '; ' +
+                                                                   "qsub -P labxchem pandda.sh'"))
+                os.system(submission_string)
+                self.Logfile.insert(str('running PANDDA remotely, using: ' + submission_string))
             else:
                 self.Logfile.insert('running PANDDA on cluster, using qsub...')
                 os.system('qsub -P labxchem pandda.sh')

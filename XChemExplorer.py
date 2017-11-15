@@ -2783,7 +2783,9 @@ class XChemExplorer(QtGui.QApplication):
             'appendix': '',
             'N_datasets': len(glob.glob(os.path.join(self.initial_model_directory, '*', 'dimple.pdb'))),
             'write_mean_map': 'interesting',
-            'pandda_table': self.pandda_analyse_data_table
+            'pandda_table': self.pandda_analyse_data_table,
+            'use_remote': self.using_remote_qsub_submission,
+            'remote_string': self.remote_qsub_submission
         }
 
         if run == 'pre_run':
