@@ -159,10 +159,13 @@ class run_pandda_export(QtCore.QThread):
 
                 # check if EVENT map exists in project directory
                 event_map=''
-                for file in glob.glob(os.path.join(self.initial_model_directory,sampleID,'*ccp4')):
+#                for file in glob.glob(os.path.join(self.initial_model_directory,sampleID,'*ccp4')):
+                for file in glob.glob(os.path.join(self.panddas_directory,'processed_datasets', sampleID, '*ccp4')):
                     filename=file[file.rfind('/')+1:]
+                    # NUDT7A-x1444-event_1_1-BDC_0.15_map.native.ccp4
                     if filename.startswith(sampleID+'-event_'+event_index) and filename.endswith('map.native.ccp4'):
-                        event_map=file
+                        event_map=os.path.join(self.initial_model_directory,sampleID,filename)
+#                        event_map=file
                         self.Logfile.insert('found respective event maps in {0!s}: {1!s}'.format(self.initial_model_directory, event_map))
                         break
 
@@ -266,7 +269,6 @@ class run_pandda_export(QtCore.QThread):
                 samples_to_export[sample]=fileModelsDict[sample]
             elif self.which_models=='selected':
                 for item in self.selected_samples:
-                    print 'hererererere',item
                     if item == sample:
                         self.Logfile.insert('exporting '+sample)
                         samples_to_export[sample]=fileModelsDict[sample]

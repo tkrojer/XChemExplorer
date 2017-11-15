@@ -534,20 +534,6 @@ class setup():
                                          'Create CIF/PDB/PNG file of SELECTED compounds']
 
         xce_object.panddas_file_tasks = ['pandda.analyse',
-<<<<<<< HEAD
-                                     'pandda.inspect',
-                                     'run pandda.inspect at home',
-                                     'Export NEW PANDDA models',
-                                     'Export ALL PANDDA models',
-                                     'Export SELECTED PANDDA models',
-                                     'Show HTML summary',
-                                     'Update datasource with results from pandda.inspect',
-                                     'cluster datasets',
-                                     'Event Map -> SF',
-                                     'check modelled ligands',
-                                     'pre-run for ground state model',
-                                     'Build ground state model']
-=======
                                          'pandda.inspect',
                                          'run pandda.inspect at home',
                                          'Export NEW PANDDA models',
@@ -560,7 +546,6 @@ class setup():
                                          'check modelled ligands',
                                          'pre-run for ground state model',
                                          'Build ground state model']
->>>>>>> master
 
         xce_object.refine_file_tasks = ['Open COOT',
                                         'Open COOT for old PanDDA',
