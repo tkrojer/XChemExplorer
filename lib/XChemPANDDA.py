@@ -537,6 +537,7 @@ class run_pandda_analyse(QtCore.QThread):
                 os.system('chmod +x pandda.sh')
                 os.system('./pandda.sh &')
             elif self.use_remote:
+                # handles remote submission of pandda.analyse jobs
                 submission_string = self.remote_string.replace("qsub'",
                                                                str('cd ' +
                                                                    self.panddas_directory +
