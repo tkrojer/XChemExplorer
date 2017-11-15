@@ -356,6 +356,9 @@ class run_pandda_analyse(QtCore.QThread):
         self.select_ground_state_model=''
         projectDir = self.data_directory.replace('/*', '')
         self.make_ligand_links='$CCP4/bin/ccp4-python %s %s %s\n' %(os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','make_ligand_links_after_pandda.py'),projectDir,self.panddas_directory)
+        self.use_remote = pandda_params['use_remote']
+        self.remote_string = pandda_params['remote_string']
+
 
         if self.appendix != '':
             self.panddas_directory=os.path.join(self.reference_dir,'pandda_'+self.appendix)
