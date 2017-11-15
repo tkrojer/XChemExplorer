@@ -414,7 +414,7 @@ class run_pandda_analyse(QtCore.QThread):
             else:
                 if self.use_remote:
                     stat_command = self.remote_string.replace("qsub'", str('stat ' + self.filter_pdb + "'"))
-                    output = subprocess.Popen(stat_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    output = subprocess.Popen(stat_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     out, err = output.communicate()
                     print out
                     if 'cannot stat' in out:
