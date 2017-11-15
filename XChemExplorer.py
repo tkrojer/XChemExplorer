@@ -497,21 +497,6 @@ class XChemExplorer(QtGui.QApplication):
 
             self.layout_funcs.pandda_html(self)
 
-            # update add lead option for proasis if pandda directory is changed
-            # if os.path.isfile(os.path.join(self.panddas_directory, 'analyses/pandda_analyse_sites.csv')):
-            #     # hide old menu info
-            #     self.proasis_lead.setVisible(False)
-            #     # enable lead adding if pandda_analyse_sites.csv now exists
-            #     self.proasis_lead = QtGui.QAction(str('Create lead from pandda sites...'), self.window)
-            #     self.proasis_lead.triggered.connect(lambda: self.add_lead())
-            #     self.proasis_menu.addAction(self.proasis_lead)
-            # else:
-            #     # otherwise, keep same as old menu
-            #     self.proasis_lead = QtGui.QAction(
-            #         str('Site info not found... please run pandda analyse before adding lead'),
-            #         self.window)
-            #     self.proasis_menu.addAction(self.proasis_lead)
-
         if self.sender().text() == 'Select HTML Export Directory':
             self.html_export_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.html_export_directory_label.setText(self.html_export_directory)
@@ -602,7 +587,10 @@ class XChemExplorer(QtGui.QApplication):
         vbox_restraints.addWidget(QtGui.QLabel('Restraints generation program:'))
         self.preferences_restraints_generation_combobox = QtGui.QComboBox()
         program_list = []
-        if self.external_software['acedrg']:       program_list.append('acedrg')
+
+        if self.external_software['acedrg']:
+            program_list.append('acedrg')
+            self.restraints_program = 'acedrg'
         if self.external_software['phenix.elbow']: program_list.append('phenix.elbow')
         if self.external_software['grade']:        program_list.append('grade')
         for item in program_list:
@@ -638,7 +626,8 @@ class XChemExplorer(QtGui.QApplication):
         remote_qsub_label = QtGui.QLabel('remote qsub:')
         settings_hbox_remote_qsub.addWidget(remote_qsub_label)
         self.remote_qsub_checkbox = QtGui.QCheckBox('use')
-        self.remote_qsub_checkbox.toggled.connect(self.run_qsub_remotely)
+        #self.remote_qsub_checkbox.toggled.connect(self.run_qsub_remotely)
+
         if self.using_remote_qsub_submission:
             self.remote_qsub_checkbox.setChecked(True)
         settings_hbox_remote_qsub.addWidget(self.remote_qsub_checkbox)
@@ -648,12 +637,18 @@ class XChemExplorer(QtGui.QApplication):
         settings_hbox_remote_qsub.addWidget(self.remote_qsub_command)
         vbox.addLayout(settings_hbox_remote_qsub)
 
+        apply_button = QtGui.QPushButton('Apply')
+        apply_button.clicked.connect(self.run_qsub_remotely)
+        settings_hbox_remote_qsub.addWidget(apply_button)
+
+
         preferencesLayout.addLayout(vbox, 0, 0)
 
         preferences.exec_();
 
     def run_qsub_remotely(self):
         self.remote_qsub_submission = str(self.remote_qsub_command.text())
+        print(str(self.remote_qsub_submission))
         if self.remote_qsub_checkbox.isChecked():
             self.update_log.insert('submitting jobs to remote machine with: %s' % self.remote_qsub_submission)
             self.external_software['qsub_remote'] = self.remote_qsub_submission
@@ -2356,7 +2351,9 @@ class XChemExplorer(QtGui.QApplication):
                                                                                   self.database_directory,
                                                                                   self.data_source_file,
                                                                                   self.max_queue_jobs,
-                                                                                  self.xce_logfile)
+                                                                                  self.xce_logfile,
+                                                                                  self.using_remote_qsub_submission,
+                                                                                  self.remote_qsub_submission)
             self.explorer_active = 1
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
@@ -2541,6 +2538,7 @@ class XChemExplorer(QtGui.QApplication):
                     if self.main_tab_widget.currentIndex() == task_index:
                         if self.explorer_active == 0 and self.data_source_set == True:
                             if action == 'Run':
+                                print('==> XCE: Remote submission status = ' + str(self.using_remote_qsub_submission))
                                 self.prepare_and_run_task(instruction)
                             elif action == 'Status':
                                 self.get_status_of_workflow_milestone(instruction)
@@ -2789,7 +2787,8 @@ class XChemExplorer(QtGui.QApplication):
             'reference_dir': self.reference_directory,
             'appendix': '',
             'N_datasets': len(glob.glob(os.path.join(self.initial_model_directory, '*', 'dimple.pdb'))),
-            'write_mean_map': 'interesting'
+            'write_mean_map': 'interesting',
+            'pandda_table': self.pandda_analyse_data_table
         }
 
         if run == 'pre_run':
@@ -2822,8 +2821,8 @@ class XChemExplorer(QtGui.QApplication):
                                                           os.path.join(self.database_directory, self.data_source_file))
         self.work_thread = XChemPANDDA.run_pandda_analyse(pandda_params, self.xce_logfile,
                                                           os.path.join(self.database_directory, self.data_source_file))
-        self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),
-                     self.datasource_menu_reload_samples)
+        #self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),
+                     #self.datasource_menu_reload_samples)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
@@ -3834,16 +3833,29 @@ class XChemExplorer(QtGui.QApplication):
                     cell_text.setText('')
                 else:
                     cell_text.setText(str(row[item]))
-                if self.overview_datasource_table_columns[
-                    y] == 'Sample ID':  # assumption is that column 0 is always sampleID
+                if self.overview_datasource_table_columns[y] == 'Sample ID':  # assumption is that column 0 is always sampleID
                     cell_text.setFlags(QtCore.Qt.ItemIsEnabled)  # and this field cannot be changed
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 self.overview_datasource_table.setItem(x, y, cell_text)
         self.overview_datasource_table.setHorizontalHeaderLabels(self.overview_datasource_table_columns)
 
+    def kill_other_pandda_options(self):
+        for i in range(0, self.pandda_analyse_data_table.rowCount()):
+            checkbox1 = self.pandda_analyse_data_table.cellWidget(i,6)
+            checkbox2 = self.pandda_analyse_data_table.cellWidget(i,7)
+            checkbox3 = self.pandda_analyse_data_table.cellWidget(i,8)
+            if checkbox1.isChecked():
+                checkbox2.setChecked(False)
+                checkbox3.setChecked(False)
+            if checkbox1.isChecked() and checkbox2.isChecked() or checkbox3.isChecked():
+                checkbox1.setChecked(False)
+            if checkbox2.isChecked() or checkbox3.isChecked():
+                checkbox1.setChecked(False)
+
     def populate_pandda_analyse_input_table(self):
 
         column_name = self.db.translate_xce_column_list_to_sqlite(self.pandda_table_columns)
+        print(column_name)
         for xtal in sorted(self.xtal_db_dict):
             new_xtal = False
             db_dict = self.xtal_db_dict[xtal]
@@ -3859,7 +3871,17 @@ class XChemExplorer(QtGui.QApplication):
                             current_row = table_row
                             break
                 for column, header in enumerate(column_name):
-                    if header[0] == 'Sample ID':
+                    if header[0]=='Exclude':
+                        deselect_button = QtGui.QCheckBox()
+                        deselect_button.stateChanged.connect(self.kill_other_pandda_options)
+                        self.pandda_analyse_data_table.setCellWidget(current_row, column, deselect_button)
+
+                    elif header[0]=='Ignore':
+                        deselect_button = QtGui.QCheckBox()
+                        deselect_button.stateChanged.connect(self.kill_other_pandda_options)
+                        self.pandda_analyse_data_table.setCellWidget(current_row, column, deselect_button)
+
+                    elif header[0] == 'Sample ID':
                         cell_text = QtGui.QTableWidgetItem()
                         cell_text.setText(str(xtal))
                         cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
