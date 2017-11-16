@@ -882,6 +882,8 @@ class GUI(object):
         # run REFMAC
         self.Refine.RunRefmac(self.Serial,self.RefmacParams,self.external_software,self.xce_logfile)
 
+        print self.external_software
+
         self.index+=1
         if self.index >= len(self.Todo):
 #            self.index = len(self.Todo)
