@@ -988,6 +988,7 @@ class panddaRefine(object):
         os.chdir(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
 #        os.system('ssh artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(self.ProjectPath,self.xtalID,Serial))
         Logfile.insert('changing directory to %s' %(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial))))
+
         if external_software['qsub']:
             Logfile.insert('starting refinement on cluster')
             os.system('qsub -P labxchem refmac.csh')
@@ -1001,6 +1002,7 @@ class panddaRefine(object):
             os.system('chmod +x refmac.csh')
             Logfile.insert('starting refinement on local machine')
             os.system('./refmac.csh &')
+
 #            if '/work/' in os.getcwd():
 #            os.system('ssh artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(self.ProjectPath,self.xtalID,Serial))
 #            else:

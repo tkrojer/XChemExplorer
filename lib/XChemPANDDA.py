@@ -99,7 +99,7 @@ class run_pandda_export(QtCore.QThread):
 
             elif xtal in os.path.join(self.panddas_directory,'processed_datasets',xtal,'modelled_structures',
                                       '{}-pandda-model.pdb'.format(xtal)):
-                self.Logfile.inser('{}: cannot start refinement because {}'.format(xtal,xtal) +
+                self.Logfile.insert('{}: cannot start refinement because {}'.format(xtal,xtal) +
                                    ' does not have a modelled structure. Check whether you expect this dataset to ' +
                                    ' have a modelled structure, compare pandda.inspect and datasource,'
                                    ' then tell XCHEMBB ')
