@@ -4,7 +4,7 @@ import os, sys, glob
 from datetime import datetime
 from PyQt4 import QtGui, QtCore
 import math
-from XChemUtils import mtztools
+#from XChemUtils import mtztools
 import XChemDB
 import XChemRefine
 import XChemUtils
@@ -86,16 +86,30 @@ class run_pandda_export(QtCore.QThread):
                     # create folder for new refinement cycle
                     if os.path.isdir(os.path.join(self.initial_model_directory,xtal,'cootOut','Refine_'+str(Serial))):
                         os.chdir(os.path.join(self.initial_model_directory,xtal,'cootOut','Refine_'+str(Serial)))
-                        os.system('/bin/rm *-ensemble-model.pdb *restraints*')
+                        try:
+                            os.system('/bin/rm *-ensemble-model.pdb *restraints*')
+                        except:
+                            self.Logfile.error("Restraint files didn't exist to remove. Will try to continue")
                     else:
                         os.mkdir(os.path.join(self.initial_model_directory,xtal,'cootOut','Refine_'+str(Serial)))
                         os.chdir(os.path.join(self.initial_model_directory,xtal,'cootOut','Refine_'+str(Serial)))
                     Refine=XChemRefine.panddaRefine(self.initial_model_directory,xtal,compoundID,self.datasource)
                     os.symlink(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb'),xtal+'-ensemble-model.pdb')
                     Refine.RunQuickRefine(Serial,self.RefmacParams,self.external_software,self.xce_logfile,'pandda_refmac')
-            else:
-                self.Logfile.error('%s: cannot start refinement because %s.free.mtz is missing in %s' %(xtal,xtal,os.path.join(self.initial_model_directory,xtal)))
 
+            elif xtal in os.path.join(self.panddas_directory,'processed_datasets',xtal,'modelled_structures',
+                                      '{}-pandda-model.pdb'.format(xtal)):
+                self.Logfile.insert('{}: cannot start refinement because {}'.format(xtal,xtal) +
+                                   ' does not have a modelled structure. Check whether you expect this dataset to ' +
+                                   ' have a modelled structure, compare pandda.inspect and datasource,'
+                                   ' then tell XCHEMBB ')
+
+            elif xtal in samples_to_export and not os.path.isfile(
+                    os.path.join(self.initial_model_directory, xtal, xtal + '.free.mtz')):
+                self.Logfile.error('%s: cannot start refinement because %s.free.mtz is missing in %s' % (
+                xtal, xtal, os.path.join(self.initial_model_directory, xtal)))
+            else:
+                self.Logfile.insert('%s: nothing to refine' % (xtal))
 
     def import_samples_into_datasouce(self):
 

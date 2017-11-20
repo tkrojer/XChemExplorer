@@ -788,8 +788,6 @@ class panddaRefine(object):
             )
             Logfile.insert(cmd+'\n')
             os.system(cmd)
-            Logfile.insert('waiting 3 seconds for giant.make_restraints to finish...')
-            time.sleep(3)
         elif os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'refine.split.ground-state.pdb')):
             Logfile.insert('found model of ground state: '+os.path.join(self.ProjectPath,self.xtalID,'refine.split.ground-state.pdb'))
             if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'refine.modified.pdb')):
@@ -798,7 +796,7 @@ class panddaRefine(object):
                 ground_state=os.path.join(self.ProjectPath,self.xtalID,'refine.split.ground-state.pdb')
                 bound_state='refine.modified.pdb'
                 Logfile.insert('running giant.merge_conformations major=%s minor=%s' %(ground_state,bound_state))
-#                os.system('giant.merge_conformations input.pdb=%s input.pdb=%s' %(ground_state,bound_state))
+
                 cmd = (
                 'export XChemExplorer_DIR="%s"\n' %os.getenv('XChemExplorer_DIR')+
                 'source %s\n' %os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh\n') +
@@ -806,19 +804,6 @@ class panddaRefine(object):
                 )
                 Logfile.insert(cmd+'\n')
                 os.system(cmd)
-                Logfile.insert('waiting 3 seconds for giant.merge_conformations to finish...')
-                time.sleep(3)
-
-                # Run wrapper function for around merge conformations
-                cmd = (
-                   '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/wrapper_merge_confs.py {} {} {}'.format('input.pdb=multi-state-model.pdb',
-                                                                                                             'input.refmac_params_file=multi-state-restraints.refmac.params',
-                                                                                                             'output.pdb=multi-state-model.pdb')
-                )
-                Logfile.insert(cmd+'\n')
-                os.system(cmd)
-                Logfile.insert('waiting 2 seconds for wrapper_merge_confs to run')
-                time.sleep(2)
             else:
                 Logfile.error('cannot find modified version of bound state in %s' %os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
                 return None
@@ -1003,6 +988,7 @@ class panddaRefine(object):
         os.chdir(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
 #        os.system('ssh artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(self.ProjectPath,self.xtalID,Serial))
         Logfile.insert('changing directory to %s' %(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial))))
+
         if external_software['qsub']:
             Logfile.insert('starting refinement on cluster')
             os.system('qsub -P labxchem refmac.csh')
@@ -1016,6 +1002,7 @@ class panddaRefine(object):
             os.system('chmod +x refmac.csh')
             Logfile.insert('starting refinement on local machine')
             os.system('./refmac.csh &')
+
 #            if '/work/' in os.getcwd():
 #            os.system('ssh artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(self.ProjectPath,self.xtalID,Serial))
 #            else:
