@@ -2671,6 +2671,7 @@ class XChemExplorer(QtGui.QApplication):
                     interface = 'reference'
                 else:
                     interface = 'old'
+                    print self.settings
                 self.work_thread = XChemThread.start_COOT(self.settings, interface)
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                 self.work_thread.start()

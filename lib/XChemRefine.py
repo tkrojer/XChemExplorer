@@ -500,14 +500,16 @@ class Refine(object):
         os.chdir(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
 #        os.system('ssh artemis "cd %s/%s/Refine_%s; qsub refmac.csh"' %(self.ProjectPath,self.xtalID,Serial))
         if os.path.isfile(xce_logfile): Logfile.insert('changing directory to %s' %(os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial)))
-        if external_software['qsub']:
-            Logfile.insert('starting refinement on cluster')
-            os.system('qsub -P labxchem refmac.csh')
-        elif external_software['qsub_remote'] != '':
+        if external_software['qsub_remote'] != '':
             if os.path.isfile(xce_logfile): Logfile.insert('starting refinement on remote cluster')
             remote_command=external_software['qsub_remote'].replace('qsub','cd %s; qsub' %os.path.join(self.ProjectPath,self.xtalID,'Refine_'+Serial))
             os.system('%s -P labxchem refmac.csh' %remote_command)
             print '%s -P labxchem refmac.csh' %remote_command
+        
+        elif external_software['qsub']:
+            Logfile.insert('starting refinement on cluster')
+            os.system('qsub -P labxchem refmac.csh')
+
         else:
             os.system('chmod +x refmac.csh')
             if os.path.isfile(xce_logfile): Logfile.insert('starting refinement on local machine')
