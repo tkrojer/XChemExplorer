@@ -82,7 +82,7 @@ class GUI(object):
         # for Data Processing and Refinement
         self.project_directory = self.settings['initial_model_directory']
         self.Serial=0
-	    self.panddaSerial=0
+        self.panddaSerial=0
         self.Refine=None
         self.index = -1
         self.Todo=[]
