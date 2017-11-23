@@ -219,23 +219,48 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 self.update_log.insert('this does not seem to be a mtz file: ' + file_name)
 
-    def check_for_new_autoprocessing_or_rescore(self, rescore_only):
-        self.update_log.insert('checking for new data collection')
-        start_thread = False
-        if rescore_only:
+
+    def select_best_autoprocessing_result(self):
+        start_thread = True
+        if self.rescore:
             # first pop up a warning message as this will overwrite all user selections
             msgBox = QtGui.QMessageBox()
             msgBox.setText("*** WARNING ***\nThis will overwrite all your manual selections!\nDo you want to continue?")
             msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.YesRole)
             msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.RejectRole)
             reply = msgBox.exec_();
-            if reply == 0:
-                start_thread = True
-            else:
+            if reply != 0:
                 start_thread = False
-        else:
-            start_thread = True
 
+        if start_thread:
+            self.update_log.insert('selecting best autoprocessing result')
+            self.update_log.insert('samples where user made manual changes will be ignored!')
+            rescore = False
+            processedDir=os.path.join(self.beamline_directory,'processed',self.target)
+            visit,beamline = XChemMain.getVisitAndBeamline(processedDir)
+            self.work_thread = XChemThread.choose_autoprocessing_outcome(os.path.join(self.database_directory,
+                                                                                      self.data_source_file),
+                                                                                      visit,
+                                                                                      self.reference_file_list,
+                                                                                      self.preferences,
+                                                                                      self.initial_model_directory,
+                                                                                      self.rescore,
+                                                                                      self.xce_logfile)
+
+            self.explorer_active = 1
+            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+            self.connect(self.work_thread, QtCore.SIGNAL("populate_datasets_summary_table"),
+                     self.populate_datasets_summary_table)
+            self.work_thread.start()
+
+
+
+
+    def check_for_new_autoprocessing_results(self):
+        self.update_log.insert('checking for new data collection')
+        start_thread = True
         if start_thread:
             if self.target == '=== SELECT TARGET ===':
                 msgBox = QtGui.QMessageBox()
@@ -256,25 +281,20 @@ class XChemExplorer(QtGui.QApplication):
                 start_thread = True
 
         if start_thread:
-            self.work_thread = XChemThread.read_autoprocessing_results_from_disc(self.visit_list,
-                                                                                 self.target,
-                                                                                 self.reference_file_list,
-                                                                                 self.database_directory,
-                                                                                 self.data_collection_dict,
-                                                                                 self.preferences,
-                                                                                 self.datasets_summary_file,
-                                                                                 self.initial_model_directory,
-                                                                                 rescore_only,
-                                                                                 self.acceptable_low_resolution_limit_for_data,
-                                                                                 os.path.join(self.database_directory,
+            processedDir=os.path.join(self.beamline_directory,'processed',self.target)
+            self.work_thread = XChemThread.read_write_autoprocessing_results_from_to_disc(processedDir,
+                                                                                          os.path.join(
+                                                                                              self.database_directory,
                                                                                               self.data_source_file),
-                                                                                 self.xce_logfile)
+                                                                                          self.initial_model_directory,
+                                                                                          self.xce_logfile)
+
             self.explorer_active = 1
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-            self.connect(self.work_thread, QtCore.SIGNAL("create_widgets_for_autoprocessing_results_only"),
-                         self.create_widgets_for_autoprocessing_results_only)
+            self.connect(self.work_thread, QtCore.SIGNAL("select_best_autoprocessing_result"),
+                         self.select_best_autoprocessing_result)
             self.work_thread.start()
 
     ####################################################################################################################
@@ -2586,16 +2606,12 @@ class XChemExplorer(QtGui.QApplication):
     def prepare_and_run_task(self, instruction):
 
         if instruction == 'Get New Results from Autoprocessing':
-            self.check_for_new_autoprocessing_or_rescore(False)
-            self.update_header_and_data_from_datasource()
-            self.update_all_tables()
+            self.rescore = False
+            self.check_for_new_autoprocessing_results()
 
         elif instruction == 'Rescore Datasets':
-            self.check_for_new_autoprocessing_or_rescore(True)
-
-        elif instruction == "Read PKL file":
-            summary = pickle.load(open(self.datasets_summary_file, "rb"))
-            self.create_widgets_for_autoprocessing_results_only(summary)
+            self.rescore = True
+            self.select_best_autoprocessing_result()
 
         elif instruction == 'Run xia2 on selected datasets':
             self.run_xia2_on_selected_datasets(False)
@@ -2686,88 +2702,6 @@ class XChemExplorer(QtGui.QApplication):
 
 
 
-    def check_status_create_png_of_soaked_compound(self):
-        number_of_samples = 0
-        running = 0
-        timestamp_list = []
-        cif_file_generated = 0
-        for folder in glob.glob(os.path.join(self.initial_model_directory, '*', 'compound')):
-            number_of_samples += 1
-            if os.path.isfile(os.path.join(folder, 'RESTRAINTS_IN_PROGRESS')):
-                running += 1
-                timestamp = datetime.fromtimestamp(
-                    os.path.getmtime(os.path.join(folder, 'RESTRAINTS_IN_PROGRESS'))).strftime('%Y-%m-%d %H:%M:%S')
-                timestamp_list.append(timestamp)
-            for cif_file in glob.glob(os.path.join(folder, '*.cif')):
-                if os.path.isfile(cif_file):
-                    cif_file_generated += 1
-        if timestamp_list != []:
-            last_timestamp = max(timestamp_list)
-        else:
-            last_timestamp = 'n/a'
-        message = 'Datasets: ' + str(number_of_samples) + ', jobs running: ' + str(running) + ', jobs finished: ' + str(
-            cif_file_generated) + ', last job submmitted: ' + str(last_timestamp)
-        self.status_bar.showMessage(message)
-
-
-
-        if start_thread:
-            if self.target == '=== SELECT TARGET ===':
-                msgBox = QtGui.QMessageBox()
-                warning = ('*** WARNING ***\n'
-                           'You did not select a target!\n'
-                           'In this case we will only parse the project directory!\n'
-                           'Please note that this option is usually only useful in case you reprocessed your data.\n'
-                           'Do you want to continue?')
-                msgBox.setText(warning)
-                msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.YesRole)
-                msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.RejectRole)
-                reply = msgBox.exec_();
-                if reply == 0:
-                    start_thread = True
-                else:
-                    start_thread = False
-            else:
-                start_thread = True
-
-        if start_thread:
-            self.work_thread = XChemThread.read_autoprocessing_results_from_disc(self.visit_list,
-                                                                                 self.target,
-                                                                                 self.reference_file_list,
-                                                                                 self.database_directory,
-                                                                                 self.data_collection_dict,
-                                                                                 self.preferences,
-                                                                                 self.datasets_summary_file,
-                                                                                 self.initial_model_directory,
-                                                                                 rescore_only,
-                                                                                 self.acceptable_low_resolution_limit_for_data,
-                                                                                 os.path.join(self.database_directory,
-                                                                                              self.data_source_file),
-                                                                                 self.xce_logfile)
-            self.explorer_active = 1
-            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-            self.connect(self.work_thread, QtCore.SIGNAL("create_widgets_for_autoprocessing_results_only"),
-                         self.create_widgets_for_autoprocessing_results_only)
-            self.work_thread.start()
-
-    def save_files_to_initial_model_folder(self):
-        self.work_thread = XChemThread.save_autoprocessing_results_to_disc(self.dataset_outcome_dict,
-                                                                           self.data_collection_table_dict,
-                                                                           self.data_collection_column_three_dict,
-                                                                           self.data_collection_dict,
-                                                                           self.database_directory,
-                                                                           self.data_source_file,
-                                                                           self.initial_model_directory,
-                                                                           self.preferences,
-                                                                           self.datasets_summary_file)
-        self.explorer_active = 1
-        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-        self.work_thread.start()
 
     def run_pandda_analyse(self, run):
         pandda_params = {
@@ -3084,158 +3018,6 @@ class XChemExplorer(QtGui.QApplication):
         msgBox.setText(text)
         msgBox.exec_()
 
-    def create_widgets_for_autoprocessing_results_only(self, data_dict):
-        self.status_bar.showMessage('Building details table for data processing results')
-        self.data_collection_dict = data_dict
-
-        column_name = ['Program',
-                       'Resolution\nOverall',
-                       'Resolution\n[Mn<I/sig(I)> = 1.5]',
-                       'DataProcessing\nSpaceGroup',
-                       'Mn<I/sig(I)>\nHigh',
-                       'Rmerge\nLow',
-                       'Completeness\nOverall',
-                       'DataProcessing\nUnitCell',
-                       'DataProcessing\nRfree',
-                       'DataProcessing\nScore']
-
-        # need to do this because db_dict keys are SQLite column names
-        diffraction_data_column_name = XChemDB.data_source(
-            os.path.join(self.database_directory, self.data_source_file)).translate_xce_column_list_to_sqlite(
-            column_name)
-
-        for xtal in sorted(self.data_collection_dict):
-            if os.path.isfile(os.path.join(self.initial_model_directory, xtal, xtal + '.mtz')):
-                mtz_already_in_inital_model_directory = True
-
-            # column 2: data collection date
-            # this one should always be there; it may need updating in case another run appears
-            # first find latest run
-            tmp = []
-            for entry in self.data_collection_dict[xtal]:
-                if entry[0] == 'image':
-                    tmp.append([entry[3], datetime.strptime(entry[3], '%Y-%m-%d %H:%M:%S')])
-            latest_run = max(tmp, key=lambda x: x[1])[0]
-
-            # first check if it does already exist
-            if xtal not in self.data_collection_column_three_dict:
-                # generate all the widgets which can later be appended and add them to the dictionary
-                data_collection_table = QtGui.QTableWidget()  # table with data processing results for each pipeline
-                selection_changed_by_user = False
-                self.data_collection_column_three_dict[xtal] = [data_collection_table, selection_changed_by_user]
-                xtal_in_table = True
-            else:
-                data_collection_table = self.data_collection_column_three_dict[xtal][0]
-                selection_changed_by_user = self.data_collection_column_three_dict[xtal][1]
-
-            data_collection_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-            data_collection_table.setColumnCount(len(column_name))
-            font = QtGui.QFont()
-            font.setPointSize(8)
-            data_collection_table.setFont(font)
-            data_collection_table.setHorizontalHeaderLabels(column_name)
-            data_collection_table.horizontalHeader().setFont(font)
-            data_collection_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-
-            #############################################################################
-            # crystal images
-            # first check there are new images that are not displayed yet; i.e. they are not in the self.data_collection_image_dict
-            if xtal not in self.data_collection_image_dict:
-                # OK this is the first time
-                self.data_collection_image_dict[xtal] = []
-
-            # sort crystal images by timestamp
-            # reminder: ['image',visit,run,timestamp,image_list,diffraction_image,run_number]
-            # a) get only image entries from self.data_collection_dict
-            tmp = []
-            for entry in self.data_collection_dict[xtal]:
-                if entry[0] == 'image':
-                    tmp.append(entry)
-
-            # b) sort by the previously assigned run number
-            #    note: entry[6]==run_number
-            for entry in sorted(tmp, key=lambda x: x[6]):
-                run_number = entry[6]
-                images_already_in_table = False
-                for image in self.data_collection_image_dict[xtal]:
-                    if run_number == image[0]:
-                        images_already_in_table = True
-                        break
-                if not images_already_in_table:
-                    # not if there is a run, but images are for whatever reason not present in self.data_collection_dict
-                    # then use image not available from $XChemExplorer_DIR/image/IMAGE_NOT_AVAILABLE.png
-                    # not sure how to do this at the moment; it will probably trigger an error that I can catch
-                    self.data_collection_image_dict[xtal].append([entry[6], entry[1], entry[2], entry[3], entry[5]])
-
-            #############################################################################
-            # initialize dataset_outcome_dict for xtal
-            if xtal not in self.dataset_outcome_dict:
-                self.dataset_outcome_dict[xtal] = []
-                # dataset outcome buttons
-
-            #############################################################################
-            # table for data processing results
-            # check if results from particular pipeline are already in table;
-            # not really looking at the table here, but compare it to self.data_collection_table_dict
-            row_position = data_collection_table.rowCount()
-            if not xtal in self.data_collection_table_dict:
-                self.data_collection_table_dict[xtal] = []
-            # reminder: ['logfile',visit,run,timestamp,autoproc,file_name,aimless_results,<aimless_index>,False]
-            logfile_list = []
-            for entry in self.data_collection_dict[xtal]:
-                if entry[0] == 'logfile':
-                    logfile_list.append(entry)
-            for entry in sorted(logfile_list, key=lambda x: x[7]):  # sort by aimless_index and so make sure
-                entry_already_in_table = False  # that aimless_index == row
-                for logfile in self.data_collection_table_dict[xtal]:
-                    if entry[1] == logfile[1] and entry[2] == logfile[2] and entry[3] == logfile[3] and entry[4] == \
-                            logfile[4]:
-                        entry_already_in_table = True
-                        # might have to update Rfree column
-                        for column, header in enumerate(diffraction_data_column_name):
-                            if header == 'DataProcessing\nRfree':
-                                # entry[7]==aimless_index, i.e. row number
-                                cell_text = QtGui.QTableWidgetItem()
-                                cell_text.setText(str(db_dict[header[1]]))
-                                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                                data_collection_table.setItem(entry[7], column, cell_text)
-                                break
-                        break
-                if not entry_already_in_table:
-                    data_collection_table.insertRow(row_position)
-                    db_dict = entry[6]
-                    for column, header in enumerate(diffraction_data_column_name):
-                        cell_text = QtGui.QTableWidgetItem()
-                        try:
-                            cell_text.setText(str(db_dict[header[1]]))
-                        except KeyError:
-                            # this may happen if not score exists
-                            cell_text.setText('0')
-                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                        data_collection_table.setItem(row_position, column, cell_text)
-                    data_collection_table.setRowHeight(row_position, 20)
-                    row_position += 1
-
-                self.data_collection_table_dict[xtal].append(
-                    ['logfile', entry[1], entry[2], entry[3], entry[4]])  # 'logfile' is just added to have
-                # same index numbers between lists
-            data_collection_table.cellClicked.connect(self.user_update_selected_autoproc_datasets_summary_table)
-
-            # select best resolution file + set data collection outcome
-            # the assumption is that index in data_collection_dict and row number are identical
-            # the assumption for data collection outcome is that as long as a logfile is found, it's a success
-            logfile_found = False
-            for entry in self.data_collection_dict[xtal]:
-                if entry[0] == 'logfile':
-                    index = entry[7]
-                    best_file = entry[8]
-                    logfile_found = True
-                    if best_file:
-                        # we change the selection only if the user did not touch it, assuming that he/she knows best
-                        # if not selection_changed_by_user:
-                        data_collection_table.selectRow(index)
-
-        self.populate_datasets_summary_table()
 
     def find_suitable_reference_file(self, db_dict):
         reference_file = []
@@ -3417,27 +3199,13 @@ class XChemExplorer(QtGui.QApplication):
             if self.dataset_outcome_combobox_dict[key] == self.sender():
                 xtal = key
                 self.update_log.insert('user changed data collection outcome of {0!s} to {1!s}'.format(xtal, outcome))
+                self.update_log.insert('updating dataset outcome in datasource for {0!s}'.format(xtal))
+                update_dict = {}
+                update_dict['DataCollectionOutcome'] = outcome
+                self.db.update_insert_data_source(xtal, update_dict)
                 break
-        self.dataset_outcome_dict[xtal] = outcome
-        if xtal != '':
-            # need to also update if not yet done
-            user_already_changed_selection = False
-            for n, entry in enumerate(self.data_collection_dict[xtal]):
-                if entry[0] == 'user_changed_selection':
-                    user_already_changed_selection = True
-                if entry[0] == 'logfile':
-                    db_dict = entry[6]
-                    db_dict['DataCollectionOutcome'] = outcome
-                    entry[6] = db_dict
-                    self.data_collection_dict[xtal][n] = entry
-            if not user_already_changed_selection:
-                self.data_collection_dict[xtal].append(['user_changed_selection'])
-            # finally need to update outcome field in data source accordingly
-            self.update_log.insert('updating dataset outcome in datasource for {0!s}'.format(xtal))
-            update_dict = {}
-            update_dict['DataCollectionOutcome'] = outcome
-            self.db.update_insert_data_source(xtal, update_dict)
 
+#
     def set_run_dimple_flag(self, state):
         if state == QtCore.Qt.Checked:
             for key in self.initial_model_dimple_dict:
@@ -3446,197 +3214,110 @@ class XChemExplorer(QtGui.QApplication):
             for key in self.initial_model_dimple_dict:
                 self.initial_model_dimple_dict[key][0].setChecked(False)
 
-    def show_data_collection_details(self, state):
-        # first remove currently displayed widget
-        if self.data_collection_details_currently_on_display is not None:
-            self.data_collection_details_currently_on_display.hide()
-            self.data_collection_details_currently_on_display = None
+    def get_sample_list_from_table(self,table):
+        sampleList = []
+        allRows = table.rowCount()
+        for row in xrange(0, allRows):
+            sample_id = str(table.item(row, 0).text())
+            sampleList.append(sample_id)
+        return sorted(sampleList)
 
-        tmp = []
-        allRows = self.datasets_summary_table.rowCount()
-        for table_row in range(allRows):
-            tmp.append([self.datasets_summary_table.item(table_row, 0).text(), table_row])
+    def get_row_of_sample_in_table(self,table,xtal):
+        allRows = table.rowCount()
+        sampleRow = allRows
+        for n,row in enumerate(xrange(0, allRows)):
+            sample_id = str(table.item(row, 0).text())
+            if sample_id == xtal:
+                sampleRow = n
+                break
+        return sampleRow
 
-        for key in self.datasets_summary_dict:
-            if self.datasets_summary_dict[key][3] == self.sender():
-                if self.sender().isChecked():
-                    for item in tmp:
-                        if item[0] == key:
-                            self.datasets_summary_table.selectRow(item[1])
-                    self.data_collection_details_currently_on_display = self.data_collection_column_three_dict[key][0]
-                    self.datasets_summarys_vbox_for_details.addWidget(
-                        self.data_collection_details_currently_on_display)
-                    self.data_collection_details_currently_on_display.show()
+
+    def update_row_in_table(self,sample,row,db_dict,table,columns_to_show):
+        xtal = str(sample)
+        column_name = self.db.translate_xce_column_list_to_sqlite(columns_to_show)
+        for column, header in enumerate(column_name):
+            if header[0] == 'Sample ID':
+                cell_text = QtGui.QTableWidgetItem()
+                cell_text.setText(str(xtal))
+                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                table.setItem(row, column, cell_text)
+            elif header[0] == 'DataCollection\nOutcome':
+                if xtal not in self.dataset_outcome_combobox_dict:
+                    dataset_outcome_combobox = QtGui.QComboBox()
+                    for outcomeItem in self.dataset_outcome:
+                        dataset_outcome_combobox.addItem(outcomeItem)
+                    dataset_outcome_combobox.activated[str].connect(self.dataset_outcome_combobox_change_outcome)
+                    self.dataset_outcome_combobox_dict[xtal] = dataset_outcome_combobox
+                    table.setCellWidget(row, column, dataset_outcome_combobox)
+                index = self.dataset_outcome_combobox_dict[xtal].findText(str(db_dict['DataCollectionOutcome']), QtCore.Qt.MatchFixedString)
+                self.dataset_outcome_combobox_dict[xtal].setCurrentIndex(index)
+            elif header[0].startswith('img'):
+                if os.path.isfile(db_dict[header[1]]):
+                    pixmap = QtGui.QPixmap(db_dict[header[1]])
+                else:
+                    pixmap = QtGui.QPixmap(
+                        os.path.join(os.getenv('XChemExplorer_DIR'), 'image', 'IMAGE_NOT_AVAILABLE.png'))
+                image = QtGui.QLabel()
+                image.resize(128, 80)
+                image.setPixmap(pixmap.scaled(image.size(), QtCore.Qt.KeepAspectRatio))
+                table.setCellWidget(row, column, image)
+
+                #                    elif header[0].startswith('SoakDB\nBarcode') or header[0].startswith('GDA\nBarcode'):
+                #                        if new_xtal:
+                #                            cell_text = QtGui.QTableWidgetItem()
+                #                            if xtal in pinDict:
+                #                                if header[0].startswith('SoakDB\nBarcode'):
+                #                                    cell_text.setText(str(pinDict[xtal][0]))
+                #                                elif header[0].startswith('GDA\nBarcode'):
+                #                                    cell_text.setText(str(pinDict[xtal][1]))
+                #                                if pinDict[xtal][0] == 'NULL' or pinDict[xtal][1] == 'NULL':
+                #                                    cell_text.setBackground(QtGui.QColor(255, 215, 0))
+                #                                elif pinDict[xtal][0] != pinDict[xtal][1]:
+                #                                    cell_text.setBackground(QtGui.QColor(255, 0, 0))
+                #                            else:
+                #                                cell_text.setText('')
+                #                            cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                #                            self.datasets_summary_table.setItem(current_row, column, cell_text)
             else:
-                # un-check all other ones
-                self.datasets_summary_dict[key][3].setChecked(False)
+                cell_text = QtGui.QTableWidgetItem()
+                # in case data collection failed for whatever reason
+                try:
+                    cell_text.setText(str(db_dict[header[1]]))
+                except KeyError:  # older pkl files may not have all the columns
+                    cell_text.setText('n/a')
+                    #                        else:
+                    #                            if header[0].startswith('Resolution\n[Mn<I/sig(I)> = 1.5]'):
+                    #                                cell_text.setText('999')
+                    #                            elif header[0].startswith('DataProcessing\nRfree'):
+                    #                                cell_text.setText('999')
+                    #                            elif header[0].startswith('Rmerge\nLow'):
+                    #                                cell_text.setText('999')
+                    #                            else:
+                    #                                cell_text.setText('')
+                cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
+                table.setItem(row, column, cell_text)
 
     def populate_datasets_summary_table(self):
         self.status_bar.showMessage(
             'Building summary table for data processing results; be patient this may take a while')
-        row = self.datasets_summary_table.rowCount()
-        column_name = self.db.translate_xce_column_list_to_sqlite(self.datasets_summary_table_columns)
 
-        pinList = self.db.execute_statement(
-            "Select CrystalName,PinBarcode,DataCollectionPinBarcode from mainTable where CrystalName is not ''")
-        pinDict = {}
-        for item in pinList:
-            pinDict[str(item[0])] = [str(item[1]), str(item[2])]
+        # get information about all samples collected during the current visit
+        visit, beamline = XChemMain.getVisitAndBeamline(self.beamline_directory)
+        self.update_log.insert('reading information about collected crystals from database...')
+        collectedXtalsDict = self.db.xtals_collected_during_visit_as_dict(visit)
 
-        for xtal in sorted(self.data_collection_dict):
-            new_xtal = False
-            if xtal not in self.datasets_summary_dict:
+        # instead of using dictionaries, query table of which crystals are in table
+        samples_in_table = self.get_sample_list_from_table(self.datasets_summary_table)
+        for xtal in sorted(collectedXtalsDict):
+            if xtal not in samples_in_table:
                 row = self.datasets_summary_table.rowCount()
                 self.datasets_summary_table.insertRow(row)
-                self.datasets_summary_dict[xtal] = []
-                new_xtal = True
-
-            # check for dataset outcome
-            outcome = ''
-            logfile_found = False
-            too_low_resolution = True
-            db_dict = {}
-            for entry in self.data_collection_dict[xtal]:
-                if entry[0] == 'logfile':
-                    logfile_found = True
-                    if entry[8]:  # if this was auto-selected best resolution file
-                        db_dict = entry[6]
-                        try:
-                            if float(db_dict['DataProcessingResolutionHigh']) <= float(
-                                    self.acceptable_low_resolution_limit_for_data):
-                                too_low_resolution = False
-                        except ValueError:
-                            pass
-
-            try:
-                outcome = str(self.db.get_value_from_field(xtal, 'DataCollectionOutcome')[0])
-            except TypeError:
-                outcome = 'Failed - unknown'
-                self.update_log.insert('cannot find DataCollectionOutcome for {0!s}'.format(xtal))
-            self.dataset_outcome_dict[xtal] = outcome
-
-            # find latest run for crystal and diffraction images
-            tmp = []
-            for entry in self.data_collection_dict[xtal]:
-                if entry[0] == 'image':
-                    tmp.append([entry, datetime.strptime(entry[3], '%Y-%m-%d %H:%M:%S')])
-            latest_run = max(tmp, key=lambda x: x[1])[0]
-
-            new_run_for_exisiting_crystal_or_new_sample = True
-            if new_xtal:
-                self.datasets_summary_dict[xtal] = [outcome, db_dict, latest_run]
             else:
-                # check if newer run appeared
-                old_run_timestamp = self.datasets_summary_dict[xtal][2][3]
-                new_run_timestamp = latest_run[3]
-                if old_run_timestamp == new_run_timestamp:
-                    new_run_for_exisiting_crystal_or_new_sample = False
-                else:
-                    checkbox_for_details = self.datasets_summary_dict[xtal][3]
-                    self.datasets_summary_dict[xtal] = [outcome, db_dict, latest_run, checkbox_for_details]
-
-            if new_xtal:
-                current_row = row
-            else:
-                allRows = self.datasets_summary_table.rowCount()
-                for table_row in range(allRows):
-                    if self.datasets_summary_table.item(table_row, 0).text() == xtal:
-                        current_row = table_row
-                        break
-
-            image_number = 0
-            for column, header in enumerate(column_name):
-                if header[0] == 'Sample ID':
-                    cell_text = QtGui.QTableWidgetItem()
-                    cell_text.setText(str(xtal))
-                    cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                    self.datasets_summary_table.setItem(current_row, column, cell_text)
-                elif header[0] == 'DataCollection\nOutcome':
-                    if new_xtal:
-                        dataset_outcome_combobox = QtGui.QComboBox()
-                        for outcomeItem in self.dataset_outcome:
-                            dataset_outcome_combobox.addItem(outcomeItem)
-                        self.datasets_summary_table.setCellWidget(current_row, column, dataset_outcome_combobox)
-                        dataset_outcome_combobox.activated[str].connect(self.dataset_outcome_combobox_change_outcome)
-                        self.dataset_outcome_combobox_dict[xtal] = dataset_outcome_combobox
-                    index = self.dataset_outcome_combobox_dict[xtal].findText(str(outcome), QtCore.Qt.MatchFixedString)
-                    self.dataset_outcome_combobox_dict[xtal].setCurrentIndex(index)
-                    continue
-
-                elif header[0].startswith('img'):
-                    if new_run_for_exisiting_crystal_or_new_sample:
-                        img = latest_run[4]
-                        pixmap = QtGui.QPixmap()
-                        # can do this (img[image_number][1]) because made sure in the threading module
-                        # that there are always exactly 5 images in there
-                        pixmap.loadFromData(base64.b64decode(img[image_number][1]))
-                        image = QtGui.QLabel()
-                        image.resize(128, 80)
-                        image.setPixmap(pixmap.scaled(image.size(), QtCore.Qt.KeepAspectRatio))
-                        self.datasets_summary_table.setCellWidget(current_row, column, image)
-                        image_number += 1
-
-                elif header[0].startswith('Show Diffraction\nImage'):
-                    if new_run_for_exisiting_crystal_or_new_sample:
-                        diffraction_image = latest_run[5]
-                        diffraction_image_name = diffraction_image[diffraction_image.rfind('/') + 1:]
-                        try:  # need to try because older pkl file may not have this item in list
-                            html_summary = latest_run[7]
-                        except IndexError:
-                            html_summary = ''
-                        if new_xtal:
-                            start_albula_button = QtGui.QPushButton('Show: \n' + diffraction_image_name)
-                            start_albula_button.clicked.connect(self.show_html_summary_and_diffraction_image)
-                            self.albula_button_dict[xtal] = [start_albula_button, diffraction_image, html_summary]
-                            self.datasets_summary_table.setCellWidget(current_row, column, start_albula_button)
-                        else:
-                            self.albula_button_dict[xtal][1] = diffraction_image
-                elif header[0].startswith('Show\nDetails'):
-                    if new_xtal:
-                        show_data_collection_details_checkbox = QtGui.QCheckBox()
-                        show_data_collection_details_checkbox.toggle()
-                        show_data_collection_details_checkbox.setChecked(False)
-                        show_data_collection_details_checkbox.stateChanged.connect(self.show_data_collection_details)
-                        self.datasets_summary_table.setCellWidget(current_row, column,
-                                                                  show_data_collection_details_checkbox)
-                        self.datasets_summary_dict[xtal].append(show_data_collection_details_checkbox)
-                elif header[0].startswith('SoakDB\nBarcode') or header[0].startswith('GDA\nBarcode'):
-                    if new_xtal:
-                        cell_text = QtGui.QTableWidgetItem()
-                        if xtal in pinDict:
-                            if header[0].startswith('SoakDB\nBarcode'):
-                                cell_text.setText(str(pinDict[xtal][0]))
-                            elif header[0].startswith('GDA\nBarcode'):
-                                cell_text.setText(str(pinDict[xtal][1]))
-                            if pinDict[xtal][0] == 'NULL' or pinDict[xtal][1] == 'NULL':
-                                cell_text.setBackground(QtGui.QColor(255, 215, 0))
-                            elif pinDict[xtal][0] != pinDict[xtal][1]:
-                                cell_text.setBackground(QtGui.QColor(255, 0, 0))
-                        else:
-                            cell_text.setText('')
-                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                        self.datasets_summary_table.setItem(current_row, column, cell_text)
-                else:
-                    cell_text = QtGui.QTableWidgetItem()
-                    # in case data collection failed for whatever reason
-                    if logfile_found:
-                        try:
-                            cell_text.setText(str(db_dict[header[1]]))
-                        except KeyError:  # older pkl files may not have all the columns
-                            cell_text.setText('n/a')
-                    else:
-                        if header[0].startswith('Resolution\n[Mn<I/sig(I)> = 1.5]'):
-                            cell_text.setText('999')
-                        elif header[0].startswith('DataProcessing\nRfree'):
-                            cell_text.setText('999')
-                        elif header[0].startswith('Rmerge\nLow'):
-                            cell_text.setText('999')
-                        else:
-                            cell_text.setText('')
-                    cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                    self.datasets_summary_table.setItem(current_row, column, cell_text)
-
-            row += 1
+                row = self.get_row_of_sample_in_table(self.datasets_summary_table,xtal)
+            db_dict = collectedXtalsDict[xtal]
+            self.update_row_in_table(xtal, row, db_dict, self.datasets_summary_table,
+                                     self.datasets_summary_table_columns)
 
         self.datasets_summary_table.resizeRowsToContents()
         self.datasets_summary_table.resizeColumnsToContents()
@@ -3645,7 +3326,69 @@ class XChemExplorer(QtGui.QApplication):
 
         self.status_bar.showMessage('idle')
 
-        self.save_files_to_initial_model_folder()
+
+    def get_selected_row(self,table):
+        indexes = table.selectionModel().selectedRows()
+        for index in sorted(indexes):
+            selected_row = index.row()
+        return selected_row
+
+    def show_results_from_all_pipelines(self):
+        selected_row=self.get_selected_row(self.datasets_summary_table)
+        xtal = self.datasets_summary_table.item(selected_row, 0).text()
+        # get details of currently selected autoprocessing result
+        selectedResultDict = self.db.get_db_dict_for_sample(xtal)
+
+        dbList=self.db.all_autoprocessing_results_for_xtal_as_dict(xtal)
+        self.data_collection_table.setRowCount(0)       # reset table
+        for db_dict in dbList:
+            row = self.data_collection_table.rowCount()
+            self.data_collection_table.insertRow(row)
+            self.update_row_in_table(xtal, row, db_dict, self.data_collection_table, self.data_collection_table_columns)
+            if selectedResultDict['DataCollectionVisit'] == db_dict['DataCollectionVisit'] \
+                and selectedResultDict['DataCollectionRun'] == db_dict['DataCollectionRun'] \
+                and selectedResultDict['DataProcessingProgram'] == db_dict['DataProcessingProgram']:
+                self.current_row = row
+                self.data_collection_table.selectRow(row)
+        self.data_collection_table.cellClicked.connect(self.select_different_autoprocessing_result)
+        self.data_collection_table_popup()
+
+    def data_collection_table_popup(self):
+        self.msgBox = QtGui.QMessageBox()
+        msgBoxLayout = self.msgBox.layout()
+        qWid = QtGui.QWidget()
+        qWid.setFixedWidth(2000)
+        qWid.setFixedHeight(500)
+        vbox = QtGui.QVBoxLayout()
+        vbox.addWidget(self.data_collection_table)
+        qWid.setLayout(vbox)
+#        msgBoxLayout.addLayout(vbox, 0, 0)
+        msgBoxLayout.addWidget(qWid)
+        self.msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
+        self.msgBox.resize(1000,200)
+        self.msgBox.exec_();
+
+    def select_different_autoprocessing_result(self):
+        selected_row=self.get_selected_row(self.data_collection_table)
+        if selected_row != self.current_row:
+            xtal =     self.data_collection_table.item(selected_row, 0).text()
+            visit =    self.data_collection_table.item(selected_row, 1).text()
+            run =      self.data_collection_table.item(selected_row, 2).text()
+            autoproc = self.data_collection_table.item(selected_row, 3).text()
+            # get db_dict from collectionTable for visit, run, autoproc
+            dbDict = self.db.get_db_dict_for_visit_run_autoproc(xtal,visit,run,autoproc)
+            dbDict['DataProcessingAutoAssigned'] = 'False'
+            self.update_log.insert('%s: changing selected autoprocessing result to %s %s %s' %(xtal,visit,run,autoproc))
+            self.update_log.insert('%s: updating row in Datasets table' %xtal)
+            self.db.update_data_source(str(xtal),dbDict)
+            self.update_log.insert('%s: getting updated information from DB mainTable' %xtal)
+            dbDict = self.db.get_db_dict_for_sample(xtal)
+            row = self.get_row_of_sample_in_table(self.datasets_summary_table,xtal)
+            self.update_row_in_table(xtal, row, dbDict, self.datasets_summary_table,
+                                     self.datasets_summary_table_columns)
+        else:
+            print 'nothing to change'
+        self.msgBox.done(1)
 
     def update_outcome_datasets_summary_table(self, sample, outcome):
         rows_in_table = self.datasets_summary_table.rowCount()
@@ -3655,147 +3398,6 @@ class XChemExplorer(QtGui.QApplication):
                 cell_text.setText(outcome)
                 self.datasets_summary_table.setItem(row, 3, cell_text)
 
-    def user_update_selected_autoproc_datasets_summary_table(self):
-        for key in self.data_collection_column_three_dict:
-            if self.data_collection_column_three_dict[key][0] == self.sender():
-                dbTmp = self.xtal_db_dict[key]
-                stage = dbTmp['RefinementOutcome'].split()[0]
-                print('===>', key, stage)
-                if int(stage) > 2:
-                    msgBox = QtGui.QMessageBox()
-                    msgBox.setText(
-                        "*** WARNING ***\n%s is currently %s\nIt will disappear from the Refinement table,\n"
-                        "when you refresh it next time.\nDo you want to continue?" % (
-                            key, dbTmp['RefinementOutcome']))
-                    msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.YesRole)
-                    msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.RejectRole)
-                    reply = msgBox.exec_();
-                    if reply == 0:
-                        self.update_log.insert('will not change data processing selection')
-                        # restore previous selection
-                        for n, entry in enumerate(self.data_collection_dict[key]):
-                            print('==>', n)
-                            if entry[0] == 'logfile':
-                                if entry[8] == True:
-                                    print('===> found:', n)
-                                    self.data_collection_column_three_dict[key][0].selectRow(n)
-                        break
-
-                indexes = self.sender().selectionModel().selectedRows()
-                selected_processing_result = 1000000
-                for index in sorted(indexes):
-                    selected_processing_result = index.row()
-                # the user changed the selection, i.e. no automated selection will update it
-                self.update_log.insert('user changed selection')
-                self.data_collection_column_three_dict[key][1] = True
-                # need to also update if not yet done
-                user_already_changed_selection = False
-                for n, entry in enumerate(self.data_collection_dict[key]):
-                    if entry[0] == 'user_changed_selection':
-                        user_already_changed_selection = True
-                    if entry[0] == 'logfile':
-                        db_dict = entry[6]
-                        db_dict['DataProcessingAutoAssigned'] = 'False'
-                        if entry[7] == selected_processing_result:
-                            db_dict_current = entry[6]
-                            program = db_dict['DataProcessingProgram']
-                            visit = db_dict['DataCollectionVisit']
-                            run = db_dict['DataCollectionRun']
-                            self.update_log.insert(
-                                'user changed data processing files for {0!s} to visit={1!s}, '
-                                'run={2!s}, program={3!s}'.format(key, visit, run, program))
-                            # update datasource
-                            self.update_log.insert('updating datasource...')
-                            self.update_data_source(key, db_dict)
-                            entry[8] = True
-                        else:
-                            entry[8] = False
-
-                        entry[6] = db_dict
-                        self.data_collection_dict[key][n] = entry
-                if not user_already_changed_selection:
-                    self.data_collection_dict[key].append(['user_changed_selection'])
-                XChemMain.change_links_to_selected_data_collection_outcome(key, self.data_collection_dict,
-                                                                           self.data_collection_column_three_dict,
-                                                                           self.dataset_outcome_dict,
-                                                                           self.initial_model_directory,
-                                                                           os.path.join(self.database_directory,
-                                                                                        self.data_source_file),
-                                                                           self.xce_logfile)
-
-                # update 'Datasets' table
-                column_name = XChemDB.data_source(
-                    os.path.join(self.database_directory, self.data_source_file)).translate_xce_column_list_to_sqlite(
-                    self.datasets_summary_table_columns)
-                rows_in_table = self.datasets_summary_table.rowCount()
-                for row in range(rows_in_table):
-                    if self.datasets_summary_table.item(row, 0).text() == key:
-                        for column, header in enumerate(column_name):
-                            if header[0] == 'Sample ID':
-                                continue
-                            elif header[0] == 'DataCollection\nOutcome':
-                                continue
-                            elif header[0].startswith('img'):
-                                continue
-                            elif header[0].startswith('Show'):
-                                continue
-                            else:
-                                cell_text = QtGui.QTableWidgetItem()
-                                try:
-                                    cell_text.setText(str(db_dict_current[header[1]]))
-                                    cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                                    self.datasets_summary_table.setItem(row, column, cell_text)
-                                except KeyError:
-                                    pass
-
-    def update_selected_autoproc_datasets_summary_table(self):
-        for key in self.data_collection_column_three_dict:
-            if self.data_collection_column_three_dict[key][0] == self.sender():
-                sample = key
-                break
-        indexes = self.sender().selectionModel().selectedRows()
-        for index in sorted(indexes):
-            selected_processing_result = index.row()
-
-        for n, entry in enumerate(self.data_collection_dict[sample]):
-            if entry[0] == 'logfile':
-                if entry[7] == selected_processing_result:
-                    db_dict = entry[6]
-                    program = db_dict['DataProcessingProgram']
-                    visit = db_dict['DataCollectionVisit']
-                    run = db_dict['DataCollectionRun']
-                    self.update_log.insert(
-                        'user changed data processing files for {0!s} to visit={1!s}, run={2!s}, program={3!s}'.format(
-                            sample, visit, run, program))
-                    # update datasource
-                    self.update_log.insert('updating datasource...')
-                    self.update_data_source(sample, db_dict)
-                    entry[8] = True
-                else:
-                    entry[8] = False
-                self.data_collection_dict[sample][n] = entry
-
-        # update 'Datasets' table
-        column_name = XChemDB.data_source(
-            os.path.join(self.database_directory, self.data_source_file)).translate_xce_column_list_to_sqlite(
-            self.datasets_summary_table_columns)
-        rows_in_table = self.datasets_summary_table.rowCount()
-        for row in range(rows_in_table):
-            if self.datasets_summary_table.item(row, 0).text() == sample:
-                for column, header in enumerate(column_name):
-                    if header[0] == 'Sample ID':
-                        continue
-                    elif header[0] == 'DataCollection\nOutcome':
-                        continue
-                    elif header[0].startswith('img'):
-                        continue
-                    elif header[0].startswith('Show'):
-                        continue
-                    else:
-                        cell_text = QtGui.QTableWidgetItem()
-                        cell_text.setText(str(db_dict[header[1]]))
-                        cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
-                        self.datasets_summary_table.setItem(row, column, cell_text)
 
     def populate_and_update_datasource_table(self):
         self.overview_datasource_table.setColumnCount(len(self.overview_datasource_table_columns))

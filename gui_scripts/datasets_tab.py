@@ -61,6 +61,13 @@ class DatasetsTab():
         # summary sub-tab
         # table
         xce_object.datasets_summary_table = QtGui.QTableWidget()
+
+        xce_object.datasets_summary_table.resizeRowsToContents()
+        xce_object.datasets_summary_table.resizeColumnsToContents()
+        xce_object.datasets_summary_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        xce_object.datasets_summary_table.cellClicked.connect(xce_object.show_results_from_all_pipelines)
+
+
         self.layout_funcs.table_setup(xce_object.datasets_summary_table, xce_object.datasets_summary_table_columns)
         xce_object.datasets_summarys_vbox_for_table = QtGui.QVBoxLayout()  # setup layout to hold table
         xce_object.datasets_summarys_vbox_for_table.addWidget(xce_object.datasets_summary_table)  # add table to layout
@@ -68,6 +75,20 @@ class DatasetsTab():
         xce_object.data_collection_details_currently_on_display = None  # switch for displaying/updating table
 
         xce_object.datasets_data_collection_vbox.addWidget(xce_object.datasets_tab_widget)  # add subtab to main tab
+
+
+        # pop-up table which shows all autoprocessing results for a specific sample
+        # called by xce_object.show_results_from_all_pipelines
+        xce_object.data_collection_table = QtGui.QTableWidget()
+        xce_object.data_collection_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        xce_object.data_collection_table.setColumnCount(len(xce_object.data_collection_table_columns))
+        font = QtGui.QFont()
+        font.setPointSize(8)
+        xce_object.data_collection_table.setFont(font)
+        xce_object.data_collection_table.setHorizontalHeaderLabels(xce_object.data_collection_table_columns)
+        xce_object.data_collection_table.horizontalHeader().setFont(font)
+        xce_object.data_collection_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+
 
         # reprocessing sub-tab
         # top options

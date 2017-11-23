@@ -1,4 +1,4 @@
-# last edited: 21/07/2017, 15:00
+# last edited: 23/11/2017, 15:00
 
 import sqlite3
 import os,sys,glob
@@ -84,6 +84,11 @@ class data_source:
             ['DataCollectionWavelength',             'Wavelength',                              'TEXT',                 0],
             ['DataCollectionPinBarcode',             'GDA\nBarcode',                            'TEXT',                 1],
 
+            ['DataCollectionCrystalImage1', 'img1', 'TEXT', 1],
+            ['DataCollectionCrystalImage2', 'img2', 'TEXT', 1],
+            ['DataCollectionCrystalImage3', 'img3', 'TEXT', 1],
+            ['DataCollectionCrystalImage4', 'img4', 'TEXT', 1],
+
             ['DataProcessingPathToImageFiles',       'Path to diffraction\nimage files',        'TEXT',                 1],
             ['DataProcessingProgram',                'Program',                                 'TEXT',                 1],
             ['DataProcessingSpaceGroup',             'DataProcessing\nSpaceGroup',              'TEXT',                 1],
@@ -96,6 +101,9 @@ class data_source:
             ['DataProcessingAlpha',                  'DataProcessing\nAlpha',                   'TEXT',                 0],
             ['DataProcessingBeta',                   'DataProcessing\nBeta',                    'TEXT',                 0],
             ['DataProcessingGamma',                  'DataProcessing\nGamma',                   'TEXT',                 0],
+
+        # True or False depending on whether user changed automatic selection
+#            ['DataProcessingUserSelected',                  'DataProcessingUserSelected',                   'TEXT', 0],
 
             ['DataProcessingResolutionOverall',             'Resolution\nOverall',                          'TEXT',                 0],
             ['DataProcessingResolutionLow',                 'Resolution\nLow',                              'TEXT',                 0],
@@ -369,68 +377,69 @@ class data_source:
 
 
 #        # this is the planned replacement for the PKL file, 18/11/2016
-#        self.data_collection_columns = [
-#            ['ID',                                          'ID',                                       'INTEGER PRIMARY KEY'],
-#            ['CrystalName',                          'Sample ID',                               'TEXT',                 0],
-#
-#            ['SelectedPipeline',                          'SelectedPipeline',                               'TEXT',                 0],
-#
-#            ['DataCollectionRun',                    'Run',                                     'TEXT',                 0],
-#            ['DataCollectionBeamline',               'Beamline',                                'TEXT',                 0],
-#            ['DataCollectionDate',                   'Data Collection\nDate',                   'TEXT',                 1],
-#            ['DataCollectionWavelength',             'Wavelength',                              'TEXT',                 0],
-#            ['DataCollectionPinBarcode',             'GDA\nBarcode',                            'TEXT',                 1],
-#
-#            ['DataCollectionCrystalImage1',             'img1',                            'TEXT',                 1],
-#            ['DataCollectionCrystalImage2',             'img2',                            'TEXT',                 1],
-#            ['DataCollectionCrystalImage3',             'img3',                            'TEXT',                 1],
-#            ['DataCollectionCrystalImage4',             'img4',                            'TEXT',                 1],
-#
-#            ['DataProcessingPathToImageFiles',       'Path to diffraction\nimage files',        'TEXT',                 1],
-#            ['DataProcessingProgram',                'Program',                                 'TEXT',                 1],
-#            ['DataProcessingSpaceGroup',             'DataProcessing\nSpaceGroup',              'TEXT',                 1],
-#            ['DataProcessingUnitCell',               'DataProcessing\nUnitCell',                'TEXT',                 0],
-#            ['DataProcessingAutoAssigned',           'auto-assigned',                           'TEXT',                 0],
-#            ['DataProcessingA',                      'DataProcessing\nA',                       'TEXT',                 0],
-#            ['DataProcessingB',                      'DataProcessing\nB',                       'TEXT',                 0],
-#            ['DataProcessingC',                      'DataProcessing\nC',                       'TEXT',                 0],
-#            ['DataProcessingAlpha',                  'DataProcessing\nAlpha',                   'TEXT',                 0],
-#            ['DataProcessingBeta',                   'DataProcessing\nBeta',                    'TEXT',                 0],
-#            ['DataProcessingGamma',                  'DataProcessing\nGamma',                   'TEXT',                 0],
-#            ['DataProcessingResolutionOverall',             'Resolution\nOverall',                          'TEXT',                 0],
-#            ['DataProcessingResolutionLow',                 'Resolution\nLow',                              'TEXT',                 0],
-#            ['DataProcessingResolutionLowInnerShell',       'Resolution\nLow (Inner Shell)',                'TEXT',                 0],
-#            ['DataProcessingResolutionHigh',                'Resolution\nHigh',                             'TEXT',                 1],
-#            ['DataProcessingResolutionHigh15sigma',         'Resolution\n[Mn<I/sig(I)> = 1.5]',             'TEXT',                 1],
-#            ['DataProcessingResolutionHighOuterShell',      'Resolution\nHigh (Outer Shell)',               'TEXT',                 0],
-#            ['DataProcessingRmergeOverall',                 'Rmerge\nOverall',                              'TEXT',                 1],
-#            ['DataProcessingRmergeLow',                     'Rmerge\nLow',                                  'TEXT',                 1],
-#            ['DataProcessingRmergeHigh',                    'Rmerge\nHigh',                                 'TEXT',                 1],
-#            ['DataProcessingIsigOverall',                   'Mn<I/sig(I)>\nOverall',                        'TEXT',                 1],
-#            ['DataProcessingIsigLow',                       'Mn<I/sig(I)>\nLow',                            'TEXT',                 1],
-#            ['DataProcessingIsigHigh',                      'Mn<I/sig(I)>\nHigh',                           'TEXT',                 1],
-#            ['DataProcessingCompletenessOverall',           'Completeness\nOverall',                        'TEXT',                 1],
-#            ['DataProcessingCompletenessLow',               'Completeness\nLow',                            'TEXT',                 1],
-#            ['DataProcessingCompletenessHigh',              'Completeness\nHigh',                           'TEXT',                 1],
-#            ['DataProcessingMultiplicityOverall',           'Multiplicity\nOverall',                        'TEXT',                 1],
-#            ['DataProcessingMultiplicityLow',               'Multiplicity\nLow',                            'TEXT',                 1],
-#            ['DataProcessingMultiplicityHigh',              'Multiplicity\nHigh',                           'TEXT',                 1],
-#            ['DataProcessingCChalfOverall',                 'CC(1/2)\nOverall',                             'TEXT',                 1],
-#            ['DataProcessingCChalfLow',                     'CC(1/2)\nLow',                                 'TEXT',                 1],
-#            ['DataProcessingCChalfHigh',                    'CC(1/2)\nHigh',                                'TEXT',                 1],
-#            ['DataProcessingPathToLogfile',                 'DataProcessingPathToLogfile',                  'TEXT',                 1],
-#            ['DataProcessingPathToMTZfile',                 'DataProcessingPathToMTZfile',                  'TEXT',                 1],
-#            ['DataProcessingLOGfileName',                   'DataProcessingLOGfileName',                    'TEXT',                 0],
-#            ['DataProcessingMTZfileName',                   'DataProcessingMTZfileName',                    'TEXT',                 0],
-#            ['DataProcessingDirectoryOriginal',             'DataProcessingDirectoryOriginal',              'TEXT',                 0],
-#            ['DataProcessingUniqueReflectionsOverall',      'Unique Reflections\nOverall',                  'TEXT',                 1],
-#            ['DataProcessingLattice',                       'DataProcessing\nLattice',                      'TEXT',                 0],
-#            ['DataProcessingPointGroup',                    'DataProcessing\nPointGroup',                   'TEXT',                 0],
-#            ['DataProcessingUnitCellVolume',                'DataProcessing\nUnit Cell Volume',             'TEXT',                 0],
-#            ['DataProcessingAlert',                         'DataProcessing\nAlert',                        'TEXT',                 0],
-#            ['DataProcessingScore',                         'DataProcessing\nScore',                        'TEXT',                 1],
-#            ['DataProcessingStatus',                        'DataProcessing\nStatus',                       'TEXT',                 1],
-#            ]
+        self.data_collection_columns = [
+            ['ID',                                          'ID',                                       'INTEGER PRIMARY KEY'],
+            ['CrystalName',                          'Sample ID',                               'TEXT',                 0],
+
+            ['DataCollectionVisit',                    'Visit',                                     'TEXT',                 0],
+            ['DataCollectionRun',                    'Run',                                     'TEXT',                 0],
+            ['DataCollectionBeamline',               'Beamline',                                'TEXT',                 0],
+            ['DataCollectionDate',                   'Data Collection\nDate',                   'TEXT',                 1],
+            ['DataCollectionWavelength',             'Wavelength',                              'TEXT',                 0],
+            ['DataCollectionPinBarcode',             'GDA\nBarcode',                            'TEXT',                 1],
+
+            ['DataCollectionCrystalImage1',             'img1',                            'TEXT',                 1],
+            ['DataCollectionCrystalImage2',             'img2',                            'TEXT',                 1],
+            ['DataCollectionCrystalImage3',             'img3',                            'TEXT',                 1],
+            ['DataCollectionCrystalImage4',             'img4',                            'TEXT',                 1],
+
+            ['DataProcessingPathToImageFiles',       'Path to diffraction\nimage files',        'TEXT',                 1],
+            ['DataProcessingProgram',                'Program',                                 'TEXT',                 1],
+            ['DataProcessingSpaceGroup',             'DataProcessing\nSpaceGroup',              'TEXT',                 1],
+            ['DataProcessingUnitCell',               'DataProcessing\nUnitCell',                'TEXT',                 0],
+            ['DataProcessingAutoAssigned',           'auto-assigned',                           'TEXT',                 0],
+            ['DataProcessingA',                      'DataProcessing\nA',                       'TEXT',                 0],
+            ['DataProcessingB',                      'DataProcessing\nB',                       'TEXT',                 0],
+            ['DataProcessingC',                      'DataProcessing\nC',                       'TEXT',                 0],
+            ['DataProcessingAlpha',                  'DataProcessing\nAlpha',                   'TEXT',                 0],
+            ['DataProcessingBeta',                   'DataProcessing\nBeta',                    'TEXT',                 0],
+            ['DataProcessingGamma',                  'DataProcessing\nGamma',                   'TEXT',                 0],
+            ['DataProcessingResolutionOverall',             'Resolution\nOverall',                          'TEXT',                 0],
+            ['DataProcessingResolutionLow',                 'Resolution\nLow',                              'TEXT',                 0],
+            ['DataProcessingResolutionLowInnerShell',       'Resolution\nLow (Inner Shell)',                'TEXT',                 0],
+            ['DataProcessingResolutionHigh',                'Resolution\nHigh',                             'TEXT',                 1],
+            ['DataProcessingResolutionHigh15sigma',         'Resolution\n[Mn<I/sig(I)> = 1.5]',             'TEXT',                 1],
+            ['DataProcessingResolutionHighOuterShell',      'Resolution\nHigh (Outer Shell)',               'TEXT',                 0],
+            ['DataProcessingRmergeOverall',                 'Rmerge\nOverall',                              'TEXT',                 1],
+            ['DataProcessingRmergeLow',                     'Rmerge\nLow',                                  'TEXT',                 1],
+            ['DataProcessingRmergeHigh',                    'Rmerge\nHigh',                                 'TEXT',                 1],
+            ['DataProcessingIsigOverall',                   'Mn<I/sig(I)>\nOverall',                        'TEXT',                 1],
+            ['DataProcessingIsigLow',                       'Mn<I/sig(I)>\nLow',                            'TEXT',                 1],
+            ['DataProcessingIsigHigh',                      'Mn<I/sig(I)>\nHigh',                           'TEXT',                 1],
+            ['DataProcessingCompletenessOverall',           'Completeness\nOverall',                        'TEXT',                 1],
+            ['DataProcessingCompletenessLow',               'Completeness\nLow',                            'TEXT',                 1],
+            ['DataProcessingCompletenessHigh',              'Completeness\nHigh',                           'TEXT',                 1],
+            ['DataProcessingMultiplicityOverall',           'Multiplicity\nOverall',                        'TEXT',                 1],
+            ['DataProcessingMultiplicityLow',               'Multiplicity\nLow',                            'TEXT',                 1],
+            ['DataProcessingMultiplicityHigh',              'Multiplicity\nHigh',                           'TEXT',                 1],
+            ['DataProcessingCChalfOverall',                 'CC(1/2)\nOverall',                             'TEXT',                 1],
+            ['DataProcessingCChalfLow',                     'CC(1/2)\nLow',                                 'TEXT',                 1],
+            ['DataProcessingCChalfHigh',                    'CC(1/2)\nHigh',                                'TEXT',                 1],
+            ['DataProcessingPathToLogfile',                 'DataProcessingPathToLogfile',                  'TEXT',                 1],
+            ['DataProcessingPathToMTZfile',                 'DataProcessingPathToMTZfile',                  'TEXT',                 1],
+            ['DataProcessingLOGfileName',                   'DataProcessingLOGfileName',                    'TEXT',                 0],
+            ['DataProcessingMTZfileName',                   'DataProcessingMTZfileName',                    'TEXT',                 0],
+            ['DataProcessingDirectoryOriginal',             'DataProcessingDirectoryOriginal',              'TEXT',                 0],
+            ['DataProcessingUniqueReflectionsOverall',      'Unique Reflections\nOverall',                  'TEXT',                 1],
+            ['DataProcessingLattice',                       'DataProcessing\nLattice',                      'TEXT',                 0],
+            ['DataProcessingPointGroup',                    'DataProcessing\nPointGroup',                   'TEXT',                 0],
+            ['DataProcessingUnitCellVolume',                'DataProcessing\nUnit Cell Volume',             'TEXT',                 0],
+            ['DataProcessingAlert',                         'DataProcessing\nAlert',                        'TEXT',                 0],
+            ['DataProcessingScore',                         'DataProcessing\nScore',                        'TEXT',                 1],
+            ['DataProcessingStatus',                        'DataProcessing\nStatus',                       'TEXT',                 1],
+            ['LastUpdated',                                 'LastUpdated',                                  'TEXT',                 0],
+            ['LastUpdated_by',                              'LastUpdated_by',                               'TEXT',                 0]
+        ]
 
 
     def columns_not_to_display(self):
@@ -452,33 +461,60 @@ class data_source:
         connect=sqlite3.connect(self.data_source_file)
         connect.row_factory = sqlite3.Row
         cursor = connect.cursor()
-        cursor.execute("SELECT * FROM mainTable")
-        for column in cursor.description:
-            existing_columns.append(column[0])
-        for column in self.column_list:
-            if column[0] not in existing_columns:
-                cursor.execute("alter table mainTable add column '"+column[0]+"' '"+column[2]+"'")
-                connect.commit()
-        # create PANDDA table if not exists
-        cursor.execute("create table if not exists panddaTable (ID INTEGER);")
-        existing_columns=[]
-        cursor.execute("SELECT * FROM panddaTable")
-        for column in cursor.description:
-            existing_columns.append(column[0])
-        for column in self.pandda_table_columns:
-            if column[0] not in existing_columns:
-                cursor.execute("alter table panddaTable add column '"+column[0]+"' '"+column[2]+"'")
-                connect.commit()
-        # create DEPOSIT table if not exists
-        cursor.execute("create table if not exists depositTable (ID INTEGER);")
-        existing_columns=[]
-        cursor.execute("SELECT * FROM depositTable")
-        for column in cursor.description:
-            existing_columns.append(column[0])
-        for column in self.deposition_table_columns:
-            if column[0] not in existing_columns:
-                cursor.execute("alter table depositTable add column '"+column[0]+"' '"+column[2]+"'")
-                connect.commit()
+
+        tableDict = {   'mainTable':        self.column_list,
+                        'panddaTable':      self.pandda_table_columns,
+                        'depositTable':     self.deposition_table_columns,
+                        'collectionTable':  self.data_collection_columns      }
+
+        for table in tableDict:
+            cursor.execute("create table if not exists "+table+" (ID INTEGER);")
+            existing_columns = []
+            cursor.execute("SELECT * FROM "+table)
+            for column in cursor.description:
+                existing_columns.append(column[0])
+            for column in tableDict[table]:
+                if column[0] not in existing_columns:
+                    cursor.execute("alter table " + table + " add column '" + column[0] + "' '" + column[2] + "'")
+                    connect.commit()
+
+#        cursor.execute("SELECT * FROM mainTable")
+#        for column in cursor.description:
+#            existing_columns.append(column[0])
+#        for column in self.column_list:
+#            if column[0] not in existing_columns:
+#                cursor.execute("alter table mainTable add column '"+column[0]+"' '"+column[2]+"'")
+#                connect.commit()
+#        # create PANDDA table if not exists
+#        cursor.execute("create table if not exists panddaTable (ID INTEGER);")
+#        existing_columns=[]
+#        cursor.execute("SELECT * FROM panddaTable")
+#        for column in cursor.description:
+#            existing_columns.append(column[0])
+#        for column in self.pandda_table_columns:
+#            if column[0] not in existing_columns:
+#                cursor.execute("alter table panddaTable add column '"+column[0]+"' '"+column[2]+"'")
+#                connect.commit()
+#        # create DEPOSIT table if not exists
+#        cursor.execute("create table if not exists depositTable (ID INTEGER);")
+#        existing_columns=[]
+#        cursor.execute("SELECT * FROM depositTable")
+#        for column in cursor.description:
+#            existing_columns.append(column[0])
+#        for column in self.deposition_table_columns:
+#            if column[0] not in existing_columns:
+#                cursor.execute("alter table depositTable add column '"+column[0]+"' '"+column[2]+"'")
+#                connect.commit()
+#        # create data collection table if not exists
+#        cursor.execute("create table if not exists collectionTable (ID INTEGER);")
+#        existing_columns=[]
+#        cursor.execute("SELECT * FROM collectionTable")
+#        for column in cursor.description:
+#            existing_columns.append(column[0])
+#        for column in self.data_collection_columns:
+#            if column[0] not in existing_columns:
+#                cursor.execute("alter table collectionTable add column '"+column[0]+"' '"+column[2]+"'")
+#                connect.commit()
 
 
     def return_column_list(self):
@@ -817,6 +853,45 @@ class data_source:
             cursor.execute("INSERT INTO panddaTable ("+column_string[:-1]+") VALUES ("+value_string[:-1]+");")
         connect.commit()
 
+    def update_insert_any_table(self,table,data_dict,condition_dict):
+        data_dict['LastUpdated'] = str(datetime.now().strftime("%Y-%m-%d %H:%M"))
+        data_dict['LastUpdated_by'] = getpass.getuser()
+        connect = sqlite3.connect(self.data_source_file)
+        cursor = connect.cursor()
+
+        # columns
+        columns = ''
+        for c in condition_dict:
+            columns+=c+','
+
+        # condition
+        condition_string = ''
+        for key in condition_dict:
+            condition = condition_dict[key]
+            condition_string += str(key) + '=' + "'" + str(condition) + "' and "
+
+        cursor.execute('Select %s FROM %s where %s' %(columns[:-1],table,condition_string[:-5]))
+
+        tmp = cursor.fetchall()
+        if tmp == []:
+            data_dict.update(condition_dict)
+            value_string=''
+            column_string=''
+            for key in data_dict:
+                value = data_dict[key]
+                value_string += "'" + str(value) + "'" + ','
+                column_string += key + ','
+            cursor.execute("INSERT INTO "+table+" (" + column_string[:-1] + ") VALUES (" + value_string[:-1] + ");")
+        else:
+            update_string=''
+            for key in data_dict:
+                value = data_dict[key]
+                update_string += str(key) + '=' + "'" + str(value) + "',"
+            cursor.execute(
+                "UPDATE " + table +
+                " SET " + update_string[:-1] +
+                " WHERE " + condition_string[:-5] + ";")
+        connect.commit()
 
     def update_insert_site_event_panddaTable(self,sampleID,data_dict):
         data_dict['LastUpdated']=str(datetime.now().strftime("%Y-%m-%d %H:%M"))
@@ -1268,9 +1343,9 @@ class data_source:
                 out_list.append(['Exclude'])
             if item.startswith('Ignore'):
                 out_list.append(['Ignore'])
-            if item.startswith('img'):
-                out_list.append([item,item])
-                continue
+#            if item.startswith('img'):
+#                out_list.append([item,item])
+#                continue
             if item.startswith('Show'):
                 out_list.append([item,item])
                 continue
@@ -1530,3 +1605,139 @@ class data_source:
 #                cursor.execute(sqlite)
 #                connect.commit()
 #
+
+    def collected_xtals_during_visit(self,visitID):
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+        cursor.execute("select CrystalName from collectionTable where DataCollectionVisit = '{0!s}'".format(visitID))
+        collectedXtals=[]
+        samples = cursor.fetchall()
+        for sample in samples:
+            if str(sample[0]) not in collectedXtals:
+                collectedXtals.append(str(sample[0]))
+        return collectedXtals
+
+    def collected_xtals_during_visit_for_scoring(self,visit,rescore):
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+        xtalList = []
+        if rescore == True:
+            cursor.execute("select CrystalName from mainTable where DataCollectionVisit = '%s'" %visit)
+        else:
+            cursor.execute("select CrystalName from mainTable where DataProcessingAutoAssigned = 'True' and DataCollectionVisit = '%s'" %visit)
+        samples = cursor.fetchall()
+        for sample in samples:
+            if str(sample[0]) not in xtalList:
+                xtalList.append(str(sample[0]))
+        return xtalList
+
+    def all_results_of_xtals_collected_during_visit_as_dict(self,visitID):
+        # first get all collected xtals as list
+        collectedXtals = self.collected_xtals_during_visit(visitID)
+        xtalDict = {}
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+        for xtal in sorted(collectedXtals):
+            if xtal not in xtalDict:
+                xtalDict[xtal] = []
+            sqlite = ("select DataCollectionVisit,"
+                      "       DataCollectionRun,"
+                      "       DataProcessingProgram,"
+                      "       DataCollectionDate,"
+                      "       DataProcessingResolutionHigh,"
+                      "       DataProcessingRmergeLow,"
+                      "       DataCollectionCrystalImage1,"
+                      "       DataCollectionCrystalImage2,"
+                      "       DataCollectionCrystalImage3,"
+                      "       DataCollectionCrystalImage4 "
+                      "from collectionTable "
+                      "where CrystalName = '%s'" % xtal)
+#            print sqlite
+            cursor.execute(sqlite)
+            sq = cursor.fetchall()
+#            print sq
+            for s in sq:
+#                print s
+                t=[str(s[0]),str(s[1]),str(s[2]),str(s[3]),str(s[4]),str(s[5]),str(s[6]),str(s[7]),str(s[8]),str(s[9])]
+                inDict = False
+                for entry in xtalDict[xtal]:
+                    if t[0] == entry[0] and t[1] == entry[1] and t[2] == entry[2]:
+                        inDict = True
+                        break
+                if not inDict:
+                    xtalDict[xtal].append(t)
+        return xtalDict
+
+    def all_autoprocessing_results_for_xtal_as_dict(self,xtal):
+        dbList = []
+        header=[]
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+        cursor.execute("select * from collectionTable where CrystalName='{0!s}';".format(xtal))
+        for column in cursor.description:
+            header.append(column[0])
+        data = cursor.fetchall()
+        for result in data:
+            db_dict = {}
+            for n,item in enumerate(result):
+                db_dict[header[n]]=str(item)
+            dbList.append(db_dict)
+        return dbList
+
+    def get_db_dict_for_visit_run_autoproc(self,xtal,visit,run,autoproc):
+        db_dict = {}
+        header=[]
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+        sqlite = (  'select * '
+                    'from collectionTable '
+                    "where CrystalName ='%s' and" %xtal +
+                    "      DataCollectionVisit = '%s' and" %visit +
+                    "      DataCollectionRun = '%s' and" %run +
+                    "      DataProcessingProgram = '%s'" %autoproc  )
+        cursor.execute(sqlite)
+        for column in cursor.description:
+            header.append(column[0])
+        data = cursor.fetchall()
+        for n, item in enumerate(data[0]):
+            db_dict[header[n]] = str(item)
+        return db_dict
+
+    def xtals_collected_during_visit_as_dict(self,visitID):
+        # first get all collected xtals as list
+        collectedXtals = self.collected_xtals_during_visit(visitID)
+        xtalDict = {}
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+        for xtal in sorted(collectedXtals):
+            db_dict = self.get_db_dict_for_sample(xtal)
+            xtalDict[xtal] = db_dict
+        return xtalDict
+
+
+
+    def getCrystalImageDict(self,visit,xtalList):
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+        imageDict = {}
+        for xtal in xtalList:
+            sqlite = (  "select CrystalName,"
+		                "   min(DataCollectionDate),"
+		                "   DataCollectionCrystalImage1,"
+		                "   DataCollectionCrystalImage2,"
+    		            "   DataCollectionCrystalImage3,"
+	    	            "   DataCollectionCrystalImage4 "
+                        "from collectionTable "
+                        "where DataCollectionVisit = '%s'"  %visit+
+                        " and CrystalName = '%s'"           % xtal      )
+            cursor.execute(sqlite)
+            img = cursor.fetchall()
+            imageDict[xtal]=[str(img[1]),str(img[2]),str(img[3]),str(img[4])]
+        return imageDict
+
+
+
+
+
+
+

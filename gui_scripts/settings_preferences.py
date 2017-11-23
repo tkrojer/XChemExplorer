@@ -35,11 +35,11 @@ class setup():
         xce_object.xce_version = 'v1.0'
 
         # general settings
-        xce_object.allowed_unitcell_difference_percent = 12
-        xce_object.acceptable_low_resolution_limit_for_data = 3.5
-        xce_object.filename_root = '${samplename}'
+#        xce_object.allowed_unitcell_difference_percent = 12
+#        xce_object.acceptable_low_resolution_limit_for_data = 3.5
+#        xce_object.filename_root = '${samplename}'
         xce_object.data_source_set = False
-        xce_object.max_queue_jobs = 100
+#        xce_object.max_queue_jobs = 100
 
         ## directory settings
 
@@ -204,8 +204,20 @@ class setup():
                                                       'highest_resolution',
                                                       'lowest_Rfree']
 
-        xce_object.preferences = {'processed_data_to_copy': 'mtz_log_only',
-                                  'dataset_selection_mechanism': 'IsigI*Comp*UniqueRefl'}
+        xce_object.allowed_unitcell_difference_percent = 12
+        xce_object.acceptable_low_resolution_limit_for_data = 3.5
+        xce_object.filename_root = '${samplename}'
+        xce_object.max_queue_jobs = 100
+
+        xce_object.preferences = {'processed_data_to_copy':                     'mtz_log_only',
+                                  'dataset_selection_mechanism':                'IsigI*Comp*UniqueRefl',
+                                  'allowed_unitcell_difference_percent':        12,
+                                  'acceptable_low_resolution_limit_for_data':   3.5,
+                                  'acceptable_low_resolution_Rmerge':           0.1,
+                                  'filename_root':                              '${samplename}',
+                                  'max_queue_jobs':                             100     }
+
+
 
         ## settings
 
@@ -259,7 +271,7 @@ class setup():
         xce_object.datasets_summary_table_columns = ['Sample ID',
                                                      'Resolution\n[Mn<I/sig(I)> = 1.5]',
                                                      'DataProcessing\nSpaceGroup',
-                                                     'DataProcessing\nRfree',
+#                                                     'DataProcessing\nRfree',
                                                      'SoakDB\nBarcode',
                                                      'GDA\nBarcode',
                                                      'Rmerge\nLow',
@@ -268,11 +280,31 @@ class setup():
                                                      'img1',
                                                      'img2',
                                                      'img3',
-                                                     'img4',
-                                                     'img5',
-                                                     'Show\nDetails',
-                                                     'Show Diffraction\nImage'
+                                                     'img4'
+#                                                     'img5',
+#                                                     'Show\nDetails',
+#                                                     'Show Diffraction\nImage'
                                                      ]
+
+
+        # functions that use tables.data_collection_table_columns:
+        #
+        # - show_results_from_all_pipelines() - appears in populate_datasets_summary_table()
+
+        xce_object.data_collection_table_columns = ['Sample ID',
+                                                    'Visit',
+                                                    'Run',
+                                                    'Program',
+                                                    'Resolution\nOverall',
+                                                    'Resolution\nHigh',
+                                                    'DataProcessing\nSpaceGroup',
+                                                    'Mn<I/sig(I)>\nHigh',
+                                                    'Rmerge\nLow',
+                                                    'Completeness\nOverall',
+                                                    'DataProcessing\nUnitCell',
+                                                    'DataProcessing\nRfree'
+                                                    'DataProcessing\nScore']
+
 
         # functions that use tables.datasets_reprocess_columns:
         #
@@ -521,9 +553,9 @@ class setup():
 
     def dropdown_items(self, xce_object):
         xce_object.dataset_tasks = ['Get New Results from Autoprocessing',
-                                    'Run DIMPLE on All Autoprocessing MTZ files',
+#                                    'Run DIMPLE on All Autoprocessing MTZ files',
                                     'Rescore Datasets',
-                                    'Read PKL file',
+#                                    'Read PKL file',
                                     'Run xia2 on selected datasets',
                                     'Run xia2 on selected datasets - overwrite']
 

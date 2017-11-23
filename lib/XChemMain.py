@@ -289,6 +289,36 @@ def remove_all_refmac_jobs_from_cluster_and_reinstate_last_stable_state():
     print 'hallo'
 
 
+
+
+def linkAutoProcessingResult(xtal,dbDict,projectDir):
+    run =      dbDict['DataCollectionRun']
+    visit =    dbDict['DataCollectionVisit']
+    autoproc = dbDict['DataProcessingProgram']
+    mtzFileAbs = dbDict['DataProcessingPathToMTZfile']
+    mtzfile = mtzFileAbs[mtzFileAbs.rfind('/')+1:]
+    logFileAbs = dbDict['DataProcessingPathToLogfile']
+    logfile = logFileAbs[logFileAbs.rfind('/')+1:]
+
+    os.chdir(os.path.join(projectDir,xtal))
+    # MTZ file
+    if os.path.isfile(xtal+'.mtz'):
+        os.system('/bin/rm %s.mtz' %xtal)
+    if os.path.isfile(os.path.join('autoprocessing', visit + '-' + run + autoproc, mtzfile)):
+        os.symlink(os.path.join('autoprocessing', visit + '-' + run + autoproc, mtzfile), xtal + '.mtz')
+    # LOG file
+    if os.path.isfile(xtal+'.log'):
+        os.system('/bin/rm %s.log' %xtal)
+    if os.path.isfile(os.path.join('autoprocessing', visit + '-' + run + autoproc, logfile)):
+        os.symlink(os.path.join('autoprocessing', visit + '-' + run + autoproc, logfile), xtal + '.log')
+
+
+
+
+
+
+
+
 def change_links_to_selected_data_collection_outcome(sample,data_collection_dict,data_collection_column_three_dict,dataset_outcome_dict,initial_model_directory,data_source_file,xce_logfile):
     Logfile=XChemLog.updateLog(xce_logfile)
     # find out which row was selected in respective data collection table
@@ -526,6 +556,28 @@ def phasing_software():
                     'WARP'      ]
 
     return software
+
+
+def getVisitAndBeamline(visitDirectory):
+    visit = 'unknown'
+    beamline = 'unknown'
+    if 'attic' in visitDirectory:
+        try:
+            visit=visitDirectory.split('/')[6]
+            beamline=visitDirectory.split('/')[3]
+        except IndexError:
+            pass
+    else:
+        try:
+            visit=visitDirectory.split('/')[5]
+            beamline=visitDirectory.split('/')[2]
+        except IndexError:
+            pass
+    return visit,beamline
+
+
+
+
 
 
 class find_diffraction_image_directory(QtCore.QThread):
