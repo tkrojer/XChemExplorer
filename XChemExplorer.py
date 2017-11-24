@@ -255,8 +255,28 @@ class XChemExplorer(QtGui.QApplication):
                      self.populate_datasets_summary_table)
             self.work_thread.start()
 
+    def update_gdaLog_parsing_instructions_and_score(self, gdaLogInstructions):
+        self.gdaLogInstructions = gdaLogInstructions
+        self.select_best_autoprocessing_result()
 
+    def read_pinIDs_from_gda_logs(self):
+        self.update_log.insert('reading pinIDs from gda logfiles...')
+        visit, beamline = XChemMain.getVisitAndBeamline(self.beamline_directory)
+        self.work_thread = XChemThread.read_pinIDs_from_gda_logs(beamline,
+                                                                 visit,
+                                                                 os.path.join(
+                                                                     self.database_directory,
+                                                                     self.data_source_file),
+                                                                 self.gdaLogInstructions,
+                                                                 self.xce_logfile)
 
+        self.explorer_active = 1
+        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_gdaLog_parsing_instructions_and_score"),
+                     self.update_gdaLog_parsing_instructions_and_score)
+        self.work_thread.start()
 
     def check_for_new_autoprocessing_results(self):
         self.update_log.insert('checking for new data collection')
@@ -293,8 +313,8 @@ class XChemExplorer(QtGui.QApplication):
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-            self.connect(self.work_thread, QtCore.SIGNAL("select_best_autoprocessing_result"),
-                         self.select_best_autoprocessing_result)
+            self.connect(self.work_thread, QtCore.SIGNAL("read_pinIDs_from_gda_logs"),
+                         self.read_pinIDs_from_gda_logs)
             self.work_thread.start()
 
     ####################################################################################################################
@@ -3263,7 +3283,7 @@ class XChemExplorer(QtGui.QApplication):
                 image.setPixmap(pixmap.scaled(image.size(), QtCore.Qt.KeepAspectRatio))
                 table.setCellWidget(row, column, image)
 
-                #                    elif header[0].startswith('SoakDB\nBarcode') or header[0].startswith('GDA\nBarcode'):
+            #elif header[0].startswith('SoakDB\nBarcode') or header[0].startswith('GDA\nBarcode'):
                 #                        if new_xtal:
                 #                            cell_text = QtGui.QTableWidgetItem()
                 #                            if xtal in pinDict:

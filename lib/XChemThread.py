@@ -1656,6 +1656,48 @@ class start_dials_image_viewer(QtCore.QThread):
 
 
 
+class read_pinIDs_from_gda_logs(QtCore.QThread):
+    def __init__(self,
+                 beamline,
+                 visit,
+                 database,
+                 gdaLogInstructions,
+                 xce_logfile):
+        QtCore.QThread.__init__(self)
+        self.beamline = beamline
+        self.visit = visit
+
+        self.xce_logfile = xce_logfile
+        self.Logfile = XChemLog.updateLog(xce_logfile)
+
+        self.db = XChemDB.data_source(os.path.join(database))
+        self.allSamples = self.db.collected_xtals_during_visit_for_scoring(visit,False)
+
+        self.gdaLogInstructions = gdaLogInstructions
+        self.gda_log_start_line = gdaLogInstructions[0]
+        self.gzipped_logs_parsed = gdaLogInstructions[1]
+
+    def run(self):
+        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'checking GDA logiles for pinID details')
+        pinDict, self.gda_log_start_line = XChemMain.get_gda_barcodes(self.allSamples,
+                                                                 self.gzipped_logs_parsed,
+                                                                 self.gda_log_start_line,
+                                                                 self.beamline,
+                                                                 self.xce_logfile)
+
+        self.update_database(pinDict)
+
+        self.emit(QtCore.SIGNAL('update_gdaLog_parsing_instructions_and_score'), self.gdaLogInstructions)
+        self.emit(QtCore.SIGNAL("finished()"))
+
+    def update_database(self,pinDict):
+        self.Logfile.insert('updating database with pinDIs from GDA logfiles')
+        for sample in pinDict:
+            dbDict = {}
+            dbDict['DataCollectionPinBarcode'] = pinDict[sample]
+            self.db.update_data_source(sample,dbDict)
+
+
 class choose_autoprocessing_outcome(QtCore.QThread):
     def __init__(self,
                 database,
@@ -1738,7 +1780,6 @@ class choose_autoprocessing_outcome(QtCore.QThread):
 
 
     def selectHighestScore(self,dbList):
-        dbListOut = []
         tmp = []
         for resultDict in dbList:
             try:
@@ -1749,7 +1790,6 @@ class choose_autoprocessing_outcome(QtCore.QThread):
         return highestScoreDict
 
     def selectHighestResolution(self,dbList):
-        dbListOut = []
         tmp = []
         for resultDict in dbList:
             try:
@@ -1767,17 +1807,18 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
     """
     major changes:
     - copying of files and updating of DB will be combined in one class
-    - fast_dp output will be ignored
-    - pkl file will be abandoned
-    - results for every autoprocessing output will be recorded in new DB table
-    - crystal alignment files will be copied to project directory
+    - pkl file is retired
+    - results for every autoprocessing output is recorded in new DB table
+    - crystal centring images are copied into project directory
     - beamline directory in project directory will not be used anymore; user needs to set data collection dir
     - DB mainTable gets flag if user updated autoprocessing selection
     - checking of reprocessed files needs to be explicit
+    - all dictionaries used to store information are retired
     - at the moment one can only review/ rescore crystals collected during the selected visit
     Note:
-    - still miss reading of pins
-    - still miss copying of image (snapshots)
+    - parsing of pinIDs in gda logfiles is still missing
+    - fast_dp output is currently ignored
+    - only currently selected visit can be reviewed
 
     """
     def __init__(self,
@@ -1911,17 +1952,10 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
                 parsed=True
         return parsed
 
-    def getProgressSteps(self):
-        if len(glob.glob(os.path.join(self.processedDir,'*'))) == 0:
-            progress_step = 1
-        else:
-            progress_step = 100 / float(len(glob.glob(os.path.join(self.processedDir,'*'))))
-        return progress_step
-
     def parse_file_system(self):
         self.Logfile.insert('checking for new data processing results in '+self.processedDir)
         progress = 0
-        progress_step = self.getProgressSteps()
+        progress_step = XChemMain.getProgressSteps(len(glob.glob(os.path.join(self.processedDir,'*'))))
 
         for collected_xtals in sorted(glob.glob(os.path.join(self.processedDir,'*'))):
             if 'tmp' in collected_xtals or 'results' in collected_xtals or 'scre' in collected_xtals:
@@ -1954,5 +1988,5 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
-        self.emit(QtCore.SIGNAL('select_best_autoprocessing_result'))
+        self.emit(QtCore.SIGNAL('read_pinIDs_from_gda_logs'))
         self.emit(QtCore.SIGNAL("finished()"))

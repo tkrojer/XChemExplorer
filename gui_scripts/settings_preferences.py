@@ -147,6 +147,7 @@ class setup():
         xce_object.albula = None
         xce_object.albula_subframes = []
         xce_object.show_diffraction_image = None
+        xce_object.gdaLogInstructions = [0,False]
         # can be any widget to be displayed in data collection summary tab
         xce_object.data_collection_details_currently_on_display = None
 
