@@ -172,7 +172,7 @@ class setup():
 
         ## external software packages
         xce_object.using_remote_qsub_submission = False
-        xce_object.remote_qsub_submission = "ssh <dls fed ID>@nx.diamond.ac.uk 'module load global/cluster; qsub'"
+        xce_object.remote_qsub_submission = "/usr/bin/ssh <dls fed ID>@nx.diamond.ac.uk 'module load global/cluster; qsub'"
 
         xce_object.update_log = XChemLog.updateLog(xce_object.xce_logfile)
         xce_object.update_log.insert('new session started')

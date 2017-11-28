@@ -35,11 +35,14 @@ class GUI(object):
         ###########################################################################################
         # read in settings file from XChemExplorer to set the relevant paths
         self.settings = pickle.load(open(".xce_settings.pkl","rb"))
+
         remote_qsub_submission=self.settings['remote_qsub']
         self.database_directory=self.settings['database_directory']
         self.xce_logfile=self.settings['xce_logfile']
         self.data_source=self.settings['data_source']
         self.db=XChemDB.data_source(self.data_source)
+
+        print self.settings
 
         # checking for external software packages
         self.external_software=XChemUtils.external_software(self.xce_logfile).check()
@@ -79,7 +82,7 @@ class GUI(object):
         # for Data Processing and Refinement
         self.project_directory = self.settings['initial_model_directory']
         self.Serial=0
-	self.panddaSerial=0
+        self.panddaSerial=0
         self.Refine=None
         self.index = -1
         self.Todo=[]
