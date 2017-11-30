@@ -15,7 +15,6 @@ import XChemMain
 import XChemLog
 import XChemDeposit
 
-
 class setup():
     def __init__(self):
         pass
@@ -409,7 +408,7 @@ class setup():
                                                    ]],
                                 'D: deposition': ["&Deposition",
                                                   [
-                                                      ['Edit information', '', xce_object.deposition_data],
+                                                      ['Edit information', '', xce_object.edit_deposition_data],
                                                       ['Export to HTML', '', xce_object.export_to_html],
                                                       ['Find PanDDA apo structures', '',
                                                        xce_object.create_missing_apo_records_in_depositTable],

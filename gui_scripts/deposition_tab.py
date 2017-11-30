@@ -6,6 +6,7 @@ sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'lib'))
 
 import layout
 import XChemToolTips
+import XChemMain
 
 
 class DepositionTab():
@@ -166,4 +167,5 @@ class DepositionTab():
         # container settings
         scrollLayout.addStretch(1)
         scroll.setWidget(scrollContent)
+
 

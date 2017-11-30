@@ -342,6 +342,11 @@ class LayoutObjects():
         self.layout_funcs.make_tab_dict(xce_object.workflow, xce_object.main_tab_widget, xce_object.tab_dict)
 
 
+    def generic_message_box(self, xce_object):
+        xce_object.messageBox = QtGui.QMessageBox()
+        xce_object.messageBoxLayout = xce_object.messageBox.layout()
+
+
 class LayoutFuncs():
     def __init__(self):
         pass
