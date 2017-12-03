@@ -267,7 +267,7 @@ class helpers:
             '\n'
             'mv {0!s}_tmp.pdb {0!s}.pdb'.format(compoundID.replace(' ', '')) +
             '\n'
-            'rm {0!s}_tmp.pdb'.format(compoundID.replace(' ', '')) +
+            'rm -f {0!s}_tmp.pdb'.format(compoundID.replace(' ', '')) +
             '\n'
             'cd ' + os.path.join(initial_model_directory, sample) +
             '\n'
@@ -280,7 +280,7 @@ class helpers:
             ' {0!s} {1!s} {2!s} {3!s}\n'.format(os.path.join(database_directory, data_source_file), sample,
                                                 initial_model_directory, compoundID.replace(' ', '')) +
             '\n'
-            '/bin/rm compound/RESTRAINTS_IN_PROGRESS\n'
+            '/bin/rm -f compound/RESTRAINTS_IN_PROGRESS\n'
         )
 
 
