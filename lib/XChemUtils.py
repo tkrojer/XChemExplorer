@@ -1532,6 +1532,7 @@ class pdbtools(object):
 
     def __init__(self,pdb):
         self.pdb = pdb
+        self.ligands = ['DRG','LIG','FRG','XXX']
         self.AminoAcids = ['ALA','ARG','ASN','ASP','CYS','GLU','GLN','GLY','HIS',
                            'ILE','LEU','LYS','MET','PHE','PRO','SER','THR','TRP','TYR','VAL']
         self.Solvents = ['DMS','EDO','GOL','HOH']
@@ -1758,10 +1759,21 @@ class pdbtools(object):
         Ligands = []
         # need to count residue numbers in case of alternative conformations
         ResiNum=[]
+#        for line in open(self.pdb):
+#            if (line.startswith('ATOM') or line.startswith('HETATM')) \
+#                    and line[17:20].replace(' ','') not in self.AminoAcids+self.Solvents+self.Ions:
+#                if [line[17:20],line[21:22],line[23:26]] not in Ligands:
+#                    Ligands.append([line[17:20],line[21:22],line[23:26]])
+#                resname_line=str(line[17:20]).replace(' ','')
+#                chainID_line=str(line[21:23]).replace(' ','')
+#                resseq_line=str(line[23:26]).replace(' ','')
+#                altLoc_line=str(line[16:17]).replace(' ','')
+
         for line in open(self.pdb):
             if (line.startswith('ATOM') or line.startswith('HETATM')) \
-                    and line[17:20].replace(' ','') not in self.AminoAcids+self.Solvents+self.Ions:
+                    and line[17:20].replace(' ','') in self.ligands:
                 if [line[17:20],line[21:22],line[23:26]] not in Ligands:
+                    # e.g. LIG B 1
                     Ligands.append([line[17:20],line[21:22],line[23:26]])
         return Ligands
 

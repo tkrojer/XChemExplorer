@@ -1684,6 +1684,22 @@ class data_source:
             dbList.append(db_dict)
         return dbList
 
+    def get_db_list_for_sample_in_panddaTable(self,xtal):
+        dbList = []
+        header=[]
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+        cursor.execute("select * from panddaTable where CrystalName='{0!s}';".format(xtal))
+        for column in cursor.description:
+            header.append(column[0])
+        data = cursor.fetchall()
+        for result in data:
+            db_dict = {}
+            for n,item in enumerate(result):
+                db_dict[header[n]]=str(item)
+            dbList.append(db_dict)
+        return dbList
+
     def get_db_dict_for_visit_run_autoproc(self,xtal,visit,run,autoproc):
         db_dict = {}
         header=[]

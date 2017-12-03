@@ -240,3 +240,4 @@ def pandda_pre_run(reference_directory):
                         '- run "pandda.analyse\n'    )
 
     return msg
+
