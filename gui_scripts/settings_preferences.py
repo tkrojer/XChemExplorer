@@ -129,6 +129,8 @@ class setup():
         xce_object.datasets_summary_dict = {}
         xce_object.diffraction_data_table_dict = {}
         xce_object.refinement_table_dict = {}
+        xce_object.deposition_table_bound_dict = {}       # contains the checkbox in the deposition table for ligand bound structure
+        xce_object.deposition_table_apo_dict = {}       # contains the checkbox in the deposition table for apo structures
         xce_object.main_data_collection_table_exists = False
         xce_object.timer_to_check_for_new_data_collection = QtCore.QTimer()
 

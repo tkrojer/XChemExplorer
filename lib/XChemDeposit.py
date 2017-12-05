@@ -20,6 +20,8 @@ from XChemUtils import smilestools
 
 
 class templates:
+    def __init__(self):
+        pass
 
     def data_template_cif(self,depositDict):
 
@@ -216,7 +218,7 @@ class synchronise_check_depositTable(object):
 
     def check(self):
         canStart = False
-        missingEntries = self.db.execute_statement("select CrystalName from depositTable ""
+        missingEntries = self.db.execute_statement("select CrystalName from depositTable "
                                                    "where group_deposition_title is null or "
                                                    "      group_deposition_title is '' "        )
         if missingEntries is not []:
@@ -281,8 +283,8 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         self.projectDir=projectDir
 
         self.data_template_dict={}
-        self.data_template_apo='data_template_apo.cif'
-        self.data_template_bound='data_template_bound.cif'
+#        self.data_template_apo='data_template_apo.cif'
+#        self.data_template_bound='data_template_bound.cif'
 #        self.structureType=structureType
 #        self.depositLog=XChemLog.depositLog('deposit.log')
 #        self.depositLog.text('starting preparation of mmcif files for deposition')
@@ -321,6 +323,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             else:
                 if self.mmcif_files_exist():
                     self.Logfile.warning('{0!s}: mmcif files exist; skipping to next sample'.format(xtal))
+                    self.Logfile.hint('tick "Overwrite existing mmcif files" in case you want to update all your files')
                     continue
 
             #
@@ -329,7 +332,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
             pre_checks_passed, eventMTZlist = self.make_pre_checks(xtal,deposit_dict,db_dict)
             if pre_checks_passed:
-                self.Logfile.insert('{0!s}: pre-checks were OK, moving on'.format(xtal)
+                self.Logfile.insert('{0!s}: pre-checks were OK, moving on'.format(xtal))
             else:
                 self.Logfile.error('{0!s}: cannot start preparing mmcif file; check messages above!'.format(xtal))
                 self.update_failureDict(xtal,deposit_dict,'pre-checks failed; for details see logfile')
@@ -347,7 +350,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             #
 
             self.make_model_mmcif_file(xtal,db_dict,deposit_dict)
-            if not model_mmcif_exists(xtal):
+            if not model_mmcif_exists(xtal,deposit_dict):
                 continue
             self.update_model_mmcif_header()
 
@@ -356,6 +359,8 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             #
 
             self.make_sf_mmcif_file(xtal,db_dict,deposit_dict,eventMTZlist)
+            if not sf_mmcif_exists(xtal,deposit_dict):
+                continue
 
 
             progress += progress_step
@@ -372,7 +377,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
     def update_failureDict(self,xtal,deposit_dict,errorMsg):
         if xtal not in self.failureDict:
             self.failureDict[xtal] = []
-        self.failureDict[xtal].append['{0!s}: {1!s} - {2!s}'.format(xtal,deposit_dict['StructureType'],errorMsg)]
+        self.failureDict[xtal].append(['{0!s}: {1!s} - {2!s}'.format(xtal,deposit_dict['StructureType'],errorMsg)])
 
 
     def make_pre_checks(self,xtal,deposit_dict,db_dict):
@@ -519,7 +524,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         self.Logfile.insert('{0!s}: running pdb_extract -> {1!s}'.format(xtal,cmd))
         XChemScript.run_script_locally(cmd)
 
-    def model_mmcif_exists(self,xtal):
+    def model_mmcif_exists(self,xtal,deposit_dict):
         mmcifFound = False
         if os.path.isfile(os.path.join(self.projectDir,xtal,xtal+'.mmcif')) \
                 and os.path.getsize(os.path.join(self.projectDir,xtal,xtal+'.mmcif')) > 20000: # even if pdb_extract files will it create a small file
@@ -527,6 +532,18 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             mmcifFound = True
         else:
             self.Logfile.error('{0!s}: model mmcif file was NOT created; skipping'.format(xtal))
+            self.update_failureDict(xtal,deposit_dict,"model mmcif creation not successful")
+        return mmcifFound
+
+    def sf_mmcif_exists(self,xtal,deposit_dict):
+        mmcifFound = False
+        if os.path.isfile(os.path.join(self.projectDir,xtal,xtal+'_sf.mmcif')) \
+                and os.path.getsize(os.path.join(self.projectDir,xtal,xtal+'_sf.mmcif')) > 20000: # even if pdb_extract files will it create a small file
+            self.Logfile.insert('{0!s}: SF mmcif file successfully created'.format(xtal))
+            mmcifFound = True
+        else:
+            self.Logfile.error('{0!s}: SF mmcif file was NOT created; skipping'.format(xtal))
+            self.update_failureDict(xtal,deposit_dict,"SF mmcif creation not successful")
         return mmcifFound
 
     def update_model_mmcif_header(self):
@@ -596,6 +613,9 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             for event in eventMTZlist:
                 mtzin+=event+' '
 
+        cmd = XChemScript.sf_convert(xtal,mtzin)
+        self.Logfile.insert('{0!s}: running sf_convert -> {1!s}'.format(xtal,cmd))
+        XChemScript.run_script_locally(cmd)
 
 
 #----------------------------------------------------------------

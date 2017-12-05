@@ -27,7 +27,7 @@ def pdb_extract(outRoot,refSoft,pdb,log,data_integration_software,phasing_softwa
     return Cmd
 
 
-def sf_convert(outRoot):
+def sf_convert(outRoot,mtzin):
         if os.path.isdir('/dls'):
             pdb_extract_init='source /dls/science/groups/i04-1/software/pdb-extract-prod/setup.sh\n'
             pdb_extract_init+='/dls/science/groups/i04-1/software/pdb-extract-prod/bin/sf_convert'
@@ -37,6 +37,6 @@ def sf_convert(outRoot):
 
         Cmd = ( pdb_extract_init+
                 ' -o mmcif'
-                ' -sf %s' %mtzin+
+                ' -sf {0!s}'.format(mtzin) +
                 ' -out {0!s}_sf.mmcif  > {1!s}.sf_mmcif.log'.format(outRoot, outRoot) )
         return Cmd

@@ -2518,12 +2518,15 @@ class XChemExplorer(QtGui.QApplication):
     def update_row_in_table(self,sample,row,db_dict,table,columns_to_show):
         xtal = str(sample)
         column_name = self.db.translate_xce_column_list_to_sqlite(columns_to_show)
+
         for column, header in enumerate(column_name):
+
             if header[0] == 'Sample ID':
                 cell_text = QtGui.QTableWidgetItem()
                 cell_text.setText(str(xtal))
                 cell_text.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter)
                 table.setItem(row, column, cell_text)
+
             elif header[0] == 'DataCollection\nOutcome':
                 if xtal not in self.dataset_outcome_combobox_dict:
                     dataset_outcome_combobox = QtGui.QComboBox()
@@ -2534,6 +2537,7 @@ class XChemExplorer(QtGui.QApplication):
                     table.setCellWidget(row, column, dataset_outcome_combobox)
                 index = self.dataset_outcome_combobox_dict[xtal].findText(str(db_dict['DataCollectionOutcome']), QtCore.Qt.MatchFixedString)
                 self.dataset_outcome_combobox_dict[xtal].setCurrentIndex(index)
+
             elif header[0].startswith('img'):
                 if os.path.isfile(db_dict[header[1]]):
                     pixmap = QtGui.QPixmap(db_dict[header[1]])
@@ -2544,6 +2548,18 @@ class XChemExplorer(QtGui.QApplication):
                 image.resize(128, 80)
                 image.setPixmap(pixmap.scaled(image.size(), QtCore.Qt.KeepAspectRatio))
                 table.setCellWidget(row, column, image)
+
+            elif header[0] == 'Select':
+                checkbox = QtGui.QCheckBox()
+                checkbox.toggle()
+                if table == self.deposition_table_apo:
+                    if xtal not in self.deposition_table_apo_dict:
+                        self.deposition_table_apo_dict[xtal] = checkbox
+                if table == self.deposition_table_bound:
+                    if xtal not in self.deposition_table_bound_dict:
+                        self.deposition_table_bound_dict[xtal] = checkbox
+                table.setCellWidget(row, column, checkbox)
+                checkbox.setChecked(False)
 
             #elif header[0].startswith('SoakDB\nBarcode') or header[0].startswith('GDA\nBarcode'):
                 #                        if new_xtal:
