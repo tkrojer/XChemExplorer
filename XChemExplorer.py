@@ -794,7 +794,8 @@ class XChemExplorer(QtGui.QApplication):
         self.messageBox.exec_()
 
     def save_deposit_config_file(self):
-        self.update_deposit_dict()
+#        self.update_deposit_dict()
+        XChemDeposit.depositDict().update()
         file_name = str(QtGui.QFileDialog.getSaveFileName(self.window, 'Save file', self.current_directory))
         # make sure that the file always has .deposit extension
         if str(file_name).rfind('.') != -1:
@@ -818,13 +819,15 @@ class XChemExplorer(QtGui.QApplication):
                                                                     '*.deposit')
         file_name = tuple(file_name_temp)[0]
         self.deposit_dict = pickle.load(open(file_name, "rb"))
-        self.update_deposit_input()
+        XChemDeposit.depositDict().update_deposit_input_widgets()
+#        self.update_deposit_input()
 
     def load_deposit_from_database(self):
         print('hallo')
 
     def save_deposit_to_database(self):
-        self.update_deposit_dict()
+#        self.update_deposit_dict()
+        XChemDeposit.depositDict().update()
         msgBox = QtGui.QMessageBox()
         msgBox.setText(
             "*** WARNING ***\nAre you sure you want to update the database?\nThis will overwrite previous entries!")
@@ -842,232 +845,232 @@ class XChemExplorer(QtGui.QApplication):
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.work_thread.start()
 
-    def update_deposit_input(self):
-        try:
-            self.contact_author_PI_salutation.setText(self.deposit_dict['contact_author_PI_salutation'])
-            self.contact_author_PI_first_name.setText(self.deposit_dict['contact_author_PI_first_name'])
-            self.contact_author_PI_last_name.setText(self.deposit_dict['contact_author_PI_last_name'])
-            self.contact_author_PI_middle_name.setText(self.deposit_dict['contact_author_PI_middle_name'])
-            index = self.contact_author_PI_role.findText(self.deposit_dict['contact_author_PI_role'],
-                                                         QtCore.Qt.MatchFixedString)
-            self.contact_author_PI_role.setCurrentIndex(index)
-            index = self.contact_author_PI_organization_type.findText(
-                self.deposit_dict['contact_author_PI_organization_type'], QtCore.Qt.MatchFixedString)
-            self.contact_author_PI_organization_type.setCurrentIndex(index)
-            self.contact_author_PI_organization_name.setText(self.deposit_dict['contact_author_PI_organization_name'])
-            self.contact_author_PI_email.setText(self.deposit_dict['contact_author_PI_email'])
-            self.contact_author_PI_address.setText(self.deposit_dict['contact_author_PI_address'])
-            self.contact_author_PI_city.setText(self.deposit_dict['contact_author_PI_city'])
-            self.contact_author_PI_State_or_Province.setText(self.deposit_dict['contact_author_PI_State_or_Province'])
-            self.contact_author_PI_Zip_Code.setText(self.deposit_dict['contact_author_PI_Zip_Code'])
-            self.contact_author_PI_Country.setText(self.deposit_dict['contact_author_PI_Country'])
-            self.contact_author_PI_phone_number.setText(self.deposit_dict['contact_author_PI_phone_number'])
+#    def update_deposit_input(self):
+#        try:
+#            self.contact_author_PI_salutation.setText(self.deposit_dict['contact_author_PI_salutation'])
+#            self.contact_author_PI_first_name.setText(self.deposit_dict['contact_author_PI_first_name'])
+#            self.contact_author_PI_last_name.setText(self.deposit_dict['contact_author_PI_last_name'])
+#            self.contact_author_PI_middle_name.setText(self.deposit_dict['contact_author_PI_middle_name'])
+#            index = self.contact_author_PI_role.findText(self.deposit_dict['contact_author_PI_role'],
+#                                                         QtCore.Qt.MatchFixedString)
+#            self.contact_author_PI_role.setCurrentIndex(index)
+#            index = self.contact_author_PI_organization_type.findText(
+#                self.deposit_dict['contact_author_PI_organization_type'], QtCore.Qt.MatchFixedString)
+#            self.contact_author_PI_organization_type.setCurrentIndex(index)
+#            self.contact_author_PI_organization_name.setText(self.deposit_dict['contact_author_PI_organization_name'])
+#            self.contact_author_PI_email.setText(self.deposit_dict['contact_author_PI_email'])
+#            self.contact_author_PI_address.setText(self.deposit_dict['contact_author_PI_address'])
+#            self.contact_author_PI_city.setText(self.deposit_dict['contact_author_PI_city'])
+#            self.contact_author_PI_State_or_Province.setText(self.deposit_dict['contact_author_PI_State_or_Province'])
+#            self.contact_author_PI_Zip_Code.setText(self.deposit_dict['contact_author_PI_Zip_Code'])
+#            self.contact_author_PI_Country.setText(self.deposit_dict['contact_author_PI_Country'])
+#            self.contact_author_PI_phone_number.setText(self.deposit_dict['contact_author_PI_phone_number'])
+#
+#            self.contact_author_salutation.setText(self.deposit_dict['contact_author_salutation'])
+#            self.contact_author_first_name.setText(self.deposit_dict['contact_author_first_name'])
+#            self.contact_author_last_name.setText(self.deposit_dict['contact_author_last_name'])
+#            self.contact_author_middle_name.setText(self.deposit_dict['contact_author_middle_name'])
+#            index = self.contact_author_role.findText(self.deposit_dict['contact_author_role'],
+#                                                      QtCore.Qt.MatchFixedString)
+#            self.contact_author_role.setCurrentIndex(index)
+#            index = self.contact_author_organization_type.findText(
+#                self.deposit_dict['contact_author_organization_type'], QtCore.Qt.MatchFixedString)
+#            self.contact_author_organization_type.setCurrentIndex(index)
+#            self.contact_author_organization_name.setText(self.deposit_dict['contact_author_organization_name'])
+#            self.contact_author_email.setText(self.deposit_dict['contact_author_email'])
+#            self.contact_author_address.setText(self.deposit_dict['contact_author_address'])
+#            self.contact_author_city.setText(self.deposit_dict['contact_author_city'])
+#            self.contact_author_State_or_Province.setText(self.deposit_dict['contact_author_State_or_Province'])
+#            self.contact_author_Zip_Code.setText(self.deposit_dict['contact_author_Zip_Code'])
+#            self.contact_author_Country.setText(self.deposit_dict['contact_author_Country'])
+#            self.contact_author_phone_number.setText(self.deposit_dict['contact_author_phone_number'])
+#            index = self.Release_status_for_coordinates.findText(self.deposit_dict['Release_status_for_coordinates'],
+#                                                                 QtCore.Qt.MatchFixedString)
+#            self.Release_status_for_coordinates.setCurrentIndex(index)
+#            index = self.Release_status_for_sequence.findText(self.deposit_dict['Release_status_for_sequence'],
+#                                                              QtCore.Qt.MatchFixedString)
+#            self.Release_status_for_sequence.setCurrentIndex(index)
+#
+#            self.group_deposition_title.setText(self.deposit_dict['group_deposition_title'])
+#            self.group_description.setText(self.deposit_dict['group_description'])
+#
+#            self.structure_title.setText(self.deposit_dict['structure_title'])
+#            self.structure_title_apo.setText(self.deposit_dict['structure_title_apo'])
+#
+#            for n, name in enumerate(self.deposit_dict['structure_author_name'].split(';')):
+#                self.structure_author_name_List[n].setText(name)
+#
+#            self.primary_citation_id.setText(self.deposit_dict['primary_citation_id'])
+#            self.primary_citation_journal_abbrev.setText(self.deposit_dict['primary_citation_journal_abbrev'])
+#            self.primary_citation_title.setText(self.deposit_dict['primary_citation_title'])
+#            self.primary_citation_year.setText(self.deposit_dict['primary_citation_year'])
+#            self.primary_citation_journal_volume.setText(self.deposit_dict['primary_citation_journal_volume'])
+#            self.primary_citation_page_first.setText(self.deposit_dict['primary_citation_page_first'])
+#            self.primary_citation_page_last.setText(self.deposit_dict['primary_citation_page_last'])
+#
+#            for n, name in enumerate(self.deposit_dict['primary_citation_author_name'].split(';')):
+#                self.primary_citation_author_name_List[n].setText(name)
+#
+#            self.molecule_name.setText(self.deposit_dict['molecule_name'])
+#            self.fragment_name_one_specific_mutation.setText(self.deposit_dict['fragment_name_one_specific_mutation'])
+#            index = self.Source_organism_scientific_name.findText(self.deposit_dict['Source_organism_scientific_name'],
+#                                                                  QtCore.Qt.MatchFixedString)
+#            self.Source_organism_scientific_name.setCurrentIndex(index)
+#
+#            self.Source_organism_gene.setText(self.deposit_dict['Source_organism_gene'])
+#            self.Source_organism_strain.setText(self.deposit_dict['Source_organism_strain'])
+#            index = self.Expression_system_scientific_name.findText(
+#                self.deposit_dict['Expression_system_scientific_name'], QtCore.Qt.MatchFixedString)
+#            self.Expression_system_scientific_name.setCurrentIndex(index)
+#
+#            self.Expression_system_strain.setText(self.deposit_dict['Expression_system_strain'])
+#            self.Expression_system_vector_type.setText(self.deposit_dict['Expression_system_vector_type'])
+#            self.Expression_system_plasmid_name.setText(self.deposit_dict['Expression_system_plasmid_name'])
+#            self.Manipulated_source_details.setText(self.deposit_dict['Manipulated_source_details'])
+#
+#            self.structure_keywords.setText(self.deposit_dict['structure_keywords'])
+#            self.biological_assembly_chain_number.setText(self.deposit_dict['biological_assembly_chain_number'])
+#            self.molecule_one_letter_sequence_uniprot_id.setText(
+#                self.deposit_dict['molecule_one_letter_sequence_uniprot_id'])
+#            self.molecule_one_letter_sequence.setText(self.deposit_dict['molecule_one_letter_sequence'])
+#            self.SG_project_name.setText(self.deposit_dict['SG_project_name'])
+#            self.full_name_of_SG_center.setText(self.deposit_dict['full_name_of_SG_center'])
+#
+#            index = self.crystallization_method.findText(self.deposit_dict['crystallization_method'],
+#                                                         QtCore.Qt.MatchFixedString)
+#            self.crystallization_method.setCurrentIndex(index)
+#
+#            self.crystallization_pH.setText(self.deposit_dict['crystallization_pH'])
+#            self.crystallization_temperature.setText(self.deposit_dict['crystallization_temperature'])
+#            self.crystallization_details.setText(self.deposit_dict['crystallization_details'])
+#            index = self.radiation_source.findText(self.deposit_dict['radiation_source'], QtCore.Qt.MatchFixedString)
+#            self.radiation_source.setCurrentIndex(index)
+#
+#            index = self.radiation_source_type.findText(self.deposit_dict['radiation_source_type'],
+#                                                        QtCore.Qt.MatchFixedString)
+#            self.radiation_source_type.setCurrentIndex(index)
+#
+#            self.radiation_wavelengths.setText(self.deposit_dict['radiation_wavelengths'])
+#            index = self.radiation_detector.findText(self.deposit_dict['radiation_detector'],
+#                                                     QtCore.Qt.MatchFixedString)
+#            self.radiation_detector.setCurrentIndex(index)
+#
+#            index = self.radiation_detector_type.findText(self.deposit_dict['radiation_detector_type'],
+#                                                          QtCore.Qt.MatchFixedString)
+#            self.radiation_detector_type.setCurrentIndex(index)
+#
+#            self.data_collection_date.setText(self.deposit_dict['data_collection_date'])
+#            self.data_collection_temperature.setText(self.deposit_dict['data_collection_temperature'])
+#            self.data_collection_protocol.setText(self.deposit_dict['data_collection_protocol'])
+#
+#            self.pdbx_starting_model.setText(self.deposit_dict['pdbx_starting_model'])
+#            index = self.data_integration_software.findText(self.deposit_dict['data_integration_software'],
+#                                                            QtCore.Qt.MatchFixedString)
+#            self.data_integration_software.setCurrentIndex(index)
+#            index = self.phasing_software.findText(self.deposit_dict['phasing_software'], QtCore.Qt.MatchFixedString)
+#            self.phasing_software.setCurrentIndex(index)
+#
+#        except ValueError:
+#            self.update_status_bar('Sorry, this is not a XChemExplorer deposit file!')
+#            self.update_log.insert('Sorry, this is not a XChemExplorer deposit file!')
 
-            self.contact_author_salutation.setText(self.deposit_dict['contact_author_salutation'])
-            self.contact_author_first_name.setText(self.deposit_dict['contact_author_first_name'])
-            self.contact_author_last_name.setText(self.deposit_dict['contact_author_last_name'])
-            self.contact_author_middle_name.setText(self.deposit_dict['contact_author_middle_name'])
-            index = self.contact_author_role.findText(self.deposit_dict['contact_author_role'],
-                                                      QtCore.Qt.MatchFixedString)
-            self.contact_author_role.setCurrentIndex(index)
-            index = self.contact_author_organization_type.findText(
-                self.deposit_dict['contact_author_organization_type'], QtCore.Qt.MatchFixedString)
-            self.contact_author_organization_type.setCurrentIndex(index)
-            self.contact_author_organization_name.setText(self.deposit_dict['contact_author_organization_name'])
-            self.contact_author_email.setText(self.deposit_dict['contact_author_email'])
-            self.contact_author_address.setText(self.deposit_dict['contact_author_address'])
-            self.contact_author_city.setText(self.deposit_dict['contact_author_city'])
-            self.contact_author_State_or_Province.setText(self.deposit_dict['contact_author_State_or_Province'])
-            self.contact_author_Zip_Code.setText(self.deposit_dict['contact_author_Zip_Code'])
-            self.contact_author_Country.setText(self.deposit_dict['contact_author_Country'])
-            self.contact_author_phone_number.setText(self.deposit_dict['contact_author_phone_number'])
-            index = self.Release_status_for_coordinates.findText(self.deposit_dict['Release_status_for_coordinates'],
-                                                                 QtCore.Qt.MatchFixedString)
-            self.Release_status_for_coordinates.setCurrentIndex(index)
-            index = self.Release_status_for_sequence.findText(self.deposit_dict['Release_status_for_sequence'],
-                                                              QtCore.Qt.MatchFixedString)
-            self.Release_status_for_sequence.setCurrentIndex(index)
-
-            self.group_deposition_title.setText(self.deposit_dict['group_deposition_title'])
-            self.group_description.setText(self.deposit_dict['group_description'])
-
-            self.structure_title.setText(self.deposit_dict['structure_title'])
-            self.structure_title_apo.setText(self.deposit_dict['structure_title_apo'])
-
-            for n, name in enumerate(self.deposit_dict['structure_author_name'].split(';')):
-                self.structure_author_name_List[n].setText(name)
-
-            self.primary_citation_id.setText(self.deposit_dict['primary_citation_id'])
-            self.primary_citation_journal_abbrev.setText(self.deposit_dict['primary_citation_journal_abbrev'])
-            self.primary_citation_title.setText(self.deposit_dict['primary_citation_title'])
-            self.primary_citation_year.setText(self.deposit_dict['primary_citation_year'])
-            self.primary_citation_journal_volume.setText(self.deposit_dict['primary_citation_journal_volume'])
-            self.primary_citation_page_first.setText(self.deposit_dict['primary_citation_page_first'])
-            self.primary_citation_page_last.setText(self.deposit_dict['primary_citation_page_last'])
-
-            for n, name in enumerate(self.deposit_dict['primary_citation_author_name'].split(';')):
-                self.primary_citation_author_name_List[n].setText(name)
-
-            self.molecule_name.setText(self.deposit_dict['molecule_name'])
-            self.fragment_name_one_specific_mutation.setText(self.deposit_dict['fragment_name_one_specific_mutation'])
-            index = self.Source_organism_scientific_name.findText(self.deposit_dict['Source_organism_scientific_name'],
-                                                                  QtCore.Qt.MatchFixedString)
-            self.Source_organism_scientific_name.setCurrentIndex(index)
-
-            self.Source_organism_gene.setText(self.deposit_dict['Source_organism_gene'])
-            self.Source_organism_strain.setText(self.deposit_dict['Source_organism_strain'])
-            index = self.Expression_system_scientific_name.findText(
-                self.deposit_dict['Expression_system_scientific_name'], QtCore.Qt.MatchFixedString)
-            self.Expression_system_scientific_name.setCurrentIndex(index)
-
-            self.Expression_system_strain.setText(self.deposit_dict['Expression_system_strain'])
-            self.Expression_system_vector_type.setText(self.deposit_dict['Expression_system_vector_type'])
-            self.Expression_system_plasmid_name.setText(self.deposit_dict['Expression_system_plasmid_name'])
-            self.Manipulated_source_details.setText(self.deposit_dict['Manipulated_source_details'])
-
-            self.structure_keywords.setText(self.deposit_dict['structure_keywords'])
-            self.biological_assembly_chain_number.setText(self.deposit_dict['biological_assembly_chain_number'])
-            self.molecule_one_letter_sequence_uniprot_id.setText(
-                self.deposit_dict['molecule_one_letter_sequence_uniprot_id'])
-            self.molecule_one_letter_sequence.setText(self.deposit_dict['molecule_one_letter_sequence'])
-            self.SG_project_name.setText(self.deposit_dict['SG_project_name'])
-            self.full_name_of_SG_center.setText(self.deposit_dict['full_name_of_SG_center'])
-
-            index = self.crystallization_method.findText(self.deposit_dict['crystallization_method'],
-                                                         QtCore.Qt.MatchFixedString)
-            self.crystallization_method.setCurrentIndex(index)
-
-            self.crystallization_pH.setText(self.deposit_dict['crystallization_pH'])
-            self.crystallization_temperature.setText(self.deposit_dict['crystallization_temperature'])
-            self.crystallization_details.setText(self.deposit_dict['crystallization_details'])
-            index = self.radiation_source.findText(self.deposit_dict['radiation_source'], QtCore.Qt.MatchFixedString)
-            self.radiation_source.setCurrentIndex(index)
-
-            index = self.radiation_source_type.findText(self.deposit_dict['radiation_source_type'],
-                                                        QtCore.Qt.MatchFixedString)
-            self.radiation_source_type.setCurrentIndex(index)
-
-            self.radiation_wavelengths.setText(self.deposit_dict['radiation_wavelengths'])
-            index = self.radiation_detector.findText(self.deposit_dict['radiation_detector'],
-                                                     QtCore.Qt.MatchFixedString)
-            self.radiation_detector.setCurrentIndex(index)
-
-            index = self.radiation_detector_type.findText(self.deposit_dict['radiation_detector_type'],
-                                                          QtCore.Qt.MatchFixedString)
-            self.radiation_detector_type.setCurrentIndex(index)
-
-            self.data_collection_date.setText(self.deposit_dict['data_collection_date'])
-            self.data_collection_temperature.setText(self.deposit_dict['data_collection_temperature'])
-            self.data_collection_protocol.setText(self.deposit_dict['data_collection_protocol'])
-
-            self.pdbx_starting_model.setText(self.deposit_dict['pdbx_starting_model'])
-            index = self.data_integration_software.findText(self.deposit_dict['data_integration_software'],
-                                                            QtCore.Qt.MatchFixedString)
-            self.data_integration_software.setCurrentIndex(index)
-            index = self.phasing_software.findText(self.deposit_dict['phasing_software'], QtCore.Qt.MatchFixedString)
-            self.phasing_software.setCurrentIndex(index)
-
-        except ValueError:
-            self.update_status_bar('Sorry, this is not a XChemExplorer deposit file!')
-            self.update_log.insert('Sorry, this is not a XChemExplorer deposit file!')
-
-    def update_deposit_dict(self):
-        self.deposit_dict = {
-            'contact_author_PI_salutation': str(self.contact_author_PI_salutation.text()),
-            'contact_author_PI_first_name': str(self.contact_author_PI_first_name.text()),
-            'contact_author_PI_last_name': str(self.contact_author_PI_last_name.text()),
-            'contact_author_PI_middle_name': str(self.contact_author_PI_middle_name.text()),
-            'contact_author_PI_role': str(self.contact_author_PI_role.currentText()),
-            'contact_author_PI_organization_type': str(self.contact_author_PI_organization_type.currentText()),
-            'contact_author_PI_organization_name': str(self.contact_author_PI_organization_name.text()),
-            'contact_author_PI_email': str(self.contact_author_PI_email.text()),
-            'contact_author_PI_address': str(self.contact_author_PI_address.text()),
-            'contact_author_PI_city': str(self.contact_author_PI_city.text()),
-            'contact_author_PI_State_or_Province': str(self.contact_author_PI_State_or_Province.text()),
-            'contact_author_PI_Zip_Code': str(self.contact_author_PI_Zip_Code.text()),
-            'contact_author_PI_Country': str(self.contact_author_PI_Country.text()),
-            'contact_author_PI_phone_number': str(self.contact_author_PI_phone_number.text()),
-
-            'contact_author_salutation': str(self.contact_author_salutation.text()),
-            'contact_author_first_name': str(self.contact_author_first_name.text()),
-            'contact_author_last_name': str(self.contact_author_last_name.text()),
-            'contact_author_middle_name': str(self.contact_author_middle_name.text()),
-            'contact_author_role': str(self.contact_author_role.currentText()),
-            'contact_author_organization_type': str(self.contact_author_organization_type.currentText()),
-            'contact_author_organization_name': str(self.contact_author_organization_name.text()),
-            'contact_author_email': str(self.contact_author_email.text()),
-            'contact_author_address': str(self.contact_author_address.text()),
-            'contact_author_city': str(self.contact_author_city.text()),
-            'contact_author_State_or_Province': str(self.contact_author_State_or_Province.text()),
-            'contact_author_Zip_Code': str(self.contact_author_Zip_Code.text()),
-            'contact_author_Country': str(self.contact_author_Country.text()),
-            'contact_author_phone_number': str(self.contact_author_phone_number.text()),
-
-            'Release_status_for_coordinates': str(self.Release_status_for_coordinates.currentText()),
-            'Release_status_for_sequence': str(self.Release_status_for_sequence.currentText()),
-
-            'group_deposition_title': str(self.group_deposition_title.text()),
-            'group_description': str(self.group_description.text()),
-
-            'structure_title': str(self.structure_title.text()),
-            'structure_title_apo': str(self.structure_title_apo.text()),
-
-            'primary_citation_id': str(self.primary_citation_id.text()),
-            'primary_citation_journal_abbrev': str(self.primary_citation_journal_abbrev.text()),
-            'primary_citation_title': str(self.primary_citation_title.text()),
-            'primary_citation_year': str(self.primary_citation_year.text()),
-            'primary_citation_journal_volume': str(self.primary_citation_journal_volume.text()),
-            'primary_citation_page_first': str(self.primary_citation_page_first.text()),
-            'primary_citation_page_last': str(self.primary_citation_page_last.text()),
-
-            'molecule_name': str(self.molecule_name.text()),
-            'Source_organism_scientific_name': str(self.Source_organism_scientific_name.currentText()),
-            'Source_organism_gene': str(self.Source_organism_gene.text()),
-            'Source_organism_strain': str(self.Source_organism_strain.text()),
-            'Expression_system_scientific_name': str(self.Expression_system_scientific_name.currentText()),
-            'Expression_system_strain': str(self.Expression_system_strain.text()),
-            'Expression_system_plasmid_name': str(self.Expression_system_plasmid_name.text()),
-            'Expression_system_vector_type': str(self.Expression_system_vector_type.text()),
-            'Manipulated_source_details': str(self.Manipulated_source_details.text()),
-            'fragment_name_one_specific_mutation': str(self.fragment_name_one_specific_mutation.text()),
-
-            'structure_keywords': str(self.structure_keywords.text()),
-            'biological_assembly_chain_number': str(self.biological_assembly_chain_number.text()),
-            'molecule_one_letter_sequence_uniprot_id': str(self.molecule_one_letter_sequence_uniprot_id.text()),
-            'SG_project_name': str(self.SG_project_name.text()),
-            'full_name_of_SG_center': str(self.full_name_of_SG_center.text()),
-            'molecule_one_letter_sequence': str(self.molecule_one_letter_sequence.toPlainText()).replace(' ',
-                                                                                                         '').replace(
-                '\n', '').replace('\r', ''),
-
-            'crystallization_method': str(self.crystallization_method.currentText()),
-            'crystallization_pH': str(self.crystallization_pH.text()),
-            'crystallization_temperature': str(self.crystallization_temperature.text()),
-            'crystallization_details': str(self.crystallization_details.text()),
-
-            'radiation_source': str(self.radiation_source.currentText()),
-            'radiation_source_type': str(self.radiation_source_type.currentText()),
-            'radiation_wavelengths': str(self.radiation_wavelengths.text()),
-            'radiation_detector': str(self.radiation_detector.currentText()),
-            'radiation_detector_type': str(self.radiation_detector_type.currentText()),
-            'data_collection_date': str(self.data_collection_date.text()),
-            'data_collection_temperature': str(self.data_collection_temperature.text()),
-            'data_collection_protocol': str(self.data_collection_protocol.text()),
-            'pdbx_starting_model': str(self.pdbx_starting_model.text()),
-            'data_integration_software': str(self.data_integration_software.currentText()),
-            'phasing_software': str(self.phasing_software.currentText())
-        }
-
-        structure_author_name = ''
-        for widget in self.structure_author_name_List:
-            structure_author_name += str(widget.text()) + ';'
-        self.deposit_dict['structure_author_name'] = structure_author_name[:-1]
-
-        primary_citation_author_name = ''
-        for widget in self.primary_citation_author_name_List:
-            primary_citation_author_name += str(widget.text()) + ';'
-        self.deposit_dict['primary_citation_author_name'] = primary_citation_author_name[:-1]
-
+#    def update_deposit_dict(self):
+#        self.deposit_dict = {
+#            'contact_author_PI_salutation': str(self.contact_author_PI_salutation.text()),
+#            'contact_author_PI_first_name': str(self.contact_author_PI_first_name.text()),
+#            'contact_author_PI_last_name': str(self.contact_author_PI_last_name.text()),
+#            'contact_author_PI_middle_name': str(self.contact_author_PI_middle_name.text()),
+#            'contact_author_PI_role': str(self.contact_author_PI_role.currentText()),
+#            'contact_author_PI_organization_type': str(self.contact_author_PI_organization_type.currentText()),
+#            'contact_author_PI_organization_name': str(self.contact_author_PI_organization_name.text()),
+#            'contact_author_PI_email': str(self.contact_author_PI_email.text()),
+#            'contact_author_PI_address': str(self.contact_author_PI_address.text()),
+#            'contact_author_PI_city': str(self.contact_author_PI_city.text()),
+#            'contact_author_PI_State_or_Province': str(self.contact_author_PI_State_or_Province.text()),
+#            'contact_author_PI_Zip_Code': str(self.contact_author_PI_Zip_Code.text()),
+#            'contact_author_PI_Country': str(self.contact_author_PI_Country.text()),
+#            'contact_author_PI_phone_number': str(self.contact_author_PI_phone_number.text()),
+#
+#            'contact_author_salutation': str(self.contact_author_salutation.text()),
+#            'contact_author_first_name': str(self.contact_author_first_name.text()),
+#            'contact_author_last_name': str(self.contact_author_last_name.text()),
+#            'contact_author_middle_name': str(self.contact_author_middle_name.text()),
+#            'contact_author_role': str(self.contact_author_role.currentText()),
+#            'contact_author_organization_type': str(self.contact_author_organization_type.currentText()),
+#            'contact_author_organization_name': str(self.contact_author_organization_name.text()),
+#            'contact_author_email': str(self.contact_author_email.text()),
+#            'contact_author_address': str(self.contact_author_address.text()),
+#            'contact_author_city': str(self.contact_author_city.text()),
+#            'contact_author_State_or_Province': str(self.contact_author_State_or_Province.text()),
+#            'contact_author_Zip_Code': str(self.contact_author_Zip_Code.text()),
+#            'contact_author_Country': str(self.contact_author_Country.text()),
+#            'contact_author_phone_number': str(self.contact_author_phone_number.text()),
+#
+#            'Release_status_for_coordinates': str(self.Release_status_for_coordinates.currentText()),
+#            'Release_status_for_sequence': str(self.Release_status_for_sequence.currentText()),
+#
+#            'group_deposition_title': str(self.group_deposition_title.text()),
+#            'group_description': str(self.group_description.text()),
+#
+#            'structure_title': str(self.structure_title.text()),
+#            'structure_title_apo': str(self.structure_title_apo.text()),
+#
+#            'primary_citation_id': str(self.primary_citation_id.text()),
+#            'primary_citation_journal_abbrev': str(self.primary_citation_journal_abbrev.text()),
+#            'primary_citation_title': str(self.primary_citation_title.text()),
+#            'primary_citation_year': str(self.primary_citation_year.text()),
+#            'primary_citation_journal_volume': str(self.primary_citation_journal_volume.text()),
+#            'primary_citation_page_first': str(self.primary_citation_page_first.text()),
+#            'primary_citation_page_last': str(self.primary_citation_page_last.text()),
+#
+#            'molecule_name': str(self.molecule_name.text()),
+#            'Source_organism_scientific_name': str(self.Source_organism_scientific_name.currentText()),
+#            'Source_organism_gene': str(self.Source_organism_gene.text()),
+#            'Source_organism_strain': str(self.Source_organism_strain.text()),
+#            'Expression_system_scientific_name': str(self.Expression_system_scientific_name.currentText()),
+#            'Expression_system_strain': str(self.Expression_system_strain.text()),
+#            'Expression_system_plasmid_name': str(self.Expression_system_plasmid_name.text()),
+#            'Expression_system_vector_type': str(self.Expression_system_vector_type.text()),
+#            'Manipulated_source_details': str(self.Manipulated_source_details.text()),
+#            'fragment_name_one_specific_mutation': str(self.fragment_name_one_specific_mutation.text()),
+#
+#            'structure_keywords': str(self.structure_keywords.text()),
+#            'biological_assembly_chain_number': str(self.biological_assembly_chain_number.text()),
+#            'molecule_one_letter_sequence_uniprot_id': str(self.molecule_one_letter_sequence_uniprot_id.text()),
+#            'SG_project_name': str(self.SG_project_name.text()),
+#            'full_name_of_SG_center': str(self.full_name_of_SG_center.text()),
+#            'molecule_one_letter_sequence': str(self.molecule_one_letter_sequence.toPlainText()).replace(' ',
+#                                                                                                         '').replace(
+#                '\n', '').replace('\r', ''),
+#
+#            'crystallization_method': str(self.crystallization_method.currentText()),
+#            'crystallization_pH': str(self.crystallization_pH.text()),
+#            'crystallization_temperature': str(self.crystallization_temperature.text()),
+#            'crystallization_details': str(self.crystallization_details.text()),
+#
+#            'radiation_source': str(self.radiation_source.currentText()),
+#            'radiation_source_type': str(self.radiation_source_type.currentText()),
+#            'radiation_wavelengths': str(self.radiation_wavelengths.text()),
+#            'radiation_detector': str(self.radiation_detector.currentText()),
+#            'radiation_detector_type': str(self.radiation_detector_type.currentText()),
+#            'data_collection_date': str(self.data_collection_date.text()),
+#            'data_collection_temperature': str(self.data_collection_temperature.text()),
+#            'data_collection_protocol': str(self.data_collection_protocol.text()),
+#            'pdbx_starting_model': str(self.pdbx_starting_model.text()),
+#            'data_integration_software': str(self.data_integration_software.currentText()),
+#            'phasing_software': str(self.phasing_software.currentText())
+#        }
+#
+#        structure_author_name = ''
+#        for widget in self.structure_author_name_List:
+#            structure_author_name += str(widget.text()) + ';'
+#        self.deposit_dict['structure_author_name'] = structure_author_name[:-1]
+#
+#        primary_citation_author_name = ''
+#        for widget in self.primary_citation_author_name_List:
+#            primary_citation_author_name += str(widget.text()) + ';'
+#        self.deposit_dict['primary_citation_author_name'] = primary_citation_author_name[:-1]
+#
     def set_primary_citation_as_structure_authors(self, state):
         if state == QtCore.Qt.Checked:
             for n, entry in enumerate(self.structure_author_name_List):

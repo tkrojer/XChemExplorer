@@ -304,12 +304,22 @@ class data_source:
             ['Release_status_for_structure_factor',         'Release_status_for_structure_factor',      'TEXT'],
             ['Release_status_for_sequence',                 'Release_status_for_sequence',              'TEXT'],
 
+            ['audit_author_name',                 'audit_author_name',              'TEXT'],
+
+
             ['group_deposition_title',                      'group_deposition_title',                   'TEXT'],
             ['group_description',                           'group_description',                        'TEXT'],
             ['structure_title',                             'structure_title',                          'TEXT'],
             ['structure_details',                           'structure_details',                        'TEXT'],
             ['group_deposition_title_apo',                  'group_deposition_title_apo',               'TEXT'],
             ['structure_title_apo',                         'structure_title_apo',                      'TEXT'],
+
+            ['group_title',                         'group_title',                      'TEXT'],
+            ['group_type',                         'group_type',                      'TEXT'],
+            ['protein_chains',                         'protein_chains',                      'TEXT'],
+            ['molecule_one_letter_sequence',                         'molecule_one_letter_sequence',                      'TEXT'],
+            ['pdbx_host_org_ncbi_taxonomy_id',                         'pdbx_host_org_ncbi_taxonomy_id',                      'TEXT'],
+            ['pdbx_gene_src_ncbi_taxonomy_id',                         'pdbx_gene_src_ncbi_taxonomy_id',                      'TEXT'],
 
             ['structure_author_name',                       'structure_author_name',                    'TEXT'],
             ['primary_citation_author_name',                'primary_citation_author_name',             'TEXT'],
@@ -369,6 +379,8 @@ class data_source:
             ['pdbx_starting_model',                         'pdbx_starting_model',                      'TEXT'],
             ['data_integration_software',                   'data_integration_software',                'TEXT'],
             ['phasing_software',                            'phasing_software',                         'TEXT'],
+
+
 
             ['LastUpdated',                                 'LastUpdated',                              'TEXT'],
             ['LastUpdated_by',                              'LastUpdated_by',                           'TEXT']

@@ -25,45 +25,6 @@ class templates:
 
     def data_template_cif(self,depositDict):
 
-        taxonomy_dict=XChemMain.NCBI_taxonomy_ID()
-        for key in taxonomy_dict:
-            if taxonomy_dict[key]==depositDict['Source_organism_scientific_name']:
-                pdbx_gene_src_ncbi_taxonomy_id=key
-            if taxonomy_dict[key]==depositDict['Expression_system_scientific_name']:
-                pdbx_host_org_ncbi_taxonomy_id=key
-
-#        structure_author_name=''
-#        for name in depositDict['structure_author_name'].split(';'):
-#            structure_author_name+='<structure_author_name=  %s>\n' %name
-
-        audit_author_name=''
-        # one name must be within quotation, last name and first initial must be separated by comma and space
-        for name in depositDict['structure_author_name'].split(';'):
-            if name.replace(' ','') == '':
-                continue
-            if name[name.find(',')+1:name.find(',')+2] != ' ':
-                name=name.replace(',',', ')
-            audit_author_name+="'{0!s}'\n".format(name)
-
-        primary_citation_author_name=''
-        # one name must be within quotation, last name and first initial must be separated by comma and space
-        for name in depositDict['primary_citation_author_name'].split(';'):
-            if name.replace(' ','') == '':
-                continue
-            if name[name.find(',')+1:name.find(',')+2] != ' ':
-                name=name.replace(',',', ')
-            primary_citation_author_name+="primary '{0!s}'\n".format(name)
-
-        molecule_one_letter_sequence=';'
-        counter=1
-        for aa in depositDict['molecule_one_letter_sequence']:
-            if counter < 70:
-                molecule_one_letter_sequence+=aa
-            if counter == 70:
-                molecule_one_letter_sequence+='\n'+aa
-                counter = 0
-            counter+=1
-
         data_template_cif = (
             'data_UNNAMED\n'
             '#\n'
@@ -213,7 +174,7 @@ class synchronise_check_depositTable(object):
         # 2.) assign structure type in depositTable based on RefinementOutcome in mainTable
         self.assignStructureType()
 
-        # 3.) update/ insert depositTable based on entries in respectve deposit_dict
+        # 3.) update/ insert depositTable based on entries in respective deposit_dict
         self.updateDepositTable()
 
     def check(self):
@@ -228,11 +189,19 @@ class synchronise_check_depositTable(object):
             self.Logfile.error(XChemWarnings.incompleteDepsitTable())
         return canStart
 
-
     def addMissingCrystalRecords(self):
         # UNDER CONSTRUCTON
-        xtalsToAdd = self.db.execute_statement('select CrystalName from mainTable where CrystalName not exists in depositTable')
-        self.db.update_insert_any_table()
+
+        sqlite = (
+            "SELECT mainTable.CrystalName "
+            "FROM mainTable "
+            "LEFT JOIN depositTable ON depositTable.CrystalName = mainTable.CrystalName "
+            "WHERE depositTable.CrystalName IS NULL and mainTable.DataCollectionOutcome is 'success'"
+        )
+        xtalsToAdd = self.db.execute_statement(sqlite)
+
+        for xtal in xtalsToAdd:
+            self.db.update_insert_any_table('depositTable',db_dict,condition_dict)
 
     def assignStructureType(self):
         for type in self.structureType:
@@ -626,14 +595,14 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 # first get all meta-data for deposition, i.e. data_template file
                 wavelength=self.prepare_data_template_for_xtal(xtal,compoundID,pdb)
 
-                # make model mmcif
-                self.make_model_mmcif(xtal,pdb,log,refSoft)
+#                # make model mmcif
+#                self.make_model_mmcif(xtal,pdb,log,refSoft)
 
-                # make SF mmcif
-                self.make_sf_mmcif(xtal,mtzFinal,mtzData,eventMtz)
+#                # make SF mmcif
+#                self.make_sf_mmcif(xtal,mtzFinal,mtzData,eventMtz)
 
-                # report any problems that came up
-                mmcif=self.check_mmcif_files_and_update_db(xtal,n_eventMtz,wavelength)
+#                # report any problems that came up
+#                mmcif=self.check_mmcif_files_and_update_db(xtal,n_eventMtz,wavelength)
 
                 # add ligand cif file to mmcif
                 if self.structureType=='ligand_bound':
@@ -1253,3 +1222,281 @@ class compare_smiles_in_db_with_ligand_in_pdb(QtCore.QThread):
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
         self.emit(QtCore.SIGNAL('show_error_dict'), self.ErrorDict)
+
+class depositDict:
+    def __init__(self):
+        pass
+
+    def update(self, xce_object):
+        xce_object.deposit_dict = {
+            'contact_author_PI_salutation': str(xce_object.contact_author_PI_salutation.text()),
+            'contact_author_PI_first_name': str(xce_object.contact_author_PI_first_name.text()),
+            'contact_author_PI_last_name': str(xce_object.contact_author_PI_last_name.text()),
+            'contact_author_PI_middle_name': str(xce_object.contact_author_PI_middle_name.text()),
+            'contact_author_PI_role': str(xce_object.contact_author_PI_role.currentText()),
+            'contact_author_PI_organization_type': str(xce_object.contact_author_PI_organization_type.currentText()),
+            'contact_author_PI_organization_name': str(xce_object.contact_author_PI_organization_name.text()),
+            'contact_author_PI_email': str(xce_object.contact_author_PI_email.text()),
+            'contact_author_PI_address': str(xce_object.contact_author_PI_address.text()),
+            'contact_author_PI_city': str(xce_object.contact_author_PI_city.text()),
+            'contact_author_PI_State_or_Province': str(xce_object.contact_author_PI_State_or_Province.text()),
+            'contact_author_PI_Zip_Code': str(xce_object.contact_author_PI_Zip_Code.text()),
+            'contact_author_PI_Country': str(xce_object.contact_author_PI_Country.text()),
+            'contact_author_PI_phone_number': str(xce_object.contact_author_PI_phone_number.text()),
+
+            'contact_author_salutation': str(xce_object.contact_author_salutation.text()),
+            'contact_author_first_name': str(xce_object.contact_author_first_name.text()),
+            'contact_author_last_name': str(xce_object.contact_author_last_name.text()),
+            'contact_author_middle_name': str(xce_object.contact_author_middle_name.text()),
+            'contact_author_role': str(xce_object.contact_author_role.currentText()),
+            'contact_author_organization_type': str(xce_object.contact_author_organization_type.currentText()),
+            'contact_author_organization_name': str(xce_object.contact_author_organization_name.text()),
+            'contact_author_email': str(xce_object.contact_author_email.text()),
+            'contact_author_address': str(xce_object.contact_author_address.text()),
+            'contact_author_city': str(xce_object.contact_author_city.text()),
+            'contact_author_State_or_Province': str(xce_object.contact_author_State_or_Province.text()),
+            'contact_author_Zip_Code': str(xce_object.contact_author_Zip_Code.text()),
+            'contact_author_Country': str(xce_object.contact_author_Country.text()),
+            'contact_author_phone_number': str(xce_object.contact_author_phone_number.text()),
+
+            'Release_status_for_coordinates': str(xce_object.Release_status_for_coordinates.currentText()),
+            'Release_status_for_sequence': str(xce_object.Release_status_for_sequence.currentText()),
+
+            'group_deposition_title': str(xce_object.group_deposition_title.text()),
+            'group_description': str(xce_object.group_description.text()),
+
+            'structure_title': str(xce_object.structure_title.text()),
+            'structure_title_apo': str(xce_object.structure_title_apo.text()),
+
+            'primary_citation_id': str(xce_object.primary_citation_id.text()),
+            'primary_citation_journal_abbrev': str(xce_object.primary_citation_journal_abbrev.text()),
+            'primary_citation_title': str(xce_object.primary_citation_title.text()),
+            'primary_citation_year': str(xce_object.primary_citation_year.text()),
+            'primary_citation_journal_volume': str(xce_object.primary_citation_journal_volume.text()),
+            'primary_citation_page_first': str(xce_object.primary_citation_page_first.text()),
+            'primary_citation_page_last': str(xce_object.primary_citation_page_last.text()),
+
+            'molecule_name': str(xce_object.molecule_name.text()),
+            'Source_organism_scientific_name': str(xce_object.Source_organism_scientific_name.currentText()),
+            'Source_organism_gene': str(xce_object.Source_organism_gene.text()),
+            'Source_organism_strain': str(xce_object.Source_organism_strain.text()),
+            'Expression_system_scientific_name': str(xce_object.Expression_system_scientific_name.currentText()),
+            'Expression_system_strain': str(xce_object.Expression_system_strain.text()),
+            'Expression_system_plasmid_name': str(xce_object.Expression_system_plasmid_name.text()),
+            'Expression_system_vector_type': str(xce_object.Expression_system_vector_type.text()),
+            'Manipulated_source_details': str(xce_object.Manipulated_source_details.text()),
+            'fragment_name_one_specific_mutation': str(xce_object.fragment_name_one_specific_mutation.text()),
+
+            'structure_keywords': str(xce_object.structure_keywords.text()),
+            'biological_assembly_chain_number': str(xce_object.biological_assembly_chain_number.text()),
+            'molecule_one_letter_sequence_uniprot_id': str(xce_object.molecule_one_letter_sequence_uniprot_id.text()),
+            'SG_project_name': str(xce_object.SG_project_name.text()),
+            'full_name_of_SG_center': str(xce_object.full_name_of_SG_center.text()),
+            'molecule_one_letter_sequence': str(xce_object.molecule_one_letter_sequence.toPlainText()).replace(' ',
+                                                                                                         '').replace(
+                '\n', '').replace('\r', ''),
+
+            'crystallization_method': str(xce_object.crystallization_method.currentText()),
+            'crystallization_pH': str(xce_object.crystallization_pH.text()),
+            'crystallization_temperature': str(xce_object.crystallization_temperature.text()),
+            'crystallization_details': str(xce_object.crystallization_details.text()),
+
+            'radiation_source': str(xce_object.radiation_source.currentText()),
+            'radiation_source_type': str(xce_object.radiation_source_type.currentText()),
+            'radiation_wavelengths': str(xce_object.radiation_wavelengths.text()),
+            'radiation_detector': str(xce_object.radiation_detector.currentText()),
+            'radiation_detector_type': str(xce_object.radiation_detector_type.currentText()),
+            'data_collection_date': str(xce_object.data_collection_date.text()),
+            'data_collection_temperature': str(xce_object.data_collection_temperature.text()),
+            'data_collection_protocol': str(xce_object.data_collection_protocol.text()),
+            'pdbx_starting_model': str(xce_object.pdbx_starting_model.text()),
+            'data_integration_software': str(xce_object.data_integration_software.currentText()),
+            'phasing_software': str(xce_object.phasing_software.currentText())
+        }
+
+        structure_author_name = ''
+        for widget in xce_object.structure_author_name_List:
+            structure_author_name += str(widget.text()) + ';'
+        xce_object.deposit_dict['structure_author_name'] = structure_author_name[:-1]
+
+        primary_citation_author_name = ''
+        for widget in xce_object.primary_citation_author_name_List:
+            primary_citation_author_name += str(widget.text()) + ';'
+        xce_object.deposit_dict['primary_citation_author_name'] = primary_citation_author_name[:-1]
+
+    def update_deposit_input_widgets(self,xce_object):
+        try:
+            xce_object.contact_author_PI_salutation.setText(xce_object.deposit_dict['contact_author_PI_salutation'])
+            xce_object.contact_author_PI_first_name.setText(xce_object.deposit_dict['contact_author_PI_first_name'])
+            xce_object.contact_author_PI_last_name.setText(xce_object.deposit_dict['contact_author_PI_last_name'])
+            xce_object.contact_author_PI_middle_name.setText(xce_object.deposit_dict['contact_author_PI_middle_name'])
+            index = xce_object.contact_author_PI_role.findText(xce_object.deposit_dict['contact_author_PI_role'],
+                                                         QtCore.Qt.MatchFixedString)
+            xce_object.contact_author_PI_role.setCurrentIndex(index)
+            index = xce_object.contact_author_PI_organization_type.findText(
+                xce_object.deposit_dict['contact_author_PI_organization_type'], QtCore.Qt.MatchFixedString)
+            xce_object.contact_author_PI_organization_type.setCurrentIndex(index)
+            xce_object.contact_author_PI_organization_name.setText(xce_object.deposit_dict['contact_author_PI_organization_name'])
+            xce_object.contact_author_PI_email.setText(xce_object.deposit_dict['contact_author_PI_email'])
+            xce_object.contact_author_PI_address.setText(xce_object.deposit_dict['contact_author_PI_address'])
+            xce_object.contact_author_PI_city.setText(xce_object.deposit_dict['contact_author_PI_city'])
+            xce_object.contact_author_PI_State_or_Province.setText(xce_object.deposit_dict['contact_author_PI_State_or_Province'])
+            xce_object.contact_author_PI_Zip_Code.setText(xce_object.deposit_dict['contact_author_PI_Zip_Code'])
+            xce_object.contact_author_PI_Country.setText(xce_object.deposit_dict['contact_author_PI_Country'])
+            xce_object.contact_author_PI_phone_number.setText(xce_object.deposit_dict['contact_author_PI_phone_number'])
+
+            xce_object.contact_author_salutation.setText(xce_object.deposit_dict['contact_author_salutation'])
+            xce_object.contact_author_first_name.setText(xce_object.deposit_dict['contact_author_first_name'])
+            xce_object.contact_author_last_name.setText(xce_object.deposit_dict['contact_author_last_name'])
+            xce_object.contact_author_middle_name.setText(xce_object.deposit_dict['contact_author_middle_name'])
+            index = xce_object.contact_author_role.findText(xce_object.deposit_dict['contact_author_role'],
+                                                      QtCore.Qt.MatchFixedString)
+            xce_object.contact_author_role.setCurrentIndex(index)
+            index = xce_object.contact_author_organization_type.findText(
+                xce_object.deposit_dict['contact_author_organization_type'], QtCore.Qt.MatchFixedString)
+            xce_object.contact_author_organization_type.setCurrentIndex(index)
+            xce_object.contact_author_organization_name.setText(xce_object.deposit_dict['contact_author_organization_name'])
+            xce_object.contact_author_email.setText(xce_object.deposit_dict['contact_author_email'])
+            xce_object.contact_author_address.setText(xce_object.deposit_dict['contact_author_address'])
+            xce_object.contact_author_city.setText(xce_object.deposit_dict['contact_author_city'])
+            xce_object.contact_author_State_or_Province.setText(xce_object.deposit_dict['contact_author_State_or_Province'])
+            xce_object.contact_author_Zip_Code.setText(xce_object.deposit_dict['contact_author_Zip_Code'])
+            xce_object.contact_author_Country.setText(xce_object.deposit_dict['contact_author_Country'])
+            xce_object.contact_author_phone_number.setText(xce_object.deposit_dict['contact_author_phone_number'])
+            index = xce_object.Release_status_for_coordinates.findText(xce_object.deposit_dict['Release_status_for_coordinates'],
+                                                                 QtCore.Qt.MatchFixedString)
+            xce_object.Release_status_for_coordinates.setCurrentIndex(index)
+            index = xce_object.Release_status_for_sequence.findText(xce_object.deposit_dict['Release_status_for_sequence'],
+                                                              QtCore.Qt.MatchFixedString)
+            xce_object.Release_status_for_sequence.setCurrentIndex(index)
+
+            xce_object.group_deposition_title.setText(xce_object.deposit_dict['group_deposition_title'])
+            xce_object.group_description.setText(xce_object.deposit_dict['group_description'])
+
+            xce_object.structure_title.setText(xce_object.deposit_dict['structure_title'])
+            xce_object.structure_title_apo.setText(xce_object.deposit_dict['structure_title_apo'])
+
+            for n, name in enumerate(xce_object.deposit_dict['structure_author_name'].split(';')):
+                xce_object.structure_author_name_List[n].setText(name)
+
+            xce_object.primary_citation_id.setText(xce_object.deposit_dict['primary_citation_id'])
+            xce_object.primary_citation_journal_abbrev.setText(xce_object.deposit_dict['primary_citation_journal_abbrev'])
+            xce_object.primary_citation_title.setText(xce_object.deposit_dict['primary_citation_title'])
+            xce_object.primary_citation_year.setText(xce_object.deposit_dict['primary_citation_year'])
+            xce_object.primary_citation_journal_volume.setText(xce_object.deposit_dict['primary_citation_journal_volume'])
+            xce_object.primary_citation_page_first.setText(xce_object.deposit_dict['primary_citation_page_first'])
+            xce_object.primary_citation_page_last.setText(xce_object.deposit_dict['primary_citation_page_last'])
+
+            for n, name in enumerate(xce_object.deposit_dict['primary_citation_author_name'].split(';')):
+                xce_object.primary_citation_author_name_List[n].setText(name)
+
+            xce_object.molecule_name.setText(xce_object.deposit_dict['molecule_name'])
+            xce_object.fragment_name_one_specific_mutation.setText(xce_object.deposit_dict['fragment_name_one_specific_mutation'])
+            index = xce_object.Source_organism_scientific_name.findText(xce_object.deposit_dict['Source_organism_scientific_name'],
+                                                                  QtCore.Qt.MatchFixedString)
+            xce_object.Source_organism_scientific_name.setCurrentIndex(index)
+
+            xce_object.Source_organism_gene.setText(xce_object.deposit_dict['Source_organism_gene'])
+            xce_object.Source_organism_strain.setText(xce_object.deposit_dict['Source_organism_strain'])
+            index = xce_object.Expression_system_scientific_name.findText(
+                xce_object.deposit_dict['Expression_system_scientific_name'], QtCore.Qt.MatchFixedString)
+            xce_object.Expression_system_scientific_name.setCurrentIndex(index)
+
+            xce_object.Expression_system_strain.setText(xce_object.deposit_dict['Expression_system_strain'])
+            xce_object.Expression_system_vector_type.setText(xce_object.deposit_dict['Expression_system_vector_type'])
+            xce_object.Expression_system_plasmid_name.setText(xce_object.deposit_dict['Expression_system_plasmid_name'])
+            xce_object.Manipulated_source_details.setText(xce_object.deposit_dict['Manipulated_source_details'])
+
+            xce_object.structure_keywords.setText(xce_object.deposit_dict['structure_keywords'])
+            xce_object.biological_assembly_chain_number.setText(xce_object.deposit_dict['biological_assembly_chain_number'])
+            xce_object.molecule_one_letter_sequence_uniprot_id.setText(
+                xce_object.deposit_dict['molecule_one_letter_sequence_uniprot_id'])
+            xce_object.molecule_one_letter_sequence.setText(xce_object.deposit_dict['molecule_one_letter_sequence'])
+            xce_object.SG_project_name.setText(xce_object.deposit_dict['SG_project_name'])
+            xce_object.full_name_of_SG_center.setText(xce_object.deposit_dict['full_name_of_SG_center'])
+
+            index = xce_object.crystallization_method.findText(xce_object.deposit_dict['crystallization_method'],
+                                                         QtCore.Qt.MatchFixedString)
+            xce_object.crystallization_method.setCurrentIndex(index)
+
+            xce_object.crystallization_pH.setText(xce_object.deposit_dict['crystallization_pH'])
+            xce_object.crystallization_temperature.setText(xce_object.deposit_dict['crystallization_temperature'])
+            xce_object.crystallization_details.setText(xce_object.deposit_dict['crystallization_details'])
+            index = xce_object.radiation_source.findText(xce_object.deposit_dict['radiation_source'], QtCore.Qt.MatchFixedString)
+            xce_object.radiation_source.setCurrentIndex(index)
+
+            index = xce_object.radiation_source_type.findText(xce_object.deposit_dict['radiation_source_type'],
+                                                        QtCore.Qt.MatchFixedString)
+            xce_object.radiation_source_type.setCurrentIndex(index)
+
+            xce_object.radiation_wavelengths.setText(xce_object.deposit_dict['radiation_wavelengths'])
+            index = xce_object.radiation_detector.findText(xce_object.deposit_dict['radiation_detector'],
+                                                     QtCore.Qt.MatchFixedString)
+            xce_object.radiation_detector.setCurrentIndex(index)
+
+            index = xce_object.radiation_detector_type.findText(xce_object.deposit_dict['radiation_detector_type'],
+                                                          QtCore.Qt.MatchFixedString)
+            xce_object.radiation_detector_type.setCurrentIndex(index)
+
+            xce_object.data_collection_date.setText(xce_object.deposit_dict['data_collection_date'])
+            xce_object.data_collection_temperature.setText(xce_object.deposit_dict['data_collection_temperature'])
+            xce_object.data_collection_protocol.setText(xce_object.deposit_dict['data_collection_protocol'])
+
+            xce_object.pdbx_starting_model.setText(xce_object.deposit_dict['pdbx_starting_model'])
+            index = xce_object.data_integration_software.findText(xce_object.deposit_dict['data_integration_software'],
+                                                            QtCore.Qt.MatchFixedString)
+            xce_object.data_integration_software.setCurrentIndex(index)
+            index = xce_object.phasing_software.findText(xce_object.deposit_dict['phasing_software'], QtCore.Qt.MatchFixedString)
+            xce_object.phasing_software.setCurrentIndex(index)
+
+        except ValueError:
+            xce_object.update_status_bar('Sorry, this is not a XChemExplorer deposit file!')
+            xce_object.update_log.insert('Sorry, this is not a XChemExplorer deposit file!')
+
+    def get_taxonomy(self):
+        taxonomy_dict=XChemMain.NCBI_taxonomy_ID()
+        for key in taxonomy_dict:
+            if taxonomy_dict[key]==xce_object.deposit_dict['Source_organism_scientific_name']:
+#                pdbx_gene_src_ncbi_taxonomy_id=key
+                xce_object.deposit_dict['pdbx_gene_src_ncbi_taxonomy_id'] = key
+            if taxonomy_dict[key]==xce_object.deposit_dict['Expression_system_scientific_name']:
+#                pdbx_host_org_ncbi_taxonomy_id=key
+                xce_object.deposit_dict['pdbx_host_org_ncbi_taxonomy_id'] = key
+
+#        structure_author_name=''
+#        for name in xce_object.deposit_dict['structure_author_name'].split(';'):
+#            structure_author_name+='<structure_author_name=  %s>\n' %name
+
+    def get_audit_author(self):
+        audit_author_name=''
+        # one name must be within quotation, last name and first initial must be separated by comma and space
+        for name in xce_object.deposit_dict['structure_author_name'].split(';'):
+            if name.replace(' ','') == '':
+                continue
+            if name[name.find(',')+1:name.find(',')+2] != ' ':
+                name=name.replace(',',', ')
+            audit_author_name+="'{0!s}'\n".format(name)
+        xce_object.deposit_dict['audit_author_name'] = audit_author_name
+
+    def primary_citation_author(self):
+        primary_citation_author_name=''
+        # one name must be within quotation, last name and first initial must be separated by comma and space
+        for name in xce_object.deposit_dict['primary_citation_author_name'].split(';'):
+            if name.replace(' ','') == '':
+                continue
+            if name[name.find(',')+1:name.find(',')+2] != ' ':
+                name=name.replace(',',', ')
+            primary_citation_author_name+="primary '{0!s}'\n".format(name)
+        xce_object.deposit_dict['primary_citation_author_name'] = primary_citation_author_name
+
+    def sequence(self):
+        molecule_one_letter_sequence=';'
+        counter=1
+        for aa in xce_object.deposit_dict['molecule_one_letter_sequence']:
+            if counter < 70:
+                molecule_one_letter_sequence+=aa
+            if counter == 70:
+                molecule_one_letter_sequence+='\n'+aa
+                counter = 0
+            counter+=1
+        xce_object.deposit_dict['molecule_one_letter_sequence'] = molecule_one_letter_sequence
