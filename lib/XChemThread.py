@@ -1855,16 +1855,18 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
 
     """
     def __init__(self,
-                processedDir,
-                database,
-                projectDir,
-                xce_logfile):
+                 processedDir,
+                 database,
+                 projectDir,
+                 xce_logfile,
+                 target):
         QtCore.QThread.__init__(self)
 #        self.target = target
         self.processedDir =  processedDir
         self.visit,self.beamline = XChemMain.getVisitAndBeamline(self.processedDir)
         self.projectDir = projectDir
         self.Logfile = XChemLog.updateLog(xce_logfile)
+        self.target = target
 
         self.db = XChemDB.data_source(os.path.join(database))
         self.exisitingSamples = self.getExistingSamples()
@@ -1956,7 +1958,8 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
                             'DataProcessingPathToLogfile':      logNew,
                             'DataProcessingPathToMTZfile':      mtzNew,
                             'DataProcessingDirectoryOriginal':  folder,
-                            'DataCollectionOutcome':            'success'   }   # success in collection Table only means that a logfile was found
+                            'DataCollectionOutcome':            'success',  # success in collection Table only means that a logfile was found
+                            'ProteinName':                      self.target     }
                 db_dict.update(parse().read_aimless_logfile(logNew))
         db_dict.update(self.findJPGs(xtal,current_run))     # image exist even if data processing failed
         db_dict['DataCollectionBeamline'] = self.beamline

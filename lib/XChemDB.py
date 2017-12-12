@@ -392,6 +392,7 @@ class data_source:
         self.data_collection_columns = [
             ['ID',                                          'ID',                                       'INTEGER PRIMARY KEY'],
             ['CrystalName',                          'Sample ID',                               'TEXT',                 0],
+            ['ProteinName',                         'ProteinName',                              'TEXT', 1],
 
             ['DataCollectionVisit',                    'Visit',                                     'TEXT',                 0],
             ['DataCollectionRun',                    'Run',                                     'TEXT',                 0],

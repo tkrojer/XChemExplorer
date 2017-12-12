@@ -298,7 +298,8 @@ class XChemExplorer(QtGui.QApplication):
                                                                                               self.database_directory,
                                                                                               self.data_source_file),
                                                                                           self.initial_model_directory,
-                                                                                          self.xce_logfile)
+                                                                                          self.xce_logfile,
+                                                                                          self.target   )
 
             self.explorer_active = 1
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
