@@ -564,7 +564,7 @@ class parse:
 #            if 'Wavelength' in line:
 #                print 'here'
 #                print line.split()
-            if 'Wavelength' in line and len(line.split())==3:
+            if 'Wavelength' in line and len(line.split())>=2:
                 self.aimless['DataCollectionWavelength']=line.split()[1]
             if line.startswith('Low resolution limit') and len(line.split())==6:
                 self.aimless['DataProcessingResolutionLow'] = line.split()[3]

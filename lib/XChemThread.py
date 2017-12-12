@@ -1671,13 +1671,16 @@ class read_pinIDs_from_gda_logs(QtCore.QThread):
         self.Logfile = XChemLog.updateLog(xce_logfile)
 
         self.db = XChemDB.data_source(os.path.join(database))
-        self.allSamples = self.db.collected_xtals_during_visit_for_scoring(visit,False)
+        self.allSamples = self.db.collected_xtals_during_visit_for_scoring(visit)
 
         self.gdaLogInstructions = gdaLogInstructions
         self.gda_log_start_line = gdaLogInstructions[0]
         self.gzipped_logs_parsed = gdaLogInstructions[1]
 
     def run(self):
+        if self.gzipped_logs_parsed:
+            self.Logfile.insert("parsed gzipped gda logfiles before, won't do again...")
+        self.Logfile.insert("will start parsing of current gda logfile at line {0!s}".format(str(self.gda_log_start_line)))
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'checking GDA logiles for pinID details')
         pinDict, self.gda_log_start_line = XChemMain.get_gda_barcodes(self.allSamples,
                                                                  self.gzipped_logs_parsed,
@@ -1687,6 +1690,7 @@ class read_pinIDs_from_gda_logs(QtCore.QThread):
 
         self.update_database(pinDict)
 
+        self.gdaLogInstructions = [self.gda_log_start_line,True]
         self.emit(QtCore.SIGNAL('update_gdaLog_parsing_instructions_and_score'), self.gdaLogInstructions)
         self.emit(QtCore.SIGNAL("finished()"))
 
@@ -1721,29 +1725,44 @@ class choose_autoprocessing_outcome(QtCore.QThread):
         self.Logfile = XChemLog.updateLog(xce_logfile)
 
         self.db = XChemDB.data_source(os.path.join(database))
-        self.allSamples = self.db.collected_xtals_during_visit_for_scoring(visit,rescore)
+        self.allSamples = self.db.collected_xtals_during_visit_for_scoring(visit)
+#        self.allSamples = self.db.collected_xtals_during_visit_for_scoring(visit,rescore)
 
 
     def run(self):
         for sample in sorted(self.allSamples):
-            self.Logfile.insert('%s: selecting autoprocessing result' %sample)
+            if self.db.autoprocessing_result_user_assigned(sample):
+                self.Logfile.warning('{0!s}: user has manually selected auto-processing result; will NOT auto-select!'.format(sample))
+                continue
+            elif self.rescore:
+                self.Logfile.warning('{0!s}: rescore selected -> might overwrite user selection!'.format(sample))
+            else:
+                self.Logfile.insert('%s: selecting autoprocessing result' % sample)
             dbList = self.db.all_autoprocessing_results_for_xtal_as_dict(sample)
             self.Logfile.insert('%s: found %s different autoprocessing results' %(sample,str(len(dbList))))
+
             # 1.) if posssible, only carry forward samples with similar UCvolume and same point group
             dbList = self.selectResultsSimilarToReference(dbList)
+
             # 2.) if possible, only carry forward samples with low resolution Rmerge smaller than
             #     specified in perferences
             dbList = self.selectResultsWithAcceptableLowResoRmerge(dbList)
+
             # 3.) Make selection based on speified selection mechanism
             if self.selection_mechanism == 'IsigI*Comp*UniqueRefl':
                 dbDict = self.selectHighestScore(dbList)
             elif self.selection_mechanism == 'highest_resolution':
                 dbDict = self.selectHighestResolution(dbList)
+
             # 4.) Set new symbolic links in project directory
             XChemMain.linkAutoProcessingResult(sample,dbDict,self.projectDir)
-            # 5.) update database
+
+            # 5.) Determine DataProcessing Outcome
+            dbDict['DataCollectionOutcome'] = self.determine_processing_outcome(dbDict)
+
+            # 6.) update database
             dbDict['DataProcessingAutoAssigned'] = 'True'
-            self.db.update_data_source(sample,dbDict)
+            self.updateDB(sample,dbDict)
 
         self.emit(QtCore.SIGNAL('populate_datasets_summary_table'))
         self.emit(QtCore.SIGNAL("finished()"))
@@ -1799,7 +1818,21 @@ class choose_autoprocessing_outcome(QtCore.QThread):
         highestResoDict = dbList[tmp.index(min(tmp))]
         return highestResoDict
 
+    def determine_processing_outcome(self,db_dict):
+        outcome = 'Failed - unknown'
+        try:
+            if float(db_dict['DataProcessingResolutionHigh']) < self.acceptable_low_resolution_limit_for_data:
+                outcome = 'success'
+            else:
+                outcome = 'Failed - low resolution'
+        except ValueError:
+            pass
+        return outcome
 
+
+    def updateDB(self,sample, dbDict):
+        self.Logfile.insert('{0!s}: updating database'.format(sample))
+        self.db.update_insert_data_source(sample, dbDict)
 
 
 class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
@@ -1851,7 +1884,7 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
     def getExistingSamples(self):
         existingSamples={}
         self.Logfile.insert('reading existing samples from collectionTable')
-        allEntries = self.db.execute_statement('select CrystalName,DataCollectionVisit,DataCollectionRun,DataProcessingProgram from collectionTable')
+        allEntries = self.db.execute_statement('select CrystalName,DataCollectionVisit,DataCollectionRun,DataProcessingProgram from collectionTable where DataCollectionOutcome = "success"')
         for item in allEntries:
             if str(item[0]) not in existingSamples:
                 existingSamples[str(item[0])]=[]
@@ -1919,12 +1952,14 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
             for logfile in glob.glob(os.path.join(folder, log)):
                 self.createAutoprocessingDir(xtal, current_run, autoproc)
                 mtzNew,logNew = self.copyMTZandLOGfiles(xtal,current_run,autoproc,mtzfile,logfile)
-                db_dict = { 'DataCollectionDate': timestamp,
-                            'DataProcessingPathToLogfile': logNew,
-                            'DataProcessingPathToMTZfile': mtzNew,
-                            'DataProcessingDirectoryOriginal': folder    }
+                db_dict = { 'DataCollectionDate':               timestamp,
+                            'DataProcessingPathToLogfile':      logNew,
+                            'DataProcessingPathToMTZfile':      mtzNew,
+                            'DataProcessingDirectoryOriginal':  folder,
+                            'DataCollectionOutcome':            'success'   }   # success in collection Table only means that a logfile was found
                 db_dict.update(parse().read_aimless_logfile(logNew))
-                db_dict.update(self.findJPGs(xtal,current_run))
+        db_dict.update(self.findJPGs(xtal,current_run))     # image exist even if data processing failed
+        db_dict['DataCollectionBeamline'] = self.beamline
         return db_dict
 
     def getAutoProc(self,folder):
@@ -1982,8 +2017,7 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
                         if self.alreadyParsed(xtal,current_run,autoproc):
                             continue
                         db_dict = self.readProcessingResults(xtal,folder,logfile,mtzfile,timestamp,current_run,autoproc)
-                        if db_dict != {}:
-                            self.update_data_collection_table(xtal,current_run,autoproc,db_dict)
+                        self.update_data_collection_table(xtal,current_run,autoproc,db_dict)
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)

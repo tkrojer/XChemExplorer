@@ -396,6 +396,7 @@ class data_source:
             ['DataCollectionVisit',                    'Visit',                                     'TEXT',                 0],
             ['DataCollectionRun',                    'Run',                                     'TEXT',                 0],
             ['DataCollectionBeamline',               'Beamline',                                'TEXT',                 0],
+            ['DataCollectionOutcome',                'DataCollection\nOutcome',                 'TEXT',                 1],
             ['DataCollectionDate',                   'Data Collection\nDate',                   'TEXT',                 1],
             ['DataCollectionWavelength',             'Wavelength',                              'TEXT',                 0],
             ['DataCollectionPinBarcode',             'GDA\nBarcode',                            'TEXT',                 1],
@@ -586,15 +587,17 @@ class data_source:
     def get_deposit_dict_for_sample(self,sampleID):
         db_dict={}
         header=[]
-        data=[]
         connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
         cursor = connect.cursor()
         cursor.execute("select * from depositTable where CrystalName='{0!s}';".format(sampleID))
         for column in cursor.description:
             header.append(column[0])
         data = cursor.fetchall()
-        for n,item in enumerate(data[0]):
-            db_dict[header[n]]=str(item)
+        try:
+            for n,item in enumerate(data[0]):
+                db_dict[header[n]]=str(item)
+        except IndexError:
+            print 'cannot find sample ID in mainTable of database'
         return db_dict
 
     def get_db_pandda_dict_for_sample_and_site(self,sampleID,site_index):
@@ -1629,19 +1632,34 @@ class data_source:
                 collectedXtals.append(str(sample[0]))
         return collectedXtals
 
-    def collected_xtals_during_visit_for_scoring(self,visit,rescore):
+    def collected_xtals_during_visit_for_scoring(self,visit):
         connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
         cursor = connect.cursor()
         xtalList = []
-        if rescore == True:
-            cursor.execute("select CrystalName from mainTable where DataCollectionVisit = '%s'" %visit)
-        else:
-            cursor.execute("select CrystalName from mainTable where DataProcessingAutoAssigned = 'True' and DataCollectionVisit = '%s'" %visit)
+#        if rescore == True:
+#            cursor.execute("select CrystalName from mainTable where DataCollectionVisit = '%s'" %visit)
+#        else:
+#            cursor.execute("select CrystalName from mainTable where DataProcessingAutoAssigned = 'True' and DataCollectionVisit = '%s'" %visit)
+        cursor.execute("select distinct CrystalName from collectionTable where DataCollectionVisit = '%s'" %visit)
         samples = cursor.fetchall()
         for sample in samples:
             if str(sample[0]) not in xtalList:
                 xtalList.append(str(sample[0]))
         return xtalList
+
+    def autoprocessing_result_user_assigned(self,sample):
+        userassigned = False
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+        cursor.execute("select DataProcessingAutoAssigned from mainTable where CrystalName = '%s'" %sample)
+        outcome = cursor.fetchall()
+        try:
+            if 'true' in str(outcome[0]).lower():
+                userassigned = True
+        except IndexError:
+            pass
+        return userassigned
+
 
     def all_results_of_xtals_collected_during_visit_as_dict(self,visitID):
         # first get all collected xtals as list
@@ -1765,7 +1783,15 @@ class data_source:
 
 
 
-
+#    def create_sampleID_in_mainTable_if_not_exists(self,sampleID):
+#        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+#        cursor = connect.cursor()
+#        sqlite = (  "insert into mainTable(CrystalName) "
+#                    " select '{0!s}'".format(sampleID) +
+#                    " where not exists (select 1 from mainTable where"
+#                    " CrystalName = '{0!s}'".format(sampleID)   )
+#        cursor.execute(sqlite)
+#        connect.commit()
 
 
 

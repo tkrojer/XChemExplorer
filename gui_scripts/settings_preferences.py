@@ -13,7 +13,7 @@ import XChemUtils
 import XChemDB
 import XChemMain
 import XChemLog
-import XChemDeposit
+#import XChemDeposit
 
 class setup():
     def __init__(self):
@@ -410,21 +410,39 @@ class setup():
                                                    ]],
                                 'D: deposition': ["&Deposition",
                                                   [
-                                                      ['Edit information', '', xce_object.edit_deposition_data],
-                                                      ['Export to HTML', '', xce_object.export_to_html],
+                                                      ['Edit information', '', xce_object.show_preferences],
+                                                      ['Export to HTML', '', xce_object.show_preferences],
                                                       ['Find PanDDA apo structures', '',
-                                                       xce_object.create_missing_apo_records_in_depositTable],
+                                                       xce_object.show_preferences],
                                                       ['Update file info of apo structures', '',
-                                                       xce_object.update_file_information_of_apo_records],
+                                                       xce_object.show_preferences],
                                                       ['Prepare mmcif for apo structures', '',
-                                                       xce_object.prepare_models_for_deposition_apo],
+                                                       xce_object.show_preferences],
                                                       ['Prepare mmcif for ligand bound structures', '',
-                                                       xce_object.prepare_models_for_deposition_ligand_bound],
+                                                       xce_object.show_preferences],
                                                       ['Copy files to group deposition directory', '',
-                                                       xce_object.prepare_for_group_deposition_upload],
-                                                      ['Update DB with PDB codes', '', xce_object.enter_pdb_codes],
-                                                      ['Check SMILES', '', xce_object.check_smiles_in_db_and_pdb]
+                                                       xce_object.show_preferences],
+                                                      ['Update DB with PDB codes', '', xce_object.show_preferences],
+                                                      ['Check SMILES', '', xce_object.show_preferences]
                                                   ]],
+#                                'D: deposition': ["&Deposition",
+#                                                  [
+#                                                      ['Edit information', '', xce_object.edit_deposition_data],
+#                                                      ['Export to HTML', '', xce_object.export_to_html],
+#                                                      ['Find PanDDA apo structures', '',
+#                                                       xce_object.create_missing_apo_records_in_depositTable],
+#                                                      ['Update file info of apo structures', '',
+#                                                       xce_object.update_file_information_of_apo_records],
+#                                                      ['Prepare mmcif for apo structures', '',
+#                                                       xce_object.prepare_models_for_deposition_apo],
+#                                                      ['Prepare mmcif for ligand bound structures', '',
+#                                                       xce_object.prepare_models_for_deposition_ligand_bound],
+#                                                      ['Copy files to group deposition directory', '',
+#                                                       xce_object.prepare_for_group_deposition_upload],
+#                                                      ['Update DB with PDB codes', '', xce_object.enter_pdb_codes],
+#                                                      ['Check SMILES', '', xce_object.check_smiles_in_db_and_pdb]
+#                                                  ]],
+
                                 'E: proasis': ["Proasis",
                                                [
                                                    [str(xce_object.proasis_project_label), '',

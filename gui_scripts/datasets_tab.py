@@ -79,15 +79,15 @@ class DatasetsTab():
 
         # pop-up table which shows all autoprocessing results for a specific sample
         # called by xce_object.show_results_from_all_pipelines
-        xce_object.data_collection_table = QtGui.QTableWidget()
-        xce_object.data_collection_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        xce_object.data_collection_table.setColumnCount(len(xce_object.data_collection_table_columns))
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        xce_object.data_collection_table.setFont(font)
-        xce_object.data_collection_table.setHorizontalHeaderLabels(xce_object.data_collection_table_columns)
-        xce_object.data_collection_table.horizontalHeader().setFont(font)
-        xce_object.data_collection_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+#        xce_object.data_collection_table = QtGui.QTableWidget()
+#        xce_object.data_collection_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+#        xce_object.data_collection_table.setColumnCount(len(xce_object.data_collection_table_columns))
+#        font = QtGui.QFont()
+#        font.setPointSize(8)
+#        xce_object.data_collection_table.setFont(font)
+#        xce_object.data_collection_table.setHorizontalHeaderLabels(xce_object.data_collection_table_columns)
+#        xce_object.data_collection_table.horizontalHeader().setFont(font)
+#        xce_object.data_collection_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
 
 
         # reprocessing sub-tab

@@ -53,7 +53,7 @@ import XChemMain
 import XChemPlots
 import XChemLog
 import XChemProcess
-import XChemDeposit
+#import XChemDeposit
 import XChemWeb
 
 import matplotlib.pyplot as plt
@@ -725,125 +725,130 @@ class XChemExplorer(QtGui.QApplication):
                                                                               self.xce_logfile)
 
     def update_file_information_of_apo_records(self):
-        XChemDeposit.update_file_locations_of_apo_structuresin_DB(
-            os.path.join(self.database_directory, self.data_source_file), self.initial_model_directory,
-            self.xce_logfile)
+        print 'hallo'
+#        XChemDeposit.update_file_locations_of_apo_structuresin_DB(
+#            os.path.join(self.database_directory, self.data_source_file), self.initial_model_directory,
+#            self.xce_logfile)
 
-    def prepare_models_for_deposition_ligand_bound(self):
-
-        structureType = "ligand_bound"
-
-        overwrite_existing_mmcif = True
-        self.work_thread = XChemDeposit.prepare_mmcif_files_for_deposition(
-            os.path.join(self.database_directory, self.data_source_file),
-            self.xce_logfile,
-            overwrite_existing_mmcif,
-            self.initial_model_directory,
-            structureType)
-        self.explorer_active = 1
-        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-        self.work_thread.start()
+#    def prepare_models_for_deposition_ligand_bound(self):
+#
+#        structureType = "ligand_bound"
+#
+#        overwrite_existing_mmcif = True
+#        self.work_thread = XChemDeposit.prepare_mmcif_files_for_deposition(
+#            os.path.join(self.database_directory, self.data_source_file),
+#            self.xce_logfile,
+#            overwrite_existing_mmcif,
+#            self.initial_model_directory,
+#            structureType)
+#        self.explorer_active = 1
+#        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+#        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+#        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#        self.work_thread.start()
 
     def prepare_models_for_deposition_apo(self):
-
-        structureType = "apo"
-
-        overwrite_existing_mmcif = True
-        self.work_thread = XChemDeposit.prepare_mmcif_files_for_deposition(
-            os.path.join(self.database_directory, self.data_source_file),
-            self.xce_logfile,
-            overwrite_existing_mmcif,
-            self.initial_model_directory,
-            structureType)
-        self.explorer_active = 1
-        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-        self.work_thread.start()
+        print 'hallo'
+#        structureType = "apo"
+#
+#        overwrite_existing_mmcif = True
+#        self.work_thread = XChemDeposit.prepare_mmcif_files_for_deposition(
+#            os.path.join(self.database_directory, self.data_source_file),
+#            self.xce_logfile,
+#            overwrite_existing_mmcif,
+#            self.initial_model_directory,
+#            structureType)
+#        self.explorer_active = 1
+#        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+#        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+#        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#        self.work_thread.start()
 
 
     def prepare_for_group_deposition_upload(self):
-
-        self.work_thread = XChemDeposit.prepare_for_group_deposition_upload(
-            os.path.join(self.database_directory, self.data_source_file),
-            self.xce_logfile,
-            self.group_deposit_directory)
-        self.explorer_active = 1
-        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-        self.work_thread.start()
+        print 'hallo'
+#        self.work_thread = XChemDeposit.prepare_for_group_deposition_upload(
+#            os.path.join(self.database_directory, self.data_source_file),
+#            self.xce_logfile,
+#            self.group_deposit_directory)
+#        self.explorer_active = 1
+#        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+#        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+#        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#        self.work_thread.start()
 
     def check_smiles_in_db_and_pdb(self):
-
-        self.work_thread = XChemDeposit.compare_smiles_in_db_with_ligand_in_pdb(self.initial_model_directory,
-                                                                                os.path.join(self.database_directory,
-                                                                                             self.data_source_file),
-                                                                                self.xce_logfile)
-        self.explorer_active = 1
-        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-        self.connect(self.work_thread, QtCore.SIGNAL("show_error_dict"), self.show_error_dict)
-        self.work_thread.start()
+        print 'hallo'
+#        self.work_thread = XChemDeposit.compare_smiles_in_db_with_ligand_in_pdb(self.initial_model_directory,
+#                                                                                os.path.join(self.database_directory,
+#                                                                                             self.data_source_file),
+#                                                                                self.xce_logfile)
+#        self.explorer_active = 1
+#        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+#        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+#        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#        self.connect(self.work_thread, QtCore.SIGNAL("show_error_dict"), self.show_error_dict)
+#        self.work_thread.start()
 
     def edit_deposition_data(self):
         DepositionDetails().setup(self)
         self.messageBox.exec_()
 
     def save_deposit_config_file(self):
-#        self.update_deposit_dict()
-        XChemDeposit.depositDict().update()
-        file_name = str(QtGui.QFileDialog.getSaveFileName(self.window, 'Save file', self.current_directory))
-        # make sure that the file always has .deposit extension
-        if str(file_name).rfind('.') != -1:
-            file_name = file_name[:file_name.rfind('.')] + '.deposit'
-        else:
-            file_name = file_name + '.deposit'
-        pickle.dump(self.deposit_dict, open(file_name, 'wb'))
+        print 'hallo'
+##        self.update_deposit_dict()
+#        XChemDeposit.depositDict().update()
+#        file_name = str(QtGui.QFileDialog.getSaveFileName(self.window, 'Save file', self.current_directory))
+#        # make sure that the file always has .deposit extension
+#        if str(file_name).rfind('.') != -1:
+#            file_name = file_name[:file_name.rfind('.')] + '.deposit'
+#        else:
+#            file_name = file_name + '.deposit'
+#        pickle.dump(self.deposit_dict, open(file_name, 'wb'))
 
     def update_database_with_pdb_codes(self):
-        self.work_thread = XChemDeposit.import_PDB_IDs(str(self.pdb_code_entry.toPlainText()),
-                                                       os.path.join(self.database_directory, self.data_source_file),
-                                                       self.xce_logfile)
-        self.explorer_active = 1
-        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-        self.work_thread.start()
+        print 'hallo'
+#        self.work_thread = XChemDeposit.import_PDB_IDs(str(self.pdb_code_entry.toPlainText()),
+#                                                       os.path.join(self.database_directory, self.data_source_file),
+#                                                       self.xce_logfile)
+#        self.explorer_active = 1
+#        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+#        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+#        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#        self.work_thread.start()
 
     def load_deposit_config_file(self):
-        file_name_temp = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window, 'Open file', self.current_directory,
-                                                                    '*.deposit')
-        file_name = tuple(file_name_temp)[0]
-        self.deposit_dict = pickle.load(open(file_name, "rb"))
-        XChemDeposit.depositDict().update_deposit_input_widgets()
-#        self.update_deposit_input()
+        print 'hallo'
+#        file_name_temp = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window, 'Open file', self.current_directory,
+#                                                                    '*.deposit')
+#        file_name = tuple(file_name_temp)[0]
+#        self.deposit_dict = pickle.load(open(file_name, "rb"))
+#        XChemDeposit.depositDict().update_deposit_input_widgets()
+##        self.update_deposit_input()
 
     def load_deposit_from_database(self):
         print('hallo')
 
     def save_deposit_to_database(self):
-#        self.update_deposit_dict()
-        XChemDeposit.depositDict().update()
-        msgBox = QtGui.QMessageBox()
-        msgBox.setText(
-            "*** WARNING ***\nAre you sure you want to update the database?\nThis will overwrite previous entries!")
-        msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.YesRole)
-        msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.RejectRole)
-        reply = msgBox.exec_();
-        if reply == 0:
-            self.work_thread = XChemDeposit.update_depositTable(self.deposit_dict,
-                                                                os.path.join(self.database_directory,
-                                                                             self.data_source_file),
-                                                                self.xce_logfile)
-            self.explorer_active = 1
-            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
-            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
-            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
-            self.work_thread.start()
+        print 'hallo'
+##        self.update_deposit_dict()
+#        XChemDeposit.depositDict().update()
+#        msgBox = QtGui.QMessageBox()
+#        msgBox.setText(
+#            "*** WARNING ***\nAre you sure you want to update the database?\nThis will overwrite previous entries!")
+#        msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.YesRole)
+#        msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.RejectRole)
+#        reply = msgBox.exec_();
+#        if reply == 0:
+#            self.work_thread = XChemDeposit.update_depositTable(self.deposit_dict,
+#                                                                os.path.join(self.database_directory,
+#                                                                             self.data_source_file),
+#                                                                self.xce_logfile)
+#            self.explorer_active = 1
+#            self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+#            self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+#            self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+#            self.work_thread.start()
 
 #    def update_deposit_input(self):
 #        try:
@@ -2229,22 +2234,23 @@ class XChemExplorer(QtGui.QApplication):
             self.work_thread.start()
 
     def update_deposition_table(self):
-        # check if PanDDA models are ready for deposition
-
-        depositChecks = XChemDeposit.update_deposition_table(
-            os.path.join(self.database_directory, self.data_source_file))
-
-        toDeposit, mismatch = depositChecks.PanDDA_models_to_deposit()
-
-        if mismatch != {}:
-            self.update_log.insert('The following samples contain ligand that are not ready for deposition:')
-            for entry in mismatch:
-                self.update_log.insert(entry[0] + ' -> site: ' + entry[1] + ' @ ' + entry[2] + ' => ' + entry[4])
-            self.update_log.insert('You need to change this before you can continue!')
-            return None
-
-        for xtal in toDeposit:
-            self.db.update_insert_depositTable(xtal, {})
+        print 'hallo'
+#        # check if PanDDA models are ready for deposition
+#
+#        depositChecks = XChemDeposit.update_deposition_table(
+#            os.path.join(self.database_directory, self.data_source_file))
+#
+#        toDeposit, mismatch = depositChecks.PanDDA_models_to_deposit()
+#
+#        if mismatch != {}:
+#            self.update_log.insert('The following samples contain ligand that are not ready for deposition:')
+#            for entry in mismatch:
+#                self.update_log.insert(entry[0] + ' -> site: ' + entry[1] + ' @ ' + entry[2] + ' => ' + entry[4])
+#            self.update_log.insert('You need to change this before you can continue!')
+#            return None
+#
+#        for xtal in toDeposit:
+#            self.db.update_insert_depositTable(xtal, {})
 
     def show_html_summary_and_diffraction_image(self):
         for key in self.albula_button_dict:
@@ -2641,8 +2647,13 @@ class XChemExplorer(QtGui.QApplication):
         selectedResultDict = self.db.get_db_dict_for_sample(xtal)
 
         dbList=self.db.all_autoprocessing_results_for_xtal_as_dict(xtal)
-        self.data_collection_table.setRowCount(0)       # reset table
+
+        self.make_data_collection_table()
+        self.msgBox = QtGui.QMessageBox()   # needs to be created here, otherwise the cellClicked function
+                                            # will reference it before it exists
         for db_dict in dbList:
+            if str(db_dict['DataProcessingSpaceGroup']).lower() == 'null' or str(db_dict['DataProcessingSpaceGroup']).lower() == 'none':
+                continue
             row = self.data_collection_table.rowCount()
             self.data_collection_table.insertRow(row)
             self.update_row_in_table(xtal, row, db_dict, self.data_collection_table, self.data_collection_table_columns)
@@ -2654,8 +2665,21 @@ class XChemExplorer(QtGui.QApplication):
         self.data_collection_table.cellClicked.connect(self.select_different_autoprocessing_result)
         self.data_collection_table_popup()
 
+    def make_data_collection_table(self):
+        # this creates a new table widget every time
+        # more elegant would be to delete or reset an existing widget...
+        self.data_collection_table = QtGui.QTableWidget()
+        self.data_collection_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.data_collection_table.setColumnCount(len(self.data_collection_table_columns))
+        font = QtGui.QFont()
+        font.setPointSize(8)
+        self.data_collection_table.setFont(font)
+        self.data_collection_table.setHorizontalHeaderLabels(self.data_collection_table_columns)
+        self.data_collection_table.horizontalHeader().setFont(font)
+        self.data_collection_table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+
     def data_collection_table_popup(self):
-        self.msgBox = QtGui.QMessageBox()
+#        self.msgBox = QtGui.QMessageBox()
         msgBoxLayout = self.msgBox.layout()
         qWid = QtGui.QWidget()
         qWid.setFixedWidth(2000)
@@ -2680,6 +2704,8 @@ class XChemExplorer(QtGui.QApplication):
             dbDict = self.db.get_db_dict_for_visit_run_autoproc(xtal,visit,run,autoproc)
             dbDict['DataProcessingAutoAssigned'] = 'False'
             self.update_log.insert('%s: changing selected autoprocessing result to %s %s %s' %(xtal,visit,run,autoproc))
+            # xtal is QString -> str(xtal)
+            XChemMain.linkAutoProcessingResult(str(xtal), dbDict, self.initial_model_directory)
             self.update_log.insert('%s: updating row in Datasets table' %xtal)
             self.db.update_data_source(str(xtal),dbDict)
             self.update_log.insert('%s: getting updated information from DB mainTable' %xtal)
