@@ -2307,11 +2307,8 @@ class XChemExplorer(QtGui.QApplication):
             else:
                 reference_file_cif = ''
 
-            if os.path.isfile(
-                    os.path.join(db_dict['DataProcessingPathToMTZfile'], db_dict['DataProcessingMTZfileName'])):
-                mtzin = os.path.join(db_dict['DataProcessingPathToMTZfile'], db_dict['DataProcessingMTZfileName'])
-            elif os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
-                mtzin = os.path.join(db_dict['DataProcessingPathToMTZfile'])
+            if os.path.isfile(os.path.join(self.initial_model_directory, xtal, xtal +'.mtz')):
+                mtzin = os.path.join(self.initial_model_directory, xtal, xtal +'.mtz')
 
             self.update_log.insert('adding ' + xtal + visit + '-' + run + autoproc + ' to list')
             job_list.append([xtal,
