@@ -1332,7 +1332,8 @@ class data_source:
         SQLite =    (   "select"
                         " panddaTable.PANDDA_site_ligand_resname,"
                         " panddaTable.PANDDA_site_ligand_sequence_number,"
-                        " panddaTable.PANDDA_site_ligand_chain,"
+                       	" panddaTable.PANDDA_site_ligand_chain,"
+                        " panddaTable.RefinementOutcome,"
                         " mainTable.CompoundSMILES,"
                         " mainTable.RefinementBoundConformation,"
                         " panddaTable.PANDDA_site_initial_mtz,"
@@ -1342,9 +1343,7 @@ class data_source:
                         "from"
                         " mainTable inner join panddaTable on mainTable.CrystalName = panddaTable.CrystalName "
                         "where"
-                        " (panddaTable.RefinementOutcome like '4%' or panddaTable.RefinementOutcome like '5%')"
-                        " and (panddaTable.PANDDA_site_confidence like '4%' or panddaTable.PANDDA_site_confidence is 'High')"     )
-
+                        " (panddaTable.RefinementOutcome like '3%' or panddaTable.RefinementOutcome like '4%' or panddaTable.RefinementOutcome like '5%')" )
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
         cursor.execute(SQLite)
