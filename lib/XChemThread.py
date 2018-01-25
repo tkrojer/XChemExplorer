@@ -2012,6 +2012,10 @@ class save_autoprocessing_results_to_disc(QtCore.QThread):
 
 
     def copy_mtz_and_logfiles_only(self,sample,autoproc,run,visit,path_to_procdir,path_to_logfile,path_to_mtzfile,mtz_filename,log_filename):
+        # clear up broken links first
+        os.chdir(self.initial_model_directory)
+        os.system('find . -xtype l -delete')
+
         os.chdir(os.path.join(self.initial_model_directory,sample,'autoprocessing',visit+'-'+run+autoproc))
         # don't do anything if file already exists
         if not os.path.isfile(mtz_filename):
