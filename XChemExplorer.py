@@ -2107,7 +2107,9 @@ class XChemExplorer(QtGui.QApplication):
     def run_dimple_on_selected_autoprocessing_file(self):
         job_list = []
         for xtal in sorted(self.initial_model_dimple_dict):
+            # print(xtal)
             if self.initial_model_dimple_dict[xtal][0].isChecked():
+                # print(xtal + ' is checked...')
                 db_dict = self.xtal_db_dict[xtal]
 
                 # the if statement below is so convoluted, so that it is compatible with older data source files
@@ -2160,6 +2162,17 @@ class XChemExplorer(QtGui.QApplication):
                                      reference_file_pdb,
                                      reference_file_mtz,
                                      reference_file_cif])
+                else:
+                    print('WARNING: ' + xtal + ' has not been submitted to dimple because no files were found: ')
+                    if not os.path.isfile(os.path.join(db_dict['ProjectDirectory'], xtal, db_dict['DataProcessingPathToMTZfile'],
+                                     db_dict['DataProcessingMTZfileName'])):
+                        print('    ' + str(os.path.join(db_dict['ProjectDirectory'], xtal, db_dict['DataProcessingPathToMTZfile'],
+                                     db_dict['DataProcessingMTZfileName'])) + ' is missing')
+                    if not os.path.isfile(os.path.join(db_dict['ProjectDirectory'], xtal, db_dict['DataProcessingPathToMTZfile'])):
+                        print('    ' + str(os.path.join(db_dict['ProjectDirectory'], xtal, db_dict['DataProcessingPathToMTZfile'])) + ' is missing')
+                    if not os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
+                        print('    ' + str(os.path.join(db_dict['DataProcessingPathToMTZfile']) + ' is missing'))
+
 
         if job_list != []:
             self.update_log.insert('trying to run DIMPLE on SELECTED auto-processing files')
@@ -2531,11 +2544,13 @@ class XChemExplorer(QtGui.QApplication):
                     # of the self.main_tab_widget which belongs to this task
                     task_index = self.workflow.index(item)
                     instruction = str(self.workflow_widget_dict[item][0].currentText())
+                    print(instruction)
                     action = str(self.sender().text())
                     if self.main_tab_widget.currentIndex() == task_index:
                         if self.explorer_active == 0 and self.data_source_set == True:
                             if action == 'Run':
                                 print('==> XCE: Remote submission status = ' + str(self.using_remote_qsub_submission))
+                                # print(instruction)
                                 self.prepare_and_run_task(instruction)
                             elif action == 'Status':
                                 self.get_status_of_workflow_milestone(instruction)
