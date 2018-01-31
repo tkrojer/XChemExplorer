@@ -35,38 +35,59 @@ Then change to the respective directory and unpack the archive, e.g.:
 
 ```shell
 cd /home/tkrojer/software
-gunzip XChemExplorer-1.0-beta.4.1.tar.gz
-tar –xvf XChemExplorer-1.0-beta.4.1.tar
+gunzip XChemExplorer-1.1.tar.gz
+tar –xvf XChemExplorer-1.1.tar
 ```
 
 This will create a new directory, i.e. from now on your XChemExplorer directory. Change into this directory, e.g.:
 
 ```shell
-cd XChemExplorer-1.0-beta.4.1
+cd XChemExplorer-1.1
 ```
 
 The contents of the directory should look something like this when you type ‘ls –l’:
 ```
--rwxr-xr-x   1 tobiaskrojer  staff   185B  2 Mar 09:53 XChemExplorer.csh
--rwxr-xr-x   1 tobiaskrojer  staff   309K  2 Mar 09:53 XChemExplorer.py
--rwxr-xr-x   1 tobiaskrojer  staff   186B  2 Mar 09:53 XChemExplorer.sh
-drwxr-xr-x  11 tobiaskrojer  staff   374B  2 Mar 09:53 helpers
-drwxr-xr-x  12 tobiaskrojer  staff   408B 26 Jan 10:53 image
-drwxr-xr-x  34 tobiaskrojer  staff   1.1K  9 Mar 14:41 lib
-drwxr-xr-x   4 tobiaskrojer  staff   136B  2 Mar 09:53 setup-scripts
-drwxr-xr-x   7 tobiaskrojer  staff   238B  9 Mar 14:41 web
+-rw-r--r--@  1 tobiaskrojer  staff     182 26 Jan 10:03 Dockerfile
+-rw-r--r--@  1 tobiaskrojer  staff    2832 26 Jan 10:03 README.md
+lrwxr-xr-x@  1 tobiaskrojer  staff      20 26 Jan 10:03 XChemExplorer -> XChemExplorer_dmd.sh
+-rwxr-xr-x@  1 tobiaskrojer  staff  222991 26 Jan 10:03 XChemExplorer.py
+-rwxr-xr-x@  1 tobiaskrojer  staff     316 26 Jan 10:03 XChemExplorer_dmd.sh
+-rwxr-xr-x@  1 tobiaskrojer  staff     269 26 Jan 10:03 XChemExplorer_local.sh
+-rw-r--r--@  1 tobiaskrojer  staff     465 26 Jan 10:03 compile_test.py
+drwxr-xr-x@ 13 tobiaskrojer  staff     442 26 Jan 10:03 gui_scripts
+drwxr-xr-x@ 14 tobiaskrojer  staff     476 26 Jan 10:03 helpers
+drwxr-xr-x@ 10 tobiaskrojer  staff     340 26 Jan 10:03 icons
+drwxr-xr-x@ 11 tobiaskrojer  staff     374 26 Jan 10:03 image
+drwxr-xr-x@ 21 tobiaskrojer  staff     714 26 Jan 10:03 lib
+-rwxr-xr-x@  1 tobiaskrojer  staff      43 26 Jan 10:03 run_tests
+drwxr-xr-x@  5 tobiaskrojer  staff     170 26 Jan 10:03 setup-scripts
+-rwxr-xr-x@  1 tobiaskrojer  staff     553 26 Jan 10:03 setupssh.sh
+-rwxr-xr-x@  1 tobiaskrojer  staff     809 26 Jan 10:03 test_build.sh
+drwxr-xr-x@  6 tobiaskrojer  staff     204 26 Jan 10:03 web
 ```
 
-The only thing left to do is to edit the XChemExplorer.sh or XChemExplorer.csh file, depending on which shell you are using. Open XChemExplorer.sh for bash shells or XChemExplorer.csh for C-shells with your editor of choice and edit the line
+The only thing left to do is to edit the XChemExplorer_dmd.sh file. After you open XChemExplorer_dmd.sh with your editor of choice, the file will look like this:
 
 ```shell
-export XChemExplorer_DIR='/usr/local/scripts/tobias/XChemExplorer'
+#!/bin/bash
+
+export XChemExplorer_DIR="/dls/science/groups/i04-1/software/XChemExplorer_new/XChemExplorer"
+source $XChemExplorer_DIR/setup-scripts/xce.setup-sh
+module unload ccp4
+source /dls/science/groups/i04-1/software/pandda-update/ccp4/ccp4-7.0/bin/ccp4.setup-sh
+
+ccp4-python $XChemExplorer_DIR/XChemExplorer.py
 ```
 
-to where you XChemExplorer is installed. In our example this would be 
+Change the first line (export XChemExplorer_Dir=...) to wherever you have the program installed (in the example, XChemExplorer is installed in /Users/tobiaskrojer/Downloads/XChemExplorer-1.1). And remove lines 3 and 4! After these edits, the file should look something like this:
 
 ```shell
-export XChemExplorer_DIR='/home/tkrojer/software/XChemExplorer-1.0-beta.3.4’
+#!/bin/bash
+
+export XChemExplorer_DIR="/Users/tobiaskrojer/Downloads/XChemExplorer-1.1"
+source $XChemExplorer_DIR/setup-scripts/xce.setup-sh
+
+ccp4-python $XChemExplorer_DIR/XChemExplorer.py
 ```
 
 That’s it! 
@@ -79,13 +100,13 @@ That’s it!
 You can now run XCE by typing
 
 ```shell
-/home/tkrojer/software/XChemExplorer-1.0/XChemExplorer.sh
+/Users/tobiaskrojer/Downloads/XChemExplorer-1.1/XChemExplorer
 ```
 
-It may however be easier if you insert an alias into your .bashrc or .cshrc file:
+It may however be easier if you insert an alias into your .bashrc file:
 
 ```shell
-alias XChemExplorer='/home/tkrojer/software/XChemExplorer-1.0-beta.3.4/XChemExplorer.sh
+alias XChemExplorer='/Users/tobiaskrojer/Downloads/XChemExplorer-1.1/XChemExplorer'
 ```
 
 # Manual
@@ -102,6 +123,8 @@ Krojer, T., Talon, R., Pearce, N., Collins, P., Douangamath, A., Brandao-Neto, J
 Tobias Krojer
 tobias.krojer@sgc.ox.ac.uk
 
+Rachael Skyner
+rachael.skyner@diamond.ac.uk
 
 # Feature Requests
 
@@ -110,6 +133,7 @@ tobias.krojer@sgc.ox.ac.uk
 
 # Version History
 
+v1.1 - 31/01/2018
 v1.0 - 10/08/2017
 
 
