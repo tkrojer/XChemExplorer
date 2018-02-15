@@ -124,7 +124,7 @@ class updateLog:
 
     def hint(self,message):
         present_time=datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
-        print( str(present_time)+' ==> XCE: ERROR!!! '+message, file = self.logfile)
+        print( str(present_time)+' ==> XCE: HINT!!! '+message, file = self.logfile)
         print('==> XCE: HINT --> '+message)
 
 

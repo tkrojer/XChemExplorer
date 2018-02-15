@@ -1424,6 +1424,7 @@ class XChemExplorer(QtGui.QApplication):
                 # the if statement below is so convoluted, so that it is compatible with older data source files
 
                 if os.path.isfile(
+                        os.path.join(self.initial_model_directory,xtal,xtal+'.mtz') or \
                         os.path.join(db_dict['ProjectDirectory'], xtal, db_dict['DataProcessingPathToMTZfile'],
                                      db_dict['DataProcessingMTZfileName'])) or \
                         os.path.isfile(
@@ -1432,20 +1433,22 @@ class XChemExplorer(QtGui.QApplication):
                                                     db_dict['DataProcessingMTZfileName'])) or \
                         os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
 
-                    if os.path.isfile(
-                            os.path.join(db_dict['DataProcessingPathToMTZfile'], db_dict['DataProcessingMTZfileName'])):
-                        mtzin = os.path.join(db_dict['DataProcessingPathToMTZfile'],
-                                             db_dict['DataProcessingMTZfileName'])
-                    elif os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
-                        mtzin = os.path.join(db_dict['DataProcessingPathToMTZfile'])
-                    elif os.path.isfile(
-                            os.path.join(db_dict['ProjectDirectory'], xtal, db_dict['DataProcessingPathToMTZfile'],
-                                         db_dict['DataProcessingMTZfileName'])):
-                        mtzin = os.path.join(db_dict['ProjectDirectory'], xtal, db_dict['DataProcessingPathToMTZfile'],
-                                             db_dict['DataProcessingMTZfileName'])
-                    elif os.path.isfile(
-                            os.path.join(db_dict['ProjectDirectory'], xtal, db_dict['DataProcessingPathToMTZfile'])):
-                        mtzin = os.path.join(db_dict['ProjectDirectory'], xtal, db_dict['DataProcessingPathToMTZfile'])
+                    mtzin = os.path.join(self.initial_model_directory,xtal,xtal+'.mtz')
+
+#                    if os.path.isfile(
+#                            os.path.join(db_dict['DataProcessingPathToMTZfile'], db_dict['DataProcessingMTZfileName'])):
+#                        mtzin = os.path.join(db_dict['DataProcessingPathToMTZfile'],
+#                                             db_dict['DataProcessingMTZfileName'])
+#                    elif os.path.isfile(os.path.join(db_dict['DataProcessingPathToMTZfile'])):
+#                        mtzin = os.path.join(db_dict['DataProcessingPathToMTZfile'])
+#                    elif os.path.isfile(
+#                            os.path.join(db_dict['ProjectDirectory'], xtal, db_dict['DataProcessingPathToMTZfile'],
+#                                         db_dict['DataProcessingMTZfileName'])):
+#                        mtzin = os.path.join(db_dict['ProjectDirectory'], xtal, db_dict['DataProcessingPathToMTZfile'],
+#                                             db_dict['DataProcessingMTZfileName'])
+#                    elif os.path.isfile(
+#                            os.path.join(db_dict['ProjectDirectory'], xtal, db_dict['DataProcessingPathToMTZfile'])):
+#                        mtzin = os.path.join(db_dict['ProjectDirectory'], xtal, db_dict['DataProcessingPathToMTZfile'])
 
                     reference_file = str(self.initial_model_dimple_dict[xtal][1].currentText())
 

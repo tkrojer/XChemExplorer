@@ -1755,7 +1755,7 @@ class choose_autoprocessing_outcome(QtCore.QThread):
                 dbDict = self.selectHighestResolution(dbList)
 
             # 4.) Set new symbolic links in project directory
-            XChemMain.linkAutoProcessingResult(sample,dbDict,self.projectDir)
+            XChemMain.linkAutoProcessingResult(sample,dbDict,self.projectDir,self.xce_logfile)
 
             # 5.) Determine DataProcessing Outcome
             dbDict['DataCollectionOutcome'] = self.determine_processing_outcome(dbDict)
@@ -1767,34 +1767,53 @@ class choose_autoprocessing_outcome(QtCore.QThread):
         self.emit(QtCore.SIGNAL('populate_datasets_summary_table'))
         self.emit(QtCore.SIGNAL("finished()"))
 
+    def report_forward_carried_pipelines(self,dbListOut,dbList):
+        if dbListOut == []:
+            dbListOut = dbList
+            self.Logfile.warning('none of the MTZ files fulfilled criteria; will carry forward all results:')
+        else:
+            self.Logfile.insert('will carry forward the MTZ files from the following auto-processing pipelines:')
+        self.Logfile.insert('{0:30} {1:10} {2:10} {3:10}'.format('pipeline','Rmerge(Low)','PG','Score'))
+        self.Logfile.insert('----------------------------------------------------------------------')
+        for resultDict in dbListOut:
+            self.Logfile.insert('{0:30} {1:10} {2:10} {3:10}'.format(resultDict['DataProcessingProgram'],resultDict['DataProcessingRmergeLow'],resultDict['DataProcessingPointGroup'],resultDict['DataProcessingScore']))
+        return dbListOut
 
     def selectResultsSimilarToReference(self,dbList):
+        self.Logfile.insert('checking if MTZ files are similar to supplied reference files')
         dbListOut = []
         for resultDict in dbList:
             try:
                 if isinstance(float(resultDict['DataProcessingUnitCellVolume']),float):
+                    self.Logfile.insert('checking unit cell volume difference and point group:')
                     for reference_file in self.reference_file_list:
                         if not reference_file[4]==0:
                             unitcell_difference=round((math.fabs(reference_file[4]-float(resultDict['DataProcessingUnitCellVolume']))/reference_file[4])*100,1)
-                            if unitcell_difference < self.acceptable_unitcell_volume_difference and reference_file[3]==resultDict['DataProcessingLattice']:
+                            self.Logfile.insert(resultDict['DataProcessingProgram'] + ': ' + str(unitcell_difference) + '% difference -> pg(ref): ' + reference_file[5] + ' -> pg(mtz): ' + resultDict['DataProcessingPointGroup'])
+                            if unitcell_difference < self.acceptable_unitcell_volume_difference and reference_file[5]==resultDict['DataProcessingPointGroup']:
+                                self.Logfile.insert('=> passed -> mtz file has same point group as reference file and similar unit cell volume')
                                 dbListOut.append(resultDict)
+                            else:
+                                self.Logfile.warning('mtz file has different point group/ unit cell volume as reference file')
             except ValueError:
                 pass
-        if dbListOut == []:
-            dbListOut = dbList
+        dbListOut = self.report_forward_carried_pipelines(dbListOut,dbList)
         return dbListOut
 
 
     def selectResultsWithAcceptableLowResoRmerge(self,dbList):
+        self.Logfile.insert('checking if MTZ files have acceptable low resolution Rmerge values (currently set to %s)' %str(self.acceptable_low_resolution_Rmerge))
         dbListOut = []
         for resultDict in dbList:
             try:
                 if float(resultDict['DataProcessingRmergeLow']) < self.acceptable_low_resolution_Rmerge:
+                    self.Logfile.insert(resultDict['DataProcessingProgram'] + ': Rmerge(low) of MTZ file is below threshold: ' + str(resultDict['DataProcessingRmergeLow']))
                     dbListOut.append(resultDict)
+                else:
+                    self.Logfile.warning(resultDict['DataProcessingProgram'] + ': Rmerge(low) of MTZ file is ABOVE threshold: ' + str(resultDict['DataProcessingRmergeLow']))
             except ValueError:
                 pass
-        if dbListOut == []:
-            dbListOut = dbList
+        dbListOut = self.report_forward_carried_pipelines(dbListOut,dbList)
         return dbListOut
 
 
@@ -1990,6 +2009,26 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
                 parsed=True
         return parsed
 
+    def empty_folder(self,xtal,folder):
+        empty = True
+        stuff = []
+        for x in glob.glob(os.path.join(folder,'*')):
+            stuff.append(x)
+        if stuff == []:
+            self.Logfile.warning(
+                '{0!s}: {1!s} is empty; probably waiting for autoprocessing to finish; try later!'.format(xtal, folder))
+        else:
+            empty = False
+        return empty
+
+    def junk(self,folder):
+        do_not_parse = False
+        if not os.path.isdir(folder):
+            do_not_parse = True
+        elif 'dimple' in folder:
+            do_not_parse = True
+        return do_not_parse
+
     def parse_file_system(self):
         self.Logfile.insert('checking for new data processing results in '+self.processedDir)
         progress = 0
@@ -2016,6 +2055,10 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
                     mtzfile = item[2]
 
                     for folder in glob.glob(procDir):
+                        if self.junk(folder):
+                            continue
+                        if self.empty_folder(xtal,folder):
+                            continue
                         autoproc = self.getAutoProc(folder)
                         if self.alreadyParsed(xtal,current_run,autoproc):
                             continue

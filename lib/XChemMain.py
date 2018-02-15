@@ -291,7 +291,9 @@ def remove_all_refmac_jobs_from_cluster_and_reinstate_last_stable_state():
 
 
 
-def linkAutoProcessingResult(xtal,dbDict,projectDir):
+def linkAutoProcessingResult(xtal,dbDict,projectDir,xce_logfile):
+    Logfile=XChemLog.updateLog(xce_logfile)
+
     run =      dbDict['DataCollectionRun']
     visit =    dbDict['DataCollectionVisit']
     autoproc = dbDict['DataProcessingProgram']
@@ -300,17 +302,23 @@ def linkAutoProcessingResult(xtal,dbDict,projectDir):
     logFileAbs = dbDict['DataProcessingPathToLogfile']
     logfile = logFileAbs[logFileAbs.rfind('/')+1:]
 
+    Logfile.insert('changing directory to ' + os.path.join(projectDir,xtal))
     os.chdir(os.path.join(projectDir,xtal))
+    print '->',os.path.join(projectDir,xtal)
     # MTZ file
     if os.path.isfile(xtal+'.mtz'):
+        Logfile.warning('removing %s.mtz' %xtal)
         os.system('/bin/rm %s.mtz' %xtal)
     if os.path.isfile(os.path.join('autoprocessing', visit + '-' + run + autoproc, mtzfile)):
         os.symlink(os.path.join('autoprocessing', visit + '-' + run + autoproc, mtzfile), xtal + '.mtz')
+        Logfile.insert('ln -s ' + os.path.join('autoprocessing', visit + '-' + run + autoproc, mtzfile) + ' ' + xtal + '.mtz')
     # LOG file
     if os.path.isfile(xtal+'.log'):
+        Logfile.warning('removing %s.log'  %xtal)
         os.system('/bin/rm %s.log' %xtal)
     if os.path.isfile(os.path.join('autoprocessing', visit + '-' + run + autoproc, logfile)):
         os.symlink(os.path.join('autoprocessing', visit + '-' + run + autoproc, logfile), xtal + '.log')
+        Logfile.insert('ln -s ' + os.path.join('autoprocessing', visit + '-' + run + autoproc, logfile) + ' ' + xtal + '.log')
 
 
 
