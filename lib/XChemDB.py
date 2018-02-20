@@ -84,6 +84,11 @@ class data_source:
             ['DataCollectionWavelength',             'Wavelength',                              'TEXT',                 0],
             ['DataCollectionPinBarcode',             'GDA\nBarcode',                            'TEXT',                 1],
 
+            ['DataCollectionCrystalImage1', 'img1', 'TEXT', 1],
+            ['DataCollectionCrystalImage2', 'img2', 'TEXT', 1],
+            ['DataCollectionCrystalImage3', 'img3', 'TEXT', 1],
+            ['DataCollectionCrystalImage4', 'img4', 'TEXT', 1],
+
             ['DataProcessingPathToImageFiles',       'Path to diffraction\nimage files',        'TEXT',                 1],
             ['DataProcessingProgram',                'Program',                                 'TEXT',                 1],
             ['DataProcessingSpaceGroup',             'DataProcessing\nSpaceGroup',              'TEXT',                 1],
@@ -96,6 +101,9 @@ class data_source:
             ['DataProcessingAlpha',                  'DataProcessing\nAlpha',                   'TEXT',                 0],
             ['DataProcessingBeta',                   'DataProcessing\nBeta',                    'TEXT',                 0],
             ['DataProcessingGamma',                  'DataProcessing\nGamma',                   'TEXT',                 0],
+
+        # True or False depending on whether user changed automatic selection
+#            ['DataProcessingUserSelected',                  'DataProcessingUserSelected',                   'TEXT', 0],
 
             ['DataProcessingResolutionOverall',             'Resolution\nOverall',                          'TEXT',                 0],
             ['DataProcessingResolutionLow',                 'Resolution\nLow',                              'TEXT',                 0],

@@ -3820,7 +3820,7 @@ class XChemExplorer(QtGui.QApplication):
 #        self.msgBox = QtGui.QMessageBox()
         msgBoxLayout = self.msgBox.layout()
         qWid = QtGui.QWidget()
-        qWid.setFixedWidth(2000)
+        qWid.setFixedWidth(3000)
         qWid.setFixedHeight(500)
         vbox = QtGui.QVBoxLayout()
         vbox.addWidget(self.data_collection_table)
