@@ -279,11 +279,31 @@ class setup():
                                                      'img1',
                                                      'img2',
                                                      'img3',
-                                                     'img4',
-                                                     'img5',
-                                                     'Show\nDetails',
-                                                     'Show Diffraction\nImage'
+                                                     'img4'
+#                                                     'img5',
+#                                                     'Show\nDetails',
+#                                                     'Show Diffraction\nImage'
                                                      ]
+
+        # functions that use tables.data_collection_table_columns:
+        #
+        # - show_results_from_all_pipelines() - appears in populate_datasets_summary_table()
+
+        xce_object.data_collection_table_columns = ['Sample ID',
+                                                    'Visit',
+                                                    'Run',
+                                                    'Program',
+                                                    'Resolution\nOverall',
+                                                    'Resolution\nHigh',
+                                                    'DataProcessing\nSpaceGroup',
+                                                    'Mn<I/sig(I)>\nHigh',
+                                                    'Rmerge\nLow',
+                                                    'Completeness\nOverall',
+                                                    'DataProcessing\nUnitCell',
+                                                    'DataProcessing\nRfree'
+                                                    'DataProcessing\nScore']
+
+
 
         # functions that use tables.datasets_reprocess_columns:
         #
