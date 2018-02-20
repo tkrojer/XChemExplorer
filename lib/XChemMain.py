@@ -474,6 +474,37 @@ def get_gda_barcodes(sampleList,gzipped_logs_parsed,gda_log_start_line,beamline,
     return pinDict,gda_log_start_line
 
 
+def linkAutoProcessingResult(xtal,dbDict,projectDir,xce_logfile):
+    Logfile=XChemLog.updateLog(xce_logfile)
+
+    run =      dbDict['DataCollectionRun']
+    visit =    dbDict['DataCollectionVisit']
+    autoproc = dbDict['DataProcessingProgram']
+    mtzFileAbs = dbDict['DataProcessingPathToMTZfile']
+    mtzfile = mtzFileAbs[mtzFileAbs.rfind('/')+1:]
+    logFileAbs = dbDict['DataProcessingPathToLogfile']
+    logfile = logFileAbs[logFileAbs.rfind('/')+1:]
+
+    Logfile.insert('changing directory to ' + os.path.join(projectDir,xtal))
+    os.chdir(os.path.join(projectDir,xtal))
+
+    # MTZ file
+    if os.path.isfile(xtal+'.mtz'):
+        Logfile.warning('removing %s.mtz' %xtal)
+        os.system('/bin/rm %s.mtz' %xtal)
+    if os.path.isfile(os.path.join('autoprocessing', visit + '-' + run + autoproc, mtzfile)):
+        os.symlink(os.path.join('autoprocessing', visit + '-' + run + autoproc, mtzfile), xtal + '.mtz')
+        Logfile.insert('ln -s ' + os.path.join('autoprocessing', visit + '-' + run + autoproc, mtzfile) + ' ' + xtal + '.mtz')
+    # LOG file
+    if os.path.isfile(xtal+'.log'):
+        Logfile.warning('removing %s.log'  %xtal)
+        os.system('/bin/rm %s.log' %xtal)
+    if os.path.isfile(os.path.join('autoprocessing', visit + '-' + run + autoproc, logfile)):
+        os.symlink(os.path.join('autoprocessing', visit + '-' + run + autoproc, logfile), xtal + '.log')
+        Logfile.insert('ln -s ' + os.path.join('autoprocessing', visit + '-' + run + autoproc, logfile) + ' ' + xtal + '.log')
+
+
+
 def getProgressSteps(iterations):
     if iterations == 0:
         progress_step = 1
