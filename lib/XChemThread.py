@@ -3431,17 +3431,19 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
 
     """
     major changes:
-    - copying of files and updating of DB will be combined in one class
-    - devilish pkl file is retired
-    - results for every autoprocessing output is recorded in new DB table
+    - pkl file is obsolete
+    - results for every autoprocessing result is recorded in new DB table
     - crystal centring images are copied into project directory
-    - beamline directory in project directory will not be used anymore; user needs to set data collection dir
+    - beamline directory in project directory will not be used anymore
+    - users need to actively select the actual data collection visit as Data Collection Directory in the
+      settings tab (e.g. /dls/i04-1/data/2017/mx15433-50
+    - results from fast_dp are not copied over and included in analysis
+
     - DB mainTable gets flag if user updated autoprocessing selection
     - checking of reprocessed files needs to be explicit
     - all dictionaries used to store information are retired
     - at the moment one can only review/ rescore crystals collected during the selected visit
     - parsing of pinIDs in gda logfiles is still missing
-    - fast_dp output is currently ignored
     """
     def __init__(self,
                  processedDir,
