@@ -3944,7 +3944,7 @@ class XChemExplorer(QtGui.QApplication):
             dbDict['DataProcessingAutoAssigned'] = 'False'
             self.update_log.insert('%s: changing selected autoprocessing result to %s %s %s' %(xtal,visit,run,autoproc))
             # xtal is QString -> str(xtal)
-            XChemMain.linkAutoProcessingResult(str(xtal), dbDict, self.initial_model_directory)
+            XChemMain.linkAutoProcessingResult(str(xtal), dbDict, self.initial_model_directory,self.xce_logfile)
             self.update_log.insert('%s: updating row in Datasets table' %xtal)
             self.db.update_data_source(str(xtal),dbDict)
             self.update_log.insert('%s: getting updated information from DB mainTable' %xtal)
