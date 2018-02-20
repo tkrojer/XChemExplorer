@@ -205,8 +205,18 @@ class setup():
                                                       'highest_resolution',
                                                       'lowest_Rfree']
 
-        xce_object.preferences = {'processed_data_to_copy': 'mtz_log_only',
-                                  'dataset_selection_mechanism': 'IsigI*Comp*UniqueRefl'}
+        xce_object.allowed_unitcell_difference_percent = 12
+        xce_object.acceptable_low_resolution_limit_for_data = 3.5
+        xce_object.filename_root = '${samplename}'
+        xce_object.max_queue_jobs = 100
+
+        xce_object.preferences = {'processed_data_to_copy':                     'mtz_log_only',
+                                  'dataset_selection_mechanism':                'IsigI*Comp*UniqueRefl',
+                                  'allowed_unitcell_difference_percent':        12,
+                                  'acceptable_low_resolution_limit_for_data':   3.5,
+                                  'acceptable_low_resolution_Rmerge':           0.1,
+                                  'filename_root':                              '${samplename}',
+                                  'max_queue_jobs':                             100     }
 
         ## settings
 
