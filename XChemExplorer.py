@@ -2694,16 +2694,24 @@ class XChemExplorer(QtGui.QApplication):
     def prepare_and_run_task(self, instruction):
 
         if instruction == 'Get New Results from Autoprocessing':
-            self.check_for_new_autoprocessing_or_rescore(False)
-            self.update_header_and_data_from_datasource()
-            self.update_all_tables()
+            self.rescore = False
+            self.check_for_new_autoprocessing_results()
 
         elif instruction == 'Rescore Datasets':
-            self.check_for_new_autoprocessing_or_rescore(True)
+            self.rescore = True
+            self.select_best_autoprocessing_result()
 
-        elif instruction == "Read PKL file":
-            summary = pickle.load(open(self.datasets_summary_file, "rb"))
-            self.create_widgets_for_autoprocessing_results_only(summary)
+#        if instruction == 'Get New Results from Autoprocessing':
+#            self.check_for_new_autoprocessing_or_rescore(False)
+#            self.update_header_and_data_from_datasource()
+#            self.update_all_tables()
+#
+#        elif instruction == 'Rescore Datasets':
+#            self.check_for_new_autoprocessing_or_rescore(True)
+
+#        elif instruction == "Read PKL file":
+#            summary = pickle.load(open(self.datasets_summary_file, "rb"))
+#            self.create_widgets_for_autoprocessing_results_only(summary)
 
         elif instruction == 'Run xia2 on selected datasets':
             self.run_xia2_on_selected_datasets(False)
