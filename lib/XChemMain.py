@@ -481,6 +481,24 @@ def getProgressSteps(iterations):
         progress_step = 100 / float(iterations)
     return progress_step
 
+def getVisitAndBeamline(visitDirectory):
+    visit = 'unknown'
+    beamline = 'unknown'
+    if 'attic' in visitDirectory:
+        try:
+            visit=visitDirectory.split('/')[6]
+            beamline=visitDirectory.split('/')[3]
+        except IndexError:
+            pass
+    else:
+        try:
+            visit=visitDirectory.split('/')[5]
+            beamline=visitDirectory.split('/')[2]
+        except IndexError:
+            pass
+    return visit,beamline
+
+
 
 
 def crystal_growth_methods():
