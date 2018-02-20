@@ -3328,7 +3328,7 @@ class choose_autoprocessing_outcome(QtCore.QThread):
             dbDict['DataProcessingAutoAssigned'] = 'True'
             self.updateDB(sample,dbDict)
 
-        self.emit(QtCore.SIGNAL('populate_datasets_summary_table'))
+        self.emit(QtCore.SIGNAL('populate_datasets_summary_table_NEW'))
         self.emit(QtCore.SIGNAL("finished()"))
 
     def report_forward_carried_pipelines(self,dbListOut,dbList):
