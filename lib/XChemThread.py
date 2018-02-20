@@ -3214,3 +3214,429 @@ class read_autoprocessing_results_from_disc(QtCore.QThread):
         cPickle.dump(self.data_collection_dict,open(self.data_collection_summary_file,'wb'))
 
         self.emit(QtCore.SIGNAL('create_widgets_for_autoprocessing_results_only'), self.data_collection_dict)
+
+#
+# --- new module from hell -------------------------------------------------------------------------------------------
+#
+
+class read_pinIDs_from_gda_logs(QtCore.QThread):
+    def __init__(self,
+                 beamline,
+                 visit,
+                 database,
+                 gdaLogInstructions,
+                 xce_logfile):
+        QtCore.QThread.__init__(self)
+        self.beamline = beamline
+        self.visit = visit
+
+        self.xce_logfile = xce_logfile
+        self.Logfile = XChemLog.updateLog(xce_logfile)
+
+        self.db = XChemDB.data_source(os.path.join(database))
+        self.allSamples = self.db.collected_xtals_during_visit_for_scoring(visit)
+
+        self.gdaLogInstructions = gdaLogInstructions
+        self.gda_log_start_line = gdaLogInstructions[0]
+        self.gzipped_logs_parsed = gdaLogInstructions[1]
+
+    def run(self):
+        if self.gzipped_logs_parsed:
+            self.Logfile.insert("parsed gzipped gda logfiles before, won't do again...")
+        self.Logfile.insert("will start parsing of current gda logfile at line {0!s}".format(str(self.gda_log_start_line)))
+        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'checking GDA logiles for pinID details')
+        pinDict, self.gda_log_start_line = XChemMain.get_gda_barcodes(self.allSamples,
+                                                                 self.gzipped_logs_parsed,
+                                                                 self.gda_log_start_line,
+                                                                 self.beamline,
+                                                                 self.xce_logfile)
+
+        self.update_database(pinDict)
+
+        self.gdaLogInstructions = [self.gda_log_start_line,True]
+        self.emit(QtCore.SIGNAL('update_gdaLog_parsing_instructions_and_score'), self.gdaLogInstructions)
+        self.emit(QtCore.SIGNAL("finished()"))
+
+    def update_database(self,pinDict):
+        self.Logfile.insert('updating database with pinDIs from GDA logfiles')
+        for sample in pinDict:
+            dbDict = {}
+            dbDict['DataCollectionPinBarcode'] = pinDict[sample]
+            self.db.update_data_source(sample,dbDict)
+
+
+
+class choose_autoprocessing_outcome(QtCore.QThread):
+    def __init__(self,
+                database,
+                visit,
+                reference_file_list,
+                preferences,
+                projectDir,
+                rescore,
+                xce_logfile):
+        QtCore.QThread.__init__(self)
+        self.visit = visit
+        self.projectDir = projectDir
+        self.reference_file_list = reference_file_list
+        self.rescore = rescore
+        self.selection_mechanism = preferences['dataset_selection_mechanism']
+        self.acceptable_unitcell_volume_difference = preferences['allowed_unitcell_difference_percent']
+        self.acceptable_low_resolution_limit_for_data = preferences['acceptable_low_resolution_limit_for_data']
+        self.acceptable_low_resolution_Rmerge = preferences['acceptable_low_resolution_Rmerge']
+
+        self.xce_logfile = xce_logfile
+        self.Logfile = XChemLog.updateLog(xce_logfile)
+
+        self.db = XChemDB.data_source(os.path.join(database))
+        self.allSamples = self.db.collected_xtals_during_visit_for_scoring(visit)
+#        self.allSamples = self.db.collected_xtals_during_visit_for_scoring(visit,rescore)
+
+
+    def run(self):
+        for sample in sorted(self.allSamples):
+            if self.db.autoprocessing_result_user_assigned(sample):
+                self.Logfile.warning('{0!s}: user has manually selected auto-processing result; will NOT auto-select!'.format(sample))
+                continue
+            elif self.rescore:
+                self.Logfile.warning('{0!s}: rescore selected -> might overwrite user selection!'.format(sample))
+            else:
+                self.Logfile.insert('%s: selecting autoprocessing result' % sample)
+            dbList = self.db.all_autoprocessing_results_for_xtal_as_dict(sample)
+            self.Logfile.insert('%s: found %s different autoprocessing results' %(sample,str(len(dbList))))
+
+            # 1.) if posssible, only carry forward samples with similar UCvolume and same point group
+            dbList = self.selectResultsSimilarToReference(dbList)
+
+            # 2.) if possible, only carry forward samples with low resolution Rmerge smaller than
+            #     specified in perferences
+            dbList = self.selectResultsWithAcceptableLowResoRmerge(dbList)
+
+            # 3.) Make selection based on speified selection mechanism
+            if self.selection_mechanism == 'IsigI*Comp*UniqueRefl':
+                dbDict = self.selectHighestScore(dbList)
+            elif self.selection_mechanism == 'highest_resolution':
+                dbDict = self.selectHighestResolution(dbList)
+
+            # 4.) Set new symbolic links in project directory
+            XChemMain.linkAutoProcessingResult(sample,dbDict,self.projectDir,self.xce_logfile)
+
+            # 5.) Determine DataProcessing Outcome
+            dbDict['DataCollectionOutcome'] = self.determine_processing_outcome(dbDict)
+
+            # 6.) update database
+            dbDict['DataProcessingAutoAssigned'] = 'True'
+            self.updateDB(sample,dbDict)
+
+        self.emit(QtCore.SIGNAL('populate_datasets_summary_table'))
+        self.emit(QtCore.SIGNAL("finished()"))
+
+    def report_forward_carried_pipelines(self,dbListOut,dbList):
+        if dbListOut == []:
+            dbListOut = dbList
+            self.Logfile.warning('none of the MTZ files fulfilled criteria; will carry forward all results:')
+        else:
+            self.Logfile.insert('will carry forward the MTZ files from the following auto-processing pipelines:')
+        self.Logfile.insert('{0:30} {1:10} {2:10} {3:10}'.format('pipeline','Rmerge(Low)','PG','Score'))
+        self.Logfile.insert('----------------------------------------------------------------------')
+        for resultDict in dbListOut:
+            self.Logfile.insert('{0:30} {1:10} {2:10} {3:10}'.format(resultDict['DataProcessingProgram'],
+                                                                     resultDict['DataProcessingRmergeLow'],
+                                                                     resultDict['DataProcessingPointGroup'],
+                                                                     resultDict['DataProcessingScore']))
+        return dbListOut
+
+    def selectResultsSimilarToReference(self,dbList):
+        self.Logfile.insert('checking if MTZ files are similar to supplied reference files')
+        dbListOut = []
+        for resultDict in dbList:
+            try:
+                if isinstance(float(resultDict['DataProcessingUnitCellVolume']),float):
+                    self.Logfile.insert('checking unit cell volume difference and point group:')
+                    for reference_file in self.reference_file_list:
+                        if not reference_file[4]==0:
+                            unitcell_difference=round((math.fabs(reference_file[4]-float(resultDict['DataProcessingUnitCellVolume']))/reference_file[4])*100,1)
+                            self.Logfile.insert(resultDict['DataProcessingProgram'] + ': ' +
+                                                str(unitcell_difference) + '% difference -> pg(ref): ' +
+                                                reference_file[5] + ' -> pg(mtz): ' + resultDict['DataProcessingPointGroup'])
+                            if unitcell_difference < self.acceptable_unitcell_volume_difference and reference_file[5]==resultDict['DataProcessingPointGroup']:
+                                self.Logfile.insert('=> passed -> mtz file has same point group as reference file and similar unit cell volume')
+                                dbListOut.append(resultDict)
+                            else:
+                                self.Logfile.warning('mtz file has different point group/ unit cell volume as reference file')
+            except ValueError:
+                pass
+        dbListOut = self.report_forward_carried_pipelines(dbListOut,dbList)
+        return dbListOut
+
+
+    def selectResultsWithAcceptableLowResoRmerge(self,dbList):
+        self.Logfile.insert('checking if MTZ files have acceptable low resolution Rmerge values (currently set to %s)' %str(self.acceptable_low_resolution_Rmerge))
+        dbListOut = []
+        for resultDict in dbList:
+            try:
+                if float(resultDict['DataProcessingRmergeLow']) < self.acceptable_low_resolution_Rmerge:
+                    self.Logfile.insert(resultDict['DataProcessingProgram'] +
+                                        ': Rmerge(low) of MTZ file is below threshold: ' +
+                                        str(resultDict['DataProcessingRmergeLow']))
+                    dbListOut.append(resultDict)
+                else:
+                    self.Logfile.warning(resultDict['DataProcessingProgram'] +
+                                         ': Rmerge(low) of MTZ file is ABOVE threshold: ' +
+                                         str(resultDict['DataProcessingRmergeLow']))
+            except ValueError:
+                pass
+        dbListOut = self.report_forward_carried_pipelines(dbListOut,dbList)
+        return dbListOut
+
+
+    def selectHighestScore(self,dbList):
+        tmp = []
+        for resultDict in dbList:
+            try:
+                tmp.append(float(resultDict['DataProcessingScore']))
+            except ValueError:
+                tmp.append(0.0)
+        highestScoreDict = dbList[tmp.index(max(tmp))]
+        return highestScoreDict
+
+    def selectHighestResolution(self,dbList):
+        tmp = []
+        for resultDict in dbList:
+            try:
+                tmp.append(float(resultDict['DataProcessingResolutionHigh']))
+            except ValueError:
+                tmp.append(100.0)
+        highestResoDict = dbList[tmp.index(min(tmp))]
+        return highestResoDict
+
+    def determine_processing_outcome(self,db_dict):
+        outcome = 'Failed - unknown'
+        try:
+            if float(db_dict['DataProcessingResolutionHigh']) < self.acceptable_low_resolution_limit_for_data:
+                outcome = 'success'
+            else:
+                outcome = 'Failed - low resolution'
+        except ValueError:
+            pass
+        return outcome
+
+
+    def updateDB(self,sample, dbDict):
+        self.Logfile.insert('{0!s}: updating database'.format(sample))
+        self.db.update_insert_data_source(sample, dbDict)
+
+
+class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
+
+    """
+    major changes:
+    - copying of files and updating of DB will be combined in one class
+    - devilish pkl file is retired
+    - results for every autoprocessing output is recorded in new DB table
+    - crystal centring images are copied into project directory
+    - beamline directory in project directory will not be used anymore; user needs to set data collection dir
+    - DB mainTable gets flag if user updated autoprocessing selection
+    - checking of reprocessed files needs to be explicit
+    - all dictionaries used to store information are retired
+    - at the moment one can only review/ rescore crystals collected during the selected visit
+    - parsing of pinIDs in gda logfiles is still missing
+    - fast_dp output is currently ignored
+    """
+    def __init__(self,
+                 processedDir,
+                 database,
+                 projectDir,
+                 xce_logfile,
+                 target):
+        QtCore.QThread.__init__(self)
+#        self.target = target
+        self.processedDir =  processedDir
+        self.visit,self.beamline = XChemMain.getVisitAndBeamline(self.processedDir)
+        self.projectDir = projectDir
+        self.Logfile = XChemLog.updateLog(xce_logfile)
+        self.target = target
+
+        self.db = XChemDB.data_source(os.path.join(database))
+        self.exisitingSamples = self.getExistingSamples()
+
+        self.toParse = [
+                [   os.path.join('xia2', '*'),
+                    os.path.join('LogFiles', '*aimless.log'),
+                    os.path.join('DataFiles', '*free.mtz')],
+                [   os.path.join('autoPROC', '*'),
+                    '*aimless.log',
+                    '*truncate-unique.mtz']
+                        ]
+
+    def run(self):
+        self.parse_file_system()
+
+    def getExistingSamples(self):
+        existingSamples={}
+        self.Logfile.insert('reading existing samples from collectionTable')
+        allEntries = self.db.execute_statement('select CrystalName,DataCollectionVisit,DataCollectionRun,DataProcessingProgram from collectionTable where DataCollectionOutcome = "success"')
+        for item in allEntries:
+            if str(item[0]) not in existingSamples:
+                existingSamples[str(item[0])]=[]
+            self.Logfile.insert('%s: adding %s' %(str(item[0]),str(item[1])))
+            existingSamples[str(item[0])].append(str(item[1])+ '-' + str(item[2])+str(item[3]))
+        return existingSamples
+
+    def createSampleDir(self,xtal):
+        if not os.path.isdir(os.path.join(self.projectDir,xtal)):
+            os.mkdir(os.path.join(self.projectDir,xtal))
+
+    def createAutoprocessingDir(self,xtal,run,autoproc):
+        # create all the directories if necessary
+        if not os.path.isdir(os.path.join(self.projectDir,xtal,'autoprocessing')):
+            os.mkdir(os.path.join(self.projectDir,xtal,'autoprocessing'))
+        if not os.path.isdir(
+                os.path.join(self.projectDir,xtal,'autoprocessing', self.visit + '-' + run + autoproc)):
+            os.mkdir(os.path.join(self.projectDir,xtal,'autoprocessing', self.visit + '-' + run + autoproc))
+
+    def copyMTZandLOGfiles(self,xtal,run,autoproc,mtzfile,logfile):
+        mtzNew = ''
+        logNew = ''
+        os.chdir(os.path.join(self.projectDir,xtal,'autoprocessing', self.visit + '-' + run + autoproc))
+        # MTZ file
+        if not os.path.isfile(mtzfile[mtzfile.rfind('/') + 1:]):
+            self.Logfile.insert('%s: copying %s' % (xtal, mtzfile))
+            os.system('/bin/cp ' + mtzfile + ' .')
+        if os.path.isfile(mtzfile[mtzfile.rfind('/')+1:]) and not os.path.isfile(xtal+'.mtz'):
+            os.symlink(mtzfile[mtzfile.rfind('/')+1:], xtal + '.mtz')
+        if os.path.isfile(mtzfile[mtzfile.rfind('/') + 1:]):
+            mtzNew=os.path.join(self.projectDir,xtal,'autoprocessing', self.visit + '-' + run + autoproc, mtzfile[mtzfile.rfind('/')+1:])
+        # AIMLESS logfile
+        if not os.path.isfile(logfile[logfile.rfind('/')+1:]):
+            self.Logfile.insert('%s: copying %s' % (xtal, logfile))
+            os.system('/bin/cp ' + logfile + ' .')
+        if os.path.isfile(logfile[logfile.rfind('/')+1:]) and not os.path.isfile(xtal+'.log'):
+            os.symlink(logfile[logfile.rfind('/')+1:], xtal + '.log')
+        if os.path.isfile(logfile[logfile.rfind('/') + 1:]):
+            logNew=os.path.join(self.projectDir,xtal,'autoprocessing', self.visit + '-' + run + autoproc, logfile[logfile.rfind('/') + 1:])
+        return mtzNew,logNew
+
+    def makeJPGdir(self,xtal,run):
+        if not os.path.isdir(os.path.join(self.projectDir,xtal,'jpg')):
+            self.Logfile.insert('making jpg directory in '+xtal)
+            os.mkdir(os.path.join(self.projectDir,xtal,'jpg'))
+        if not os.path.isdir(
+                os.path.join(self.projectDir,xtal,'jpg', self.visit + '-' + run)):
+            os.mkdir(os.path.join(self.projectDir,xtal,'jpg', self.visit + '-' + run))
+
+    def copyJPGs(self,xtal,run):
+        for img in glob.glob(os.path.join(self.processedDir.replace('processed','jpegs'),xtal,run+'*t.png')):
+            if not os.path.isfile(os.path.join(self.projectDir,xtal,'jpg', self.visit +'-'+ run,img[img.rfind('/')+1:])):
+                os.system('/bin/cp %s %s' %(img,os.path.join(self.projectDir,xtal,'jpg', self.visit + '-' + run)))
+
+    def findJPGs(self,xtal,run):
+        jpgDict={}
+        for n,img in enumerate(glob.glob(os.path.join(self.projectDir,xtal,'jpg', self.visit +'-'+ run,'*t.png'))):
+            if n <= 3: jpgDict['DataCollectionCrystalImage'+str(n+1)]=img
+        return jpgDict
+
+
+    def readProcessingResults(self,xtal,folder,log,mtz,timestamp,current_run,autoproc):
+        db_dict = {}
+        for mtzfile in glob.glob(os.path.join(folder,mtz)):
+            for logfile in glob.glob(os.path.join(folder, log)):
+                self.createAutoprocessingDir(xtal, current_run, autoproc)
+                mtzNew,logNew = self.copyMTZandLOGfiles(xtal,current_run,autoproc,mtzfile,logfile)
+                db_dict = { 'DataCollectionDate':               timestamp,
+                            'DataProcessingPathToLogfile':      logNew,
+                            'DataProcessingPathToMTZfile':      mtzNew,
+                            'DataProcessingDirectoryOriginal':  folder,
+                            'DataCollectionOutcome':            'success',  # success in collection Table only means that a logfile was found
+                            'ProteinName':                      self.target     }
+                db_dict.update(parse().read_aimless_logfile(logNew))
+        db_dict.update(self.findJPGs(xtal,current_run))     # image exist even if data processing failed
+        db_dict['DataCollectionBeamline'] = self.beamline
+        return db_dict
+
+    def getAutoProc(self,folder):
+        autoproc='unkown'
+        if 'ap-run' in folder:
+            autoproc = 'autoPROC'
+        else:
+            autoproc = folder.split('/')[len(folder.split('/'))-1]
+        return autoproc
+
+    def update_data_collection_table(self,xtal,current_run,autoproc,db_dict):
+        condition_dict = {  'CrystalName':              xtal,
+                            'DataCollectionVisit':      self.visit,
+                            'DataCollectionRun':        current_run,
+                            'DataProcessingProgram':    autoproc    }
+        self.db.update_insert_any_table('collectionTable', db_dict, condition_dict)
+
+    def alreadyParsed(self,xtal,current_run,autoproc):
+        parsed=False
+        if xtal in self.exisitingSamples:
+            if self.visit + '-' + current_run + autoproc in self.exisitingSamples[xtal]:
+                self.Logfile.insert(
+                    '%s: results from %s already parsed; skipping...' % (
+                        xtal, self.visit + '-' + current_run + autoproc))
+                parsed=True
+        return parsed
+
+    def empty_folder(self,xtal,folder):
+        empty = True
+        stuff = []
+        for x in glob.glob(os.path.join(folder,'*')):
+            stuff.append(x)
+        if stuff == []:
+            self.Logfile.warning(
+                '{0!s}: {1!s} is empty; probably waiting for autoprocessing to finish; try later!'.format(xtal, folder))
+        else:
+            empty = False
+        return empty
+
+    def junk(self,folder):
+        do_not_parse = False
+        if not os.path.isdir(folder):
+            do_not_parse = True
+        elif 'dimple' in folder:
+            do_not_parse = True
+        return do_not_parse
+
+    def parse_file_system(self):
+        self.Logfile.insert('checking for new data processing results in '+self.processedDir)
+        progress = 0
+        progress_step = XChemMain.getProgressSteps(len(glob.glob(os.path.join(self.processedDir,'*'))))
+
+        for collected_xtals in sorted(glob.glob(os.path.join(self.processedDir,'*'))):
+            if 'tmp' in collected_xtals or 'results' in collected_xtals or 'scre' in collected_xtals:
+                continue
+
+            xtal = collected_xtals[collected_xtals.rfind('/')+1:]
+            self.createSampleDir(xtal)
+
+            for run in sorted(glob.glob(os.path.join(collected_xtals,'*'))):
+                current_run=run[run.rfind('/')+1:]
+                timestamp=datetime.fromtimestamp(os.path.getmtime(run)).strftime('%Y-%m-%d %H:%M:%S')
+
+                # create directory for crystal aligment images in projectDir
+                self.makeJPGdir(xtal,current_run)
+                self.copyJPGs(xtal, current_run)
+
+                for item in self.toParse:
+                    procDir = os.path.join(run,item[0])
+                    logfile = item[1]
+                    mtzfile = item[2]
+
+                    for folder in glob.glob(procDir):
+                        if self.junk(folder):
+                            continue
+                        if self.empty_folder(xtal,folder):
+                            continue
+                        autoproc = self.getAutoProc(folder)
+                        if self.alreadyParsed(xtal,current_run,autoproc):
+                            continue
+                        db_dict = self.readProcessingResults(xtal,folder,logfile,mtzfile,timestamp,current_run,autoproc)
+                        self.update_data_collection_table(xtal,current_run,autoproc,db_dict)
+
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+        self.emit(QtCore.SIGNAL('read_pinIDs_from_gda_logs'))
+        self.emit(QtCore.SIGNAL("finished()"))

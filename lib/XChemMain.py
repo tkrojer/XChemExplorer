@@ -432,6 +432,56 @@ def append_dict_of_gda_barcodes(out_dict,files,xce_logfile):
 
     return out_dict
 
+def get_gda_barcodes(sampleList,gzipped_logs_parsed,gda_log_start_line,beamline,xce_logfile):
+    Logfile=XChemLog.updateLog(xce_logfile)
+    Logfile.insert('checking GDA logfile in {0!s}'.format(os.path.join('/dls_sw',beamline,'logs')))
+    pinDict = {}
+    found_barcode_entry=False
+    for gdaLogFile in glob.glob(os.path.join('/dls_sw',beamline,'logs','gda-server*log*')):
+        Logfile.insert('parsing {0!s}'.format(gdaLogFile))
+        if gzipped_logs_parsed and gdaLogFile.endswith('.gz'):
+            Logfile.insert('{0!s} was already parsed during this visit'.format(gdaLogFile))
+            continue
+        if gdaLogFile.endswith('.gz'):
+            with gzip.open(gdaLogFile, 'r') as f:
+                for line in f:
+                    if 'BART SampleChanger - getBarcode() returning' in line:
+                        barcode = line.split()[len(line.split()) - 1]
+                        found_barcode_entry = True
+                    if found_barcode_entry:
+                        if 'Snapshots will be saved' in line:
+                            sampleID = line.split()[len(line.split()) - 1].split('/')[-1]
+                            if sampleID in sampleList:
+                                pinDict[sampleID] = barcode
+                                Logfile.insert(
+                                'found: sample={0!s}, barcode={1!s}, file={2!s}'.format(sampleID, barcode, gdaLogFile))
+                            found_barcode_entry = False
+        else:
+            for n,line in enumerate(open(gdaLogFile).readlines()[gda_log_start_line:]):
+                if 'BART SampleChanger - getBarcode() returning' in line:
+                    barcode = line.split()[len(line.split()) - 1]
+                    found_barcode_entry = True
+                if found_barcode_entry:
+                    if 'Snapshots will be saved' in line:
+                        sampleID = line.split()[len(line.split()) - 1].split('/')[-1]
+                        if sampleID in sampleList:
+                            pinDict[sampleID] = barcode
+                            Logfile.insert(
+                            'found: sample={0!s}, barcode={1!s}, file={2!s}'.format(sampleID, barcode, gdaLogFile))
+                        found_barcode_entry = False
+            gda_log_start_line = gda_log_start_line + n -1
+
+    return pinDict,gda_log_start_line
+
+
+def getProgressSteps(iterations):
+    if iterations == 0:
+        progress_step = 1
+    else:
+        progress_step = 100 / float(iterations)
+    return progress_step
+
+
 
 def crystal_growth_methods():
 
