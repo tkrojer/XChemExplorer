@@ -1,1 +1,4 @@
 **/*.pyc
+*.pyc
+XChemExplorer_dmd.sh
+.idea

@@ -10,6 +10,7 @@ import shutil
 import math
 import platform
 
+
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit.Chem import Draw
@@ -31,7 +32,7 @@ class process:
         self.fileroot_in=dimple['fileroot_in']
         self.mtz_free=self.fileroot_in+'.free.mtz'
         self.mtz_in=self.fileroot_in+'.mtz'
-        # need to set $CCP4_SCR, because the default directory in /home/zqr16691/tmp fills up easily 
+        # need to set $CCP4_SCR, because the default directory in /home/zqr16691/tmp fills up easily
         # and then dimple will not run
 #        if not os.path.isdir(self.project_directory[:self.project_directory.find('processing')+11]+'/tmp'):
 #            os.mkdir(self.project_directory[:self.project_directory.find('processing')+11]+'/tmp')
@@ -194,7 +195,7 @@ class helpers:
             from rdkit.Chem import Draw
             self.pil_rdkit_present=True
         except ImportError:
-            self.pil_rdkit_present=FalseU
+            self.pil_rdkit_present=False
             pass
 
     def pil_rdkit_exist(self):
@@ -221,43 +222,68 @@ class helpers:
             if os.path.isfile(os.path.join(initial_model_directory,sample,'old.cif')):
                 software='phenix.elbow --file=../old.cif --id LIG --output {0!s}\n'.format((compoundID.replace(' ','')))
             else:
-                software='phenix.elbow --smiles="{0!s}" --id LIG --output {1!s}\n'.format(smiles, compoundID.replace(' ',''))
+                software='phenix.elbow --smiles="{0!s}" --id LIG --output {1!s}\n'\
+                    .format(smiles, compoundID.replace(' ',''))
         elif restraints_program=='grade':
             if os.getcwd().startswith('/dls'):
                 software+='module load buster\n'
             software+="export BDG_TOOL_OBABEL='none'\n"
             if os.path.isfile(os.path.join(initial_model_directory,sample,'old.cif')):
-                software+='grade -resname LIG -nomogul -in ../old.cif -ocif {0!s}.cif -opdb {1!s}.pdb\n'.format(compoundID.replace(' ',''), compoundID.replace(' ',''))
+                software+='grade -resname LIG -nomogul -in ../old.cif -ocif {0!s}.cif -opdb {1!s}.pdb\n'\
+                    .format(compoundID.replace(' ',''), compoundID.replace(' ',''))
             else:
-                software+='grade -resname LIG -nomogul "{0!s}" -ocif {1!s}.cif -opdb {2!s}.pdb\n'.format(smiles, compoundID.replace(' ',''), compoundID.replace(' ',''))
+                software+='grade -resname LIG -nomogul "{0!s}" -ocif {1!s}.cif -opdb {2!s}.pdb\n'\
+                    .format(smiles, compoundID.replace(' ',''), compoundID.replace(' ',''))
+        # Removal of the hydrogen atoms in PDB files is required for REFMAC 5 run. With hydrogens some ligands fail to
+        # pass the external restraints in pandda.giant.make_restraints.
+        # Copy the file with hydrogens to retain in case needed
+
+        copy_with_hydrogens = 'cp {0!s}.pdb {0!s}_with_H.pdb'.format(compoundID.replace(' ', ''))
+
+        strip_hydrogens = 'phenix.reduce {0!s}.pdb -trim > {0!s}_tmp.pdb'.format(compoundID.replace(' ', ''))
 
         Cmds = (
-                    header+
-                    '\n'
-                    'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
-                    '\n'
-                    'source $XChemExplorer_DIR/setup-scripts/xce.setup-sh\n'
-                    '\n'
-                    '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(os.path.join(database_directory,data_source_file),sample,'RefinementCIFStatus','running') +
-                    '\n'
-                    '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','create_png_of_compound.py')+
-                    ' "{0!s}" {1!s} {2!s} {3!s}\n'.format(smiles, compoundID.replace(' ',''), sample, initial_model_directory)+
-                    '\n'
-                    'cd '+os.path.join(initial_model_directory,sample,'compound')+'\n'
-                    '\n'
-                    +software+
-                    '\n'
-                    'cd '+os.path.join(initial_model_directory,sample)+'\n'
-                    '\n'
-                    'ln -s compound/%s.cif .\n' %compoundID.replace(' ','')+
-                    'ln -s compound/{0!s}.pdb .\n'.format(compoundID.replace(' ',''))+
-                    'ln -s compound/{0!s}.png .\n'.format(compoundID.replace(' ',''))+
-                    '\n'
-                    '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_for_new_cif_files.py')+
-                    ' {0!s} {1!s} {2!s} {3!s}\n'.format(os.path.join(database_directory,data_source_file), sample, initial_model_directory, compoundID.replace(' ','') )+
-                    '\n'
-                    '/bin/rm compound/RESTRAINTS_IN_PROGRESS\n'
-            )
+
+            header +
+            '\n'
+            'export XChemExplorer_DIR="' + os.getenv('XChemExplorer_DIR') + '"' +
+            '\n'
+            'source $XChemExplorer_DIR/setup-scripts/xce.setup-sh'
+            '\n'
+            '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py {0!s} {1!s} {2!s} {3!s}'
+            .format(os.path.join(database_directory, data_source_file), sample, 'RefinementCIFStatus', 'running') +
+            '\n'
+            '$CCP4/bin/ccp4-python {0!s} "{1!s}" {2!s} {3!s} {4!s}\n'
+            .format(os.path.join(os.getenv('XChemExplorer_DIR'), 'helpers','create_png_of_compound.py'),
+                    smiles, compoundID.replace(' ', ''), sample, initial_model_directory) +
+            '\n'
+            'cd ' + os.path.join(initial_model_directory, sample, 'compound') +
+            '\n'
+            + software +
+            '\n'
+            + copy_with_hydrogens +
+            '\n'
+            + strip_hydrogens +
+            '\n'
+            'mv {0!s}_tmp.pdb {0!s}.pdb'.format(compoundID.replace(' ', '')) +
+            '\n'
+            'rm {0!s}_tmp.pdb'.format(compoundID.replace(' ', '')) +
+            '\n'
+            'cd ' + os.path.join(initial_model_directory, sample) +
+            '\n'
+            'ln -s compound/%s.cif .\n' % compoundID.replace(' ', '') +
+            'ln -s compound/{0!s}.pdb .\n'.format(compoundID.replace(' ', '')) +
+            'ln -s compound/{0!s}.png .\n'.format(compoundID.replace(' ', '')) +
+            '\n'
+            '$CCP4/bin/ccp4-python ' + os.path.join(os.getenv('XChemExplorer_DIR'), 'helpers',
+                                                    'update_data_source_for_new_cif_files.py') +
+            ' {0!s} {1!s} {2!s} {3!s}\n'.format(os.path.join(database_directory, data_source_file), sample,
+                                                initial_model_directory, compoundID.replace(' ', '')) +
+            '\n'
+            '/bin/rm compound/RESTRAINTS_IN_PROGRESS\n'
+        )
+
+
         os.chdir(ccp4_scratch_directory)
         Logfile.insert('creating ACEDRG shell script for {0!s},{1!s} in {2!s}'.format(sample, compoundID, ccp4_scratch_directory))
         print Cmds
@@ -337,8 +363,7 @@ class parse:
                                                         '23':           12,
                                                         '432':          24  }
 
-        self.aimless = {    'DataProcessingProgram':                        'n/a',
-                            'DataCollectionRun':                            'n/a',
+        self.aimless = {    #'DataProcessingProgram':                        'n/a',
                             'DataProcessingSpaceGroup':                     'n/a',
                             'DataProcessingUnitCell':                       'n/a',
                             'DataProcessingA':                              'n/a',
@@ -513,32 +538,30 @@ class parse:
         beta='n/a'
         gamma='n/a'
 
-        if 'fast_dp' in logfile:
-            self.aimless['DataProcessingProgram']='fast_dp'
-        elif '3d-run' in logfile:
-            self.aimless['DataProcessingProgram']='xia2 3d'
-        elif '3dii-run' in logfile:
-            self.aimless['DataProcessingProgram']='xia2 3dii'
-        elif 'dials-run' in logfile:
-            self.aimless['DataProcessingProgram']='dials'
-        elif 'autoPROC' in logfile:
-            self.aimless['DataProcessingProgram']='autoPROC'
+#        if 'fast_dp' in logfile:
+#            self.aimless['DataProcessingProgram']='fast_dp'
+#        elif '3d-run' in logfile:
+#            self.aimless['DataProcessingProgram']='xia2 3d'
+#        elif '3dii-run' in logfile:
+#            self.aimless['DataProcessingProgram']='xia2 3dii'
+#        elif 'dials-run' in logfile:
+#            self.aimless['DataProcessingProgram']='dials'
+#        elif 'autoPROC' in logfile:
+#            self.aimless['DataProcessingProgram']='autoPROC'
 
         # get run number from logfile
         # Note: only works if file is in original directory, but not once it moved to 'inital_model' folder
-#        print self.Logfile.split('/')[9].split('_')[1]
-#        if len(self.Logfile.split('/'))>8 and len(self.Logfile.split('/')[9].split('_'))==1:
-        try:
-            self.aimless['DataCollectionRun']=logfile.split('/')[9].split('_')[1]
-        except IndexError:
-            pass
+#        try:
+#            self.aimless['DataCollectionRun']=logfile.split('/')[9].split('_')[1]
+#        except IndexError:
+#            pass
 
         resolution_at_sigma_line_overall_found=False
         for line_number,line in enumerate(open(logfile)):
 #            if 'Wavelength' in line:
 #                print 'here'
 #                print line.split()
-            if 'Wavelength' in line and len(line.split())==3:
+            if 'Wavelength' in line and len(line.split())>=2:
                 self.aimless['DataCollectionWavelength']=line.split()[1]
             if line.startswith('Low resolution limit') and len(line.split())==6:
                 self.aimless['DataProcessingResolutionLow'] = line.split()[3]
@@ -780,8 +803,8 @@ class parse:
                                                                                  math.radians(float(gamma)),
                                                                                  PDBinfo['Lattice'])
 
-                    
-                    
+
+
         return PDBinfo
 
 
@@ -867,7 +890,7 @@ class parse:
         db.update_data_source(xtal,db_dict)
 
 class mtztools:
-    
+
     def __init__(self,mtzfile):
         self.mtzfile=mtzfile
         self.space_group_dict=   {  'triclinic':    [1],
@@ -1028,7 +1051,7 @@ class mtztools:
         mtzdmp=subprocess.Popen(['mtzdmp',self.mtzfile],stdout=subprocess.PIPE)
         for n,line in enumerate(iter(mtzdmp.stdout.readline,'')):
             if line.startswith(' * Space group ='):
-                spg=line[line.find("'")+1:line.rfind("'")]        
+                spg=line[line.find("'")+1:line.rfind("'")]
         return spg
 
     def get_bravais_lattice_from_mtz(self):
@@ -1076,7 +1099,7 @@ class mtztools:
             if n==resolution_line and len(line.split())==8:
                 resolution_high=line.split()[5]
         return resolution_high
-        
+
     def get_low_resolution_from_mtz(self):
         resolution_low='n/a'
         resolution_line=1000000
@@ -1506,6 +1529,7 @@ class pdbtools(object):
 
     def __init__(self,pdb):
         self.pdb = pdb
+        self.ligands = ['DRG','LIG','FRG','XXX']
         self.AminoAcids = ['ALA','ARG','ASN','ASP','CYS','GLU','GLN','GLY','HIS',
                            'ILE','LEU','LYS','MET','PHE','PRO','SER','THR','TRP','TYR','VAL']
         self.Solvents = ['DMS','EDO','GOL','HOH']
@@ -1732,10 +1756,21 @@ class pdbtools(object):
         Ligands = []
         # need to count residue numbers in case of alternative conformations
         ResiNum=[]
+#        for line in open(self.pdb):
+#            if (line.startswith('ATOM') or line.startswith('HETATM')) \
+#                    and line[17:20].replace(' ','') not in self.AminoAcids+self.Solvents+self.Ions:
+#                if [line[17:20],line[21:22],line[23:26]] not in Ligands:
+#                    Ligands.append([line[17:20],line[21:22],line[23:26]])
+#                resname_line=str(line[17:20]).replace(' ','')
+#                chainID_line=str(line[21:23]).replace(' ','')
+#                resseq_line=str(line[23:26]).replace(' ','')
+#                altLoc_line=str(line[16:17]).replace(' ','')
+
         for line in open(self.pdb):
             if (line.startswith('ATOM') or line.startswith('HETATM')) \
-                    and line[17:20].replace(' ','') not in self.AminoAcids+self.Solvents+self.Ions:
+                    and line[17:20].replace(' ','') in self.ligands:
                 if [line[17:20],line[21:22],line[23:26]] not in Ligands:
+                    # e.g. LIG B 1
                     Ligands.append([line[17:20],line[21:22],line[23:26]])
         return Ligands
 
@@ -1842,6 +1877,62 @@ class pdbtools(object):
                     residueList.append([resname,chainID,resseq,altLoc,occupancy])
         return residueList
 
+
+    def check_occupancies(self):
+        errorText=''
+        warningText=''
+        residueDict = {}
+        for line in open(self.pdb):
+            if line.startswith('ATOM') or line.startswith('HETATM'):
+                atomname=str(line[12:16]).replace(' ','')
+                resname=str(line[17:20]).replace(' ','')
+                chainID=str(line[21:22]).replace(' ','')
+                resseq=str(line[22:26]).replace(' ','')
+                altLoc=str(line[16:17]).replace(' ','')
+                occupancy=str(line[56:60]).replace(' ','')
+                if resname+'-'+chainID+'-'+resseq not in residueDict:
+                    residueDict[resname+'-'+chainID+'-'+resseq] = []
+                if altLoc == '':
+                    altLoc='0'
+                residueDict[resname+'-'+chainID+'-'+resseq].append([altLoc,occupancy,atomname,resname,chainID,resseq])
+        for item in residueDict:
+            altLocDict={}
+            for atom in residueDict[item]:
+                altLoc=atom[0]
+                occupancy=atom[1]
+                atomname=atom[2]
+                resname=atom[3]
+                chainID=atom[4]
+                resseq=atom[5]
+                if altLoc not in altLocDict:
+                    altLocDict[altLoc]=[]
+                altLocDict[altLoc].append([occupancy,atomname,resname,chainID,resseq])
+                if float(occupancy) > 1:
+                    errorText+='ERROR: %s %s %s (%s) %s: occupancy is %s\n' %(chainID,resname,resseq,altLoc,atomname,occupancy)
+            occupancySumList=[]
+            for altLoc in altLocDict:
+                occupancySum=0.0
+                nAtom=float(len(altLocDict[altLoc]))
+                for n,atom in enumerate(altLocDict[altLoc]):
+                    occupancy=atom[0]
+                    occupancySum+=float(occupancy)
+                    atomname=atom[1]
+                    resname=atom[2]
+                    chainID=atom[3]
+                    resseq=atom[4]
+                    if n==0:
+                        occStart=occupancy
+                    else:
+                        if occupancy != occStart:
+                            warningText+='%s %s %s (%s) %s: occupancy differs for altLoc -> %s\n' %(chainID,resname,resseq,altLoc,atomname,occupancy)
+                occupancySumList.append(occupancySum/nAtom)
+            occAdd=0.0
+            for entry in occupancySumList:
+                occAdd+=entry
+            if occAdd > 1:
+                errorText+='ERROR: '+item+' -> summarised occupanies of alternative conformations are > 1.0 ('+str(occupancySumList)+')\n'
+            
+        return errorText,warningText
 
     def get_xyz_coordinated_of_residue(self,chain,number):
         X=0.0

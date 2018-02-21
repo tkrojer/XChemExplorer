@@ -1,6 +1,10 @@
 # last edited: 08/08/2017, 15:00
 
-import pygtk, gtk, pango
+import pygtk
+
+pygtk.require('2.0')
+import gtk, pango
+
 import os
 import glob
 import sys
@@ -44,6 +48,7 @@ class RefineParams(object):
         self.compoundID = compoundID
         self.prefix = 'refine'
         self.datasource=datasource
+
 
     def RefmacRefinementParams(self,RefmacParams):
         self.RefmacParams=RefmacParams
@@ -172,6 +177,22 @@ class RefineParams(object):
 
         if os.path.isfile(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(Serial)+'/refmac.csh'):
             for line in open(self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(Serial)+'/refmac.csh'):
+                if line.startswith('refi tlsc'):
+                    RefmacParams['TLS']=line
+                if line.startswith('TLSO'):
+                    RefmacParams['TLSADD']=line
+                if line.startswith('NCSR LOCAL'):
+                    RefmacParams['NCS']=line
+                if line.startswith('    bref '):
+                    RefmacParams['BREF']=line
+                if line.startswith('ncyc'):
+                    RefmacParams['Ncycles'] = line.split()[1]
+                if line.startswith('weight'):
+                    RefmacParams['MATRIX_WEIGHT'] = line.split()[len(line.split())-1]
+                if line.startswith('TWIN'):
+                    RefmacParams['TWIN']=line
+        elif os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'refmac.csh')):
+            for line in open(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'refmac.csh')):
                 if line.startswith('refi tlsc'):
                     RefmacParams['TLS']=line
                 if line.startswith('TLSO'):
@@ -635,6 +656,22 @@ class Refine(object):
                     RefmacParams['MATRIX_WEIGHT'] = line.split()[len(line.split())-1]
                 if line.startswith('TWIN'):
                     RefmacParams['TWIN']=line
+        elif os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-restraints.refmac.params')):
+            for line in open(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-restraints.refmac.params')):
+                if 'refi tlsc' in line:
+                    RefmacParams['TLS']=line
+                if 'TLSO' in line:
+                    RefmacParams['TLSADD']=line
+                if 'NCSR LOCAL' in line:
+                    RefmacParams['NCS']=line
+                if 'bref' in line:
+                    RefmacParams['BREF']=line
+                if 'ncyc' in line:
+                    RefmacParams['Ncycles'] = line.split()[1]
+                if 'weight' in line:
+                    RefmacParams['MATRIX_WEIGHT'] = line.split()[len(line.split())-1]
+                if 'TWIN' in line:
+                    RefmacParams['TWIN']=line
 
         return RefmacParams
 
@@ -702,7 +739,7 @@ class panddaRefine(object):
         Logfile=XChemLog.updateLog(xce_logfile)
         Logfile.insert('preparing files for giant.quick_refine')
         # panddaSerial because giant.quick_refine writes Refine_0001 instead of Refine_1
-        panddaSerial=m=(4-len(str(Serial)))*'0'+str(Serial)
+        panddaSerial=(4-len(str(Serial)))*'0'+str(Serial)
 
         # first check if refinement is ongoing and exit if yes
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'REFINEMENT_IN_PROGRESS')):
@@ -751,8 +788,8 @@ class panddaRefine(object):
             )
             Logfile.insert(cmd+'\n')
             os.system(cmd)
-            Logfile.insert('waiting 10 seconds for giant.make_restraints to finish...')
-            time.sleep(10)
+            Logfile.insert('waiting 3 seconds for giant.make_restraints to finish...')
+            time.sleep(3)
         elif os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'refine.split.ground-state.pdb')):
             Logfile.insert('found model of ground state: '+os.path.join(self.ProjectPath,self.xtalID,'refine.split.ground-state.pdb'))
             if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'refine.modified.pdb')):
@@ -760,17 +797,28 @@ class panddaRefine(object):
                 os.chdir(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
                 ground_state=os.path.join(self.ProjectPath,self.xtalID,'refine.split.ground-state.pdb')
                 bound_state='refine.modified.pdb'
-                Logfile.insert('running giant.merge_conformations input.pdb=%s input.pdb=%s' %(ground_state,bound_state))
+                Logfile.insert('running giant.merge_conformations major=%s minor=%s' %(ground_state,bound_state))
 #                os.system('giant.merge_conformations input.pdb=%s input.pdb=%s' %(ground_state,bound_state))
                 cmd = (
                 'export XChemExplorer_DIR="%s"\n' %os.getenv('XChemExplorer_DIR')+
                 'source %s\n' %os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh\n') +
-                'giant.merge_conformations input.pdb=%s input.pdb=%s' %(ground_state,bound_state)
+                'giant.merge_conformations major=%s minor=%s reset_all_occupancies=False options.major_occupancy=1.0 options.minor_occupancy=1.0' %(ground_state,bound_state)
                 )
                 Logfile.insert(cmd+'\n')
                 os.system(cmd)
-                Logfile.insert('waiting 10 seconds for giant.merge_conformations to finish...')
-                time.sleep(10)
+                Logfile.insert('waiting 3 seconds for giant.merge_conformations to finish...')
+                time.sleep(3)
+
+                # Run wrapper function for around merge conformations
+                cmd = (
+                   '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/wrapper_merge_confs.py {} {} {}'.format('input.pdb=multi-state-model.pdb',
+                                                                                                             'input.refmac_params_file=multi-state-restraints.refmac.params',
+                                                                                                             'output.pdb=multi-state-model.pdb')
+                )
+                Logfile.insert(cmd+'\n')
+                os.system(cmd)
+                Logfile.insert('waiting 2 seconds for wrapper_merge_confs to run')
+                time.sleep(2)
             else:
                 Logfile.error('cannot find modified version of bound state in %s' %os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
                 return None
@@ -796,15 +844,15 @@ class panddaRefine(object):
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-restraints.refmac.params')):
             # add REFMAC keywords to multi-state-restraints.refmac.params
             with open('multi-state-restraints.refmac.params','a') as refmacParams:
-                refmacParams.write(RefmacParams['BREF'])
-                refmacParams.write(RefmacParams['TLS'])
-                refmacParams.write(RefmacParams['TWIN'])
-                refmacParams.write('ncyc '+RefmacParams['NCYCLES'])
+                refmacParams.write(RefmacParams['BREF']+'\n')
+                refmacParams.write(RefmacParams['TLS']+'\n')
+                refmacParams.write(RefmacParams['TWIN']+'\n')
+                refmacParams.write('ncyc '+RefmacParams['NCYCLES']+'\n')
                 if str(RefmacParams['MATRIX_WEIGHT']).lower() == 'auto':
-                    refmacParams.write('weight AUTO')
+                    refmacParams.write('weight AUTO' + '\n')
                 else:
-                    refmacParams.write('weight matrix '+str(RefmacParams['MATRIX_WEIGHT']))
-                refmacParams.write(RefmacParams['TLSADD'])
+                    refmacParams.write('weight matrix '+str(RefmacParams['MATRIX_WEIGHT'])+'\n')
+                refmacParams.write(RefmacParams['TLSADD']+'\n')
         else:
             Logfile.error('cannot find multi-state-restraints.refmac.params in %s; aborting...' %os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
             return None
@@ -908,24 +956,40 @@ class panddaRefine(object):
             ' program=%s' %refinementProgram +
             ' params=%s' %refinementParams+
             " dir_prefix='Refine_'"
-            " out_prefix='refine_%s'\n" %str(Serial)+
+            " out_prefix='refine_%s'" %str(Serial)+
+            " split_conformations='False'"
             '\n'
             'cd '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(panddaSerial)+'\n'
+            'giant.split_conformations'
+            " input.pdb='refine_%s.pdb'" %str(Serial)+
+            ' reset_occupancies=False'
+            ' suffix_prefix=split'
+            '\n'
+            'giant.split_conformations'
+            " input.pdb='refine_%s.pdb'" %str(Serial)+
+            ' reset_occupancies=True'
+            ' suffix_prefix=output '
+            '\n'
             +spider_plot+
             '\n'
             'phenix.molprobity refine_%s.pdb refine_%s.mtz\n' %(Serial,Serial)+
             '/bin/mv molprobity.out refine_molprobity.log\n'
+            'module load phenix\n'
             'mmtbx.validate_ligands refine_%s.pdb refine_%s.mtz LIG > validate_ligands.txt\n' %(Serial,Serial)+
             'cd '+self.ProjectPath+'/'+self.xtalID+'\n'
             '\n'
             'ln -s Refine_%s/validate_ligands.txt .\n' %panddaSerial+
             'ln -s Refine_%s/refine_molprobity.log .\n' %panddaSerial+
+            'ln -s Refine_%s/refine_%s.split.bound-state.pdb ./refine.split.bound-state.pdb\n' %(panddaSerial,Serial)+
+            'ln -s Refine_%s/refine_%s.split.ground-state.pdb ./refine.split.ground-state.pdb\n' %(panddaSerial,Serial)+
+            'ln -s Refine_%s/refine_%s.output.bound-state.pdb ./refine.output.bound-state.pdb\n' %(panddaSerial,Serial)+
+            'ln -s Refine_%s/refine_%s.output.ground-state.pdb ./refine.output.ground-state.pdb\n' %(panddaSerial,Serial)+
             'mmtbx.validation_summary refine.pdb > validation_summary.txt\n'
             '\n'
             + mapCalculation +
             '\n'
             '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_after_refinement.py')+
-            ' %s %s %s %s\n' %(self.datasource,self.xtalID,self.ProjectPath,os.path.join(self.ProjectPath,self.xtalID,'Refine_'+str(Serial)))+
+            ' %s %s %s %s\n' %(self.datasource,self.xtalID,self.ProjectPath,os.path.join(self.ProjectPath,self.xtalID,'Refine_'+str(panddaSerial)))+
             '\n'
             '/bin/rm %s/%s/REFINEMENT_IN_PROGRESS\n' %(self.ProjectPath,self.xtalID)+
             '\n'

@@ -156,6 +156,8 @@ def html_export_directory_background():
     text = (    'The HTML export directory will contain all files necessary to generate the summary file.\n'
                 'It is also makes it easy to share the results with collaborators.')
 
+    return text
+
 def html_export_step():
 
     text = (    'This step will create an index.html file and it will copy pdb, mtz and cif files\n'
@@ -238,3 +240,4 @@ def pandda_pre_run(reference_directory):
                         '- run "pandda.analyse\n'    )
 
     return msg
+
