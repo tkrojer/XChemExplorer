@@ -289,44 +289,6 @@ def remove_all_refmac_jobs_from_cluster_and_reinstate_last_stable_state():
     print 'hallo'
 
 
-
-
-def linkAutoProcessingResult(xtal,dbDict,projectDir,xce_logfile):
-    Logfile=XChemLog.updateLog(xce_logfile)
-
-    run =      dbDict['DataCollectionRun']
-    visit =    dbDict['DataCollectionVisit']
-    autoproc = dbDict['DataProcessingProgram']
-    mtzFileAbs = dbDict['DataProcessingPathToMTZfile']
-    mtzfile = mtzFileAbs[mtzFileAbs.rfind('/')+1:]
-    logFileAbs = dbDict['DataProcessingPathToLogfile']
-    logfile = logFileAbs[logFileAbs.rfind('/')+1:]
-
-    Logfile.insert('changing directory to ' + os.path.join(projectDir,xtal))
-    os.chdir(os.path.join(projectDir,xtal))
-    print '->',os.path.join(projectDir,xtal)
-    # MTZ file
-    if os.path.isfile(xtal+'.mtz'):
-        Logfile.warning('removing %s.mtz' %xtal)
-        os.system('/bin/rm %s.mtz' %xtal)
-    if os.path.isfile(os.path.join('autoprocessing', visit + '-' + run + autoproc, mtzfile)):
-        os.symlink(os.path.join('autoprocessing', visit + '-' + run + autoproc, mtzfile), xtal + '.mtz')
-        Logfile.insert('ln -s ' + os.path.join('autoprocessing', visit + '-' + run + autoproc, mtzfile) + ' ' + xtal + '.mtz')
-    # LOG file
-    if os.path.isfile(xtal+'.log'):
-        Logfile.warning('removing %s.log'  %xtal)
-        os.system('/bin/rm %s.log' %xtal)
-    if os.path.isfile(os.path.join('autoprocessing', visit + '-' + run + autoproc, logfile)):
-        os.symlink(os.path.join('autoprocessing', visit + '-' + run + autoproc, logfile), xtal + '.log')
-        Logfile.insert('ln -s ' + os.path.join('autoprocessing', visit + '-' + run + autoproc, logfile) + ' ' + xtal + '.log')
-
-
-
-
-
-
-
-
 def change_links_to_selected_data_collection_outcome(sample,data_collection_dict,data_collection_column_three_dict,dataset_outcome_dict,initial_model_directory,data_source_file,xce_logfile):
     Logfile=XChemLog.updateLog(xce_logfile)
     # find out which row was selected in respective data collection table
@@ -444,7 +406,7 @@ def append_dict_of_gda_barcodes(out_dict,files,xce_logfile):
     Logfile=XChemLog.updateLog(xce_logfile)
     found_barcode_entry=False
     gda_log= files[files.rfind('/')+1:]
-    if gda_log.startswith('gda_server.') or gda_log.startswith('gda-server.') and gda_log.endswith('.gz'):
+    if gda_log.startswith('gda_server.') and gda_log.endswith('.gz'):
         with gzip.open(files,'r') as f:
             for line in f:
                 if 'BART SampleChanger - getBarcode() returning' in line:
@@ -456,7 +418,7 @@ def append_dict_of_gda_barcodes(out_dict,files,xce_logfile):
                         out_dict[sampleID]=barcode
                         Logfile.insert('found: sample={0!s}, barcode={1!s}, file={2!s}'.format(sampleID, barcode, files))
                         found_barcode_entry=False
-    elif gda_log.startswith('gda_server') or gda_log.startswith('gda-server') and gda_log.endswith('txt'):
+    elif gda_log.startswith('gda_server') and gda_log.endswith('log'):
         for line in open(files):
             if 'BART SampleChanger - getBarcode() returning' in line:
                 barcode=line.split()[len(line.split())-1]
@@ -469,55 +431,6 @@ def append_dict_of_gda_barcodes(out_dict,files,xce_logfile):
                     found_barcode_entry=False
 
     return out_dict
-
-def get_gda_barcodes(sampleList,gzipped_logs_parsed,gda_log_start_line,beamline,xce_logfile):
-    Logfile=XChemLog.updateLog(xce_logfile)
-    Logfile.insert('checking GDA logfile in {0!s}'.format(os.path.join('/dls_sw',beamline,'logs')))
-    pinDict = {}
-    found_barcode_entry=False
-    for gdaLogFile in glob.glob(os.path.join('/dls_sw',beamline,'logs','gda-server*log*')):
-        Logfile.insert('parsing {0!s}'.format(gdaLogFile))
-        if gzipped_logs_parsed and gdaLogFile.endswith('.gz'):
-            Logfile.insert('{0!s} was already parsed during this visit'.format(gdaLogFile))
-            continue
-        if gdaLogFile.endswith('.gz'):
-            with gzip.open(gdaLogFile, 'r') as f:
-                for line in f:
-                    if 'BART SampleChanger - getBarcode() returning' in line:
-                        barcode = line.split()[len(line.split()) - 1]
-                        found_barcode_entry = True
-                    if found_barcode_entry:
-                        if 'Snapshots will be saved' in line:
-                            sampleID = line.split()[len(line.split()) - 1].split('/')[-1]
-                            if sampleID in sampleList:
-                                pinDict[sampleID] = barcode
-                                Logfile.insert(
-                                'found: sample={0!s}, barcode={1!s}, file={2!s}'.format(sampleID, barcode, gdaLogFile))
-                            found_barcode_entry = False
-        else:
-            for n,line in enumerate(open(gdaLogFile).readlines()[gda_log_start_line:]):
-                if 'BART SampleChanger - getBarcode() returning' in line:
-                    barcode = line.split()[len(line.split()) - 1]
-                    found_barcode_entry = True
-                if found_barcode_entry:
-                    if 'Snapshots will be saved' in line:
-                        sampleID = line.split()[len(line.split()) - 1].split('/')[-1]
-                        if sampleID in sampleList:
-                            pinDict[sampleID] = barcode
-                            Logfile.insert(
-                            'found: sample={0!s}, barcode={1!s}, file={2!s}'.format(sampleID, barcode, gdaLogFile))
-                        found_barcode_entry = False
-            gda_log_start_line = gda_log_start_line + n -1
-
-    return pinDict,gda_log_start_line
-
-def getProgressSteps(iterations):
-    if iterations == 0:
-        progress_step = 1
-    else:
-        progress_step = 100 / float(iterations)
-    return progress_step
-
 
 
 def crystal_growth_methods():
@@ -615,28 +528,6 @@ def phasing_software():
     return software
 
 
-def getVisitAndBeamline(visitDirectory):
-    visit = 'unknown'
-    beamline = 'unknown'
-    if 'attic' in visitDirectory:
-        try:
-            visit=visitDirectory.split('/')[6]
-            beamline=visitDirectory.split('/')[3]
-        except IndexError:
-            pass
-    else:
-        try:
-            visit=visitDirectory.split('/')[5]
-            beamline=visitDirectory.split('/')[2]
-        except IndexError:
-            pass
-    return visit,beamline
-
-
-
-
-
-
 class find_diffraction_image_directory(QtCore.QThread):
     def __init__(self,diffraction_data_directory):
         QtCore.QThread.__init__(self)
@@ -699,7 +590,7 @@ class find_diffraction_image_directory(QtCore.QThread):
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
-        self.emit(QtCore.SIGNAL('update_datasets_reprocess_table'), self.data_dict)
+        self.emit(QtCore.SIGNAL('update_reprocess_datasets_table'), self.data_dict)
 
 class find_diffraction_image_directory_fast(QtCore.QThread):
     def __init__(self,diffraction_data_directory):
@@ -710,7 +601,6 @@ class find_diffraction_image_directory_fast(QtCore.QThread):
 #        self.datasetID_to_sampleID_conversion='*'
 
     def run(self):
-        print('Running diffraction image search in ' + str(self.diffraction_data_directory))
         os.chdir(self.diffraction_data_directory)
         if len(glob.glob(os.path.join(self.diffraction_data_directory,'*'))) != 0:
             progress_step=100/float(len(glob.glob(os.path.join(self.diffraction_data_directory,'*'))))
@@ -721,7 +611,6 @@ class find_diffraction_image_directory_fast(QtCore.QThread):
 
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'searching diffraction data directory')
         for xtal in glob.glob('*'):
-            #print xtal
             if 'screening' in xtal:
                 continue
             self.data_dict[xtal]=[]
@@ -758,5 +647,5 @@ class find_diffraction_image_directory_fast(QtCore.QThread):
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
-        self.emit(QtCore.SIGNAL('update_datasets_reprocess_table'), self.data_dict)
+        self.emit(QtCore.SIGNAL('update_reprocess_datasets_table'), self.data_dict)
 

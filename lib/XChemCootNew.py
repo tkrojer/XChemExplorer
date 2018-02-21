@@ -79,7 +79,6 @@ class GUI(object):
         # for Data Processing and Refinement
         self.project_directory = self.settings['initial_model_directory']
         self.Serial=0
-	self.panddaSerial=0
         self.Refine=None
         self.index = -1
         self.Todo=[]
@@ -735,9 +734,7 @@ class GUI(object):
 
     def ChooseSite(self, widget):
         tmp=str(widget.get_active_text())
-	print self.siteDict	
-	print self.site_index       
-	self.site_index=tmp.split()[1]
+        self.site_index=tmp.split()[1]
         self.event_index=tmp.split()[4]
         for n,item in enumerate(self.siteDict[self.xtalID]):
             if item[5]==self.site_index and item[6]==self.event_index:
@@ -882,7 +879,6 @@ class GUI(object):
         # initialize Refinement library
         self.Refine=XChemRefine.Refine(self.project_directory,self.xtalID,self.compoundID,self.data_source)
         self.Serial=XChemRefine.GetSerial(self.project_directory,self.xtalID)
-	self.panddaSerial=panddaSerial=m=(4-len(str(self.Serial)))*'0'+str(self.Serial)
 #        self.Serial=self.Refine.GetSerial()
         if self.Serial==1:
             # i.e. no refinement has been done; data is probably straight out of dimple
@@ -904,7 +900,6 @@ class GUI(object):
 #        self.hbox_for_info_graphics.remove(self.canvas)
         if self.Serial > 1:
             self.RefmacParams=self.Refine.ParamsFromPreviousCycle(self.Serial-1)
-            print '==> REFMAC params:',self.RefmacParams
 #            refinement_cycle,Rfree,Rcryst=self.Refine.GetRefinementHistory()
 #            self.canvas = FigureCanvas(self.update_plot(refinement_cycle,Rfree,Rcryst))
 #        else:
@@ -1188,16 +1183,10 @@ class GUI(object):
         coot.close_molecule(self.mol_dict['ligand'])
 
     def show_molprobity_to_do(self,widget):
-	print self.panddaSerial
-	AdjPanddaSerial=(4-len(str(self.Serial)))*'0'+str(int(self.panddaSerial)-1)
-	print os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.panddaSerial),'molprobity_coot.py')
         if os.path.isfile(os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial-1),'molprobity_coot.py')):
             print '==> XCE: running MolProbity Summary for',self.xtalID
             coot.run_script(os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial-1),'molprobity_coot.py'))
-        elif os.path.isfile(os.path.join(self.project_directory,self.xtalID,'Refine_'+str(AdjPanddaSerial),'molprobity_coot.py')):
-            print '==> XCE: running MolProbity Summary for',self.xtalID
-            coot.run_script(os.path.join(self.project_directory,self.xtalID,'Refine_'+str(AdjPanddaSerial),'molprobity_coot.py'))
-	else:
+        else:
             print '==> XCE: cannot find '+os.path.join(self.project_directory,self.xtalID,'Refine_'+str(self.Serial-1),'molprobity_coot.py')
 
     def refinementProtocolCallback(self, widget):

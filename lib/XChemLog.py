@@ -42,7 +42,6 @@ class startLog:
         else:
             message+='writing into existing logfile for current XChemExplorer ('+version+') session:\n'+self.logfile+'\n'
         updateLog(self.logfile).insert(message)
-        #print(message)
 
 class depositLog:
 
@@ -121,10 +120,5 @@ class updateLog:
         present_time=datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
         print( str(present_time)+' ==> XCE: ERROR!!! '+message, file = self.logfile)
         print('==> XCE: ERROR!!! '+message)
-
-    def hint(self,message):
-        present_time=datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
-        print( str(present_time)+' ==> XCE: HINT!!! '+message, file = self.logfile)
-        print('==> XCE: HINT --> '+message)
 
 
