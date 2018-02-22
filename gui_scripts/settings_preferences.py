@@ -32,7 +32,7 @@ class setup():
 
     def settings(self, xce_object):
         # set XCE version
-        xce_object.xce_version = 'v1.0'
+        xce_object.xce_version = 'v1.1'
 
         # general settings
         xce_object.allowed_unitcell_difference_percent = 12
@@ -147,6 +147,7 @@ class setup():
         xce_object.albula = None
         xce_object.albula_subframes = []
         xce_object.show_diffraction_image = None
+        xce_object.gdaLogInstructions = [0,False]
         # can be any widget to be displayed in data collection summary tab
         xce_object.data_collection_details_currently_on_display = None
 
@@ -204,8 +205,18 @@ class setup():
                                                       'highest_resolution',
                                                       'lowest_Rfree']
 
-        xce_object.preferences = {'processed_data_to_copy': 'mtz_log_only',
-                                  'dataset_selection_mechanism': 'IsigI*Comp*UniqueRefl'}
+        xce_object.allowed_unitcell_difference_percent = 12
+        xce_object.acceptable_low_resolution_limit_for_data = 3.5
+        xce_object.filename_root = '${samplename}'
+        xce_object.max_queue_jobs = 100
+
+        xce_object.preferences = {'processed_data_to_copy':                     'mtz_log_only',
+                                  'dataset_selection_mechanism':                'IsigI*Comp*UniqueRefl',
+                                  'allowed_unitcell_difference_percent':        12,
+                                  'acceptable_low_resolution_limit_for_data':   3.5,
+                                  'acceptable_low_resolution_Rmerge':           0.1,
+                                  'filename_root':                              '${samplename}',
+                                  'max_queue_jobs':                             100     }
 
         ## settings
 
@@ -268,11 +279,31 @@ class setup():
                                                      'img1',
                                                      'img2',
                                                      'img3',
-                                                     'img4',
-                                                     'img5',
-                                                     'Show\nDetails',
-                                                     'Show Diffraction\nImage'
+                                                     'img4'
+#                                                     'img5',
+#                                                     'Show\nDetails',
+#                                                     'Show Diffraction\nImage'
                                                      ]
+
+        # functions that use tables.data_collection_table_columns:
+        #
+        # - show_results_from_all_pipelines() - appears in populate_datasets_summary_table()
+
+        xce_object.data_collection_table_columns = ['Sample ID',
+                                                    'Visit',
+                                                    'Run',
+                                                    'Program',
+                                                    'Resolution\nOverall',
+                                                    'Resolution\nHigh',
+                                                    'DataProcessing\nSpaceGroup',
+                                                    'Mn<I/sig(I)>\nHigh',
+                                                    'Rmerge\nLow',
+                                                    'Completeness\nOverall',
+                                                    'DataProcessing\nUnitCell',
+                                                    'DataProcessing\nRfree'
+                                                    'DataProcessing\nScore']
+
+
 
         # functions that use tables.datasets_reprocess_columns:
         #
