@@ -173,7 +173,7 @@ class PanddaTab():
         xce_object.pandda_analyse_input_params_vbox.addWidget(label)
         # reference file combobox, label with spg display
         hbox = QtGui.QHBoxLayout()
-        xce_object.reference_file_list = xce_object.get_reference_file_list(' ')
+        #sxce_object.reference_file_list = xce_object.get_reference_file_list('')
         xce_object.pandda_reference_file_selection_combobox = QtGui.QComboBox()
         xce_object.populate_reference_combobox(xce_object.pandda_reference_file_selection_combobox)
         xce_object.pandda_reference_file_selection_combobox.activated[str].connect(xce_object.change_pandda_spg_label)

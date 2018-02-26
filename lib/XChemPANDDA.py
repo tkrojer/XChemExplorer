@@ -386,6 +386,9 @@ class run_pandda_analyse(QtCore.QThread):
 
     def run(self):
 
+        print self.reference_dir
+        print self.filter_pdb
+
         # how to run pandda.analyse on large datasets
         #
         # 1) Run the normal pandda command, with the new setting, e.g.
@@ -424,6 +427,7 @@ class run_pandda_analyse(QtCore.QThread):
                 source_file=''
 
             if os.path.isfile(self.filter_pdb):
+                print('filter pdb located')
                 filter_pdb=' filter.pdb='+self.filter_pdb
             else:
                 if self.use_remote:
