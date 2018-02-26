@@ -20,18 +20,21 @@ class startLog:
 
         message = (
             '\n\n'
-            '     ######################################################################\n'
-            '     #                                                                    #\n'
-            '     # XCHEMEXPLORER - multi dataset analysis                             #\n'
-            '     #                                                                    #\n'
-            '     # Version: %s                                      #\n' %pasteVersion+
-            '     #                                                                    #\n'
-            '     # Date:                                                              #\n'
-            '     #                                                                    #\n'
-            '     # Author: Tobias Krojer, Structural Genomics Consortium, Oxford, UK  #\n'
-            '     #         tobias.krojer@sgc.ox.ac.uk                                 #\n'
-            '     #                                                                    #\n'
-            '     ######################################################################\n'
+            '     #######################################################################\n'
+            '     #                                                                     #\n'
+            '     # XCHEMEXPLORER - multi dataset analysis                              #\n'
+            '     #                                                                     #\n'
+            '     # Version: %s                                       #\n' %pasteVersion+
+            '     #                                                                     #\n'
+            '     # Date: 20/02/2018                                                    #\n'
+            '     #                                                                     #\n'
+            '     # Authors: Tobias Krojer, Structural Genomics Consortium, Oxford, UK  #\n'
+            '     #          tobias.krojer@sgc.ox.ac.uk                                 #\n'
+            '     #                                                                     #\n'
+            '     #          Rachael Skyner, Diamond Light Source, UK                   #\n'
+            '     #          rachael.skyner@diamond.ac.uk                               #\n'
+            '     #                                                                     #\n'
+            '     #######################################################################\n'
             '\n'
         )
 

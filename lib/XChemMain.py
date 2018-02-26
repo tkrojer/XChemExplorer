@@ -432,6 +432,107 @@ def append_dict_of_gda_barcodes(out_dict,files,xce_logfile):
 
     return out_dict
 
+def get_gda_barcodes(sampleList,gzipped_logs_parsed,gda_log_start_line,beamline,xce_logfile):
+    Logfile=XChemLog.updateLog(xce_logfile)
+    Logfile.insert('checking GDA logfile in {0!s}'.format(os.path.join('/dls_sw',beamline,'logs')))
+    pinDict = {}
+    found_barcode_entry=False
+    for gdaLogFile in glob.glob(os.path.join('/dls_sw',beamline,'logs','gda-server*log*')):
+        Logfile.insert('parsing {0!s}'.format(gdaLogFile))
+        if gzipped_logs_parsed and gdaLogFile.endswith('.gz'):
+            Logfile.insert('{0!s} was already parsed during this visit'.format(gdaLogFile))
+            continue
+        if gdaLogFile.endswith('.gz'):
+            with gzip.open(gdaLogFile, 'r') as f:
+                for line in f:
+                    if 'BART SampleChanger - getBarcode() returning' in line:
+                        barcode = line.split()[len(line.split()) - 1]
+                        found_barcode_entry = True
+                    if found_barcode_entry:
+                        if 'Snapshots will be saved' in line:
+                            sampleID = line.split()[len(line.split()) - 1].split('/')[-1]
+                            if sampleID in sampleList:
+                                pinDict[sampleID] = barcode
+                                Logfile.insert(
+                                'found: sample={0!s}, barcode={1!s}, file={2!s}'.format(sampleID, barcode, gdaLogFile))
+                            found_barcode_entry = False
+        else:
+            for n,line in enumerate(open(gdaLogFile).readlines()[gda_log_start_line:]):
+                if 'BART SampleChanger - getBarcode() returning' in line:
+                    barcode = line.split()[len(line.split()) - 1]
+                    found_barcode_entry = True
+                if found_barcode_entry:
+                    if 'Snapshots will be saved' in line:
+                        sampleID = line.split()[len(line.split()) - 1].split('/')[-1]
+                        if sampleID in sampleList:
+                            pinDict[sampleID] = barcode
+                            Logfile.insert(
+                            'found: sample={0!s}, barcode={1!s}, file={2!s}'.format(sampleID, barcode, gdaLogFile))
+                        found_barcode_entry = False
+            gda_log_start_line = gda_log_start_line + n -1
+
+    return pinDict,gda_log_start_line
+
+
+def linkAutoProcessingResult(xtal,dbDict,projectDir,xce_logfile):
+    Logfile=XChemLog.updateLog(xce_logfile)
+
+    run =      dbDict['DataCollectionRun']
+    visit =    dbDict['DataCollectionVisit']
+    autoproc = dbDict['DataProcessingProgram']
+    mtzFileAbs = dbDict['DataProcessingPathToMTZfile']
+    mtzfile = mtzFileAbs[mtzFileAbs.rfind('/')+1:]
+    logFileAbs = dbDict['DataProcessingPathToLogfile']
+    logfile = logFileAbs[logFileAbs.rfind('/')+1:]
+
+    Logfile.insert('changing directory to ' + os.path.join(projectDir,xtal))
+    os.chdir(os.path.join(projectDir,xtal))
+
+    # MTZ file
+    if os.path.isfile(xtal+'.mtz'):
+        Logfile.warning('removing %s.mtz' %xtal)
+        os.system('/bin/rm %s.mtz' %xtal)
+    if os.path.isfile(os.path.join('autoprocessing', visit + '-' + run + autoproc, mtzfile)):
+        os.symlink(os.path.join('autoprocessing', visit + '-' + run + autoproc, mtzfile), xtal + '.mtz')
+        Logfile.insert('linking MTZ file from different auto-processing pipeline:')
+        Logfile.insert('ln -s ' + os.path.join('autoprocessing', visit + '-' + run + autoproc, mtzfile) + ' ' + xtal + '.mtz')
+    # LOG file
+    if os.path.isfile(xtal+'.log'):
+        Logfile.warning('removing %s.log'  %xtal)
+        os.system('/bin/rm %s.log' %xtal)
+    if os.path.isfile(os.path.join('autoprocessing', visit + '-' + run + autoproc, logfile)):
+        os.symlink(os.path.join('autoprocessing', visit + '-' + run + autoproc, logfile), xtal + '.log')
+        Logfile.insert('linking LOG file from different auto-processing pipeline:')
+        Logfile.insert('ln -s ' + os.path.join('autoprocessing', visit + '-' + run + autoproc, logfile) + ' ' + xtal + '.log')
+
+
+
+def getProgressSteps(iterations):
+    if iterations == 0:
+        progress_step = 1
+    else:
+        progress_step = 100 / float(iterations)
+    return progress_step
+
+def getVisitAndBeamline(visitDirectory):
+    visit = 'unknown'
+    beamline = 'unknown'
+    if 'attic' in visitDirectory:
+        try:
+            visit=visitDirectory.split('/')[6]
+            beamline=visitDirectory.split('/')[3]
+        except IndexError:
+            pass
+    else:
+        try:
+            visit=visitDirectory.split('/')[5]
+            beamline=visitDirectory.split('/')[2]
+        except IndexError:
+            pass
+    return visit,beamline
+
+
+
 
 def crystal_growth_methods():
 
