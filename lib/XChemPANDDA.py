@@ -386,8 +386,8 @@ class run_pandda_analyse(QtCore.QThread):
 
     def run(self):
 
-        print self.reference_dir
-        print self.filter_pdb
+        # print self.reference_dir
+        # print self.filter_pdb
 
         # how to run pandda.analyse on large datasets
         #
@@ -438,7 +438,7 @@ class run_pandda_analyse(QtCore.QThread):
                     if 'cannot stat' in out:
                         filter_pdb = ''
                     else:
-                        filter_pdb = ' filter.pdb=' + self.filter_pdb
+                        filter_pdb = ' filter.pdb=' + self.filter_pdb + '.pdb'
 
                 else:
                     filter_pdb=''

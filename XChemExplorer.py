@@ -3482,7 +3482,7 @@ class XChemExplorer(QtGui.QApplication):
                     reference_root = files[files.rfind('/') + 1:files.rfind('.')]
 
                     if os.path.isfile(os.path.join(self.reference_directory, reference_root + '.pdb')):
-                        reference_file = reference_root + '.pdb'
+                        # reference_file = reference_root + '.pdb'
                         pdb_reference = parse().PDBheader(
                             os.path.join(self.reference_directory, reference_root + '.pdb'))
                         spg_reference = pdb_reference['SpaceGroup']
@@ -3490,7 +3490,7 @@ class XChemExplorer(QtGui.QApplication):
                         lattice_reference = pdb_reference['Lattice']
                         unitcell_volume_reference = pdb_reference['UnitCellVolume']
                         pointgroup_reference = pdb_reference['PointGroup']
-                        reference_file_list.append([reference_file,
+                        reference_file_list.append([reference_root,
                                                     spg_reference,
                                                     unitcell_reference,
                                                     lattice_reference,
