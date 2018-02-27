@@ -314,7 +314,10 @@ class XChemExplorer(QtGui.QApplication):
         start_thread = True
         if start_thread:
             if self.target == '=== SELECT TARGET ===':
-                start_thread = CheckAutoProcessing().query(self)
+                try:
+                    start_thread = CheckAutoProcessing().query(self)
+                except:
+                    print("==> XCE: ERROR: NO TARGET SELECTED, PLEASE SELECT A TARGET AND TRY AGAIN!")
 
         if start_thread:
             processedDir=os.path.join(self.beamline_directory,'processed',self.target)
