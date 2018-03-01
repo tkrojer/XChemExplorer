@@ -1628,18 +1628,19 @@ class data_source:
         return xtalList
 
     def autoprocessing_result_user_assigned(self,sample):
-        userassigned = True
+        userassigned = False
         connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
         cursor = connect.cursor()
         cursor.execute("select DataProcessingAutoAssigned from mainTable where CrystalName = '%s'" %sample)
         outcome = cursor.fetchall()
         try:
-            if 'true' in str(outcome[0]).lower() or str(outcome[0]).encode('ascii', 'ignore') == '':
-                userassigned = False        # a bit counterintuitive, but here we ask about userassigned
+            if 'false' in str(outcome[0]).lower() or str(outcome[0]).encode('ascii', 'ignore') == '':
+                userassigned = True        # a bit counterintuitive, but here we ask about userassigned
                                             # whereas DB records autoassigned
         except IndexError:
-            userassigned = False    # this is the case when sample is encountered the first time
-                                    # and not yet in mainTable
+            pass                # this is the case when sample is encountered the first time
+                                # and not yet in mainTable
+
         return userassigned
 
 
