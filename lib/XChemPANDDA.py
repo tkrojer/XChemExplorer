@@ -426,9 +426,9 @@ class run_pandda_analyse(QtCore.QThread):
             else:
                 source_file=''
 
-            if os.path.isfile(self.filter_pdb):
+            if os.path.isfile(self.filter_pdb + '.pdb'):
                 print('filter pdb located')
-                filter_pdb=' filter.pdb='+self.filter_pdb
+                filter_pdb=' filter.pdb='+self.filter_pdb+'.pdb'
             else:
                 if self.use_remote:
                     stat_command = self.remote_string.replace("qsub'", str('stat ' + self.filter_pdb + "'"))
