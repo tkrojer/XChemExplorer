@@ -429,6 +429,7 @@ class run_pandda_analyse(QtCore.QThread):
             if os.path.isfile(self.filter_pdb + '.pdb'):
                 print('filter pdb located')
                 filter_pdb=' filter.pdb='+self.filter_pdb+'.pdb'
+                print('will use ' + filter_pdb + 'as a filter for pandda.analyse')
             else:
                 if self.use_remote:
                     stat_command = self.remote_string.replace("qsub'", str('stat ' + self.filter_pdb + "'"))
