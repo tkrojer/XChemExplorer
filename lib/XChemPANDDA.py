@@ -497,8 +497,8 @@ class run_pandda_analyse(QtCore.QThread):
 
             for i in range(number_of_cyles):
                 Cmds += (
-                    'module load pymol '+
-		            '\n'+
+                    # 'module load pymol '+
+		            # '\n'+
                     'pandda.analyse '+
                     ' data_dirs="'+self.data_directory+'"'
                     ' out_dir="'+self.panddas_directory+'"'
