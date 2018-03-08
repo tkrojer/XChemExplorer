@@ -1,6 +1,7 @@
 # last edited: 10/08/2017, 15:00
 
 import os,glob
+import sys
 
 #projectDir='/dls/labxchem/data/2017/lb13385-109/processing/analysis/initial_model_cov'
 #panddaDir='/dls/labxchem/data/2017/lb13385-109/processing/analysis/panddas_cov'
