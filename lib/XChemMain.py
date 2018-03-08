@@ -492,6 +492,7 @@ def linkAutoProcessingResult(xtal,dbDict,projectDir,xce_logfile):
     if os.path.isfile(xtal+'.mtz'):
         Logfile.warning('removing %s.mtz' %xtal)
         os.system('/bin/rm %s.mtz' %xtal)
+    print xtal,os.path.join('autoprocessing', visit + '-' + run + autoproc, mtzfile)
     if os.path.isfile(os.path.join('autoprocessing', visit + '-' + run + autoproc, mtzfile)):
         os.symlink(os.path.join('autoprocessing', visit + '-' + run + autoproc, mtzfile), xtal + '.mtz')
         Logfile.insert('linking MTZ file from different auto-processing pipeline:')
