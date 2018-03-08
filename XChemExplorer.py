@@ -448,14 +448,20 @@ class XChemExplorer(QtGui.QApplication):
                 pdbin = pdbin_temp
             else:
                 pdbin = ''
-        if len(filepath.split('/')) - len(self.initial_model_directory.split('/')) == 2:
-            self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory, '*'))
-        elif len(filepath.split('/')) - len(self.initial_model_directory.split('/')) > 2:
-            subdir = os.path.join(
-                *filepath.split('/')[len(self.initial_model_directory.split('/')) + 1:len(filepath.split('/')) - 1])
-            self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory, '*', subdir))
-        else:
-            pass
+
+        try:
+            self.pandda_input_data_dir_entry.setText(
+                '/'+os.path.join(*filepath.split('/')[0:len(filepath.split('/'))-2]))
+        except TypeError:
+            self.update_log.error('directory selection invalid')            
+#        if len(filepath.split('/')) - len(self.initial_model_directory.split('/')) == 2:
+#            self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory, '*'))
+#        elif len(filepath.split('/')) - len(self.initial_model_directory.split('/')) > 2:
+#            subdir = os.path.join(
+#                *filepath.split('/')[len(self.initial_model_directory.split('/')) + 1:len(filepath.split('/')) - 1])
+#            self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory, '*', subdir))
+#        else:
+#            pass
         self.pandda_pdb_style_entry.setText(pdbin)
         self.pandda_mtz_style_entry.setText(mtzin)
 
@@ -2085,7 +2091,7 @@ class XChemExplorer(QtGui.QApplication):
                    'acceptable_low_resolution_limit_for_data': 'too_low_resolution_data',
                    #'reference_directory_temp': 'reference_directory'
                      }
-        self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory, '*'))
+#        self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory, '*'))
 
         for current_key in key_list:
             try:
@@ -2151,6 +2157,7 @@ class XChemExplorer(QtGui.QApplication):
             self.beamline_directory_label.setText(self.beamline_directory)
             self.ccp4_scratch_directory_label.setText(self.ccp4_scratch_directory)
             self.reference_file_list = self.get_reference_file_list(' ')
+            self.pandda_input_data_dir_entry.setText(os.path.join(self.initial_model_directory, '*'))
 
             self.update_all_tables()
 
