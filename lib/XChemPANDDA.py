@@ -500,7 +500,7 @@ class run_pandda_analyse(QtCore.QThread):
                     # 'module load pymol '+
 		            # '\n'+
                     'pandda.analyse '+
-                    ' data_dirs="'+self.data_directory+'"'
+                    ' data_dirs="'+self.data_directory.replace('/*','')+'/*"'+
                     ' out_dir="'+self.panddas_directory+'"'
                     ' min_build_datasets='+self.min_build_datasets+
                     #' maps.ampl_label=FWT maps.phas_label=PHWT'
