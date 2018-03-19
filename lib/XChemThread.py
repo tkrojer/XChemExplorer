@@ -3466,6 +3466,9 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
                 [   os.path.join('xia2', '*'),
                     os.path.join('LogFiles', '*aimless.log'),
                     os.path.join('DataFiles', '*free.mtz')],
+                [   os.path.join('multi-xia2', '*'),
+                    os.path.join('LogFiles', '*aimless.log'),
+                    os.path.join('DataFiles', '*free.mtz')],
                 [   os.path.join('autoPROC', '*'),
                     '*aimless.log',
                     '*truncate-unique.mtz']
