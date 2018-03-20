@@ -15,6 +15,8 @@ import time
 import getpass
 import csv
 
+from iotbx import mtz
+
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 from XChemUtils import process
 from XChemUtils import parse
@@ -1076,13 +1078,20 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
 #            if os.path.isfile(ref_mtz.split()[len(ref_mtz.split())-1]):
 #                mtz_column_dict=mtztools(ref_mtz.split()[len(ref_mtz.split())-1]).get_all_columns_as_dict()
             if os.path.isfile(ref_mtz):
-                mtz_column_dict=mtztools(ref_mtz).get_all_columns_as_dict()
-                if 'FreeR_flag' not in mtz_column_dict['RFREE']:
+                if 'FreeR_flag' not in mtz.object(ref_mtz).column_labels():
+#                mtz_column_dict=mtztools(ref_mtz).get_all_columns_as_dict()
+#                if 'FreeR_flag' not in mtz_column_dict['RFREE']:
                     self.Logfile.insert('cannot find FreeR_flag in reference mtz file: {0!s} -> ignoring reference mtzfile!!!'.format(ref_mtz))
                     ref_mtz = ''
-                    if mtz_column_dict['RFREE'] != []:
-                        self.Logfile.insert('found Rfree set with other column name though: {0!s}'.format(str(mtz_column_dict['RFREE'])))
-                        self.Logfile.insert('try renaming Rfree column to FreeR_flag with CAD!')
+#                    if mtz_column_dict['RFREE'] != []:
+#                        self.Logfile.insert('found Rfree set with other column name though: {0!s}'.format(str(mtz_column_dict['RFREE'])))
+#                        self.Logfile.insert('try renaming Rfree column to FreeR_flag with CAD!')
+
+            uniqueify = ''
+            if 'FreeR_flag' in mtz.object(mtzin).column_labels():
+                uniqueify = 'uniqueify -f FreeR_flag ' + mtzin + '\n'
+            else:
+                uniqueify = 'uniqueify ' + mtzin + '\n'
 
 
             db_dict={}
@@ -1145,21 +1154,23 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     '\n'
                     '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(database,xtal,'DimpleStatus','running') +
                     '\n'
-                    'unique hklout unique.mtz << eof\n'
-                    ' cell %s\n' %str(mtztools(mtzin).get_unit_cell_from_mtz()).replace("'",'').replace('[','').replace(']','').replace(',','')+
-                    ' symmetry %s\n' %mtztools(mtzin).get_spg_number_from_mtz()+
-                    ' resolution %s\n' %mtztools(mtzin).get_high_resolution_from_mtz()+
-                    'eof\n'
+                    + uniqueify + 
                     '\n'
-                    'cad hklin1 %s hklin2 unique.mtz hklout %s.999A.mtz << eof\n' %(mtzin,xtal) +
-                    ' monitor BRIEF\n'
-                    ' labin file 1 ALL\n'
-                    ' labin file 2 E1=F E2=SIGF\n'
-                    ' labout file 2 E1=F_unique E2=SIGF_unique\n'
-                    ' resolution file 1 999.0 %s\n' %mtztools(mtzin).get_high_resolution_from_mtz()+
-                    'eof\n'
-                    '\n'
-                    'dimple --no-cleanup %s.999A.mtz %s %s %s dimple\n' %(xtal,ref_pdb,ref_mtz,ref_cif) +
+#                    'unique hklout unique.mtz << eof\n'
+#                    ' cell %s\n' %str(mtztools(mtzin).get_unit_cell_from_mtz()).replace("'",'').replace('[','').replace(']','').replace(',','')+
+#                    ' symmetry %s\n' %mtztools(mtzin).get_spg_number_from_mtz()+
+#                    ' resolution %s\n' %mtztools(mtzin).get_high_resolution_from_mtz()+
+#                    'eof\n'
+#                    '\n'
+#                    'cad hklin1 %s hklin2 unique.mtz hklout %s.999A.mtz << eof\n' %(mtzin,xtal) +
+#                    ' monitor BRIEF\n'
+#                    ' labin file 1 ALL\n'
+#                    ' labin file 2 E1=F E2=SIGF\n'
+#                    ' labout file 2 E1=F_unique E2=SIGF_unique\n'
+#                    ' resolution file 1 999.0 %s\n' %mtztools(mtzin).get_high_resolution_from_mtz()+
+#                    'eof\n'
+#                    '\n'
+                    'dimple --no-cleanup %s-unique.mtz %s %s %s dimple\n' %(xtal,ref_pdb,ref_mtz,ref_cif) +
                     '\n'
                     'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc,'dimple') +
                     '\n'
