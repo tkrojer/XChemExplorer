@@ -5,9 +5,9 @@ import os
 import pickle
 import time
 import gtk
-import threading
-import gobject
-gtk.gdk.threads_init()
+#import threading
+#import gobject
+#gtk.gdk.threads_init()
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
@@ -178,42 +178,42 @@ class GUI(object):
         #################################################################################
         # --- ground state mean map ---
         # checking for ground state mean map in reference folder
-        self.meanMaps = {}
-        for dirs in glob.glob(os.path.join(self.reference_directory,'pandda_*')):
-            panddaDir=dirs.split('/')[len(dirs.split('/'))-1]
-            for files in glob.glob(os.path.join(dirs,'processed_datasets','*','*ground-state-mean-map.native.ccp4')):
-                if os.path.isfile(files):
-                    self.meanMaps[panddaDir]=files
-                    break
+#        self.meanMaps = {}
+#        for dirs in glob.glob(os.path.join(self.reference_directory,'pandda_*')):
+#            panddaDir=dirs.split('/')[len(dirs.split('/'))-1]
+#            for files in glob.glob(os.path.join(dirs,'processed_datasets','*','*ground-state-mean-map.native.ccp4')):
+#                if os.path.isfile(files):
+#                    self.meanMaps[panddaDir]=files
+#                    break
 
-        frame = gtk.Frame(label='Load ground-state-mean-map files')
-        hbox=gtk.HBox()
-        self.cb_select_mean_map = gtk.combo_box_new_text()
-        for item in self.meanMaps:
-            self.cb_select_mean_map.append_text(item)
-        hbox.add(self.cb_select_mean_map)
-        self.load_ground_state_map_button = gtk.Button(label="Load")
-        self.load_ground_state_map_button.connect("clicked",self.load_ground_state_map)
-        hbox.add(self.load_ground_state_map_button)
-        frame.add(hbox)
-        self.vbox.pack_start(frame)
+#        frame = gtk.Frame(label='Load ground-state-mean-map files')
+#        hbox=gtk.HBox()
+#        self.cb_select_mean_map = gtk.combo_box_new_text()
+#        for item in self.meanMaps:
+#            self.cb_select_mean_map.append_text(item)
+#        hbox.add(self.cb_select_mean_map)
+#        self.load_ground_state_map_button = gtk.Button(label="Load")
+#        self.load_ground_state_map_button.connect("clicked",self.load_ground_state_map)
+#        hbox.add(self.load_ground_state_map_button)
+#        frame.add(hbox)
+#        self.vbox.pack_start(frame)
 
-        frame = gtk.Frame()
-        hbox=gtk.HBox()
-        self.cb_select_mean_map_by_resolution = gtk.combo_box_new_text()
-        self.cb_select_mean_map_by_resolution.connect("changed", self.show_selected_mean_map)
-        hbox.add(self.cb_select_mean_map_by_resolution)
-#        self.show_highres_ground_state_map_button = gtk.Button(label="Show Highest\nResolution Map")
-#        self.show_highres_ground_state_map_button.connect("clicked",self.show_highres_ground_state_map)
-#        hbox.add(self.show_highres_ground_state_map_button)
-#        self.show_all_ground_state_map_button = gtk.Button(label="Show All Maps")
-#        self.show_all_ground_state_map_button.connect("clicked",self.show_all_ground_state_map)
-#        hbox.add(self.show_all_ground_state_map_button)
-        frame.add(hbox)
-        self.vbox.pack_start(frame)
+#        frame = gtk.Frame()
+#        hbox=gtk.HBox()
+#        self.cb_select_mean_map_by_resolution = gtk.combo_box_new_text()
+#        self.cb_select_mean_map_by_resolution.connect("changed", self.show_selected_mean_map)
+#        hbox.add(self.cb_select_mean_map_by_resolution)
+##        self.show_highres_ground_state_map_button = gtk.Button(label="Show Highest\nResolution Map")
+##        self.show_highres_ground_state_map_button.connect("clicked",self.show_highres_ground_state_map)
+##        hbox.add(self.show_highres_ground_state_map_button)
+##        self.show_all_ground_state_map_button = gtk.Button(label="Show All Maps")
+##        self.show_all_ground_state_map_button.connect("clicked",self.show_all_ground_state_map)
+##        hbox.add(self.show_all_ground_state_map_button)
+#        frame.add(hbox)
+#        self.vbox.pack_start(frame)
 
         # SPACER
-        self.vbox.add(gtk.Label(' \n '))
+#        self.vbox.add(gtk.Label(' \n '))
 
         #################################################################################
         # --- Refinement History ---
@@ -380,6 +380,7 @@ class GUI(object):
         # initialize Refinement library
         self.Refine=XChemRefine.Refine(self.reference_directory,self.refinementDir,'dummy_compound_ID','dummy_database')
         self.Serial=self.Refine.GetSerial()
+        print '====> Serial',self.Serial
 
         #########################################################################################
         # history
@@ -470,26 +471,35 @@ class GUI(object):
 #        self.refinementRunning.start()
         self.status_label.set_text('Refinement running...')
 
-        # launch refinement
         time.sleep(1)   # waiting 1s to make sure that REFINEMENT_IN_PROGRESS is written
-        self.source_id = gobject.timeout_add(100, self.wait_for_refined_pdb)
+        snooze = 0
+        while os.path.exists(os.path.join(self.reference_directory,self.refinementDir,'REFINEMENT_IN_PROGRESS')):
+            time.sleep(10)
+            print '==> XCE: waiting for refinement to finish; elapsed time = ' + str(snooze) + 's'
+            snooze += 10
+        self.update_pdb_mtz_files('')
 
-    def wait_for_refined_pdb(self):
-        self.spinnerBox.add(self.refinementRunning)
-        self.refinementRunning.show()
-        self.refinementRunning.start()
-        if not os.path.isfile(os.path.join(self.reference_directory,self.refinementDir,'REFINEMENT_IN_PROGRESS')):
-            self.job_running=False
-            self.end_thread('update_pdb_mtz')
-        return True
 
-    def end_thread(self,action):
-        self.refinementRunning.stop()
-        self.spinnerBox.remove(self.refinementRunning)
-        self.status_label.set_text('idle')
-        gobject.source_remove(self.source_id)
-        if action=='update_pdb_mtz':
-            self.update_pdb_mtz_files('')
+        # launch refinement
+#        time.sleep(1)   # waiting 1s to make sure that REFINEMENT_IN_PROGRESS is written
+#        self.source_id = gobject.timeout_add(100, self.wait_for_refined_pdb)
+
+#    def wait_for_refined_pdb(self):
+#        self.spinnerBox.add(self.refinementRunning)
+#        self.refinementRunning.show()
+#        self.refinementRunning.start()
+#        if not os.path.isfile(os.path.join(self.reference_directory,self.refinementDir,'REFINEMENT_IN_PROGRESS')):
+#            self.job_running=False
+#            self.end_thread('update_pdb_mtz')
+#        return True
+
+#    def end_thread(self,action):
+#        self.refinementRunning.stop()
+#        self.spinnerBox.remove(self.refinementRunning)
+#        self.status_label.set_text('idle')
+#        gobject.source_remove(self.source_id)
+#        if action=='update_pdb_mtz':
+#            self.update_pdb_mtz_files('')
 
 
 
@@ -560,7 +570,9 @@ class GUI(object):
         self.mtzRefine=''
         if os.path.isfile(os.path.join(self.reference_directory,self.refinementDir,'refine.mtz')):
             self.mtzRefine=os.path.join(self.reference_directory,self.refinementDir,'refine.mtz')
-            self.mtzRefine_label.set_text('Refine_'+str(self.Serial)+'/refine.mtz')
+            mtzRefineReal = os.path.realpath(os.path.join(self.reference_directory,self.refinementDir,'refine.mtz'))
+            mtzRefineCurrent = mtzRefineReal.replace(os.path.join(self.reference_directory,self.refinementDir+'/'),'')
+            self.mtzRefine_label.set_text(mtzRefineCurrent)
             coot.set_default_initial_contour_level_for_map(1)
             if os.path.isfile(os.path.join(self.reference_directory,self.refinementDir,self.mtz_style)):
                 coot.auto_read_make_and_draw_maps(os.path.join(self.reference_directory,self.refinementDir,self.mtz_style))
@@ -568,52 +580,61 @@ class GUI(object):
             self.mtzRefine_label.set_text('missing file')
             self.Logfile.warning('cannot find file with F,SIGF and FreeR_flag; cannot start refinement')
 
+        groundStateMap = os.path.join(self.reference_directory,Root+'-mean-map.native.ccp4').replace('.pdb','')
+        print '===>',groundStateMap
+        if os.path.isfile(groundStateMap):
+            imol=coot.handle_read_ccp4_map(groundStateMap,0)
+            coot.set_contour_level_in_sigma(imol,1)
+            coot.set_last_map_colour(0.6,0.6,0)
+        else:
+            print '==> XCE: ERROR - cannot find ground state mean map!'
+
         self.RefreshData()
 
-    def load_ground_state_map(self,widget):
-        self.spinnerBox.add(self.refinementRunning)
-        self.refinementRunning.start()
-        self.status_label.set_text('loading ground state maps by reso...')
-        self.source_id = gobject.timeout_add(100, self.load_ground_state_map_thread)
+#    def load_ground_state_map(self,widget):
+#        self.spinnerBox.add(self.refinementRunning)
+#        self.refinementRunning.start()
+#        self.status_label.set_text('loading ground state maps by reso...')
+#        self.source_id = gobject.timeout_add(100, self.load_ground_state_map_thread)
 
 
-    def load_ground_state_map_thread(self):
-        self.spinnerBox.add(self.refinementRunning)
-        self.refinementRunning.show()
-        self.refinementRunning.start()
+#    def load_ground_state_map_thread(self):
+#        self.spinnerBox.add(self.refinementRunning)
+#        self.refinementRunning.show()
+#        self.refinementRunning.start()
+#
+#        # first remove all ground state maps files
+#        if len(coot_utils_XChem.molecule_number_list()) > 0:
+#            for item in coot_utils_XChem.molecule_number_list():
+#                if 'ground-state-mean-map' in coot.molecule_name(item):
+#                    coot.close_molecule(item)
+#
+#        # first remove all entries for self.cb_select_mean_map_by_resolution
+#        # clear CB first, 100 is sort of arbitrary since it's unlikely there will ever be 100 maps
+#        for n in range(-1,100):
+#            self.cb_select_mean_map_by_resolution.remove_text(0)
+#
+#        self.status_label.set_text('loading ground state maps')
+#        self.get_highest_reso_ground_state_map()
+#        blueStart=0.02
+#        for map in self.ground_state_map_List:
+#            self.cb_select_mean_map_by_resolution.append_text(map[0])
+#            imol=coot.handle_read_ccp4_map((map[1]),0)
+#            coot.set_contour_level_in_sigma(imol,1)
+#            coot.set_last_map_colour(0.74,0.44,blueStart)
+#            blueStart+=0.05
+#        # show only highest resolution map to start with
+#        self.show_highres_ground_state_map()
+#        self.cb_select_mean_map_by_resolution.set_active(0)
+#        self.end_thread('')
 
-        # first remove all ground state maps files
-        if len(coot_utils_XChem.molecule_number_list()) > 0:
-            for item in coot_utils_XChem.molecule_number_list():
-                if 'ground-state-mean-map' in coot.molecule_name(item):
-                    coot.close_molecule(item)
-
-        # first remove all entries for self.cb_select_mean_map_by_resolution
-        # clear CB first, 100 is sort of arbitrary since it's unlikely there will ever be 100 maps
-        for n in range(-1,100):
-            self.cb_select_mean_map_by_resolution.remove_text(0)
-
-        self.status_label.set_text('loading ground state maps')
-        self.get_ground_state_maps_by_resolution()
-        blueStart=0.02
-        for map in self.ground_state_map_List:
-            self.cb_select_mean_map_by_resolution.append_text(map[0])
-            imol=coot.handle_read_ccp4_map((map[1]),0)
-            coot.set_contour_level_in_sigma(imol,1)
-            coot.set_last_map_colour(0.74,0.44,blueStart)
-            blueStart+=0.05
-        # show only highest resolution map to start with
-        self.show_highres_ground_state_map()
-        self.cb_select_mean_map_by_resolution.set_active(0)
-        self.end_thread('')
-
-    def show_highres_ground_state_map(self):
-        if len(self.ground_state_map_List) >= 1:
-            for imol in coot_utils_XChem.molecule_number_list():
-                if coot.molecule_name(imol) in self.ground_state_map_List[0][1]:
-                    coot.set_map_displayed(imol,1)
-                elif 'ground-state-mean-map' in coot.molecule_name(imol):
-                    coot.set_map_displayed(imol,0)
+#    def show_highres_ground_state_map(self):
+#        if len(self.ground_state_map_List) >= 1:
+#            for imol in coot_utils_XChem.molecule_number_list():
+#                if coot.molecule_name(imol) in self.ground_state_map_List[0][1]:
+#                    coot.set_map_displayed(imol,1)
+#                elif 'ground-state-mean-map' in coot.molecule_name(imol):
+#                    coot.set_map_displayed(imol,0)
 
 #    def show_all_ground_state_map(self):
 #        if len(self.ground_state_map_List) >= 1:
@@ -621,17 +642,17 @@ class GUI(object):
 #                if 'ground-state-mean-map' in coot.molecule_name(imol):
 #                    coot.set_map_displayed(imol,1)
 
-    def show_selected_mean_map(self,widget):
-        reso=str(self.cb_select_mean_map_by_resolution.get_active_text())
-        mapToshow=''
-        for maps in self.ground_state_map_List:
-            if maps[0]==reso:
-                mapToshow=maps[1]
-        for imol in coot_utils_XChem.molecule_number_list():
-            if coot.molecule_name(imol) in mapToshow:
-                coot.set_map_displayed(imol,1)
-            elif 'ground-state-mean-map' in coot.molecule_name(imol):
-                coot.set_map_displayed(imol,0)
+#    def show_selected_mean_map(self,widget):
+#        reso=str(self.cb_select_mean_map_by_resolution.get_active_text())
+#        mapToshow=''
+#        for maps in self.ground_state_map_List:
+#            if maps[0]==reso:
+#                mapToshow=maps[1]
+#        for imol in coot_utils_XChem.molecule_number_list():
+#            if coot.molecule_name(imol) in mapToshow:
+#                coot.set_map_displayed(imol,1)
+#            elif 'ground-state-mean-map' in coot.molecule_name(imol):
+#                coot.set_map_displayed(imol,0)
 
     def show_molprobity_to_do(self,widget):
         if os.path.isfile(os.path.join(self.reference_directory,self.refinementDir,'Refine_'+str(self.Serial-1),'molprobity_coot.py')):
@@ -652,20 +673,32 @@ class GUI(object):
 
     def get_ground_state_maps_by_resolution(self):
         found=False
-        self.ground_state_map_List=[]
+        mapList=[]
         for logFile in glob.glob(os.path.join(self.reference_directory,str(self.cb_select_mean_map.get_active_text()),'logs','*.log')):
             for n,line in enumerate(open(logFile)):
                 if line.startswith('Statistical Electron Density Characterisation') and len(line.split()) == 6:
-                    resolution=line.split()[5]
+#                    try:
+#                    resolution=float(line.split()[5])
+                    resolution=line.split()[5] 
+                    print resolution
                     found=True
                     foundLine=n
+#                    except ValueError:
+#                        print 'error'
+#                        break
                 if found and n==foundLine+3:
                     xtal=line.split(',')[0].replace(' ','').replace('\t','')
                     meanmap=os.path.join(self.reference_directory,self.cb_select_mean_map.get_active_text(),'processed_datasets',xtal,xtal+'-ground-state-mean-map.native.ccp4')
-                    self.ground_state_map_List.append([resolution,meanmap])
+                    mapList.append([resolution,meanmap])
                     found=False
-        return self.ground_state_map_List
+        return mapList
 
+    def get_highest_reso_ground_state_map(self):
+        mapList = self.get_ground_state_maps_by_resolution()
+        print mapList
+        self.ground_state_map_List=[]
+        self.ground_state_map_List.append(min(mapList, key=lambda x: x[0]))
+        return self.ground_state_map_List
 
 
 if __name__=='__main__':

@@ -498,7 +498,7 @@ class run_pandda_analyse(QtCore.QThread):
             for i in range(number_of_cyles):
                 Cmds += (
                     'pandda.analyse '+
-                    ' data_dirs="'+self.data_directory+'"'
+                    ' data_dirs="'+self.data_directory.replace('/*','')+'/*"'+
                     ' out_dir="'+self.panddas_directory+'"'
                     ' min_build_datasets='+self.min_build_datasets+
                     ' max_new_datasets='+self.max_new_datasets+
