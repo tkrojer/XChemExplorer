@@ -1089,9 +1089,9 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
 
             uniqueify = ''
             if 'FreeR_flag' in mtz.object(mtzin).column_labels():
-                uniqueify = 'uniqueify -f FreeR_flag ' + mtzin + '\n'
+                uniqueify = 'uniqueify -f FreeR_flag ' + mtzin + ' ' + xtal + '-unique.mtz' + '\n'
             else:
-                uniqueify = 'uniqueify ' + mtzin + '\n'
+                uniqueify = 'uniqueify ' + mtzin + ' ' + xtal + '-unique.mtz' + '\n'
 
 
             db_dict={}
@@ -1156,7 +1156,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     '\n'
                     '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(database,xtal,'DimpleStatus','running') +
                     '\n'
-                    + uniqueify + ' %s-unique.mtz' %(xtal) +
+                    + uniqueify +
                     '\n'
 
                     'dimple --no-cleanup %s-unique.mtz %s %s %s dimple\n' %(xtal,ref_pdb,ref_mtz,ref_cif) +
