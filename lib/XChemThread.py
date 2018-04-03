@@ -1141,6 +1141,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     '\n'
                     'source $XChemExplorer_DIR/setup-scripts/xce.setup-sh\n'
                     '\n'
+                    'module unload ccp4\n'
                     'source /dls/science/groups/i04-1/software/pandda-update/ccp4/ccp4-7.0/bin/ccp4.setup-sh\n'
                     +ccp4_scratch+
                     '\n'
@@ -1353,6 +1354,7 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
                 '\n'
                 'source $XChemExplorer_DIR/setup-scripts/xce.setup-sh\n'
                 '\n'
+                'module unload ccp4\n'
                 'source /dls/science/groups/i04-1/software/pandda-update/ccp4/ccp4-7.0/bin/ccp4.setup-sh\n'
                 +ccp4_scratch+
                 '\n'
