@@ -497,13 +497,10 @@ class run_pandda_analyse(QtCore.QThread):
 
             for i in range(number_of_cyles):
                 Cmds += (
-                    # 'module load pymol '+
-		            # '\n'+
                     'pandda.analyse '+
                     ' data_dirs="'+self.data_directory+'"'
                     ' out_dir="'+self.panddas_directory+'"'
                     ' min_build_datasets='+self.min_build_datasets+
-                    #' maps.ampl_label=FWT maps.phas_label=PHWT'
                     ' max_new_datasets='+self.max_new_datasets+
                     ' grid_spacing='+self.grid_spacing+
                     ' cpus='+self.nproc+
@@ -951,7 +948,7 @@ class convert_event_map_to_SF:
 
     def prepare_conversion_script(self):
 
-        os.chdir(os.path.join(self.project_directory,self.xtalID))
+        os.chdir(os.path.join(self.project_directory, self.xtalID))
 
         # see also:
         # http://www.phaser.cimr.cam.ac.uk/index.php/Using_Electron_Density_as_a_Model
