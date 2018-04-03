@@ -1089,9 +1089,9 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
 
             uniqueify = ''
             if 'FreeR_flag' in mtz.object(mtzin).column_labels():
-                uniqueify = 'uniqueify -f FreeR_flag ' + mtzin + '\n'
+                uniqueify = 'uniqueify -f FreeR_flag ' + mtzin + ' ' + xtal + '-unique.mtz' + '\n'
             else:
-                uniqueify = 'uniqueify ' + mtzin + '\n'
+                uniqueify = 'uniqueify ' + mtzin + ' ' + xtal + '-unique.mtz' + '\n'
 
 
             db_dict={}
@@ -1156,22 +1156,9 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     '\n'
                     '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(database,xtal,'DimpleStatus','running') +
                     '\n'
-                    + uniqueify + 
+                    + uniqueify +
                     '\n'
-#                    'unique hklout unique.mtz << eof\n'
-#                    ' cell %s\n' %str(mtztools(mtzin).get_unit_cell_from_mtz()).replace("'",'').replace('[','').replace(']','').replace(',','')+
-#                    ' symmetry %s\n' %mtztools(mtzin).get_spg_number_from_mtz()+
-#                    ' resolution %s\n' %mtztools(mtzin).get_high_resolution_from_mtz()+
-#                    'eof\n'
-#                    '\n'
-#                    'cad hklin1 %s hklin2 unique.mtz hklout %s.999A.mtz << eof\n' %(mtzin,xtal) +
-#                    ' monitor BRIEF\n'
-#                    ' labin file 1 ALL\n'
-#                    ' labin file 2 E1=F E2=SIGF\n'
-#                    ' labout file 2 E1=F_unique E2=SIGF_unique\n'
-#                    ' resolution file 1 999.0 %s\n' %mtztools(mtzin).get_high_resolution_from_mtz()+
-#                    'eof\n'
-#                    '\n'
+
                     'dimple --no-cleanup %s-unique.mtz %s %s %s dimple\n' %(xtal,ref_pdb,ref_mtz,ref_cif) +
                     '\n'
                     'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc,'dimple') +
