@@ -1135,7 +1135,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                             '/bin/rm fofc.map\n'
                             'ln -s dimple/dimple_rerun_on_selected_file/dimple/fofc.map .\n'
                             '\n'
-                            '$CCP4/libexec/python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_for_new_dimple_pdb.py')+
+                            '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_for_new_dimple_pdb.py')+
                             ' {0!s} {1!s} {2!s}\n'.format(os.path.join(self.database_directory,self.data_source_file), xtal, self.initial_model_directory)  )
 
             else:
@@ -1381,7 +1381,7 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
                 ' labin F1=FOFCWT PHI=PHFOFCWT\n'
                 'EOF\n'
                 '\n'
-                '$CCP4/libexec/python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_for_new_dimple_pdb.py')+
+                '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_for_new_dimple_pdb.py')+
                 ' {0!s} {1!s} {2!s}\n'.format(os.path.join(self.database_directory,self.data_source_file), xtal, self.initial_model_directory)+
                 '\n'
                 '/bin/rm dimple_run_in_progress\n'
