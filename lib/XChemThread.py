@@ -1063,6 +1063,8 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
         db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
         database=os.path.join(self.database_directory,self.data_source_file)
 
+        print(self.sample_list)
+
         for n,item in enumerate(self.sample_list):
 
             xtal =                  item[0]
@@ -1141,6 +1143,18 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             else:
                 additional_cmds=''
 
+            mtzdmp = subprocess.Popen(['mtzdmp', os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc, str(xtal + '-unique.mtz'))], stdout=subprocess.PIPE)
+            resolution_high = 'n/a'
+            resolution_line = 1000000
+            for n, line in enumerate(iter(mtzdmp.stdout.readline, '')):
+
+                if line.startswith(' *  Resolution Range :'):
+                    resolution_line = n + 2
+                if n == resolution_line and len(line.split()) == 8:
+                    resolution_high = line.split()[5]
+
+            # print(resolution_high)
+
             Cmds = (
                     '{0!s}\n'.format(top_line)+
                     '\n'
@@ -1162,7 +1176,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     'monitor BRIEF\n'
                     'labin file 1 -\n' 
                     '    ALL\n'
-                    #'resolution file 1 999.0 HIGHRES\n'
+                    'resolution file 1 999.0 %s\n' %(resolution_high) +
                     'eof\n'
                     'dimple --no-cleanup %s-unique-2.mtz %s %s %s dimple\n' %(xtal,ref_pdb,ref_mtz,ref_cif) +
                     '\n'
@@ -1185,6 +1199,8 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     'ln -s dimple/final.pdb .\n'
                     'ln -s dimple/final.mtz .\n'
                     )
+
+            # print(Cmds)
 
             os.chdir(self.ccp4_scratch_directory)
             f = open('xce_dimple_{0!s}.sh'.format(str(n+1)),'w')
