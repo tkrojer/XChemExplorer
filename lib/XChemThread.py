@@ -1144,7 +1144,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                 additional_cmds=''
 
             mtzdmp = subprocess.Popen(['mtzdmp', os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc, str(xtal + '-unique.mtz'))], stdout=subprocess.PIPE)
-            resolution_high = 'n/a'
+            resolution_high = 0.1
             resolution_line = 1000000
             for n, line in enumerate(iter(mtzdmp.stdout.readline, '')):
 
