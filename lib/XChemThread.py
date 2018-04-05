@@ -1146,14 +1146,14 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             mtzdmp = subprocess.Popen(['mtzdmp', os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc, str(xtal + '-unique.mtz'))], stdout=subprocess.PIPE)
             resolution_high = 0.1
             resolution_line = 1000000
-            for n, line in enumerate(iter(mtzdmp.stdout.readline, '')):
+            for m, line in enumerate(iter(mtzdmp.stdout.readline, '')):
 
                 if line.startswith(' *  Resolution Range :'):
-                    resolution_line = n + 2
-                if n == resolution_line and len(line.split()) == 8:
+                    resolution_line = m + 2
+                if m == resolution_line and len(line.split()) == 8:
                     resolution_high = line.split()[5]
 
-            # print(resolution_high)
+            print('High resolution limit = ' + str(resolution_high) + ' (if = 0.1 then mtzdmp failed to read high res limit)')
 
             Cmds = (
                     '{0!s}\n'.format(top_line)+
