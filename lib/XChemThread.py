@@ -1159,10 +1159,10 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     + uniqueify +
                     '\n'
                     'cad hklin1 %s hklout %s <<eof\n' %(str(xtal + '-unique.mtz'), str(xtal + '-unique-2.mtz')) +
-                   'monitor BRIEF\n'
-                   'labin file 1 -\n' 
-                   'ALL\n'
-                   'resolution file 1 999.0 HIGHRES\n'
+                    'monitor BRIEF\n'
+                    'labin file 1 -\n' 
+                    '    ALL\n'
+                    #'resolution file 1 999.0 HIGHRES\n'
                     'eof\n'
                     'dimple --no-cleanup %s-unique-2.mtz %s %s %s dimple\n' %(xtal,ref_pdb,ref_mtz,ref_cif) +
                     '\n'
