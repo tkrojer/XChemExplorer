@@ -30,6 +30,8 @@ import XChemDB
 import XChemLog
 import XChemMain
 
+import iotbx.mtz
+
 
 class update_datasource_from_file_system(QtCore.QThread):
     def __init__(self,initial_model_directory,datasource,panddas_directory,xce_logfile):
@@ -1143,17 +1145,9 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             else:
                 additional_cmds=''
 
-            mtzdmp = subprocess.Popen(['mtzdmp', os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc, str(xtal + '-unique.mtz'))], stdout=subprocess.PIPE)
             resolution_high = 0.1
-            resolution_line = 1000000
-            for m, line in enumerate(iter(mtzdmp.stdout.readline, '')):
-
-                if line.startswith(' *  Resolution Range :'):
-                    resolution_line = m + 2
-                if m == resolution_line and len(line.split()) == 8:
-                    resolution_high = line.split()[5]
-
-            print('High resolution limit = ' + str(resolution_high) + ' (if = 0.1 then mtzdmp failed to read high res limit)')
+            o = iotbx.mtz.object(mtzin)
+            low, high = o.max_min_resolution()
 
             Cmds = (
                     '{0!s}\n'.format(top_line)+
@@ -1176,7 +1170,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     'monitor BRIEF\n'
                     'labin file 1 -\n' 
                     '    ALL\n'
-                    'resolution file 1 999.0 %s\n' %(resolution_high) +
+                    'resolution file 1 999.0 %s\n' %(high) +
                     'eof\n'
                     'dimple --no-cleanup %s-unique-2.mtz %s %s %s dimple\n' %(xtal,ref_pdb,ref_mtz,ref_cif) +
                     '\n'
