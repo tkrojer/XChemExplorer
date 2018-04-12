@@ -10,7 +10,6 @@ sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'gui_scripts'))
 
 from settings_preferences import setup
 
-from proasis_functions import Proasis
 import XChemToolTips
 import XChemMain
 
