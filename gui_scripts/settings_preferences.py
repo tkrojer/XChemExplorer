@@ -7,8 +7,6 @@ sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'lib'))
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'gui_scripts'))
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'web'))
 
-from proasis_functions import Proasis
-
 import XChemUtils
 import XChemDB
 import XChemMain
@@ -424,12 +422,6 @@ class setup():
                                                   ]],
                                 'E: proasis': ["Proasis",
                                                [
-                                                   [str(xce_object.proasis_project_label), '',
-                                                    xce_object.proasis_project_function],
-                                                   [str(xce_object.proasis_lead_label), '',
-                                                    xce_object.proasis_lead_function],
-                                                   [str(xce_object.proasis_hits_label), '',
-                                                    xce_object.proasis_hits_function],
                                                    ['Launch Proasis in browser', '', partial(webbrowser.open,
                                                                                              url='http://cs04r-sc-vserv-137.diamond.ac.uk/Proasis4_2017/')]
                                                ]],

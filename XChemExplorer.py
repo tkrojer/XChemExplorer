@@ -38,7 +38,6 @@ sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'), 'gui_scripts'))
 from settings_preferences import *
 from layout import *
 from stylesheet import set_stylesheet
-from proasis_functions import Proasis
 
 
 from XChemUtils import parse
@@ -79,7 +78,6 @@ class XChemExplorer(QtGui.QApplication):
         setup().settings(self)
         setup().preferences(self)
         setup().tables(self)
-        Proasis().proasis_menu(self)
 
         self.layout_funcs = LayoutFuncs()
 
