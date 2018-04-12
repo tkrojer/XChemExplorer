@@ -16,6 +16,7 @@ import getpass
 import csv
 
 from iotbx import mtz
+from iotbx.reflection_file_reader import any_reflection_file
 
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 from XChemUtils import process
@@ -1091,12 +1092,11 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
 #                        self.Logfile.insert('found Rfree set with other column name though: {0!s}'.format(str(mtz_column_dict['RFREE'])))
 #                        self.Logfile.insert('try renaming Rfree column to FreeR_flag with CAD!')
 
-            uniqueify = ''
-            if 'FreeR_flag' in mtz.object(mtzin).column_labels():
-                uniqueify = 'uniqueify -f FreeR_flag ' + mtzin + ' ' + xtal + '-unique.mtz' + '\n'
-            else:
-                uniqueify = 'uniqueify ' + mtzin + ' ' + xtal + '-unique.mtz' + '\n'
-
+#            uniqueify = ''
+#            if 'FreeR_flag' in mtz.object(mtzin).column_labels():
+#                uniqueify = 'uniqueify -f FreeR_flag ' + mtzin + ' ' + xtal + '-unique.mtz' + '\n'
+#            else:
+#                uniqueify = 'uniqueify ' + mtzin + ' ' + xtal + '-unique.mtz' + '\n'
 
             db_dict={}
             db_dict['DimpleReferencePDB']=ref_pdb
@@ -1145,9 +1145,14 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             else:
                 additional_cmds=''
 
-            resolution_high = 0.1
-            o = iotbx.mtz.object(mtzin)
-            low, high = o.max_min_resolution()
+#            resolution_high = 0.1
+#            o = iotbx.mtz.object(mtzin)
+#            low, high = o.max_min_resolution()
+            hkl = any_reflection_file(file_name=mtzin)
+            miller_arrays = hkl.as_miller_arrays()
+            mtzFile = miller_arrays[0]
+
+            symNoAbsence = str([x[0] for x in str(mtzFile.space_group_info().symbol_and_number().split('(')[0]).split()]).replace('[','').replace(']','').replace("'","").replace(',','').replace(' ','')
 
             Cmds = (
                     '{0!s}\n'.format(top_line)+
@@ -1164,17 +1169,43 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     '\n'
                     '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(database,xtal,'DimpleStatus','running') +
                     '\n'
-                    + uniqueify +
-                    '\n'
-                    'cad hklin1 %s hklout %s <<eof\n' %(str(xtal + '-unique.mtz'), str(xtal + '-unique-2.mtz')) +
-                    'monitor BRIEF\n'
-                    'labin file 1 -\n' 
-                    '    ALL\n'
-                    'resolution file 1 999.0 %s\n' %(high) +
+                    'unique hklout unique.mtz << eof\n'
+                    ' cell %s\n' %str([round(float(i),2) for i in mtzFile.unit_cell().parameters()]).replace('[','').replace(']','')+
+                    ' symmetry %s\n' %symNoAbsence+
+                    ' resolution %s\n' %str(round(float(mtzFile.d_min()),3))+
                     'eof\n'
-                    'dimple --no-cleanup %s-unique-2.mtz %s %s %s dimple\n' %(xtal,ref_pdb,ref_mtz,ref_cif) +
+                    '\n'
+#                    'freerflag hklin unique.mtz hklout free.mtz > freerflag.log\n'
+                    '\n'
+                    'sftools << eof > sftools.log\n'
+                    ' read unique.mtz\n'
+                    ' calc col F = 10.0\n'
+                    ' calc col SIGF = 1.0\n'
+                    ' write sftools.mtz\n'
+                    'eof\n'
+                    '\n'
+                    'cad hklin1 sftools.mtz hklin2 %s hklout %s.999A.mtz << eof\n' %(mtzin,xtal) +
+                    ' monitor BRIEF\n'
+                    ' labin file 1 E1=F E2=SIGF\n'
+                    ' labout file 1 E1=F_unique E2=SIGF_unique\n'
+                    ' labin file 2 ALL\n'
+                    ' resolution file 1 999.0 %s\n' %str(round(float(mtzFile.d_min()),2))+
+                    'eof\n'
+                    '\n'
+                    'dimple --no-cleanup %s.999A.mtz %s %s %s dimple\n' %(xtal,ref_pdb,ref_mtz,ref_cif) +
                     '\n'
                     'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc,'dimple') +
+#                    + uniqueify +
+#                    '\n'
+#                    'cad hklin1 %s hklout %s <<eof\n' %(str(xtal + '-unique.mtz'), str(xtal + '-unique-2.mtz')) +
+#                    'monitor BRIEF\n'
+#                    'labin file 1 -\n' 
+#                    '    ALL\n'
+#                    'resolution file 1 999.0 %s\n' %(high) +
+#                    'eof\n'
+#                    'dimple --no-cleanup %s-unique-2.mtz %s %s %s dimple\n' %(xtal,ref_pdb,ref_mtz,ref_cif) +
+#                    '\n'
+#                    'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc,'dimple') +
                     '\n'
                     'fft hklin final.mtz mapout 2fofc.map << EOF\n'
                     ' labin F1=FWT PHI=PHWT\n'
