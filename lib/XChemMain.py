@@ -489,18 +489,16 @@ def linkAutoProcessingResult(xtal,dbDict,projectDir,xce_logfile):
     os.chdir(os.path.join(projectDir,xtal))
 
     # MTZ file
-    if os.path.isfile(xtal+'.mtz'):
-        Logfile.warning('removing %s.mtz' %xtal)
-        os.system('/bin/rm %s.mtz' %xtal)
+    Logfile.warning('removing %s.mtz' %xtal)
+    os.system('/bin/rm %s.mtz' %xtal)
     print xtal,os.path.join('autoprocessing', visit + '-' + run + autoproc, mtzfile)
     if os.path.isfile(os.path.join('autoprocessing', visit + '-' + run + autoproc, mtzfile)):
         os.symlink(os.path.join('autoprocessing', visit + '-' + run + autoproc, mtzfile), xtal + '.mtz')
         Logfile.insert('linking MTZ file from different auto-processing pipeline:')
         Logfile.insert('ln -s ' + os.path.join('autoprocessing', visit + '-' + run + autoproc, mtzfile) + ' ' + xtal + '.mtz')
     # LOG file
-    if os.path.isfile(xtal+'.log'):
-        Logfile.warning('removing %s.log'  %xtal)
-        os.system('/bin/rm %s.log' %xtal)
+    Logfile.warning('removing %s.log'  %xtal)
+    os.system('/bin/rm %s.log' %xtal)
     if os.path.isfile(os.path.join('autoprocessing', visit + '-' + run + autoproc, logfile)):
         os.symlink(os.path.join('autoprocessing', visit + '-' + run + autoproc, logfile), xtal + '.log')
         Logfile.insert('linking LOG file from different auto-processing pipeline:')
@@ -629,6 +627,330 @@ def phasing_software():
 
     return software
 
+def html_header():
+    header = (
+        '<html>\n'
+        '<head>\n'
+        '<link rel="stylesheet" type="text/css" href="css/jquery.dataTables.min.css">\n'
+        '<link rel="stylesheet" type="text/css" href="css/custom-fragment.css">\n'
+        '<meta http-equiv="Content-type" content="text/html; charset=utf-8">\n'
+        '<meta name="viewport" content="width=device-width,initial-scale=1">\n'
+        '<title>Summary Fragment Hits</title>\n'
+        '<script type="text/javascript" language="javascript" src="js/jquery-1.12.3.min.js">\n'
+        '</script>\n'
+        '<script type="text/javascript" language="javascript" src="js/jquery.dataTables.min.js">\n'
+        '</script>\n'
+        '<script type="text/javascript" class="init">\n'
+        "$(document).ready(function() {\n"
+        "$('#example').DataTable( {\n"
+        "scrollY:        '90vh',\n"
+        "scrollCollapse: true,\n"
+        "paging:         false,\n"
+        "'bautoWidth': false,\n"
+        "'columns': [\n"
+        "{ 'width': '12%' },\n"
+        "{ 'width': '10%' },\n"
+        "{ 'width': '9%' },\n"
+        "{ 'width': '14%' },\n"
+        "{ 'width': '14%' },\n"
+        "{ 'width': '9%' },\n"
+        "{ 'width': '7%' },\n"
+        "{ 'width': '17%' },\n"
+        "{ 'width': '8%' },\n"
+        "]\n"
+        "} )\n"
+        "} );\n"
+        'stage = undefined;\n'
+        '</script>\n'
+        '<script src="https://unpkg.com/ngl@next"></script>\n'
+        '</head>\n'
+        '<body class="xchem">\n'
+        '    <script >'+"""
+    function create_stage(){// Create NGL Stage object
+    stage = new NGL.Stage("viewport");
+
+	stage.setParameters({
+	  cameraType: 'orthographic',
+	  mousePreset: 'coot'
+	})
+
+    // Handle window resizing
+    window.addEventListener( "resize", function( event ){
+        stage.handleResize();
+    }, false );        
+}
+
+		function addElement (el) {
+		  Object.assign(el.style, {
+		    position: 'absolute',
+		    zIndex: 10
+		  })
+		  stage.viewer.container.appendChild(el)
+		}
+
+		function createElement (name, properties, style) {
+		  var el = document.createElement(name)
+		  Object.assign(el, properties)
+		  Object.assign(el.style, style)
+		  return el
+		}
+
+
+            function create_view(div_name,pdb_bound,event_name,FWT,DELFWT,lig_name) {
+    // Code for example: test/map-shift
+    if (stage==undefined){
+     create_stage();
+    }
+    else{
+      var components = stage.getComponentsByName();
+      for (var component in components.list) {
+        stage.removeComponent(components.list[component]);
+     } 
+    }
+    Promise.all( [
+    stage.loadFile( window.location.href.replace("index.html",event_name)),
+    stage.loadFile( window.location.href.replace("index.html",pdb_bound)),
+    stage.loadFile( window.location.href.replace("index.html",FWT)),
+    stage.loadFile( window.location.href.replace("index.html",DELFWT))
+        ] ).then( function( ol ){
+        var map = ol[ 0 ];
+        var struc = ol[ 1 ];
+        var fwt = ol[ 2 ];
+        var delfwt = ol[ 3 ];
+		var strucSurf = ol[1];
+        struc.autoView(lig_name)
+        var eventMap = map.addRepresentation( "surface", {
+            boxSize: 10,
+            useWorker: false,
+            wrap: true,
+            color: "purple",
+            contour: true
+        } );
+        var fwtMap = fwt.addRepresentation( "surface", {
+            boxSize: 10,
+            useWorker: false,
+            wrap: true,
+            color: "skyblue",
+            isolevel: 1.0,
+            contour: true
+        } );
+        fwtMap.toggleVisibility()
+
+        var surfFofc = delfwt.addRepresentation('surface', {
+            boxSize: 10,
+            useWorker: false,
+            wrap: true,
+            color: "green",
+            isolevel: 3.0,
+            contour: true
+            });
+          surfFofc.toggleVisibility()
+
+        var surfFofcNeg = delfwt.addRepresentation('surface', {
+            boxSize: 10,
+            useWorker: false,
+            wrap: true,
+            color: "red",
+            isolevel: 3.0,
+            negateIsolevel: true,
+            contour: true
+            });
+          surfFofcNeg.toggleVisibility()
+
+
+		var strucSurfdispay = strucSurf.addRepresentation("surface", {
+	        sele: "polymer",
+	        colorScheme: "electrostatic",
+            colorDomain: [ -0.3, 0.3 ],
+    	    surfaceType: "av"
+		  })
+		strucSurfdispay.toggleVisibility()
+
+        
+        struc.addRepresentation( "licorice" );
+        struc.addRepresentation( "licorice", { sele: "hetero" } );
+
+		var selection = new NGL.Selection("(( not polymer or hetero ) and not ( water or ion ))");
+		var radius = 5;
+		var atomSet = struc.structure.getAtomSetWithinSelection( selection, radius );
+		var atomSet2 = struc.structure.getAtomSetWithinGroup( atomSet );
+		var sele2 = atomSet2.toSeleString();            
+
+		var interaction = struc.addRepresentation('contact', {masterModelIndex: 0,
+			maxHbondDonPlaneAngle: 35,
+			linewidth: 1,
+			sele: sele2 + " or LIG"
+			});
+
+        stage.setFocus( 95 );
+
+		stage.mouseControls.add('scroll', function () {
+		  if (fwtMap) {
+		    var level2fofc = fwtMap.getParameters().isolevel.toFixed(1)
+		    isolevel2fofcText.innerText = '2fofc level: ' + level2fofc + '\u03C3'
+		  }
+		  if (surfFofc) {
+		    var levelFofc = surfFofc.getParameters().isolevel.toFixed(1)
+		    isolevelFofcText.innerText = 'fofc level: ' + levelFofc + '\u03C3'
+		  }
+		})
+        
+		var toggleEventButton = createElement('input', {
+		  type: 'button',
+		  value: 'toggle Event map',
+		  onclick: function (e) {
+		    eventMap.toggleVisibility()
+		  }
+			}, { top: '420px', left: '12px' })
+		addElement(toggleEventButton)
+
+		var toggleFWTButton = createElement('input', {
+		  type: 'button',
+		  value: 'toggle 2fofc Map',
+		  onclick: function (e) {
+		    fwtMap.toggleVisibility()
+		  }
+			}, { top: '450px', left: '12px' })
+		addElement(toggleFWTButton)
+
+        var toggleFofcButton = createElement('input', {
+          type: 'button',
+          value: 'toggle fofc map',
+          onclick: function (e) {
+          surfFofc.toggleVisibility()
+          surfFofcNeg.toggleVisibility()
+          }
+        }, { top: '480px', left: '12px' })
+        addElement(toggleFofcButton)
+
+        var toggleInteractionButton = createElement('input', {
+          type: 'button',
+          value: 'toggle Interactions',
+          onclick: function (e) {
+          interaction.toggleVisibility()
+          }
+        }, { top: '510px', left: '12px' })
+        addElement(toggleInteractionButton)
+
+        var surfaceButton = createElement('input', {
+          type: 'button',
+          value: 'toggle surface',
+          onclick: function (e) {
+          strucSurfdispay.toggleVisibility()
+          }
+        }, { top: '540px', left: '12px' })
+        addElement(surfaceButton)
+
+		var screenshotButton = createElement('input', {
+		  type: 'button',
+		  value: 'screenshot',
+		  onclick: function () {
+		    stage.makeImage({
+		      factor: 1,
+		      antialias: false,
+		      trim: false,
+		      transparent: false
+		    }).then(function (blob) {
+		      NGL.download(blob, 'ngl-xray-viewer-screenshot.png')
+		    })
+		  }
+		}, { top: '570px', left: '12px' })
+		addElement(screenshotButton)
+        
+        
+    } );
+    };
+        """+
+        '</script>\n'
+        '\n'
+        '    <div class="viewport-wrapper">\n'
+        '    <div id="viewport" style="width:800px;height:600px"></div>\n'
+        '    </div>\n'
+        '\n'
+        '<p></p>\n'
+        '</ul><table id="example" class="display" cellspacing="0">\n'
+        '<thead>\n'
+        '<tr>\n'
+        '<th>Crystal ID</th>\n'
+        '<th>PDB ID</th>\n'
+        '<th>Ligand ID</th>\n'
+        '<th>Compound</th>\n'
+        '<th>Ligand Validation</th>\n'
+        '<th>Event Map 3D</th>\n'
+        '<th>Resol</th>\n'
+        '<th>SPG/ Cell</th>\n'
+        '<th>Files</th>\n'
+        '</tr>\n'
+        '</thead>\n'
+        '<tbody>\n'
+    )
+
+    return header
+
+
+def html_table_row(xtalID,pdbID,ligID,compoundImage,residuePlot,pdb,event,thumbNail,resoHigh,spg,unitCell,FWT,DELFWT):
+
+    row = (
+        '<tr>\n'
+        '<td>%s</td>\n' %xtalID +
+        '<td><a target="_blank" href="http://www.rcsb.org/structure/%s">%s</a></td>\n' %(pdbID,pdbID) +
+        '<td>%s</td>\n' %ligID +
+        "<td><img src='png/%s' height=130px></td>\n" %compoundImage +
+        "<td><img src='png/%s' height=153px></td>\n" %residuePlot +
+        "<td><div id='%s' class='map'><a onclick=create_view('viewport','files/%s','files/%s','files/%s','files/%s','LIG')><img src='png/%s'></a></div></td>\n" %(pdbID,pdb,event,FWT,DELFWT,thumbNail) +
+        '<td>%s</td>\n' %resoHigh +
+        '<td>%s </br> %s</td>\n' %(spg,unitCell) +
+        "<td><a href='download/%s_%s.zip'>Save</a></td>\n" %(pdb.replace('.pdb',''),ligID) +
+        '</tr>\n'
+    )
+
+    return row
+
+def html_footer():
+
+    footer = (
+        '</tbody>\n'
+        '</table>\n'
+        '</body>\n'
+        '</html>\n'
+    )
+
+    return footer
+
+def coot_prepare_input(x,y,z,ligID,sampleDir,eventMap):
+
+    os.chdir(sampleDir)
+    cmd = (
+        '# !/usr/bin/env coot\n'
+        '# python script for coot - generated by dimple\n'
+        'import coot\n'
+        'set_nomenclature_errors_on_read("ignore")\n'
+        'molecule = read_pdb("refine.split.bound-state.pdb")\n'
+        'set_rotation_centre(%s, %s, %s)\n' %(x,y,z) +
+        'set_zoom(30.)\n'
+        'set_view_quaternion(-0.180532, -0.678828, 0, 0.711759)\n'
+        'coot.handle_read_ccp4_map(("%s"),0)\n' %eventMap +
+#        'mtz = "final.mtz"\n'
+#        'map21 = make_and_draw_map(mtz, "FWT", "PHWT", "", 0, 0)\n'
+#        'map11 = make_and_draw_map(mtz, "DELFWT", "PHDELWT", "", 0, 1)\n'
+        'coot.raster3d("%s.r3d")\n' %ligID +
+        'coot_real_exit(0)\n'
+    )
+    f = open(ligID+'.py', 'w')
+    f.write(cmd)
+    f.close()
+
+def coot_write_raster_file(ligID,sampleDir):
+    os.chdir(sampleDir)
+    os.system('coot --no-graphics --no-guano --script %s.py' %ligID)
+
+def render_scene(xtal,ligID,sampleDir):
+    os.chdir(sampleDir)
+    os.system('render < %s.r3d -png %s_%s.png' %(ligID,xtal,ligID))
+
+def make_thumbnail(xtal,ligID,sampleDir):
+    os.chdir(sampleDir)
+    os.system('convert -thumbnail 150x150 %s_%s.png %s_%s_thumb.png' %(xtal,ligID,xtal,ligID))
 
 class find_diffraction_image_directory(QtCore.QThread):
     def __init__(self,diffraction_data_directory):

@@ -1288,3 +1288,77 @@ class check_number_of_modelled_ligands(QtCore.QThread):
         if self.errorDict != {}:
             self.update_errorDict('General','The aforementioned PDB files were automatically changed by XCE!\nPlease check and refine them!!!')
         self.emit(QtCore.SIGNAL('show_error_dict'), self.errorDict)
+
+
+
+class find_event_map_for_ligand(QtCore.QThread):
+
+    def __init__(self,project_directory,xce_logfile):
+        QtCore.QThread.__init__(self)
+        self.Logfile=XChemLog.updateLog(xce_logfile)
+        self.project_directory=project_directory
+
+    def run(self):
+        self.Logfile.insert('======== checking ligand CC in event maps ========')
+        for dirs in sorted(glob.glob(os.path.join(self.project_directory,'*'))):
+            xtal = dirs[dirs.rfind('/')+1:]
+            if os.path.isfile(os.path.join(dirs,'refine.pdb')) and \
+               os.path.isfile(os.path.join(dirs,'refine.mtz')):
+                self.Logfile.insert('%s: found refine.pdb' %xtal)
+                os.chdir(dirs)
+                reso = XChemUtils.mtztools('refine.mtz').get_dmin()
+                ligList = XChemUtils.pdbtools('refine.pdb').save_residues_with_resname(dirs,'LIG')
+                self.Logfile.insert('%s: found %s ligands of type LIG in refine.pdb' %(xtal,str(len(ligList))))
+
+                for maps in glob.glob(os.path.join(dirs,'*event*.native.ccp4')):
+                    self.expand_map_to_p1(maps)
+                    self.convert_map_to_sf(maps.replace('.ccp4','.P1.ccp4'),reso)
+
+                summary = ''
+                for lig in sorted(ligList):
+                    for mtz in sorted(glob.glob(os.path.join(dirs,'*event*.native*P1.mtz'))):
+                        self.get_lig_cc(mtz,lig)
+                        cc = self.check_lig_cc(mtz.replace('.mtz', '_CC.log'))
+                        summary += '%s: %s LIG CC = %s (%s)\n' %(xtal,lig,cc,mtz[mtz.rfind('/')+1:])
+                self.Logfile.insert('\nsummary of CC analysis:\n======================:\n'+summary)
+
+    def expand_map_to_p1(self,emap):
+        self.Logfile.insert('expanding map to P1: %s' %emap)
+        if os.path.isfile(emap.replace('.ccp4','.P1.ccp4')):
+            self.Logfile.warning('P1 map exists; skipping...')
+            return
+        cmd = ( 'mapmask MAPIN %s MAPOUT %s << eof\n' %(emap,emap.replace('.ccp4','.P1.ccp4'))+
+                ' XYZLIM CELL\n'
+                ' PAD 0.0\n'
+                ' SYMMETRY 1\n'
+                'eof\n' )
+        os.system(cmd)
+
+    def convert_map_to_sf(self,emap,reso):
+        self.Logfile.insert('converting ccp4 map to mtz with phenix.map_to_structure_factors: %s' %emap)
+        if os.path.isfile(emap.replace('.ccp4','.mtz')):
+            self.Logfile.warning('mtz file of event map exists; skipping...')
+            return
+        cmd = ( 'module load phenix\n'
+                'phenix.map_to_structure_factors %s d_min=%s\n' %(emap,reso)+
+                '/bin/mv map_to_structure_factors.mtz %s' %emap.replace('.ccp4', '.mtz') )
+        os.system(cmd)
+
+    def get_lig_cc(self,mtz,lig):
+        self.Logfile.insert('calculating CC for %s in %s' %(lig,mtz))
+        if os.path.isfile(mtz.replace('.mtz', '_CC.log')):
+            self.Logfile.warning('logfile of CC analysis exists; skipping...')
+            return
+        cmd = ( 'module load phenix\n'
+                'phenix.get_cc_mtz_pdb %s %s > %s' % (mtz, lig, mtz.replace('.mtz', '_CC.log')) )
+        os.system(cmd)
+
+    def check_lig_cc(self,log):
+        cc = 'n/a'
+        if os.path.isfile(log):
+            for line in open(log):
+                if line.startswith('local'):
+                    cc = line.split()[len(line.split()) - 1]
+        else:
+            self.Logfile.error('logfile does not exist: %s' %log)
+        return cc
