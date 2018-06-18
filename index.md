@@ -100,7 +100,7 @@ That’s it!
 You can now run XCE by typing
 
 ```shell
-/Users/tobiaskrojer/Downloads/XChemExplorer-1.1/XChemExplorer
+/Users/tobiaskrojer/Downloads/XChemExplorer-1.2/XChemExplorer
 ```
 
 It may however be easier if you insert an alias into your .bashrc file:
@@ -133,9 +133,9 @@ rachael.skyner@diamond.ac.uk
 
 # Version History
 
-v1.2 - 18/06/2018
-v1.1 - 31/01/2018
-v1.0 - 10/08/2017
+* v1.2 - 18/06/2018
+* v1.1 - 31/01/2018
+* v1.0 - 10/08/2017
 
 
 # Links
