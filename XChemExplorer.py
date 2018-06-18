@@ -238,20 +238,23 @@ class XChemExplorer(QtGui.QApplication):
             if self.target == '=== SELECT TARGET ===':
                 msgBox = QtGui.QMessageBox()
                 warning = ('*** WARNING ***\n'
-                           'You did not select a target!\n'
-                           'In this case we will only parse the project directory!\n'
-                           'Please note that this option is usually only useful in case you reprocessed your data.\n'
-                           'Do you want to continue?')
+                           'Please select a target or\n'
+                           'select "=== project directory ===" if you want to read reprocessed results\n'
+                           'In case target list is empty, make sure that you have selected the actual\n'
+                           'data collection visit (e.g. /dls/i04-1/data/2018/lb18145-70)' )
                 msgBox.setText(warning)
-                msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.YesRole)
-                msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.RejectRole)
-                reply = msgBox.exec_();
-                if reply == 0:
-                    start_thread = True
-                else:
-                    start_thread = False
-            else:
-                start_thread = True
+                start_thread = False
+
+#                msgBox.setText(warning)
+#                msgBox.addButton(QtGui.QPushButton('Yes'), QtGui.QMessageBox.YesRole)
+#                msgBox.addButton(QtGui.QPushButton('No'), QtGui.QMessageBox.RejectRole)
+#                reply = msgBox.exec_();
+#                if reply == 0:
+#                    start_thread = True
+#                else:
+#                    start_thread = False
+#            else:
+#                start_thread = True
 
         if start_thread:
             self.work_thread = XChemThread.read_autoprocessing_results_from_disc(self.visit_list,
@@ -309,16 +312,18 @@ class XChemExplorer(QtGui.QApplication):
 
     def check_for_new_autoprocessing_results(self):
         self.update_log.insert('checking for new data collection')
-        start_thread = True
-        if start_thread:
-            if self.target == '=== SELECT TARGET ===':
-                try:
-                    start_thread = CheckAutoProcessing().query(self)
-                except:
-                    print("==> XCE: ERROR: NO TARGET SELECTED, PLEASE SELECT A TARGET AND TRY AGAIN!")
+        if self.target == '=== SELECT TARGET ===':
+            self.update_log.error('NO TARGET SELECTED, PLEASE SELECT A TARGET AND TRY AGAIN!')
+            start_thread = False
+        elif self.target == '=== project directory ===':
+            processedDir = self.initial_model_directory
+            start_thread = True
+        else:
+            processedDir = os.path.join(self.beamline_directory, 'processed', self.target)
+            start_thread = True
 
         if start_thread:
-            processedDir=os.path.join(self.beamline_directory,'processed',self.target)
+#            processedDir=os.path.join(self.beamline_directory,'processed',self.target)
             self.work_thread = XChemThread.read_write_autoprocessing_results_from_to_disc(processedDir,
                                                                                           os.path.join(
                                                                                               self.database_directory,
@@ -336,7 +341,6 @@ class XChemExplorer(QtGui.QApplication):
             self.work_thread.start()
 
     def select_best_autoprocessing_result(self):
-        start_thread = True
         if self.rescore:
             # first pop up a warning message as this will overwrite all user selections
             msgBox = QtGui.QMessageBox()
@@ -346,12 +350,18 @@ class XChemExplorer(QtGui.QApplication):
             reply = msgBox.exec_();
             if reply != 0:
                 start_thread = False
+        else:
+            start_thread = True
 
         if start_thread:
             self.update_log.insert('selecting best autoprocessing result')
             self.update_log.insert('samples where user made manual changes will be ignored!')
-            rescore = False
-            processedDir=os.path.join(self.beamline_directory,'processed',self.target)
+
+            if self.target == '=== project directory ===':
+                processedDir = self.initial_model_directory
+            else:
+                processedDir = os.path.join(self.beamline_directory, 'processed', self.target)
+
             visit,beamline = XChemMain.getVisitAndBeamline(processedDir)
             self.work_thread = XChemThread.choose_autoprocessing_outcome(os.path.join(self.database_directory,
                                                                                       self.data_source_file),
