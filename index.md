@@ -5,7 +5,7 @@ XChemExplorer (XCE) is a data management and workflow tool for the parallel dete
 
 # [](#header-1)Download
 
-[v1.1](https://github.com/xchem/XChemExplorer/archive/v1.1.tar.gz)
+[v1.1](https://github.com/xchem/XChemExplorer/archive/v1.2.tar.gz)
 
 
 # [](#header-1)Mailing List
@@ -35,14 +35,14 @@ Then change to the respective directory and unpack the archive, e.g.:
 
 ```shell
 cd /home/tkrojer/software
-gunzip XChemExplorer-1.1.tar.gz
-tar –xvf XChemExplorer-1.1.tar
+gunzip XChemExplorer-1.2.tar.gz
+tar –xvf XChemExplorer-1.2.tar
 ```
 
 This will create a new directory, i.e. from now on your XChemExplorer directory. Change into this directory, e.g.:
 
 ```shell
-cd XChemExplorer-1.1
+cd XChemExplorer-1.2
 ```
 
 The contents of the directory should look something like this when you type ‘ls –l’:
@@ -79,7 +79,7 @@ source /dls/science/groups/i04-1/software/pandda-update/ccp4/ccp4-7.0/bin/ccp4.s
 ccp4-python $XChemExplorer_DIR/XChemExplorer.py
 ```
 
-Change the first line (export XChemExplorer_Dir=...) to wherever you have the program installed (in the example, XChemExplorer is installed in /Users/tobiaskrojer/Downloads/XChemExplorer-1.1). And remove lines 3 and 4! After these edits, the file should look something like this:
+Change the first line (export XChemExplorer_Dir=...) to wherever you have the program installed (in the example, XChemExplorer is installed in /Users/tobiaskrojer/Downloads/XChemExplorer-1.2). And remove lines 3 and 4! After these edits, the file should look something like this:
 
 ```shell
 #!/bin/bash
@@ -133,6 +133,7 @@ rachael.skyner@diamond.ac.uk
 
 # Version History
 
+v1.2 - 18/06/2018
 v1.1 - 31/01/2018
 v1.0 - 10/08/2017
 
