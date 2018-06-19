@@ -1,0 +1,284 @@
+(dp0
+S'primary_citation_page_last'
+p1
+S''
+p2
+sS'contact_author_role'
+p3
+S'responsible scientist'
+p4
+sS'contact_author_PI_first_name'
+p5
+S'Frank'
+p6
+sS'Expression_system_strain'
+p7
+g2
+sS'radiation_detector_type'
+p8
+S'DECTRIS PILATUS 6M'
+p9
+sS'structure_title'
+p10
+S'Crystal Structure of $ProteinName in complex with $CompoundName'
+p11
+sS'primary_citation_journal_volume'
+p12
+g2
+sS'data_collection_temperature'
+p13
+S'100'
+p14
+sS'crystallization_details'
+p15
+S'0.1M bis-tris pH 5.5 -- 0.1M ammonium acetate -- 5%(w/v) PEG10K'
+p16
+sS'contact_author_PI_State_or_Province'
+p17
+g2
+sS'Expression_system_scientific_name'
+p18
+S'escherichia coli'
+p19
+sS'radiation_detector'
+p20
+S'PIXEL'
+p21
+sS'contact_author_organization_name'
+p22
+S'Structural Genomics Consortium'
+p23
+sS'contact_author_PI_organization_name'
+p24
+S'Structural Genomics Consortium'
+p25
+sS'contact_author_PI_Zip_Code'
+p26
+S'OX3 7DQ'
+p27
+sS'radiation_source'
+p28
+S'SYNCHROTRON'
+p29
+sS'primary_citation_author_name'
+p30
+S'Krojer, T.;Talon, R.;Fairhead,M.;Diaz Saez, L.;Bradley, A.R.;Aimon, A.;Collins,P.;Brandao-Neto,J.;Douangamath,A.;Spencer, J.;London, N.;Nelson, A.;Brennan,P.E.;Huber, K.;Bountra,C.;Arrowsmith,C.H.;Edwards,A.;von Delft,F.;;;;;;;;;;'
+p31
+sS'contact_author_city'
+p32
+S'Oxford'
+p33
+sS'contact_author_PI_address'
+p34
+S'Roosevelt Drive'
+p35
+sS'radiation_source_type'
+p36
+S'DIAMOND BEAMLINE I04-1'
+p37
+sS'crystallization_method'
+p38
+S'VAPOR DIFFUSION, SITTING DROP'
+p39
+sS'contact_author_Country'
+p40
+S'United Kingdom'
+p41
+sS'data_integration_software'
+p42
+S'XDS'
+p43
+sS'Source_organism_strain'
+p44
+g2
+sS'Source_organism_gene'
+p45
+S'NUDT7'
+p46
+sS'group_deposition_title'
+p47
+S'PanDDA analysis group deposition'
+p48
+sS'contact_author_PI_role'
+p49
+S'principal investigator/group leader'
+p50
+sS'contact_author_PI_middle_name'
+p51
+g2
+sS'contact_author_first_name'
+p52
+S'Tobias'
+p53
+sS'contact_author_phone_number'
+p54
+S'+44-1865-617576'
+p55
+sS'fragment_name_one_specific_mutation'
+p56
+g2
+sS'contact_author_address'
+p57
+S'Roosevelt Drive'
+p58
+sS'contact_author_PI_organization_type'
+p59
+S'academic'
+p60
+sS'molecule_one_letter_sequence_uniprot_id'
+p61
+S'P0C024'
+p62
+sS'data_collection_date'
+p63
+S'2017-05-11'
+p64
+sS'data_collection_protocol'
+p65
+S'SINGLE WAVELENGTH'
+p66
+sS'primary_citation_page_first'
+p67
+g2
+sS'SG_project_name'
+p68
+S'SGC'
+p69
+sS'primary_citation_journal_abbrev'
+p70
+S'To be published'
+p71
+sS'radiation_wavelengths'
+p72
+S'0.9282'
+p73
+sS'contact_author_organization_type'
+p74
+S'academic'
+p75
+sS'Expression_system_vector_type'
+p76
+g2
+sS'contact_author_PI_last_name'
+p77
+S'von Delft'
+p78
+sS'Release_status_for_coordinates'
+p79
+S'RELEASE NOW'
+p80
+sS'phasing_software'
+p81
+S'REFMAC'
+p82
+sS'full_name_of_SG_center'
+p83
+S'Structural Genomics Consortium'
+p84
+sS'contact_author_Zip_Code'
+p85
+S'OX3 7DQ'
+p86
+sS'Release_status_for_sequence'
+p87
+S'RELEASE NOW'
+p88
+sS'primary_citation_title'
+p89
+g2
+sS'contact_author_PI_phone_number'
+p90
+S'+44-1865-617576'
+p91
+sS'contact_author_PI_city'
+p92
+S'Oxford'
+p93
+sS'contact_author_middle_name'
+p94
+g2
+sS'group_description'
+p95
+S'human $ProteinName screened against the 3D-Fragment Consortium Library by X-ray Crystallography at the XChem facility of Diamond Light Source beamline I04-1'
+p96
+sS'Expression_system_plasmid_name'
+p97
+g2
+sS'contact_author_State_or_Province'
+p98
+g2
+sS'structure_keywords'
+p99
+S'PanDDA,SGC - Diamond I04-1 fragment screening,NUDIX domain,XChemExplorer'
+p100
+sS'crystallization_temperature'
+p101
+S'293'
+p102
+sS'contact_author_salutation'
+p103
+S'Dr.'
+p104
+sS'molecule_one_letter_sequence'
+p105
+S'SMLDDAKARLRKYDIGGKYSHLPYNKYSVLLPLVAKEGKLHLLFTVRSEKLRRAPGEVCFPGGKRDPTDMDDAATALREAQEEVGLR(HYP)HQVEVV(CSO)CLVPCLIDTDTLITPFVGLIDHNFQAQPNPAEVKDVFLVPLAYFLHPQVHDQINHIFEYTNPEDGVTYQIKGMTANLAVLVAFIILEKKPT'
+p106
+sS'contact_author_last_name'
+p107
+S'Krojer'
+p108
+sS'contact_author_PI_email'
+p109
+S'frank.vondelft@sgc.ox.ac.uk'
+p110
+sS'molecule_name'
+p111
+S'Peroxisomal coenzyme A diphosphatase NUDT7'
+p112
+sS'biological_assembly_chain_number'
+p113
+S'1'
+p114
+sS'Manipulated_source_details'
+p115
+g2
+sS'primary_citation_year'
+p116
+g2
+sS'primary_citation_id'
+p117
+S'primary'
+p118
+sS'Source_organism_scientific_name'
+p119
+S'homo sapiens'
+p120
+sS'contact_author_PI_salutation'
+p121
+S'Dr.'
+p122
+sS'structure_title_apo'
+p123
+S'Crystal Structure of $ProteinName after initial refinement with no ligand modelled (structure $n)'
+p124
+sS'pdbx_starting_model'
+p125
+S'5T3P'
+p126
+sS'structure_author_name'
+p127
+S'Krojer, T.;Talon, R.;Fairhead,M.;Diaz Saez, L.;Bradley, A.R.;Aimon, A.;Collins,P.;Brandao-Neto,J.;Douangamath,A.;Spencer, J.;London, N.;Nelson, A.;Brennan,P.E.;Huber, K.;Bountra,C.;Arrowsmith,C.H.;Edwards,A.;von Delft,F.;;;;;;;;;;'
+p128
+sS'crystallization_pH'
+p129
+S'5.5'
+p130
+sS'contact_author_email'
+p131
+S'tobias.krojer@sgc.ox.ac.uk'
+p132
+sS'contact_author_PI_Country'
+p133
+S'United Kingdom'
+p134
+s.
