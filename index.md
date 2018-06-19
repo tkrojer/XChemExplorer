@@ -109,7 +109,7 @@ It may however be easier if you insert an alias into your .bashrc file:
 alias XChemExplorer='/Users/tobiaskrojer/Downloads/XChemExplorer-1.1/XChemExplorer'
 ```
 
-# Manual
+# Manual - under development -
 
 * [XChemExplorer 2018-06-18](https://github.com/tkrojer/XChemExplorer/blob/gh-pages/XCE_manual_2018-06-18.pdf)
 
@@ -146,3 +146,8 @@ rachael.skyner@diamond.ac.uk
 * [XChem](http://www.diamond.ac.uk/Beamlines/Mx/Fragment-Screening.html)
 
 * [PanDDA](https://pandda.bitbucket.io)
+
+
+# Resources
+
+* [example .deposit file]
