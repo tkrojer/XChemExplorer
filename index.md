@@ -150,4 +150,4 @@ rachael.skyner@diamond.ac.uk
 
 # Resources
 
-* [example .deposit file]
+* [example .deposit file](https://github.com/tkrojer/XChemExplorer/blob/gh-pages/example.deposit)
