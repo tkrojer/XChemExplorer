@@ -149,7 +149,7 @@ class run_xia2(QtCore.QThread):
                 self.Logfile.insert('submitting array job with maximal 100 jobs running on cluster')
                 self.Logfile.insert('using the following command:')
                 self.Logfile.insert('qsub -t 1:{0!s} -tc {1!s} xia2_master.sh'.format(str(i+1), self.max_queue_jobs))
-                os.system('qsub -P labxchem -t 1:{0!s} -tc {1!s} xia2_master.sh'.format(str(i+1), self.max_queue_jobs))
+                os.system('qsub -P labxchem -q medium.q -N xia2 -t 1:{0!s} -tc {1!s} xia2_master.sh'.format(str(i+1), self.max_queue_jobs))
             else:
                 self.Logfile.insert("cannot start ARRAY job: make sure that 'module load global/cluster' is in your .bashrc or .cshrc file")
         elif self.external_software['qsub']:
@@ -157,7 +157,7 @@ class run_xia2(QtCore.QThread):
             self.Logfile.insert('WARNING: this could potentially lead to a crash...')
             for n in range(i+1):
                 self.Logfile.insert('qsub xce_xia2_{0!s}.sh'.format((str(n+1))))
-                os.system('qsub xce_xia2_{0!s}.sh'.format((str(n+1))))
+                os.system('qsub -q medium.q -N xia2 xce_xia2_{0!s}.sh'.format((str(n+1))))
         else:
             self.Logfile.insert('running %s consecutive XIA2 jobs on your local machine')
             for n in range(i+1):
