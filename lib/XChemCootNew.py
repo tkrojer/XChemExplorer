@@ -4,6 +4,7 @@ import gobject
 import sys
 import os
 import pickle
+import glob
 
 from matplotlib.figure import Figure
 #from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
@@ -885,7 +886,7 @@ class GUI(object):
         # initialize Refinement library
         self.Refine=XChemRefine.Refine(self.project_directory,self.xtalID,self.compoundID,self.data_source)
         self.Serial=XChemRefine.GetSerial(self.project_directory,self.xtalID)
-	self.panddaSerial=panddaSerial=m=(4-len(str(self.Serial)))*'0'+str(self.Serial)
+        self.panddaSerial=panddaSerial=m=(4-len(str(self.Serial)))*'0'+str(self.Serial)
 #        self.Serial=self.Refine.GetSerial()
         if self.Serial==1:
             # i.e. no refinement has been done; data is probably straight out of dimple
@@ -940,15 +941,24 @@ class GUI(object):
             os.chdir(os.path.join(self.project_directory,self.xtalID))
 
         if self.refinementProtocol.startswith('pandda'):
+            print '=> XCE: looking for ground-state model',os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.ground-state.pdb')
             if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.ground-state.pdb')):
+                print '=> XCE: found ground-state model'
                 os.chdir(os.path.join(self.project_directory,self.xtalID))
                 coot.set_colour_map_rotation_on_read_pdb(0)
-                color_wheel_rotation=160/float(imol+2)
+                try:
+                    color_wheel_rotation=160/float(imol+2)
+                except UnboundLocalError:
+                    color_wheel_rotation=80
                 coot.set_colour_map_rotation_on_read_pdb(color_wheel_rotation)
                 imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.ground-state.pdb'),0)
                 coot.set_colour_by_molecule(imol)
                 coot.set_mol_active(imol,0)
+            else:
+                print '=> XCE - ERROR: cannot find ground-state model'
+            print '=> XCE: looking for bound-state model',os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb')
             if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb')):
+                print '=> XCE: found bound-state model'
                 os.chdir(os.path.join(self.project_directory,self.xtalID))
                 coot.set_colour_map_rotation_on_read_pdb(0)
                 color_wheel_rotation=21/float(imol+2)
@@ -956,6 +966,8 @@ class GUI(object):
                 imol=coot.handle_read_draw_molecule_with_recentre(os.path.join(self.project_directory,self.xtalID,self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb'),0)
                 self.mol_dict['protein']=imol
             else:
+                print '=> XCE - ERROR: cannot find bound-state model'
+                print '=> XCE: moving to next crystal...'
                 self.go_to_next_xtal()
         else:
             if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.pdb_style)):
@@ -968,13 +980,20 @@ class GUI(object):
                 self.go_to_next_xtal()
             self.mol_dict['protein']=imol
 
+            # read any one event map if present
+            for event_map in glob.glob(os.path.join(self.project_directory,self.xtalID,self.xtalID+'-event_*.native.ccp4')):
+                coot.handle_read_ccp4_map((event_map),0)
+                coot.set_contour_level_in_sigma(imol,2)
+                coot.set_last_map_colour(0.74,0.44,0.02)
+                break
+
         for item in coot_utils_XChem.molecule_number_list():
             if coot.molecule_name(item).endswith(self.pdb_style.replace('.pdb','')+'.split.bound-state.pdb') or coot.molecule_name(item).endswith(self.pdb_style):
                 coot.set_show_symmetry_master(1)    # master switch to show symmetry molecules
                 coot.set_show_symmetry_molecule(item,1) # show symm for model
 
         #########################################################################################
-        # read fofo maps
+        # read fofc maps
         # - read ccp4 map: 0 - 2fofc map, 1 - fofc.map
         # read 2fofc map last so that one can change its contour level
         if os.path.isfile(os.path.join(self.project_directory,self.xtalID,'2fofc.map')):

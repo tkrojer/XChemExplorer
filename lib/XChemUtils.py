@@ -15,6 +15,11 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit.Chem import Draw
 
+import iotbx.pdb
+
+from iotbx.reflection_file_reader import any_reflection_file
+from iotbx import mtz
+
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 import XChemDB
 import XChemLog
@@ -896,6 +901,11 @@ class mtztools:
 
     def __init__(self,mtzfile):
         self.mtzfile=mtzfile
+        self.hkl = any_reflection_file(file_name=self.mtzfile)
+        self.miller_arrays = self.hkl.as_miller_arrays()
+        self.mtz = self.miller_arrays[0]
+        self.iotbxMTZ = mtz.object(self.mtzfile)
+
         self.space_group_dict=   {  'triclinic':    [1],
 #                                    'monoclinic':   [3,4,5],
                                     'monoclinic_P': [3,4],
@@ -987,6 +997,18 @@ class mtztools:
                             'DataProcessingAlert':                          '#FF0000',
                             'DataCollectionWavelength':                     'n/a',
                             'DataProcessingScore':                          'n/a'             }
+
+    def get_dmin(self):
+        return str(round(float(self.mtz.d_min()), 2))
+
+    def get_wavelength(self):
+        wavelength = 0.0
+        for crystal in self.iotbxMTZ.crystals():
+            for dataset in crystal.datasets():
+                if not dataset.wavelength() == 0.0:
+                    wavelength = str(round(dataset.wavelength(),5))
+                    break
+        return wavelength
 
     def get_information_for_datasource(self):
         db_dict={}
@@ -1532,6 +1554,10 @@ class pdbtools(object):
 
     def __init__(self,pdb):
         self.pdb = pdb
+        self.pdb_inp = iotbx.pdb.input(file_name=self.pdb)
+        self.hierarchy = self.pdb_inp.construct_hierarchy()
+
+
         self.AminoAcids = ['ALA','ARG','ASN','ASP','CYS','GLU','GLN','GLY','HIS',
                            'ILE','LEU','LYS','MET','PHE','PRO','SER','THR','TRP','TYR','VAL']
         self.Solvents = ['DMS','EDO','GOL','HOH']
@@ -1594,6 +1620,69 @@ class pdbtools(object):
                                                         '23':           12,
                                                         '432':          24  }
 
+    def get_refinement_program(self):
+        program = 'unknown'
+        for remark in self.pdb_inp.remark_section():
+            if 'PROGRAM' in remark:
+                if 'refmac' in remark.lower():
+                    program = 'REFMAC'
+                elif 'phenix' in remark.lower():
+                    program = 'PHENIX'
+        return  program
+
+    def get_residues_with_resname(self,resname):
+        ligands = []
+        for model in self.hierarchy.models():
+            for chain in model.chains():
+                for conformer in chain.conformers():
+                    for residue in conformer.residues():
+                        if residue.resname == resname:
+                            if [residue.resname, residue.resseq, chain.id] not in ligands:
+                                ligands.append([residue.resname, residue.resseq, chain.id])
+        return ligands
+
+#    def get_centre_of_gravity_of_residue(self,resname_resseq_chain):
+    def get_centre_of_gravity_of_residue(self,resname_chain_resseq):
+        resname_x = resname_chain_resseq.split('-')[0]
+        chain_x = resname_chain_resseq.split('-')[1]
+        resseq_x = resname_chain_resseq.split('-')[2]
+        x = []
+        y = []
+        z = []
+        for model in self.hierarchy.models():
+            for chain in model.chains():
+                for conformer in chain.conformers():
+                    for residue in conformer.residues():
+                        if residue.resname.replace(' ','') == resname_x and residue.resseq.replace(' ','') == resseq_x and chain.id.replace(' ','') == chain_x:
+                            for atom in residue.atoms():
+                                x.append(atom.xyz[0])
+                                y.append(atom.xyz[1])
+                                z.append(atom.xyz[2])
+
+        if x != [] and y != [] and z != []:
+            x = ((max(x) - min(x)) / 2) + min(x)
+            y = ((max(y) - min(y)) / 2) + min(y)
+            z = ((max(z) - min(z)) / 2) + min(z)
+
+        return x,y,z
+
+    def save_residues_with_resname(self,outDir,resname):
+        ligands = self.get_residues_with_resname(resname)
+        ligList = []
+        for l in ligands:
+            sel_cache = self.hierarchy.atom_selection_cache()
+            lig_sel = sel_cache.selection("(resname %s and resseq %s and chain %s)" % (l[0], l[1], l[2]))
+            hierarchy_lig = self.hierarchy.select(lig_sel)
+
+#            ligName = (l[0] + '-' + l[1] + '-' + l[2] + '.pdb').replace(' ', '')
+            ligName = (l[0] + '-' + l[2] + '-' + l[1] + '.pdb').replace(' ', '')
+            ligList.append(ligName)
+
+            f = open(os.path.join(outDir,ligName), "w")
+            f.write(hierarchy_lig.as_pdb_string(crystal_symmetry=self.pdb_inp.crystal_symmetry()))
+            f.close()
+
+        return ligList
 
     def GetRefinementProgram(self):
         program=''

@@ -4,6 +4,8 @@ import os,sys
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 import glob
 
+from iotbx import mtz
+
 from XChemUtils import parse
 import XChemDB
 
@@ -30,15 +32,43 @@ if __name__=='__main__':
         db_dict['DimpleRfree']=pdb['Rfree']
         db_dict['RefinementOutcome']='1 - Analysis Pending'
         db_dict['RefinementSpaceGroup']=pdb['SpaceGroup']
-        if not os.path.isfile(xtal+'.free.mtz'):
-            os.chdir(os.path.join(inital_model_directory,xtal))
-            os.system('/bin/rm '+xtal+'.free.mtz')
-            if os.path.isfile(os.path.join(inital_model_directory,xtal,'dimple','dimple_rerun_on_selected_file','dimple','prepared2.mtz')):
-                os.symlink(os.path.join('dimple','dimple_rerun_on_selected_file','dimple','prepared2.mtz'),xtal+'.free.mtz')
-                db_dict['RefinementMTZfree']=xtal+'.free.mtz'
-            elif os.path.isfile(os.path.join(inital_model_directory,xtal,'dimple','dimple_rerun_on_selected_file','dimple','prepared.mtz')):
-                os.symlink(os.path.join('dimple','dimple_rerun_on_selected_file','dimple','prepared.mtz'),xtal+'.free.mtz')
-                db_dict['RefinementMTZfree']=xtal+'.free.mtz'
+#        if not os.path.isfile(xtal+'.free.mtz'):
+#            os.chdir(os.path.join(inital_model_directory,xtal))
+#            os.system('/bin/rm '+xtal+'.free.mtz')
+#            if os.path.isfile(os.path.join(inital_model_directory,xtal,'dimple','dimple_rerun_on_selected_file','dimple','prepared2.mtz')):
+#                os.symlink(os.path.join('dimple','dimple_rerun_on_selected_file','dimple','prepared2.mtz'),xtal+'.free.mtz')
+#                db_dict['RefinementMTZfree']=xtal+'.free.mtz'
+#            elif os.path.isfile(os.path.join(inital_model_directory,xtal,'dimple','dimple_rerun_on_selected_file','dimple','prepared.mtz')):
+#                os.symlink(os.path.join('dimple','dimple_rerun_on_selected_file','dimple','prepared.mtz'),xtal+'.free.mtz')
+#                db_dict['RefinementMTZfree']=xtal+'.free.mtz'
+
+        # setting free.mtz file
+
+        os.chdir(os.path.join(inital_model_directory,xtal))
+        os.system('/bin/rm -f %s.free.mtz' %xtal)
+        mtzFree = None
+        db_dict['RefinementMTZfree'] = ''
+        if os.path.isfile(os.path.join(inital_model_directory,xtal,'dimple','dimple_rerun_on_selected_file','dimple','prepared2.mtz')):
+            mtzFree = os.path.join(inital_model_directory,xtal,'dimple','dimple_rerun_on_selected_file','dimple','prepared2.mtz')
+        elif os.path.isfile(os.path.join(inital_model_directory,xtal,'dimple','dimple_rerun_on_selected_file','dimple','prepared.mtz')):
+            mtzFree = os.path.join(inital_model_directory,xtal,'dimple','dimple_rerun_on_selected_file','dimple','prepared.mtz')
+        
+        if mtzFree is not None:
+            if 'F_unique' in mtz.object(mtzFree).column_labels():
+                cmd = ( 'cad hklin1 %s hklout %s.free.mtz << eof\n' %(mtzFree,xtal) +
+                        ' monitor BRIEF\n'
+                        ' labin file 1 E1=F E2=SIGF E3=FreeR_flag\n'
+                        ' labout file 1 E1=F E2=SIGF E3=FreeR_flag\n'
+                        'eof\n' )
+
+                os.system(cmd)
+            else:
+                os.symlink(mtzFree,xtal+'.free.mtz')
+
+            db_dict['RefinementMTZfree']=xtal+'.free.mtz'
+
+
+
 
         # if no refinement was carried out yet, then we also want to link the dimple files to refine.pdb/refine.log
         # so that we can look at them with the COOT plugin
