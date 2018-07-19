@@ -454,6 +454,7 @@ class run_pandda_analyse(QtCore.QThread):
                 '#!'+os.getenv('SHELL')+'\n'
                 '\n'
                 + source_file +
+                '\n'
                 'cd '+self.panddas_directory+'\n'
                 '\n'
                 '\n'
