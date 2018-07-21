@@ -451,12 +451,11 @@ class run_pandda_analyse(QtCore.QThread):
             # note: copied latest pandda.setup-sh from XCE2 installation (08/08/2017)
 
             Cmds = (
-                '#!'+os.getenv('SHELL')+'\n'
-                '\n'
-                + source_file +
-                '\n'
-                'cd '+self.panddas_directory+'\n'
-                '\n'
+                '#!'+os.getenv('SHELL')+'\n' +
+                '\n' +
+                source_file +
+                '\n' + ' module load pymol' + ' \n' +
+                'cd ' + self.panddas_directory + '\n' +
                 '\n'
                 )
 
