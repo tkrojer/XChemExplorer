@@ -514,12 +514,16 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         self.Logfile.insert('%s: trying to find fitting event maps for modelled ligands' %xtal)
         ligList = self.pdb.save_residues_with_resname(os.path.join(self.projectDir,xtal), 'LIG')
         foundMatchingMap = None
+        if os.path.isfile('no_pandda_analysis_performed'):
+            self.Logfile.warning('%s: found empty file named "no_pandda_analysis_performed" which suggests we will ignore event maps for this sample' %xtal)
+            foundMatchingMap = True
+            ligList = []
         for lig in sorted(ligList):
             ligID = lig.replace('.pdb','')
-            if os.path.isfile('no_pandda_analysis_performed'):
-                self.Logfile.warning('%s: no pandda analysis performed; skipping this step...' %xtal)
-                foundMatchingMap = True
-                break
+#            if os.path.isfile('no_pandda_analysis_performed'):
+#                self.Logfile.warning('%s: no pandda analysis performed; skipping this step...' %xtal)
+#                foundMatchingMap = True
+#                break
             ligCC = []
             for mtz in sorted(glob.glob('*event*.native*P1.mtz')):
                 self.get_lig_cc(xtal, mtz, lig)
