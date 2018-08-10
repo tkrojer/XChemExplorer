@@ -803,9 +803,16 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
     def update_sf_mmcif_file(self,xtal):
         self.Logfile.insert('%s: updating %s_sf.mmcif' %(xtal,xtal))
-        bound = ["data from final refinement with ligand, final.mtz",
-                 "data from original reflections, data.mtz",
-                 "data for ligand evidence map (PanDDA event map), event_map_$.mtz"]
+
+        if os.path.isfile('no_pandda_analysis_performed'):
+            self.Logfile.warning('%s: found empty file named "no_pandda_analysis_performed" which suggests we will ignore event maps for this sample' %xtal)
+            bound = ["data from final refinement with ligand, final.mtz",
+                     "data from original reflections, data.mtz"]
+
+        else:
+            bound = ["data from final refinement with ligand, final.mtz",
+                     "data from original reflections, data.mtz",
+                     "data for ligand evidence map (PanDDA event map), event_map_$.mtz"]
 
         block = -1
 
