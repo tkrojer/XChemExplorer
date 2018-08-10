@@ -747,9 +747,12 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         fileStatus = False
         os.chdir(os.path.join(self.projectDir, xtal))
 
-        mtzin = 'refine.mtz ' + xtal + '.free.mtz '
-        for event in self.eventList:
-            mtzin += event + ' '
+        if os.path.isfile('no_pandda_analysis_performed'):
+            mtzin = 'refine.mtz '
+        else:
+            mtzin = 'refine.mtz ' + xtal + '.free.mtz '
+            for event in self.eventList:
+                mtzin += event + ' '
 
         if os.path.isdir('/dls'):
             pdb_extract_init = 'source /dls/science/groups/i04-1/software/pdb-extract-prod/setup.sh\n'
@@ -804,19 +807,18 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
     def update_sf_mmcif_file(self,xtal):
         self.Logfile.insert('%s: updating %s_sf.mmcif' %(xtal,xtal))
 
-        if os.path.isfile('no_pandda_analysis_performed'):
-            self.Logfile.warning('%s: found empty file named "no_pandda_analysis_performed" which suggests we will ignore event maps for this sample' %xtal)
-            bound = ["data from final refinement with ligand, final.mtz",
-                     "data from original reflections, data.mtz"]
-
-        else:
-            bound = ["data from final refinement with ligand, final.mtz",
-                     "data from original reflections, data.mtz",
-                     "data for ligand evidence map (PanDDA event map), event_map_$.mtz"]
+        bound = [   "data from final refinement with ligand, final.mtz",
+                    "data from original reflections, data.mtz",
+                    "data for ligand evidence map (PanDDA event map), event_map_$.mtz"]
 
         block = -1
 
         self.Logfile.insert('%s: reading wavelength from mtz file; lambda = %s' %(xtal,self.mtz.get_wavelength()))
+
+        if os.path.isfile('no_pandda_analysis_performed'):
+            self.Logfile.warning('%s: apparently not a pandda deposition; will skip this step...')
+            return None
+
         for i, line in enumerate(fileinput.input(xtal + '_sf.mmcif', inplace=1)):
 
             if line.startswith('_cell.length_a'):
