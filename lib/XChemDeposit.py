@@ -816,7 +816,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         self.Logfile.insert('%s: reading wavelength from mtz file; lambda = %s' %(xtal,self.mtz.get_wavelength()))
 
         if os.path.isfile('no_pandda_analysis_performed'):
-            self.Logfile.warning('%s: apparently not a pandda deposition; will skip this step...')
+            self.Logfile.warning('%s: apparently not a pandda deposition; will skip this step...' %xtal)
             return None
 
         for i, line in enumerate(fileinput.input(xtal + '_sf.mmcif', inplace=1)):
