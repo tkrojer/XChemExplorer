@@ -1806,7 +1806,9 @@ class data_source:
     def samples_for_html_summary(self):
         connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
         cursor = connect.cursor()
-        cursor.execute("select CrystalName from mainTable where RefinementOutcome like '5%' or RefinementOutcome like '6%' order by CrystalName ASC")
+        cursor.execute("select CrystalName from mainTable where RefinementOutcome like '4%' or "
+                                                               "RefinementOutcome like '5%' or "
+                                                               "RefinementOutcome like '6%' order by CrystalName ASC")
         xtalList=[]
         samples = cursor.fetchall()
         for sample in samples:
