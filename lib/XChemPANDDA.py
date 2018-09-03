@@ -426,7 +426,8 @@ class run_pandda_analyse(QtCore.QThread):
 #            else:
 #                source_file=''
             # v1.2.1 - pandda.setup files should be obsolete now that pandda is part of ccp4
-            source_file='source /dls/science/groups/i04-1/software/pandda-update/ccp4/ccp4-7.0/bin/ccp4.setup-sh'
+            source_file='source /dls/science/groups/i04-1/software/pandda-update/ccp4/ccp4-7.0/bin/ccp4.setup-sh\n'
+            source_file += 'export XChemExplorer_DIR="' + os.getenv('XChemExplorer_DIR') + '"\n'
 
             if os.path.isfile(self.filter_pdb + '.pdb'):
                 print('filter pdb located')
