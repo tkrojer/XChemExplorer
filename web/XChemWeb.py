@@ -334,7 +334,11 @@ class export_to_html:
                 ligCC.append([mtz,float(cc)])
             except ValueError:
                 ligCC.append([mtz, 0.00])
-        highestCC = max(ligCC, key=lambda x: x[0])[1]
+        try:
+            highestCC = max(ligCC, key=lambda x: x[0])[1]
+        except ValueError:
+            self.Logfile.error('%s: event maps are not yet converted to mtz files...' %xtal)
+            return
         if highestCC == 0.00 or ligCC is []:
             self.Logfile.error('%s: best CC of ligand %s for any event map is 0!' %(xtal,ligID))
         else:
