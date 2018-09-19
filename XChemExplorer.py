@@ -746,6 +746,14 @@ class XChemExplorer(QtGui.QApplication):
         self.remote_qsub_checkbox = QtGui.QCheckBox('use')
         #self.remote_qsub_checkbox.toggled.connect(self.run_qsub_remotely)
 
+        settings_hbox_dimple_twin_mode = QtGui.QHBoxLayout()
+        self.dimple_twin_mode_label_checkbox = QtGui.QCheckBox('run DIMPLE in TWIN mode')
+        if self.preferences['dimple_twin_mode']:
+            self.dimple_twin_mode_label_checkbox.setChecked(True)
+        self.dimple_twin_mode_label_checkbox.toggled.connect(self.dimple_change_twin_mode)
+        settings_hbox_dimple_twin_mode.addWidget(self.dimple_twin_mode_label_checkbox)
+        vbox.addLayout(settings_hbox_dimple_twin_mode)
+
         if self.using_remote_qsub_submission:
             self.remote_qsub_checkbox.setChecked(True)
         settings_hbox_remote_qsub.addWidget(self.remote_qsub_checkbox)
@@ -763,6 +771,14 @@ class XChemExplorer(QtGui.QApplication):
         preferencesLayout.addLayout(vbox, 0, 0)
 
         preferences.exec_();
+
+    def dimple_change_twin_mode(self):
+        if self.preferences['dimple_twin_mode']:
+            self.update_log.insert('changing preferences: turning off DIMPLE in TWIN mode')
+            self.preferences['dimple_twin_mode'] = False
+        else:
+            self.update_log.insert('changing preferences: changing DIMPLE to TWIN mode')
+            self.preferences['dimple_twin_mode'] = True
 
     def run_qsub_remotely(self):
         self.remote_qsub_submission = str(self.remote_qsub_command.text())
@@ -2481,7 +2497,8 @@ class XChemExplorer(QtGui.QApplication):
                                                                                   self.max_queue_jobs,
                                                                                   self.xce_logfile,
                                                                                   self.using_remote_qsub_submission,
-                                                                                  self.remote_qsub_submission)
+                                                                                  self.remote_qsub_submission,
+                                                                                  self.preferences['dimple_twin_mode']  )
             self.explorer_active = 1
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)

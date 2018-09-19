@@ -207,6 +207,7 @@ class setup():
         xce_object.acceptable_low_resolution_limit_for_data = 3.5
         xce_object.filename_root = '${samplename}'
         xce_object.max_queue_jobs = 100
+        xce_object.dimple_twin_mode = False
 
         xce_object.preferences = {'processed_data_to_copy':                     'mtz_log_only',
                                   'dataset_selection_mechanism':                'IsigI*Comp*UniqueRefl',
@@ -214,7 +215,8 @@ class setup():
                                   'acceptable_low_resolution_limit_for_data':   3.5,
                                   'acceptable_low_resolution_Rmerge':           0.1,
                                   'filename_root':                              '${samplename}',
-                                  'max_queue_jobs':                             100     }
+                                  'max_queue_jobs':                             100,
+                                  'dimple_twin_mode':                           False   }
 
         ## settings
 
@@ -236,7 +238,8 @@ class setup():
                                'diffraction_data_directory': xce_object.diffraction_data_directory,
                                'html_export_directory': xce_object.html_export_directory,
                                'group_deposit_directory': xce_object.group_deposit_directory,
-                               'remote_qsub': ''}
+                               'remote_qsub': '',
+                               'dimple_twin_mode': False    }
 
     def tables(self, xce_object):
         # Table column settings

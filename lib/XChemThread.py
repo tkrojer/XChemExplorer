@@ -1041,7 +1041,8 @@ class create_png_and_cif_of_compound(QtCore.QThread):
         self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
 
 class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
-    def __init__(self,sample_list,initial_model_directory,external_software,ccp4_scratch_directory,database_directory,data_source_file,max_queue_jobs,xce_logfile, remote_submission, remote_submission_string):
+    def __init__(self,sample_list,initial_model_directory,external_software,ccp4_scratch_directory,database_directory,
+                 data_source_file,max_queue_jobs,xce_logfile, remote_submission, remote_submission_string, dimple_twin_mode):
         QtCore.QThread.__init__(self)
         self.sample_list=sample_list
         self.initial_model_directory=initial_model_directory
@@ -1056,6 +1057,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
         self.pipeline='dimple'
         self.using_remote_qsub_submission = remote_submission
         self.remote_qsub_submission = remote_submission_string
+        self.dimple_twin_mode = dimple_twin_mode
 
 
     def run(self):
@@ -1169,6 +1171,9 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     'source /dls/science/groups/i04-1/software/pandda-update/ccp4/ccp4-7.0/bin/ccp4.setup-sh\n'
                 )
 
+            twin = ''
+            if self.dimple_twin_mode:
+                twin = "--refmac-key 'TWIN'"
 
             Cmds = (
                     '{0!s}\n'.format(top_line)+
@@ -1208,7 +1213,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
                     ' resolution file 1 999.0 %s\n' %str(round(float(mtzFile.d_min()),2))+
                     'eof\n'
                     '\n'
-                    'dimple --no-cleanup %s.999A.mtz %s %s %s dimple\n' %(xtal,ref_pdb,ref_mtz,ref_cif) +
+                    "dimple --no-cleanup %s.999A.mtz %s %s %s %s dimple\n" %(xtal,ref_pdb,ref_mtz,ref_cif,twin) +
                     '\n'
                     'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc,'dimple') +
 #                    + uniqueify +
