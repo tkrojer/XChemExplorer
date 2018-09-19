@@ -51,9 +51,11 @@ class run_xia2(QtCore.QThread):
             if os.getcwd().startswith('/dls'):
 #                script += 'module load ccp4\n'
 #                script += 'module load phenix\n'
-                script += 'module load ccp4\n'
-                script += 'module load XDS\n'
-                script += 'module load ccp4 xia2\n'
+
+# 2018-09-19 - removed this for Joe's test
+#                script += 'module load ccp4\n'
+#                script += 'module load XDS\n'
+#                script += 'module load ccp4 xia2\n'
 
             if self.spg == []:
                 spg_option=''
@@ -84,10 +86,13 @@ class run_xia2(QtCore.QThread):
 
             if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'processed')):
                 os.mkdir(os.path.join(self.initial_model_directory,xtal,'processed'))
-
-            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'processed','run_in_progress')):
-                self.Logfile.insert('data processing is in progress; skipping...')
-                continue
+# 2018-09-19 - disabled this for Joe's test
+#            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'processed','run_in_progress')):
+#                self.Logfile.insert('data processing is in progress; skipping...')
+#                continue
+            f = False
+            if f:
+                print 'hallo'
             else:
                 if self.overwrite:
                     os.chdir(os.path.join(self.initial_model_directory,xtal,'diffraction_images'))
@@ -97,7 +102,8 @@ class run_xia2(QtCore.QThread):
                     self.Logfile.insert('removing all links to diffraction images in '+os.path.join(self.initial_model_directory,xtal,'processed'))
                     os.system('/bin/rm -fr *')
                 os.chdir(os.path.join(self.initial_model_directory,xtal,'processed'))
-                os.system('touch run_in_progress')
+# 2018-09-19 - disabled this for Joe's test
+#                os.system('touch run_in_progress')
 
             for n,entry in enumerate(sorted(self.run_dict[xtal])):
                 newRun=1
@@ -118,7 +124,10 @@ class run_xia2(QtCore.QThread):
                         os.mkdir(os.path.join(self.initial_model_directory,xtal,'processed','run_'+str(newRun),pipeline))
 
                     script+='$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_status_flag.py')+' {0!s} {1!s} {2!s} {3!s}\n'.format(self.database, xtal, 'DataProcessingStatus', 'running')
-                    script+='$CCP4/bin/xia2 pipeline='+pipeline+' '+ref_option+' '+spg_option+' '+reso_limit_option+' '+cc_half_option+' '+image_dir+'\n'
+
+# 2018-09-19 - changed this for Joe's test
+#                    script+='$CCP4/bin/xia2 pipeline='+pipeline+' '+ref_option+' '+spg_option+' '+reso_limit_option+' '+cc_half_option+' '+image_dir+'\n'
+                    script+='xia2 pipeline='+pipeline+' '+ref_option+' '+spg_option+' '+reso_limit_option+' '+cc_half_option+' '+image_dir+'\n'
 
             script+='$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_status_flag.py')+' {0!s} {1!s} {2!s} {3!s}\n'.format(self.database, xtal, 'DataProcessingStatus', 'finished')
             script+='cd '+os.path.join(self.initial_model_directory,xtal,'processed')+'\n'
