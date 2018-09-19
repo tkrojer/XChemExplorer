@@ -56,6 +56,7 @@ class run_xia2(QtCore.QThread):
 #                script += 'module load ccp4\n'
 #                script += 'module load XDS\n'
 #                script += 'module load ccp4 xia2\n'
+                print 'hallo'
 
             if self.spg == []:
                 spg_option=''
