@@ -481,7 +481,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
     def ligand_in_pdb_file(self,xtal):
         self.Logfile.insert('%s: checking if refine.split.bound-state.pdb contains ligands of type LIG' %xtal)
         ligandStatus = False
-        ligList = pdbtools('refine.split.bound-state.pdb').get_residues_with_resname('H3D')
+        ligList = pdbtools('refine.split.bound-state.pdb').get_residues_with_resname('LIG')
         if ligList is []:
             self.Logfile.error('%s: refine.split.bound-state.pdb does not contain any modelled ligands of type LIG' %xtal)
             self.add_to_errorList(xtal)
@@ -512,7 +512,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
     def find_matching_event_map(self,xtal):
         self.eventList = []
         self.Logfile.insert('%s: trying to find fitting event maps for modelled ligands' %xtal)
-        ligList = self.pdb.save_residues_with_resname(os.path.join(self.projectDir,xtal), 'H3D')
+        ligList = self.pdb.save_residues_with_resname(os.path.join(self.projectDir,xtal), 'LIG')
         foundMatchingMap = None
         if os.path.isfile('no_pandda_analysis_performed'):
             self.Logfile.warning('%s: found empty file named "no_pandda_analysis_performed" which suggests we will ignore event maps for this sample' %xtal)
