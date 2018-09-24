@@ -138,6 +138,7 @@ class export_to_html:
         self.db=XChemDB.data_source(database)
         self.db_dict = None
         self.pdb = None
+        self.protein_name = None
 
     def prepare(self):
         self.Logfile.insert('======== preparing HTML summary ========')
@@ -146,6 +147,8 @@ class export_to_html:
         html = XChemMain.html_header()
         for xtal in self.db.samples_for_html_summary():
             self.db_dict = self.db.get_db_dict_for_sample(xtal)
+            if self.protein_name is None:
+                self.protein_name = self.db_dict['ProteinName']
             self.copy_pdb(xtal)
             self.copy_electron_density(xtal)
             self.copy_ligand_files(xtal)
@@ -168,8 +171,19 @@ class export_to_html:
                 html += XChemMain.html_table_row(xtal,pdbID,ligand,compoundImage,residuePlot,pdb,event,thumbNail,resoHigh,spg,unitCell,FWT,DELFWT)
                 self.make_thumbnail(xtal,x,y,z,ligand,eventMap)
                 self.prepare_for_download(xtal, pdb, event, compoundCIF, ligand)
+
+        html = XChemMain.html_download_all_section(html,self.protein_name)
         self.write_html_file(html)
         self.Logfile.insert('======== finished preparing HTML summary ========')
+
+
+    def prepare_zip_archives(self):
+        os.chdir(os.path.join(self.htmlDir,'files'))
+        self.Logfile.insert('%s: preparing ZIP archive of all PDB files' %self.protein_name)
+        os.system('zip %s_allPDBs.zip *.pdb')
+        self.Logfile.insert('%s: preparing ZIP archive of all PanDDA event maps' %self.protein_name)
+        os.system('zip %s_allEventMaps.zip *LIG*.ccp4')
+
 
     def prepare_for_download(self,xtal,pdb,event,compoundCIF,ligID):
         os.chdir(os.path.join(self.htmlDir,'tmp'))
