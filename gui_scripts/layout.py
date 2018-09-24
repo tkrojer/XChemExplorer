@@ -13,7 +13,7 @@ from settings_preferences import setup
 import XChemToolTips
 import XChemMain
 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 from overview_tab import OverviewTab
