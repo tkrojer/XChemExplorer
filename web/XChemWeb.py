@@ -379,8 +379,9 @@ class export_to_html:
         if os.path.isfile(mtz.replace('.mtz', '_CC'+ligID+'.log')):
             self.Logfile.warning('logfile of CC analysis exists; skipping...')
             return
-        cmd = ( 'module load phenix\n'
-                'phenix.get_cc_mtz_pdb %s %s > %s' % (mtz, lig, mtz.replace('.mtz', '_CC'+ligID+'.log')) )
+#        cmd = ( 'module load phenix\n'
+#                'phenix.get_cc_mtz_pdb %s %s > %s' % (mtz, lig, mtz.replace('.mtz', '_CC'+ligID+'.log')) )
+        cmd = ( 'phenix.get_cc_mtz_pdb %s %s > %s' % (mtz, lig, mtz.replace('.mtz', '_CC'+ligID+'.log')) )
         os.system(cmd)
 
     def check_lig_cc(self,log):
