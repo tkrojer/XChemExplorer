@@ -52,8 +52,8 @@ import XChemProcess
 import XChemDeposit
 import XChemWeb
 
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+#import matplotlib.pyplot as plt
+#from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 class XChemExplorer(QtGui.QApplication):
     def __init__(self, args):
