@@ -895,7 +895,7 @@ def html_download_all_section(html,protein_name):
         '<ul>\n'
         "<li><a href='files/%s_allPDBs.zip'>Download all PDB model files<a></li>\n" %protein_name +
         "<li><a href='files/%s_allEventMaps.zip'>Download all Event Map files<a></li>\n" %protein_name +
-        '</ul><table id="example" class="display" cellspacing="0">\n
+        '</ul><table id="example" class="display" cellspacing="0">\n'
     )
 
     html += download_section
