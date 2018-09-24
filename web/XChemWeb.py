@@ -148,8 +148,8 @@ class export_to_html:
         for xtal in self.db.samples_for_html_summary():
             self.db_dict = self.db.get_db_dict_for_sample(xtal)
             if self.protein_name == None:
-                self.Logfile.insert('protein name is: '+self.protein_name)
                 self.protein_name = self.db_dict['ProteinName']
+                self.Logfile.insert('protein name is: ' + self.protein_name)
             self.copy_pdb(xtal)
             self.copy_electron_density(xtal)
             self.copy_ligand_files(xtal)
