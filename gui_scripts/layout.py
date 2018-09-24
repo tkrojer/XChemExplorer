@@ -16,7 +16,7 @@ import XChemMain
 #import matplotlib.pyplot as plt
 #from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
-from overview_tab import OverviewTab
+#from overview_tab import OverviewTab
 from datasets_tab import DatasetsTab
 from maps_tab import MapsTab
 from pandda_tab import PanddaTab
@@ -257,7 +257,7 @@ class LayoutObjects():
         # Settings
 
         # Setup tabs
-        OverviewTab().setup(xce_object)
+#        OverviewTab().setup(xce_object)
         DatasetsTab().setup(xce_object)
         MapsTab().setup(xce_object)
         PanddaTab().setup(xce_object)
