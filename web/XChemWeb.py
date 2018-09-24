@@ -312,11 +312,12 @@ class export_to_html:
         self.Logfile.insert(xtal + ': looking for ' + os.path.join(self.projectDir,xtal,'residue_plots',ligID.replace('LIG-','')+'.png'))
         for plot in glob.glob(os.path.join(self.projectDir,xtal,'residue_plots','*')):
             self.Logfile.insert('%s: found %s' %(xtal,plot))
+        self.Logfile.insert('%s: looking for spider plot: %s' %(xtal,os.path.join(self.projectDir,xtal,'residue_plots',ligID.replace('LIG-','')+'.png')))
         if os.path.isfile(os.path.join(self.projectDir,xtal,'residue_plots',ligID.replace('LIG-','')+'.png')):
-            self.Logfile.insert('%s: copying spider plot for %s' %(xtal,ligID))
+            self.Logfile.insert('%s: copying spider plot for %s' %(xtal,ligID.replace('LIG-','')+'.png'))
             os.system('/bin/cp %s %s_%s.png' %(os.path.join(self.projectDir,xtal,'residue_plots',ligID.replace('LIG-','')+'.png'),xtal,ligID))
         else:
-            self.Logfile.error('%s: cannot find spider plot for %s' %(xtal,ligID))
+            self.Logfile.error('%s: cannot find spider plot for %s' %(xtal,ligID.replace('LIG-','')+'.png'))
 
 
     def ligands_in_pdbFile(self,xtal):
@@ -375,12 +376,15 @@ class export_to_html:
 
     def get_lig_cc(self, xtal, mtz, lig):
         ligID = lig.replace('.pdb','')
+        ccLog = mtz.replace('.mtz', '_CC'+ligID+'.log')
         self.Logfile.insert('%s: calculating CC for %s in %s' %(xtal,lig,mtz))
-        if os.path.isfile(mtz.replace('.mtz', '_CC'+ligID+'.log')):
+#        if os.path.isfile(mtz.replace('.mtz', '_CC'+ligID+'.log')):
+        if os.path.isfile(ccLog) and os.path.getsize(ccLog) != 0:
             self.Logfile.warning('logfile of CC analysis exists; skipping...')
             return
 #        cmd = ( 'module load phenix\n'
 #                'phenix.get_cc_mtz_pdb %s %s > %s' % (mtz, lig, mtz.replace('.mtz', '_CC'+ligID+'.log')) )
+        os.system('/bin/rm %s' %mtz.replace('.mtz', '_CC'+ligID+'.log') )
         cmd = ( 'phenix.get_cc_mtz_pdb %s %s > %s' % (mtz, lig, mtz.replace('.mtz', '_CC'+ligID+'.log')) )
         os.system(cmd)
 
