@@ -184,9 +184,9 @@ class export_to_html:
     def prepare_zip_archives(self):
         os.chdir(os.path.join(self.htmlDir,'files'))
         self.Logfile.insert('%s: preparing ZIP archive of all PDB files' %self.protein_name)
-        os.system('zip %s_allPDBs.zip *.pdb')
+        os.system('zip %s_allPDBs.zip *.pdb' %self.protein_name)
         self.Logfile.insert('%s: preparing ZIP archive of all PanDDA event maps' %self.protein_name)
-        os.system('zip %s_allEventMaps.zip *LIG*.ccp4')
+        os.system('zip %s_allEventMaps.zip *LIG*.ccp4' %self.protein_name)
 
 
     def prepare_for_download(self,xtal,pdb,event,compoundCIF,ligID):
