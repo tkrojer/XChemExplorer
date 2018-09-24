@@ -171,7 +171,7 @@ class export_to_html:
                 html += XChemMain.html_table_row(xtal,pdbID,ligand,compoundImage,residuePlot,pdb,event,thumbNail,resoHigh,spg,unitCell,FWT,DELFWT)
                 self.make_thumbnail(xtal,x,y,z,ligand,eventMap)
                 self.prepare_for_download(xtal, pdb, event, compoundCIF, ligand)
-
+        self.prepare_zip_archives()
         html = XChemMain.html_download_all_section(html,self.protein_name)
         self.write_html_file(html)
         self.Logfile.insert('======== finished preparing HTML summary ========')
