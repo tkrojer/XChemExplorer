@@ -46,14 +46,14 @@ import XChemDB
 import XChemPANDDA
 import XChemToolTips
 import XChemMain
-#import XChemPlots
+import XChemPlots
 import XChemLog
 import XChemProcess
 import XChemDeposit
 import XChemWeb
 
-#import matplotlib.pyplot as plt
-#from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 class XChemExplorer(QtGui.QApplication):
     def __init__(self, args):
@@ -637,11 +637,11 @@ class XChemExplorer(QtGui.QApplication):
             self.update_log.insert('{0!s} is marked for DIMPLE'.format(index.row()))
             self.initial_model_dimple_dict[xtal][0].setChecked(True)
 
-#    def update_summary_plot(self):
-#        if self.data_source_set:
-#            XChemPlots.summary_plot(os.path.join(self.database_directory, self.data_source_file),
-#                                    self.overview_axes).update_overview()
-#            self.overview_canvas.draw()
+    def update_summary_plot(self):
+        if self.data_source_set:
+            XChemPlots.summary_plot(os.path.join(self.database_directory, self.data_source_file),
+                                    self.overview_axes).update_overview()
+            self.overview_canvas.draw()
 
     def show_preferences(self):
         preferences = QtGui.QMessageBox()
@@ -2597,7 +2597,7 @@ class XChemExplorer(QtGui.QApplication):
         self.update_status_bar('updating REPROCESSING table')
         self.update_reprocessing_table()
         self.update_status_bar('idle')
-#        self.update_summary_plot()
+        self.update_summary_plot()
 
 
 
