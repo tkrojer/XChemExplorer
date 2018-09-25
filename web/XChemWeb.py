@@ -309,15 +309,21 @@ class export_to_html:
 
     def copy_spider_plot(self,xtal,ligID):
         os.chdir(os.path.join(self.htmlDir, 'png'))
-        self.Logfile.insert(xtal + ': looking for ' + os.path.join(self.projectDir,xtal,'residue_plots',ligID.replace('LIG-','')+'.png'))
-        for plot in glob.glob(os.path.join(self.projectDir,xtal,'residue_plots','*')):
-            self.Logfile.insert('%s: found %s' %(xtal,plot))
-        self.Logfile.insert('%s: looking for spider plot: %s' %(xtal,os.path.join(self.projectDir,xtal,'residue_plots',ligID.replace('LIG-','')+'.png')))
-        if os.path.isfile(os.path.join(self.projectDir,xtal,'residue_plots',ligID.replace('LIG-','')+'.png')):
-            self.Logfile.insert('%s: copying spider plot for %s' %(xtal,ligID.replace('LIG-','')+'.png'))
-            os.system('/bin/cp %s %s_%s.png' %(os.path.join(self.projectDir,xtal,'residue_plots',ligID.replace('LIG-','')+'.png'),xtal,ligID))
+        refPDB = os.path.join(self.projectDir,'refine.pdb')
+        self.Logfile.insert('%s: looking for spider plots...' %xtal)
+        if os.path.isfile(refPDB):
+            refPDBreal = os.path.realpath(refPDB)[:os.path.realpath(refPDB).rfind('/')]
+            self.Logfile.insert(xtal + ': looking for ' + os.path.join(refPDBreal,'residue_plots',ligID.replace('LIG-','')+'.png'))
+            for plot in glob.glob(os.path.join(refPDBreal,'residue_plots','*')):
+                self.Logfile.insert('%s: found %s' %(xtal,plot))
+            self.Logfile.insert('%s: looking for spider plot: %s' %(xtal,os.path.join(refPDBreal,'residue_plots',ligID.replace('LIG-','')+'.png')))
+            if os.path.isfile(os.path.join(self.projectDir,xtal,'residue_plots',ligID.replace('LIG-','')+'.png')):
+                self.Logfile.insert('%s: copying spider plot for %s' %(xtal,ligID.replace('LIG-','')+'.png'))
+                os.system('/bin/cp %s %s_%s.png' %(os.path.join(refPDBreal,'residue_plots',ligID.replace('LIG-','')+'.png'),xtal,ligID))
+            else:
+                self.Logfile.error('%s: cannot find spider plot for %s' %(xtal,ligID.replace('LIG-','')+'.png'))
         else:
-            self.Logfile.error('%s: cannot find spider plot for %s' %(xtal,ligID.replace('LIG-','')+'.png'))
+            self.Logfile.error('%s: cannot find refine.pdb, i.e. cannot start looking for spider plots...' %xtal)
 
 
     def ligands_in_pdbFile(self,xtal):
@@ -366,13 +372,26 @@ class export_to_html:
             if not os.path.isfile(eventMAP):
                 eventMAP = []
             else:
-                self.copy_eventMap(xtal,ligID,eventMAP)
+                self.cut_eventMAP(xtal,ligID,eventMAP)
         return eventMAP
+
+    def cut_eventMAP(self,xtal,ligID,eventMAP):
+        os.chdir(os.path.join(self.projectDir, xtal))
+        self.Logfile.insert('%s: cutting event map around ligand %s' %(xtal,ligID))
+        ligMAP = xtal + '_' + ligID + '.ccp4'
+        cmd = (
+            'mapmask mapin %s mapout %s xyzin %s << eof\n'  %(eventMAP,ligMAP,ligID+'.pdb') +
+            ' border 10\n'
+            ' end\n'
+            'eof'
+        )
+        os.system(cmd)
+        self.copy_eventMap(xtal, ligID, eventMAP)
 
     def copy_eventMap(self,xtal,ligID,eventMAP):
         os.chdir(os.path.join(self.htmlDir,'files'))
         self.Logfile.insert('%s: copying event map for %s' %(xtal,ligID))
-        os.system('/bin/cp %s %s_%s.ccp4' %(os.path.join(self.projectDir,xtal,eventMAP),xtal,ligID))
+        os.system('/bin/cp %s/%s_%s.ccp4 .' %(os.path.join(self.projectDir,xtal),xtal,ligID))
 
     def get_lig_cc(self, xtal, mtz, lig):
         ligID = lig.replace('.pdb','')
