@@ -396,7 +396,7 @@ class export_to_html:
         self.Logfile.insert('%s: cutting %s around %s' %(xtal,mapin,mapout))
         cmd = (
             'mapmask mapin %s mapout %s xyzin %s << eof\n'  %(mapin,mapout,pdbCentre) +
-            ' border 7\n'
+            ' border 12\n'
             ' end\n'
             'eof'
         )
