@@ -391,7 +391,7 @@ class export_to_html:
     def copy_eventMap(self,xtal,ligID,eventMAP):
         os.chdir(os.path.join(self.htmlDir,'files'))
         self.Logfile.insert('%s: copying event map for %s' %(xtal,ligID))
-        os.system('/bin/cp %s/%s_%s.ccp4 .' %(os.path.join(self.projectDir,xtal),xtal,ligID))
+        os.system('/bin/mv %s/%s_%s.ccp4 .' %(os.path.join(self.projectDir,xtal),xtal,ligID))
 
     def get_lig_cc(self, xtal, mtz, lig):
         ligID = lig.replace('.pdb','')
