@@ -152,10 +152,12 @@ class export_to_html:
                 self.Logfile.insert('protein name is: ' + self.protein_name)
             self.copy_pdb(xtal)
             self.copy_mtz(xtal)
-            self.copy_electron_density(xtal)
+#            self.copy_electron_density(xtal)
             self.copy_ligand_files(xtal)
             for ligand in self.ligands_in_pdbFile(xtal):
                 eventMap = self.find_matching_event_map(xtal, ligand)
+                if eventMap != []:
+                    self.cut_and_copy_map(xtal, ligand+'.pdb', eventMap, xtal + '_' + ligand + '.ccp4')
                 x,y,z = self.pdb.get_centre_of_gravity_of_residue(ligand)
                 self.copy_spider_plot(xtal,ligand)
                 pdbID = self.db_dict['Deposition_PDB_ID']
@@ -168,8 +170,10 @@ class export_to_html:
                 resoHigh = self.db_dict['DataProcessingResolutionHigh']
                 spg = self.db_dict['RefinementSpaceGroup']
                 unitCell = self.db_dict['DataProcessingUnitCell']
-                FWT = xtal + '_2fofc.ccp4'
-                DELFWT = xtal + '_fofc.ccp4'
+                FWT = xtal + '-' + ligand + '_2fofc.ccp4'
+                self.cut_and_copy_map(xtal, ligand + '.pdb', '2fofc.map', FWT)
+                DELFWT = xtal + '-' + ligand + '_fofc.ccp4'
+                self.cut_and_copy_map(xtal, ligand + '.pdb', 'fofc.map', DELFWT)
                 html += XChemMain.html_table_row(xtal,pdbID,ligand,compoundImage,residuePlot,pdb,event,thumbNail,resoHigh,spg,unitCell,FWT,DELFWT)
                 self.make_thumbnail(xtal,x,y,z,ligand,eventMap)
                 self.prepare_for_download(xtal, pdb, event, compoundCIF, ligand)
@@ -383,9 +387,24 @@ class export_to_html:
             eventMAP = mtz[mtz.rfind('/')+1:].replace('.P1.mtz','.ccp4')
             if not os.path.isfile(eventMAP):
                 eventMAP = []
-            else:
-                self.cut_eventMAP(xtal,ligID,eventMAP)
+#            else:
+#                self.cut_eventMAP(xtal,ligID,eventMAP)
         return eventMAP
+
+    def cut_and_copy_map(self,xtal,pdbCentre,mapin,mapout):
+        os.chdir(os.path.join(self.projectDir, xtal))
+        self.Logfile.insert('%s: cutting %s around %s' %(xtal,mapin,mapout))
+        cmd = (
+            'mapmask mapin %s mapout %s xyzin %s << eof\n'  %(mapin,mapout,pdbCentre) +
+            ' border 7\n'
+            ' end\n'
+            'eof'
+        )
+        os.system(cmd)
+        self.Logfile.insert('%s: moving %s to %s/files' %(xtal,mapout,self.htmlDir))
+        os.system('/bin/mv %s %s/files' %(mapout,self.htmlDir))
+
+
 
     def cut_eventMAP(self,xtal,ligID,eventMAP):
         os.chdir(os.path.join(self.projectDir, xtal))
