@@ -191,7 +191,7 @@ class export_to_html:
         self.Logfile.insert('%s: preparing ZIP archive of all CIF files' %self.protein_name)
         os.system('zip %s_allCIFs.zip *.cif' %self.protein_name)
         self.Logfile.insert('%s: preparing ZIP archive of all MTZ files' %self.protein_name)
-        os.system('zip %s_allCIFs.zip *.mtz' %self.protein_name)
+        os.system('zip %s_allMTZs.zip *.mtz' %self.protein_name)
 
 
     def prepare_for_download(self,xtal,pdb,event,compoundCIF,ligID):
@@ -326,13 +326,12 @@ class export_to_html:
         self.Logfile.insert('%s: looking for spider plots...' %xtal)
         if os.path.isfile(refPDB):
             refPDBreal = os.path.realpath(refPDB)[:os.path.realpath(refPDB).rfind('/')]
-            self.Logfile.insert(xtal + ': looking for ' + os.path.join(refPDBreal,'residue_plots',ligID.replace('LIG-','')+'.png'))
-            for plot in glob.glob(os.path.join(refPDBreal,'residue_plots','*')):
-                self.Logfile.insert('%s: found %s' %(xtal,plot))
-            self.Logfile.insert('%s: looking for spider plot: %s' %(xtal,os.path.join(refPDBreal,'residue_plots',ligID.replace('LIG-','')+'.png')))
-            if os.path.isfile(os.path.join(self.projectDir,xtal,'residue_plots',ligID.replace('LIG-','')+'.png')):
-                self.Logfile.insert('%s: copying spider plot for %s' %(xtal,ligID.replace('LIG-','')+'.png'))
-                os.system('/bin/cp %s %s_%s.png' %(os.path.join(refPDBreal,'residue_plots',ligID.replace('LIG-','')+'.png'),xtal,ligID))
+            plot = os.path.join(refPDBreal,'residue_plots',ligID.replace('LIG-','')+'.png')
+            self.Logfile.insert(xtal + ': looking for ' + plot)
+            if os.path.isfile(plot):
+                self.Logfile.insert('%s: found %s' % (xtal, plot))
+                self.Logfile.insert('%s: copying spider plot for %s' % (xtal, ligID.replace('LIG-', '') + '.png'))
+                os.system('/bin/cp %s %s_%s.png' % (plot, xtal, ligID))
             else:
                 self.Logfile.error('%s: cannot find spider plot for %s' %(xtal,ligID.replace('LIG-','')+'.png'))
         else:
