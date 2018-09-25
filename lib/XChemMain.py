@@ -696,7 +696,7 @@ def html_header():
 		}
 
 
-            function create_view(div_name,pdb_bound,event_name,FWT,DELFWT,lig_name) {
+            function create_view(div_name,pdb_bound,event_name,FWT,DELFWT,ligChain,ligResid) {
     // Code for example: test/map-shift
     if (stage==undefined){
      create_stage();
@@ -718,7 +718,6 @@ def html_header():
         var fwt = ol[ 2 ];
         var delfwt = ol[ 3 ];
 		var strucSurf = ol[1];
-        struc.autoView(lig_name)
         var eventMap = map.addRepresentation( "surface", {
             boxSize: 10,
             useWorker: false,
@@ -782,6 +781,7 @@ def html_header():
 			sele: sele2 + " or LIG"
 			});
 
+        struc.autoView("ligand and " + ligResid + " and " + ":" + ligChain)
         stage.setFocus( 95 );
 
 		stage.mouseControls.add('scroll', function () {
@@ -907,6 +907,9 @@ def html_download_all_section(html,protein_name):
 
 def html_table_row(xtalID,pdbID,ligID,compoundImage,residuePlot,pdb,event,thumbNail,resoHigh,spg,unitCell,FWT,DELFWT):
 
+    ligChain = ligID.split('-')[1]
+    ligResid = ligID.split('-')[2]
+
     row = (
         '<tr>\n'
         '<td>%s</td>\n' %xtalID +
@@ -914,7 +917,7 @@ def html_table_row(xtalID,pdbID,ligID,compoundImage,residuePlot,pdb,event,thumbN
         '<td>%s</td>\n' %ligID +
         "<td><img src='png/%s' height=130px></td>\n" %compoundImage +
         "<td><img src='png/%s' height=153px></td>\n" %residuePlot +
-        "<td><div id='%s' class='map'><a onclick=create_view('viewport','files/%s','files/%s','files/%s','files/%s','LIG')><img src='png/%s'></a></div></td>\n" %(pdbID,pdb,event,FWT,DELFWT,thumbNail) +
+        "<td><div id='%s' class='map'><a onclick=create_view('viewport','files/%s','files/%s','files/%s','files/%s','%s','%s')><img src='png/%s'></a></div></td>\n" %(pdbID,pdb,event,FWT,DELFWT,ligChain,ligResid,thumbNail) +
         '<td>%s</td>\n' %resoHigh +
         '<td>%s </br> %s</td>\n' %(spg,unitCell) +
         "<td><a href='download/%s_%s.zip'>Save</a></td>\n" %(pdb.replace('.pdb',''),ligID) +
