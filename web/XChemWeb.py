@@ -151,6 +151,7 @@ class export_to_html:
                 self.protein_name = self.db_dict['ProteinName']
                 self.Logfile.insert('protein name is: ' + self.protein_name)
             self.copy_pdb(xtal)
+            self.copy_mtz(xtal)
             self.copy_electron_density(xtal)
             self.copy_ligand_files(xtal)
             for ligand in self.ligands_in_pdbFile(xtal):
@@ -186,7 +187,11 @@ class export_to_html:
         self.Logfile.insert('%s: preparing ZIP archive of all PDB files' %self.protein_name)
         os.system('zip %s_allPDBs.zip *.pdb' %self.protein_name)
         self.Logfile.insert('%s: preparing ZIP archive of all PanDDA event maps' %self.protein_name)
-        os.system('zip %s_allEventMaps.zip *LIG*.ccp4' %self.protein_name)
+        os.system('zip %s_allEVENTmaps.zip *LIG*.ccp4' %self.protein_name)
+        self.Logfile.insert('%s: preparing ZIP archive of all CIF files' %self.protein_name)
+        os.system('zip %s_allCIFs.zip *.cif' %self.protein_name)
+        self.Logfile.insert('%s: preparing ZIP archive of all MTZ files' %self.protein_name)
+        os.system('zip %s_allCIFs.zip *.mtz' %self.protein_name)
 
 
     def prepare_for_download(self,xtal,pdb,event,compoundCIF,ligID):
@@ -275,6 +280,15 @@ class export_to_html:
         else:
             self.Logfile.error('%s: cannot find refine.split.bound-state.pdb' %xtal)
 
+    def copy_mtz(self,xtal):
+        os.chdir(os.path.join(self.htmlDir, 'files'))
+        self.pdb = None
+        if os.path.isfile(os.path.join(self.projectDir,xtal,xtal+'.free.mtz')):
+            self.Logfile.insert('%s: copying %s.free.mtz to html directory' %(xtal,xtal))
+            os.system('/bin/cp %s/%s.free.mtz .' %(os.path.join(self.projectDir,xtal),xtal))
+        else:
+            self.Logfile.error('%s: cannot find %s.free.mtz' %(xtal,xtal))
+
     def copy_electron_density(self,xtal):
         os.chdir(os.path.join(self.htmlDir, 'files'))
 
@@ -309,7 +323,7 @@ class export_to_html:
 
     def copy_spider_plot(self,xtal,ligID):
         os.chdir(os.path.join(self.htmlDir, 'png'))
-        refPDB = os.path.join(self.projectDir,'refine.pdb')
+        refPDB = os.path.join(self.projectDir,xtal,'refine.pdb')
         self.Logfile.insert('%s: looking for spider plots...' %xtal)
         if os.path.isfile(refPDB):
             refPDBreal = os.path.realpath(refPDB)[:os.path.realpath(refPDB).rfind('/')]

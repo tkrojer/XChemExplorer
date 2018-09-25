@@ -893,8 +893,10 @@ def html_download_all_section(html,protein_name):
     download_section = (
         '<h4>Download data</h4>\n'
         '<ul>\n'
-        "<li><a href='files/%s_allPDBs.zip'>Download all PDB model files<a></li>\n" %protein_name +
-        "<li><a href='files/%s_allEventMaps.zip'>Download all Event Map files<a></li>\n" %protein_name +
+        "<li><a href='files/%s_allPDBs.zip'>Download all PDB model files<a></li>" %protein_name +
+        "<li><a href='files/%s_allEVENTmaps.zip'>Download all EVENT map files<a></li>\n" %protein_name +
+        "<li><a href='files/%s_allMTZs.zip'>Download all MTZ files files<a></li>" % protein_name +
+        "<li><a href='files/%s_allCIFs.zip'>Download all CIF files<a></li>\n" % protein_name +
         '</ul><table id="example" class="display" cellspacing="0">\n'
     )
 
