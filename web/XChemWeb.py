@@ -157,7 +157,7 @@ class export_to_html:
             for ligand in self.ligands_in_pdbFile(xtal):
                 eventMap = self.find_matching_event_map(xtal, ligand)
                 if eventMap != []:
-                    self.cut_and_copy_map(xtal, ligand+'.pdb', eventMap, xtal + '_' + ligand + '.ccp4')
+                    self.cut_and_copy_map(xtal, ligand+'.pdb', eventMap, xtal + '_' + ligand + '_event.ccp4')
                 x,y,z = self.pdb.get_centre_of_gravity_of_residue(ligand)
                 self.copy_spider_plot(xtal,ligand)
                 pdbID = self.db_dict['Deposition_PDB_ID']
@@ -165,7 +165,7 @@ class export_to_html:
                 compoundCIF = xtal + '_' + self.db_dict['CompoundCode'] + '.cif'
                 residuePlot = xtal + '_' + ligand + '.png'
                 pdb = xtal + '.pdb'
-                event = xtal + '_' + ligand + '.ccp4'
+                event = xtal + '_' + ligand + '_event.ccp4'
                 thumbNail = xtal + '_' + ligand + '_thumb.png'
                 resoHigh = self.db_dict['DataProcessingResolutionHigh']
                 spg = self.db_dict['RefinementSpaceGroup']
@@ -191,7 +191,7 @@ class export_to_html:
         self.Logfile.insert('%s: preparing ZIP archive of all PDB files' %self.protein_name)
         os.system('zip %s_allPDBs.zip *.pdb' %self.protein_name)
         self.Logfile.insert('%s: preparing ZIP archive of all PanDDA event maps' %self.protein_name)
-        os.system('zip %s_allEVENTmaps.zip *LIG*.ccp4' %self.protein_name)
+        os.system('zip %s_allEVENTmaps.zip *event.ccp4' %self.protein_name)
         self.Logfile.insert('%s: preparing ZIP archive of all CIF files' %self.protein_name)
         os.system('zip %s_allCIFs.zip *.cif' %self.protein_name)
         self.Logfile.insert('%s: preparing ZIP archive of all MTZ files' %self.protein_name)
@@ -406,23 +406,23 @@ class export_to_html:
 
 
 
-    def cut_eventMAP(self,xtal,ligID,eventMAP):
-        os.chdir(os.path.join(self.projectDir, xtal))
-        self.Logfile.insert('%s: cutting event map around ligand %s' %(xtal,ligID))
-        ligMAP = xtal + '_' + ligID + '.ccp4'
-        cmd = (
-            'mapmask mapin %s mapout %s xyzin %s << eof\n'  %(eventMAP,ligMAP,ligID+'.pdb') +
-            ' border 10\n'
-            ' end\n'
-            'eof'
-        )
-        os.system(cmd)
-        self.copy_eventMap(xtal, ligID, eventMAP)
+#    def cut_eventMAP(self,xtal,ligID,eventMAP):
+#        os.chdir(os.path.join(self.projectDir, xtal))
+#        self.Logfile.insert('%s: cutting event map around ligand %s' %(xtal,ligID))
+#        ligMAP = xtal + '_' + ligID + '.ccp4'
+#        cmd = (
+#            'mapmask mapin %s mapout %s xyzin %s << eof\n'  %(eventMAP,ligMAP,ligID+'.pdb') +
+#            ' border 10\n'
+#            ' end\n'
+#            'eof'
+#        )
+#        os.system(cmd)
+#        self.copy_eventMap(xtal, ligID, eventMAP)
 
-    def copy_eventMap(self,xtal,ligID,eventMAP):
-        os.chdir(os.path.join(self.htmlDir,'files'))
-        self.Logfile.insert('%s: copying event map for %s' %(xtal,ligID))
-        os.system('/bin/mv %s/%s_%s.ccp4 .' %(os.path.join(self.projectDir,xtal),xtal,ligID))
+#    def copy_eventMap(self,xtal,ligID,eventMAP):
+#        os.chdir(os.path.join(self.htmlDir,'files'))
+#        self.Logfile.insert('%s: copying event map for %s' %(xtal,ligID))
+#        os.system('/bin/mv %s/%s_%s.ccp4 .' %(os.path.join(self.projectDir,xtal),xtal,ligID))
 
     def get_lig_cc(self, xtal, mtz, lig):
         ligID = lig.replace('.pdb','')
