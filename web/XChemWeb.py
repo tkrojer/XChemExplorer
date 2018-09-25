@@ -282,7 +282,6 @@ class export_to_html:
 
     def copy_mtz(self,xtal):
         os.chdir(os.path.join(self.htmlDir, 'files'))
-        self.pdb = None
         if os.path.isfile(os.path.join(self.projectDir,xtal,xtal+'.free.mtz')):
             self.Logfile.insert('%s: copying %s.free.mtz to html directory' %(xtal,xtal))
             os.system('/bin/cp %s/%s.free.mtz .' %(os.path.join(self.projectDir,xtal),xtal))
