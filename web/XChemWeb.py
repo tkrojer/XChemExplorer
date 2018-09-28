@@ -174,9 +174,11 @@ class export_to_html:
                 spg = self.db_dict['RefinementSpaceGroup']
                 unitCell = self.db_dict['DataProcessingUnitCell']
                 FWT = xtal + '-' + ligand + '_2fofc.ccp4'
-                self.cut_and_copy_map(xtal, ligand + '.pdb', 'refine.mtz', FWT,'FWT','PHWT')
+                if not os.path.isfile(FWT):
+                    self.cut_and_copy_map(xtal, ligand + '.pdb', 'refine.mtz', FWT,'FWT','PHWT')
                 DELFWT = xtal + '-' + ligand + '_fofc.ccp4'
-                self.cut_and_copy_map(xtal, ligand + '.pdb', 'refine.mtz', DELFWT,'DELFWT','PHDELWT')
+                if not os.path.isfile(DELFWT):
+                    self.cut_and_copy_map(xtal, ligand + '.pdb', 'refine.mtz', DELFWT,'DELFWT','PHDELWT')
                 ligConfidence = self.db.get_ligand_confidence_for_ligand(xtal, ligChain, ligNumber, ligName)
                 modelStatus = self.db_dict['RefinementOutcome']
                 html += XChemMain.html_table_row(xtal,pdbID,ligand,compoundImage,residuePlot,pdb,event,
