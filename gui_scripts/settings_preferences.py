@@ -201,7 +201,12 @@ class setup():
 
         xce_object.preferences_selection_mechanism = ['IsigI*Comp*UniqueRefl',
                                                       'highest_resolution',
-                                                      'lowest_Rfree']
+                                                      'lowest_Rfree',
+                                                      'dials - only',
+                                                      'xia2 3d - only',
+                                                      'xia2 3dii - only',
+                                                      'autoProc -only',
+                                                      'autoProc_staraniso - only']
 
         xce_object.allowed_unitcell_difference_percent = 12
         xce_object.acceptable_low_resolution_limit_for_data = 3.5

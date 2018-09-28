@@ -1965,6 +1965,8 @@ class choose_autoprocessing_outcome(QtCore.QThread):
                 dbDict = self.selectHighestScore(dbList)
             elif self.selection_mechanism == 'highest_resolution':
                 dbDict = self.selectHighestResolution(dbList)
+            elif 'only' in self.selection_mechanism:
+                dbDict = self.selectSpecificPipelineOnly(dbList)
 
             # 4.) Set new symbolic links in project directory
             XChemMain.linkAutoProcessingResult(sample,dbDict,self.projectDir,self.xce_logfile)
@@ -2057,6 +2059,14 @@ class choose_autoprocessing_outcome(QtCore.QThread):
                 tmp.append(100.0)
         highestResoDict = dbList[tmp.index(min(tmp))]
         return highestResoDict
+
+    def selectSpecificPipelineOnly(self,dbList):
+        print 'hallo'
+#        tmp = []
+#        for resultDict in dbList:
+#            if 'dials' in self.selection_mechanism and resultDict['DataProcessingResolutionHigh']
+#                tmp.append(entry)
+#            if
 
     def determine_processing_outcome(self,db_dict):
         outcome = 'Failed - unknown'

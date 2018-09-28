@@ -573,17 +573,17 @@ class parse:
 #                print line.split()
             if 'Wavelength' in line and len(line.split())==3:
                 self.aimless['DataCollectionWavelength']=line.split()[1]
-            if line.startswith('Low resolution limit') and len(line.split())==6:
+            if 'Low resolution limit' in line and len(line.split())==6:
                 self.aimless['DataProcessingResolutionLow'] = line.split()[3]
                 self.aimless['DataProcessingResolutionHighOuterShell'] = line.split()[5]
-            if line.startswith('High resolution limit') and len(line.split())==6:
+            if 'High resolution limit' in line and len(line.split())==6:
                 self.aimless['DataProcessingResolutionHigh'] = line.split()[3]
                 self.aimless['DataProcessingResolutionLowInnerShell'] = line.split()[4]
-            if line.startswith('Rmerge  (all I+ and I-)') and len(line.split())==8:
+            if 'Rmerge  (all I+ and I-)' in line and len(line.split())==8:
                 self.aimless['DataProcessingRmergeOverall'] = line.split()[5]
                 self.aimless['DataProcessingRmergeLow'] = line.split()[6]
                 self.aimless['DataProcessingRmergeHigh']  = line.split()[7]
-            if line.startswith('Mean((I)/sd(I))') and len(line.split())==4:
+            if 'Mean((I)/sd(I))' in line and len(line.split())==4:
                 self.aimless['DataProcessingIsigOverall'] = line.split()[1]
                 self.aimless['DataProcessingIsigHigh'] = line.split()[3]
                 self.aimless['DataProcessingIsigLow'] = line.split()[2]
@@ -591,7 +591,11 @@ class parse:
                 self.aimless['DataProcessingCompletenessOverall'] = line.split()[1]
                 self.aimless['DataProcessingCompletenessHigh'] = line.split()[3]
                 self.aimless['DataProcessingCompletenessLow'] = line.split()[2]
-            if line.startswith('Multiplicity') and len(line.split())==4:
+            if 'Completeness (ellipsoidal)' in line and len(line.split())==5:
+                self.aimless['DataProcessingCompletenessOverall'] = line.split()[2]
+                self.aimless['DataProcessingCompletenessHigh'] = line.split()[4]
+                self.aimless['DataProcessingCompletenessLow'] = line.split()[3]
+            if 'Multiplicity' in line and len(line.split())==4:
                 self.aimless['DataProcessingMultiplicityOverall'] = line.split()[1]
                 self.aimless['DataProcessingMultiplicityHigh'] = line.split()[3]
                 self.aimless['DataProcessingMultiplicityLow'] = line.split()[3]
@@ -599,6 +603,10 @@ class parse:
                 self.aimless['DataProcessingCChalfOverall'] = line.split()[4]
                 self.aimless['DataProcessingCChalfLow'] = line.split()[5]
                 self.aimless['DataProcessingCChalfHigh'] = line.split()[6]
+            if line.startswith('     CC(1/2)') and len(line.split())==4:
+                self.aimless['DataProcessingCChalfOverall'] = line.split()[1]
+                self.aimless['DataProcessingCChalfLow'] = line.split()[2]
+                self.aimless['DataProcessingCChalfHigh'] = line.split()[3]
             if line.startswith('Estimates of resolution limits: overall'):
                 resolution_at_sigma_line_overall_found=True
             if resolution_at_sigma_line_overall_found:
@@ -609,7 +617,7 @@ class parse:
                     if '2.0' in line.split()[3]:
                         self.aimless['DataProcessingResolutionHigh20sigma']=line.split()[6][:-1]
                         resolution_at_sigma_line_overall_found=False
-            if line.startswith('Average unit cell:') and len(line.split())==9:
+            if (line.startswith('Average unit cell:') or line.startswith('  Unit cell parameters')) and len(line.split())==9:
                 tmp = []
                 tmp.append(line.split())
                 a = int(float(tmp[0][3]))
@@ -626,8 +634,11 @@ class parse:
                 self.aimless['DataProcessingGamma']=str(gamma)
             if line.startswith('Total number unique') and len(line.split())==6:
                 self.aimless['DataProcessingUniqueReflectionsOverall']=line.split()[3]
-            if line.startswith('Space group:'):
-                self.aimless['DataProcessingSpaceGroup']=line.replace('Space group: ','')[:-1]
+            if line.startswith('Space group:') or line.startswith('  Spacegroup name'):
+                if 'Spacegroup name' in line:
+                    self.aimless['DataProcessingSpaceGroup'] = line.replace('  Spacegroup name', '')[:-1]
+                else:
+                    self.aimless['DataProcessingSpaceGroup']=line.replace('Space group: ','')[:-1]
                 self.aimless['DataProcessingLattice']=self.get_lattice_from_space_group(self.aimless['DataProcessingSpaceGroup'])
                 self.aimless['DataProcessingPointGroup']=self.get_pointgroup_from_space_group(self.aimless['DataProcessingSpaceGroup'])
                 if a != 'n/a' and b != 'n/a' and c != 'n/a' and \
