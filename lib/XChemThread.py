@@ -2285,6 +2285,7 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
                 continue
 
             xtal = collected_xtals[collected_xtals.rfind('/')+1:]
+            self.Logfile.insert('%s: checking auto-processing results')
             self.createSampleDir(xtal)
 
             if self.target == '=== project directory ===':
