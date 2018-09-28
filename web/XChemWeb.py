@@ -420,17 +420,23 @@ class export_to_html:
         os.chdir(os.path.join(self.projectDir, xtal))
         self.Logfile.insert('%s: cutting density of %s around %s' %(xtal,mtzin,pdbCentre))
         if os.path.isfile(mapout):
+            self.Logfile.warning('%s: removing map -> %s' %(xtal,mapout))
             os.system('/bin/rm '+mapout)
-            self.Logfile.warning('%s: %s exists; skipping...' %(xtal,mapout))
 #        else:
 
         if mtzin.endswith('.map') or mtzin.endswith('.ccp4'):
+#            cmd = (
+#                'mapmask mapin %s mapout %s xyzin %s << eof\n'  %(mtzin,mapout,pdbCentre) +
+#                ' border 12\n'
+#                ' end\n'
+#                'eof'
+#            )
+
             cmd = (
-                'mapmask mapin %s mapout %s xyzin %s << eof\n'  %(mtzin,mapout,pdbCentre) +
-                ' border 12\n'
-                ' end\n'
-                'eof'
+                'cmapcut -mapin %s -pdbin %s -mapout %s' %(mtzin,pdbCentre,mapout)
+
             )
+
 #            cmd = (
 #                "phenix.cut_out_density %s %s map_coeff_labels='%s,%s' cutout_model_radius=6 cutout_map_file_name=%s cutout_as_map=True" %(pdbCentre,mtzin,F,PHI,mapout)
 #            )
