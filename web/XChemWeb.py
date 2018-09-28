@@ -420,7 +420,7 @@ class export_to_html:
         os.chdir(os.path.join(self.projectDir, xtal))
         self.Logfile.insert('%s: cutting density of %s around %s' %(xtal,mtzin,pdbCentre))
         if os.path.isfile(mapout):
-            self.Logfile.warning('%s: %s exists; skipping...' %{xtal,mapout})
+            self.Logfile.warning('%s: %s exists; skipping...' %(xtal,mapout))
         else:
 
 #        cmd = (
