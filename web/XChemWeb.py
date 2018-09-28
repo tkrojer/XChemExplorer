@@ -367,15 +367,14 @@ class export_to_html:
         self.Logfile.insert('%s: the database thinks the following event map belongs to %s: %s' %(xtal,ligID,eventMAP))
         if eventMAP == '':
             self.Logfile.warning('%s: the respective field in the DB is apparently emtpy' %xtal)
-            self.Logfile.warning('%s: will try to determine ligand - event map relationship by checking CC...')
+            self.Logfile.warning('%s: will try to determine ligand - event map relationship by checking CC...' %xtal)
             eventMap = self.find_matching_event_map(xtal,ligID)
         elif not os.path.isfile(eventMAP):
             self.Logfile.warning('%s: event map file does not exist!' %xtal)
-            self.Logfile.warning('%s: will try to determine ligand - event map relationship by checking CC...')
+            self.Logfile.warning('%s: will try to determine ligand - event map relationship by checking CC...' %xtal)
             eventMap = self.find_matching_event_map(xtal,ligID)
         else:
-            self.Logfile.insert('%s: found matching event map!')
-            eventMAP = mtz[mtz.rfind('/') + 1:].replace('.P1.mtz', '.ccp4')
+            self.Logfile.insert('%s: found matching event map!' %xtal)
         return eventMAP
 
     def find_matching_event_map(self,xtal,ligID):
