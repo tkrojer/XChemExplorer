@@ -155,6 +155,9 @@ class export_to_html:
 #            self.copy_electron_density(xtal)
             self.copy_ligand_files(xtal)
             for ligand in self.ligands_in_pdbFile(xtal):
+                ligName = ligand.split('-')[0]
+                ligChain = ligand.split('-')[1]
+                ligNumber = ligand.split('-')[2]
                 eventMap = self.find_matching_event_map_from_database(xtal, ligand)
                 if eventMap != []:
                     if not os.path.isfile(os.path.join(self.projectDir,xtal,xtal + '_' + ligand + '_event.ccp4')):
