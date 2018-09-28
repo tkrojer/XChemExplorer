@@ -426,7 +426,7 @@ class export_to_html:
 
         if mtzin.endswith('.map') or mtzin.endswith('.ccp4'):
             cmd = (
-                'mapmask mapin %s mapout %s xyzin %s << eof\n'  %(mapin,mapout,pdbCentre) +
+                'mapmask mapin %s mapout %s xyzin %s << eof\n'  %(mtzin,mapout,pdbCentre) +
                 ' border 12\n'
                 ' end\n'
                 'eof'
