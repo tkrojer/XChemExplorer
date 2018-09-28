@@ -411,7 +411,7 @@ class export_to_html:
 
     def cut_and_copy_map(self,xtal,pdbCentre,mtzin,mapout,F,PHI):
         os.chdir(os.path.join(self.projectDir, xtal))
-        self.Logfile.insert('%s: cutting %s around %s' %(xtal,mapin,mapout))
+        self.Logfile.insert('%s: cutting %s around %s' %(xtal,mtzin,mapout))
 #        cmd = (
 #            'mapmask mapin %s mapout %s xyzin %s << eof\n'  %(mapin,mapout,pdbCentre) +
 #            ' border 12\n'
