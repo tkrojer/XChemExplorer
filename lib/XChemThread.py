@@ -2120,6 +2120,9 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
                 [   os.path.join('autoPROC', '*'),
                     '*aimless.log',
                     '*truncate-unique.mtz'],
+                [   os.path.join('autoPROC', '*'),
+                    '*staraniso_alldata-unique.table1',
+                    '*staraniso_alldata-unique.mtz'],
                 [   os.path.join('*'),
                     os.path.join('LogFiles', '*aimless.log'),
                     os.path.join('DataFiles', '*free.mtz')]
@@ -2297,7 +2300,10 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
                             continue
                         if self.empty_folder(xtal,folder):
                             continue
-                        autoproc = self.getAutoProc(folder)
+                        if 'staraniso' in logfile:
+                            autoproc = 'aP_staraniso'
+                        else
+                            autoproc = self.getAutoProc(folder)
                         if self.alreadyParsed(xtal,current_run,autoproc):
                             continue
                         db_dict = self.readProcessingResults(xtal,folder,logfile,mtzfile,timestamp,current_run,autoproc)

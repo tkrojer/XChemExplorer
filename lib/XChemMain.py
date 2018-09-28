@@ -730,7 +730,6 @@ def html_header():
         var fwtMap = fwt.addRepresentation( "surface", {
             boxSize: 10,
             useWorker: false,
-            wrap: true,
             color: "skyblue",
             isolevel: 1.0,
             contour: true
@@ -740,7 +739,6 @@ def html_header():
         var surfFofc = delfwt.addRepresentation('surface', {
             boxSize: 10,
             useWorker: false,
-            wrap: true,
             color: "green",
             isolevel: 3.0,
             contour: true

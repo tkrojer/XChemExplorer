@@ -554,6 +554,8 @@ class parse:
             self.aimless['DataProcessingProgram']='dials'
         elif 'autoPROC' in logfile:
             self.aimless['DataProcessingProgram']='autoPROC'
+        elif 'staraniso' in logfile:
+            self.aimless['DataProcessingProgram']='aP_staraniso'
 
         # get run number from logfile
         # Note: only works if file is in original directory, but not once it moved to 'inital_model' folder
