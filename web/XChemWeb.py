@@ -157,7 +157,7 @@ class export_to_html:
             for ligand in self.ligands_in_pdbFile(xtal):
                 eventMap = self.find_matching_event_map_from_database(xtal, ligand)
                 if eventMap != []:
-                    self.cut_and_copy_map(xtal, ligand+'.pdb', eventMap, xtal + '_' + ligand + '_event.ccp4')
+                    self.cut_and_copy_map(xtal, ligand+'.pdb', eventMAP.replace('.ccp4','.P1.mtz'), xtal + '_' + ligand + '_event.ccp4')
                 x,y,z = self.pdb.get_centre_of_gravity_of_residue(ligand)
                 self.copy_spider_plot(xtal,ligand)
                 pdbID = self.db_dict['Deposition_PDB_ID']
@@ -171,9 +171,9 @@ class export_to_html:
                 spg = self.db_dict['RefinementSpaceGroup']
                 unitCell = self.db_dict['DataProcessingUnitCell']
                 FWT = xtal + '-' + ligand + '_2fofc.ccp4'
-                self.cut_and_copy_map(xtal, ligand + '.pdb', '2fofc.map', FWT)
+                self.cut_and_copy_map(xtal, ligand + '.pdb', 'refine.mtz', FWT,'FWT','PHWT')
                 DELFWT = xtal + '-' + ligand + '_fofc.ccp4'
-                self.cut_and_copy_map(xtal, ligand + '.pdb', 'fofc.map', DELFWT)
+                self.cut_and_copy_map(xtal, ligand + '.pdb', 'refine.mtz', DELFWT,'DELFWT','PHDELWT')
                 html += XChemMain.html_table_row(xtal,pdbID,ligand,compoundImage,residuePlot,pdb,event,thumbNail,resoHigh,spg,unitCell,FWT,DELFWT)
                 self.make_thumbnail(xtal,x,y,z,ligand,eventMap)
                 self.prepare_for_download(xtal, pdb, event, compoundCIF, ligand)
@@ -409,7 +409,7 @@ class export_to_html:
 #                self.cut_eventMAP(xtal,ligID,eventMAP)
         return eventMAP
 
-    def cut_and_copy_map(self,xtal,pdbCentre,mapin,mapout):
+    def cut_and_copy_map(self,xtal,pdbCentre,mtzin,mapout,F,PHI):
         os.chdir(os.path.join(self.projectDir, xtal))
         self.Logfile.insert('%s: cutting %s around %s' %(xtal,mapin,mapout))
 #        cmd = (
@@ -419,7 +419,7 @@ class export_to_html:
 #            'eof'
 #        )
         cmd = (
-            'phenix.cut_out_density %s %s cutout_model_radius=6 cutout_map_file_name=%s cutout_as_map=True' %(pdbCentre,mapin,mapout)
+            "phenix.cut_out_density %s %s map_coeff_labels='%s,%s' cutout_model_radius=6 cutout_map_file_name=%s cutout_as_map=True" %(pdbCentre,mtzin,F,PHI,mapout)
         )
 
         os.system(cmd)
