@@ -1816,3 +1816,29 @@ class data_source:
                 xtalList.append(str(sample[0]))
         return xtalList
 
+    def get_event_map_for_ligand(self,xtal,ligChain,ligNumber,ligName):
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+
+        sql = (
+            'select '
+            ' PANDDA_site_event_map '
+            'from '
+            ' panddaTable '
+            'where '
+            " CrystalName = '%s' and " %xtal +
+            " PANDDA_site_ligand_chain='%s' and " %ligChain +
+            " PANDDA_site_ligand_sequence_number='%s' and " %ligNumber +
+            " PANDDA_site_ligand_resname='%s'"  %ligName
+        )
+
+        cursor.execute(sql)
+
+        eventMap = ''
+        maps = cursor.fetchall()
+        for map in maps:
+            eventMap = map[0]
+
+        return eventMap
+
+

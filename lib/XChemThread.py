@@ -758,6 +758,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         pandda_models=self.db.execute_statement("select CrystalName,PANDDA_site_index,PANDDA_site_event_index,PANDDA_site_x,PANDDA_site_y,PANDDA_site_z,PANDDApath,ApoStructures from panddaTable")
         if len(pandda_models) > 0:
             progress_step=100/float(len(pandda_models))
+        else:
+            self.Logfile.warning('panddaTable seems to be empty!')
 
         if pandda_models != []:
             for entry in pandda_models:

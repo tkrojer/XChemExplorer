@@ -155,7 +155,7 @@ class export_to_html:
 #            self.copy_electron_density(xtal)
             self.copy_ligand_files(xtal)
             for ligand in self.ligands_in_pdbFile(xtal):
-                eventMap = self.find_matching_event_map(xtal, ligand)
+                eventMap = self.find_matching_event_map_from_database(xtal, ligand)
                 if eventMap != []:
                     self.cut_and_copy_map(xtal, ligand+'.pdb', eventMap, xtal + '_' + ligand + '_event.ccp4')
                 x,y,z = self.pdb.get_centre_of_gravity_of_residue(ligand)
@@ -359,6 +359,25 @@ class export_to_html:
         return ligList
 
 
+    def find_matching_event_map_from_database(self,xtal,ligID):
+        ligName = ligID.split('-')[0]
+        ligChain = ligID.split('-')[1]
+        ligNumber = ligID.split('-')[2]
+        eventMAP = self.db.get_event_map_for_ligand(self, xtal, ligChain, ligNumber, ligName)
+        self.Logfile.insert('%s: the database thinks the following event map belongs to %s: %s' %(xtal,ligID,eventMAP))
+        if eventMAP == '':
+            self.Logfile.warning('%s: the respective field in the DB is apparently emtpy' %xtal)
+            self.Logfile.warning('%s: will try to determine ligand - event map relationship by checking CC...')
+            eventMap = self.find_matching_event_map(xtal,ligID)
+        elif not os.path.isfile(eventMAP):
+            self.Logfile.warning('%s: event map file does not exist!' %xtal)
+            self.Logfile.warning('%s: will try to determine ligand - event map relationship by checking CC...')
+            eventMap = self.find_matching_event_map(xtal,ligID)
+        else:
+            self.Logfile.insert('%s: found matching event map!')
+            eventMAP = mtz[mtz.rfind('/') + 1:].replace('.P1.mtz', '.ccp4')
+        return eventMAP
+
     def find_matching_event_map(self,xtal,ligID):
         os.chdir(os.path.join(self.projectDir, xtal))
         eventMAP = []
@@ -394,12 +413,16 @@ class export_to_html:
     def cut_and_copy_map(self,xtal,pdbCentre,mapin,mapout):
         os.chdir(os.path.join(self.projectDir, xtal))
         self.Logfile.insert('%s: cutting %s around %s' %(xtal,mapin,mapout))
+#        cmd = (
+#            'mapmask mapin %s mapout %s xyzin %s << eof\n'  %(mapin,mapout,pdbCentre) +
+#            ' border 12\n'
+#            ' end\n'
+#            'eof'
+#        )
         cmd = (
-            'mapmask mapin %s mapout %s xyzin %s << eof\n'  %(mapin,mapout,pdbCentre) +
-            ' border 12\n'
-            ' end\n'
-            'eof'
+            'phenix.cut_out_density %s %s cutout_model_radius=6 cutout_map_file_name=%s cutout_as_map=True' %(pdbCentre,mapin,mapout)
         )
+
         os.system(cmd)
         self.Logfile.insert('%s: moving %s to %s/files' %(xtal,mapout,self.htmlDir))
         os.system('/bin/mv %s %s/files' %(mapout,self.htmlDir))
