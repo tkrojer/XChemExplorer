@@ -363,7 +363,7 @@ class export_to_html:
         ligName = ligID.split('-')[0]
         ligChain = ligID.split('-')[1]
         ligNumber = ligID.split('-')[2]
-        eventMAP = self.db.get_event_map_for_ligand(self, xtal, ligChain, ligNumber, ligName)
+        eventMAP = self.db.get_event_map_for_ligand(xtal, ligChain, ligNumber, ligName)
         self.Logfile.insert('%s: the database thinks the following event map belongs to %s: %s' %(xtal,ligID,eventMAP))
         if eventMAP == '':
             self.Logfile.warning('%s: the respective field in the DB is apparently emtpy' %xtal)
