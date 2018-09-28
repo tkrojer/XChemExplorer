@@ -176,6 +176,7 @@ class export_to_html:
                 resoHigh = self.db_dict['DataProcessingResolutionHigh']
                 spg = self.db_dict['RefinementSpaceGroup']
                 unitCell = self.db_dict['DataProcessingUnitCell']
+                os.chdir(os.path.join(self.projectDir,xtal))
                 FWT = xtal + '-' + ligand + '_2fofc.ccp4'
                 if not os.path.isfile(FWT):
                     self.cut_and_copy_map(xtal, ligand + '.pdb', 'refine.mtz', FWT,'FWT','PHWT')
