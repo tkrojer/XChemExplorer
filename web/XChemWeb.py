@@ -175,7 +175,8 @@ class export_to_html:
                 self.cut_and_copy_map(xtal, ligand + '.pdb', 'refine.mtz', FWT,'FWT','PHWT')
                 DELFWT = xtal + '-' + ligand + '_fofc.ccp4'
                 self.cut_and_copy_map(xtal, ligand + '.pdb', 'refine.mtz', DELFWT,'DELFWT','PHDELWT')
-                html += XChemMain.html_table_row(xtal,pdbID,ligand,compoundImage,residuePlot,pdb,event,thumbNail,resoHigh,spg,unitCell,FWT,DELFWT)
+                ligConfidence = self.db.get_ligand_confidence_for_ligand(xtal, ligChain, ligNumber, ligName)
+                html += XChemMain.html_table_row(xtal,pdbID,ligand,compoundImage,residuePlot,pdb,event,thumbNail,resoHigh,spg,unitCell,FWT,DELFWT,ligConfidence)
                 self.make_thumbnail(xtal,x,y,z,ligand,eventMap)
                 self.prepare_for_download(xtal, pdb, event, compoundCIF, ligand)
         if self.protein_name == None:

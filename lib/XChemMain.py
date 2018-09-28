@@ -651,6 +651,7 @@ def html_header():
         "{ 'width': '12%' },\n"
         "{ 'width': '10%' },\n"
         "{ 'width': '9%' },\n"
+        "{ 'width': '9%' },\n"
         "{ 'width': '14%' },\n"
         "{ 'width': '14%' },\n"
         "{ 'width': '9%' },\n"
@@ -885,6 +886,7 @@ def html_header():
         '<th>Crystal ID</th>\n'
         '<th>PDB ID</th>\n'
         '<th>Ligand ID</th>\n'
+        '<th>Ligand confidence</th>\n'
         '<th>Compound</th>\n'
         '<th>Ligand Validation</th>\n'
         '<th>Event Map 3D</th>\n'
@@ -916,7 +918,7 @@ def html_download_all_section(html,protein_name):
     return html
 
 
-def html_table_row(xtalID,pdbID,ligID,compoundImage,residuePlot,pdb,event,thumbNail,resoHigh,spg,unitCell,FWT,DELFWT):
+def html_table_row(xtalID,pdbID,ligID,compoundImage,residuePlot,pdb,event,thumbNail,resoHigh,spg,unitCell,FWT,DELFWT,ligConfidence):
 
     ligChain = ligID.split('-')[1]
     ligResid = ligID.split('-')[2]
@@ -926,6 +928,7 @@ def html_table_row(xtalID,pdbID,ligID,compoundImage,residuePlot,pdb,event,thumbN
         '<td>%s</td>\n' %xtalID +
         '<td><a target="_blank" href="http://www.rcsb.org/structure/%s">%s</a></td>\n' %(pdbID,pdbID) +
         '<td>%s</td>\n' %ligID +
+        '<td>%s</td>\n' % ligConfidence +
         "<td><img src='png/%s' height=130px></td>\n" %compoundImage +
         "<td><img src='png/%s' height=153px></td>\n" %residuePlot +
         "<td><div id='%s' class='map'><a onclick=create_view('viewport','files/%s','files/%s','files/%s','files/%s','%s','%s')><img src='png/%s'></a></div></td>\n" %(pdbID,pdb,event,FWT,DELFWT,ligChain,ligResid,thumbNail) +

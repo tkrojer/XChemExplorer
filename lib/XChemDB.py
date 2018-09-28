@@ -1841,4 +1841,28 @@ class data_source:
 
         return eventMap
 
+    def get_ligand_confidence_for_ligand(self,xtal,ligChain,ligNumber,ligName):
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+
+        sql = (
+            'select '
+            ' PANDDA_site_confidence '
+            'from '
+            ' panddaTable '
+            'where '
+            " CrystalName = '%s' and " %xtal +
+            " PANDDA_site_ligand_chain='%s' and " %ligChain +
+            " PANDDA_site_ligand_sequence_number='%s' and " %ligNumber +
+            " PANDDA_site_ligand_resname='%s'"  %ligName
+        )
+
+        cursor.execute(sql)
+
+        ligConfidence = 'not assigned'
+        ligs = cursor.fetchall()
+        for lig in ligs:
+            ligConfidence = lig[0]
+
+        return ligConfidence
 
