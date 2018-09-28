@@ -160,10 +160,7 @@ class export_to_html:
                 ligNumber = ligand.split('-')[2]
                 eventMap = self.find_matching_event_map_from_database(xtal, ligand)
                 if eventMap != []:
-                    if not os.path.isfile(os.path.join(self.projectDir,xtal,xtal + '_' + ligand + '_event.ccp4')):
-                        self.cut_and_copy_map(xtal, ligand+'.pdb', eventMap.replace('.ccp4','.P1.mtz'), xtal + '_' + ligand + '_event.ccp4','F','PHIF')
-                    else:
-                        self.Logfile.insert('%s: smaller version of event map already exists; skipping...' %xtal)
+                    self.cut_and_copy_map(xtal, ligand+'.pdb', eventMap.replace('.ccp4','.P1.mtz'), xtal + '_' + ligand + '_event.ccp4','F','PHIF')
                 x,y,z = self.pdb.get_centre_of_gravity_of_residue(ligand)
                 self.copy_spider_plot(xtal,ligand)
                 pdbID = self.db_dict['Deposition_PDB_ID']
@@ -178,11 +175,9 @@ class export_to_html:
                 unitCell = self.db_dict['DataProcessingUnitCell']
                 os.chdir(os.path.join(self.projectDir,xtal))
                 FWT = xtal + '-' + ligand + '_2fofc.ccp4'
-                if not os.path.isfile(FWT):
-                    self.cut_and_copy_map(xtal, ligand + '.pdb', 'refine.mtz', FWT,'FWT','PHWT')
+                self.cut_and_copy_map(xtal, ligand + '.pdb', 'refine.mtz', FWT,'FWT','PHWT')
                 DELFWT = xtal + '-' + ligand + '_fofc.ccp4'
-                if not os.path.isfile(DELFWT):
-                    self.cut_and_copy_map(xtal, ligand + '.pdb', 'refine.mtz', DELFWT,'DELFWT','PHDELWT')
+                self.cut_and_copy_map(xtal, ligand + '.pdb', 'refine.mtz', DELFWT,'DELFWT','PHDELWT')
                 ligConfidence = self.db.get_ligand_confidence_for_ligand(xtal, ligChain, ligNumber, ligName)
                 modelStatus = self.db_dict['RefinementOutcome']
                 html += XChemMain.html_table_row(xtal,pdbID,ligand,compoundImage,residuePlot,pdb,event,
@@ -423,20 +418,24 @@ class export_to_html:
 
     def cut_and_copy_map(self,xtal,pdbCentre,mtzin,mapout,F,PHI):
         os.chdir(os.path.join(self.projectDir, xtal))
-        self.Logfile.insert('%s: cutting %s around %s' %(xtal,mtzin,mapout))
+        self.Logfile.insert('%s: cutting density of %s around %s' %(xtal,mtzin,pdbCentre))
+        if os.path.isfile(mapout):
+            self.Logfile.warning('%s: %s exists; skipping...' %{xtal,mapout})
+        else:
+
 #        cmd = (
 #            'mapmask mapin %s mapout %s xyzin %s << eof\n'  %(mapin,mapout,pdbCentre) +
 #            ' border 12\n'
 #            ' end\n'
 #            'eof'
 #        )
-        cmd = (
-            "phenix.cut_out_density %s %s map_coeff_labels='%s,%s' cutout_model_radius=6 cutout_map_file_name=%s cutout_as_map=True" %(pdbCentre,mtzin,F,PHI,mapout)
-        )
+            cmd = (
+                "phenix.cut_out_density %s %s map_coeff_labels='%s,%s' cutout_model_radius=6 cutout_map_file_name=%s cutout_as_map=True" %(pdbCentre,mtzin,F,PHI,mapout)
+            )
 
-        os.system(cmd)
-        self.Logfile.insert('%s: moving %s to %s/files' %(xtal,mapout,self.htmlDir))
-        os.system('/bin/cp %s %s/files' %(mapout,self.htmlDir))
+            os.system(cmd)
+            self.Logfile.insert('%s: copying %s to %s/files' %(xtal,mapout,self.htmlDir))
+            os.system('/bin/cp %s %s/files' %(mapout,self.htmlDir))
 
 
 
