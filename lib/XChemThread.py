@@ -2302,7 +2302,7 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
                             continue
                         if 'staraniso' in logfile:
                             autoproc = 'aP_staraniso'
-                        else
+                        else:
                             autoproc = self.getAutoProc(folder)
                         if self.alreadyParsed(xtal,current_run,autoproc):
                             continue
