@@ -606,6 +606,9 @@ class parse:
                     if '1.5' in line.split()[3]:
                         self.aimless['DataProcessingResolutionHigh15sigma']=line.split()[6][:-1]
                         resolution_at_sigma_line_overall_found=False
+                    if '2.0' in line.split()[3]:
+                        self.aimless['DataProcessingResolutionHigh20sigma']=line.split()[6][:-1]
+                        resolution_at_sigma_line_overall_found=False
             if line.startswith('Average unit cell:') and len(line.split())==9:
                 tmp = []
                 tmp.append(line.split())

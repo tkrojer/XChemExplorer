@@ -110,6 +110,7 @@ class data_source:
             ['DataProcessingResolutionLowInnerShell',       'Resolution\nLow (Inner Shell)',                'TEXT',                 0],
             ['DataProcessingResolutionHigh',                'Resolution\nHigh',                             'TEXT',                 1],
             ['DataProcessingResolutionHigh15sigma',         'Resolution\n[Mn<I/sig(I)> = 1.5]',             'TEXT',                 1],
+            ['DataProcessingResolutionHigh20sigma',         'Resolution\n[Mn<I/sig(I)> = 2.0]',             'TEXT',                 1],
             ['DataProcessingResolutionHighOuterShell',      'Resolution\nHigh (Outer Shell)',               'TEXT',                 0],
             ['DataProcessingRmergeOverall',                 'Rmerge\nOverall',                              'TEXT',                 1],
             ['DataProcessingRmergeLow',                     'Rmerge\nLow',                                  'TEXT',                 1],
