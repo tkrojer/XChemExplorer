@@ -784,16 +784,27 @@ def html_header():
         struc.autoView("ligand and " + ligResid + " and " + ":" + ligChain)
         stage.setFocus( 95 );
 
-		stage.mouseControls.add('scroll', function () {
-		  if (fwtMap) {
-		    var level2fofc = fwtMap.getParameters().isolevel.toFixed(1)
-		    isolevel2fofcText.innerText = '2fofc level: ' + level2fofc + '\u03C3'
-		  }
-		  if (surfFofc) {
-		    var levelFofc = surfFofc.getParameters().isolevel.toFixed(1)
-		    isolevelFofcText.innerText = 'fofc level: ' + levelFofc + '\u03C3'
-		  }
-		})
+        // remove default scroll mouse action
+        stage.mouseControls.remove("scroll")
+
+        // change contour level of event map
+        stage.mouseControls.add("scroll", function (stage, delta) {
+            var d = Math.sign(delta) / 5
+            var l = eventMap.getParameters().isolevel
+            eventMap.setParameters({ isolevel: l + d })
+          })
+        })
+
+//		stage.mouseControls.add('scroll', function () {
+//		  if (fwtMap) {
+//		    var level2fofc = fwtMap.getParameters().isolevel.toFixed(1)
+//		    isolevel2fofcText.innerText = '2fofc level: ' + level2fofc + '\u03C3'
+//		  }
+//		  if (surfFofc) {
+//		    var levelFofc = surfFofc.getParameters().isolevel.toFixed(1)
+//		    isolevelFofcText.innerText = 'fofc level: ' + levelFofc + '\u03C3'
+//		  }
+//		})
         
 		var toggleEventButton = createElement('input', {
 		  type: 'button',

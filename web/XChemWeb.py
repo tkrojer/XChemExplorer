@@ -157,7 +157,8 @@ class export_to_html:
             for ligand in self.ligands_in_pdbFile(xtal):
                 eventMap = self.find_matching_event_map_from_database(xtal, ligand)
                 if eventMap != []:
-                    self.cut_and_copy_map(xtal, ligand+'.pdb', eventMap.replace('.ccp4','.P1.mtz'), xtal + '_' + ligand + '_event.ccp4','F','PHIF')
+                    if not os.path.isfile(os.path.join(self.projectDir,xtal,xtal + '_' + ligand + '_event.ccp4')):
+                        self.cut_and_copy_map(xtal, ligand+'.pdb', eventMap.replace('.ccp4','.P1.mtz'), xtal + '_' + ligand + '_event.ccp4','F','PHIF')
                 x,y,z = self.pdb.get_centre_of_gravity_of_residue(ligand)
                 self.copy_spider_plot(xtal,ligand)
                 pdbID = self.db_dict['Deposition_PDB_ID']
@@ -424,7 +425,7 @@ class export_to_html:
 
         os.system(cmd)
         self.Logfile.insert('%s: moving %s to %s/files' %(xtal,mapout,self.htmlDir))
-        os.system('/bin/mv %s %s/files' %(mapout,self.htmlDir))
+        os.system('/bin/cp %s %s/files' %(mapout,self.htmlDir))
 
 
 
