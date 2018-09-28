@@ -159,6 +159,8 @@ class export_to_html:
                 if eventMap != []:
                     if not os.path.isfile(os.path.join(self.projectDir,xtal,xtal + '_' + ligand + '_event.ccp4')):
                         self.cut_and_copy_map(xtal, ligand+'.pdb', eventMap.replace('.ccp4','.P1.mtz'), xtal + '_' + ligand + '_event.ccp4','F','PHIF')
+                    else:
+                        self.Logfile.insert('%s: smaller version of event map already exists; skipping...' %xtal)
                 x,y,z = self.pdb.get_centre_of_gravity_of_residue(ligand)
                 self.copy_spider_plot(xtal,ligand)
                 pdbID = self.db_dict['Deposition_PDB_ID']
@@ -176,7 +178,9 @@ class export_to_html:
                 DELFWT = xtal + '-' + ligand + '_fofc.ccp4'
                 self.cut_and_copy_map(xtal, ligand + '.pdb', 'refine.mtz', DELFWT,'DELFWT','PHDELWT')
                 ligConfidence = self.db.get_ligand_confidence_for_ligand(xtal, ligChain, ligNumber, ligName)
-                html += XChemMain.html_table_row(xtal,pdbID,ligand,compoundImage,residuePlot,pdb,event,thumbNail,resoHigh,spg,unitCell,FWT,DELFWT,ligConfidence)
+                modelStatus = self.db_dict['RefinementOutcome']
+                html += XChemMain.html_table_row(xtal,pdbID,ligand,compoundImage,residuePlot,pdb,event,
+                                                 thumbNail,resoHigh,spg,unitCell,FWT,DELFWT,ligConfidence,modelStatus)
                 self.make_thumbnail(xtal,x,y,z,ligand,eventMap)
                 self.prepare_for_download(xtal, pdb, event, compoundCIF, ligand)
         if self.protein_name == None:
