@@ -723,8 +723,8 @@ def html_header():
         var eventMap = map.addRepresentation( "surface", {
             boxSize: 10,
             useWorker: false,
-            wrap: true,
             color: "purple",
+            isolevel: 1.0,
             contour: true
         } );
         var fwtMap = fwt.addRepresentation( "surface", {
