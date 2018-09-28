@@ -434,8 +434,8 @@ class export_to_html:
             )
 
             os.system(cmd)
-            self.Logfile.insert('%s: copying %s to %s/files' %(xtal,mapout,self.htmlDir))
-            os.system('/bin/cp %s %s/files' %(mapout,self.htmlDir))
+        self.Logfile.insert('%s: copying %s to %s/files' %(xtal,mapout,self.htmlDir))
+        os.system('/bin/cp %s %s/files' %(mapout,self.htmlDir))
 
 
 
