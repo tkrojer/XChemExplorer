@@ -583,7 +583,15 @@ class parse:
                 self.aimless['DataProcessingRmergeOverall'] = line.split()[5]
                 self.aimless['DataProcessingRmergeLow'] = line.split()[6]
                 self.aimless['DataProcessingRmergeHigh']  = line.split()[7]
+            if 'Rmerge  (all I+ & I-)' in line and len(line.split())==8:
+                self.aimless['DataProcessingRmergeOverall'] = line.split()[5]
+                self.aimless['DataProcessingRmergeLow'] = line.split()[6]
+                self.aimless['DataProcessingRmergeHigh']  = line.split()[7]
             if 'Mean((I)/sd(I))' in line and len(line.split())==4:
+                self.aimless['DataProcessingIsigOverall'] = line.split()[1]
+                self.aimless['DataProcessingIsigHigh'] = line.split()[3]
+                self.aimless['DataProcessingIsigLow'] = line.split()[2]
+            if 'Mean(I)/sd(I)' in line and len(line.split())==4:
                 self.aimless['DataProcessingIsigOverall'] = line.split()[1]
                 self.aimless['DataProcessingIsigHigh'] = line.split()[3]
                 self.aimless['DataProcessingIsigLow'] = line.split()[2]
@@ -632,11 +640,11 @@ class parse:
                 self.aimless['DataProcessingAlpha']=str(alpha)
                 self.aimless['DataProcessingBeta']=str(beta)
                 self.aimless['DataProcessingGamma']=str(gamma)
-            if line.startswith('Total number unique') and len(line.split())==6:
+            if 'Total number unique' in line and len(line.split())==6:
                 self.aimless['DataProcessingUniqueReflectionsOverall']=line.split()[3]
             if line.startswith('Space group:') or line.startswith('  Spacegroup name'):
                 if 'Spacegroup name' in line:
-                    self.aimless['DataProcessingSpaceGroup'] = line.replace('  Spacegroup name', '')[:-1]
+                    self.aimless['DataProcessingSpaceGroup'] = line.replace('  Spacegroup name', '')[:-1].replace(' ','')
                 else:
                     self.aimless['DataProcessingSpaceGroup']=line.replace('Space group: ','')[:-1]
                 self.aimless['DataProcessingLattice']=self.get_lattice_from_space_group(self.aimless['DataProcessingSpaceGroup'])
