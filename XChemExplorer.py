@@ -350,6 +350,8 @@ class XChemExplorer(QtGui.QApplication):
             reply = msgBox.exec_();
             if reply != 0:
                 start_thread = False
+            else:
+                start_thread = True
         else:
             start_thread = True
 
