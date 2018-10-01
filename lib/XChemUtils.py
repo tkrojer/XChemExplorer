@@ -647,7 +647,6 @@ class parse:
                     self.aimless['DataProcessingSpaceGroup'] = line.replace('  Spacegroup name', '')[:-1].replace(' ','')
                 else:
                     self.aimless['DataProcessingSpaceGroup']=line.replace('Space group: ','')[:-1]
-                print '===>',self.aimless['DataProcessingSpaceGroup']
                 self.aimless['DataProcessingLattice']=self.get_lattice_from_space_group(self.aimless['DataProcessingSpaceGroup'])
                 self.aimless['DataProcessingPointGroup']=self.get_pointgroup_from_space_group(self.aimless['DataProcessingSpaceGroup'])
 #                print a,b,c,alpha,beta,gamma,self.aimless['DataProcessingLattice']

@@ -205,7 +205,7 @@ class setup():
                                                       'dials - only',
                                                       'xia2 3d - only',
                                                       'xia2 3dii - only',
-                                                      'autoProc -only',
+                                                      'autoProc - only',
                                                       'autoProc_staraniso - only']
 
         xce_object.allowed_unitcell_difference_percent = 12

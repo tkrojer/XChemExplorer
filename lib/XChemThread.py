@@ -2061,12 +2061,23 @@ class choose_autoprocessing_outcome(QtCore.QThread):
         return highestResoDict
 
     def selectSpecificPipelineOnly(self,dbList):
-        print 'hallo'
-#        tmp = []
-#        for resultDict in dbList:
-#            if 'dials' in self.selection_mechanism and resultDict['DataProcessingResolutionHigh']
-#                tmp.append(entry)
-#            if
+        tmp = []
+        for resultDict in dbList:
+            if self.selection_mechanism == 'dials - only' and 'dials' in resultDict['DataProcessingProgram']:
+                tmp.append(resultDict)
+            if self.selection_mechanism == 'xia2 3d - only' and '3d-run' in resultDict['DataProcessingProgram']:
+                tmp.append(resultDict)
+            if self.selection_mechanism == 'xia2 3dii - only' and '3dii-run' in resultDict['DataProcessingProgram']:
+                tmp.append(resultDict)
+            if self.selection_mechanism == 'autoProc - only' and resultDict['DataProcessingProgram'] == 'autoPROC':
+                tmp.append(resultDict)
+            if self.selection_mechanism == 'autoProc_staraniso - only' and resultDict['DataProcessingProgram'] == 'aP_staraniso':
+                tmp.append(resultDict)
+        if tmp == []:
+            tmp = dbList
+        pipelineDict = self.selectHighestScore(tmp)
+        return pipelineDict
+
 
     def determine_processing_outcome(self,db_dict):
         outcome = 'Failed - unknown'
@@ -2285,7 +2296,7 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
                 continue
 
             xtal = collected_xtals[collected_xtals.rfind('/')+1:]
-            self.Logfile.insert('%s: checking auto-processing results')
+            self.Logfile.insert('%s: checking auto-processing results' %xtal)
             self.createSampleDir(xtal)
 
             if self.target == '=== project directory ===':
