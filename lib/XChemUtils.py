@@ -341,7 +341,7 @@ class parse:
                                                      'P432','P4232','F432','F4132','I432','P4332','P4132','I4132' ] }
 
         self.point_group_dict=   {  '1':    ['P1'],
-                                    '2':    ['P2','P21','C121','P1211','P121'],
+                                    '2':    ['P2','P21','C121','P1211','P121','C2'],
                                     '222':  ['P222','P2122','P2212','P2221',
                                              'P21212','P21221','P22121','P212121',
                                              'C222','C2221',
@@ -647,23 +647,25 @@ class parse:
                     self.aimless['DataProcessingSpaceGroup'] = line.replace('  Spacegroup name', '')[:-1].replace(' ','')
                 else:
                     self.aimless['DataProcessingSpaceGroup']=line.replace('Space group: ','')[:-1]
+                print '===>',self.aimless['DataProcessingSpaceGroup']
                 self.aimless['DataProcessingLattice']=self.get_lattice_from_space_group(self.aimless['DataProcessingSpaceGroup'])
                 self.aimless['DataProcessingPointGroup']=self.get_pointgroup_from_space_group(self.aimless['DataProcessingSpaceGroup'])
-                if a != 'n/a' and b != 'n/a' and c != 'n/a' and \
+#                print a,b,c,alpha,beta,gamma,self.aimless['DataProcessingLattice']
+            if a != 'n/a' and b != 'n/a' and c != 'n/a' and \
                    alpha != 'n/a' and beta != 'n/a' and gamma != 'n/a' and self.aimless['DataProcessingLattice'] != 'n/a':
-                    self.aimless['DataProcessingUnitCellVolume']=str(self.calc_unitcell_volume_from_logfile(float(a),float(b),float(c),
+                self.aimless['DataProcessingUnitCellVolume']=str(self.calc_unitcell_volume_from_logfile(float(a),float(b),float(c),
                                                                                  math.radians(float(alpha)),
                                                                                  math.radians(float(beta)),
                                                                                  math.radians(float(gamma)),
                                                                                  self.aimless['DataProcessingLattice']))
-                    try:
-                        high_symmetry_boost=self.nr_asu_in_unitcell_for_point_group[self.aimless['DataProcessingPointGroup']]
-                        self.aimless['DataProcessingScore'] = (float(self.aimless['DataProcessingUniqueReflectionsOverall'])*\
+                try:
+                    high_symmetry_boost=self.nr_asu_in_unitcell_for_point_group[self.aimless['DataProcessingPointGroup']]
+                    self.aimless['DataProcessingScore'] = (float(self.aimless['DataProcessingUniqueReflectionsOverall'])*\
                                                                float(self.aimless['DataProcessingCompletenessOverall'])*\
                                                                high_symmetry_boost*\
                                                                float(self.aimless['DataProcessingIsigOverall']))/float(self.aimless['DataProcessingUnitCellVolume'])
-                    except ValueError:
-                        self.aimless['DataProcessingScore']=0.0
+                except ValueError:
+                    self.aimless['DataProcessingScore']=0.0
         self.aimless['DataProcessingUnitCell']=str(a)+' '+str(b)+' '+str(c)+' '+str(alpha)+' '+str(beta)+' '+str(gamma)
         self.aimless['DataProcessingResolutionOverall']=str(self.aimless['DataProcessingResolutionLow'])+' - '+str(self.aimless['DataProcessingResolutionHigh'])
 
