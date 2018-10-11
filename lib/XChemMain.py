@@ -988,7 +988,7 @@ def html_download(protein_name):
 
     return download
 
-def html_guide()
+def html_guide():
 
     guide = (
     "        <button id='guide_toggle' onclick='toggleGuide()'>Analysis Guide / Help</button>\n"
