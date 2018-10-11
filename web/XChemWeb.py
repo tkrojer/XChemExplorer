@@ -12,123 +12,6 @@ from XChemUtils import pdbtools
 from XChemUtils import mtztools
 
 
-def create_ICM_input_file(html_export_directory,database):
-
-    if os.getcwd().startswith('/work'):
-        panddaDir='panddaDir="%s"\n' %html_export_directory.replace('/work','W:')
-        molcart='connect molcart filename="%s"\n' %database.replace('/work','W:')
-    else:
-        panddaDir='panddaDir="%s"\n' %html_export_directory
-        molcart='connect molcart filename="%s"\n' %database
-
-    icm_in = (
-        '#!/usr/local/bin/icm\n'
-        '# Author: Brian Marsden\n'
-        +panddaDir+
-#        'panddaDir="%s"\n' %html_export_directory+
-        '\n'
-        'set directory panddaDir\n'
-        +molcart+
-#        'connect molcart filename="%s"\n' %database+
-
-#        'query molcart "select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.PANDDA_site_confidence,p.CrystalName || '_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,m.RefinementPDB_latest,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (LigandConfidence like '1%' or LigandConfidence like '2%' or LigandConfidence like '3%' or LigandConfidence like '4%') order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index" name="T"\n'
-
-#        'query molcart "select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.PANDDA_site_confidence,p.CrystalName || '
-#        "'_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence "
-#        "as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, "
-#        "p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,"
-#        "m.RefinementPDB_latest,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m "
-#        "where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (LigandConfidence like '1%' "
-#        "or LigandConfidence like '2%' or LigandConfidence like '3%' or LigandConfidence like '4%') "
-#        'order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index" name="T"\n'
-
-#        'query molcart "select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.PANDDA_site_confidence,p.CrystalName || '
-#        "'_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence "
-#        "as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, "
-#        "p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,"
-#        "m.RefinementBoundConformation,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m "
-#        "where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (p.RefinementOutcome like '4%' or p.RefinementOutcome like '5%' or p.RefinementOutcome like '6%') "
-#        'order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index" name="T"\n'
-
-#        'query molcart "select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.PANDDA_site_confidence,p.CrystalName || '
-#        "'_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence "
-#        "as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, "
-#        "p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,"
-#        "m.RefinementBoundConformation,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m "
-#        "where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (p.RefinementOutcome like '4%' or p.RefinementOutcome like '5%' or p.RefinementOutcome like '6%') "
-#        " and (p.PANDDA_site_confidence like '1%' or p.PANDDA_site_confidence like '2%' or p.PANDDA_site_confidence like '3%' or p.PANDDA_site_confidence like '4%')"
-#        'order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index" name="T"\n'
-
-        'query molcart "select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.PANDDA_site_confidence,p.CrystalName || '
-        "'_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence "
-        "as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, "
-        "p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,"
-        "m.RefinementBoundConformation,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m "
-        "where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (m.RefinementOutcome like '4%' or m.RefinementOutcome like '5%' or m.RefinementOutcome like '6%') "
-        " and (p.PANDDA_site_confidence like '1%' or p.PANDDA_site_confidence like '2%' or p.PANDDA_site_confidence like '3%' or p.PANDDA_site_confidence like '4%')"
-        'order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index" name="T"\n'
-
-
-        'numToDo=Nof(T)\n'
-        '\n'
-        'macro generateICB s_eventID s_pdb s_ligandSMILES s_eventMap R_coords\n'
-        'l_confirm=no\n'
-        'l_info=no\n'
-        'l_commands=no\n'
-        'l_warn=no\n'
-        'print s_eventID s_pdb s_ligandSMILES s_eventMap R_coords\n'
-        '# Read pdb\n'
-        'read pdb s_pdb\n'
-        'if Nof(a_1.?lig)==0 then\n'
-        '  print "No ligand!"\n'
-        '  delete a_*.*\n'
-        '  return\n'
-        'endif\n'
-        '# Fix ligand topology\n'
-        'set bond topology a_1.?lig s_ligandSMILES\n'
-        '# Read event map\n'
-        'read map s_eventMap\n'
-        'contourEDS Name( map )[1] {2.0} {"cyan"} a_1.?lig | Sphere(a_1.?lig !a_1.?lig 7.5) yes yes\n'
-        'assign sstructure\n'
-        'cool a_ no\n'
-        'color background refresh rgb={0,0,0}\n'
-        'display xstick Res(Sphere(a_1.?lig !a_1.?lig 7.5))\n'
-        'read binary s_icmhome+"shapes" name="star"\n'
-        'display star\n'
-        'translate star R_coords\n'
-        'center star margin=0.0\n'
-        'undisplay star\n'
-        'center a_1.?lig\n'
-        'write png "mapImages/"+s_eventID+"_large.png" window={800,600} GRAPHICS.quality=Max(image graphic)\n'
-        'write png "mapImages/"+s_eventID+"_small.png" window={150,150} GRAPHICS.quality=Max(image graphic)\n'
-        'delete star\n'
-        'writeProject "icbs/"+s_eventID+".icb" no\n'
-        'delete maps\n'
-        'delete a_*.\n'
-        'delete grob\n'
-        'endmacro\n'
-        '\n'
-        'for i=1,numToDo\n'
-        '  ligandSMILES=T.CompoundSMILES[i]\n'
-        '  # PDB file path\n'
-        '  pdbID="pdbs/"+T.ModelName[i]+".pdb"\n'
-        '  if (T.PANDDA_site_name[i]!="" & T.PANDDA_site_confidence[i]!="None") then\n'
-        '  # Get event ID\n'
-        '  eventID=T.ModelName[i]+"_"+T.CompoundCode[i]\n'
-#        '  eventID=T.ModelName[i]\n'
-        '  # Event map path\n'
-        '  eventMap="maps/"+T.ModelName[i]+".ccp4"\n'
-        '  # Ligand centre\n'
-        '  ligR3={$T.PANDDA_site_x[i],$T.PANDDA_site_y[i],$T.PANDDA_site_z[i]}\n'
-        '  generateICB eventID,pdbID,ligandSMILES,eventMap,ligR3\n'
-        '  endif\n'
-        'endfor\n'
-        )
-
-    f=open('%s/dsEvent_sqlite.icm' %html_export_directory,'w')
-    f.write(icm_in)
-    f.close()
-
 class export_to_html:
 
     def __init__(self,htmlDir,projectDir,database,xce_logfile):
@@ -145,11 +28,16 @@ class export_to_html:
         self.makeFolders()
         self.copy_jscss()
         html = XChemMain.html_header()
+        firstFile = True
         for xtal in self.db.samples_for_html_summary():
             self.db_dict = self.db.get_db_dict_for_sample(xtal)
-            if self.protein_name == None:
-                self.protein_name = self.db_dict['ProteinName']
-                self.Logfile.insert('protein name is: ' + self.protein_name)
+            if firstFile:
+                if self.db_dict['ProteinName'] == None:
+                    self.Logfile.warning('could not determine protein name; setting it to blank')
+                    self.protein_name = ''
+                else:
+                    self.protein_name = self.db_dict['ProteinName']
+                    self.Logfile.insert('protein name is: ' + self.protein_name)
             self.copy_pdb(xtal)
             self.copy_mtz(xtal)
 #            self.copy_electron_density(xtal)
@@ -180,15 +68,19 @@ class export_to_html:
                 self.cut_and_copy_map(xtal, ligand + '.pdb', 'fofc.map', DELFWT,'DELFWT','PHDELWT')
                 ligConfidence = self.db.get_ligand_confidence_for_ligand(xtal, ligChain, ligNumber, ligName)
                 modelStatus = self.db_dict['RefinementOutcome']
+                if firstFile:
+                    html += XChemMain.html_ngl(pdb,eventMap,FWT,DELFWT,ligand)
+                    html += XChemMain.html_download(self.protein_name)
+                    html += XChemMain.html_guide()
+                    html += XChemMain.html_table_header()
+                    firstFile = False
+
                 html += XChemMain.html_table_row(xtal,pdbID,ligand,compoundImage,residuePlot,pdb,event,
                                                  thumbNail,resoHigh,spg,unitCell,FWT,DELFWT,ligConfidence,modelStatus)
                 self.make_thumbnail(xtal,x,y,z,ligand,eventMap)
                 self.prepare_for_download(xtal, pdb, event, compoundCIF, ligand)
-        if self.protein_name == None:
-            self.Logfile.warning('could not determine protein name; setting it to blank')
-            self.protein_name = ''
         self.prepare_zip_archives()
-        html = XChemMain.html_download_all_section(html,self.protein_name)
+#        html = XChemMain.html_download_all_section(html,self.protein_name)
         self.write_html_file(html)
         self.Logfile.insert('======== finished preparing HTML summary ========')
 

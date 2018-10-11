@@ -4,6 +4,22 @@
 	margin: 0 auto;
 }
 
+.xchem .viewport-wrapper #viewer_toggle, .xchem .viewport-wrapper #guide_toggle, .xchem .viewport-wrapper #table_toggle {
+	width: 100%;
+	border: none;
+	cursor: pointer;
+	font-size: 15px;
+	background: #006666;
+	color: #ffffff;
+	margin-top: 5px;
+  padding: 5px 0;
+}
+
+.xchem .viewport-wrapper #viewer_toggle:focus, .xchem .viewport-wrapper #guide_toggle:focus, .xchem .viewport-wrapper #table_toggle:focus {
+	outline: none;
+	border: 2px solid #c2c2c2;
+}
+
 .xchem #example_wrapper {
 	max-width: 1210px;
 	margin: 0 auto;
