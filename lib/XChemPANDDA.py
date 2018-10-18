@@ -564,7 +564,7 @@ class run_pandda_analyse(QtCore.QThread):
                                                                str('cd ' +
                                                                    self.panddas_directory +
                                                                    '; ' +
-                                                                   "qsub -P labxchem -q medium.q -N pandda -pe smp 5 -l exclusive,m_mem_free=100GB pandda.sh'"))
+                                                                   "qsub -P labxchem -q medium.q -N pandda -pe smp 5 -l exclusive,m_mem_free=100G pandda.sh'"))
                 os.system(submission_string)
                 self.Logfile.insert(str('running PANDDA remotely, using: ' + submission_string))
             else:
