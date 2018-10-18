@@ -205,7 +205,7 @@ class PanddaTab():
         label = QtGui.QLabel('max_new_datasets')
         xce_object.pandda_analyse_input_params_vbox.addWidget(label)
         xce_object.pandda_max_new_datasets_entry = QtGui.QLineEdit()
-        xce_object.pandda_max_new_datasets_entry.setText('500')
+        xce_object.pandda_max_new_datasets_entry.setText('300')
         xce_object.pandda_analyse_input_params_vbox.addWidget(xce_object.pandda_max_new_datasets_entry)
 
         # grid spacing
