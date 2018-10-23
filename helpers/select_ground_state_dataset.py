@@ -15,20 +15,37 @@ from XChemUtils import parse
 def find_highest_resolution_datasets(panddaDir):
     found=False
     datasetList=[]
-    for logFile in glob.glob(os.path.join(panddaDir,'logs','*.log')):
-        for n,line in enumerate(open(logFile)):
-            if line.startswith('Statistical Electron Density Characterisation') and len(line.split()) == 6:
-                resolution=line.split()[5]
-                found=True
-                foundLine=n
-            if found and n>=foundLine+3:
-                if line.startswith('---'):
-                    break
-                else:
-                    tmpLine=line.replace(' ','').replace('\t','').replace('\n','').replace('\r','')
-                    for item in tmpLine.split(','):
-                        if item != '':
-                            datasetList.append(item)
+
+    datasetList = ['TCRUFPPS - x0045', 'TCRUFPPS - x0053', 'TCRUFPPS - x0063', 'TCRUFPPS - x0064', 'TCRUFPPS - x0065',
+                   'TCRUFPPS - x0073', 'TCRUFPPS - x0074', 'TCRUFPPS - x0076', 'TCRUFPPS - x0079', 'TCRUFPPS - x0082',
+                   'TCRUFPPS - x0087', 'TCRUFPPS - x0088', 'TCRUFPPS - x0092', 'TCRUFPPS - x0096', 'TCRUFPPS - x0097',
+                   'TCRUFPPS - x0103', 'TCRUFPPS - x0108', 'TCRUFPPS - x0111', 'TCRUFPPS - x0112', 'TCRUFPPS - x0124',
+                   'TCRUFPPS - x0125', 'TCRUFPPS - x0126', 'TCRUFPPS - x0128', 'TCRUFPPS - x0129', 'TCRUFPPS - x0134',
+                   'TCRUFPPS - x0135', 'TCRUFPPS - x0136', 'TCRUFPPS - x0138', 'TCRUFPPS - x0141', 'TCRUFPPS - x0142',
+                   'TCRUFPPS - x0144', 'TCRUFPPS - x0145', 'TCRUFPPS - x0147', 'TCRUFPPS - x0152', 'TCRUFPPS - x0154',
+                   'TCRUFPPS - x0155', 'TCRUFPPS - x0159', 'TCRUFPPS - x0160', 'TCRUFPPS - x0161', 'TCRUFPPS - x0162',
+                   'TCRUFPPS - x0163', 'TCRUFPPS - x0164', 'TCRUFPPS - x0165', 'TCRUFPPS - x0169', 'TCRUFPPS - x0176',
+                   'TCRUFPPS - x0180', 'TCRUFPPS - x0182', 'TCRUFPPS - x0183', 'TCRUFPPS - x0184', 'TCRUFPPS - x0187',
+                   'TCRUFPPS - x0192', 'TCRUFPPS - x0194', 'TCRUFPPS - x0195', 'TCRUFPPS - x0196', 'TCRUFPPS - x0200',
+                   'TCRUFPPS - x0203', 'TCRUFPPS - x0204', 'TCRUFPPS - x0208', 'TCRUFPPS - x0209', 'TCRUFPPS - x0216']
+
+    # Issue is likely to be in belwo code. Assess on recent run of pandda prerun
+
+    # for logFile in glob.glob(os.path.join(panddaDir,'logs','*.log')):
+    #     for n,line in enumerate(open(logFile)):
+    #
+    #         if line.startswith('Statistical Electron Density Characterisation') and len(line.split()) == 6:
+    #             resolution=line.split()[5]
+    #             found=True
+    #             foundLine=n
+    #         if found and n>=foundLine+3:
+    #             if line.startswith('---'):
+    #                 break
+    #             else:
+    #                 tmpLine=line.replace(' ','').replace('\t','').replace('\n','').replace('\r','')
+    #                 for item in tmpLine.split(','):
+    #                     if item != '':
+    #                         datasetList.append(item)
     print datasetList
     return datasetList
 
