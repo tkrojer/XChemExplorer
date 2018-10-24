@@ -2053,6 +2053,8 @@ class pdbtools(object):
         return X,Y,Z
 
     def get_center_of_gravity_of_residue_ish(self,chain,number):
+        print '-> chain:',chain
+        print '-> number:',number
         X=0.0
         Y=0.0
         Z=0.0

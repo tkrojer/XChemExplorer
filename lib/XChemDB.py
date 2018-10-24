@@ -587,7 +587,10 @@ class data_source:
         data=[]
         connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
         cursor = connect.cursor()
-        cursor.execute("select * from depositTable where CrystalName='{0!s}';".format(sampleID))
+        if sampleID == 'ground-state':      # just select first row in depositTable
+            cursor.execute("SELECT * FROM depositTable ORDER BY ROWID ASC LIMIT 1;")
+        else:
+            cursor.execute("select * from depositTable where CrystalName='{0!s}';".format(sampleID))
 
         for column in cursor.description:
             header.append(column[0])

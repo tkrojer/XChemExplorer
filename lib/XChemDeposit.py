@@ -46,23 +46,43 @@ def create_data_template_text():
 def create_Model_mmcif(outDir,pdbList):
     print 'hallo'
 
-def update_file_locations_of_apo_structuresin_DB(database,projectDir,xce_logfile):
-    Logfile=XChemLog.updateLog(xce_logfile)
-    Logfile.insert('updating file information for apo structures')
-    db=XChemDB.data_source(database)
-    apo=db.execute_statement("select CrystalName from depositTable where StructureType is 'apo';")
-    for item in apo:
-        xtal=str(item[0])
-        db_dict={}
-        db_dict['label']=xtal+'-apo'
-        db_dict['description']='apo structure for pandda.analyse'
-        if os.path.isfile(os.path.join(projectDir,xtal,'dimple.pdb')):
-            db_dict['PDB_file']=os.path.realpath(os.path.join(projectDir,xtal,'dimple.pdb'))
-            if os.path.isfile(os.path.join(projectDir,xtal,'dimple.mtz')):
-                db_dict['MTZ_file']=os.path.realpath(os.path.join(projectDir,xtal,'dimple.mtz'))
-                Logfile.insert('updating depositTable for apo structure '+xtal)
-                db.update_depositTable(xtal,'apo',db_dict)
+#def update_file_locations_of_apo_structuresin_DB(database,projectDir,xce_logfile):
+#    Logfile=XChemLog.updateLog(xce_logfile)
+#    Logfile.insert('updating file information for apo structures')
+#    db=XChemDB.data_source(database)
+#    apo=db.execute_statement("select CrystalName from depositTable where StructureType is 'apo';")
+#    for item in apo:
+#        xtal=str(item[0])
+#        db_dict={}
+#        db_dict['label']=xtal+'-apo'
+#        db_dict['description']='apo structure for pandda.analyse'
+#        if os.path.isfile(os.path.join(projectDir,xtal,'dimple.pdb')):
+#            db_dict['PDB_file']=os.path.realpath(os.path.join(projectDir,xtal,'dimple.pdb'))
+#            if os.path.isfile(os.path.join(projectDir,xtal,'dimple.mtz')):
+#                db_dict['MTZ_file']=os.path.realpath(os.path.join(projectDir,xtal,'dimple.mtz'))
+#                Logfile.insert('updating depositTable for apo structure '+xtal)
+#                db.update_depositTable(xtal,'apo',db_dict)
 
+
+
+def sf_convert_apo_structures(panddaDir):
+    for dirs in glob.glob(os.path.join(panddaDir,'processed_datasets','*')):
+        xtal = dirs[dirs.rfind('/')+1:]
+        if os.path.isfile(os.path.join(dirs,xtal+'-pandda-input.mtz')):
+            os.chdir(dirs)
+            if os.path.isdir('/dls'):
+                pdb_extract_init = 'source /dls/science/groups/i04-1/software/pdb-extract-prod/setup.sh\n'
+                pdb_extract_init += '/dls/science/groups/i04-1/software/pdb-extract-prod/bin/sf_convert'
+            else:
+                pdb_extract_init = 'source ' + os.path.join(os.getenv('XChemExplorer_DIR'),
+                                                            'pdb_extract/pdb-extract-prod/setup.sh') + '\n'
+                pdb_extract_init += +os.path.join(os.getenv('XChemExplorer_DIR'),
+                                                              'pdb_extract/pdb-extract-prod/bin/sf_convert')
+        Cmd = (pdb_extract_init +
+               ' -o mmcif'
+               ' -sf %s' % xtal+'-pandda-input.mtz' +
+               ' -out {0!s}_sf.mmcif  > {1!s}.sf_mmcif.log'.format(xtal, xtal))
+        os.system(Cmd)
 
 
 
@@ -284,7 +304,7 @@ class update_depositTable(QtCore.QThread):
 
 class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
-    def __init__(self,database,xce_logfile,overwrite_existing_mmcif,projectDir):
+    def __init__(self,database,xce_logfile,overwrite_existing_mmcif,projectDir,ground_state):
         QtCore.QThread.__init__(self)
         self.database=database
         self.xce_logfile=xce_logfile
@@ -293,6 +313,16 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         self.overwrite_existing_mmcif=overwrite_existing_mmcif
         self.projectDir=projectDir
         self.data_template_dict={}
+
+        self.ground_state = False
+        self.ground_state_pdb = ''
+        self.ground_state_mean_mtz = ''
+        self.panddaDir = ''
+        if ground_state != []:
+            self.ground_state = True
+            self.ground_state_pdb = [ground_state[1]]
+            self.ground_state_mean_mtz = [ground_state[2]]
+            self.panddaDir = [ground_state[3]]
 
         self.errorList = []
         self.eventList = []
@@ -307,7 +337,10 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
         self.Logfile.insert('======= preparing mmcif files for wwPDB deposition =======')
         self.Logfile.insert('checking DB for structures to deposit...')
-        toDeposit = self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%';")
+        if self.ground_state:
+            toDeposit = [ ['ground-state'] ]
+        else:
+            toDeposit = self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%';")
         self.Logfile.insert('found ' + str(len(toDeposit)) + ' samples ready for deposition')
 
         progress_step=1
@@ -320,54 +353,87 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
         for item in sorted(toDeposit):
             xtal=str(item[0])
-            os.chdir(os.path.join(self.projectDir, xtal))
+            if self.ground_state:
+                os.chdir(self.projectDir)       # projectDir == referenceDir in this case
+            else:
+                os.chdir(os.path.join(self.projectDir, xtal))
             self.Logfile.insert('%s: ----- preparing files for deposition -----' %xtal)
 
-            if not self.mmcif_files_can_be_replaced(xtal):
-                continue
+            if self.ground_state:
+                if not self.data_template_dict_exists(xtal):
+                    continue
 
-            if not self.data_template_dict_exists(xtal):
-                continue
+                if not self.save_data_template_dict(xtal):
+                    continue
 
-            if not self.db_dict_exists(xtal):
-                continue
+                if not self.create_model_mmcif(xtal):
+                    continue
 
-            if not self.zenodo_dict_exists(xtal):
-                continue
+                if not self.create_sf_mmcif(xtal):
+                    continue
 
-            if not self.refine_bound_exists(xtal):
-                continue
+                if not self.add_apo_sf_mmcif()
+                    continue
 
-            if not self.refine_mtz_exists(xtal):
-                continue
 
-            if not self.aimless_logfile_exists(xtal):
-                continue
 
-            if not self.ligand_in_pdb_file(xtal):
-                continue
 
-            if not self.eventMTZ_exists((xtal)):
-                continue
+            else:
+                if not self.mmcif_files_can_be_replaced(xtal):
+                    continue
 
-            if not self.find_matching_event_map(xtal):
-                continue
+                if not self.data_template_dict_exists(xtal):
+                    continue
 
-            if not self.save_data_template_dict(xtal):
-                continue
+                if not self.db_dict_exists(xtal):
+                    continue
 
-            if not self.create_model_mmcif(xtal):
-                continue
+                if not self.zenodo_dict_exists(xtal):
+                    continue
 
-            if not self.create_sf_mmcif(xtal):
-                continue
+                if not self.refine_bound_exists(xtal):
+                    continue
 
-            if not self.event_maps_exist_in_sf_mmcif(xtal):
-                continue
+                if not self.refine_mtz_exists(xtal):
+                    continue
+
+                if not self.aimless_logfile_exists(xtal):
+                    continue
+
+                if not self.ligand_in_pdb_file(xtal):
+                    continue
+
+                if not self.eventMTZ_exists((xtal)):
+                    continue
+
+                if not self.find_matching_event_map(xtal):
+                    continue
+
+                if not self.save_data_template_dict(xtal):
+                    continue
+
+                if not self.create_model_mmcif(xtal):
+                    continue
+
+                if not self.create_sf_mmcif(xtal):
+                    continue
+
+                if not self.event_maps_exist_in_sf_mmcif(xtal):
+                    continue
 
 
         self.print_errorlist()
         self.Logfile.insert('======= finished preparing mmcif files for wwPDB deposition =======')
+
+    def ground_state_mmcif_exists(self):
+        mmcifStatus = False
+        for dirs in glob.glob(os.path.join(self.panddaDir, 'processed_datasets', '*')):
+            xtal = dirs[dirs.rfind('/') + 1:]
+            if os.path.isfile(os.path.join(dirs, xtal + '_sf.mmcif')):
+                self.Logfile.insert('%s: found mmcif file for apo structure' %xtal)
+                mmcifStatus = True
+
+        return mmcifStatus
 
     def data_template_dict_exists(self,xtal):
         dictStatus = False
@@ -590,8 +656,20 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         if self.overwrite_existing_mmcif:
             os.chdir(os.path.join(self.projectDir, xtal))
 
-            # edit wavelength
-            self.data_template_dict['radiation_wavelengths'] = self.mtz.get_wavelength()
+            if self.ground_state:
+                self.data_template_dict['radiation_wavelengths'] = '1.000'
+                title = 'ground-state'
+                self.data_template_dict['group_type'] = 'ground state'
+
+            else:
+                # edit wavelength
+                self.data_template_dict['radiation_wavelengths'] = self.mtz.get_wavelength()
+
+                title = self.data_template_dict['structure_title'].replace('$ProteinName', self.data_template_dict[
+                    'Source_organism_gene']).replace('$CompoundName', self.db_dict['CompoundCode'])
+
+                self.data_template_dict['group_type'] = 'changed state'
+
 
             # edit title
             self.data_template_dict['group_title'] = self.data_template_dict['group_deposition_title'].replace('$ProteinName',
@@ -599,8 +677,6 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                                                                                                          'Source_organism_gene']).replace(
                 '$CompoundName', self.db_dict['CompoundCode'])
 
-            title = self.data_template_dict['structure_title'].replace('$ProteinName', self.data_template_dict[
-                    'Source_organism_gene']).replace('$CompoundName', self.db_dict['CompoundCode'])
 #            self.data_template_dict[
 #                    'group_title'] = 'PanDDA analysis group deposition of models with modelled events (e.g. bound ligands)'
             self.data_template_dict['group_description'] = self.data_template_dict['group_description'].replace('$ProteinName',
@@ -627,12 +703,13 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 self.data_template_dict['protein_chains'] += item + ','
             self.data_template_dict['protein_chains'] = self.data_template_dict['protein_chains'][:-1]
 
-            self.data_template_dict['group_type'] = ''
-            self.data_template_dict['group_type'] = 'changed state'
             data_template = templates().data_template_cif(self.data_template_dict)
 #            site_details = self.make_site_description(xtal)
 #            data_template += site_details
-            f = open(os.path.join(self.projectDir, xtal, 'data_template.cif'), 'w')
+            if self.ground_state:
+                f = open(os.path.join(self.projectDir, 'data_template.cif'), 'w')
+            else:
+                f = open(os.path.join(self.projectDir, xtal, 'data_template.cif'), 'w')
 
             f.write(data_template)
             f.close()
@@ -642,7 +719,10 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
     def create_model_mmcif(self,xtal):
         fileStatus = False
-        os.chdir(os.path.join(self.projectDir, xtal))
+        if self.ground_state:
+            os.chdir(os.path.join(self.projectDir))
+        else:
+            os.chdir(os.path.join(self.projectDir, xtal))
         refSoft = self.pdb.get_refinement_program()
 
         if os.path.isdir('/dls'):
@@ -654,14 +734,22 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             pdb_extract_init += +os.path.join(os.getenv('XChemExplorer_DIR'),
                                                   'pdb_extract/pdb-extract-prod/bin/pdb_extract')
 
-        Cmd = (pdb_extract_init +
-                ' -r {0!s}'.format(refSoft) +
-               ' -iPDB {0!s}'.format('refine.split.bound-state.pdb') +
-                ' -e MR'
-               ' -s AIMLESS'
-               ' -iLOG {0!s}.log'.format(xtal) +
-               ' -iENT data_template.cif'
-               ' -o {0!s}.mmcif > {1!s}.mmcif.log'.format(xtal, xtal))
+        if self.ground_state:
+            Cmd = (pdb_extract_init +
+                   ' -r {0!s}'.format(refSoft) +
+                   ' -iPDB {0!s}'.format(self.ground_state_pdb) +
+                   ' -e MR'
+                   ' -iENT data_template.cif'
+                   ' -o {0!s}.mmcif > {1!s}.mmcif.log'.format(xtal, xtal))
+        else:
+            Cmd = (pdb_extract_init +
+                   ' -r {0!s}'.format(refSoft) +
+                   ' -iPDB {0!s}'.format('refine.split.bound-state.pdb') +
+                   ' -e MR'
+                   ' -s AIMLESS'
+                   ' -iLOG {0!s}.log'.format(xtal) +
+                   ' -iENT data_template.cif'
+                   ' -o {0!s}.mmcif > {1!s}.mmcif.log'.format(xtal, xtal))
 
         self.Logfile.insert(xtal + ': running pdb_extract: ' + Cmd)
         os.system(Cmd)
@@ -670,7 +758,8 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
         if os.path.isfile(xtal+'.mmcif') and os.path.getsize(xtal+'.mmcif') > 20000 :
             self.Logfile.insert('%s: model mmcif file successfully created' %xtal)
-            self.db.execute_statement("update depositTable set mmCIF_model_file='{0!s}.mmcif' where CrystalName is '{1!s}'".format(xtal,xtal))
+            if not self.ground_state:
+                self.db.execute_statement("update depositTable set mmCIF_model_file='{0!s}.mmcif' where CrystalName is '{1!s}'".format(xtal,xtal))
             fileStatus = True
         else:
             self.Logfile.error('%s: model mmcif file was not created successfully')
@@ -745,7 +834,10 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
     def create_sf_mmcif(self,xtal):
         fileStatus = False
-        os.chdir(os.path.join(self.projectDir, xtal))
+        if self.ground_state:
+            os.chdir(self.projectDir)
+        else:
+            os.chdir(os.path.join(self.projectDir, xtal))
 
         if os.path.isfile('no_pandda_analysis_performed'):
             mtzin = 'refine.mtz '
@@ -753,6 +845,9 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             mtzin = 'refine.mtz ' + xtal + '.free.mtz '
             for event in self.eventList:
                 mtzin += event + ' '
+
+        if self.ground_state:
+            mtzin = self.ground_state_mean_mtz
 
         if os.path.isdir('/dls'):
             pdb_extract_init = 'source /dls/science/groups/i04-1/software/pdb-extract-prod/setup.sh\n'
@@ -776,13 +871,15 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
         if os.path.isfile(xtal+'_sf.mmcif') and os.path.getsize(xtal+'_sf.mmcif') > 20000 :
             self.Logfile.insert('%s: SF mmcif file successfully created' %xtal)
-            self.db.execute_statement("update depositTable set mmCIF_SF_file='{0!s}_sf.mmcif' where CrystalName is '{1!s}'".format(xtal,xtal))
+            if not self.ground_state:
+                self.db.execute_statement("update depositTable set mmCIF_SF_file='{0!s}_sf.mmcif' where CrystalName is '{1!s}'".format(xtal,xtal))
             fileStatus = True
         else:
             self.Logfile.error('%s: SF mmcif file was not created successfully')
             self.add_to_errorList(xtal)
 
         return fileStatus
+
 
     def event_maps_exist_in_sf_mmcif(self,xtal):
         fileOK = False
