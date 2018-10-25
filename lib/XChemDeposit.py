@@ -896,7 +896,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             self.Logfile.insert('%s: compound SMILES -> %s' %(xtal,smiles))
             if os.path.isfile(os.path.join(dirs,xtal+'_sf.mmcif')):
                 self.Logfile.insert('adding %s_sf.mmcif to ground-state_sf.mmcif' %xtal)
-                for line in open(os.path.join(dirs,xtal+'_sf.mmcif'))
+                for line in open(os.path.join(dirs,xtal+'_sf.mmcif')):
                     if line.startswith('_cell.angle_gamma'):
                         newLine = line
                         newLine += '#\n'
