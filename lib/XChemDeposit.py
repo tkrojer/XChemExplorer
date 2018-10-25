@@ -87,6 +87,7 @@ def sf_convert_apo_structures(panddaDir):
 
 
 
+
 class templates:
 
     def data_template_cif(self,depositDict):
@@ -320,9 +321,9 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         self.panddaDir = ''
         if ground_state != []:
             self.ground_state = True
-            self.ground_state_pdb = [ground_state[1]]
-            self.ground_state_mean_mtz = [ground_state[2]]
-            self.panddaDir = [ground_state[3]]
+            self.ground_state_pdb = ground_state[0]
+            self.ground_state_mean_mtz = ground_state[1]
+            self.panddaDir = ground_state[2]
 
         self.errorList = []
         self.eventList = []
@@ -372,7 +373,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 if not self.create_sf_mmcif(xtal):
                     continue
 
-                if not self.add_apo_sf_mmcif()
+                if not self.add_apo_sf_mmcif():
                     continue
 
 
@@ -879,6 +880,16 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             self.add_to_errorList(xtal)
 
         return fileStatus
+
+
+    def add_apo_sf_mmcif(self):
+        self.Logfile.insert('checking pandda directory for apo mmcif files: '+self.panddaDir)
+        for dirs in glob.glob(os.path.join(self.panddaDir,'processed_datasets','*')):
+            xtal = dirs[dirs.rfind('/')+1:]
+            if os.path.isfile(os.path.join(dirs,xtal+'_sf.mmcif')):
+                print 'hallo'
+                # change header
+                # append to apo mmcif file
 
 
     def event_maps_exist_in_sf_mmcif(self,xtal):

@@ -30,62 +30,81 @@ class DepositionTab():
         deposition_page_heading = self.layout_funcs.add_depo_heading('HTML export & ZENODO upload')
         deposition_page_heading.setStyleSheet("font: 30pt Arial Bold")
 
-        # introduction text
-        introduction_text = self.layout_funcs.add_depo_text(XChemToolTips.html_summary_introduction())
-
-        # zenodo example image
-        zenodo_image = QtGui.QLabel()
-        zenodo_pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'), 'image', 'html_summary_page.png'))
-        zenodo_image.setPixmap(zenodo_pixmap)
-
-        # export html directory heading
-        export_html_heading = self.layout_funcs.add_depo_heading('1. Specify HTML export directory in the settings tab')
-
-        # export html directory text
-        export_html_text = self.layout_funcs.add_depo_text(XChemToolTips.html_export_directory_background())
-
-        # default for dls
-        dls_dir_text = self.layout_funcs.add_depo_text(
-            'Note: default for labxchem project at DLS is <labxchem_directory>/processing/html.')
-
-        # user specific directory
-        usr_dir_text = self.layout_funcs.add_depo_text('In your case: ' + xce_object.html_export_directory)
-
-        # html prep heading
-        html_prep_heading = self.layout_funcs.add_depo_heading("2. Prepare files for HTML export")
-
-        # html prep test
-        html_prep_text = self.layout_funcs.add_depo_text(XChemToolTips.html_export_step())
+#        # introduction text
+#        introduction_text = self.layout_funcs.add_depo_text(XChemToolTips.html_summary_introduction())
+#
+#        # zenodo example image
+#        zenodo_image = QtGui.QLabel()
+#        zenodo_pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'), 'image', 'html_summary_page.png'))
+#        zenodo_image.setPixmap(zenodo_pixmap)
+#
+#        # export html directory heading
+#        export_html_heading = self.layout_funcs.add_depo_heading('1. Specify HTML export directory in the settings tab')
+#
+#        # export html directory text
+#        export_html_text = self.layout_funcs.add_depo_text(XChemToolTips.html_export_directory_background())
+#
+#        # default for dls
+#        dls_dir_text = self.layout_funcs.add_depo_text(
+#            'Note: default for labxchem project at DLS is <labxchem_directory>/processing/html.')
+#
+#        # user specific directory
+#        usr_dir_text = self.layout_funcs.add_depo_text('In your case: ' + xce_object.html_export_directory)
+#
+#        # html prep heading
+#        html_prep_heading = self.layout_funcs.add_depo_heading("2. Prepare files for HTML export")
+#
+#        # html prep test
+#        html_prep_text = self.layout_funcs.add_depo_text(XChemToolTips.html_export_step())
 
         # html export button
         html_export_button = QtGui.QPushButton('Export to HTML')
         html_export_button.clicked.connect(xce_object.export_to_html)
         html_export_button.setMaximumWidth(200)
 
-        # prepare ICM heading
-        ICM_heading = self.layout_funcs.add_depo_heading("3. Prepare ICM files")
+        ground_state_pdb_button = QtGui.QPushButton('Select ground-state PDB file')
+        ground_state_pdb_button.clicked.connect(xce_object.select_ground_state_pdb)
+        ground_state_pdb_button.setMaximumWidth(200)
 
-        # ICM background text
-        ICM_bgr_text = self.layout_funcs.add_depo_text(XChemToolTips.icb_file_background())
+        xce_object.ground_state_pdb_button_label = QtGui.QLabel('')
 
-        # ICM prep text
-        ICM_prep_text = self.layout_funcs.add_depo_text(XChemToolTips.prepare_ICB_files())
+        ground_state_mtz_button = QtGui.QPushButton('Select ground-state MTZ file')
+        ground_state_mtz_button.clicked.connect(xce_object.select_ground_state_mtz)
+        ground_state_mtz_button.setMaximumWidth(200)
 
-        # Open ICM button
-        ICM_button = QtGui.QPushButton('Open ICM-pro')
-        ICM_button.clicked.connect(xce_object.open_icm)
-        ICM_button.setMaximumWidth(200)
+        xce_object.ground_state_mtz_button_label = QtGui.QLabel('')
 
-        # ICM loading image
-        ICM_image = QtGui.QLabel()
-        ICM_pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'), 'image', 'drag_and_drop_icb_file.png'))
-        ICM_image.setPixmap(ICM_pixmap)
+        warning_label = QtGui.QLabel('Please check the settings tab that you have selected the correct pandda directory')
 
-        # ICM run image
-        ICM_run_image = QtGui.QLabel()
-        ICM_run_pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'), 'image', 'run_icm_script.png'))
-        ICM_run_image.setPixmap(ICM_run_pixmap)
+        prepare_ground_state_mmcif_button = QtGui.QPushButton('Prepare ground-state mmcif file')
+        prepare_ground_state_mmcif_button.clicked.connect(xce_object.prepare_ground_state_mmcif)
+        prepare_ground_state_mmcif_button.setMaximumWidth(200)
 
+
+#        # prepare ICM heading
+#        ICM_heading = self.layout_funcs.add_depo_heading("3. Prepare ICM files")
+#
+#        # ICM background text
+#        ICM_bgr_text = self.layout_funcs.add_depo_text(XChemToolTips.icb_file_background())
+#
+#        # ICM prep text
+#        ICM_prep_text = self.layout_funcs.add_depo_text(XChemToolTips.prepare_ICB_files())
+#
+#        # Open ICM button
+#        ICM_button = QtGui.QPushButton('Open ICM-pro')
+#        ICM_button.clicked.connect(xce_object.open_icm)
+#        ICM_button.setMaximumWidth(200)
+#
+#        # ICM loading image
+#        ICM_image = QtGui.QLabel()
+#        ICM_pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'), 'image', 'drag_and_drop_icb_file.png'))
+#        ICM_image.setPixmap(ICM_pixmap)
+#
+#        # ICM run image
+#        ICM_run_image = QtGui.QLabel()
+#        ICM_run_pixmap = QtGui.QPixmap(os.path.join(os.getenv('XChemExplorer_DIR'), 'image', 'run_icm_script.png'))
+#        ICM_run_image.setPixmap(ICM_run_pixmap)
+#
         # zenodo upload heading 1
         zenodo_upload_heading = self.layout_funcs.add_depo_heading("4. Prepare files for ZENODO upload")
 
@@ -146,12 +165,14 @@ class DepositionTab():
         upload_html_text = self.layout_funcs.add_depo_text(XChemToolTips.zenodo_upload_part_four(xce_object.
                                                                                                  html_export_directory))
 
-        deposition_widget_list = [deposition_page_heading, QtGui.QLabel('  '), introduction_text, QtGui.QLabel('  '),
-                                  zenodo_image, QtGui.QLabel('  '), export_html_heading, export_html_text, dls_dir_text,
-                                  usr_dir_text, QtGui.QLabel('  '), html_prep_heading, html_prep_text,
-                                  html_export_button, QtGui.QLabel('  '), ICM_heading, ICM_bgr_text, ICM_prep_text,
-                                  ICM_button, QtGui.QLabel('  '), ICM_image, QtGui.QLabel('  '), ICM_run_image,
-                                  QtGui.QLabel('  '), zenodo_upload_heading, zenodo_upload_text, prep_files_button,
+        deposition_widget_list = [deposition_page_heading, QtGui.QLabel('  '),
+                                  html_export_button, QtGui.QLabel('  '),
+                                  ground_state_pdb_button,xce_object.ground_state_pdb_button_label,
+                                  ground_state_mtz_button,xce_object.ground_state_mtz_button_label,
+                                  warning_label,
+                                  prepare_ground_state_mmcif_button,
+                                  QtGui.QLabel('  \n  '),
+                                  zenodo_upload_heading, zenodo_upload_text, prep_files_button,
                                   QtGui.QLabel('  '), zenodo_upload_heading2, zenodo_upload_text2, zenodo_upload_image,
                                   QtGui.QLabel('  '), zenodo_upload_ID_heading, zenodo_upload_ID_text,
                                   zenodo_upload_image2, zenodo_upload_ID_text2]

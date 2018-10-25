@@ -592,7 +592,7 @@ def NCBI_taxonomy_ID():
 
     taxonomy_dict = {   '9606':     'homo sapiens',
                         '562':      'escherichia coli',
-                        '7108':     'SPODOPTERA FRUGIPERDA'
+                        '7108':     'SPODOPTERA FRUGIPERDA',
                         '5693 ':    'Trypanosoma cruzi' }
 
     return taxonomy_dict

@@ -508,6 +508,20 @@ class XChemExplorer(QtGui.QApplication):
 #        self.update_log.insert('be patient, this may take a while, depending on the number of events')
 #        self.status_bar.showMessage('please check terminal window for further information')
 
+    def select_ground_state_pdb(self):
+        p = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window, 'Select File', os.getcwd(),'*.pdb')
+        pdb = str(tuple(p)[0])
+        self.ground_state_pdb_button_label.setText(pdb)
+
+    def select_ground_state_mtz(self):
+        m = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window, 'Select File', os.getcwd(),'*.mtz')
+        mtz = str(tuple(m)[0])
+        self.ground_state_mtz_button_label.setText(mtz)
+
+    def prepare_ground_state_mmcif(self):
+        self.update_log.insert('preparing mmcif file for apo structure deposition')
+        self.prepare_models_for_deposition_ligand_bound(self,'ground-state')
+
     def open_icm(self):
         self.update_log.insert('starting ICM...')
         self.work_thread = XChemThread.start_ICM(self.html_export_directory)
@@ -834,7 +848,14 @@ class XChemExplorer(QtGui.QApplication):
             os.path.join(self.database_directory, self.data_source_file), self.initial_model_directory,
             self.xce_logfile)
 
-    def prepare_models_for_deposition_ligand_bound(self):
+    def prepare_models_for_deposition_ligand_bound(self,structureType):
+
+        if structureType == 'ground-state':
+            ground_state = []
+        else:
+            ground_state = [ str(self.ground_state_pdb_button_label.text()),
+                             str(self.ground_state_mtz_button_label.text()),
+                             self.panddas_directory ]
 
         structureType = "ligand_bound"
 
@@ -843,7 +864,8 @@ class XChemExplorer(QtGui.QApplication):
             os.path.join(self.database_directory, self.data_source_file),
             self.xce_logfile,
             overwrite_existing_mmcif,
-            self.initial_model_directory)
+            self.initial_model_directory,
+            ground_state)
         self.explorer_active = 1
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
