@@ -851,13 +851,13 @@ class XChemExplorer(QtGui.QApplication):
     def prepare_models_for_deposition_ligand_bound(self,structureType):
 
         if structureType == 'ground-state':
-            ground_state = []
-        else:
             ground_state = [ str(self.ground_state_pdb_button_label.text()),
                              str(self.ground_state_mtz_button_label.text()),
                              self.panddas_directory ]
+        else:
+            ground_state = []
 
-        structureType = "ligand_bound"
+#        structureType = "ligand_bound"
 
         overwrite_existing_mmcif = True
         self.work_thread = XChemDeposit.prepare_mmcif_files_for_deposition(
