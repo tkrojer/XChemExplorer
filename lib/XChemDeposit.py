@@ -296,7 +296,9 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         self.ground_state_pdb = ''
         self.ground_state_mean_mtz = ''
         self.panddaDir = ''
+        print '====>>>>',ground_state
         if ground_state != []:
+            print 'here'
             self.ground_state = True
             self.ground_state_pdb = ground_state[0]
             self.ground_state_mean_mtz = ground_state[1]
