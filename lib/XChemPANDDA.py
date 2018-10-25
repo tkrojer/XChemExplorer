@@ -1148,9 +1148,9 @@ class convert_apo_structures_to_mmcif(QtCore.QThread):
         pdb_extract_init = self.sf_convert_environment()
 
         self.Logfile.insert('parsing '+self.panddaDir)
-        for dirs in glob.glob(os.path.join(panddaDir,'processed_datasets','*')):
+        for dirs in glob.glob(os.path.join(self.panddaDir,'processed_datasets','*')):
             xtal = dirs[dirs.rfind('/')+1:]
-            self.Logfile.insert('%s: converting %s to mmcif' %(xtalxtal+'-pandda-input.mtz'))
+            self.Logfile.insert('%s: converting %s to mmcif' %(xtal,xtal+'-pandda-input.mtz'))
             if os.path.isfile(os.path.join(dirs,xtal+'-pandda-input.mtz')):
                 os.chdir(dirs)
                 Cmd = (pdb_extract_init +
