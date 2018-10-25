@@ -572,7 +572,7 @@ class setup():
                                          'Update datasource with results from pandda.inspect',
                                          'cluster datasets',
                                          'Event Map -> SF',
-                                         'apo -> mmcif'
+                                         'apo -> mmcif',
                                          'check modelled ligands',
                                          'pre-run for ground state model',
                                          'Build ground state model']
