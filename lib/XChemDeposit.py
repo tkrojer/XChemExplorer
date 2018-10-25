@@ -870,7 +870,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 counter += 1
         if counter < 40:
             self.Logfile.error('found only %s apo mmcif files' %str(counter))
-            self.Logfile.warning('you may need to run "PanDDA tab"/"apo -> mmcif")
+            self.Logfile.warning('you may need to run "PanDDA tab"/"apo -> mmcif"')
         else:
             self.Logfile.insert('found %s apo mmcif files; seems OK!' %str(counter))
             fileStatus = True
