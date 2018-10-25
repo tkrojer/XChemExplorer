@@ -889,7 +889,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 smiles = 'none'
             elif 'none' in xtalDict['CompoundSMILES'].lower().replace(' ',''):
                 smiles = 'none'
-            elif 'null' in xtalDict['CompoundSMILES'].lower.()replace(' ',''):
+            elif 'null' in xtalDict['CompoundSMILES'].lower().replace(' ',''):
                 smiles = 'none'
             else:
                 smiles = xtalDict['CompoundSMILES'].replace(' ','')
