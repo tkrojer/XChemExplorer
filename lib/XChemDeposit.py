@@ -637,14 +637,15 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         noError = True
         self.Logfile.insert('%s: preparing data_template.cif file' %xtal)
         if self.overwrite_existing_mmcif:
-            os.chdir(os.path.join(self.projectDir, xtal))
 
             if self.ground_state:
+                os.chdir(self.projectDir)
                 self.data_template_dict['radiation_wavelengths'] = '1.000'
                 title = 'ground-state'
                 self.data_template_dict['group_type'] = 'ground state'
 
             else:
+                os.chdir(os.path.join(self.projectDir, xtal))
                 # edit wavelength
                 self.data_template_dict['radiation_wavelengths'] = self.mtz.get_wavelength()
 
