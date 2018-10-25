@@ -350,7 +350,10 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 if not self.create_sf_mmcif(xtal):
                     continue
 
-                if not self.add_apo_sf_mmcif():
+                if not self.apo_mmcif_exists():
+                    continue
+
+                if not self.add_apo_sf_mmcif_to_ground_state_mmcif():
                     continue
 
 
@@ -858,15 +861,51 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
         return fileStatus
 
+    def apo_mmcif_exists(self):
+        fileStatus = False
+        self.Logfile.insert('checking if mmcif files of apo structures exist')
+        counter = 0
+        for mmcif in glob.glob(os.path.join(self.panddaDir,'processed_datasets','*','*.mmcif')):
+            if os.path.isfile(mmcif):
+                counter += 1
+        if counter < 40:
+            self.Logfile.error('found only %s apo mmcif files' %str(counter))
+            self.Logfile.warning('you may need to run "PanDDA tab"/"apo -> mmcif")
+        else:
+            self.Logfile.insert('found %s apo mmcif files; seems OK!' %str(counter))
+            fileStatus = True
+        return fileStatus
 
-    def add_apo_sf_mmcif(self):
+    def add_apo_sf_mmcif_to_ground_state_mmcif(self):
+        os.chdir(self.projectDir)
         self.Logfile.insert('checking pandda directory for apo mmcif files: '+self.panddaDir)
+        f = open('ground-state_sf.mmcif','a')
+        counter = 1
         for dirs in glob.glob(os.path.join(self.panddaDir,'processed_datasets','*')):
             xtal = dirs[dirs.rfind('/')+1:]
+            self.Logfile.insert('%s: reading saoked compound information from database' %xtal)
+            xtalDict = self.db.get_db_dict_for_sample(xtal)
+            if xtalDict['CompoundSMILES'].lower().replace(' ','') == '':
+                smiles = 'none'
+            elif 'none' in xtalDict['CompoundSMILES'].lower().replace(' ',''):
+                smiles = 'none'
+            elif 'null' in xtalDict['CompoundSMILES'].lower.()replace(' ',''):
+                smiles = 'none'
+            else:
+                smiles = xtalDict['CompoundSMILES'].replace(' ','')
+            self.Logfile.insert('%s: compound SMILES -> %s' %(xtal,smiles))
             if os.path.isfile(os.path.join(dirs,xtal+'_sf.mmcif')):
-                print 'hallo'
-                # change header
-                # append to apo mmcif file
+                self.Logfile.insert('adding %s_sf.mmcif to ground-state_sf.mmcif' %xtal)
+                for line in open(os.path.join(dirs,xtal+'_sf.mmcif'))
+                    if line.startswith('_cell.angle_gamma'):
+                        newLine = line
+                        newLine += '#\n'
+                        newLine += '_diffrn.id                  1\n'
+                        newLine += '_diffrn.details             "diffraction data from crystal %s; soaked compound: %s"\n' %(str(counter),smiles)
+                        f.write(newLine)
+                    else:
+                        f.write(line)
+        f.close()
 
 
     def event_maps_exist_in_sf_mmcif(self,xtal):

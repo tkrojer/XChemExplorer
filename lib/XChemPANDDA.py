@@ -1152,13 +1152,16 @@ class convert_apo_structures_to_mmcif(QtCore.QThread):
             xtal = dirs[dirs.rfind('/')+1:]
             self.Logfile.insert('%s: converting %s to mmcif' %(xtal,xtal+'-pandda-input.mtz'))
             if os.path.isfile(os.path.join(dirs,xtal+'-pandda-input.mtz')):
-                os.chdir(dirs)
-                Cmd = (pdb_extract_init +
-                   ' -o mmcif'
-                   ' -sf %s' % xtal+'-pandda-input.mtz' +
-                   ' -out {0!s}_sf.mmcif  > {1!s}.sf_mmcif.log'.format(xtal, xtal))
-            self.Logfile.insert('running command: '+Cmd)
-            os.system(Cmd)
+                if os.path.isfile(os.path.join(dirs,xtal+'_sf.mmcif')):
+                    self.Logfile.insert('%s: %s_sf.mmcif exists; skipping...' %(xtal,xtal))
+                else:
+                    os.chdir(dirs)
+                    Cmd = (pdb_extract_init +
+                       ' -o mmcif'
+                       ' -sf %s' % xtal+'-pandda-input.mtz' +
+                       ' -out {0!s}_sf.mmcif  > {1!s}.sf_mmcif.log'.format(xtal, xtal))
+                self.Logfile.insert('running command: '+Cmd)
+                os.system(Cmd)
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
