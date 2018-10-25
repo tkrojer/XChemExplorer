@@ -2836,6 +2836,9 @@ class XChemExplorer(QtGui.QApplication):
         elif instruction == 'Event Map -> SF':
             self.convert_event_maps_to_SF()
 
+        elif instruction == 'apo -> mmcif':
+            self.convert_apo_to_mmcif()
+
         elif instruction == 'check modelled ligands':
             self.compare_modelled_ligands_and_panddaTable()
 
@@ -3052,6 +3055,17 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
+
+    def convert_apo_to_mmcif(self):
+        self.work_thread = XChemPANDDA.convert_apo_structures_to_mmcif(self.panddas_directory,
+                                                                          self.xce_logfile)
+
+        self.explorer_active = 1
+        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.work_thread.start()
+
 
     def compare_modelled_ligands_and_panddaTable(self):
         self.update_log.insert('checking agreement of ligands in refine.pdb and entries in panddaTable')

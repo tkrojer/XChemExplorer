@@ -65,29 +65,6 @@ def create_Model_mmcif(outDir,pdbList):
 
 
 
-def sf_convert_apo_structures(panddaDir):
-    for dirs in glob.glob(os.path.join(panddaDir,'processed_datasets','*')):
-        xtal = dirs[dirs.rfind('/')+1:]
-        if os.path.isfile(os.path.join(dirs,xtal+'-pandda-input.mtz')):
-            os.chdir(dirs)
-            if os.path.isdir('/dls'):
-                pdb_extract_init = 'source /dls/science/groups/i04-1/software/pdb-extract-prod/setup.sh\n'
-                pdb_extract_init += '/dls/science/groups/i04-1/software/pdb-extract-prod/bin/sf_convert'
-            else:
-                pdb_extract_init = 'source ' + os.path.join(os.getenv('XChemExplorer_DIR'),
-                                                            'pdb_extract/pdb-extract-prod/setup.sh') + '\n'
-                pdb_extract_init += +os.path.join(os.getenv('XChemExplorer_DIR'),
-                                                              'pdb_extract/pdb-extract-prod/bin/sf_convert')
-        Cmd = (pdb_extract_init +
-               ' -o mmcif'
-               ' -sf %s' % xtal+'-pandda-input.mtz' +
-               ' -out {0!s}_sf.mmcif  > {1!s}.sf_mmcif.log'.format(xtal, xtal))
-        os.system(Cmd)
-
-
-
-
-
 class templates:
 
     def data_template_cif(self,depositDict):
