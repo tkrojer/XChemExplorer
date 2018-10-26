@@ -1608,7 +1608,7 @@ class data_source:
                     cursor.execute(sqlite)
                     connect.commit()
         elif type == 'ground_state':
-            sqlite = "insert into depositTable (CrystalName,StructureType) values ('{0!s}','{1!s}');".format(xtal, type)
+            sqlite = "insert into depositTable (CrystalName,StructureType,DimplePANDDApath) values ('{0!s}','{1!s}','{2!s}');".format(xtal, type, db_dict['DimplePANDDApath'])
             Logfile.insert('creating new entry for ' + str(type) + ' structure of ' + xtal + ' in depositTable')
             cursor.execute(sqlite)
             connect.commit()
