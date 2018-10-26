@@ -1033,8 +1033,8 @@ class prepare_for_group_deposition_upload(QtCore.QThread):
                 mmcif=os.path.join(self.projectDir,xtal,str(item[1]))
                 mmcif_sf=os.path.join(self.projectDir,xtal,str(item[2]))
             elif self.type == 'ground_state':
-                mmcif=os.path.join(str(item[3],str(item[1]))
-                mmcif_sf=os.path.join(str(item[3],str(item[2]))
+                mmcif=os.path.join(str(item[3]),str(item[1]))
+                mmcif_sf=os.path.join(str(item[3]),str(item[2]))
             else:
                 continue
             self.Logfile.insert('%s: %s/ %s' %(xtal,mmcif,mmcif_sf))
