@@ -292,18 +292,6 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         self.projectDir=projectDir
         self.data_template_dict={}
 
-        self.ground_state = False
-        self.ground_state_pdb = ''
-        self.ground_state_mean_mtz = ''
-        self.panddaDir = ''
-        print '====>>>>',ground_state
-        if ground_state != []:
-            print 'here'
-            self.ground_state = True
-            self.ground_state_pdb = ground_state[0]
-            self.ground_state_mean_mtz = ground_state[1]
-            self.panddaDir = ground_state[2]
-
         self.errorList = []
         self.eventList = []
         self.db_dict = None
@@ -312,6 +300,18 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         self.pdb = None
         self.mtz = None
 
+        self.ground_state = False
+        self.ground_state_pdb = ''
+        self.ground_state_mean_mtz = ''
+        self.panddaDir = ''
+        if ground_state != []:
+            print 'here'
+            self.ground_state = True
+            self.ground_state_pdb = ground_state[0]
+            self.ground_state_mean_mtz = ground_state[1]
+            self.panddaDir = ground_state[2]
+            self.pdb = self.ground_state_pdb
+            self.mtz = self.ground_state_mean_mtz
 
     def run(self):
 
