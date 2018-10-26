@@ -768,8 +768,9 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                     except (ValueError,IndexError):
                         pass
                 if '#' in line:
-                    amendSoftwareBlock = True
-                    foundSoftwareBlock = False
+                    if not self.ground_state:
+                        amendSoftwareBlock = True
+                        foundSoftwareBlock = False
             if '_refine.pdbx_ls_cross_valid_method' in line:
                 sys.stdout.write('_refine.pdbx_ls_cross_valid_method               THROUGHOUT \n')
 
