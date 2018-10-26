@@ -1584,20 +1584,27 @@ class data_source:
             oldRefiStage=str(tmp[0][0])
             Logfile.insert('setting RefinementOutcome field to "'+db_dict['RefinementOutcome']+'" for '+xtal)
             self.update_insert_data_source(xtal,db_dict)
+        elif type == 'ground_state':
+            cursor.execute("select DimplePANDDApath from depositTable where StructureType is '{0!s}' and DimplePANDDApath is '{1!s}".format(type,db_dict['DimplePANDDApath']))
+            tmp = cursor.fetchall()
+            print tmp
 
         cursor.execute("select CrystalName,StructureType from depositTable where CrystalName is '{0!s}' and StructureType is '{1!s}'".format(xtal, type))
         tmp = cursor.fetchall()
-        if tmp == [] and int(db_dict['RefinementOutcome'].split()[0]) == 5:
-            sqlite="insert into depositTable (CrystalName,StructureType) values ('{0!s}','{1!s}');".format(xtal, type)
-            Logfile.insert('creating new entry for '+str(type)+' structure of '+xtal+' in depositTable')
-            cursor.execute(sqlite)
-            connect.commit()
-        else:
-            if int(db_dict['RefinementOutcome'].split()[0]) < 5:
-                sqlite="delete from depositTable where CrystalName is '{0!s}' and StructureType is '{1!s}'".format(xtal, type)
-                Logfile.insert('removing entry for '+str(type)+' structure of '+xtal+' from depositTable')
+        if type == 'ligand_bound':
+            if tmp == [] and int(db_dict['RefinementOutcome'].split()[0]) == 5:
+                sqlite="insert into depositTable (CrystalName,StructureType) values ('{0!s}','{1!s}');".format(xtal, type)
+                Logfile.insert('creating new entry for '+str(type)+' structure of '+xtal+' in depositTable')
                 cursor.execute(sqlite)
                 connect.commit()
+            else:
+                if int(db_dict['RefinementOutcome'].split()[0]) < 5:
+                    sqlite="delete from depositTable where CrystalName is '{0!s}' and StructureType is '{1!s}'".format(xtal, type)
+                    Logfile.insert('removing entry for '+str(type)+' structure of '+xtal+' from depositTable')
+                    cursor.execute(sqlite)
+                    connect.commit()
+        elif type == 'ground_state':
+            print 'hallo'
 
 
     def remove_selected_apo_structures_from_depositTable(self,xce_logfile,xtalList):
