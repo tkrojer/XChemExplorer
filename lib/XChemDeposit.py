@@ -305,7 +305,6 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         self.ground_state_mean_mtz = ''
         self.panddaDir = ''
         if ground_state != []:
-            print 'here'
             self.ground_state = True
             self.ground_state_pdb = ground_state[0]
             self.ground_state_mean_mtz = ground_state[1]
@@ -911,6 +910,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                         newLine += '_diffrn.id                  1\n'
                         newLine += '_diffrn.details             "diffraction data from crystal %s; soaked compound: %s"\n' %(str(counter),smiles)
                         f.write(newLine)
+                        counter += 1
                     else:
                         f.write(line)
         f.close()
@@ -939,9 +939,12 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
     def update_sf_mmcif_file(self,xtal):
         self.Logfile.insert('%s: updating %s_sf.mmcif' %(xtal,xtal))
 
-        bound = [   "data from final refinement with ligand, final.mtz",
-                    "data from original reflections, data.mtz",
-                    "data for ligand evidence map (PanDDA event map), event_map_$.mtz"]
+        if self.ground_state:
+            bound = [   "data for PanDDA ground-state-mean-map"  ]
+        else:
+            bound = [   "data from final refinement with ligand, final.mtz",
+                        "data from original reflections, data.mtz",
+                        "data for ligand evidence map (PanDDA event map), event_map_$.mtz"  ]
 
         block = -1
 
