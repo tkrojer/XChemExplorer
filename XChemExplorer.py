@@ -521,6 +521,8 @@ class XChemExplorer(QtGui.QApplication):
     def add_ground_state_db(self):
         db_dict = {}
         db_dict['DimplePANDDApath'] = self.panddas_directory
+        db_dict['PDB_file'] = str(self.ground_state_pdb_button_label.text())
+        db_dict['MTZ_file'] = str(self.ground_state_mtz_button_label.text())
         self.db.create_or_remove_missing_records_in_depositTable(self.xce_logfile, 'ground_state', 'ground_state',
                                                                  db_dict)
 
