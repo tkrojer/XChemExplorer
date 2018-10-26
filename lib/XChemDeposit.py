@@ -456,10 +456,10 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
     def zenodo_dict_exists(self,xtal):
         dictStatus = False
         self.zenodo_dict = None
-        self.Logfile.insert('%s: reading information from zenodoTable for pandda run: %s' % (xtal,self.db_dict['DimplePANDDApath']))
         if self.ground_state:
             self.zenodo_dict = self.db.get_zenodo_dict_for_pandda_analysis(self.panddaDir)
         else:
+            self.Logfile.insert('%s: reading information from zenodoTable for pandda run: %s' % (xtal, self.db_dict['DimplePANDDApath']))
             self.zenodo_dict = self.db.get_zenodo_dict_for_pandda_analysis(self.db_dict['DimplePANDDApath'])
         if self.zenodo_dict == {}:
             dictStatus = True
