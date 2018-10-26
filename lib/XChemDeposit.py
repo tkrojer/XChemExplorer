@@ -1020,17 +1020,23 @@ class prepare_for_group_deposition_upload(QtCore.QThread):
         # ligand bound structures
         if self.type == 'ligand_bound':
             self.Logfile.insert('checking depositionTable for mmcif files of ligand-bound structures')
-            toDeposit=self.db.execute_statement("select CrystalName,mmCIF_model_file,mmCIF_SF_file from depositTable where StructureType is 'ligand_bound';")
+            toDeposit=self.db.execute_statement("select CrystalName,mmCIF_model_file,mmCIF_SF_file,DimplePANDDApath from depositTable where StructureType is 'ligand_bound';")
         elif self.type == 'ground_state':
             self.Logfile.insert('checking depositionTable for mmcif files of ground-state structures')
-            toDeposit = self.db.execute_statement("select CrystalName,mmCIF_model_file,mmCIF_SF_file from depositTable where StructureType is 'ground_state';")
+            toDeposit = self.db.execute_statement("select CrystalName,mmCIF_model_file,mmCIF_SF_file,DimplePANDDApath from depositTable where StructureType is 'ground_state';")
         else:
             return
 
         for n,item in enumerate(sorted(toDeposit)):
             xtal=str(item[0])
-            mmcif=os.path.join(self.projectDir,xtal,str(item[1]))
-            mmcif_sf=os.path.join(self.projectDir,xtal,str(item[2]))
+            if self.type == 'ligand_bound':
+                mmcif=os.path.join(self.projectDir,xtal,str(item[1]))
+                mmcif_sf=os.path.join(self.projectDir,xtal,str(item[2]))
+            elif self.type == 'ground_state':
+                mmcif=os.path.join(str(item[3],str(item[1]))
+                mmcif_sf=os.path.join(str(item[3],str(item[2]))
+            else:
+                continue
             self.Logfile.insert('%s: %s/ %s' %(xtal,mmcif,mmcif_sf))
             if os.path.isfile(mmcif) and os.path.isfile(mmcif_sf):
                 self.Logfile.insert('copying {0!s} to {1!s}'.format(mmcif, self.depositDir))
@@ -1044,7 +1050,7 @@ class prepare_for_group_deposition_upload(QtCore.QThread):
                     os.system('/bin/mv ground_state_sf.mmcif ground_state_{0!s}_sf.mmcif'.format(str(n)))
                     mmcif_sf = mmcif_sf.replace('ground_state_sf.mmcif', 'ground_state_{0!s}_sf.mmcif'.format(str(n)))
             else:
-                self.Logfile.error('cannot find ligand_bound mmcif file for '+xtal)
+                self.Logfile.error('cannot find mmcif file for '+xtal)
 
             text = (    'label: {0!s}-{1!s}\n'.format(xtal,self.type)+
                         'description: {0!s} structure of {1!s}\n'.format(self.type,xtal)+
