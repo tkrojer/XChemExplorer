@@ -1585,7 +1585,7 @@ class data_source:
             Logfile.insert('setting RefinementOutcome field to "'+db_dict['RefinementOutcome']+'" for '+xtal)
             self.update_insert_data_source(xtal,db_dict)
         elif type == 'ground_state':
-            cursor.execute("select DimplePANDDApath from depositTable where StructureType is '{0!s}' and DimplePANDDApath is '{1!s}".format(type,db_dict['DimplePANDDApath']))
+            cursor.execute("select DimplePANDDApath from depositTable where StructureType is '{0!s}' and DimplePANDDApath is '{1!s}'".format(type,db_dict['DimplePANDDApath']))
             tmp = cursor.fetchall()
             print tmp
 
