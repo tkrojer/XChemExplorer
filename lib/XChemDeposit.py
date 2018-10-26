@@ -1063,11 +1063,11 @@ class prepare_for_group_deposition_upload(QtCore.QThread):
         f.close()
 
         self.Logfile.insert('preparing tar archive...')
-        os.system('tar -cvf ligand_bound_structures.tar *mmcif index.txt')
+        os.system('tar -cvf {0!s}_structures.tar *mmcif index.txt'.format(self.type))
         self.Logfile.insert('bzipping archive...')
-        os.system('bzip2 ligand_bound_structures.tar')
+        os.system('bzip2 {0!s}_structures.tar'.format(self.type))
         self.Logfile.insert('removing all bound mmcif files and index.txt file from '+self.depositDir)
-        os.system('/bin/rm -f *mmcif index.txt')
+#        os.system('/bin/rm -f *mmcif index.txt')
         self.Logfile.insert('done!')
 
 
