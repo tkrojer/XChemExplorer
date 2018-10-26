@@ -759,7 +759,11 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
         if os.path.isfile(xtal+'.mmcif') and os.path.getsize(xtal+'.mmcif') > 20000 :
             self.Logfile.insert('%s: model mmcif file successfully created' %xtal)
-            if not self.ground_state:
+            if self.ground_state:
+                self.db.execute_statement(
+                    "update depositTable set mmCIF_model_file='{0!s}.mmcif' where CrystalName is '{1!s}' and DimplePANDDApath is '{2!s}'".format(xtal,
+                                                                                                                 xtal,self.panddaDir))
+            else:
                 self.db.execute_statement("update depositTable set mmCIF_model_file='{0!s}.mmcif' where CrystalName is '{1!s}'".format(xtal,xtal))
             fileStatus = True
         else:
@@ -872,7 +876,9 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
         if os.path.isfile(xtal+'_sf.mmcif') and os.path.getsize(xtal+'_sf.mmcif') > 20000 :
             self.Logfile.insert('%s: SF mmcif file successfully created' %xtal)
-            if not self.ground_state:
+            if self.ground_state:
+                self.db.execute_statement("update depositTable set mmCIF_SF_file='{0!s}_sf.mmcif' where CrystalName is '{1!s}' and DimplePANDDApath is '{2!s}'".format(xtal,xtal,self.panddaDir))
+            else:
                 self.db.execute_statement("update depositTable set mmCIF_SF_file='{0!s}_sf.mmcif' where CrystalName is '{1!s}'".format(xtal,xtal))
             fileStatus = True
         else:
