@@ -641,9 +641,10 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             if self.ground_state:
                 os.chdir(self.projectDir)
                 self.data_template_dict['radiation_wavelengths'] = '1.000'
-                title = 'ground-state'
                 self.data_template_dict['group_type'] = 'ground state'
-
+                self.data_template_dict['group_title'] = 'group_title'
+                self.data_template_dict['group_description'] = 'group_description'
+                self.data_template_dict['title'] = 'title'
             else:
                 os.chdir(os.path.join(self.projectDir, xtal))
                 # edit wavelength
