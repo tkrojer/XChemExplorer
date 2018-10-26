@@ -1067,7 +1067,7 @@ class prepare_for_group_deposition_upload(QtCore.QThread):
         self.Logfile.insert('bzipping archive...')
         os.system('bzip2 {0!s}_structures.tar'.format(self.type))
         self.Logfile.insert('removing all bound mmcif files and index.txt file from '+self.depositDir)
-#        os.system('/bin/rm -f *mmcif index.txt')
+        os.system('/bin/rm -f *mmcif index.txt')
         self.Logfile.insert('done!')
 
 
