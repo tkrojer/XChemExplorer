@@ -1587,7 +1587,11 @@ class data_source:
         elif type == 'ground_state':
             cursor.execute("select DimplePANDDApath from depositTable where StructureType is '{0!s}' and DimplePANDDApath is '{1!s}'".format(type,db_dict['DimplePANDDApath']))
             tmp = cursor.fetchall()
-            print tmp
+            if tmp == []:
+                Logfile.insert('entry for ground-state model in depositTable does not exist')
+            else:
+                Logfile.warning('entry for ground-state model in depositTable does already exist')
+                return
 
         cursor.execute("select CrystalName,StructureType from depositTable where CrystalName is '{0!s}' and StructureType is '{1!s}'".format(xtal, type))
         tmp = cursor.fetchall()
@@ -1604,8 +1608,10 @@ class data_source:
                     cursor.execute(sqlite)
                     connect.commit()
         elif type == 'ground_state':
-            print 'hallo'
-
+            sqlite = "insert into depositTable (CrystalName,StructureType) values ('{0!s}','{1!s}');".format(xtal, type)
+            Logfile.insert('creating new entry for ' + str(type) + ' structure of ' + xtal + ' in depositTable')
+            cursor.execute(sqlite)
+            connect.commit()
 
     def remove_selected_apo_structures_from_depositTable(self,xce_logfile,xtalList):
         connect=sqlite3.connect(self.data_source_file)
