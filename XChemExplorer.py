@@ -518,6 +518,12 @@ class XChemExplorer(QtGui.QApplication):
         mtz = str(tuple(m)[0])
         self.ground_state_mtz_button_label.setText(mtz)
 
+    def add_ground_state_db(self):
+        db_dict = {}
+        db_dict['DimplePANDDApath'] = self.panddas_directory
+        self.db.create_or_remove_missing_records_in_depositTable(self.xce_logfile, 'ground_state', 'ground_state',
+                                                                 db_dict)
+
     def prepare_ground_state_mmcif(self):
         self.update_log.insert('preparing mmcif file for apo structure deposition')
         self.prepare_models_for_deposition_ligand_bound('ground-state')
@@ -1199,7 +1205,7 @@ class XChemExplorer(QtGui.QApplication):
         grid.addWidget(QtGui.QLabel('Structure Title (apo)'), 7, 0)
         self.structure_title_apo = QtGui.QLineEdit()
         self.structure_title_apo.setText(
-            'Crystal Structure of $ProteinName after initial refinement with no ligand modelled (structure $n)')
+            'PanDDA analysis group deposition of ground-state model of $ProteinName')
         self.structure_title_apo.setFixedWidth(600)
         grid.addWidget(self.structure_title_apo, 7, 1)
 

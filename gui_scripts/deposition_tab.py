@@ -64,21 +64,25 @@ class DepositionTab():
 
         ground_state_pdb_button = QtGui.QPushButton('Select ground-state PDB file')
         ground_state_pdb_button.clicked.connect(xce_object.select_ground_state_pdb)
-        ground_state_pdb_button.setMaximumWidth(200)
+        ground_state_pdb_button.setMaximumWidth(400)
 
         xce_object.ground_state_pdb_button_label = QtGui.QLabel('')
 
         ground_state_mtz_button = QtGui.QPushButton('Select ground-state MTZ file')
         ground_state_mtz_button.clicked.connect(xce_object.select_ground_state_mtz)
-        ground_state_mtz_button.setMaximumWidth(200)
+        ground_state_mtz_button.setMaximumWidth(400)
 
         xce_object.ground_state_mtz_button_label = QtGui.QLabel('')
 
         warning_label = QtGui.QLabel('Please check the settings tab that you have selected the correct pandda directory')
 
+        add_ground_state_db_button = QtGui.QPushButton('Add ground-state to database')
+        add_ground_state_db_button.clicked.connect(xce_object.add_ground_state_db)
+        add_ground_state_db_button.setMaximumWidth(400)
+
         prepare_ground_state_mmcif_button = QtGui.QPushButton('Prepare ground-state mmcif file')
         prepare_ground_state_mmcif_button.clicked.connect(xce_object.prepare_ground_state_mmcif)
-        prepare_ground_state_mmcif_button.setMaximumWidth(200)
+        prepare_ground_state_mmcif_button.setMaximumWidth(400)
 
 
 #        # prepare ICM heading
@@ -170,6 +174,7 @@ class DepositionTab():
                                   ground_state_pdb_button,xce_object.ground_state_pdb_button_label,
                                   ground_state_mtz_button,xce_object.ground_state_mtz_button_label,
                                   warning_label,
+                                  add_ground_state_db_button,
                                   prepare_ground_state_mmcif_button,
                                   QtGui.QLabel('  \n  '),
                                   zenodo_upload_heading, zenodo_upload_text, prep_files_button,

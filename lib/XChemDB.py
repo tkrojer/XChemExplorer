@@ -269,6 +269,8 @@ class data_source:
             ['label',                                       'label',                                    'TEXT'],    # for index.txt
             ['description',                                 'description',                              'TEXT'],    # for index.txt
 
+            ['DimplePANDDApath',                            'DimplePANDDApath',                         'TEXT'],
+
             ['contact_author_PI_salutation',                'contact_author_PI_salutation',             'TEXT'],
             ['contact_author_PI_first_name',                'contact_author_PI_first_name',             'TEXT'],
             ['contact_author_PI_last_name',                 'contact_author_PI_last_name',              'TEXT'],
@@ -1575,13 +1577,13 @@ class data_source:
     def create_or_remove_missing_records_in_depositTable(self,xce_logfile,xtal,type,db_dict):
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
-        cursor.execute("select RefinementOutcome from mainTable where CrystalName is '{0!s}'".format(xtal))
-        tmp = cursor.fetchall()
-        oldRefiStage=str(tmp[0][0])
-
         Logfile=XChemLog.updateLog(xce_logfile)
-        Logfile.insert('setting RefinementOutcome field to "'+db_dict['RefinementOutcome']+'" for '+xtal)
-        self.update_insert_data_source(xtal,db_dict)
+        if type == 'ligand_bound':
+            cursor.execute("select RefinementOutcome from mainTable where CrystalName is '{0!s}'".format(xtal))
+            tmp = cursor.fetchall()
+            oldRefiStage=str(tmp[0][0])
+            Logfile.insert('setting RefinementOutcome field to "'+db_dict['RefinementOutcome']+'" for '+xtal)
+            self.update_insert_data_source(xtal,db_dict)
 
         cursor.execute("select CrystalName,StructureType from depositTable where CrystalName is '{0!s}' and StructureType is '{1!s}'".format(xtal, type))
         tmp = cursor.fetchall()
