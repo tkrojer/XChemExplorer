@@ -318,7 +318,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         self.Logfile.insert('======= preparing mmcif files for wwPDB deposition =======')
         self.Logfile.insert('checking DB for structures to deposit...')
         if self.ground_state:
-            toDeposit = self.db.execute_statement("select CrystalName from mainTable where DimplePANDDApath = '%s';" %self.panddaDir)
+            toDeposit = self.db.execute_statement("select CrystalName from depositTable where DimplePANDDApath = '%s';" %self.panddaDir)
         else:
             toDeposit = self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%';")
         self.Logfile.insert('found ' + str(len(toDeposit)) + ' samples ready for deposition')
