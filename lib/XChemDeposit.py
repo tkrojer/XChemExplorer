@@ -252,8 +252,11 @@ class update_depositTable(QtCore.QThread):
                 diffractionExperiment=self.db.execute_statement("select DataCollectionBeamline,DataCollectionDate from mainTable where CrystalName is '{0!s}'".format(xtal))
                 beamline=str(diffractionExperiment[0][0])
                 date=str(diffractionExperiment[0][1])
-            except UnboundLocalError:
-                self.Logfile.warning('%s: cannot find details about diffraction experiment in mainTable')
+            except (UnboundLocalError,IndexError):
+                self.Logfile.warning('%s: cannot find details about diffraction experiment in mainTable' %xtal)
+                beamline = db_dict['radiation_source']
+                date = db_dict['data_collection_date']
+                self.Logfile.warning('%s: using values provided in depositTable for beamline and data collection date' %xtal)
             if beamline.lower() != 'none':
                 db_dict=self.tweak_deposit_dict(xtal,db_dict)
             if date.lower() != 'none':
