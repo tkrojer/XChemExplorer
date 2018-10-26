@@ -248,9 +248,12 @@ class update_depositTable(QtCore.QThread):
             db_dict=self.deposit_dict   # need to do this because individual fields might need updating for some xtals
 
             # try to get information about the diffraction experiment
-            diffractionExperiment=self.db.execute_statement("select DataCollectionBeamline,DataCollectionDate from mainTable where CrystalName is '{0!s}'".format(xtal))
-            beamline=str(diffractionExperiment[0][0])
-            date=str(diffractionExperiment[0][1])
+            try:
+                diffractionExperiment=self.db.execute_statement("select DataCollectionBeamline,DataCollectionDate from mainTable where CrystalName is '{0!s}'".format(xtal))
+                beamline=str(diffractionExperiment[0][0])
+                date=str(diffractionExperiment[0][1])
+            except UnboundLocalError:
+                self.Logfile.warning('%s: cannot find details about diffraction experiment in mainTable')
             if beamline.lower() != 'none':
                 db_dict=self.tweak_deposit_dict(xtal,db_dict)
             if date.lower() != 'none':
