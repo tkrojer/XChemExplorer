@@ -897,12 +897,24 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
-    def prepare_for_group_deposition_upload(self):
+    def prepare_for_group_deposition_upload_ligand_bound(self):
 
         self.work_thread = XChemDeposit.prepare_for_group_deposition_upload(
             os.path.join(self.database_directory, self.data_source_file),
             self.xce_logfile,
-            self.group_deposit_directory,self.initial_model_directory)
+            self.group_deposit_directory,self.initial_model_directory,'ligand_bound')
+        self.explorer_active = 1
+        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.work_thread.start()
+
+    def prepare_for_group_deposition_upload_ground_state(self):
+
+        self.work_thread = XChemDeposit.prepare_for_group_deposition_upload(
+            os.path.join(self.database_directory, self.data_source_file),
+            self.xce_logfile,
+            self.group_deposit_directory,self.initial_model_directory,'ground_state')
         self.explorer_active = 1
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)

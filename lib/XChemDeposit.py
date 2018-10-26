@@ -1001,13 +1001,14 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
 class prepare_for_group_deposition_upload(QtCore.QThread):
 
-    def __init__(self,database,xce_logfile,depositDir,projectDir):
+    def __init__(self,database,xce_logfile,depositDir,projectDir,type):
         QtCore.QThread.__init__(self)
         self.database=database
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.db=XChemDB.data_source(database)
         self.depositDir=depositDir
         self.projectDir=projectDir
+        self.type=type
 
 
 
@@ -1017,7 +1018,51 @@ class prepare_for_group_deposition_upload(QtCore.QThread):
         os.chdir(self.depositDir)
 
         # ligand bound structures
-        toDeposit=self.db.execute_statement("select CrystalName,mmCIF_model_file,mmCIF_SF_file from depositTable where StructureType is 'ligand_bound';")
+        if self.type == 'ligand_bound':
+            toDeposit=self.db.execute_statement("select CrystalName,mmCIF_model_file,mmCIF_SF_file from depositTable where StructureType is 'ligand_bound';")
+        elif self.type == 'ground_state':
+            toDeposit = self.db.execute_statement("select CrystalName,mmCIF_model_file,mmCIF_SF_file from depositTable where StructureType is 'ground_state';")
+        else:
+            return
+
+        for n,item in enumerate(sorted(toDeposit)):
+            xtal=str(item[0])
+            mmcif=os.path.join(self.projectDir,xtal,str(item[1]))
+            mmcif_sf=os.path.join(self.projectDir,xtal,str(item[2]))
+            if os.path.isfile(mmcif) and os.path.isfile(mmcif_sf):
+                self.Logfile.insert('copying {0!s} to {1!s}'.format(mmcif, self.depositDir))
+                os.system('/bin/cp {0!s} .'.format(mmcif))
+                if self.type == 'ground_state':
+                    os.system('/bin/mv ground_state.mmcif ground_state_{0!s}.mmcif'.format(str(n)))
+                    mmcif = mmcif.replace('ground_state.mmcif','ground_state_{0!s}.mmcif'.format(str(n)))
+                self.Logfile.insert('copying {0!s} to {1!s}'.format(mmcif_sf, self.depositDir))
+                os.system('/bin/cp {0!s} .'.format(mmcif_sf))
+                if self.type == 'ground_state':
+                    os.system('/bin/mv ground_state_sf.mmcif ground_state_{0!s}_sf.mmcif'.format(str(n)))
+                    mmcif_sf = mmcif_sf.replace('ground_state_sf.mmcif', 'ground_state_{0!s}_sf.mmcif'.format(str(n)))
+            else:
+                self.Logfile.error('cannot find ligand_bound mmcif file for '+xtal)
+
+            text = (    'label: {0!s}-{1!s}\n'.format(xtal,self.type)+
+                        'description: {0!s} structure of {1!s}\n'.format(self.type,xtal)+
+                        'model: {0!s}\n'.format(mmcif[mmcif.rfind('/')+1:])+
+                        'sf: {0!s}\n\n'.format(mmcif_sf[mmcif_sf.rfind('/')+1:])          )
+            TextIndex+=text
+
+        f = open('index.txt','w')
+        f.write(TextIndex)
+        f.close()
+
+        self.Logfile.insert('preparing tar archive...')
+        os.system('tar -cvf ligand_bound_structures.tar *mmcif index.txt')
+        self.Logfile.insert('bzipping archive...')
+        os.system('bzip2 ligand_bound_structures.tar')
+        self.Logfile.insert('removing all bound mmcif files and index.txt file from '+self.depositDir)
+        os.system('/bin/rm -f *mmcif index.txt')
+        self.Logfile.insert('done!')
+
+        # ground-state structures
+        toDeposit=self.db.execute_statement("select CrystalName,mmCIF_model_file,mmCIF_SF_file from depositTable where StructureType is 'ground-state';")
         for item in sorted(toDeposit):
             xtal=str(item[0])
             mmcif=os.path.join(self.projectDir,xtal,str(item[1]))
@@ -1047,7 +1092,6 @@ class prepare_for_group_deposition_upload(QtCore.QThread):
         self.Logfile.insert('removing all bound mmcif files and index.txt file from '+self.depositDir)
         os.system('/bin/rm -f *mmcif index.txt')
         self.Logfile.insert('done!')
-
 
 
 #        # apo structures

@@ -423,8 +423,10 @@ class setup():
                                                        xce_object.prepare_models_for_deposition_apo],
                                                       ['Prepare mmcif for ligand bound structures', '',
                                                        xce_object.prepare_models_for_deposition_ligand_bound],
-                                                      ['Copy files to group deposition directory', '',
-                                                       xce_object.prepare_for_group_deposition_upload],
+                                                      ['Copy files to group deposition directory (ligand bound)', '',
+                                                       xce_object.prepare_for_group_deposition_upload_ligand_bound],
+                                                      ['Copy files to group deposition directory (ground state)', '',
+                                                       xce_object.prepare_for_group_deposition_upload_ground_state],
                                                       ['Update DB with PDB codes', '', xce_object.enter_pdb_codes],
                                                       ['Check SMILES', '', xce_object.check_smiles_in_db_and_pdb]
                                                   ]],
