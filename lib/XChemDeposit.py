@@ -349,6 +349,9 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 if not self.data_template_dict_exists(xtal):
                     continue
 
+                if not self.zenodo_dict_exists(xtal):
+                    continue
+
                 if not self.save_data_template_dict(xtal):
                     continue
 
