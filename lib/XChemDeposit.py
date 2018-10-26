@@ -905,7 +905,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
     def add_apo_sf_mmcif_to_ground_state_mmcif(self):
         os.chdir(self.projectDir)
         self.Logfile.insert('checking pandda directory for apo mmcif files: '+self.panddaDir)
-        f = open('ground-state_sf.mmcif','a')
+        f = open('ground_state_sf.mmcif','a')
         counter = 1
         for dirs in glob.glob(os.path.join(self.panddaDir,'processed_datasets','*')):
             if not os.path.isdir(dirs):         # this is needed in case single files are in processed_datasets
