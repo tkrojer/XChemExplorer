@@ -851,10 +851,10 @@ class XChemExplorer(QtGui.QApplication):
         self.db.create_missing_apo_records_for_all_structures_in_depositTable(self.initial_model_directory,
                                                                               self.xce_logfile)
 
-    def update_file_information_of_apo_records(self):
-        XChemDeposit.update_file_locations_of_apo_structuresin_DB(
-            os.path.join(self.database_directory, self.data_source_file), self.initial_model_directory,
-            self.xce_logfile)
+#    def update_file_information_of_apo_records(self):
+#        XChemDeposit.update_file_locations_of_apo_structuresin_DB(
+#            os.path.join(self.database_directory, self.data_source_file), self.initial_model_directory,
+#            self.xce_logfile)
 
     def prepare_models_for_deposition_ligand_bound(self,structureType):
 
