@@ -27,8 +27,8 @@ class DepositionTab():
         scrollContent.setLayout(scrollLayout)
 
         # deposition page heading
-        deposition_page_heading = self.layout_funcs.add_depo_heading('HTML export & ZENODO upload')
-        deposition_page_heading.setStyleSheet("font: 30pt Arial Bold")
+        deposition_page_heading = self.layout_funcs.add_depo_heading('HTML export, GROUND-STATE deposition & ZENODO upload')
+        deposition_page_heading.setStyleSheet("font: 40pt Arial Bold")
 
 #        # introduction text
 #        introduction_text = self.layout_funcs.add_depo_text(XChemToolTips.html_summary_introduction())
@@ -57,10 +57,15 @@ class DepositionTab():
 #        # html prep test
 #        html_prep_text = self.layout_funcs.add_depo_text(XChemToolTips.html_export_step())
 
-        # html export button
+        deposition_html_heading = self.layout_funcs.add_depo_heading('HTML export')
+        deposition_html_heading.setStyleSheet("font: 20pt Arial Bold")
+
         html_export_button = QtGui.QPushButton('Export to HTML')
         html_export_button.clicked.connect(xce_object.export_to_html)
         html_export_button.setMaximumWidth(200)
+
+        deposition_ground_state_heading = self.layout_funcs.add_depo_heading('ground-state deposition')
+        deposition_ground_state_heading.setStyleSheet("font: 20pt Arial Bold")
 
         ground_state_pdb_button = QtGui.QPushButton('Select ground-state PDB file')
         ground_state_pdb_button.clicked.connect(xce_object.select_ground_state_pdb)
@@ -169,8 +174,10 @@ class DepositionTab():
         upload_html_text = self.layout_funcs.add_depo_text(XChemToolTips.zenodo_upload_part_four(xce_object.
                                                                                                  html_export_directory))
 
-        deposition_widget_list = [deposition_page_heading, QtGui.QLabel('  '),
-                                  html_export_button, QtGui.QLabel('  '),
+        deposition_widget_list = [deposition_page_heading, QtGui.QLabel(' \n\n\n '),
+                                  deposition_html_heading, QtGui.QLabel(' \n '),
+                                  html_export_button, QtGui.QLabel('  \n\n '),
+                                  deposition_ground_state_heading, QtGui.QLabel(' \n '),
                                   ground_state_pdb_button,xce_object.ground_state_pdb_button_label,
                                   ground_state_mtz_button,xce_object.ground_state_mtz_button_label,
                                   warning_label,
