@@ -67,24 +67,34 @@ class DepositionTab():
         deposition_ground_state_heading = self.layout_funcs.add_depo_heading('ground-state deposition')
         deposition_ground_state_heading.setStyleSheet("font: 20pt Arial Bold")
 
+        ground_state_pdb_button_label_help.QtGui.QLabel('1. Select ground-state PDB file')
         ground_state_pdb_button = QtGui.QPushButton('Select ground-state PDB file')
         ground_state_pdb_button.clicked.connect(xce_object.select_ground_state_pdb)
         ground_state_pdb_button.setMaximumWidth(400)
-
         xce_object.ground_state_pdb_button_label = QtGui.QLabel('')
 
+        ground_state_mtz_button_label_help.QtGui.QLabel('2. Select ground-state MTZ file')
         ground_state_mtz_button = QtGui.QPushButton('Select ground-state MTZ file')
         ground_state_mtz_button.clicked.connect(xce_object.select_ground_state_mtz)
         ground_state_mtz_button.setMaximumWidth(400)
-
         xce_object.ground_state_mtz_button_label = QtGui.QLabel('')
 
-        warning_label = QtGui.QLabel('Please check the settings tab that you have selected the correct pandda directory')
+        warning_label = QtGui.QLabel('3. Please check the settings tab that you have selected the correct pandda directory')
 
+        add_ground_state_db_button_help.QtGui.QLabel('4. Add the ground-state entry to the database')
         add_ground_state_db_button = QtGui.QPushButton('Add ground-state to database')
         add_ground_state_db_button.clicked.connect(xce_object.add_ground_state_db)
         add_ground_state_db_button.setMaximumWidth(400)
 
+        further_instructions = (
+            '5. Enter meta-data for ground-state model:\n'
+            '   - Open "Deposition -> Edit information"\n'
+            '   - Fill out form or load .deposit file\n'
+            '   - Press "Save to Database"\n'
+            '   - Press "OK"\n'        )
+        further_instructions_label = QtGui.QLabel(further_instructions)
+
+        prepare_ground_state_mmcif_button_help('6. Prepare the ground-state mmcif file\n    (is saved to pandda directory')
         prepare_ground_state_mmcif_button = QtGui.QPushButton('Prepare ground-state mmcif file')
         prepare_ground_state_mmcif_button.clicked.connect(xce_object.prepare_ground_state_mmcif)
         prepare_ground_state_mmcif_button.setMaximumWidth(400)
@@ -178,11 +188,14 @@ class DepositionTab():
                                   deposition_html_heading, QtGui.QLabel(' \n '),
                                   html_export_button, QtGui.QLabel('  \n\n '),
                                   deposition_ground_state_heading, QtGui.QLabel(' \n '),
-                                  ground_state_pdb_button,xce_object.ground_state_pdb_button_label,
-                                  ground_state_mtz_button,xce_object.ground_state_mtz_button_label,
-                                  warning_label,
-                                  add_ground_state_db_button,
-                                  prepare_ground_state_mmcif_button,
+                                  ground_state_pdb_button_label_help,
+                                  ground_state_pdb_button,xce_object.ground_state_pdb_button_label,QtGui.QLabel(' '),
+                                  ground_state_mtz_button_label_help,
+                                  ground_state_mtz_button,xce_object.ground_state_mtz_button_label,QtGui.QLabel(' '),
+                                  warning_label,QtGui.QLabel(' '),
+                                  add_ground_state_db_button_help,add_ground_state_db_button,QtGui.QLabel(' '),
+                                  further_instructions_label,QtGui.QLabel(' '),
+                                  prepare_ground_state_mmcif_button_help,prepare_ground_state_mmcif_button,QtGui.QLabel('  \n\n '),
                                   QtGui.QLabel('  \n  '),
                                   zenodo_upload_heading, zenodo_upload_text, prep_files_button,
                                   QtGui.QLabel('  '), zenodo_upload_heading2, zenodo_upload_text2, zenodo_upload_image,
