@@ -5,6 +5,7 @@ import glob
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 
 from XChemUtils import parse
+from XChemUtils import mtztools
 
 
 # - select datasets with highest resolution
@@ -88,7 +89,7 @@ def convert_mean_map_to_mtz(emap,mtz):
            'eof\n')
     print cmd
     os.system(cmd)
-    reso = XChemUtils.mtztools(mtz).get_dmin()
+    reso = mtztools(mtz).get_dmin()
     print '-> resolution:',reso
     cmd = ('module load phenix\n'
            'phenix.map_to_structure_factors %s d_min=%s\n' % (emap, reso) +
