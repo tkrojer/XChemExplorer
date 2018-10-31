@@ -63,7 +63,7 @@ class GUI(object):
                                         ['Comp Chem Ready!',        '4 - CompChem ready',       65000,  0,  0],
                                         ['Ready for Deposition!',   '5 - Deposition ready',     65000,  0,  0],
                                         ['In PDB',                  '6 - Deposited',            65000,  0,  0],
-                                        ['Analysed & Rejected',     '7 - Analysed & Rejected'   65000,  0,  0]]
+                                        ['Analysed & Rejected',     '7 - Analysed & Rejected',  65000,  0,  0]]
 
         self.ligand_confidence_category = [     '0 - no ligand present',
                                                 '1 - Low Confidence',
