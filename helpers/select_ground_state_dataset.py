@@ -89,6 +89,7 @@ def convert_mean_map_to_mtz(emap,mtz):
            'eof\n')
     print cmd
     os.system(cmd)
+    print '--->',mtz
     reso = mtztools(mtz).get_dmin()
     print '-> resolution:',reso
     cmd = ('module load phenix\n'
