@@ -1,3 +1,10 @@
+h1 {
+  font-size: 28px;
+}
+ 
+h2 {
+  font-size: 23px;
+}
 
 .xchem .viewport-wrapper {
 	max-width: 1210px;
