@@ -67,6 +67,9 @@ class export_to_html:
                 DELFWT = xtal + '-' + ligand + '_fofc.ccp4'
                 self.cut_and_copy_map(xtal, ligand + '.pdb', 'fofc.map', DELFWT,'DELFWT','PHDELWT')
                 ligConfidence = self.db.get_ligand_confidence_for_ligand(xtal, ligChain, ligNumber, ligName)
+                if ligConfidence.startswith('0'):
+                    self.Logfile.warning('%s: ligand confidence of %s-%s-%s is %s; ignoring...' %(xtal,ligChain,ligNumber,ligName,ligConfidence))
+                    continue
                 modelStatus = self.db_dict['RefinementOutcome']
                 if firstFile:
                     html += XChemMain.html_ngl(pdb,eventMap,FWT,DELFWT,ligand)
