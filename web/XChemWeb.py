@@ -331,7 +331,7 @@ class export_to_html:
 #            cmd = (
 #                "phenix.cut_out_density %s %s map_coeff_labels='%s,%s' cutout_model_radius=6 cutout_map_file_name=%s cutout_as_map=True" %(pdbCentre,mtzin,F,PHI,mapout)
 #            )
-
+            self.Logfile.insert(xtal+': running command:\n'+cmd)
             os.system(cmd)
         self.Logfile.insert('%s: copying %s to %s/files' %(xtal,mapout,self.htmlDir))
         os.system('/bin/cp %s %s/files' %(mapout,self.htmlDir))

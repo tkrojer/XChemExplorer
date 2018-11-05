@@ -2063,7 +2063,8 @@ class pdbtools(object):
         z_list=[]
         # pdb definition see: http://www.wwpdb.org/documentation/file-format-content/format33/sect9.html#ATOM
         for line in open(self.pdb):
-            if (line.startswith('ATOM') or line.startswith('HETATM')) and line[21:22]==chain and line[22:26].replace(' ','')==str(number):
+#            print line[21:22],line[22:26]
+            if (line.startswith('ATOM') or line.startswith('HETATM')) and line[21:22].replace(' ','')==chain.replace(' ','') and line[22:26].replace(' ','')==str(number).replace(' ',''):
                 X=float(line[30:38])
                 x_list.append(X)
                 Y=float(line[38:46])
