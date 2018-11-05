@@ -308,9 +308,9 @@ class export_to_html:
 #                self.cut_eventMAP(xtal,ligID,eventMAP)
         return eventMAP
 
-    def cut_and_copy_map(self,xtal,pdbCentre,mtzin,mapout,F,PHI):
+    def cut_and_copy_map(self,xtal,pdbCentre,mapin,mapout,F,PHI):
         os.chdir(os.path.join(self.projectDir, xtal))
-        self.Logfile.insert('%s: cutting density of %s around %s' %(xtal,mtzin,pdbCentre))
+        self.Logfile.insert('%s: cutting density of %s around %s' %(xtal,mapin.replace('.ccp4','.P1.ccp4'),pdbCentre))
         if os.path.isfile(mapout):
             self.Logfile.warning('%s: removing map -> %s' %(xtal,mapout))
             os.system('/bin/rm '+mapout)
@@ -318,7 +318,7 @@ class export_to_html:
 
         if mtzin.endswith('.map') or mtzin.endswith('.ccp4'):
             cmd = (
-                'mapmask mapin %s mapout %s xyzin %s << eof\n'  %(mtzin,mapout,pdbCentre) +
+                'mapmask mapin %s mapout %s xyzin %s << eof\n'  %(mapin.replace('.ccp4','.P1.ccp4'),mapout,pdbCentre) +
                 ' border 12\n'
                 ' end\n'
                 'eof'
@@ -333,8 +333,12 @@ class export_to_html:
 #            )
             self.Logfile.insert(xtal+': running command:\n'+cmd)
             os.system(cmd)
-        self.Logfile.insert('%s: copying %s to %s/files' %(xtal,mapout,self.htmlDir))
-        os.system('/bin/cp %s %s/files' %(mapout,self.htmlDir))
+            if os.path.isfile(mapout):
+                self.Logfile.insert(xtal+': reduced event map successfully created')
+                self.Logfile.insert('%s: copying %s to %s/files' % (xtal, mapout, self.htmlDir))
+                os.system('/bin/cp %s %s/files' % (mapout, self.htmlDir))
+            else:
+                self.Logfile.error(xtal+': creation of event map failed')
 
 
 
