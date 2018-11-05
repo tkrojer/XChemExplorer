@@ -316,7 +316,7 @@ class export_to_html:
             os.system('/bin/rm '+mapout)
 #        else:
 
-        if mtzin.endswith('.map') or mtzin.endswith('.ccp4'):
+        if mapin.endswith('.map') or mapin.endswith('.ccp4'):
             cmd = (
                 'mapmask mapin %s mapout %s xyzin %s << eof\n'  %(mapin.replace('.ccp4','.P1.ccp4'),mapout,pdbCentre) +
                 ' border 12\n'
