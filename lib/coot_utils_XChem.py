@@ -38,7 +38,7 @@ default_ball_and_stick_selection = "//A/1-2"
 # for mingw debug
 global have_mingw
 have_mingw = False
-if  os.getenv("MSYSTEM"):
+if os.getenv("MSYSTEM"):
     have_mingw = True
 
 
@@ -2835,14 +2835,10 @@ def run_download_binary_curl(revision, version_string,
         pre_release_flag = "-pre" in coot_version()
         ys = "www.ysbl.york.ac.uk/~emsley/software/binaries/"
         binary_type = coot_sys_build_type()
-        if (binary_type == "Linux-i386-fedora-3") or                  \
-               (binary_type == "Linux-i386-fedora-3-python") or       \
-               (binary_type == "Linux-i386-fedora-8-python-gtk2") or  \
-               (binary_type == "Linux-i386-fedora-8-gtk2") or         \
-               (binary_type == "Linux-i386-fedora-10-python-gtk2") or \
-               (binary_type == "Linux-i386-fedora-10-gtk2") or        \
-               (binary_type == "Linux-i686-ubuntu-8.04.3") or         \
-               (binary_type == "Linux-i686-ubuntu-8.04.3-python"):
+        type_list = ['Linux-i386-fedora-3', 'Linux-i386-fedora-3-python', 'Linux-i386-fedora-8-python-gtk2',
+                     'Linux-i386-fedora-8-gtk2', 'Linux-i386-fedora-10-python-gtk2', 'Linux-i386-fedora-10-gtk2',
+                     'Linux-i686-ubuntu-8.04.3', 'Linux-i686-ubuntu-8.04.3-python']
+        if binary_type in type_list:
             host_dir = ys
         else:
             host_dir = "www.biop.ox.ac.uk/coot/software/binaries/"

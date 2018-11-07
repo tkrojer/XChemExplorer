@@ -367,6 +367,7 @@ class run_pandda_analyse(QtCore.QThread):
         self.db=XChemDB.data_source(datasource)
         self.appendix=pandda_params['appendix']
         self.write_mean_maps=pandda_params['write_mean_map']
+        self.calc_map_by = pandda_params['average_map']
         self.select_ground_state_model=''
         projectDir = self.data_directory.replace('/*', '')
         self.make_ligand_links='$CCP4/bin/ccp4-python %s %s %s\n' %(os.path.join(os.getenv('XChemExplorer_DIR'),
@@ -426,7 +427,7 @@ class run_pandda_analyse(QtCore.QThread):
 #            else:
 #                source_file=''
             # v1.2.1 - pandda.setup files should be obsolete now that pandda is part of ccp4
-            source_file='source /dls/science/groups/i04-1/software/pandda-update/ccp4/ccp4-7.0/bin/ccp4.setup-sh\n'
+            source_file='source /dls/science/groups/i04-1/software/pandda_0.2.12/ccp4/ccp4-7.0/bin/ccp4.setup-sh\n'
             source_file += 'export XChemExplorer_DIR="' + os.getenv('XChemExplorer_DIR') + '"\n'
 
             if os.path.isfile(self.filter_pdb + '.pdb'):
@@ -512,8 +513,10 @@ class run_pandda_analyse(QtCore.QThread):
                     ' pdb_style='+self.pdb_style+
                     ' mtz_style='+self.mtz_style+
                     ' lig_style=/compound/*.cif'+
-                    ' use_b_factor_scaling='+self.wilson_scaling+
-                    ' write_mean_map='+self.write_mean_maps+' '+
+                    ' apply_b_factor_scaling='+self.wilson_scaling+
+                    ' write_average_map='+self.write_mean_maps +
+                    ' average_map=' + self.calc_map_by +
+                    ' ' +
                     ignore_string +' '+
                     char_string +' '+
                     zmap_string +' '+
