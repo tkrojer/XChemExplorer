@@ -302,9 +302,7 @@ class run_pandda_export(QtCore.QThread):
             select_dir_string=''
             select_dir_string_new_pannda=' '
             for sample in samples_to_export:
-                db_dict={}
-                db_dict['RefinementOutcome']='2 - PANDDA model'
-                db_dict['DatePanDDAModelCreated']=samples_to_export[sample]
+                db_dict= {'RefinementOutcome': '2 - PANDDA model', 'DatePanDDAModelCreated': samples_to_export[sample]}
                 select_dir_string+="select_dir={0!s} ".format(sample)
                 select_dir_string_new_pannda+='{0!s} '.format(sample)
                 self.Logfile.insert('updating database for '+sample+' setting time model was created to '+db_dict['DatePanDDAModelCreated']+' and RefinementOutcome to '+db_dict['RefinementOutcome'])
@@ -670,8 +668,7 @@ class giant_cluster_datasets(QtCore.QThread):
         if cluster_dict != {}:
             for key in cluster_dict:
                 for xtal in cluster_dict[key]:
-                    db_dict={}
-                    db_dict['CrystalFormName']=key
+                    db_dict= {'CrystalFormName': key}
                     self.db.update_data_source(xtal,db_dict)
 
         # 6.) finish
@@ -1300,7 +1297,7 @@ class check_number_of_modelled_ligands(QtCore.QThread):
             if os.path.isfile(os.path.join(xtal,'refine.pdb')):
                 ligands=XChemUtils.pdbtools(os.path.join(xtal,'refine.pdb')).ligand_details_as_list()
                 self.Logfile.insert('{0!s}: found file refine.pdb'.format(xtal))
-                if ligands != []:
+                if ligands:
                     if os.path.isdir(os.path.join(xtal,'xceTmp')):
                         os.system('/bin/rm -fr {0!s}'.format(os.path.join(xtal,'xceTmp')))
                     os.mkdir(os.path.join(xtal,'xceTmp'))

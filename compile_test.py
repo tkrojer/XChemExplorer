@@ -1,7 +1,7 @@
 import os, sys
 
 # set XCE environment variables
-os.environ['XChemExplorer_DIR']=os.path.join(os.getcwd(), 'XChemExplorer/')
+os.environ['XChemExplorer_DIR'] = os.path.join(os.getcwd(), 'XChemExplorer/')
 
 print('XCE path = ' + os.environ['XChemExplorer_DIR'])
 
@@ -15,4 +15,5 @@ for p in sys.path:
 
 # try to import all of XCE stuff
 from XChemExplorer import *
+
 print('Successfully imported XCE... compile was succesful')

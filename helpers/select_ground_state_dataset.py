@@ -58,7 +58,7 @@ def select_dataset_with_lowest_Rfree(panddaDir,datasetListwithoutEvent):
                 datasetList.append([dataset,float(Rfree)])
             except ValueError:
                 pass
-    if datasetList != []:
+    if datasetList:
         lowestRfree=min(datasetList,key=lambda x: x[1])[0]
     return lowestRfree
 

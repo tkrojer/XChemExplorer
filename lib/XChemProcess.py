@@ -30,7 +30,7 @@ class run_xia2(QtCore.QThread):
         os.chdir(os.path.join(self.initial_model_directory))
         # first create directories if they do not exist
 
-        if self.protocol == []:
+        if not self.protocol:
             self.Logfile.insert('please select data processing protocol first!')
             return None
 
@@ -58,22 +58,22 @@ class run_xia2(QtCore.QThread):
 #                script += 'module load ccp4 xia2\n'
                 print 'hallo'
 
-            if self.spg == []:
+            if not self.spg:
                 spg_option=''
             else:
                 spg_option='space_group='+str(self.spg[0])
 
-            if self.ref == []:
+            if not self.ref:
                 ref_option=''
             else:
                 ref_option='reference_reflection_file='+str(self.ref[0])
 
-            if self.reso_limit == []:
+            if not self.reso_limit:
                 reso_limit_option=''
             else:
                 reso_limit_option='misigma='+str(self.reso_limit[0])
 
-            if self.cc_half == []:
+            if not self.cc_half:
                 cc_half_option=''
             else:
                 cc_half_option='cc_half='+str(self.cc_half[0])
@@ -139,8 +139,7 @@ class run_xia2(QtCore.QThread):
             f.write(script)
             f.close()
             os.system('chmod +x xce_xia2_{0!s}.sh'.format(str(i+1)))
-            db_dict={}
-            db_dict['DataProcessingStatus']='started'
+            db_dict= {'DataProcessingStatus': 'started'}
             self.Logfile.insert('{0!s}: setting DataProcessingStatus flag to started'.format(xtal))
             self.db.update_data_source(xtal,db_dict)
 

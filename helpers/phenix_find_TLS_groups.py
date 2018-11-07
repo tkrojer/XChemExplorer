@@ -14,8 +14,7 @@ def FindTLSgroups(pdbFile):
         if found: 
             if line.startswith('}'):
                 break 
-            temp = [] 
-            temp.append(line.split()) 
+            temp = [line.split()]
             OutRefmac = OutRefmac + '\nTLS    {0!s}\nRANGE '.format((GroupNames)[i]) + str(temp[0][3])[:-1] + ' ' + \
                         str(temp[0][6]) +'.\'  ' + str(temp[0][3])[:-1] + ' ' + str(temp[0][8]) + '.\' ALL\n'
             i += 1

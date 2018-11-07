@@ -207,7 +207,7 @@ def print_cluster_status_message(program,cluster_dict,xce_logfile):
                 job_ids.append(item[0])
         average_runtime=round(float(cumulative_runtime)/float(n+1),0)
         Logfile.insert('average run time '+str(average_runtime)+' minutes')
-        if job_ids != []:
+        if job_ids:
             Logfile.insert('you can kill them by pasting the following line into a new terminal window:')
             out='qdel '
             for job in job_ids:
@@ -294,7 +294,7 @@ def change_links_to_selected_data_collection_outcome(sample,data_collection_dict
     # find out which row was selected in respective data collection table
     selected_processing_result='n/a'
     indexes=data_collection_column_three_dict[sample][0].selectionModel().selectedRows()
-    if indexes != []:       # i.e. logfile exists
+    if indexes:       # i.e. logfile exists
         for index in sorted(indexes):
             selected_processing_result=index.row()
 
@@ -1166,7 +1166,7 @@ class find_diffraction_image_directory(QtCore.QThread):
                         if os.path.join(self.diffraction_data_directory,root) not in self.data_dict[xtal][0]:
                             self.data_dict[xtal][0].append(os.path.join(self.diffraction_data_directory,root))
 #                        break
-                if self.data_dict[xtal][0] != []:
+                if self.data_dict[xtal][0]:
                     found_new_file_root=False
                     run_list=[]
                     counter=0
@@ -1185,7 +1185,7 @@ class find_diffraction_image_directory(QtCore.QThread):
                         if found_new_file_root and file_root==current_file_root:
                             counter+=1
 
-                    if run_list != []:
+                    if run_list:
                         self.data_dict[xtal][1]=run_list
 
 
@@ -1248,7 +1248,7 @@ class find_diffraction_image_directory_fast(QtCore.QThread):
 
                 imageCounter+=1
 
-            if self.data_dict[xtal]==[]:
+            if not self.data_dict[xtal]:
                 del self.data_dict[xtal]
 
             progress += progress_step

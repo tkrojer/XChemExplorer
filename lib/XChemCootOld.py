@@ -648,7 +648,7 @@ class GUI(object):
         self.refresh_site_combobox()
         self.db_dict_mainTable={}
         self.db_dict_panddaTable={}
-        if str(self.Todo[self.index][0]) != None:
+        if str(self.Todo[self.index][0]) is not None:
             self.compoundID=str(self.Todo[self.index][1])
             self.refinement_folder=str(self.Todo[self.index][4])
             self.refinement_outcome=str(self.Todo[self.index][5])

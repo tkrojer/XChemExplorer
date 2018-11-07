@@ -16,8 +16,7 @@ if __name__=='__main__':
 
     db=XChemDB.data_source(db_file)
     if os.path.isfile(os.path.join(inital_model_directory,xtal,'dimple.pdb')):
-        db_dict={}
-        db_dict['DimplePathToPDB']=os.path.join(inital_model_directory,xtal,'dimple.pdb')
+        db_dict= {'DimplePathToPDB': os.path.join(inital_model_directory, xtal, 'dimple.pdb')}
         dimple_ran_successfully=False
         if os.path.isfile(os.path.join(inital_model_directory,xtal,'dimple.mtz')):
             db_dict['DimplePathToMTZ']=os.path.join(inital_model_directory,xtal,'dimple.mtz')
