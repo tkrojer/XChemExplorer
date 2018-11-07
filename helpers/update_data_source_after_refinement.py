@@ -158,12 +158,17 @@ def parse_ligand_validation(inital_model_directory,refinement_directory,xtal):
 
 def update_ligand_information_in_panddaTable(inital_model_directory,xtal):
     if os.path.isfile(os.path.join(inital_model_directory, xtal, 'refine.pdb')):
-        ligands_in_file=pdbtools(os.path.join(inital_model_directory, xtal, 'refine.pdb')).find_xce_ligand_details()
+#        ligands_in_file=pdbtools(os.path.join(inital_model_directory, xtal, 'refine.pdb')).find_xce_ligand_details()
+        ligands_in_file=pdbtools(os.path.join(inital_model_directory, xtal, 'refine.pdb')).get_residues_with_resname('LIG')
         for ligand in ligands_in_file:
+#            residue_name=   ligand[0]
+#            residue_chain=  ligand[1]
+#            residue_number= ligand[2]
+#            residue_altLoc= ligand[3]
             residue_name=   ligand[0]
-            residue_chain=  ligand[1]
-            residue_number= ligand[2]
-            residue_altLoc= ligand[3]
+            residue_chain=  ligand[2]
+            residue_number= ligand[1]
+            residue_altLoc = 'X'
             residue_xyz = pdbtools(os.path.join(inital_model_directory, xtal, 'refine.pdb')).get_center_of_gravity_of_residue_ish(residue_chain, residue_number)
             event = db.execute_statement("select PANDDA_site_x,PANDDA_site_y,PANDDA_site_z,PANDDA_site_index from panddaTable where CrystalName='{0!s}'".format(xtal))
             for coord in event:
