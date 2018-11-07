@@ -1163,7 +1163,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             if os.path.isdir('/dls'):
                 dls_stuff = (
                     'module unload ccp4\n'
-                    'source /dls/science/groups/i04-1/software/pandda-update/ccp4/ccp4-7.0/bin/ccp4.setup-sh\n'
+                    'source /dls/science/groups/i04-1/software/pandda_0.2.12/ccp4/ccp4-7.0/bin/ccp4.setup-sh\n'
                 )
 
 
@@ -1412,7 +1412,7 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
                 'source $XChemExplorer_DIR/setup-scripts/xce.setup-sh\n'
                 '\n'
                 'module unload ccp4\n'
-                'source /dls/science/groups/i04-1/software/pandda-update/ccp4/ccp4-7.0/bin/ccp4.setup-sh\n'
+                'source /dls/science/groups/i04-1/software/pandda_0.2.12/ccp4/ccp4-7.0/bin/ccp4.setup-sh\n'
                 +ccp4_scratch+
                 '\n'
                 '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(database,xtal,'DimpleStatus','running') +
