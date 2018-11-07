@@ -64,6 +64,9 @@ class PanddaTab():
         xce_object.pandda_status_label.setFont(QtGui.QFont("Arial", 25, QtGui.QFont.Bold))
         grid_pandda.addWidget(xce_object.pandda_status_label, 3, 0)
 
+        header_font = QtGui.QFont()
+        header_font.setBold(True)
+
         # input parameters for PANDDAs run - right
         frame_right = QtGui.QFrame()
 
@@ -71,7 +74,8 @@ class PanddaTab():
 
         # data directory section
         pandda_input_dir_hbox = QtGui.QHBoxLayout()
-        label = QtGui.QLabel('Data directory:')
+        label = QtGui.QLabel('Input data directory:')
+        label.setFont(header_font)
         xce_object.pandda_analyse_input_params_vbox.addWidget(label)
         xce_object.pandda_input_data_dir_entry = QtGui.QLineEdit()
         xce_object.pandda_input_data_dir_entry.setText(os.path.join(xce_object.initial_model_directory, '*'))
@@ -119,6 +123,19 @@ class PanddaTab():
 
             print('==> XCE: Copied ligand restraints over')
 
+        # output directory section
+        pandda_output_dir_hbox = QtGui.QHBoxLayout()
+        label = QtGui.QLabel('Output directory:')
+        label.setFont(header_font)
+        xce_object.pandda_analyse_input_params_vbox.addWidget(label)
+        xce_object.pandda_output_data_dir_entry = QtGui.QLineEdit()
+        xce_object.pandda_output_data_dir_entry.setText(xce_object.panddas_directory)
+        pandda_output_dir_hbox.addWidget(xce_object.pandda_output_data_dir_entry)
+        xce_object.select_pandda_output_dir_button = QtGui.QPushButton("Select PanDDA Directory")
+        xce_object.select_pandda_output_dir_button.clicked.connect(xce_object.settings_button_clicked)
+        pandda_output_dir_hbox.addWidget(xce_object.select_pandda_output_dir_button)
+        xce_object.pandda_analyse_input_params_vbox.addLayout(pandda_output_dir_hbox)
+
         pandda_add_ligands_button = QtGui.QPushButton('Copy Ligand restraints for PanDDA')
         pandda_add_ligands_button.clicked.connect(lambda: copy_ligands(xce_object))
         xce_object.pandda_analyse_input_params_vbox.addWidget(pandda_add_ligands_button)
@@ -127,22 +144,12 @@ class PanddaTab():
         spacer = QtGui.QLabel(' ')
         xce_object.pandda_analyse_input_params_vbox.addWidget(spacer)
 
-        # output directory section
-        pandda_output_dir_hbox = QtGui.QHBoxLayout()
-        label = QtGui.QLabel('Output directory:')
+        label = QtGui.QLabel('Submission parameters')
+        label.setFont(header_font)
         xce_object.pandda_analyse_input_params_vbox.addWidget(label)
-        xce_object.pandda_output_data_dir_entry = QtGui.QLineEdit()
-        xce_object.pandda_output_data_dir_entry.setText(xce_object.panddas_directory)
-        pandda_output_dir_hbox.addWidget(xce_object.pandda_output_data_dir_entry)
-        xce_object.select_pandda_output_dir_button = QtGui.QPushButton("Select PANNDAs Directory")
-        xce_object.select_pandda_output_dir_button.clicked.connect(xce_object.settings_button_clicked)
-        pandda_output_dir_hbox.addWidget(xce_object.select_pandda_output_dir_button)
-        xce_object.pandda_analyse_input_params_vbox.addLayout(pandda_output_dir_hbox)
-
-        xce_object.pandda_analyse_input_params_vbox.addWidget(spacer)
 
         # qstat or local machine
-        label = QtGui.QLabel('Submit:')
+        label = QtGui.QLabel('Submit via:')
         xce_object.pandda_analyse_input_params_vbox.addWidget(label)
         xce_object.pandda_submission_mode_selection_combobox = QtGui.QComboBox()
         if xce_object.external_software['qsub']:
@@ -160,13 +167,24 @@ class PanddaTab():
 
         xce_object.pandda_analyse_input_params_vbox.addWidget(spacer)
 
-        # how to order events
-        label = QtGui.QLabel('Order events by:')
-        xce_object.pandda_analyse_input_params_vbox.addWidget(label)
-        xce_object.pandda_sort_event_combobox = QtGui.QComboBox()
-        pandda_events = ['cluster_size', 'z_peak']
-        self.layout_funcs.populate_combobox(pandda_events, xce_object.pandda_sort_event_combobox)
-        xce_object.pandda_analyse_input_params_vbox.addWidget(xce_object.pandda_sort_event_combobox)
+        params_hbox = QtGui.QHBoxLayout()
+        label = QtGui.QLabel('PanDDA parameters')
+        label.setFont(header_font)
+        params_hbox.addWidget(label)
+
+        url_html = "<a href=\"https://pandda.bitbucket.io/manual.html\">For docs: click here</a>"
+        label = QtGui.QLabel()
+        label.setText(url_html)
+        label.setOpenExternalLinks(True)
+        label.setAlignment(QtCore.Qt.AlignRight)
+        params_hbox.addWidget(label)
+
+        xce_object.pandda_analyse_input_params_vbox.addLayout(params_hbox)
+
+        # checkbox for wilson scaling
+        xce_object.wilson_checkbox = QtGui.QCheckBox('Wilson B-factor Scaling')
+        self.layout_funcs.add_checkbox(xce_object, xce_object.wilson_checkbox, 'xce_object.set_run_dimple_flag')
+        xce_object.pandda_analyse_input_params_vbox.addWidget(xce_object.wilson_checkbox)
 
         # crystal form option
         label = QtGui.QLabel('Use space group of reference file as filter:')
@@ -182,17 +200,21 @@ class PanddaTab():
         hbox.addWidget(xce_object.pandda_reference_file_spg_label)
         xce_object.pandda_analyse_input_params_vbox.addLayout(hbox)
 
-        xce_object.pandda_analyse_input_params_vbox.addWidget(spacer)
-
-        # Expert parameters
-        label = QtGui.QLabel('Expert Parameters (only change if you know what you are doing!):')
+        # how to order events
+        label = QtGui.QLabel('Order events by:')
         xce_object.pandda_analyse_input_params_vbox.addWidget(label)
+        xce_object.pandda_sort_event_combobox = QtGui.QComboBox()
+        pandda_events = ['cluster_size', 'z_peak']
+        self.layout_funcs.populate_combobox(pandda_events, xce_object.pandda_sort_event_combobox)
+        xce_object.pandda_analyse_input_params_vbox.addWidget(xce_object.pandda_sort_event_combobox)
 
-        xce_object.pandda_analyse_input_params_vbox.addWidget(spacer)
-
-        xce_object.wilson_checkbox = QtGui.QCheckBox('Wilson B-factor Scaling')
-        self.layout_funcs.add_checkbox(xce_object, xce_object.wilson_checkbox, 'xce_object.set_run_dimple_flag')
-        xce_object.pandda_analyse_input_params_vbox.addWidget(xce_object.wilson_checkbox)
+        # how calculate mean map
+        label = QtGui.QLabel('Calculate average map by:')
+        xce_object.pandda_analyse_input_params_vbox.addWidget(label)
+        xce_object.pandda_calc_map_combobox = QtGui.QComboBox()
+        average_map = ['mean_map', 'median_map']
+        self.layout_funcs.populate_combobox(average_map, xce_object.pandda_calc_map_combobox)
+        xce_object.pandda_analyse_input_params_vbox.addWidget(xce_object.pandda_calc_map_combobox)
 
         # minimum number of datasets
         label = QtGui.QLabel('min_build_datasets')

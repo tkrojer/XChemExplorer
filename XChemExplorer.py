@@ -606,7 +606,7 @@ class XChemExplorer(QtGui.QApplication):
             self.ccp4_scratch_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.ccp4_scratch_directory_label.setText(self.ccp4_scratch_directory)
             self.settings['ccp4_scratch'] = self.ccp4_scratch_directory
-        if self.sender().text() == 'Select PANNDAs Directory':
+        if self.sender().text() == 'Select PanDDA Directory':
             self.panddas_directory = str(QtGui.QFileDialog.getExistingDirectory(self.window, "Select Directory"))
             self.panddas_directory_label.setText(self.panddas_directory)
             self.pandda_output_data_dir_entry.setText(self.panddas_directory)
@@ -2913,6 +2913,7 @@ class XChemExplorer(QtGui.QApplication):
             'pdb_style': str(self.pandda_pdb_style_entry.text()),
             'mtz_style': str(self.pandda_mtz_style_entry.text()),
             'sort_event': str(self.pandda_sort_event_combobox.currentText()),
+            'average_map': str(self.pandda_calc_map_combobox.currentText()),
             'max_new_datasets': str(self.pandda_max_new_datasets_entry.text()),
             'grid_spacing': str(self.pandda_grid_spacing_entry.text()),
             'pandda_dir_structure': str(self.pandda_input_data_dir_entry.text()),
