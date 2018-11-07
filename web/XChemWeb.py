@@ -32,9 +32,14 @@ class export_to_html:
         for xtal in self.db.samples_for_html_summary():
             self.db_dict = self.db.get_db_dict_for_sample(xtal)
             if firstFile:
-                if self.db_dict['ProteinName'] == None:
-                    self.Logfile.warning('could not determine protein name; setting it to blank')
-                    self.protein_name = ''
+                if self.db_dict['ProteinName'] == 'None':
+                    self.Logfile.warning('could not determine protein name')
+                    try:
+                        self.protein_name = xtal.split('-')[0]
+                        self.Logfile.warning('xtal name = %s => setting protein name to %s' %(xtal,self.protein_name))
+                    except IndexError:
+                        self.Logfile.warning('could not determine protein name from cystal name; setting to None')
+                        self.protein_name = ''
                 else:
                     self.protein_name = self.db_dict['ProteinName']
                     self.Logfile.insert('protein name is: ' + self.protein_name)
@@ -72,7 +77,7 @@ class export_to_html:
                     continue
                 modelStatus = self.db_dict['RefinementOutcome']
                 if firstFile:
-                    html += XChemMain.html_ngl(pdb,eventMap,FWT,DELFWT,ligand)
+                    html += XChemMain.html_ngl(pdb,eventMap.replace(self.projectDir,''),FWT,DELFWT,ligand)
                     html += XChemMain.html_download(self.protein_name)
                     html += XChemMain.html_guide()
                     html += XChemMain.html_table_header()
