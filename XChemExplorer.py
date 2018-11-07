@@ -350,6 +350,8 @@ class XChemExplorer(QtGui.QApplication):
             reply = msgBox.exec_();
             if reply != 0:
                 start_thread = False
+            else:
+                start_thread = True
         else:
             start_thread = True
 
@@ -505,6 +507,28 @@ class XChemExplorer(QtGui.QApplication):
 #        self.update_log.insert('right click on the script and select RUN')
 #        self.update_log.insert('be patient, this may take a while, depending on the number of events')
 #        self.status_bar.showMessage('please check terminal window for further information')
+
+    def select_ground_state_pdb(self):
+        p = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window, 'Select File', os.getcwd(),'*.pdb')
+        pdb = str(tuple(p)[0])
+        self.ground_state_pdb_button_label.setText(pdb)
+
+    def select_ground_state_mtz(self):
+        m = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window, 'Select File', os.getcwd(),'*.mtz')
+        mtz = str(tuple(m)[0])
+        self.ground_state_mtz_button_label.setText(mtz)
+
+    def add_ground_state_db(self):
+        db_dict = {}
+        db_dict['DimplePANDDApath'] = self.panddas_directory
+        db_dict['PDB_file'] = str(self.ground_state_pdb_button_label.text())
+        db_dict['MTZ_file'] = str(self.ground_state_mtz_button_label.text())
+        self.db.create_or_remove_missing_records_in_depositTable(self.xce_logfile, 'ground_state', 'ground_state',
+                                                                 db_dict)
+
+    def prepare_ground_state_mmcif(self):
+        self.update_log.insert('preparing mmcif file for apo structure deposition')
+        self.prepare_models_for_deposition_ligand_bound('ground-state')
 
     def open_icm(self):
         self.update_log.insert('starting ICM...')
@@ -746,6 +770,14 @@ class XChemExplorer(QtGui.QApplication):
         self.remote_qsub_checkbox = QtGui.QCheckBox('use')
         #self.remote_qsub_checkbox.toggled.connect(self.run_qsub_remotely)
 
+        settings_hbox_dimple_twin_mode = QtGui.QHBoxLayout()
+        self.dimple_twin_mode_label_checkbox = QtGui.QCheckBox('run DIMPLE in TWIN mode')
+        if self.preferences['dimple_twin_mode']:
+            self.dimple_twin_mode_label_checkbox.setChecked(True)
+        self.dimple_twin_mode_label_checkbox.toggled.connect(self.dimple_change_twin_mode)
+        settings_hbox_dimple_twin_mode.addWidget(self.dimple_twin_mode_label_checkbox)
+        vbox.addLayout(settings_hbox_dimple_twin_mode)
+
         if self.using_remote_qsub_submission:
             self.remote_qsub_checkbox.setChecked(True)
         settings_hbox_remote_qsub.addWidget(self.remote_qsub_checkbox)
@@ -763,6 +795,14 @@ class XChemExplorer(QtGui.QApplication):
         preferencesLayout.addLayout(vbox, 0, 0)
 
         preferences.exec_();
+
+    def dimple_change_twin_mode(self):
+        if self.preferences['dimple_twin_mode']:
+            self.update_log.insert('changing preferences: turning off DIMPLE in TWIN mode')
+            self.preferences['dimple_twin_mode'] = False
+        else:
+            self.update_log.insert('changing preferences: changing DIMPLE to TWIN mode')
+            self.preferences['dimple_twin_mode'] = True
 
     def run_qsub_remotely(self):
         self.remote_qsub_submission = str(self.remote_qsub_command.text())
@@ -811,21 +851,29 @@ class XChemExplorer(QtGui.QApplication):
         self.db.create_missing_apo_records_for_all_structures_in_depositTable(self.initial_model_directory,
                                                                               self.xce_logfile)
 
-    def update_file_information_of_apo_records(self):
-        XChemDeposit.update_file_locations_of_apo_structuresin_DB(
-            os.path.join(self.database_directory, self.data_source_file), self.initial_model_directory,
-            self.xce_logfile)
+#    def update_file_information_of_apo_records(self):
+#        XChemDeposit.update_file_locations_of_apo_structuresin_DB(
+#            os.path.join(self.database_directory, self.data_source_file), self.initial_model_directory,
+#            self.xce_logfile)
 
-    def prepare_models_for_deposition_ligand_bound(self):
+    def prepare_models_for_deposition_ligand_bound(self,structureType):
 
-        structureType = "ligand_bound"
+        if structureType == 'ground-state':
+            ground_state = [ str(self.ground_state_pdb_button_label.text()),
+                             str(self.ground_state_mtz_button_label.text()),
+                             self.panddas_directory ]
+        else:
+            ground_state = []
+
+#        structureType = "ligand_bound"
 
         overwrite_existing_mmcif = True
         self.work_thread = XChemDeposit.prepare_mmcif_files_for_deposition(
             os.path.join(self.database_directory, self.data_source_file),
             self.xce_logfile,
             overwrite_existing_mmcif,
-            self.initial_model_directory)
+            self.initial_model_directory,
+            ground_state)
         self.explorer_active = 1
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
@@ -849,12 +897,24 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
 
-    def prepare_for_group_deposition_upload(self):
+    def prepare_for_group_deposition_upload_ligand_bound(self):
 
         self.work_thread = XChemDeposit.prepare_for_group_deposition_upload(
             os.path.join(self.database_directory, self.data_source_file),
             self.xce_logfile,
-            self.group_deposit_directory,self.initial_model_directory)
+            self.group_deposit_directory,self.initial_model_directory,'ligand_bound')
+        self.explorer_active = 1
+        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.work_thread.start()
+
+    def prepare_for_group_deposition_upload_ground_state(self):
+
+        self.work_thread = XChemDeposit.prepare_for_group_deposition_upload(
+            os.path.join(self.database_directory, self.data_source_file),
+            self.xce_logfile,
+            self.group_deposit_directory,self.initial_model_directory,'ground_state')
         self.explorer_active = 1
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
@@ -1159,7 +1219,7 @@ class XChemExplorer(QtGui.QApplication):
         grid.addWidget(QtGui.QLabel('Structure Title (apo)'), 7, 0)
         self.structure_title_apo = QtGui.QLineEdit()
         self.structure_title_apo.setText(
-            'Crystal Structure of $ProteinName after initial refinement with no ligand modelled (structure $n)')
+            'PanDDA analysis group deposition of ground-state model of $ProteinName')
         self.structure_title_apo.setFixedWidth(600)
         grid.addWidget(self.structure_title_apo, 7, 1)
 
@@ -2481,7 +2541,8 @@ class XChemExplorer(QtGui.QApplication):
                                                                                   self.max_queue_jobs,
                                                                                   self.xce_logfile,
                                                                                   self.using_remote_qsub_submission,
-                                                                                  self.remote_qsub_submission)
+                                                                                  self.remote_qsub_submission,
+                                                                                  self.preferences['dimple_twin_mode']  )
             self.explorer_active = 1
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
@@ -2795,6 +2856,9 @@ class XChemExplorer(QtGui.QApplication):
         elif instruction == 'Event Map -> SF':
             self.convert_event_maps_to_SF()
 
+        elif instruction == 'apo -> mmcif':
+            self.convert_apo_to_mmcif()
+
         elif instruction == 'check modelled ligands':
             self.compare_modelled_ligands_and_panddaTable()
 
@@ -3012,6 +3076,17 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
+
+    def convert_apo_to_mmcif(self):
+        self.work_thread = XChemPANDDA.convert_apo_structures_to_mmcif(self.panddas_directory,
+                                                                          self.xce_logfile)
+
+        self.explorer_active = 1
+        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.work_thread.start()
+
 
     def compare_modelled_ligands_and_panddaTable(self):
         self.update_log.insert('checking agreement of ligands in refine.pdb and entries in panddaTable')

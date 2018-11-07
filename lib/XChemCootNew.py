@@ -55,13 +55,15 @@ class GUI(object):
                                         '3 - In Refinement',
                                         '4 - CompChem ready',
                                         '5 - Deposition ready',
-                                        '6 - Deposited'         ]
+                                        '6 - Deposited',
+                                        '7 - Analysed & Rejected'    ]
 
-        self.experiment_stage =     [   ['Review PANDDA export',    '2 - PANDDA model',     65000,  0,  0],
-                                        ['In Refinement',           '3 - In Refinement',    65000,  0,  0],
-                                        ['Comp Chem Ready!',        '4 - CompChem ready',   65000,  0,  0],
-                                        ['Ready for Deposition!',   '5 - Deposition ready', 65000,  0,  0],
-                                        ['In PDB',                  '6 - Deposited',        65000,  0,  0]]
+        self.experiment_stage =     [   ['Review PANDDA export',    '2 - PANDDA model',         65000,  0,  0],
+                                        ['In Refinement',           '3 - In Refinement',        65000,  0,  0],
+                                        ['Comp Chem Ready!',        '4 - CompChem ready',       65000,  0,  0],
+                                        ['Ready for Deposition!',   '5 - Deposition ready',     65000,  0,  0],
+                                        ['In PDB',                  '6 - Deposited',            65000,  0,  0],
+                                        ['Analysed & Rejected',     '7 - Analysed & Rejected',  65000,  0,  0]]
 
         self.ligand_confidence_category = [     '0 - no ligand present',
                                                 '1 - Low Confidence',

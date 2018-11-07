@@ -12,123 +12,6 @@ from XChemUtils import pdbtools
 from XChemUtils import mtztools
 
 
-def create_ICM_input_file(html_export_directory,database):
-
-    if os.getcwd().startswith('/work'):
-        panddaDir='panddaDir="%s"\n' %html_export_directory.replace('/work','W:')
-        molcart='connect molcart filename="%s"\n' %database.replace('/work','W:')
-    else:
-        panddaDir='panddaDir="%s"\n' %html_export_directory
-        molcart='connect molcart filename="%s"\n' %database
-
-    icm_in = (
-        '#!/usr/local/bin/icm\n'
-        '# Author: Brian Marsden\n'
-        +panddaDir+
-#        'panddaDir="%s"\n' %html_export_directory+
-        '\n'
-        'set directory panddaDir\n'
-        +molcart+
-#        'connect molcart filename="%s"\n' %database+
-
-#        'query molcart "select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.PANDDA_site_confidence,p.CrystalName || '_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,m.RefinementPDB_latest,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (LigandConfidence like '1%' or LigandConfidence like '2%' or LigandConfidence like '3%' or LigandConfidence like '4%') order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index" name="T"\n'
-
-#        'query molcart "select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.PANDDA_site_confidence,p.CrystalName || '
-#        "'_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence "
-#        "as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, "
-#        "p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,"
-#        "m.RefinementPDB_latest,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m "
-#        "where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (LigandConfidence like '1%' "
-#        "or LigandConfidence like '2%' or LigandConfidence like '3%' or LigandConfidence like '4%') "
-#        'order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index" name="T"\n'
-
-#        'query molcart "select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.PANDDA_site_confidence,p.CrystalName || '
-#        "'_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence "
-#        "as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, "
-#        "p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,"
-#        "m.RefinementBoundConformation,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m "
-#        "where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (p.RefinementOutcome like '4%' or p.RefinementOutcome like '5%' or p.RefinementOutcome like '6%') "
-#        'order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index" name="T"\n'
-
-#        'query molcart "select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.PANDDA_site_confidence,p.CrystalName || '
-#        "'_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence "
-#        "as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, "
-#        "p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,"
-#        "m.RefinementBoundConformation,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m "
-#        "where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (p.RefinementOutcome like '4%' or p.RefinementOutcome like '5%' or p.RefinementOutcome like '6%') "
-#        " and (p.PANDDA_site_confidence like '1%' or p.PANDDA_site_confidence like '2%' or p.PANDDA_site_confidence like '3%' or p.PANDDA_site_confidence like '4%')"
-#        'order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index" name="T"\n'
-
-        'query molcart "select p.ID,p.CrystalName,p.PANDDA_site_event_index,p.PANDDA_site_confidence,p.CrystalName || '
-        "'_event'|| p.PANDDA_site_event_index as ModelName,m.CompoundCode,m.CompoundSMILES,p.PANDDA_site_name,p.PANDDA_site_confidence "
-        "as LigandConfidence,p.RefinementOutcome as ModelStatus,p.PANDDA_site_comment,p.PANDDA_site_x,p.PANDDA_site_y,p.PANDDA_site_z, "
-        "p.PANDDA_site_spider_plot,m.DataProcessingResolutionHigh,m.DataProcessingSpaceGroup,m.DataProcessingUnitCell,"
-        "m.RefinementBoundConformation,m.RefinementMTZ_latest,p.PANDDA_site_event_map from panddaTable as p, mainTable as m "
-        "where p.CrystalName=m.CrystalName and p.PANDDA_site_ligand_placed='True' and (m.RefinementOutcome like '4%' or m.RefinementOutcome like '5%' or m.RefinementOutcome like '6%') "
-        " and (p.PANDDA_site_confidence like '1%' or p.PANDDA_site_confidence like '2%' or p.PANDDA_site_confidence like '3%' or p.PANDDA_site_confidence like '4%')"
-        'order by p.CrystalName,ModelStatus desc,PANDDA_site_event_index" name="T"\n'
-
-
-        'numToDo=Nof(T)\n'
-        '\n'
-        'macro generateICB s_eventID s_pdb s_ligandSMILES s_eventMap R_coords\n'
-        'l_confirm=no\n'
-        'l_info=no\n'
-        'l_commands=no\n'
-        'l_warn=no\n'
-        'print s_eventID s_pdb s_ligandSMILES s_eventMap R_coords\n'
-        '# Read pdb\n'
-        'read pdb s_pdb\n'
-        'if Nof(a_1.?lig)==0 then\n'
-        '  print "No ligand!"\n'
-        '  delete a_*.*\n'
-        '  return\n'
-        'endif\n'
-        '# Fix ligand topology\n'
-        'set bond topology a_1.?lig s_ligandSMILES\n'
-        '# Read event map\n'
-        'read map s_eventMap\n'
-        'contourEDS Name( map )[1] {2.0} {"cyan"} a_1.?lig | Sphere(a_1.?lig !a_1.?lig 7.5) yes yes\n'
-        'assign sstructure\n'
-        'cool a_ no\n'
-        'color background refresh rgb={0,0,0}\n'
-        'display xstick Res(Sphere(a_1.?lig !a_1.?lig 7.5))\n'
-        'read binary s_icmhome+"shapes" name="star"\n'
-        'display star\n'
-        'translate star R_coords\n'
-        'center star margin=0.0\n'
-        'undisplay star\n'
-        'center a_1.?lig\n'
-        'write png "mapImages/"+s_eventID+"_large.png" window={800,600} GRAPHICS.quality=Max(image graphic)\n'
-        'write png "mapImages/"+s_eventID+"_small.png" window={150,150} GRAPHICS.quality=Max(image graphic)\n'
-        'delete star\n'
-        'writeProject "icbs/"+s_eventID+".icb" no\n'
-        'delete maps\n'
-        'delete a_*.\n'
-        'delete grob\n'
-        'endmacro\n'
-        '\n'
-        'for i=1,numToDo\n'
-        '  ligandSMILES=T.CompoundSMILES[i]\n'
-        '  # PDB file path\n'
-        '  pdbID="pdbs/"+T.ModelName[i]+".pdb"\n'
-        '  if (T.PANDDA_site_name[i]!="" & T.PANDDA_site_confidence[i]!="None") then\n'
-        '  # Get event ID\n'
-        '  eventID=T.ModelName[i]+"_"+T.CompoundCode[i]\n'
-#        '  eventID=T.ModelName[i]\n'
-        '  # Event map path\n'
-        '  eventMap="maps/"+T.ModelName[i]+".ccp4"\n'
-        '  # Ligand centre\n'
-        '  ligR3={$T.PANDDA_site_x[i],$T.PANDDA_site_y[i],$T.PANDDA_site_z[i]}\n'
-        '  generateICB eventID,pdbID,ligandSMILES,eventMap,ligR3\n'
-        '  endif\n'
-        'endfor\n'
-        )
-
-    f=open('%s/dsEvent_sqlite.icm' %html_export_directory,'w')
-    f.write(icm_in)
-    f.close()
-
 class export_to_html:
 
     def __init__(self,htmlDir,projectDir,database,xce_logfile):
@@ -138,19 +21,39 @@ class export_to_html:
         self.db=XChemDB.data_source(database)
         self.db_dict = None
         self.pdb = None
+        self.protein_name = None
 
     def prepare(self):
         self.Logfile.insert('======== preparing HTML summary ========')
         self.makeFolders()
         self.copy_jscss()
         html = XChemMain.html_header()
+        firstFile = True
         for xtal in self.db.samples_for_html_summary():
             self.db_dict = self.db.get_db_dict_for_sample(xtal)
+            if firstFile:
+                if self.db_dict['ProteinName'] == 'None':
+                    self.Logfile.warning('could not determine protein name')
+                    try:
+                        self.protein_name = xtal.split('-')[0]
+                        self.Logfile.warning('xtal name = %s => setting protein name to %s' %(xtal,self.protein_name))
+                    except IndexError:
+                        self.Logfile.warning('could not determine protein name from cystal name; setting to None')
+                        self.protein_name = ''
+                else:
+                    self.protein_name = self.db_dict['ProteinName']
+                    self.Logfile.insert('protein name is: ' + self.protein_name)
             self.copy_pdb(xtal)
-            self.copy_electron_density(xtal)
+            self.copy_mtz(xtal)
+#            self.copy_electron_density(xtal)
             self.copy_ligand_files(xtal)
             for ligand in self.ligands_in_pdbFile(xtal):
-                eventMap = self.find_matching_event_map(xtal, ligand)
+                ligName = ligand.split('-')[0]
+                ligChain = ligand.split('-')[1]
+                ligNumber = ligand.split('-')[2]
+                eventMap = self.find_matching_event_map_from_database(xtal, ligand)
+                if eventMap != []:
+                    self.cut_and_copy_map(xtal, ligand+'.pdb', eventMap, xtal + '_' + ligand + '_event.ccp4','F','PHIF')
                 x,y,z = self.pdb.get_centre_of_gravity_of_residue(ligand)
                 self.copy_spider_plot(xtal,ligand)
                 pdbID = self.db_dict['Deposition_PDB_ID']
@@ -158,18 +61,49 @@ class export_to_html:
                 compoundCIF = xtal + '_' + self.db_dict['CompoundCode'] + '.cif'
                 residuePlot = xtal + '_' + ligand + '.png'
                 pdb = xtal + '.pdb'
-                event = xtal + '_' + ligand + '.ccp4'
+                event = xtal + '_' + ligand + '_event.ccp4'
                 thumbNail = xtal + '_' + ligand + '_thumb.png'
                 resoHigh = self.db_dict['DataProcessingResolutionHigh']
                 spg = self.db_dict['RefinementSpaceGroup']
                 unitCell = self.db_dict['DataProcessingUnitCell']
-                FWT = xtal + '_2fofc.ccp4'
-                DELFWT = xtal + '_fofc.ccp4'
-                html += XChemMain.html_table_row(xtal,pdbID,ligand,compoundImage,residuePlot,pdb,event,thumbNail,resoHigh,spg,unitCell,FWT,DELFWT)
+                os.chdir(os.path.join(self.projectDir,xtal))
+                FWT = xtal + '-' + ligand + '_2fofc.ccp4'
+                self.cut_and_copy_map(xtal, ligand + '.pdb', '2fofc.map', FWT,'FWT','PHWT')
+                DELFWT = xtal + '-' + ligand + '_fofc.ccp4'
+                self.cut_and_copy_map(xtal, ligand + '.pdb', 'fofc.map', DELFWT,'DELFWT','PHDELWT')
+                ligConfidence = self.db.get_ligand_confidence_for_ligand(xtal, ligChain, ligNumber, ligName)
+                if ligConfidence.startswith('0'):
+                    self.Logfile.warning('%s: ligand confidence of %s-%s-%s is %s; ignoring...' %(xtal,ligChain,ligNumber,ligName,ligConfidence))
+                    continue
+                modelStatus = self.db_dict['RefinementOutcome']
+                if firstFile:
+                    html += XChemMain.html_ngl(pdb,eventMap.replace(self.projectDir,''),FWT,DELFWT,ligand)
+                    html += XChemMain.html_download(self.protein_name)
+                    html += XChemMain.html_guide()
+                    html += XChemMain.html_table_header()
+                    firstFile = False
+
+                html += XChemMain.html_table_row(xtal,pdbID,ligand,compoundImage,residuePlot,pdb,event,
+                                                 thumbNail,resoHigh,spg,unitCell,FWT,DELFWT,ligConfidence,modelStatus)
                 self.make_thumbnail(xtal,x,y,z,ligand,eventMap)
                 self.prepare_for_download(xtal, pdb, event, compoundCIF, ligand)
+        self.prepare_zip_archives()
+#        html = XChemMain.html_download_all_section(html,self.protein_name)
         self.write_html_file(html)
         self.Logfile.insert('======== finished preparing HTML summary ========')
+
+
+    def prepare_zip_archives(self):
+        os.chdir(os.path.join(self.htmlDir,'files'))
+        self.Logfile.insert('%s: preparing ZIP archive of all PDB files' %self.protein_name)
+        os.system('zip %s_allPDBs.zip *.pdb' %self.protein_name)
+        self.Logfile.insert('%s: preparing ZIP archive of all PanDDA event maps' %self.protein_name)
+        os.system('zip %s_allEVENTmaps.zip *event.ccp4' %self.protein_name)
+        self.Logfile.insert('%s: preparing ZIP archive of all CIF files' %self.protein_name)
+        os.system('zip %s_allCIFs.zip *.cif' %self.protein_name)
+        self.Logfile.insert('%s: preparing ZIP archive of all MTZ files' %self.protein_name)
+        os.system('zip %s_allMTZs.zip *.mtz' %self.protein_name)
+
 
     def prepare_for_download(self,xtal,pdb,event,compoundCIF,ligID):
         os.chdir(os.path.join(self.htmlDir,'tmp'))
@@ -257,6 +191,14 @@ class export_to_html:
         else:
             self.Logfile.error('%s: cannot find refine.split.bound-state.pdb' %xtal)
 
+    def copy_mtz(self,xtal):
+        os.chdir(os.path.join(self.htmlDir, 'files'))
+        if os.path.isfile(os.path.join(self.projectDir,xtal,xtal+'.free.mtz')):
+            self.Logfile.insert('%s: copying %s.free.mtz to html directory' %(xtal,xtal))
+            os.system('/bin/cp %s/%s.free.mtz .' %(os.path.join(self.projectDir,xtal),xtal))
+        else:
+            self.Logfile.error('%s: cannot find %s.free.mtz' %(xtal,xtal))
+
     def copy_electron_density(self,xtal):
         os.chdir(os.path.join(self.htmlDir, 'files'))
 
@@ -291,14 +233,20 @@ class export_to_html:
 
     def copy_spider_plot(self,xtal,ligID):
         os.chdir(os.path.join(self.htmlDir, 'png'))
-        self.Logfile.insert(xtal + ': looking for ' + os.path.join(self.projectDir,xtal,'residue_plots',ligID.replace('LIG-','')+'.png'))
-        for plot in glob.glob(os.path.join(self.projectDir,xtal,'residue_plots','*')):
-            self.Logfile.insert('%s: found %s' %(xtal,plot))
-        if os.path.isfile(os.path.join(self.projectDir,xtal,'residue_plots',ligID.replace('LIG-','')+'.png')):
-            self.Logfile.insert('%s: copying spider plot for %s' %(xtal,ligID))
-            os.system('/bin/cp %s %s_%s.png' %(os.path.join(self.projectDir,xtal,'residue_plots',ligID.replace('LIG-','')+'.png'),xtal,ligID))
+        refPDB = os.path.join(self.projectDir,xtal,'refine.pdb')
+        self.Logfile.insert('%s: looking for spider plots...' %xtal)
+        if os.path.isfile(refPDB):
+            refPDBreal = os.path.realpath(refPDB)[:os.path.realpath(refPDB).rfind('/')]
+            plot = os.path.join(refPDBreal,'residue_plots',ligID.replace('LIG-','')+'.png')
+            self.Logfile.insert(xtal + ': looking for ' + plot)
+            if os.path.isfile(plot):
+                self.Logfile.insert('%s: found %s' % (xtal, plot))
+                self.Logfile.insert('%s: copying spider plot for %s' % (xtal, ligID.replace('LIG-', '') + '.png'))
+                os.system('/bin/cp %s %s_%s.png' % (plot, xtal, ligID))
+            else:
+                self.Logfile.error('%s: cannot find spider plot for %s' %(xtal,ligID.replace('LIG-','')+'.png'))
         else:
-            self.Logfile.error('%s: cannot find spider plot for %s' %(xtal,ligID))
+            self.Logfile.error('%s: cannot find refine.pdb, i.e. cannot start looking for spider plots...' %xtal)
 
 
     def ligands_in_pdbFile(self,xtal):
@@ -318,6 +266,24 @@ class export_to_html:
         return ligList
 
 
+    def find_matching_event_map_from_database(self,xtal,ligID):
+        ligName = ligID.split('-')[0]
+        ligChain = ligID.split('-')[1]
+        ligNumber = ligID.split('-')[2]
+        eventMAP = self.db.get_event_map_for_ligand(xtal, ligChain, ligNumber, ligName)
+        self.Logfile.insert('%s: the database thinks the following event map belongs to %s: %s' %(xtal,ligID,eventMAP))
+        if eventMAP == '':
+            self.Logfile.warning('%s: the respective field in the DB is apparently emtpy' %xtal)
+            self.Logfile.warning('%s: will try to determine ligand - event map relationship by checking CC...' %xtal)
+            eventMap = self.find_matching_event_map(xtal,ligID)
+        elif not os.path.isfile(eventMAP):
+            self.Logfile.warning('%s: event map file does not exist!' %xtal)
+            self.Logfile.warning('%s: will try to determine ligand - event map relationship by checking CC...' %xtal)
+            eventMap = self.find_matching_event_map(xtal,ligID)
+        else:
+            self.Logfile.insert('%s: found matching event map!' %xtal)
+        return eventMAP
+
     def find_matching_event_map(self,xtal,ligID):
         os.chdir(os.path.join(self.projectDir, xtal))
         eventMAP = []
@@ -334,7 +300,11 @@ class export_to_html:
                 ligCC.append([mtz,float(cc)])
             except ValueError:
                 ligCC.append([mtz, 0.00])
-        highestCC = max(ligCC, key=lambda x: x[0])[1]
+        try:
+            highestCC = max(ligCC, key=lambda x: x[0])[1]
+        except ValueError:
+            self.Logfile.error('%s: event maps are not yet converted to mtz files...' %xtal)
+            return
         if highestCC == 0.00 or ligCC is []:
             self.Logfile.error('%s: best CC of ligand %s for any event map is 0!' %(xtal,ligID))
         else:
@@ -342,23 +312,74 @@ class export_to_html:
             eventMAP = mtz[mtz.rfind('/')+1:].replace('.P1.mtz','.ccp4')
             if not os.path.isfile(eventMAP):
                 eventMAP = []
-            else:
-                self.copy_eventMap(xtal,ligID,eventMAP)
+#            else:
+#                self.cut_eventMAP(xtal,ligID,eventMAP)
         return eventMAP
 
-    def copy_eventMap(self,xtal,ligID,eventMAP):
-        os.chdir(os.path.join(self.htmlDir,'files'))
-        self.Logfile.insert('%s: copying event map for %s' %(xtal,ligID))
-        os.system('/bin/cp %s %s_%s.ccp4' %(os.path.join(self.projectDir,xtal,eventMAP),xtal,ligID))
+    def cut_and_copy_map(self,xtal,pdbCentre,mapin,mapout,F,PHI):
+        os.chdir(os.path.join(self.projectDir, xtal))
+        self.Logfile.insert('%s: cutting density of %s around %s' %(xtal,mapin.replace('.ccp4','.P1.ccp4'),pdbCentre))
+        if os.path.isfile(mapout):
+            self.Logfile.warning('%s: removing map -> %s' %(xtal,mapout))
+            os.system('/bin/rm '+mapout)
+#        else:
+
+        if mapin.endswith('.map') or mapin.endswith('.ccp4'):
+            cmd = (
+                'mapmask mapin %s mapout %s xyzin %s << eof\n'  %(mapin.replace('.ccp4','.P1.ccp4'),mapout,pdbCentre) +
+                ' border 12\n'
+                ' end\n'
+                'eof'
+            )
+
+#            cmd = (
+#                'cmapcut -mapin %s -pdbin %s -mapout %s' %(mtzin,pdbCentre,mapout)
+#            )
+
+#            cmd = (
+#                "phenix.cut_out_density %s %s map_coeff_labels='%s,%s' cutout_model_radius=6 cutout_map_file_name=%s cutout_as_map=True" %(pdbCentre,mtzin,F,PHI,mapout)
+#            )
+            self.Logfile.insert(xtal+': running command:\n'+cmd)
+            os.system(cmd)
+            if os.path.isfile(mapout):
+                self.Logfile.insert(xtal+': reduced event map successfully created')
+                self.Logfile.insert('%s: copying %s to %s/files' % (xtal, mapout, self.htmlDir))
+                os.system('/bin/cp %s %s/files' % (mapout, self.htmlDir))
+            else:
+                self.Logfile.error(xtal+': creation of event map failed')
+
+
+
+#    def cut_eventMAP(self,xtal,ligID,eventMAP):
+#        os.chdir(os.path.join(self.projectDir, xtal))
+#        self.Logfile.insert('%s: cutting event map around ligand %s' %(xtal,ligID))
+#        ligMAP = xtal + '_' + ligID + '.ccp4'
+#        cmd = (
+#            'mapmask mapin %s mapout %s xyzin %s << eof\n'  %(eventMAP,ligMAP,ligID+'.pdb') +
+#            ' border 10\n'
+#            ' end\n'
+#            'eof'
+#        )
+#        os.system(cmd)
+#        self.copy_eventMap(xtal, ligID, eventMAP)
+
+#    def copy_eventMap(self,xtal,ligID,eventMAP):
+#        os.chdir(os.path.join(self.htmlDir,'files'))
+#        self.Logfile.insert('%s: copying event map for %s' %(xtal,ligID))
+#        os.system('/bin/mv %s/%s_%s.ccp4 .' %(os.path.join(self.projectDir,xtal),xtal,ligID))
 
     def get_lig_cc(self, xtal, mtz, lig):
         ligID = lig.replace('.pdb','')
+        ccLog = mtz.replace('.mtz', '_CC'+ligID+'.log')
         self.Logfile.insert('%s: calculating CC for %s in %s' %(xtal,lig,mtz))
-        if os.path.isfile(mtz.replace('.mtz', '_CC'+ligID+'.log')):
+#        if os.path.isfile(mtz.replace('.mtz', '_CC'+ligID+'.log')):
+        if os.path.isfile(ccLog) and os.path.getsize(ccLog) != 0:
             self.Logfile.warning('logfile of CC analysis exists; skipping...')
             return
-        cmd = ( 'module load phenix\n'
-                'phenix.get_cc_mtz_pdb %s %s > %s' % (mtz, lig, mtz.replace('.mtz', '_CC'+ligID+'.log')) )
+#        cmd = ( 'module load phenix\n'
+#                'phenix.get_cc_mtz_pdb %s %s > %s' % (mtz, lig, mtz.replace('.mtz', '_CC'+ligID+'.log')) )
+        os.system('/bin/rm %s' %mtz.replace('.mtz', '_CC'+ligID+'.log') )
+        cmd = ( 'phenix.get_cc_mtz_pdb %s %s > %s' % (mtz, lig, mtz.replace('.mtz', '_CC'+ligID+'.log')) )
         os.system(cmd)
 
     def check_lig_cc(self,log):

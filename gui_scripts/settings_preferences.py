@@ -201,12 +201,18 @@ class setup():
 
         xce_object.preferences_selection_mechanism = ['IsigI*Comp*UniqueRefl',
                                                       'highest_resolution',
-                                                      'lowest_Rfree']
+                                                      'lowest_Rfree',
+                                                      'dials - only',
+                                                      'xia2 3d - only',
+                                                      'xia2 3dii - only',
+                                                      'autoProc - only',
+                                                      'autoProc_staraniso - only']
 
         xce_object.allowed_unitcell_difference_percent = 12
         xce_object.acceptable_low_resolution_limit_for_data = 3.5
         xce_object.filename_root = '${samplename}'
         xce_object.max_queue_jobs = 100
+        xce_object.dimple_twin_mode = False
 
         xce_object.preferences = {'processed_data_to_copy':                     'mtz_log_only',
                                   'dataset_selection_mechanism':                'IsigI*Comp*UniqueRefl',
@@ -214,7 +220,8 @@ class setup():
                                   'acceptable_low_resolution_limit_for_data':   3.5,
                                   'acceptable_low_resolution_Rmerge':           0.1,
                                   'filename_root':                              '${samplename}',
-                                  'max_queue_jobs':                             100     }
+                                  'max_queue_jobs':                             100,
+                                  'dimple_twin_mode':                           False   }
 
         ## settings
 
@@ -236,7 +243,8 @@ class setup():
                                'diffraction_data_directory': xce_object.diffraction_data_directory,
                                'html_export_directory': xce_object.html_export_directory,
                                'group_deposit_directory': xce_object.group_deposit_directory,
-                               'remote_qsub': ''}
+                               'remote_qsub': '',
+                               'dimple_twin_mode': False    }
 
     def tables(self, xce_object):
         # Table column settings
@@ -409,14 +417,16 @@ class setup():
                                                       ['Export to HTML', '', xce_object.export_to_html],
                                                       ['Find PanDDA apo structures', '',
                                                        xce_object.create_missing_apo_records_in_depositTable],
-                                                      ['Update file info of apo structures', '',
-                                                       xce_object.update_file_information_of_apo_records],
+#                                                      ['Update file info of apo structures', '',
+#                                                       xce_object.update_file_information_of_apo_records],
                                                       ['Prepare mmcif for apo structures', '',
                                                        xce_object.prepare_models_for_deposition_apo],
                                                       ['Prepare mmcif for ligand bound structures', '',
                                                        xce_object.prepare_models_for_deposition_ligand_bound],
-                                                      ['Copy files to group deposition directory', '',
-                                                       xce_object.prepare_for_group_deposition_upload],
+                                                      ['Copy files to group deposition directory (ligand bound)', '',
+                                                       xce_object.prepare_for_group_deposition_upload_ligand_bound],
+                                                      ['Copy files to group deposition directory (ground state)', '',
+                                                       xce_object.prepare_for_group_deposition_upload_ground_state],
                                                       ['Update DB with PDB codes', '', xce_object.enter_pdb_codes],
                                                       ['Check SMILES', '', xce_object.check_smiles_in_db_and_pdb]
                                                   ]],
@@ -564,6 +574,7 @@ class setup():
                                          'Update datasource with results from pandda.inspect',
                                          'cluster datasets',
                                          'Event Map -> SF',
+                                         'apo -> mmcif',
                                          'check modelled ligands',
                                          'pre-run for ground state model',
                                          'Build ground state model']

@@ -341,7 +341,7 @@ class parse:
                                                      'P432','P4232','F432','F4132','I432','P4332','P4132','I4132' ] }
 
         self.point_group_dict=   {  '1':    ['P1'],
-                                    '2':    ['P2','P21','C121','P1211','P121'],
+                                    '2':    ['P2','P21','C121','P1211','P121','C2'],
                                     '222':  ['P222','P2122','P2212','P2221',
                                              'P21212','P21221','P22121','P212121',
                                              'C222','C2221',
@@ -554,6 +554,8 @@ class parse:
             self.aimless['DataProcessingProgram']='dials'
         elif 'autoPROC' in logfile:
             self.aimless['DataProcessingProgram']='autoPROC'
+        elif 'staraniso' in logfile:
+            self.aimless['DataProcessingProgram']='aP_staraniso'
 
         # get run number from logfile
         # Note: only works if file is in original directory, but not once it moved to 'inital_model' folder
@@ -571,17 +573,25 @@ class parse:
 #                print line.split()
             if 'Wavelength' in line and len(line.split())==3:
                 self.aimless['DataCollectionWavelength']=line.split()[1]
-            if line.startswith('Low resolution limit') and len(line.split())==6:
+            if 'Low resolution limit' in line and len(line.split())==6:
                 self.aimless['DataProcessingResolutionLow'] = line.split()[3]
                 self.aimless['DataProcessingResolutionHighOuterShell'] = line.split()[5]
-            if line.startswith('High resolution limit') and len(line.split())==6:
+            if 'High resolution limit' in line and len(line.split())==6:
                 self.aimless['DataProcessingResolutionHigh'] = line.split()[3]
                 self.aimless['DataProcessingResolutionLowInnerShell'] = line.split()[4]
-            if line.startswith('Rmerge  (all I+ and I-)') and len(line.split())==8:
+            if 'Rmerge  (all I+ and I-)' in line and len(line.split())==8:
                 self.aimless['DataProcessingRmergeOverall'] = line.split()[5]
                 self.aimless['DataProcessingRmergeLow'] = line.split()[6]
                 self.aimless['DataProcessingRmergeHigh']  = line.split()[7]
-            if line.startswith('Mean((I)/sd(I))') and len(line.split())==4:
+            if 'Rmerge  (all I+ & I-)' in line and len(line.split())==8:
+                self.aimless['DataProcessingRmergeOverall'] = line.split()[5]
+                self.aimless['DataProcessingRmergeLow'] = line.split()[6]
+                self.aimless['DataProcessingRmergeHigh']  = line.split()[7]
+            if 'Mean((I)/sd(I))' in line and len(line.split())==4:
+                self.aimless['DataProcessingIsigOverall'] = line.split()[1]
+                self.aimless['DataProcessingIsigHigh'] = line.split()[3]
+                self.aimless['DataProcessingIsigLow'] = line.split()[2]
+            if 'Mean(I)/sd(I)' in line and len(line.split())==4:
                 self.aimless['DataProcessingIsigOverall'] = line.split()[1]
                 self.aimless['DataProcessingIsigHigh'] = line.split()[3]
                 self.aimless['DataProcessingIsigLow'] = line.split()[2]
@@ -589,7 +599,11 @@ class parse:
                 self.aimless['DataProcessingCompletenessOverall'] = line.split()[1]
                 self.aimless['DataProcessingCompletenessHigh'] = line.split()[3]
                 self.aimless['DataProcessingCompletenessLow'] = line.split()[2]
-            if line.startswith('Multiplicity') and len(line.split())==4:
+            if 'Completeness (ellipsoidal)' in line and len(line.split())==5:
+                self.aimless['DataProcessingCompletenessOverall'] = line.split()[2]
+                self.aimless['DataProcessingCompletenessHigh'] = line.split()[4]
+                self.aimless['DataProcessingCompletenessLow'] = line.split()[3]
+            if 'Multiplicity' in line and len(line.split())==4:
                 self.aimless['DataProcessingMultiplicityOverall'] = line.split()[1]
                 self.aimless['DataProcessingMultiplicityHigh'] = line.split()[3]
                 self.aimless['DataProcessingMultiplicityLow'] = line.split()[3]
@@ -597,6 +611,10 @@ class parse:
                 self.aimless['DataProcessingCChalfOverall'] = line.split()[4]
                 self.aimless['DataProcessingCChalfLow'] = line.split()[5]
                 self.aimless['DataProcessingCChalfHigh'] = line.split()[6]
+            if line.startswith('     CC(1/2)') and len(line.split())==4:
+                self.aimless['DataProcessingCChalfOverall'] = line.split()[1]
+                self.aimless['DataProcessingCChalfLow'] = line.split()[2]
+                self.aimless['DataProcessingCChalfHigh'] = line.split()[3]
             if line.startswith('Estimates of resolution limits: overall'):
                 resolution_at_sigma_line_overall_found=True
             if resolution_at_sigma_line_overall_found:
@@ -604,7 +622,10 @@ class parse:
                     if '1.5' in line.split()[3]:
                         self.aimless['DataProcessingResolutionHigh15sigma']=line.split()[6][:-1]
                         resolution_at_sigma_line_overall_found=False
-            if line.startswith('Average unit cell:') and len(line.split())==9:
+                    if '2.0' in line.split()[3]:
+                        self.aimless['DataProcessingResolutionHigh20sigma']=line.split()[6][:-1]
+                        resolution_at_sigma_line_overall_found=False
+            if (line.startswith('Average unit cell:') or line.startswith('  Unit cell parameters')) and len(line.split())==9:
                 tmp = []
                 tmp.append(line.split())
                 a = int(float(tmp[0][3]))
@@ -619,27 +640,31 @@ class parse:
                 self.aimless['DataProcessingAlpha']=str(alpha)
                 self.aimless['DataProcessingBeta']=str(beta)
                 self.aimless['DataProcessingGamma']=str(gamma)
-            if line.startswith('Total number unique') and len(line.split())==6:
+            if 'Total number unique' in line and len(line.split())==6:
                 self.aimless['DataProcessingUniqueReflectionsOverall']=line.split()[3]
-            if line.startswith('Space group:'):
-                self.aimless['DataProcessingSpaceGroup']=line.replace('Space group: ','')[:-1]
+            if line.startswith('Space group:') or line.startswith('  Spacegroup name'):
+                if 'Spacegroup name' in line:
+                    self.aimless['DataProcessingSpaceGroup'] = line.replace('  Spacegroup name', '')[:-1].replace(' ','')
+                else:
+                    self.aimless['DataProcessingSpaceGroup']=line.replace('Space group: ','')[:-1]
                 self.aimless['DataProcessingLattice']=self.get_lattice_from_space_group(self.aimless['DataProcessingSpaceGroup'])
                 self.aimless['DataProcessingPointGroup']=self.get_pointgroup_from_space_group(self.aimless['DataProcessingSpaceGroup'])
-                if a != 'n/a' and b != 'n/a' and c != 'n/a' and \
+#                print a,b,c,alpha,beta,gamma,self.aimless['DataProcessingLattice']
+            if a != 'n/a' and b != 'n/a' and c != 'n/a' and \
                    alpha != 'n/a' and beta != 'n/a' and gamma != 'n/a' and self.aimless['DataProcessingLattice'] != 'n/a':
-                    self.aimless['DataProcessingUnitCellVolume']=str(self.calc_unitcell_volume_from_logfile(float(a),float(b),float(c),
+                self.aimless['DataProcessingUnitCellVolume']=str(self.calc_unitcell_volume_from_logfile(float(a),float(b),float(c),
                                                                                  math.radians(float(alpha)),
                                                                                  math.radians(float(beta)),
                                                                                  math.radians(float(gamma)),
                                                                                  self.aimless['DataProcessingLattice']))
-                    try:
-                        high_symmetry_boost=self.nr_asu_in_unitcell_for_point_group[self.aimless['DataProcessingPointGroup']]
-                        self.aimless['DataProcessingScore'] = (float(self.aimless['DataProcessingUniqueReflectionsOverall'])*\
+                try:
+                    high_symmetry_boost=self.nr_asu_in_unitcell_for_point_group[self.aimless['DataProcessingPointGroup']]
+                    self.aimless['DataProcessingScore'] = (float(self.aimless['DataProcessingUniqueReflectionsOverall'])*\
                                                                float(self.aimless['DataProcessingCompletenessOverall'])*\
                                                                high_symmetry_boost*\
                                                                float(self.aimless['DataProcessingIsigOverall']))/float(self.aimless['DataProcessingUnitCellVolume'])
-                    except ValueError:
-                        self.aimless['DataProcessingScore']=0.0
+                except ValueError:
+                    self.aimless['DataProcessingScore']=0.0
         self.aimless['DataProcessingUnitCell']=str(a)+' '+str(b)+' '+str(c)+' '+str(alpha)+' '+str(beta)+' '+str(gamma)
         self.aimless['DataProcessingResolutionOverall']=str(self.aimless['DataProcessingResolutionLow'])+' - '+str(self.aimless['DataProcessingResolutionHigh'])
 
@@ -2028,6 +2053,8 @@ class pdbtools(object):
         return X,Y,Z
 
     def get_center_of_gravity_of_residue_ish(self,chain,number):
+        print '-> chain:',chain
+        print '-> number:',number
         X=0.0
         Y=0.0
         Z=0.0
@@ -2036,7 +2063,8 @@ class pdbtools(object):
         z_list=[]
         # pdb definition see: http://www.wwpdb.org/documentation/file-format-content/format33/sect9.html#ATOM
         for line in open(self.pdb):
-            if (line.startswith('ATOM') or line.startswith('HETATM')) and line[21:22]==chain and line[22:26].replace(' ','')==str(number):
+#            print line[21:22],line[22:26]
+            if (line.startswith('ATOM') or line.startswith('HETATM')) and line[21:22].replace(' ','')==chain.replace(' ','') and line[22:26].replace(' ','')==str(number).replace(' ',''):
                 X=float(line[30:38])
                 x_list.append(X)
                 Y=float(line[38:46])
