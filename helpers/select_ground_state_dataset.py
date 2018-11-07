@@ -5,6 +5,7 @@ import glob
 sys.path.append(os.path.join(os.getenv('XChemExplorer_DIR'),'lib'))
 
 from XChemUtils import parse
+from XChemUtils import mtztools
 
 
 # - select datasets with highest resolution
@@ -76,8 +77,26 @@ def link_pdb_mtz_files(panddaDir,lowestRfree):
     if os.path.isfile(os.path.join(panddaDir,'processed_datasets',lowestRfree,lowestRfree+'-ground-state-mean-map.native.ccp4')):
         os.system('/bin/rm %s-ground-state-mean-map.native.ccp4 2> /dev/null' %lowestRfree)
         os.symlink(os.path.join(panddaFolder,'processed_datasets',lowestRfree,lowestRfree+'-ground-state-mean-map.native.ccp4'),lowestRfree+'-ground-state-mean-map.native.ccp4')
+    convert_mean_map_to_mtz(lowestRfree+'-ground-state-mean-map.native.ccp4',lowestRfree+'-ground-state.free.mtz')
 
 
+def convert_mean_map_to_mtz(emap,mtz):
+    print 'converting ground-state-mean-map to MTZ'
+    cmd = ('mapmask MAPIN %s MAPOUT %s << eof\n' % (emap, emap.replace('.ccp4', '.P1.ccp4')) +
+           ' XYZLIM CELL\n'
+           ' PAD 0.0\n'
+           ' SYMMETRY 1\n'
+           'eof\n')
+    print cmd
+    os.system(cmd)
+    print '--->',mtz
+    reso = mtztools(mtz).get_dmin()
+    print '-> resolution:',reso
+    cmd = ('module load phenix\n'
+           'phenix.map_to_structure_factors %s d_min=%s\n' % (emap.replace('.ccp4', '.P1.ccp4'), reso) +
+           '/bin/mv map_to_structure_factors.mtz %s' % emap.replace('.ccp4', '.mtz'))
+    print cmd
+    os.system(cmd)
 
 if __name__=='__main__':
     panddaDir=sys.argv[1]

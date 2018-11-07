@@ -110,6 +110,7 @@ class data_source:
             ['DataProcessingResolutionLowInnerShell',       'Resolution\nLow (Inner Shell)',                'TEXT',                 0],
             ['DataProcessingResolutionHigh',                'Resolution\nHigh',                             'TEXT',                 1],
             ['DataProcessingResolutionHigh15sigma',         'Resolution\n[Mn<I/sig(I)> = 1.5]',             'TEXT',                 1],
+            ['DataProcessingResolutionHigh20sigma',         'Resolution\n[Mn<I/sig(I)> = 2.0]',             'TEXT',                 1],
             ['DataProcessingResolutionHighOuterShell',      'Resolution\nHigh (Outer Shell)',               'TEXT',                 0],
             ['DataProcessingRmergeOverall',                 'Rmerge\nOverall',                              'TEXT',                 1],
             ['DataProcessingRmergeLow',                     'Rmerge\nLow',                                  'TEXT',                 1],
@@ -268,6 +269,8 @@ class data_source:
             ['label',                                       'label',                                    'TEXT'],    # for index.txt
             ['description',                                 'description',                              'TEXT'],    # for index.txt
 
+            ['DimplePANDDApath',                            'DimplePANDDApath',                         'TEXT'],
+
             ['contact_author_PI_salutation',                'contact_author_PI_salutation',             'TEXT'],
             ['contact_author_PI_first_name',                'contact_author_PI_first_name',             'TEXT'],
             ['contact_author_PI_last_name',                 'contact_author_PI_last_name',              'TEXT'],
@@ -410,6 +413,7 @@ class data_source:
             ['DataProcessingResolutionLowInnerShell',       'Resolution\nLow (Inner Shell)',                'TEXT',                 0],
             ['DataProcessingResolutionHigh',                'Resolution\nHigh',                             'TEXT',                 1],
             ['DataProcessingResolutionHigh15sigma',         'Resolution\n[Mn<I/sig(I)> = 1.5]',             'TEXT',                 1],
+            ['DataProcessingResolutionHigh20sigma',         'Resolution\n[Mn<I/sig(I)> = 2.0]',             'TEXT',                 1],
             ['DataProcessingResolutionHighOuterShell',      'Resolution\nHigh (Outer Shell)',               'TEXT',                 0],
             ['DataProcessingRmergeOverall',                 'Rmerge\nOverall',                              'TEXT',                 1],
             ['DataProcessingRmergeLow',                     'Rmerge\nLow',                                  'TEXT',                 1],
@@ -585,7 +589,10 @@ class data_source:
         data=[]
         connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
         cursor = connect.cursor()
-        cursor.execute("select * from depositTable where CrystalName='{0!s}';".format(sampleID))
+        if sampleID == 'ground-state':      # just select first row in depositTable
+            cursor.execute("SELECT * FROM depositTable ORDER BY ROWID ASC LIMIT 1;")
+        else:
+            cursor.execute("select * from depositTable where CrystalName='{0!s}';".format(sampleID))
 
         for column in cursor.description:
             header.append(column[0])
@@ -1570,28 +1577,41 @@ class data_source:
     def create_or_remove_missing_records_in_depositTable(self,xce_logfile,xtal,type,db_dict):
         connect=sqlite3.connect(self.data_source_file)
         cursor = connect.cursor()
-        cursor.execute("select RefinementOutcome from mainTable where CrystalName is '{0!s}'".format(xtal))
-        tmp = cursor.fetchall()
-        oldRefiStage=str(tmp[0][0])
-
         Logfile=XChemLog.updateLog(xce_logfile)
-        Logfile.insert('setting RefinementOutcome field to "'+db_dict['RefinementOutcome']+'" for '+xtal)
-        self.update_insert_data_source(xtal,db_dict)
+        if type == 'ligand_bound':
+            cursor.execute("select RefinementOutcome from mainTable where CrystalName is '{0!s}'".format(xtal))
+            tmp = cursor.fetchall()
+            oldRefiStage=str(tmp[0][0])
+            Logfile.insert('setting RefinementOutcome field to "'+db_dict['RefinementOutcome']+'" for '+xtal)
+            self.update_insert_data_source(xtal,db_dict)
+        elif type == 'ground_state':
+            cursor.execute("select DimplePANDDApath from depositTable where StructureType is '{0!s}' and DimplePANDDApath is '{1!s}'".format(type,db_dict['DimplePANDDApath']))
+            tmp = cursor.fetchall()
+            if tmp == []:
+                Logfile.insert('entry for ground-state model in depositTable does not exist')
+            else:
+                Logfile.warning('entry for ground-state model in depositTable does already exist')
+                return
 
         cursor.execute("select CrystalName,StructureType from depositTable where CrystalName is '{0!s}' and StructureType is '{1!s}'".format(xtal, type))
         tmp = cursor.fetchall()
-        if tmp == [] and int(db_dict['RefinementOutcome'].split()[0]) == 5:
-            sqlite="insert into depositTable (CrystalName,StructureType) values ('{0!s}','{1!s}');".format(xtal, type)
-            Logfile.insert('creating new entry for '+str(type)+' structure of '+xtal+' in depositTable')
-            cursor.execute(sqlite)
-            connect.commit()
-        else:
-            if int(db_dict['RefinementOutcome'].split()[0]) < 5:
-                sqlite="delete from depositTable where CrystalName is '{0!s}' and StructureType is '{1!s}'".format(xtal, type)
-                Logfile.insert('removing entry for '+str(type)+' structure of '+xtal+' from depositTable')
+        if type == 'ligand_bound':
+            if tmp == [] and int(db_dict['RefinementOutcome'].split()[0]) == 5:
+                sqlite="insert into depositTable (CrystalName,StructureType) values ('{0!s}','{1!s}');".format(xtal, type)
+                Logfile.insert('creating new entry for '+str(type)+' structure of '+xtal+' in depositTable')
                 cursor.execute(sqlite)
                 connect.commit()
-
+            else:
+                if int(db_dict['RefinementOutcome'].split()[0]) < 5:
+                    sqlite="delete from depositTable where CrystalName is '{0!s}' and StructureType is '{1!s}'".format(xtal, type)
+                    Logfile.insert('removing entry for '+str(type)+' structure of '+xtal+' from depositTable')
+                    cursor.execute(sqlite)
+                    connect.commit()
+        elif type == 'ground_state':
+            sqlite = "insert into depositTable (CrystalName,StructureType,DimplePANDDApath,PDB_file,MTZ_file) values ('{0!s}','{1!s}','{2!s}','{3!s}','{4!s}');".format(xtal, type, db_dict['DimplePANDDApath'], db_dict['PDB_file'], db_dict['MTZ_file'])
+            Logfile.insert('creating new entry for ' + str(type) + ' structure of ' + xtal + ' in depositTable')
+            cursor.execute(sqlite)
+            connect.commit()
 
     def remove_selected_apo_structures_from_depositTable(self,xce_logfile,xtalList):
         connect=sqlite3.connect(self.data_source_file)
@@ -1806,11 +1826,63 @@ class data_source:
     def samples_for_html_summary(self):
         connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
         cursor = connect.cursor()
-        cursor.execute("select CrystalName from mainTable where RefinementOutcome like '5%' or RefinementOutcome like '6%' order by CrystalName ASC")
+        cursor.execute("select CrystalName from mainTable where RefinementOutcome like '4%' or "
+                                                               "RefinementOutcome like '5%' or "
+                                                               "RefinementOutcome like '6%' order by CrystalName ASC")
         xtalList=[]
         samples = cursor.fetchall()
         for sample in samples:
             if str(sample[0]) not in xtalList:
                 xtalList.append(str(sample[0]))
         return xtalList
+
+    def get_event_map_for_ligand(self,xtal,ligChain,ligNumber,ligName):
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+
+        sql = (
+            'select '
+            ' PANDDA_site_event_map '
+            'from '
+            ' panddaTable '
+            'where '
+            " CrystalName = '%s' and " %xtal +
+            " PANDDA_site_ligand_chain='%s' and " %ligChain +
+            " PANDDA_site_ligand_sequence_number='%s' and " %ligNumber +
+            " PANDDA_site_ligand_resname='%s'"  %ligName
+        )
+
+        cursor.execute(sql)
+
+        eventMap = ''
+        maps = cursor.fetchall()
+        for map in maps:
+            eventMap = map[0]
+
+        return eventMap
+
+    def get_ligand_confidence_for_ligand(self,xtal,ligChain,ligNumber,ligName):
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+
+        sql = (
+            'select '
+            ' PANDDA_site_confidence '
+            'from '
+            ' panddaTable '
+            'where '
+            " CrystalName = '%s' and " %xtal +
+            " PANDDA_site_ligand_chain='%s' and " %ligChain +
+            " PANDDA_site_ligand_sequence_number='%s' and " %ligNumber +
+            " PANDDA_site_ligand_resname='%s'"  %ligName
+        )
+
+        cursor.execute(sql)
+
+        ligConfidence = 'not assigned'
+        ligs = cursor.fetchall()
+        for lig in ligs:
+            ligConfidence = lig[0]
+
+        return ligConfidence
 
