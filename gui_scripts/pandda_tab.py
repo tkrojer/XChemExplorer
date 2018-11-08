@@ -255,6 +255,25 @@ class PanddaTab():
         xce_object.pandda_analyse_hbox = QtGui.QHBoxLayout()
         xce_object.pandda_analyse_hbox.addWidget(frame_pandda)
 
+        ## change to do select options
+
+        # create context menu... no idea where this lives again.
+        xce_object.popMenu_for_pandda_table = QtGui.QMenu()
+        ignore = QtGui.QAction("ignore selected", xce_object.window)
+        exclude_characterisation = QtGui.QAction("exclude selected from characterisation", xce_object.window)
+        exclude_zmap = QtGui.QAction("exclude selected from z-map analysis", xce_object.window)
+        deselect = QtGui.QAction("deselect highlighted", xce_object.window)
+        ignore.triggered.connect(lambda: xce_object.select_sample_for_pandda(option='ignore'))
+        exclude_characterisation.triggered.connect(lambda: xce_object.select_sample_for_pandda(option='char'))
+        exclude_zmap.triggered.connect(lambda: xce_object.select_sample_for_pandda(option='zmap'))
+        deselect.triggered.connect(lambda: xce_object.select_sample_for_pandda(option='deselect'))
+        xce_object.popMenu_for_pandda_table.addAction(ignore)
+        xce_object.popMenu_for_pandda_table.addAction(exclude_characterisation)
+        xce_object.popMenu_for_pandda_table.addAction(exclude_zmap)
+        xce_object.popMenu_for_pandda_table.addAction(deselect)
+        xce_object.pandda_analyse_data_table.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        xce_object.pandda_analyse_data_table.customContextMenuRequested.connect(xce_object.on_context_menu_pandda)
+
         # next three blocks display html documents created by pandda.analyse
         self.layout_funcs.pandda_html(xce_object)
 

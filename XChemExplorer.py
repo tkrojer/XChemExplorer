@@ -482,6 +482,10 @@ class XChemExplorer(QtGui.QApplication):
                 self.pandda_reference_file_spg_label.setText(file[1])
                 break
 
+    def on_context_menu_pandda(self, point):
+        # show context menu
+        self.popMenu_for_pandda_table.exec_(self.sender().mapToGlobal(point))
+
     ####################################################################################################################
     #                                                                                                                  #
     #                                                 DEPO TAB                                                         #
@@ -4329,6 +4333,28 @@ class XChemExplorer(QtGui.QApplication):
                         self.pandda_analyse_data_table.setItem(current_row, column, cell_text)
             if new_xtal:
                 self.pandda_analyse_input_table_dict[xtal] = []
+
+    def select_sample_for_pandda(self, option):
+        indexes = self.pandda_analyse_data_table.selectionModel().selectedRows()
+        if option == 'deselect':
+            for index in sorted(indexes):
+                self.pandda_analyse_data_table.cellWidget(index.row(), 6).setChecked(False)
+                self.pandda_analyse_data_table.cellWidget(index.row(), 7).setChecked(False)
+                self.pandda_analyse_data_table.cellWidget(index.row(), 8).setChecked(False)
+        else:
+            for index in sorted(indexes):
+                self.pandda_analyse_data_table.cellWidget(index.row(), 6).setChecked(False)
+                self.pandda_analyse_data_table.cellWidget(index.row(), 7).setChecked(False)
+                self.pandda_analyse_data_table.cellWidget(index.row(), 8).setChecked(False)
+                if option =='ignore':
+                    checkbox = self.pandda_analyse_data_table.cellWidget(index.row(), 6)
+                if option == 'char':
+                    checkbox = self.pandda_analyse_data_table.cellWidget(index.row(), 7)
+                if option == 'zmap':
+                    checkbox = self.pandda_analyse_data_table.cellWidget(index.row(), 8)
+
+                checkbox.setChecked(True)
+            self.kill_other_pandda_options()
 
     def populate_and_update_refinement_table(self):
 
