@@ -26,7 +26,7 @@ sys.path.append('/usr/local/coot/current/lib/python2.7/site-packages')
 import coot
 
 import re, string, os
-        
+
 # 3D annotations - a bit of a hack currently
 global annotations
 annotations = []
@@ -46,7 +46,7 @@ global user_defined_alert_smarts
 # example: user_defined_alert_smarts = [['C', 'my-user-defined alert for carbon']]
 user_defined_alert_smarts = []
 
-    
+
 
 # not sure if the implementation of the macros will work
 
@@ -88,7 +88,7 @@ def with_auto_accept(*funcs):
         #print "BL DEBUG:: func %s and args %s" %(func, args)
         ret = func(*args)
         accept_regularizement()
-    
+
     if (replace_state == 0):
         set_refinement_immediate_replacement(0)
 
@@ -108,7 +108,7 @@ def using_active_atom(*funcs):
     if (not active_atom):
         add_status_bar_text("No residue found")
     else:
-        
+
         def arg_to_append(item):
             aa_dict = {"aa_imol":      active_atom[0],
                        "aa_chain_id":  active_atom[1],
@@ -116,7 +116,7 @@ def using_active_atom(*funcs):
                        "aa_ins_code":  active_atom[3],
                        "aa_atom_name": active_atom[4],
                        "aa_alt_conf":  active_atom[5]}
-            
+
             if isinstance(item, list):
                 arg_ls = []
                 for ele in item:
@@ -127,7 +127,7 @@ def using_active_atom(*funcs):
                     return aa_dict[item]
                 else:
                     return item
-        
+
         if (len(funcs) == 1):
             # we have a list of functions
             # so use
@@ -173,7 +173,7 @@ class NoBackups:
         refine_zone(imol, "A", 43, 45, "")
         accept_regularizement()
     """
-    
+
     def __init__(self, imol):
         self.imol = imol
     def __enter__(self):
@@ -202,7 +202,7 @@ class AutoAccept:
          refine_zone(0, "A", 43, 45, "")
 
     """
-   
+
     def __init__(self):
         self.replace_state = -1
         pass
@@ -224,7 +224,7 @@ class UsingActiveAtom:
     > with UsingActiveAtom() as [aa_imol, aa_chain_id, aa_res_no, aa_ins_code, aa_atom_name, aa_alt_conf]:
           refine_zone(aa_imol, aa_chain_id, aa_res_no-2, aa_res_no+2, aa_ins_code)
     """
-    
+
     def __init__(self):
         self.no_residue = False
         pass
@@ -256,7 +256,7 @@ def molecule_has_hydrogens(imol):
 
 def add_hydrogens_using_refmac(imol):
     out_file_name = os.path.join("coot-refmac",
-				 molecule_name_stub(imol, 0) + '-needs-H.pdb') 
+				 molecule_name_stub(imol, 0) + '-needs-H.pdb')
     in_file_name = os.path.join("coot-refmac",
 				molecule_name_stub(imol, 0) + '-with-H.pdb')
     make_directory_maybe('coot-refmac')
@@ -266,13 +266,13 @@ def add_hydrogens_using_refmac(imol):
 
 def add_hydrogens_to_chain_using_refmac(imol, chain_id):
     out_file_name = os.path.join("coot-refmac",
-				 molecule_name_stub(imol, 0) + '-chain-' + chain_id + '-needs-H.pdb') 
+				 molecule_name_stub(imol, 0) + '-chain-' + chain_id + '-needs-H.pdb')
     in_file_name = os.path.join("coot-refmac",
 				molecule_name_stub(imol, 0) + '-chain-' + chain_id + '-with-H.pdb')
     make_directory_maybe('coot-refmac')
     write_chain_to_pdb_file(imol, chain_id, out_file_name)
     return add_hydrogens_using_refmac_inner(imol, in_file_name, out_file_name)
-    
+
 
 def add_hydrogens_using_refmac_inner(imol, in_file_name, out_file_name):
 
@@ -286,8 +286,8 @@ def add_hydrogens_using_refmac_inner(imol, in_file_name, out_file_name):
 	    return add_hydrogens_from_file(imol, in_file_name)
     except:
 	return False
-	
-	      
+
+
 
 # set this to a function accepting two argument (the molecule number
 # and the manipulation mode) and it will be run after a model
@@ -366,7 +366,7 @@ def directory_is_modifiable_qm(prefix_dir):
 def most_recently_created_file(glob_str, dir):
 
     import glob, time
-    
+
     patt = os.path.join(dir, glob_str)
     files = glob.glob(patt)
 
@@ -380,7 +380,7 @@ def most_recently_created_file(glob_str, dir):
             latest_mtime = this_mtime
 
     return latest_file
-            
+
 
 # Convert a residue_spec to an mmdb atom selection string.
 # FIXME:: to be tested
@@ -424,7 +424,7 @@ def residue_spec2res_no(rs):
             if (len(rs) == 4):
                 return rs[2]
         return False
-            
+
 def residue_spec2ins_code(rs):
     if not isinstance(rs, list):
         return False
@@ -512,12 +512,12 @@ def list_of_strings_qm(ls):
 # string concat with spaces, @var{ls} must be a list of strings.
 #
 def string_append_with_spaces(ls):
-    
+
     import string
     if ls:
        return string.join(ls)
     else:
-       return [""] 
+       return [""]
 
 # The screen centre.
 #
@@ -532,11 +532,11 @@ def rotation_centre():
 # this is actually not essentail since python has these funtion(s)
 def number_list(a,b):
     result = []
-    if a == b: 
+    if a == b:
        result.append(a)
        return result
     elif a > b : return result
-    else :  
+    else :
         while a <=b :
            result.append(a)
            a = a + 1
@@ -560,7 +560,7 @@ Backported from Python 2.7 as it's implemented as pure python on stdlib.
 >>> check_output(['/usr/bin/python', '--version'])
 Python 2.6.2
 """
-    
+
     import subprocess
     process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
     output, unused_err = process.communicate()
@@ -608,12 +608,12 @@ def command_in_path_qm(cmd, only_extension_here=None,
                         screen_info=False,
                         only_extension=only_extension_here,
                         add_extensions=add_extensions_here)
-    
+
     if exe_path:
         return True
     else:
         return False
-    
+
 
 
 def command_in_path_qm_old_version(cmd, only_extension="", add_extensions=None):
@@ -649,7 +649,7 @@ def command_in_path_qm_old_version(cmd, only_extension="", add_extensions=None):
         if extensions:
             program_names += map(lambda ext: cmd_noext + "." + ext,
                                  extensions)
-        
+
         try:
             primary_path = os.environ["PATH"]
             for cmd_name in program_names:
@@ -663,10 +663,10 @@ def command_in_path_qm_old_version(cmd, only_extension="", add_extensions=None):
             print "BL WARNING:: couldnt open $PATH"  # this shouldnt happen
             return False
 
-       
+
 global gtk_thread_return_value
 gtk_thread_return_value = None
-# Where cmd is e.g. "refmac" 
+# Where cmd is e.g. "refmac"
 #       args is ["HKLIN","thing.mtz"]
 #       data_list is ["HEAD","END"]
 #       log_file_name is "refmac.log"      
@@ -679,7 +679,7 @@ gtk_thread_return_value = None
 def popen_command(cmd, args, data_list, log_file, screen_flag=False):
 
     import sys, string, os
-    
+
     major, minor, micro, releaselevel, serial = sys.version_info
 
     if (os.path.isfile(cmd)):
@@ -713,14 +713,14 @@ def popen_command(cmd, args, data_list, log_file, screen_flag=False):
             log.close()
 
             return process.returncode
-        
+
         else:
             # popen (old)
             data_list_file = "data_list_file_tmp.txt"
-        
+
             # make args string
             args_string = string.join(args)
-            
+
             # write tmp input file
             input = file (data_list_file,'w')
             for data in data_list:
@@ -766,7 +766,7 @@ def strip_extension(s):
 # "" -> ""
 #
 def file_name_extension(file_name):
-    
+
     import os, string
     root, ext = os.path.splitext(file_name)
     if ext:
@@ -778,7 +778,7 @@ def file_name_extension(file_name):
 # e.g. "a.pdb" -> "a-tmp.pdb"
 #
 def add_tmp_extension_to(file_name):
-  
+
     import types
     if isinstance(file_name,types.StringTypes):
        root, ext = os.path.splitext(file_name)
@@ -826,7 +826,7 @@ def unique_date_time_str():
     lt = time.strftime("%Y-%m-%d_%H%M", time.localtime())
     return lt
 
-# return a list that has only every-nth members; 
+# return a list that has only every-nth members;
 # e.g. @code{every_nth ([0,1,2,3,4,5,6,7,8],2)} -> [0,2,4,6,8]
 #      @code{every_nth ([0,1,2,3,4,5,6,7,8],3)} -> [0,3,6]
 # 
@@ -849,7 +849,7 @@ def get_atom_from_residue(atom_name, residue_atoms, alt_conf):
     """Get atom_info fomr a residue.
     residue_atoms must be a list
     """
-    
+
     if ((isinstance(residue_atoms, list)) and
         (residue_atoms != [])):
         for residue_atom in residue_atoms:
@@ -858,7 +858,7 @@ def get_atom_from_residue(atom_name, residue_atoms, alt_conf):
                 return residue_atom
     # print "BL WARNING:: no atom name %s found in residue" %atom_name
     return False # no residue name found fail save
-    
+
 
 # return atom info or False (if atom not found).
 #
@@ -937,7 +937,7 @@ def view_quaternion():
 	ret = map(get_view_quaternion_internal,[0,1,2,3])
 	return ret
 
-# Return the view number 
+# Return the view number
 #
 def add_view(position, quaternion, zoom, view_name):
 
@@ -957,14 +957,14 @@ def matrix2quaternion(m00, m10, m20, m01, m11, m21, m02, m12, m22):
     # rotation matrix is special orthogonal, so (1 + trace) > 0. So
     # we can simply do a sqrt on the 4 trace variants.  Most of the
     # code here is simply recovering the sign.
-    
+
     # return x with the sign of y
     def convert_sign(x, y):
         if (x > 0 and y > 0):
             return x
-        elif (x < 0 and y > 0):
+        elif (x < 0 < y):
             return -x
-        elif (x > 0 and y <0):
+        elif (x > 0 > y):
             return -x
         else:
             return x
@@ -1081,14 +1081,14 @@ def rotate_about_screen_axis(axis,degrees):
         sin_alpha = math.sin(alpha)
         return [cos_alpha,-sin_alpha,0,sin_alpha,cos_alpha,0,0,0,]
 
-# BL says: I dont know what the next 2 defines are for... 
+# BL says: I dont know what the next 2 defines are for...
 # looks not used and/or useless to me
 # seems that only 2nd matrix is used and not view_matrix!
     def vm():view_matrix()
     def mult(mat1,mat2):mat2
 # end of uselessness...
 
-    if (operator.isNumberType(degrees)): 
+    if (operator.isNumberType(degrees)):
        if (axis=="x"):
           mult(view_matrix(),simple_rotation_x(deg_to_rad(degrees)))
        elif (axis=="y"):
@@ -1154,7 +1154,7 @@ def reorder_chains(imol):
     #
     def reorder_chains_in_model(chain_list):
         map(lambda model: model.sort(), chain_list)
-            
+
     p_rep = python_representation(imol)
     if (type(p_rep) is ListType):
         reorder_chains_in_model(p_rep)
@@ -1210,7 +1210,7 @@ def transform_map(*args):
         ret = tf(imol, args[1], args[2], args[3], args[4],
                  space_group(imol), cell(imol))
     # no matrix specified:
-    elif (len(args)==4): 
+    elif (len(args)==4):
         imol = args[0]
         ret = tf(imol, identity_matrix(), args[1], args[2], args[3],
                  space_group(imol), cell(imol))
@@ -1259,7 +1259,7 @@ def transform_map_using_lsq_matrix(imol_bref, ref_chain, ref_resno_start, ref_re
         message = "Bad cell or symmetry for molecule" + str(cell) + str(space_group) + str(imol_ref)
         print "Bad cell or symmetry for molecule", message
         ret = -1           # invalid mol! or return message!?
-        
+
     else:
         rtop = apply_lsq_matches(imol_ref, imol_mov)
         ret = transform_map(imol_map, rtop[0], rtop[1], about_pt, radius,
@@ -1337,7 +1337,7 @@ def is_nucleotide_chain_qm(imol, chain_id):
 # python (schemeyish) interface to eponymous scripting interface function!?
 # return True or False
 #
-def valid_model_molecule_qm(imol): 
+def valid_model_molecule_qm(imol):
     if (coot.is_valid_model_molecule(imol)==1): return True
     else: return False
 
@@ -1348,7 +1348,7 @@ def valid_map_molecule_qm(imol):
     if (coot.is_valid_map_molecule(imol)==1): return True
     else: return False
 
-# convenience function (slightly less typing).  
+# convenience function (slightly less typing).
 #
 # Return True or False
 #
@@ -1378,10 +1378,10 @@ def is_difference_map_qm(imol_map):
 #
 # Return True or False
 #
-def residue_exists_qm(imol,chain_id,resno,ins_code): 
+def residue_exists_qm(imol,chain_id,resno,ins_code):
     return does_residue_exist_p(imol,chain_id,resno,ins_code) == 1
 
-# Does the residue contain hetatoms? 
+# Does the residue contain hetatoms?
 # Return True or False.
 #
 def residue_has_hetatms_qm(imol, chain_id, res_no, ins_code):
@@ -1422,7 +1422,7 @@ def atom_spec2residue_spec(atom_spec):
 def guess_refinement_map():
 
     map_list = map_molecule_list()
-    if map_list == []:
+    if not map_list:
         return -1       # failed to find a map
     else:
         for map_mol in map_list:
@@ -1431,7 +1431,7 @@ def guess_refinement_map():
         print "BL WARNING:: we couldnt find a non difference map for fitting!"
         return -1
 
-    
+
 # Ian Tickle says (as far as I can understand) that the target rmsd
 # should be 0.25 or thereabouts.  You can over-ride it now.
 #
@@ -1441,7 +1441,7 @@ def guess_refinement_map():
 # It seems reality is different to theory, here at least...
 global target_auto_weighting_value
 target_auto_weighting_value = 1.0
-    
+
 # Set the refinement weight (matrix) by iterating the refinement and
 # varying the weight until the chi squares (not including the
 # non-bonded terms) reach 1.0 =/- 10%.  It uses sphere refinement.
@@ -1466,7 +1466,7 @@ def auto_weight_for_refinement():
             if (isinstance(other_residues, list)):
                 all_residues += other_residues
             return [imol, all_residues]
-        
+
     # the refinement function that is run and returns nice refinement
     # results
     #
@@ -1518,8 +1518,7 @@ def auto_weight_for_refinement():
         if n_trials > 20:
             print "BL INFO:: refinement did not converge, bailing out"
             return False
-        if (av_rms_d < (target_auto_weighting_value * 1.1) and
-            av_rms_d > (target_auto_weighting_value * 0.9)):
+        if ((target_auto_weighting_value * 1.1) > av_rms_d > (target_auto_weighting_value * 0.9)):
             # done
             s = "Success: Set weight matrix to " + str(matrix_state())
             add_status_bar_text(s)
@@ -1547,7 +1546,7 @@ def auto_weight_for_refinement():
 # This is not really a util, perhaps it should be somewhere else?
 #
 def print_sequence(imol):
-    
+
     for chain in chain_ids(imol):
        print_sequence_chain(imol,chain)
 
@@ -1565,7 +1564,7 @@ def pir_file_name2pir_sequence(pir_file_name):
             return str
         except:
             return False
-        
+
 # Associate the contents of a PIR file with a molecule.
 #
 def associate_pir_file(imol, chain_id, pir_file_name):
@@ -1617,7 +1616,7 @@ def decode_key(key_val_name):
     except:
         return key_sym_code(key_val_name)
 
-# Add a key binding 
+# Add a key binding
 #
 # with a given name, key (e.g. "x" or "S") and the function to run
 # (a thunk) when that key is pressed.
@@ -1651,7 +1650,7 @@ def add_key_binding(name, key, thunk):
                 print "INFO:: key {0!s} not found in code table".format(key)
         else:
             print "BL WARNING:: invalid key", key
-                
+
 
 # general key press hook, not for public use!!
 #
@@ -1688,10 +1687,10 @@ def graphics_general_key_press_hook(key, control_flag = 0):
 # Returns: nothing interesting.
 # 
 def read_vu_file(filename, obj_name):
-    
+
     from types import StringType
     from operator import isNumberType
-    
+
     def colour_from_number(obj):
         if type(obj) is StringType:
             return obj
@@ -1720,7 +1719,7 @@ def read_vu_file(filename, obj_name):
             to_generic_object_add_line(n, colour, 2,
                                        *coords)
     set_display_generic_object(n, 1)
-                   
+
 
 # residue_test_func is a function that takes 4 arguments, the
 # chain_id, resno, inscode and residue_serial_number (should it be
@@ -1772,7 +1771,7 @@ def residues_with_alt_confs(imol):
 
     return residues_matching_criteria(imol, lambda chain_id, res_no, ins_code, res_serial_no: alt_func1(chain_id, res_no, ins_code, res_serial_no))
 
-# Return a list of all the altconfs in the residue. 
+# Return a list of all the altconfs in the residue.
 # Typically this will return [""] or ["A", "B"]
 # 
 def residue_alt_confs(imol, chain_id, res_no, ins_code):
@@ -1797,7 +1796,7 @@ def atoms_with_zero_occ(imol):
     for chain_id in chain_ids(imol):
         n_residues = chain_n_residues(chain_id, imol)
         for serial_number in range(n_residues):
-                              
+
             res_name = resname_from_serial_number(imol, chain_id, serial_number)
             res_no = seqnum_from_serial_number(imol, chain_id, serial_number)
             ins_code = insertion_code_from_serial_number(imol, chain_id, serial_number)
@@ -1881,9 +1880,9 @@ def residue_spec2atom_for_centre(imol, chain_id, res_no, ins_code):
         if (not centre_atom_name_alt_conf) and (len(atom_ls)>0):
             # take the first atom
             centre_atom_name_alt_conf = atom_ls[0][0][0:2]
-                 
+
     return centre_atom_name_alt_conf
- 
+
 
 def set_go_to_atom(res_spec):
     set_go_to_atom_chain_residue_atom_name(
@@ -1891,7 +1890,7 @@ def set_go_to_atom(res_spec):
         res_spec2res_no(res_spec),
         " CA ")
 
-    
+
 def update_go_to_atom_from_current_atom():
 
     active_atom = active_residue()
@@ -1970,7 +1969,7 @@ def mutate_by_overlap(imol, chain_id_in, resno, tlc):
         else:
             print "we have dict and model for tlc already"
             return have_tlc_molecule
-    
+
     #
     def mutate_it():
         imol_ligand = get_monomer_and_dictionary(tlc)
@@ -1995,7 +1994,7 @@ def mutate_by_overlap(imol, chain_id_in, resno, tlc):
                 imol_map = imol_refinement_map()
                 set_refinement_immediate_replacement(1)
                 if imol_map == -1:
-                    regularize_zone(imol, chain_id_in, resno, resno, "")	
+                    regularize_zone(imol, chain_id_in, resno, resno, "")
                 else:
                     spin_atoms = [" P  ", " O1P", " O2P", " O3P"]
                     phos_dir = {
@@ -2079,7 +2078,7 @@ def overlay_my_ligands(imol_mov, chain_id_mov, resno_mov,
     transform_coords_molecule(imol_mov, rtop_i[0])
 
 def label_all_CAs(imol):
-    
+
     for chain_id in chain_ids(imol):
         if not (is_solvent_chain_qm(imol, chain_id)):
             n_residues = chain_n_residues(chain_id, imol)
@@ -2130,7 +2129,7 @@ def sanitise_alt_confs(atom_info, atom_ls):
 
             if (atom_name_1 == atom_name_2):
                 matchers.append(atom)
-                
+
         if matchers:
             return matchers
         else:
@@ -2215,7 +2214,7 @@ def save_dialog_positions_to_init_file():
                 return False
             port = open(init_file, 'a')
             print "BL INFO:: writing dialog positions to .coot.py"
-            
+
         if port:
 
             port.write("# ----------------------------------------------------------")
@@ -2253,7 +2252,7 @@ def save_dialog_positions_to_init_file():
         if (write_init_status == False):
             # try to write a file to preferences
             dump_positions_to_file(positions, preferences=True)
-        
+
 # saves a string to a file!
 # if the string is already present dont do anything
 # optional arg: overwrite
@@ -2261,7 +2260,7 @@ def save_dialog_positions_to_init_file():
 #               True  - overwrite file
 #
 def save_string_to_file(string, filename, overwrite=False):
-    
+
     #home = 'HOME'
     #if (os.name == 'nt'):
     #    home = 'COOT_HOME'
@@ -2325,7 +2324,7 @@ def multi_chicken(imol, n_colours = False):
         ret = [degrees/360 , col[1], col[2] - degrees/360]
         # ??? not sure about 1st element, think mistake in Paul's scheme script
         return ret
-    
+
     start = 1.0
     stop = 6.0
     initial_colour = [0.2, 0.2, 0.8]
@@ -2337,7 +2336,7 @@ def multi_chicken(imol, n_colours = False):
         else:
             n_col = n_colours
         sigma = map_sigma(imol)
-        
+
         print "range n_col returns: ", range(n_col)
 
         for icol in range(n_col):
@@ -2348,7 +2347,7 @@ def multi_chicken(imol, n_colours = False):
             set_last_map_colour(*rotate_colour_map(initial_colour, colour_range * frac))
     else:
         print "BL INFO:: {0!s} is not valid map".format(imol)
-        
+
 
 # simple enumeration
 #
@@ -2468,7 +2467,7 @@ def pukka_puckers_qm(imol):
                                         (pucker_atom == " C3'")):
                                     add_questionable([pucker_atom, residue_spec,
                                                       "puckered atom:" + pucker_atom])
-            
+
     if (len(residue_list) == 0):
         info_dialog("No bad puckers.")
     else:
@@ -2613,8 +2612,8 @@ def prodrg_ify(imol, chain_id, res_no, ins_code):
                 set_mol_displayed(imol_replacing, 0)
                 set_mol_active   (imol_replacing, 0)
                 graphics_draw()
-    
-                
+
+
 # ---------- annotations ---------------------
 
 def add_annotation_here(text):
@@ -2649,7 +2648,7 @@ def save_annotations(file_name):
         # remove existing file
     #    print "BL INFO:: overwrite old annotation file", file_name
     #    os.remove(file_name)
-        
+
     save_string_to_file(str(annotations), file_name, True)
 
 def load_annotations(file_name):
@@ -2700,7 +2699,7 @@ def make_latest_version_url():
           build_type + \
           "-latest.txt"
     return url
-            
+
 
 
 # Get the binary (i.e. the action that happens when the download
@@ -2792,13 +2791,13 @@ def run_download_binary_curl(revision, version_string,
                     else:
                         if os.path.isfile(tar_file_name):
                             # needs to be removed on WIN32 first
-                            os.remove(tar_file_name)  
+                            os.remove(tar_file_name)
                         os.rename(a_tar_file_name, tar_file_name)
 
                 os.chdir(current_dir)
                 return True # ?
 
-            
+
     # return as a string, or False
     def get_target_md5_string(file_name):
         if not os.path.isfile(file_name):
@@ -2875,7 +2874,7 @@ def run_download_binary_curl(revision, version_string,
             set_file_name_func(tar_file_name)
 
         print "INFO:: getting URL:", url
-        
+
         if (use_curl):
             # this is for curl
             coot_get_url_and_activate_curl_hook(md5_url, md5_tar_file_name, 1)
@@ -3008,8 +3007,8 @@ def load_default_sequence():
     if os.path.isfile(default_seq):
         s = file2string(default_seq)
         align_to_closest_chain(s, 0.95)
-    
-    
+
+
 # not sure if this works, especally with python and Win
 # is for command line update
 # FIXME
@@ -3024,7 +3023,7 @@ def update_self(use_curl=False):
     import time
     global file_name_for_progress_bar
     file_name_for_progress_bar = False
-    
+
     url = make_latest_version_url()
     if use_curl:
         #x=get_url_as_string(url)  # dummy to fool the firewall FIXME
@@ -3080,7 +3079,7 @@ def update_self(use_curl=False):
                 count += 1
                 time.sleep(2)
         coot_real_exit(0)
-                    
+
 
 def use_curl_status():
     global use_curl
@@ -3128,7 +3127,7 @@ def get_drug_via_wikipedia(drug_name_in):
 
     def get_redirected_drug_name(xml):
         return parse_wiki_drug_xml(xml, '#REDIRECT', True)
-    
+
     def parse_wiki_drug_xml(tree, key, redirect=False):
         key_re = re.compile(key)
         drug_bank_id = False
@@ -3153,8 +3152,8 @@ def get_drug_via_wikipedia(drug_name_in):
 	    print 'Oops! len rev_text is 0'
 
         return drug_bank_id
-            
-    
+
+
     file_name = False
     if isinstance(drug_name_in, str):
         if len(drug_name_in) > 0:
@@ -3166,7 +3165,7 @@ def get_drug_via_wikipedia(drug_name_in):
             # we want to parse the Etree rather than xml as this is an addurlinfo thingy
             xml = urllib2.urlopen(url)
             xml_tree = ElementTree.parse(xml)
-            
+
             mol_name = parse_wiki_drug_xml(xml_tree, "DrugBank  *= ")
 
             if not isinstance(mol_name, str):
@@ -3180,21 +3179,21 @@ def get_drug_via_wikipedia(drug_name_in):
                     # if so, get the name and call get_drug_via_wikipedia with it
                     redirected_drug_name = get_redirected_drug_name(xml_tree)
                     return get_drug_via_wikipedia(redirected_drug_name)
-                    
+
                 else:
                     pc_mol_uri = "http://pubchem.ncbi.nlm.nih.gov" + \
                                  "/summary/summary.cgi?cid=" + \
                                  mol_name + "&disopt=DisplaySDF"
                     file_name = "pc-" + mol_name + ".mol"
                     coot_get_url(pc_mol_uri, file_name)
-                    
+
             else:
                 db_mol_uri = "http://www.drugbank.ca/structures/structures/small_molecule_drugs/" + \
                              mol_name + ".mol"
                 file_name = mol_name + ".mol"
                 coot_get_url(db_mol_uri, file_name)
     return file_name
-                    
+
 
 def get_SMILES_for_comp_id_from_pdbe(comp_id):
 
@@ -3256,7 +3255,7 @@ def get_SMILES_for_comp_id_from_pdbe(comp_id):
 # Add file with filename to preferences directory
 #
 def file_to_preferences(filename):
-    
+
     """Copy the file filename from python pkgdatadir directory to
     prefereneces directory.
     """
@@ -3343,7 +3342,7 @@ def set_b_factor_molecule(imol, bval):
         start_res = seqnum_from_serial_number(imol, chain_id, 0)
         end_res   = seqnum_from_serial_number(imol, chain_id, chain_n_residues(chain_id, imol) - 1)
         set_b_factor_residue_range(imol, chain_id, start_res, end_res, bval)
-        
+
 # reset B-factor for molecule imol to default value
 #
 def reset_b_factor_molecule(imol):
@@ -3440,7 +3439,7 @@ def find_exe(program_name, *args, **kwargs):
             # list of extensions (no dot) only
             extensions = map(lambda ext: ext[1:], tmp_ext)
 
-    
+
     if "only_extension" in kwargs:
         if kwargs["only_extension"]:
             extensions = kwargs["only_extension"]
@@ -3459,7 +3458,7 @@ def find_exe(program_name, *args, **kwargs):
     for file_name in program_names:
         # search the extra Paths
         for search_path in path_ls:
-        
+
             if (os.path.isdir(search_path)):
                 # we have a single file name, not environ var
                 program_exe = os.path.join(search_path, file_name)
@@ -3479,7 +3478,7 @@ def find_exe(program_name, *args, **kwargs):
                 except:
                     if info:
                         print "BL WARNING:: {0!s} not defined!".format(search_path)
-            
+
     # BL says: before we search everywhere we might want to ask
     # the user if he actually wishes to do so!
     # lets insert a small pygtk dialog and ask!
@@ -3501,7 +3500,7 @@ def find_exe(program_name, *args, **kwargs):
     else:
         if info:
             print "BL INFO:: we don't search the whole disk for", program_name_noext
-            
+
     if info:
         print "BL WARNING:: We cannot find {0!s} anywhere! Program {1!s} won't run!".format(program_name_noext, program_name_noext)
     return False
@@ -3531,7 +3530,7 @@ def printf(*args):
 # to print elements of a list:
 def printl(ls):
     map(printf, ls)
-    
+
 # Where cmd is e.g. "bltwish" 
 #       args is list, e.g. [loggraph, "refmac.log"]
 #
@@ -3573,13 +3572,13 @@ def run_concurrently(cmd, args=None, data_list=None, logfile=None, screen_flag=F
                 for data in data_list:
                     process.stdin.write(data + "\n")
 
-            pid = process.pid            
+            pid = process.pid
 
             if log:
                 return (process, log)
             else:
                 return pid
-        
+
         else:
             # spawn (old)
             pid = os.spawnv(os.P_NOWAIT, cmd_execfile, [cmd_execfile] + args)
@@ -3722,7 +3721,7 @@ def merge_solvent_chains(imol):
         master_chain = solvent_chains[0]
         last_prev_water = chain_n_residues(master_chain, imol)
         for chain_id in solvent_chains[1:]:
-            n_residues = chain_n_residues(chain_id, imol)     
+            n_residues = chain_n_residues(chain_id, imol)
             renumber_residue_range(imol, chain_id, 1,
                                    n_residues, last_prev_water)
             new_start = last_prev_water + 1
@@ -3730,7 +3729,7 @@ def merge_solvent_chains(imol):
             change_chain_id(imol, chain_id, master_chain, 1,
                             new_start, new_end)
             last_prev_water = new_end
-            
+
 
 # helper to comvert functions to strings
 def cmd2str(*args):
@@ -3777,7 +3776,7 @@ def set_alt_conf_occ(imol, chain_id, res_no, ins_code, alt_conf_list):
         set_atom_attributes(change_list)
     else:
         print "BL INFO:: no alt confs in residue", imol, chain_id, res_no, ins_code
-            
+
 
 # simplyfy check for windows
 def is_windows():

@@ -52,7 +52,7 @@ class export_to_html:
                 ligChain = ligand.split('-')[1]
                 ligNumber = ligand.split('-')[2]
                 eventMap = self.find_matching_event_map_from_database(xtal, ligand)
-                if eventMap != []:
+                if eventMap:
                     self.cut_and_copy_map(xtal, ligand+'.pdb', eventMap, xtal + '_' + ligand + '_event.ccp4','F','PHIF')
                 x,y,z = self.pdb.get_centre_of_gravity_of_residue(ligand)
                 self.copy_spider_plot(xtal,ligand)
@@ -258,7 +258,7 @@ class export_to_html:
             ligPDB = self.pdb.save_residues_with_resname(os.path.join(self.projectDir, xtal), 'LIG')
         else:
             self.Logfile.error('%s: cannot find refine.split.bound-state.pdb' %xtal)
-        if ligPDB == []:
+        if not ligPDB:
             self.Logfile.error('%s; cannot find any ligands of type LIG in refine.split.bound-state.pdb' %xtal)
         else:
             for lig in sorted(ligPDB):

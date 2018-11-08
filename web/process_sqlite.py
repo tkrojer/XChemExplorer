@@ -287,7 +287,7 @@ def main (argv):
       cur.execute(sql)
 
       rows=cur.fetchall()
-      if rows == []:
+      if not rows:
         print '==> WARNING: none of your samples seems to be at least CompChem ready (4)'
         return None
       writer = csv.DictWriter(f, fieldnames=rows[1].keys())

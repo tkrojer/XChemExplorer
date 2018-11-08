@@ -519,10 +519,9 @@ class XChemExplorer(QtGui.QApplication):
         self.ground_state_mtz_button_label.setText(mtz)
 
     def add_ground_state_db(self):
-        db_dict = {}
-        db_dict['DimplePANDDApath'] = self.panddas_directory
-        db_dict['PDB_file'] = str(self.ground_state_pdb_button_label.text())
-        db_dict['MTZ_file'] = str(self.ground_state_mtz_button_label.text())
+        db_dict = {'DimplePANDDApath': self.panddas_directory,
+                   'PDB_file': str(self.ground_state_pdb_button_label.text()),
+                   'MTZ_file': str(self.ground_state_mtz_button_label.text())}
         self.db.create_or_remove_missing_records_in_depositTable(self.xce_logfile, 'ground_state', 'ground_state',
                                                                  db_dict)
 
@@ -2278,7 +2277,7 @@ class XChemExplorer(QtGui.QApplication):
                                 job_list = self.get_job_list_for_dimple_rerun(xtal, job_list, db_dict, entry)
                         except KeyError:
                             continue
-        if job_list != []:
+        if job_list:
             self.update_log.insert('trying to run DIMPLE on ALL auto-processing files')
             self.check_before_running_dimple(job_list)
 
@@ -2352,7 +2351,7 @@ class XChemExplorer(QtGui.QApplication):
                         print('    ' + str(os.path.join(db_dict['DataProcessingPathToMTZfile']) + ' is missing'))
 
 
-        if job_list != []:
+        if job_list:
             self.update_log.insert('trying to run DIMPLE on SELECTED auto-processing files')
             self.check_before_running_dimple(job_list)
 
@@ -2362,7 +2361,7 @@ class XChemExplorer(QtGui.QApplication):
             if self.initial_model_dimple_dict[xtal][0].isChecked():
                 job_list.append(xtal)
 
-        if job_list != []:
+        if job_list:
             msgBox = QtGui.QMessageBox()
             msgBox.setText("Do you really want to delete {0!s} Dimple files?".format(len(job_list)))
             msgBox.addButton(QtGui.QPushButton('Go'), QtGui.QMessageBox.YesRole)
@@ -2480,7 +2479,7 @@ class XChemExplorer(QtGui.QApplication):
                     suitable_reference.append([reference[0], difference])
                 except ValueError:
                     continue
-        if suitable_reference != []:
+        if suitable_reference:
             reference_file = min(suitable_reference, key=lambda x: x[1])[0]
             visit = entry[1]
             run = entry[2]
@@ -2690,7 +2689,7 @@ class XChemExplorer(QtGui.QApplication):
         self.settings['filename_root'] = self.filename_root
 
     def button_clicked(self):
-        if self.data_source_set == False:
+        if not self.data_source_set:
             print('sender text bit')
             if self.sender().text() == "Create New Data\nSource (SQLite)":
                 file_name = str(QtGui.QFileDialog.getSaveFileName(self.window, 'Save file', self.database_directory))
@@ -2899,7 +2898,7 @@ class XChemExplorer(QtGui.QApplication):
             for cif_file in glob.glob(os.path.join(folder, '*.cif')):
                 if os.path.isfile(cif_file):
                     cif_file_generated += 1
-        if timestamp_list != []:
+        if timestamp_list:
             last_timestamp = max(timestamp_list)
         else:
             last_timestamp = 'n/a'
@@ -3167,7 +3166,7 @@ class XChemExplorer(QtGui.QApplication):
                     if self.initial_model_dimple_dict[str(item[0])][0].isChecked():
                         compound_list.append([str(item[0]), compoundID, str(item[2])])
 
-        if compound_list != []:
+        if compound_list:
             self.update_log.insert(
                 'trying to create cif and pdb files for ' + str(len(compound_list)) + ' compounds using ACEDRG...')
             if self.external_software['qsub']:
@@ -3554,8 +3553,7 @@ class XChemExplorer(QtGui.QApplication):
     def refinement_outcome_combobox_changed(self):
         for xtal in self.refinement_table_dict:
             if self.sender() == self.refinement_table_dict[xtal]:
-                db_dict = {}
-                db_dict['RefinementOutcome'] = str(self.sender().currentText())
+                db_dict = {'RefinementOutcome': str(self.sender().currentText())}
                 self.db.create_or_remove_missing_records_in_depositTable(self.xce_logfile, xtal, 'ligand_bound',
                                                                          db_dict)
 
@@ -3625,8 +3623,7 @@ class XChemExplorer(QtGui.QApplication):
 #                self.data_collection_dict[xtal].append(['user_changed_selection'])
 #            # finally need to update outcome field in data source accordingly
             self.update_log.insert('updating dataset outcome in datasource for {0!s}'.format(xtal))
-            update_dict = {}
-            update_dict['DataCollectionOutcome'] = outcome
+            update_dict = {'DataCollectionOutcome': outcome}
             self.db.update_insert_data_source(xtal, update_dict)
 
     def set_run_dimple_flag(self, state):
@@ -4104,7 +4101,7 @@ class XChemExplorer(QtGui.QApplication):
                         for n, entry in enumerate(self.data_collection_dict[key]):
                             print('==>', n)
                             if entry[0] == 'logfile':
-                                if entry[8] == True:
+                                if entry[8]:
                                     print('===> found:', n)
                                     self.data_collection_column_three_dict[key][0].selectRow(n)
                         break

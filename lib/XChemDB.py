@@ -914,7 +914,7 @@ class data_source:
         cursor.execute('Select %s FROM %s where %s' %(columns[:-1],table,condition_string[:-5]))
 
         tmp = cursor.fetchall()
-        if tmp == []:
+        if not tmp:
             data_dict.update(condition_dict)
             value_string=''
             column_string=''
@@ -1367,7 +1367,7 @@ class data_source:
                             " CrystalName is '%s' and PANDDA_site_ligand_placed is 'True';" %entry[0]     )
                 cursor.execute(sqlite)
                 tmp = cursor.fetchall()
-                if tmp != []:
+                if tmp:
                     crystalDict[entry[0]]=[]
                     for item in tmp:
                         print [entry[0], str(item[0]),str(item[1]),str(item[2]),str(item[3]),str(item[4]),str(item[5]),str(item[6]),str(item[7]),str(item[8]),str(item[9]),str(item[10]),str(item[11]) ]
@@ -1482,7 +1482,7 @@ class data_source:
         for item in tmp:
             for xtal in str(item[0]).split(';'):
                 if xtal not in apoStructureList: apoStructureList.append(xtal)
-        if apoStructureList==[]:
+        if not apoStructureList:
             Logfile.insert('no apo structures were assigned to your pandda models')
         else:
             Logfile.insert('the following datasets were at some point used as apo structures for pandda.analyse: '+str(apoStructureList))
@@ -1587,7 +1587,7 @@ class data_source:
         elif type == 'ground_state':
             cursor.execute("select DimplePANDDApath from depositTable where StructureType is '{0!s}' and DimplePANDDApath is '{1!s}'".format(type,db_dict['DimplePANDDApath']))
             tmp = cursor.fetchall()
-            if tmp == []:
+            if not tmp:
                 Logfile.insert('entry for ground-state model in depositTable does not exist')
             else:
                 Logfile.warning('entry for ground-state model in depositTable does already exist')
@@ -1596,7 +1596,7 @@ class data_source:
         cursor.execute("select CrystalName,StructureType from depositTable where CrystalName is '{0!s}' and StructureType is '{1!s}'".format(xtal, type))
         tmp = cursor.fetchall()
         if type == 'ligand_bound':
-            if tmp == [] and int(db_dict['RefinementOutcome'].split()[0]) == 5:
+            if not tmp and int(db_dict['RefinementOutcome'].split()[0]) == 5:
                 sqlite="insert into depositTable (CrystalName,StructureType) values ('{0!s}','{1!s}');".format(xtal, type)
                 Logfile.insert('creating new entry for '+str(type)+' structure of '+xtal+' in depositTable')
                 cursor.execute(sqlite)

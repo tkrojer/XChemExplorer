@@ -82,7 +82,7 @@ def parse_molprobity_output(inital_model_directory,xtal,db_dict):
                     db_dict['RefinementMolProbityScore'] = line.split()[3]
                     if float(line.split()[3]) < 2:
                         db_dict['RefinementMolProbityScoreTL'] = 'green'
-                    if float(line.split()[3]) >= 2 and float(line.split()[3]) < 3:
+                    if 2 <= float(line.split()[3]) < 3:
                         db_dict['RefinementMolProbityScoreTL'] = 'orange'
                     if float(line.split()[3]) >= 3:
                         db_dict['RefinementMolProbityScoreTL'] = 'red'
@@ -93,7 +93,7 @@ def parse_molprobity_output(inital_model_directory,xtal,db_dict):
 
                     if float(line.split()[3]) < 0.3:
                         db_dict['RefinementRamachandranOutliersTL'] = 'green'
-                    if float(line.split()[3]) >= 0.3 and float(line.split()[3]) < 1:
+                    if 0.3 <= float(line.split()[3]) < 1:
                         db_dict['RefinementRamachandranOutliersTL'] = 'orange'
                     if float(line.split()[3]) >= 1:
                         db_dict['RefinementRamachandranOutliersTL'] = 'red'
@@ -103,7 +103,7 @@ def parse_molprobity_output(inital_model_directory,xtal,db_dict):
                     db_dict['RefinementRamachandranFavored'] = line.split()[2]
                     if float(line.split()[2]) < 90:
                         db_dict['RefinementRamachandranFavoredTL'] = 'red'
-                    if float(line.split()[2]) >= 90 and float(line.split()[2]) < 98:
+                    if 90 <= float(line.split()[2]) < 98:
                         db_dict['RefinementRamachandranFavoredTL'] = 'orange'
                     if float(line.split()[2]) >= 98:
                         db_dict['RefinementRamachandranFavoredTL'] = 'green'

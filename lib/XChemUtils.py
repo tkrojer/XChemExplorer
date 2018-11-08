@@ -102,7 +102,7 @@ class process:
             # this 'if not' step is usually not necessary; only if process was stopped in an odd way
             if not os.path.isfile(self.project_directory+'/'+self.xtalID+'/'+self.mtz_free):
                 generate_Rfree_Cmds=self.get_Rfree()
-            if self.delete_old==True:
+            if self.delete_old:
                 os.system('rm -fr Dimple')
                 os.mkdir('{0!s}/{1!s}/Dimple'.format(self.project_directory, self.xtalID))
             else:
@@ -488,8 +488,7 @@ class parse:
                 Aimless['MultiplicityHigh'] = line.split()[3]
                 Aimless['MultiplicityLow'] = line.split()[3]
             if line.startswith('Average unit cell:') and len(line.split())==9:
-                tmp = []
-                tmp.append(line.split())
+                tmp = [line.split()]
                 a = int(float(tmp[0][3]))
                 b = int(float(tmp[0][4]))
                 c = int(float(tmp[0][5]))
@@ -521,8 +520,8 @@ class parse:
         else:
             if float(Aimless['ResolutionHigh']) > 3.5 or float(Aimless['RmergeLow']) > 0.1:
                 Aimless['Alert'] = '#FF0000'
-            if (float(Aimless['ResolutionHigh']) <= 3.5 and float(Aimless['ResolutionHigh']) > 2.5) or \
-               (float(Aimless['RmergeLow']) <= 0.1 and float(Aimless['RmergeLow']) > 0.05):
+            if (3.5 >= float(Aimless['ResolutionHigh']) > 2.5) or \
+               (0.1 >= float(Aimless['RmergeLow']) > 0.05):
                 Aimless['Alert'] = '#FF9900'
             if float(Aimless['ResolutionHigh']) <= 2.5 and float(Aimless['RmergeLow']) <= 0.05:
                 Aimless['Alert'] = '#00FF00'
@@ -626,8 +625,7 @@ class parse:
                         self.aimless['DataProcessingResolutionHigh20sigma']=line.split()[6][:-1]
                         resolution_at_sigma_line_overall_found=False
             if (line.startswith('Average unit cell:') or line.startswith('  Unit cell parameters')) and len(line.split())==9:
-                tmp = []
-                tmp.append(line.split())
+                tmp = [line.split()]
                 a = int(float(tmp[0][3]))
                 b = int(float(tmp[0][4]))
                 c = int(float(tmp[0][5]))
@@ -679,8 +677,8 @@ class parse:
         else:
             if float(self.aimless['DataProcessingResolutionHigh']) > 3.5 or float(self.aimless['DataProcessingRmergeLow']) > 0.1:
                 self.aimless['DataProcessingAlert'] = '#FF0000'
-            if (float(self.aimless['DataProcessingResolutionHigh']) <= 3.5 and float(self.aimless['DataProcessingResolutionHigh']) > 2.5) or \
-               (float(self.aimless['DataProcessingRmergeLow']) <= 0.1 and float(self.aimless['DataProcessingRmergeLow']) > 0.05):
+            if (3.5 >= float(self.aimless['DataProcessingResolutionHigh']) > 2.5) or \
+               (0.1 >= float(self.aimless['DataProcessingRmergeLow']) > 0.05):
                 self.aimless['DataProcessingAlert'] = '#FF9900'
             if float(self.aimless['DataProcessingResolutionHigh']) <= 2.5 and float(self.aimless['DataProcessingRmergeLow']) <= 0.05:
                 self.aimless['DataProcessingAlert'] = '#00FF00'
@@ -768,7 +766,7 @@ class parse:
                         if float(PDBinfo['Rcryst']) > 0.4:
                             PDBinfo['Alert']='#FF0000'
                             PDBinfo['RcrystTL'] = 'red'
-                        if float(PDBinfo['Rcryst']) <= 0.4 and float(PDBinfo['Rcryst']) >= 0.3:
+                        if 0.4 >= float(PDBinfo['Rcryst']) >= 0.3:
                             PDBinfo['Alert']='#FF9900'
                             PDBinfo['RcrystTL'] = 'orange'
                         if float(PDBinfo['Rcryst']) < 0.3:
@@ -779,7 +777,7 @@ class parse:
                         if float(PDBinfo['Rfree']) > 0.4:
                             PDBinfo['Alert']='#FF0000'
                             PDBinfo['RfreeTL'] = 'red'
-                        if float(PDBinfo['Rfree']) <= 0.4 and float(PDBinfo['Rfree']) >= 0.3:
+                        if 0.4 >= float(PDBinfo['Rfree']) >= 0.3:
                             PDBinfo['Alert']='#FF9900'
                             PDBinfo['RfreeTL'] = 'orange'
                         if float(PDBinfo['Rfree']) < 0.3:
@@ -792,7 +790,7 @@ class parse:
                     PDBinfo['ResolutionHigh']=line.split()[7]
                     try:
                         if float(line.split()[7]) < 2.4:                                   PDBinfo['ResolutionColor'] = 'green'
-                        if float(line.split()[7]) >= 2.4 and float(line.split()[7]) < 2.8: PDBinfo['ResolutionColor'] = 'orange'
+                        if 2.4 <= float(line.split()[7]) < 2.8: PDBinfo['ResolutionColor'] = 'orange'
                         if float(line.split()[7]) >= 2.8:                                  PDBinfo['ResolutionColor'] = 'red'
                     except ValueError:
                         pass
@@ -800,7 +798,7 @@ class parse:
                     PDBinfo['rmsdBonds'] = line.split()[9]
                     try:
                         if float(line.split()[9]) < 0.02:                                       PDBinfo['rmsdBondsTL'] = 'green'
-                        if float(line.split()[9]) >= 0.02 and float(line.split()[9]) < 0.03:    PDBinfo['rmsdBondsTL'] = 'orange'
+                        if 0.02 <= float(line.split()[9]) < 0.03:    PDBinfo['rmsdBondsTL'] = 'orange'
                         if float(line.split()[9]) >= 0.03:                                      PDBinfo['rmsdBondsTL'] = 'red'
                     except ValueError:
                         pass
@@ -808,7 +806,7 @@ class parse:
                     PDBinfo['rmsdAngles'] = line.split()[9]
                     try:
                         if float(line.split()[9]) < 2.0:                                        PDBinfo['rmsdAnglesTL'] = 'green'
-                        if float(line.split()[9]) >= 2.0 and float(line.split()[9]) < 3.0:      PDBinfo['rmsdAnglesTL'] = 'orange'
+                        if 2.0 <= float(line.split()[9]) < 3.0:      PDBinfo['rmsdAnglesTL'] = 'orange'
                         if float(line.split()[9]) >= 3.0:                                       PDBinfo['rmsdAnglesTL'] = 'red'
                     except ValueError:
                         pass
@@ -842,39 +840,25 @@ class parse:
 
 
     def dict_for_datasource_update(self,pdbfile):
-        db_dict={}
-        db_dict['RefinementPDB_latest']=os.path.realpath(pdbfile)
-        pdb=self.PDBheader(pdbfile)
-        db_dict['RefinementRcryst'] =               pdb['Rcryst']
-        db_dict['RefinementRcrystTraficLight'] =    pdb['RcrystTL']
-        db_dict['RefinementRfree']=                 pdb['Rfree']
-        db_dict['RefinementRfreeTraficLight'] =     pdb['RfreeTL']
-        db_dict['RefinementRmsdBonds']  =           pdb['rmsdBonds']
-        db_dict['RefinementRmsdBondsTL'] =          pdb['rmsdBondsTL']
-        db_dict['RefinementRmsdAngles'] =           pdb['rmsdAngles']
-        db_dict['RefinementRmsdAnglesTL'] =         pdb['rmsdAnglesTL']
-        db_dict['RefinementSpaceGroup'] =           pdb['SpaceGroup']
-        db_dict['RefinementResolution'] =           pdb['ResolutionHigh']
-        db_dict['RefinementResolutionTL'] =         pdb['ResolutionColor']
+        pdb = self.PDBheader(pdbfile)
+        db_dict= {'RefinementPDB_latest': os.path.realpath(pdbfile), 'RefinementRcryst': pdb['Rcryst'],
+                  'RefinementRcrystTraficLight': pdb['RcrystTL'], 'RefinementRfree': pdb['Rfree'],
+                  'RefinementRfreeTraficLight': pdb['RfreeTL'], 'RefinementRmsdBonds': pdb['rmsdBonds'],
+                  'RefinementRmsdBondsTL': pdb['rmsdBondsTL'], 'RefinementRmsdAngles': pdb['rmsdAngles'],
+                  'RefinementRmsdAnglesTL': pdb['rmsdAnglesTL'], 'RefinementSpaceGroup': pdb['SpaceGroup'],
+                  'RefinementResolution': pdb['ResolutionHigh'], 'RefinementResolutionTL': pdb['ResolutionColor']}
         return db_dict
 
 
 
     def update_datasource_with_PDBheader(self,xtal,datasource,pdbfile):
-        db_dict={}
-        db_dict['RefinementPDB_latest']=os.path.realpath(pdbfile)
-        pdb=self.PDBheader(pdbfile)
-        db_dict['RefinementRcryst'] =               pdb['Rcryst']
-        db_dict['RefinementRcrystTraficLight'] =    pdb['RcrystTL']
-        db_dict['RefinementRfree']=                 pdb['Rfree']
-        db_dict['RefinementRfreeTraficLight'] =     pdb['RfreeTL']
-        db_dict['RefinementRmsdBonds']  =           pdb['rmsdBonds']
-        db_dict['RefinementRmsdBondsTL'] =          pdb['rmsdBondsTL']
-        db_dict['RefinementRmsdAngles'] =           pdb['rmsdAngles']
-        db_dict['RefinementRmsdAnglesTL'] =         pdb['rmsdAnglesTL']
-        db_dict['RefinementSpaceGroup'] =           pdb['SpaceGroup']
-        db_dict['RefinementResolution'] =           pdb['ResolutionHigh']
-        db_dict['RefinementResolutionTL'] =         pdb['ResolutionColor']
+        pdb = self.PDBheader(pdbfile)
+        db_dict= {'RefinementPDB_latest': os.path.realpath(pdbfile), 'RefinementRcryst': pdb['Rcryst'],
+                  'RefinementRcrystTraficLight': pdb['RcrystTL'], 'RefinementRfree': pdb['Rfree'],
+                  'RefinementRfreeTraficLight': pdb['RfreeTL'], 'RefinementRmsdBonds': pdb['rmsdBonds'],
+                  'RefinementRmsdBondsTL': pdb['rmsdBondsTL'], 'RefinementRmsdAngles': pdb['rmsdAngles'],
+                  'RefinementRmsdAnglesTL': pdb['rmsdAnglesTL'], 'RefinementSpaceGroup': pdb['SpaceGroup'],
+                  'RefinementResolution': pdb['ResolutionHigh'], 'RefinementResolutionTL': pdb['ResolutionColor']}
         print db_dict
         db=XChemDB.data_source(datasource)
         db.update_data_source(xtal,db_dict)
@@ -888,7 +872,7 @@ class parse:
                         db_dict['RefinementMolProbityScore'] = line.split()[3]
                         if float(line.split()[3]) < 2:
                             db_dict['RefinementMolProbityScoreTL'] = 'green'
-                        if float(line.split()[3]) >= 2 and float(line.split()[3]) < 3:
+                        if 2 <= float(line.split()[3]) < 3:
                             db_dict['RefinementMolProbityScoreTL'] = 'orange'
                         if float(line.split()[3]) >= 3:
                             db_dict['RefinementMolProbityScoreTL'] = 'red'
@@ -898,7 +882,7 @@ class parse:
                         db_dict['RefinementRamachandranOutliers'] = line.split()[3]
                         if float(line.split()[3]) < 0.3:
                             db_dict['RefinementRamachandranOutliersTL'] = 'green'
-                        if float(line.split()[3]) >= 0.3 and float(line.split()[3]) < 1:
+                        if 0.3 <= float(line.split()[3]) < 1:
                             db_dict['RefinementRamachandranOutliersTL'] = 'orange'
                         if float(line.split()[3]) >= 1:
                             db_dict['RefinementRamachandranOutliersTL'] = 'red'
@@ -908,7 +892,7 @@ class parse:
                         db_dict['RefinementRamachandranFavored'] = line.split()[2]
                         if float(line.split()[2]) < 90:
                             db_dict['RefinementRamachandranFavoredTL'] = 'red'
-                        if float(line.split()[2]) >= 90 and float(line.split()[2]) < 98:
+                        if 90 <= float(line.split()[2]) < 98:
                             db_dict['RefinementRamachandranFavoredTL'] = 'orange'
                         if float(line.split()[2]) >= 98:
                             db_dict['RefinementRamachandranFavoredTL'] = 'green'
@@ -1315,7 +1299,7 @@ class queue:
 
     def remove_all_jobs_from_queue(self):
             jobs_in_queue=self.jobs_in_queue()
-            if jobs_in_queue != []:
+            if jobs_in_queue:
                 for job in jobs_in_queue:
                     os.system('qdel '+job[0])
 
@@ -1499,17 +1483,17 @@ class ParseFiles:
                 if line.startswith('REMARK   3   RESOLUTION RANGE HIGH (ANGSTROMS) :'):
                     QualityIndicators['Resolution'] = line.split()[7]
                     if float(line.split()[7]) < 2.4:                                   QualityIndicators['ResolutionColor'] = 'green'
-                    if float(line.split()[7]) >= 2.4 and float(line.split()[7]) < 2.8: QualityIndicators['ResolutionColor'] = 'orange'
+                    if 2.4 <= float(line.split()[7]) < 2.8: QualityIndicators['ResolutionColor'] = 'orange'
                     if float(line.split()[7]) >= 2.8:                                  QualityIndicators['ResolutionColor'] = 'red'
                 if line.startswith('REMARK   3   BOND LENGTHS REFINED ATOMS        (A):'):
                     QualityIndicators['rmsdBonds'] = line.split()[9]
                     if float(line.split()[9]) < 0.02:                                   QualityIndicators['rmsdBondsColor'] = 'green'
-                    if float(line.split()[9]) >= 0.02 and float(line.split()[9]) < 0.03: QualityIndicators['rmsdBondsColor'] = 'orange'
+                    if 0.02 <= float(line.split()[9]) < 0.03: QualityIndicators['rmsdBondsColor'] = 'orange'
                     if float(line.split()[9]) >= 0.03:                                  QualityIndicators['rmsdBondsColor'] = 'red'
                 if line.startswith('REMARK   3   BOND ANGLES REFINED ATOMS   (DEGREES):'):
                     QualityIndicators['rmsdAngles'] = line.split()[9]
                     if float(line.split()[9]) < 2.0:                                   QualityIndicators['rmsdAnglesColor'] = 'green'
-                    if float(line.split()[9]) >= 2.0 and float(line.split()[9]) < 3.0: QualityIndicators['rmsdAnglesColor'] = 'orange'
+                    if 2.0 <= float(line.split()[9]) < 3.0: QualityIndicators['rmsdAnglesColor'] = 'orange'
                     if float(line.split()[9]) >= 3.0:                                  QualityIndicators['rmsdAnglesColor'] = 'red'
 
 
@@ -1523,7 +1507,7 @@ class ParseFiles:
                         QualityIndicators['MolprobityScore'] = line.split()[3]
                         try:
                             if float(line.split()[3]) < 2:                                 QualityIndicators['MolprobityScoreColor'] = 'green'
-                            if float(line.split()[3]) >= 2 and float(line.split()[3]) < 3: QualityIndicators['MolprobityScoreColor'] = 'orange'
+                            if 2 <= float(line.split()[3]) < 3: QualityIndicators['MolprobityScoreColor'] = 'orange'
                             if float(line.split()[3]) >= 3:                                QualityIndicators['MolprobityScoreColor'] = 'red'
                         except ValueError:
                             pass
@@ -1533,7 +1517,7 @@ class ParseFiles:
                         QualityIndicators['RamachandranOutliers'] = line.split()[3]
                         try:
                             if float(line.split()[3]) < 0.3:                                 QualityIndicators['RamachandranOutliersColor'] = 'green'
-                            if float(line.split()[3]) >= 0.3 and float(line.split()[3]) < 1: QualityIndicators['RamachandranOutliersColor'] = 'orange'
+                            if 0.3 <= float(line.split()[3]) < 1: QualityIndicators['RamachandranOutliersColor'] = 'orange'
                             if float(line.split()[3]) >= 1:                                  QualityIndicators['RamachandranOutliersColor'] = 'red'
                         except ValueError:
                             pass
@@ -1543,7 +1527,7 @@ class ParseFiles:
                         QualityIndicators['RamachandranFavored'] = line.split()[2]
                         try:
                             if float(line.split()[2]) < 90:                                  QualityIndicators['RamachandranFavoredColor'] = 'red'
-                            if float(line.split()[2]) >= 90 and float(line.split()[2]) < 98: QualityIndicators['RamachandranFavoredColor'] = 'orange'
+                            if 90 <= float(line.split()[2]) < 98: QualityIndicators['RamachandranFavoredColor'] = 'orange'
                             if float(line.split()[2]) >= 98:                                 QualityIndicators['RamachandranFavoredColor'] = 'green'
                         except ValueError:
                             pass
@@ -1555,7 +1539,7 @@ class ParseFiles:
                 if 'LIG' in line:
                     QualityIndicators['LigandCC'] = line.split()[6]
                     if float(line.split()[6]) < 0.8:                                   QualityIndicators['LigandCCcolor'] = 'red'
-                    if float(line.split()[6]) >= 0.8 and float(line.split()[6]) < 0.9: QualityIndicators['LigandCCcolor'] = 'orange'
+                    if 0.8 <= float(line.split()[6]) < 0.9: QualityIndicators['LigandCCcolor'] = 'orange'
                     if float(line.split()[6]) >= 0.9:                                  QualityIndicators['LigandCCcolor'] = 'green'
 
         # Matrix Weight
@@ -2399,7 +2383,7 @@ class logtools:
                         QualityIndicators['MolprobityScore'] = line.split()[3]
                         try:
                             if float(line.split()[3]) < 2:                                 QualityIndicators['MolprobityScoreColor'] = 'green'
-                            if float(line.split()[3]) >= 2 and float(line.split()[3]) < 3: QualityIndicators['MolprobityScoreColor'] = 'orange'
+                            if 2 <= float(line.split()[3]) < 3: QualityIndicators['MolprobityScoreColor'] = 'orange'
                             if float(line.split()[3]) >= 3:                                QualityIndicators['MolprobityScoreColor'] = 'red'
                         except ValueError:
                             pass
@@ -2409,7 +2393,7 @@ class logtools:
                         QualityIndicators['RamachandranOutliers'] = line.split()[3]
                         try:
                             if float(line.split()[3]) < 0.3:                                 QualityIndicators['RamachandranOutliersColor'] = 'green'
-                            if float(line.split()[3]) >= 0.3 and float(line.split()[3]) < 1: QualityIndicators['RamachandranOutliersColor'] = 'orange'
+                            if 0.3 <= float(line.split()[3]) < 1: QualityIndicators['RamachandranOutliersColor'] = 'orange'
                             if float(line.split()[3]) >= 1:                                  QualityIndicators['RamachandranOutliersColor'] = 'red'
                         except ValueError:
                             pass
@@ -2419,7 +2403,7 @@ class logtools:
                         QualityIndicators['RamachandranFavored'] = line.split()[2]
                         try:
                             if float(line.split()[2]) < 90:                                  QualityIndicators['RamachandranFavoredColor'] = 'red'
-                            if float(line.split()[2]) >= 90 and float(line.split()[2]) < 98: QualityIndicators['RamachandranFavoredColor'] = 'orange'
+                            if 90 <= float(line.split()[2]) < 98: QualityIndicators['RamachandranFavoredColor'] = 'orange'
                             if float(line.split()[2]) >= 98:                                 QualityIndicators['RamachandranFavoredColor'] = 'green'
                         except ValueError:
                             pass

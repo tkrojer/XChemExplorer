@@ -310,7 +310,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         self.ground_state_pdb = ''
         self.ground_state_mean_mtz = ''
         self.panddaDir = ''
-        if ground_state != []:
+        if ground_state:
             self.ground_state = True
             self.ground_state_pdb = ground_state[0]
             self.ground_state_mean_mtz = ground_state[1]
@@ -634,7 +634,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             self.errorList.append(xtal)
 
     def print_errorlist(self):
-        if self.errorList == []:
+        if not self.errorList:
             self.Logfile.insert('XCE did not detect any problems during mmcif file preparation. '
                                 'It is however recommended to check the logfile.')
         else:

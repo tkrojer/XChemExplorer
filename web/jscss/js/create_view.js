@@ -15,7 +15,7 @@ Promise.all( [
 ] ).then( function( ol ){
     var map = ol[ 0 ];
     var struc = ol[ 1 ];
-    struc.autoView(lig_name)
+    struc.autoView(lig_name);
     var surfRepr = map.addRepresentation( "surface", {
         boxSize: 10,
         useWorker: false,
@@ -34,5 +34,5 @@ Promise.all( [
         }
     } );
 } );
-};
+}
 

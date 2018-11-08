@@ -761,7 +761,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
         else:
             self.Logfile.warning('panddaTable seems to be empty!')
 
-        if pandda_models != []:
+        if pandda_models:
             for entry in pandda_models:
                 db_pandda_dict={}
                 xtal=entry[0]
@@ -839,7 +839,7 @@ class synchronise_db_and_filesystem(QtCore.QThread):
 
                 if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'refine.pdb')):
                     ligands_in_file=pdbtools(os.path.join(self.initial_model_directory,xtal,'refine.pdb')).find_xce_ligand_details()
-                    if ligands_in_file == []:
+                    if not ligands_in_file:
                         self.Logfile.warning('{0!s}: could not find any ligands in refine.pdb'.format(xtal))
                         continue
                     else:
@@ -960,8 +960,7 @@ class create_png_and_cif_of_compound(QtCore.QThread):
                     os.system('/bin/rm '+os.path.join(self.initial_model_directory,sampleID,compoundID.replace(' ','')+'.png'))
                 if os.path.isdir(os.path.join(self.initial_model_directory,sampleID,'compound')):
                     os.system('/bin/rm -fr '+os.path.join(self.initial_model_directory,sampleID,'compound'))
-                    db_dict={}
-                    db_dict['RefinementCIFStatus']='pending'
+                    db_dict= {'RefinementCIFStatus': 'pending'}
                     self.Logfile.insert('{0!s}: removed compound directory and all its contents'.format(sampleID))
                     self.Logfile.insert('{0!s}: setting RefinementCIFStatus flag to started'.format(sampleID))
                     self.db.update_data_source(sampleID,db_dict)
@@ -997,9 +996,7 @@ class create_png_and_cif_of_compound(QtCore.QThread):
                                     self.restraints_program )
                 counter += 1
 
-                db_dict={}
-                db_dict['RefinementCIFprogram']=self.restraints_program
-                db_dict['RefinementCIFStatus']='started'
+                db_dict= {'RefinementCIFprogram': self.restraints_program, 'RefinementCIFStatus': 'started'}
                 self.Logfile.insert('{0!s}: setting RefinementCIFStatus flag to started'.format(sampleID))
                 self.db.update_data_source(sampleID,db_dict)
 
@@ -1107,8 +1104,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
 #            else:
 #                uniqueify = 'uniqueify ' + mtzin + ' ' + xtal + '-unique.mtz' + '\n'
 
-            db_dict={}
-            db_dict['DimpleReferencePDB']=ref_pdb
+            db_dict= {'DimpleReferencePDB': ref_pdb}
             db.update_data_source(xtal,db_dict)
 
             self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'creating input script for '+xtal+' in '+visit_run_autoproc)
@@ -1255,8 +1251,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             f.write(Cmds)
             f.close()
             os.system('chmod +x xce_dimple_{0!s}.sh'.format(str(n+1)))
-            db_dict={}
-            db_dict['DimpleStatus']='started'
+            db_dict= {'DimpleStatus': 'started'}
             self.Logfile.insert('{0!s}: setting DataProcessingStatus flag to started'.format(xtal))
             db.update_data_source(xtal,db_dict)
 
@@ -1462,8 +1457,7 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
         f.close()
         self.n+=1
         os.system('chmod +x xce_{0!s}_{1!s}.sh'.format(self.pipeline, str(n+1)))
-        db_dict={}
-        db_dict['DimpleStatus']='started'
+        db_dict= {'DimpleStatus': 'started'}
         self.Logfile.insert('{0!s}: setting DataProcessingStatus flag to started'.format(xtal))
         self.db.update_data_source(xtal,db_dict)
 
@@ -1563,8 +1557,7 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
         f.close()
         self.n+=1
         os.system('chmod +x xce_{0!s}_{1!s}.sh'.format(self.pipeline, str(n+1)))
-        db_dict={}
-        db_dict['DimpleStatus']='started'
+        db_dict= {'DimpleStatus': 'started'}
         self.Logfile.insert('{0!s}: setting DataProcessingStatus flag to started'.format(xtal))
         self.db.update_data_source(xtal,db_dict)
 
@@ -1584,12 +1577,11 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
             if 'FreeR_flag' not in mtz_column_dict['RFREE']:
                 self.Logfile.insert('cannot find FreeR_flag in reference mtz file: {0!s} -> ignoring reference mtzfile!!!'.format(ref_mtz))
                 ref_mtz = ''
-                if mtz_column_dict['RFREE'] != []:
+                if mtz_column_dict['RFREE']:
                     self.Logfile.insert('found Rfree set with other column name though: {0!s}'.format(str(mtz_column_dict['RFREE'])))
                     self.Logfile.insert('try renaming Rfree column to FreeR_flag with CAD!')
 
-        db_dict={}
-        db_dict['DimpleReferencePDB']=ref_pdb
+        db_dict= {'DimpleReferencePDB': ref_pdb}
         self.db.update_data_source(xtal,db_dict)
 
         self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'creating input script for '+xtal+' in '+visit_run_autoproc)
@@ -1676,8 +1668,7 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
         f.close()
         self.n+=1
         os.system('chmod +x xce_{0!s}_{1!s}.sh'.format(self.pipeline, str(n+1)))
-        db_dict={}
-        db_dict['DimpleStatus']='started'
+        db_dict= {'DimpleStatus': 'started'}
         self.Logfile.insert('{0!s}: setting DataProcessingStatus flag to started'.format(xtal))
         self.db.update_data_source(xtal,db_dict)
 
@@ -1908,8 +1899,7 @@ class read_pinIDs_from_gda_logs(QtCore.QThread):
     def update_database(self,pinDict):
         self.Logfile.insert('updating database with pinDIs from GDA logfiles')
         for sample in pinDict:
-            dbDict = {}
-            dbDict['DataCollectionPinBarcode'] = pinDict[sample]
+            dbDict = {'DataCollectionPinBarcode': pinDict[sample]}
             self.db.update_data_source(sample,dbDict)
 
 
@@ -1982,7 +1972,7 @@ class choose_autoprocessing_outcome(QtCore.QThread):
         self.emit(QtCore.SIGNAL("finished()"))
 
     def report_forward_carried_pipelines(self,dbListOut,dbList):
-        if dbListOut == []:
+        if not dbListOut:
             dbListOut = dbList
             self.Logfile.warning('none of the MTZ files fulfilled criteria; will carry forward all results:')
         else:
@@ -2073,7 +2063,7 @@ class choose_autoprocessing_outcome(QtCore.QThread):
                 tmp.append(resultDict)
             if self.selection_mechanism == 'autoProc_staraniso - only' and resultDict['DataProcessingProgram'] == 'aP_staraniso':
                 tmp.append(resultDict)
-        if tmp == []:
+        if not tmp:
             tmp = dbList
         pipelineDict = self.selectHighestScore(tmp)
         return pipelineDict
@@ -2268,7 +2258,7 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
         stuff = []
         for x in glob.glob(os.path.join(folder,'*')):
             stuff.append(x)
-        if stuff == []:
+        if not stuff:
             self.Logfile.warning(
                 '{0!s}: {1!s} is empty; probably waiting for autoprocessing to finish; try later!'.format(xtal, folder))
         else:
