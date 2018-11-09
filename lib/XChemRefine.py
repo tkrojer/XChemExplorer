@@ -404,9 +404,9 @@ class Refine(object):
             '#!'+os.getenv('SHELL')+'\n'
             +pbs_line+
             '\n'
-            +source+
+            + module_load +
             '\n'
-            +module_load+
+            +source+
             'cd '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'\n'
             '\n'
             +refinementStatus+
@@ -930,10 +930,10 @@ class panddaRefine(object):
             '#!'+os.getenv('SHELL')+'\n'
             +pbs_line+
             '\n'
-            +source+
+            + module_load +
             '\n'
+            +source+
             'cd '+self.ProjectPath+'/'+self.xtalID+'\n'
-            +module_load+
             '\n'
             '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(self.datasource,self.xtalID,'RefinementStatus','running') +
             '\n'
@@ -1438,9 +1438,9 @@ class RefineOld(object):
             '#!'+os.getenv('SHELL')+'\n'
             +pbs_line+
             '\n'
-            +source+
+            + module_load +
             '\n'
-            +module_load+
+            + source +
             'cd '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+Serial+'\n'
             '\n'
             '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(self.datasource,self.xtalID,'RefinementStatus','running') +
