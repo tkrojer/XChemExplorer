@@ -797,7 +797,7 @@ class panddaRefine(object):
                 Logfile.insert('found model of modified bound state')
                 os.chdir(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
                 ground_state=os.path.join(self.ProjectPath,self.xtalID,'refine.split.ground-state.pdb')
-                bound_state=os.path.join(self.ProjectPath,self.xtalID,'refine.split.bound-state.pdb')
+                bound_state='refine.modified.pdb'
                 Logfile.insert('running giant.merge_conformations major=%s minor=%s' %(ground_state,bound_state))
 
                 cmd = (
@@ -831,44 +831,19 @@ class panddaRefine(object):
         # checking if multi-state-restraints.refmac.params file is present
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-restraints.refmac.params')):
             # add REFMAC keywords to multi-state-restraints.refmac.params
-            add_params = None
-            with open(os.path.join(self.ProjectPath, self.xtalID, 'extra.params'),'r') as extra_params:
-                add_params = extra_params.read()
-
-            exte_dist = []
-            other_lines = []
-            for line in open('multi-state-restraints.refmac.params','r'):
-                if line.startswith("exte"):
-                    exte_dist.append(line)
-                else:
-                    other_lines.append(line)
-
-            with open('multi-state-restraints.refmac.params','w') as refmacParams:
-
-                for line in exte_dist:
-                    refmacParams.write(line)
-
-                if add_params is not None:
-                    refmacParams.write(add_params)
-
-                for line in other_lines:
-                    refmacParams.write(line)
-
+            with open('multi-state-restraints.refmac.params','a') as refmacParams:
                 refmacParams.write(RefmacParams['BREF']+'\n')
                 refmacParams.write(RefmacParams['TLS']+'\n')
                 refmacParams.write(RefmacParams['TWIN']+'\n')
-                refmacParams.write('ncyc '+ RefmacParams['NCYCLES']+'\n')
+                refmacParams.write('ncyc '+RefmacParams['NCYCLES']+'\n')
                 if str(RefmacParams['MATRIX_WEIGHT']).lower() == 'auto':
                     refmacParams.write('weight AUTO' + '\n')
                 else:
                     refmacParams.write('weight matrix '+str(RefmacParams['MATRIX_WEIGHT'])+'\n')
                 refmacParams.write(RefmacParams['TLSADD']+'\n')
-
-
         else:
             Logfile.error('cannot find multi-state-restraints.refmac.params in %s; aborting...' %os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
             return None
-
 
         #######################################################
         # we write 'REFINEMENT_IN_PROGRESS' immediately to avoid unncessary refinement
@@ -1021,7 +996,6 @@ class panddaRefine(object):
 
         Logfile.insert('writing refinement shell script to'+os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'refmac.csh'))
         cmd = open(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'refmac.csh'),'w')
-        Logfile.insert(refmacCmds)
         cmd.write(refmacCmds)
         cmd.close()
 
