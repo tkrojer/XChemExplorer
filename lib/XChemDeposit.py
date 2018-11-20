@@ -367,7 +367,8 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 if not self.add_apo_sf_mmcif_to_ground_state_mmcif():
                     continue
 
-
+                if not self.add_data_increment_to_apo_mmcif():
+                    continue
 
 
             else:
@@ -902,6 +903,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             fileStatus = True
         return fileStatus
 
+
     def add_apo_sf_mmcif_to_ground_state_mmcif(self):
         os.chdir(self.projectDir)
         self.Logfile.insert('checking pandda directory for apo mmcif files: '+self.panddaDir)
@@ -934,6 +936,48 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                         counter += 1
                     else:
                         f.write(line)
+        f.close()
+
+    def add_data_increment_to_apo_mmcif(self):
+        self.Logfile.insert('inrementing data_rxxxxsf in ground-state_sf.mmcif')
+        x = ['','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
+
+#        s = 'data_rxxxxsf'
+#        a = 0
+#        b = 0
+#        c = 0
+#        for m in range(150):
+#            if a == len(x):
+#                a = 1
+#                b += 1
+#            if b == len(x):
+#                a = 1
+#                b = 1
+#                c += 1
+#        print m,s.replace('xsf','s%ssf' %str(x[a]+x[b]+x[c]))
+#        a += 1
+
+        foundFirstLine = False
+        if os.path.isfile(os.path.join(dirs,xtal+'_sf.mmcif')):
+            f = open('ground_state_sf.mmcif','a')
+            for n,line in enumerate(open(os.path.join(dirs,xtal+'_sf.mmcif'))):
+                if line.startswith('data_rxxxxsf') and not foundFirstLine:
+                    foundFirstLine = True
+                if line.startswith('data_rxxxxsf') and foundFirstLine:
+                    newLine = line
+                    if a == len(x):
+                        a = 1
+                        b += 1
+                    if b == len(x):
+                        a = 1
+                        b = 1
+                        c += 1
+                    newLine = line.replace('xsf','s%ssf' %str(x[a]+x[b]+x[c]))
+                    f.write(newLine)
+                else:
+                    f.write(line)
+                a += 1
+
         f.close()
 
 
