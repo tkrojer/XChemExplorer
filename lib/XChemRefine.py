@@ -915,6 +915,10 @@ class panddaRefine(object):
                 'labin F1=DELFWT PHI=PHDELWT\n'
                 'EOF\n'   )
         elif refinementProtocol=='pandda_phenix':
+
+            if os.getcwd().startswith('/dls'):
+                module_load = 'module load phenix/1.13\n'
+
             refinementProgram='phenix'
             refinementParams=os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'multi-state-restraints.phenix.params')
             mapCalculation = (
@@ -948,6 +952,13 @@ class panddaRefine(object):
             " split_conformations='False'"
             '\n'
             'cd '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(panddaSerial)+'\n'
+            
+            'ln -s '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(panddaSerial)+'/refine_'+str(Serial)+'_001.pdb '
+            +self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(panddaSerial)+'/refine_'+str(Serial)+'.pdb' +'\n'
+             
+            'ln -s '+self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(panddaSerial)+'/refine_'+str(Serial)+'_001.mtz '
+            +self.ProjectPath+'/'+self.xtalID+'/Refine_'+str(panddaSerial)+'/refine_'+str(Serial)+'.mtz' +'\n'
+
             'giant.split_conformations'
             " input.pdb='refine_%s.pdb'" %str(Serial)+
             ' reset_occupancies=False'
