@@ -852,7 +852,7 @@ class panddaRefine(object):
                 found_lig = False
                 for lig in ligandsInFile:
                     if lig[0] in knowLigandIDs:
-                        Logfile.insert('found ligand of type: ' + lig)
+                        Logfile.insert('found ligand of type: ' + lig[0])
                         found_lig = True
                 if found_lig:
                     Logfile.warning('giant.make_restraints was not able to create multi-state-restraints.refmac.params. ' +
