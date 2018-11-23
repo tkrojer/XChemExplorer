@@ -21,9 +21,13 @@ Operating Systems:
 - Mac OSX
 
 <b>Windows users: </b>
+
 Potential solutions:
+
 a) Partition your hard drive and install a light-weight version of linux, such as Ubuntu (https://www.ubuntu.com/download/desktop)
-b) Install Ubuntu (or other) on a USB drive, and boot from that: https://tutorials.ubuntu.com/tutorial/tutorial-create-a-usb-stick-on-ubuntu#0
+
+b) Install Ubuntu (or other) on a USB drive, and boot from that: https://tutorials.ubuntu.com/tutorial/tutorial-create-a-usb-stick-on-windows#0
+
 c) VirtualBox - emulate a linux environment on your Windows desktop (https://www.virtualbox.org)
 
 Prerequisites:
