@@ -18,6 +18,7 @@ import time
 
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 import XChemLog
+from XChemUtils import pdbtools
 
 
 def GetSerial(ProjectPath,xtalID):
@@ -842,8 +843,26 @@ class panddaRefine(object):
                     refmacParams.write('weight matrix '+str(RefmacParams['MATRIX_WEIGHT'])+'\n')
                 refmacParams.write(RefmacParams['TLSADD']+'\n')
         else:
-            Logfile.error('cannot find multi-state-restraints.refmac.params in %s; aborting...' %os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
-            return None
+            Logfile.warning('cannot find multi-state-restraints.refmac.params in %s!' %os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
+            Logfile.insert('checking if %s-ensemble-model.pdb contains residue of type LIG, DRG, FRG, UNK or UNL' %self.xtalID)
+            knowLigandIDs = ['LIG', 'DRG', 'FRG', 'UNK', 'UNL']
+            ligandsInFile = pdbtools(self.xtalID+'-ensemble-model.pdb').find_ligands()
+            found_lig = False
+            for lig in knowLigandIDs:
+                if lig in ligandsInFile:
+                    Logfile.insert('found ligand of type: ' + lig)
+                    found_lig = True
+            if found_lig:
+                Logfile.warning('giant.make_restraints was not able to create multi-state-restraints.refmac.params. ' +
+                                'Something may have gone wrong, but it could be that ligand binding did not lead to ' +
+                                'displacement of water molecules or rearrangement of protein side-chains. ' +
+                                'Hence, there is no difference between the bound-state and the ground-state. ' +
+                                'We will create an empty multi-state-restraints.refmac.params which may contain ' +
+                                'additional REFMAC keywords and otherwise try to continue with refinement')
+                os.system('touch multi-state-restraints.refmac.params')
+            else:
+                Logfile.error('%s-ensemble-model.pdb does not contain any modelled ligand; aborting refinement' %self.xtalID)
+                return None
 
         #######################################################
         # we write 'REFINEMENT_IN_PROGRESS' immediately to avoid unncessary refinement
