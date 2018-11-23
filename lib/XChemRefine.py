@@ -745,6 +745,9 @@ class panddaRefine(object):
         # panddaSerial because giant.quick_refine writes Refine_0001 instead of Refine_1
         panddaSerial=(4-len(str(Serial)))*'0'+str(Serial)
 
+        make_all_links = True
+        add_links_line = ''
+
         # first check if refinement is ongoing and exit if yes
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'REFINEMENT_IN_PROGRESS')):
 #            coot.info_dialog('*** REFINEMENT IN PROGRESS ***')
@@ -818,6 +821,10 @@ class panddaRefine(object):
                 Logfile.warning('This may be a case where there are no differences between bound and ground state')
                 Logfile.warning('creating symbolic link: ln -s refine.modified.pdb %s-ensemble-model.pdb' %self.xtalID)
                 os.system('ln -s refine.modified.pdb %s-ensemble-model.pdb' %self.xtalID)
+                # note: after first cycle of refinement, REFMAC will remove alternate conformer from the ligand
+                #       i.e. need to link refine.pdb to refine.split.bound-state.pdb
+                make_all_links = False
+                add_links_line = 'ln -s refine.pdb refine.split.bound-state.pdb'
                 Logfile.insert('trying to continue with refinement')
             else:
                 Logfile.error('cannot find any suitable PDB file for refinement, aborting...')
@@ -959,6 +966,15 @@ class panddaRefine(object):
                 'labin F1=FOFCWT PHI=PHFOFCWT\n'
                 'EOF\n'   )
 
+        if make_all_links:
+            add_links_line = (
+            'ln -s Refine_%s/refine_%s.split.bound-state.pdb ./refine.split.bound-state.pdb\n' %(panddaSerial,Serial)+
+            'ln -s Refine_%s/refine_%s.split.ground-state.pdb ./refine.split.ground-state.pdb\n' %(panddaSerial,Serial)+
+            'ln -s Refine_%s/refine_%s.output.bound-state.pdb ./refine.output.bound-state.pdb\n' %(panddaSerial,Serial)+
+            'ln -s Refine_%s/refine_%s.output.ground-state.pdb ./refine.output.ground-state.pdb\n' %(panddaSerial,Serial)
+            )
+
+
         refmacCmds = (
             '#!'+os.getenv('SHELL')+'\n'
             +pbs_line+
@@ -1001,10 +1017,9 @@ class panddaRefine(object):
             '\n'
             'ln -s Refine_%s/validate_ligands.txt .\n' %panddaSerial+
             'ln -s Refine_%s/refine_molprobity.log .\n' %panddaSerial+
-            'ln -s Refine_%s/refine_%s.split.bound-state.pdb ./refine.split.bound-state.pdb\n' %(panddaSerial,Serial)+
-            'ln -s Refine_%s/refine_%s.split.ground-state.pdb ./refine.split.ground-state.pdb\n' %(panddaSerial,Serial)+
-            'ln -s Refine_%s/refine_%s.output.bound-state.pdb ./refine.output.bound-state.pdb\n' %(panddaSerial,Serial)+
-            'ln -s Refine_%s/refine_%s.output.ground-state.pdb ./refine.output.ground-state.pdb\n' %(panddaSerial,Serial)+
+            '\n'
+            + add_links_line +
+            '\n'
             'mmtbx.validation_summary refine.pdb > validation_summary.txt\n'
             '\n'
             + mapCalculation +
