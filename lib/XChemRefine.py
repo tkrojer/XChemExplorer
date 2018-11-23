@@ -812,8 +812,15 @@ class panddaRefine(object):
                 Logfile.error('cannot find modified version of bound state in %s' %os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
                 return None
         else:
-            Logfile.error('cannot find model of ground state, aborting...')
-            return None
+            if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'refine.modified.pdb')):
+                Logfile.warning('%s: ground-state model does not exist, but refine.modified.pdb does exist' %self.xtalID)
+                Logfile.warning('This may be a case where there are no differences between bound and ground state')
+                Logfile.warning('creating symbolic link: ln -s refine.modified.pdb %s-ensemble-model.pdb' %self.xtalID)
+                os.system('ln -s refine.modified.pdb %s-ensemble-model.pdb' %self.xtalID)
+                Logfile.insert('trying to continue with refinement')
+            else:
+                Logfile.error('cannot find any suitable PDB file for refinement, aborting...')
+                return None
 
 
         #######################################################
