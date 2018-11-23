@@ -813,6 +813,7 @@ class panddaRefine(object):
                 return None
         else:
             if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'refine.modified.pdb')):
+                os.chdir(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
                 Logfile.warning('%s: ground-state model does not exist, but refine.modified.pdb does exist' %self.xtalID)
                 Logfile.warning('This may be a case where there are no differences between bound and ground state')
                 Logfile.warning('creating symbolic link: ln -s refine.modified.pdb %s-ensemble-model.pdb' %self.xtalID)
