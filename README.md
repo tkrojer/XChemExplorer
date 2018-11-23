@@ -20,6 +20,12 @@ Operating Systems:
 - Linux
 - Mac OSX
 
+<b>Windows users: </b>
+Potential solutions:
+a) Partition your hard drive and install a light-weight version of linux, such as Ubuntu (https://www.ubuntu.com/download/desktop)
+b) Install Ubuntu (or other) on a USB drive, and boot from that: https://tutorials.ubuntu.com/tutorial/tutorial-create-a-usb-stick-on-ubuntu#0
+c) VirtualBox - emulate a linux environment on your Windows desktop (https://www.virtualbox.org)
+
 Prerequisites:
 - CCP4 version 7.0 (or higher)
 - PHENIX (optional, but recommended)
