@@ -52,4 +52,45 @@ cd XChemExplorer/
 alias xce="<full_path_to_local_git_repository>/XChemExplorer_local.sh"
 ```
 
+## For Diamond users: Accessing your data on your local machine
 
+For XChemExplorer to work with your data from Diamond, you will need to mirror diamond's filesystem on your local machine. This can be done in a number of ways, but here is our reccommended route. (NB: sudo access - i.e. your system administrators - may be required)
+
+1. Install FUSE (Filesystem in Userspace) - more info: https://github.com/libfuse/libfuse
+
+Linux distributions:
+```
+sudo yum install fuse-utils sshfs
+```
+
+MacOS: https://osxfuse.github.io
+
+2. Create a mountpoint for the diamond filesystem in your root directory (may require root/sudo access):
+```
+sudo mkdir /dls
+```
+
+3. Change ownership of /dls from sudo/root to yourself:
+```
+sudo chown <user>:<group> /dls
+```
+
+4. Now, you should be able to mount the Diamond filesytem with:
+```
+sshfs <fed_id>@nx.diamond.ac.uk:/dls /dls
+```
+
+5. To run XCE: change directory to your project directory, and then launch your local version (described in installation section):
+```
+# change to project directory
+cd /dls/labxchem/data/2016/lb13385-10/processing
+
+# launch XCE with local version script
+<path-to-local-install>/XChemExplorer_local.sh
+
+```
+
+6. And finally, when you are done unmount Diamond's drives:
+```
+fusermount -u /dls
+```
