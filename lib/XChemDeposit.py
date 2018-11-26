@@ -941,6 +941,9 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
     def add_data_increment_to_apo_mmcif(self):
         self.Logfile.insert('inrementing data_rxxxxsf in ground-state_sf.mmcif')
         x = ['','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
+        a = 0
+        b = 0
+        c = 0
 
         foundFirstLine = False
         if os.path.isfile(os.path.join(self.panddaDir,'ground_state_sf.mmcif')):
