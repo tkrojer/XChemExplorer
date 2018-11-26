@@ -20,21 +20,21 @@ Operating Systems:
 - Linux
 - Mac OSX
 
-<b>Windows users: </b>
-
-Potential solutions:
-
-a) Partition your hard drive and install a light-weight version of linux, such as Ubuntu (https://www.ubuntu.com/download/desktop)
-
-b) Install Ubuntu (or other) on a USB drive, and boot from that: https://tutorials.ubuntu.com/tutorial/tutorial-create-a-usb-stick-on-windows#0
-
-c) VirtualBox - emulate a linux environment on your Windows desktop (https://www.virtualbox.org)
-
 Prerequisites:
 - CCP4 version 7.0 (or higher)
 - PHENIX (optional, but recommended)
 
 <b>Please note:</b> The recommended installation process, described below, includes an install of CCP4. This is so that we know that our code works with the version of CCP4, rather than your system version, making user support much easier
+
+## Windows users:
+
+Potential solutions:
+
+a) Partition your hard drive and install a light-weight version of linux, such as Ubuntu: https://www.ubuntu.com/download/desktop
+
+b) Install Ubuntu (or other) on a USB drive, and boot from that: https://tutorials.ubuntu.com/tutorial/tutorial-create-a-usb-stick-on-windows#0 (NB: This will require a huge USB stick or external hard drive - ccp4 is a large package)
+
+c) VirtualBox - emulate a linux environment on your Windows desktop: https://www.virtualbox.org
 
 ## Installation
 1. Clone the github repository onto your machine with:
