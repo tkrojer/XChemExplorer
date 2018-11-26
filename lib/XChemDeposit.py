@@ -366,9 +366,11 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
                 if not self.add_apo_sf_mmcif_to_ground_state_mmcif():
                     continue
+                print 'aaaaaaaaaaaaa'
 
                 if not self.add_data_increment_to_apo_mmcif():
                     continue
+                print 'bbbbbbbbbbbbb'
 
 
             else:
