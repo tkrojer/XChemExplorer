@@ -907,8 +907,6 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
 
     def add_apo_sf_mmcif_to_ground_state_mmcif(self):
-        print 'STOPP'
-        quit()
         os.chdir(self.projectDir)
         self.Logfile.insert('checking pandda directory for apo mmcif files: '+self.panddaDir)
         f = open('ground_state_sf.mmcif','a')
@@ -941,6 +939,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                     else:
                         f.write(line)
         f.close()
+        return True
 
     def add_data_increment_to_apo_mmcif(self):
         self.Logfile.insert('inrementing data_rxxxxsf in ground-state_sf.mmcif')
@@ -968,6 +967,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 a += 1
 
         f.close()
+        return True
 
 
     def event_maps_exist_in_sf_mmcif(self,xtal):
