@@ -963,8 +963,8 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                         b = 1
                         c += 1
                     newLine = line.replace('xsf','s%ssf' %str(x[a]+x[b]+x[c]))
-                    print newLine
                     datasetCounter += 1
+                    print datasetCounter, newLine
                     f.write(newLine)
                     a += 1
                     if datasetCounter % 50 == 0:
