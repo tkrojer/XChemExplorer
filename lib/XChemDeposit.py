@@ -960,6 +960,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                         a = 1
                         b = 1
                         c += 1
+                    print 'a,b,c',a,b,c
                     newLine = line.replace('xsf','s%ssf' %str(x[a]+x[b]+x[c]))
                     print newLine
                     f.write(newLine)
