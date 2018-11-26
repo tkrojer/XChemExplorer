@@ -946,12 +946,14 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         c = 0
 
         foundFirstLine = False
+        datasetCounter = 0
         if os.path.isfile(os.path.join(self.panddaDir,'ground_state_sf.mmcif')):
             f = open('ground_state_sf.mmcif','a')
             for n,line in enumerate(open(os.path.join(self.panddaDir,'ground_state_sf.mmcif'))):
                 if line.startswith('data_rxxxxsf') and not foundFirstLine:
                     foundFirstLine = True
                     a += 1
+                    f.write(line)
                 elif line.startswith('data_rxxxxsf') and foundFirstLine:
                     if a == len(x):
                         a = 1
@@ -960,13 +962,15 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                         a = 1
                         b = 1
                         c += 1
-                    print 'a,b,c',a,b,c
                     newLine = line.replace('xsf','s%ssf' %str(x[a]+x[b]+x[c]))
                     print newLine
+                    datasetCounter += 1
                     f.write(newLine)
                     a += 1
                 else:
                     f.write(line)
+                if datasetCounter % 50 == 0:
+                    self.Logfile.insert('%s data_rxxxxsf records edited...' %str(datasetCounter))
 
         f.close()
         return True
