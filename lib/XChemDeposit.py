@@ -958,7 +958,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 #        a += 1
 
         foundFirstLine = False
-        if os.path.isfile(os.path.join(dirs,xtal+'_sf.mmcif')):
+        if os.path.isfile(os.path.join(self.panddaDir,xtal+'_sf.mmcif')):
             f = open('ground_state_sf.mmcif','a')
             for n,line in enumerate(open(os.path.join(dirs,xtal+'_sf.mmcif'))):
                 if line.startswith('data_rxxxxsf') and not foundFirstLine:
