@@ -946,6 +946,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         c = 0
 
         foundFirstLine = False
+        foundCulprit = False
         datasetCounter = 0
         if os.path.isfile(os.path.join(self.panddaDir,'ground_state_sf.mmcif')):
             f = open('ground_state_sf.mmcif','a')
@@ -971,6 +972,11 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                         self.Logfile.insert('%s data_rxxxxsf records edited...' %str(datasetCounter))
                 else:
                     f.write(line)
+                if datasetCounter == 599:
+                    foundCulprit = True
+                if foundCulprit:
+                    print line
+
 
         f.close()
         return True
