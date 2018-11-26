@@ -943,9 +943,9 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         x = ['','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
 
         foundFirstLine = False
-        if os.path.isfile(os.path.join(self.panddaDir,ground_state_sf.mmcif)):
+        if os.path.isfile(os.path.join(self.panddaDir,'ground_state_sf.mmcif')):
             f = open('ground_state_sf.mmcif','a')
-            for n,line in enumerate(open(os.path.join(self.panddaDir,ground_state_sf.mmcif))):
+            for n,line in enumerate(open(os.path.join(self.panddaDir,'ground_state_sf.mmcif'))):
                 if line.startswith('data_rxxxxsf') and not foundFirstLine:
                     foundFirstLine = True
                 if line.startswith('data_rxxxxsf') and foundFirstLine:
