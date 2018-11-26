@@ -951,8 +951,8 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             for n,line in enumerate(open(os.path.join(self.panddaDir,'ground_state_sf.mmcif'))):
                 if line.startswith('data_rxxxxsf') and not foundFirstLine:
                     foundFirstLine = True
-                if line.startswith('data_rxxxxsf') and foundFirstLine:
-                    newLine = line
+                    a += 1
+                elif line.startswith('data_rxxxxsf') and foundFirstLine:
                     if a == len(x):
                         a = 1
                         b += 1
@@ -964,9 +964,9 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                     newLine = line.replace('xsf','s%ssf' %str(x[a]+x[b]+x[c]))
                     print newLine
                     f.write(newLine)
+                    a += 1
                 else:
                     f.write(line)
-                a += 1
 
         f.close()
         return True
