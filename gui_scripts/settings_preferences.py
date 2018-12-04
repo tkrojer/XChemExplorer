@@ -437,6 +437,11 @@ class setup():
                                                ]],
                                 'F: help': ["&Help",
                                             [
+                                                ['Open XCE manual', '',
+                                                 lambda: setup().openFile(
+                                                     "/dls/science/groups/i04-1/software/XCE_manual_2018-11-09.pdf"
+                                                 )
+                                                 ],
                                                 ['Open XCE tutorial', '',
                                                  lambda: setup().openFile(
                                                      "/dls/science/groups/i04-1/software/docs/XChemExplorer.pdf")],
