@@ -358,17 +358,17 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 if not self.create_model_mmcif(xtal):
                     continue
 
-                if not self.create_sf_mmcif(xtal):
-                    continue
-
-                if not self.apo_mmcif_exists():
-                    continue
-
-                if not self.add_apo_sf_mmcif_to_ground_state_mmcif():
-                    continue
-
-                if not self.add_data_increment_to_apo_mmcif():
-                    continue
+#                if not self.create_sf_mmcif(xtal):
+#                    continue
+#
+#                if not self.apo_mmcif_exists():
+#                    continue
+#
+#                if not self.add_apo_sf_mmcif_to_ground_state_mmcif():
+#                    continue
+#
+#                if not self.add_data_increment_to_apo_mmcif():
+#                    continue
 
             else:
                 if not self.mmcif_files_can_be_replaced(xtal):
@@ -740,6 +740,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                    ' -r {0!s}'.format(refSoft) +
                    ' -iPDB {0!s}'.format(self.ground_state_pdb) +
                    ' -e MR'
+                   ' -iLOG {0!s}.log'.format(self.ground_state.replace('.pdb','.log')) +
                    ' -iENT data_template.cif'
                    ' -o {0!s}.mmcif > {1!s}.mmcif.log'.format(xtal, xtal))
         else:
@@ -966,23 +967,12 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                         c += 1
                     newLine = line.replace('xsf','s%ssf' %str(x[a]+x[b]+x[c]))
                     datasetCounter += 1
-                    print datasetCounter, newLine
                     f.write(newLine)
                     a += 1
                     if datasetCounter % 50 == 0:
                         self.Logfile.insert('%s data_rxxxxsf records edited...' %str(datasetCounter))
                 else:
                     f.write(line)
-#                if datasetCounter == 599:
-#                    foundCulprit = True
-#                if foundCulprit:
-#                    print line
-#                    print 'a',a,'b',b,'c',c
-#                    print 'n',n
-#                    print 'newLine',newLine
-#                    quit()
-
-
             f.close()
         os.chdir(self.panddaDir)
         os.system('/bin/mv ground_state_sf_tmp.mmcif ground_state_sf.mmcif')
