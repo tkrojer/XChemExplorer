@@ -367,8 +367,8 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 if not self.add_apo_sf_mmcif_to_ground_state_mmcif():
                     continue
 
-                if not self.add_data_increment_to_apo_mmcif():
-                    continue
+#                if not self.add_data_increment_to_apo_mmcif():
+#                    continue
 
             else:
                 if not self.mmcif_files_can_be_replaced(xtal):
@@ -936,6 +936,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                     else:
                         f.write(line)
         f.close()
+        self.Logfile.insert('added %s apo mmcif files to ground-state mmcif' %str(counter))
         return True
 
     def add_data_increment_to_apo_mmcif(self):
