@@ -976,6 +976,10 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                     foundCulprit = True
                 if foundCulprit:
                     print line
+                    print 'a',a,'b',b,'c',c
+                    print 'n',n
+                    print 'newLine',newLine
+                    quit()
 
 
         f.close()
