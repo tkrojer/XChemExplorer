@@ -367,8 +367,8 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 if not self.add_apo_sf_mmcif_to_ground_state_mmcif():
                     continue
 
-#                if not self.add_data_increment_to_apo_mmcif():
-#                    continue
+                if not self.add_data_increment_to_apo_mmcif():
+                    continue
 
             else:
                 if not self.mmcif_files_can_be_replaced(xtal):
@@ -950,7 +950,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         foundCulprit = False
         datasetCounter = 0
         if os.path.isfile(os.path.join(self.panddaDir,'ground_state_sf.mmcif')):
-            f = open('ground_state_sf.mmcif','a')
+            f = open('ground_state_sf_tmp.mmcif','w')
             for n,line in enumerate(open(os.path.join(self.panddaDir,'ground_state_sf.mmcif'))):
                 if line.startswith('data_rxxxxsf') and not foundFirstLine:
                     foundFirstLine = True
@@ -973,17 +973,17 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                         self.Logfile.insert('%s data_rxxxxsf records edited...' %str(datasetCounter))
                 else:
                     f.write(line)
-                if datasetCounter == 599:
-                    foundCulprit = True
-                if foundCulprit:
-                    print line
-                    print 'a',a,'b',b,'c',c
-                    print 'n',n
-                    print 'newLine',newLine
-                    quit()
+#                if datasetCounter == 599:
+#                    foundCulprit = True
+#                if foundCulprit:
+#                    print line
+#                    print 'a',a,'b',b,'c',c
+#                    print 'n',n
+#                    print 'newLine',newLine
+#                    quit()
 
 
-        f.close()
+            f.close()
         return True
 
 
