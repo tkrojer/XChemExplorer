@@ -112,7 +112,7 @@ class SettingsTab():
             (xce_object.data_collection_vbox_for_settings,
              '\n\n<b>PANDDAs directory: - OPTIONAL -</b>',
              xce_object.panddas_directory,
-             'Select PANNDAs Directory',
+             'Select PanDDA Directory',
              xce_object.settings_button_clicked)
 
         xce_object.html_export_directory_label = self.layout_funcs.settings_section_setup \
