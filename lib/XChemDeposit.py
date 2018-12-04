@@ -984,6 +984,8 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
 
             f.close()
+        os.chdir(self.panddaDir)
+        os.system('/bin/mv ground_state_sf_tmp.mmcif ground_state_sf.mmcif')
         return True
 
 
