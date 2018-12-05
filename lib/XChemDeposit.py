@@ -740,8 +740,8 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                    ' -r {0!s}'.format(refSoft) +
                    ' -iPDB {0!s}'.format(self.ground_state_pdb) +
                    ' -e MR'
-#                   ' -s AIMLESS'
-#                   ' -iLOG {0!s}.log'.format(self.ground_state_pdb.replace('.pdb','.log')) +
+                   ' -s AIMLESS'
+                   ' -iLOG {0!s}.log'.format(self.ground_state_pdb.replace('.pdb','.log')) +
                    ' -iENT data_template.cif'
                    ' -o {0!s}.mmcif > {1!s}.mmcif.log'.format(xtal, xtal))
         else:
