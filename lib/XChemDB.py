@@ -207,6 +207,8 @@ class data_source:
             ['Deposition_mmCIF_model_file',                 'Deposition_mmCIF_model_file',                  'TEXT',                 0],
             ['Deposition_mmCIF_SF_file',                    'Deposition_mmCIF_SF_file',                     'TEXT',                 0],
 
+            ['Label',                                       'Label',                                        'TEXT',                 0],
+
             ['AssayIC50',                                   'AssayIC50',                                    'TEXT',                 0],
             ['LastUpdated',                                 'LastUpdated',                                  'TEXT',                 0],
             ['LastUpdated_by',                              'LastUpdated_by',                               'TEXT',                 0]
@@ -457,6 +459,11 @@ class data_source:
             ['LastUpdated_by',              'LastUpdated_by',               'TEXT'                  ]
         ]
 
+        self.label_table_columns = [
+            ['ID',                          'ID',                           'INTEGER PRIMARY KEY'   ],
+            ['Label',                       'Label',                        'TEXT'                  ],
+            ['Description',                 'Description',                  'TEXT'                  ],
+        ]
 
 
     def columns_not_to_display(self):
@@ -483,7 +490,8 @@ class data_source:
                         'panddaTable':      self.pandda_table_columns,
                         'depositTable':     self.deposition_table_columns,
                         'collectionTable':  self.data_collection_columns,
-                        'zenodoTable':      self.zenodo_table_columns   }
+                        'zenodoTable':      self.zenodo_table_columns,
+                        'labelTable':       self.label_table_columns    }
 
         for table in tableDict:
             cursor.execute("create table if not exists "+table+" (ID INTEGER);")
@@ -1886,3 +1894,23 @@ class data_source:
 
         return ligConfidence
 
+    def get_labels_from_db(self):
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+        cursor.execute('select label from labelTable')
+        labels = cursor.fetchall()
+        labelList = []
+        for l in labels:
+            labelList.append(l[0])
+        return labelList
+
+    def get_label_of_sample(self,xtalID):
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+        cursor.execute("select label from mainTable where CrystalName is '%s'" %xtalID)
+        label = None
+        lab = cursor.fetchall()
+        for l in lab:
+            label = l[0]
+            break
+        return label
