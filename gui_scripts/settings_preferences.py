@@ -443,7 +443,11 @@ class setup():
                                                 ['Troubleshooting', '',
                                                  lambda: setup().openFile(
                                                      "/dls/science/groups/i04-1/software/xce_troubleshooting.pdf")]
-                                            ]]
+                                            ]],
+                                'G: labels': ["&Labels",
+                                               [
+                                                   ['Edit label information', '', xce_object.add_label_information]
+                                               ]]
 
                                 }
 

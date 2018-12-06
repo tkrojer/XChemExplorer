@@ -358,17 +358,17 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 if not self.create_model_mmcif(xtal):
                     continue
 
-#                if not self.create_sf_mmcif(xtal):
-#                    continue
-#
-#                if not self.apo_mmcif_exists():
-#                    continue
-#
-#                if not self.add_apo_sf_mmcif_to_ground_state_mmcif():
-#                    continue
-#
-#                if not self.add_data_increment_to_apo_mmcif():
-#                    continue
+                if not self.create_sf_mmcif(xtal):
+                    continue
+
+                if not self.apo_mmcif_exists():
+                    continue
+
+                if not self.add_apo_sf_mmcif_to_ground_state_mmcif():
+                    continue
+
+                if not self.add_data_increment_to_apo_mmcif():
+                    continue
 
             else:
                 if not self.mmcif_files_can_be_replaced(xtal):

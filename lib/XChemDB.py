@@ -503,6 +503,12 @@ class data_source:
                 if column[0] not in existing_columns:
                     cursor.execute("alter table " + table + " add column '" + column[0] + "' '" + column[2] + "'")
                     connect.commit()
+            if table == 'labelTable':
+                cursor.execute('select ID from labelTable')
+                id = cursor.fetchall()
+                if id == []:
+                    for idx in range(5):
+                        cursor.execute("insert into labelTable (ID) Values (%s)" %str(idx+1))
 
 #        existing_columns=[]
 #        connect=sqlite3.connect(self.data_source_file)
@@ -1897,11 +1903,21 @@ class data_source:
     def get_labels_from_db(self):
         connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
         cursor = connect.cursor()
-        cursor.execute('select label from labelTable')
+        cursor.execute('select Label from labelTable')
         labels = cursor.fetchall()
         labelList = []
         for l in labels:
             labelList.append(l[0])
+        return labelList
+
+    def get_label_info_from_db(self):
+        connect=sqlite3.connect(self.data_source_file)     # creates sqlite file if non existent
+        cursor = connect.cursor()
+        cursor.execute('select Label,Description from labelTable')
+        labels = cursor.fetchall()
+        labelList = []
+        for l in labels:
+            labelList.append([str(l[0]),str(l[1])])
         return labelList
 
     def get_label_of_sample(self,xtalID):

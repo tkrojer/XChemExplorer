@@ -850,6 +850,60 @@ class XChemExplorer(QtGui.QApplication):
         pdbID_entryLayout.addLayout(vbox, 0, 0)
         pdbID_entry.exec_();
 
+
+    def add_label_information(self):
+        label_entry = QtGui.QMessageBox()
+        label_entryLayout = label_entry.layout()
+
+        try:
+            labelInfo = self.db.get_label_info_from_db()
+        except AttributeError:
+            self.update_log.warning('please specify DB file first')
+            return None
+
+        vbox = QtGui.QVBoxLayout()
+
+        frame = QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+
+        grid = QtGui.QGridLayout()
+        grid.addWidget(QtGui.QLabel('label'), 0, 0)
+        grid.addWidget(QtGui.QLabel('description'), 0, 1)
+
+        self.remote_qsub_command = QtGui.QLineEdit()
+        self.remote_qsub_command.setFixedWidth(550)
+        self.remote_qsub_command.setText(self.remote_qsub_submission)
+
+        self.labelList = []
+        for i in range(5):
+            labelEdit = QtGui.QLineEdit()
+            descriptionEdit = QtGui.QLineEdit()
+            grid.addWidget(labelEdit, i + 1, 0)
+            grid.addWidget(descriptionEdit, i + 1, 1)
+            try:
+                labelEdit.setText(labelInfo[i][0])
+                descriptionEdit.setText(labelInfo[i][1])
+            except IndexError:
+                labelEdit.setText('')
+                descriptionEdit.setText('')
+            labelEdit.setFixedWidth(100)
+            descriptionEdit.setFixedWidth(500)
+            self.labelList.append([labelEdit,descriptionEdit])
+        frame.setLayout(grid)
+        vbox.addWidget(frame)
+
+        hbox = QtGui.QHBoxLayout()
+        button = QtGui.QPushButton('Update Database')
+        button.clicked.connect(self.update_database_with_labelInfo)
+        hbox.addWidget(button)
+
+        vbox.addLayout(hbox)
+        label_entryLayout.addLayout(vbox, 0, 0)
+        label_entry.exec_();
+
+
+
+
     def create_missing_apo_records_in_depositTable(self):
         self.db.create_missing_apo_records_for_all_structures_in_depositTable(self.initial_model_directory,
                                                                               self.xce_logfile)
@@ -1690,6 +1744,13 @@ class XChemExplorer(QtGui.QApplication):
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
         self.work_thread.start()
+
+    def update_database_with_labelInfo(self):
+        for l in self.labelList:
+            label = str(l[0].text())
+            description = str(l[1].text())
+            self.db.execute_statement("update labelTable set Label='%s',set Description='%s'" %(label,description))
+            print label,description
 
     def load_deposit_config_file(self):
         file_name_temp = QtGui.QFileDialog.getOpenFileNameAndFilter(self.window, 'Open file', self.current_directory,
