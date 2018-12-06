@@ -743,21 +743,16 @@ class GUI(object):
                 break
 
     def update_label_radiobutton(self):
-        print '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         found = False
         for button in self.label_button_list:
             if button.get_label() == self.label:
                 button.set_active(True)
                 found = True
-        print found
         if not found:
             for button in self.label_button_list:
-                print button.get_label()
                 if button.get_label() == 'not_shown':
-                    print 'unknown label'
                     button.set_active(True)
                     break
-        print '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'
 
     def update_LigandConfidence_radiobutton(self):
         # updating ligand confidence radiobuttons
@@ -953,11 +948,11 @@ class GUI(object):
     def label_button_clicked(self, widget, data=None):
         print '............',data
         if data == 'not_shown':
-            self.db_dict_mainTable['label'] = None
+            self.db.execute_statement("update mainTable set label=Null where CrystalName = '%s'" %self.xtalID)
         else:
             self.db_dict_mainTable['label'] = data
-        print '==> XCE: setting label for ' + self.xtalID + ' to ' + str(data) + ' in mainTable of datasource'
-        self.db.update_data_source(self.xtalID, self.db_dict_mainTable)
+            print '==> XCE: setting label for ' + self.xtalID + ' to ' + str(data) + ' in mainTable of datasource'
+            self.db.update_data_source(self.xtalID, self.db_dict_mainTable)
 
     def RefreshData(self):
         # reset spider plot image
