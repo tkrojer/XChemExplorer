@@ -1746,10 +1746,11 @@ class XChemExplorer(QtGui.QApplication):
         self.work_thread.start()
 
     def update_database_with_labelInfo(self):
-        for l in self.labelList:
+        for n,l in enumerate(self.labelList):
             label = str(l[0].text())
             description = str(l[1].text())
-            self.db.execute_statement("update labelTable set Label='%s',set Description='%s'" %(label,description))
+            print "update labelTable set Label='%s',Description='%s' where ID=%s" %(label,description,str(n+1))
+            self.db.execute_statement("update labelTable set Label='%s',Description='%s' where ID=%s" %(label,description,str(n+1)))
             print label,description
 
     def load_deposit_config_file(self):

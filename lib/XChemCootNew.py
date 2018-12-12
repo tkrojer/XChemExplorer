@@ -210,7 +210,8 @@ class GUI(object):
         # --- refinement protocol ---
         frame = gtk.Frame()
         self.refinementProtocolcheckbox = gtk.CheckButton('giant.quick_refine (REFMAC - default for PanDDA refinement)')
-        self.refinementProtocolcheckbox.connect("toggled", self.refinementProtocolCallback)
+        # callback is defined later
+#        self.refinementProtocolcheckbox.connect("toggled", self.refinementProtocolCallback)
         self.refinementProtocolcheckbox.set_active(True)
         frame.add(self.refinementProtocolcheckbox)
         self.vbox.pack_start(frame)
@@ -585,6 +586,7 @@ class GUI(object):
         # if the label has not been set yet
         labels.append('not_shown')
         for n, l in enumerate(labels):
+            print n,l
             if n == 0:
                 new_button = gtk.RadioButton(None, l)
             else:
@@ -677,6 +679,11 @@ class GUI(object):
 
         #        self.VALIDATEbutton = gtk.Button(label="validate structure")
         #        self.DEPOSITbutton = gtk.Button(label="prepare for deposition")
+
+
+        # need to put it here, because attributes within refinementProtocolCallback function
+        # are defined after checkbox is defined
+        self.refinementProtocolcheckbox.connect("toggled", self.refinementProtocolCallback)
 
 
         # --- CANCEL button ---
@@ -1355,14 +1362,14 @@ class GUI(object):
 
     def refinementProtocolCallback(self, widget):
         if widget.get_active():
-            if self.refinementProgramcheckbox.get_active():
+            if self.refinementProtocolcheckbox.get_active():
                 self.refinementProtocol = 'pandda_phenix'
             else:
                 self.refinementProtocol = 'pandda_refmac'
             self.PREVbuttonSite.set_sensitive(True)
             self.NEXTbuttonSite.set_sensitive(True)
         else:
-            self.refinementProgramcheckbox.set_active(False)
+            self.refinementProtocolcheckbox.set_active(False)
             self.refinementProtocol = 'refmac'
             self.PREVbuttonSite.set_sensitive(False)
             self.NEXTbuttonSite.set_sensitive(False)
