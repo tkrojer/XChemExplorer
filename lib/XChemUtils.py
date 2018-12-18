@@ -641,6 +641,8 @@ class parse:
             if 'Total number unique' in line and len(line.split())==6:
                 self.aimless['DataProcessingUniqueReflectionsOverall']=line.split()[3]
             if line.startswith('Space group:') or line.startswith('  Spacegroup name'):
+                if 'Laue' in line:
+                    continue
                 if 'Spacegroup name' in line:
                     self.aimless['DataProcessingSpaceGroup'] = line.replace('  Spacegroup name', '')[:-1].replace(' ','')
                 else:

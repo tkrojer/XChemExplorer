@@ -1029,7 +1029,7 @@ class create_png_and_cif_of_compound(QtCore.QThread):
                 self.Logfile.insert('WARNING: this could potentially lead to a crash...')
                 for i in range(counter):
                     self.Logfile.insert('qsub -q medium.q -N acedrg xce_acedrg_{0!s}.sh'.format((str(i+1))))
-                    os.system('qsub -q medium.q -N acedrg xce_acedrg_{0!s}.sh'.format((str(i+1))))
+                    os.system('qsub -N acedrg xce_acedrg_{0!s}.sh'.format((str(i+1))))
             else:
                 self.Logfile.insert('running %s consecutive ACEDRG jobs on your local machine')
                 for i in range(counter):
