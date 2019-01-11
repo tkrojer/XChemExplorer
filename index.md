@@ -154,6 +154,6 @@ rachael.skyner@diamond.ac.uk
 
 # Resources
 
-* [example .deposit file](https://github.com/tkrojer/XChemExplorer/blob/gh-pages/example.deposit)
+* <a href="https://github.com/tkrojer/XChemExplorer/blob/gh-pages/example.deposit">example.deposit file</a>
 
 Note: right-click on link, then 'Save Link As...'
