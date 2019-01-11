@@ -113,7 +113,6 @@ alias XChemExplorer='/Users/tobiaskrojer/Downloads/XChemExplorer-1.1/XChemExplor
 
 * [XChemExplorer v1.3](https://github.com/tkrojer/XChemExplorer/blob/gh-pages/XCE_manual_2019-01-11.pdf)
 
-Note: right-click on link, then 'Save Link As...'
 
 
 # Reference
@@ -156,4 +155,3 @@ rachael.skyner@diamond.ac.uk
 
 * <a href="https://github.com/tkrojer/XChemExplorer/blob/gh-pages/example.deposit">example.deposit file</a>
 
-Note: right-click on link, then 'Save Link As...'
