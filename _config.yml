@@ -1,7 +1,7 @@
 title: XChemExplorer
 description: 
 google_analytics: 
-show_downloads: False
+show_downloads: True
 theme: jekyll-theme-midnight
 image:  XChemExplorer_banner.png
 
