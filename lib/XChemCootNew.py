@@ -102,6 +102,8 @@ class GUI(object):
         self.pdb_style = 'refine.pdb'
         self.mtz_style = 'refine.mtz'
 
+        self.label = None
+
         # stores imol of currently loaded molecules and maps
         self.mol_dict = {'protein': -1,
                          'ligand': -1,
@@ -113,6 +115,9 @@ class GUI(object):
         # and which contain information to update the data source if necessary
         self.db_dict_mainTable = {}
         self.db_dict_panddaTable = {}
+
+        self.label_button_list = []
+
 
         ###########################################################################################
         # some COOT settings
@@ -205,7 +210,8 @@ class GUI(object):
         # --- refinement protocol ---
         frame = gtk.Frame()
         self.refinementProtocolcheckbox = gtk.CheckButton('giant.quick_refine (REFMAC - default for PanDDA refinement)')
-        self.refinementProtocolcheckbox.connect("toggled", self.refinementProtocolCallback)
+        # callback is defined later
+#        self.refinementProtocolcheckbox.connect("toggled", self.refinementProtocolCallback)
         self.refinementProtocolcheckbox.set_active(True)
         frame.add(self.refinementProtocolcheckbox)
         self.vbox.pack_start(frame)
@@ -558,6 +564,46 @@ class GUI(object):
         outer_frame.add(hboxSample)
         self.vbox.add(outer_frame)
 
+        #        # SPACER
+        self.vbox.add(gtk.Label(' '))
+
+        #################################################################################
+        outer_frame = gtk.Frame(label='Label')
+        hboxlabel = gtk.HBox()
+
+        # --- crystal navigator combobox ---
+        frame = gtk.Frame()
+        self.vbox_label = gtk.VBox()
+
+        hbox = gtk.HBox()
+        labels = self.db.get_labels_from_db()
+        if len(labels) > 5:
+            print '==> sorry, too many labels; cannot display them in panel'
+        labels = labels[:5]
+        # with radiobuttons, one of them needs to be always on
+        # but there will be cases when the user has not assigned a label yet
+        # hence, the not_shown button is not shown but gets active
+        # if the label has not been set yet
+        labels.append('not_shown')
+        for n, l in enumerate(labels):
+            print n,l
+            if n == 0:
+                new_button = gtk.RadioButton(None, l)
+            else:
+                new_button = gtk.RadioButton(new_button, l)
+            new_button.connect("toggled", self.label_button_clicked, l)
+            if not l == 'not_shown':
+                hbox.add(new_button)
+            self.label_button_list.append(new_button)
+
+        self.vbox_label.add(hbox)
+        frame.add(self.vbox_label)
+
+        hboxlabel.add(frame)
+
+        outer_frame.add(hboxlabel)
+        self.vbox.add(outer_frame)
+
         # SPACER
         self.vbox.add(gtk.Label(' '))
 
@@ -635,6 +681,11 @@ class GUI(object):
         #        self.DEPOSITbutton = gtk.Button(label="prepare for deposition")
 
 
+        # need to put it here, because attributes within refinementProtocolCallback function
+        # are defined after checkbox is defined
+        self.refinementProtocolcheckbox.connect("toggled", self.refinementProtocolCallback)
+
+
         # --- CANCEL button ---
         self.CANCELbutton = gtk.Button(label="CANCEL")
         self.CANCELbutton.connect("clicked", self.CANCEL)
@@ -675,10 +726,14 @@ class GUI(object):
             self.compoundID = str(self.Todo[self.index][1])
             self.refinement_folder = str(self.Todo[self.index][4])
             self.refinement_outcome = str(self.Todo[self.index][5])
+            self.label = self.db.get_label_of_sample(self.xtalID)
+            self.update_label_radiobutton()
             self.update_RefinementOutcome_radiobutton()
         if self.xtalID not in self.siteDict:  # i.e. we are not working with a PanDDA model
             self.ligand_confidence = str(self.Todo[self.index][6])
             self.update_LigandConfidence_radiobutton()
+            self.label = self.db.get_label_of_sample(self.xtalID)
+            self.update_label_radiobutton()
 
         self.RefreshData()
 
@@ -693,6 +748,18 @@ class GUI(object):
             if i == current_stage:
                 button.set_active(True)
                 break
+
+    def update_label_radiobutton(self):
+        found = False
+        for button in self.label_button_list:
+            if button.get_label() == self.label:
+                button.set_active(True)
+                found = True
+        if not found:
+            for button in self.label_button_list:
+                if button.get_label() == 'not_shown':
+                    button.set_active(True)
+                    break
 
     def update_LigandConfidence_radiobutton(self):
         # updating ligand confidence radiobuttons
@@ -756,6 +823,10 @@ class GUI(object):
                 for imol in coot_utils_XChem.molecule_number_list():
                     if self.compoundID + '.pdb' in coot.molecule_name(imol):
                         coot.close_molecule(imol)
+
+        for w in self.label_button_list:
+            w.set_active(False)
+
 
         print 'pandda index', self.pandda_index
         self.spider_plot = self.siteDict[self.xtalID][self.pandda_index][4]
@@ -867,6 +938,28 @@ class GUI(object):
             self.db.update_site_event_panddaTable(self.xtalID, self.site_index, self.event_index,
                                                   self.db_dict_panddaTable)
             self.siteDict[self.xtalID][self.pandda_index][7] = data
+
+#        def update_label(self, widget):
+#            print '\n\n\n>>>>>>>>>>>>>>>>>>>>>>>>'
+#            #        widget.pressed()
+#            for w in self.label_button_list:
+#                print w.get_label(), w.get_active()
+#                if w != widget:
+#                    w.set_active(False)
+#            print '<<<<<<<<<<<<<<<<<<<<<<<<<<'
+#            self.db_dict_mainTable['label'] = widget.get_label()
+#            print '==> XCE: setting label for ' + self.xtalID + ' to ' + str(
+#                widget.get_label()) + ' in mainTable of datasource'
+#            self.db.update_data_source(self.xtalID, self.db_dict_mainTable)
+
+    def label_button_clicked(self, widget, data=None):
+        print '............',data
+        if data == 'not_shown':
+            self.db.execute_statement("update mainTable set label=Null where CrystalName = '%s'" %self.xtalID)
+        else:
+            self.db_dict_mainTable['label'] = data
+            print '==> XCE: setting label for ' + self.xtalID + ' to ' + str(data) + ' in mainTable of datasource'
+            self.db.update_data_source(self.xtalID, self.db_dict_mainTable)
 
     def RefreshData(self):
         # reset spider plot image
@@ -1269,14 +1362,14 @@ class GUI(object):
 
     def refinementProtocolCallback(self, widget):
         if widget.get_active():
-            if self.refinementProgramcheckbox.get_active():
+            if self.refinementProtocolcheckbox.get_active():
                 self.refinementProtocol = 'pandda_phenix'
             else:
                 self.refinementProtocol = 'pandda_refmac'
             self.PREVbuttonSite.set_sensitive(True)
             self.NEXTbuttonSite.set_sensitive(True)
         else:
-            self.refinementProgramcheckbox.set_active(False)
+            self.refinementProtocolcheckbox.set_active(False)
             self.refinementProtocol = 'refmac'
             self.PREVbuttonSite.set_sensitive(False)
             self.NEXTbuttonSite.set_sensitive(False)

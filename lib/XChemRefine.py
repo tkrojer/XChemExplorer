@@ -18,6 +18,7 @@ import time
 
 sys.path.append(os.getenv('XChemExplorer_DIR')+'/lib')
 import XChemLog
+from XChemUtils import pdbtools
 
 
 def GetSerial(ProjectPath,xtalID):
@@ -744,6 +745,9 @@ class panddaRefine(object):
         # panddaSerial because giant.quick_refine writes Refine_0001 instead of Refine_1
         panddaSerial=(4-len(str(Serial)))*'0'+str(Serial)
 
+        make_all_links = True
+        add_links_line = ''
+
         # first check if refinement is ongoing and exit if yes
         if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'REFINEMENT_IN_PROGRESS')):
 #            coot.info_dialog('*** REFINEMENT IN PROGRESS ***')
@@ -811,8 +815,20 @@ class panddaRefine(object):
                 Logfile.error('cannot find modified version of bound state in %s' %os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
                 return None
         else:
-            Logfile.error('cannot find model of ground state, aborting...')
-            return None
+            if os.path.isfile(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial),'refine.modified.pdb')):
+                os.chdir(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
+                Logfile.warning('%s: ground-state model does not exist, but refine.modified.pdb does exist' %self.xtalID)
+                Logfile.warning('This may be a case where there are no differences between bound and ground state')
+                Logfile.warning('creating symbolic link: ln -s refine.modified.pdb %s-ensemble-model.pdb' %self.xtalID)
+                os.system('ln -s refine.modified.pdb %s-ensemble-model.pdb' %self.xtalID)
+                # note: after first cycle of refinement, REFMAC will remove alternate conformer from the ligand
+                #       i.e. need to link refine.pdb to refine.split.bound-state.pdb
+                make_all_links = False
+                add_links_line = 'ln -s refine.pdb refine.split.bound-state.pdb'
+                Logfile.insert('trying to continue with refinement')
+            else:
+                Logfile.error('cannot find any suitable PDB file for refinement, aborting...')
+                return None
 
 
         #######################################################
@@ -842,8 +858,32 @@ class panddaRefine(object):
                     refmacParams.write('weight matrix '+str(RefmacParams['MATRIX_WEIGHT'])+'\n')
                 refmacParams.write(RefmacParams['TLSADD']+'\n')
         else:
-            Logfile.error('cannot find multi-state-restraints.refmac.params in %s; aborting...' %os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
-            return None
+            Logfile.warning('cannot find multi-state-restraints.refmac.params in %s!' %os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
+            try:
+                os.chdir(os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
+                Logfile.insert('checking if %s-ensemble-model.pdb contains residue of type LIG, DRG, FRG, UNK or UNL' %self.xtalID)
+                knowLigandIDs = ['LIG', 'DRG', 'FRG', 'UNK', 'UNL']
+                ligandsInFile = pdbtools(self.xtalID+'-ensemble-model.pdb').find_ligands()
+                found_lig = False
+                for lig in ligandsInFile:
+                    if lig[0] in knowLigandIDs:
+                        Logfile.insert('found ligand of type: ' + lig[0])
+                        found_lig = True
+                if found_lig:
+                    Logfile.warning('giant.make_restraints was not able to create multi-state-restraints.refmac.params. ' +
+                                    'Something may have gone wrong, but it could be that ligand binding did not lead to ' +
+                                    'displacement of water molecules or rearrangement of protein side-chains. ' +
+                                    'Hence, there is no difference between the bound-state and the ground-state. ' +
+                                    'We will create an empty multi-state-restraints.refmac.params which may contain ' +
+                                    'additional REFMAC keywords and otherwise try to continue with refinement')
+                    os.system('touch multi-state-restraints.refmac.params')
+                else:
+                    Logfile.error('%s-ensemble-model.pdb does not contain any modelled ligand; aborting refinement' %self.xtalID)
+                    return None
+            except OSError:
+                Logfile.error('directory does not exisit: %s' %os.path.join(self.ProjectPath,self.xtalID,'cootOut','Refine_'+str(Serial)))
+                Logfile.error('aborting refinement...')
+                return None
 
         #######################################################
         # we write 'REFINEMENT_IN_PROGRESS' immediately to avoid unncessary refinement
@@ -930,6 +970,15 @@ class panddaRefine(object):
                 'labin F1=FOFCWT PHI=PHFOFCWT\n'
                 'EOF\n'   )
 
+        if make_all_links:
+            add_links_line = (
+            'ln -s Refine_%s/refine_%s.split.bound-state.pdb ./refine.split.bound-state.pdb\n' %(panddaSerial,Serial)+
+            'ln -s Refine_%s/refine_%s.split.ground-state.pdb ./refine.split.ground-state.pdb\n' %(panddaSerial,Serial)+
+            'ln -s Refine_%s/refine_%s.output.bound-state.pdb ./refine.output.bound-state.pdb\n' %(panddaSerial,Serial)+
+            'ln -s Refine_%s/refine_%s.output.ground-state.pdb ./refine.output.ground-state.pdb\n' %(panddaSerial,Serial)
+            )
+
+
         refmacCmds = (
             '#!'+os.getenv('SHELL')+'\n'
             +pbs_line+
@@ -979,10 +1028,9 @@ class panddaRefine(object):
             '\n'
             'ln -s Refine_%s/validate_ligands.txt .\n' %panddaSerial+
             'ln -s Refine_%s/refine_molprobity.log .\n' %panddaSerial+
-            'ln -s Refine_%s/refine_%s.split.bound-state.pdb ./refine.split.bound-state.pdb\n' %(panddaSerial,Serial)+
-            'ln -s Refine_%s/refine_%s.split.ground-state.pdb ./refine.split.ground-state.pdb\n' %(panddaSerial,Serial)+
-            'ln -s Refine_%s/refine_%s.output.bound-state.pdb ./refine.output.bound-state.pdb\n' %(panddaSerial,Serial)+
-            'ln -s Refine_%s/refine_%s.output.ground-state.pdb ./refine.output.ground-state.pdb\n' %(panddaSerial,Serial)+
+            '\n'
+            + add_links_line +
+            '\n'
             'mmtbx.validation_summary refine.pdb > validation_summary.txt\n'
             '\n'
             + mapCalculation +

@@ -30,7 +30,7 @@ class setup():
 
     def settings(self, xce_object):
         # set XCE version
-        xce_object.xce_version = 'v1.2.1'
+        xce_object.xce_version = 'v1.3'
 
         # general settings
         xce_object.allowed_unitcell_difference_percent = 12
@@ -448,7 +448,11 @@ class setup():
                                                 ['Troubleshooting', '',
                                                  lambda: setup().openFile(
                                                      "/dls/science/groups/i04-1/software/xce_troubleshooting.pdf")]
-                                            ]]
+                                            ]],
+                                'G: labels': ["&Labels",
+                                               [
+                                                   ['Edit label information', '', xce_object.add_label_information]
+                                               ]]
 
                                 }
 

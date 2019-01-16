@@ -367,8 +367,8 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 if not self.add_apo_sf_mmcif_to_ground_state_mmcif():
                     continue
 
-
-
+                if not self.add_data_increment_to_apo_mmcif():
+                    continue
 
             else:
                 if not self.mmcif_files_can_be_replaced(xtal):
@@ -740,6 +740,8 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                    ' -r {0!s}'.format(refSoft) +
                    ' -iPDB {0!s}'.format(self.ground_state_pdb) +
                    ' -e MR'
+                   ' -s AIMLESS'
+                   ' -iLOG {0!s}'.format(self.ground_state_pdb.replace('.pdb','.log')) +
                    ' -iENT data_template.cif'
                    ' -o {0!s}.mmcif > {1!s}.mmcif.log'.format(xtal, xtal))
         else:
@@ -902,6 +904,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             fileStatus = True
         return fileStatus
 
+
     def add_apo_sf_mmcif_to_ground_state_mmcif(self):
         os.chdir(self.projectDir)
         self.Logfile.insert('checking pandda directory for apo mmcif files: '+self.panddaDir)
@@ -935,6 +938,46 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                     else:
                         f.write(line)
         f.close()
+        self.Logfile.insert('added %s apo mmcif files to ground-state mmcif' %str(counter))
+        return True
+
+    def add_data_increment_to_apo_mmcif(self):
+        self.Logfile.insert('inrementing data_rxxxxsf in ground-state_sf.mmcif')
+        x = ['','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
+        a = 0
+        b = 0
+        c = 0
+
+        foundFirstLine = False
+        foundCulprit = False
+        datasetCounter = 0
+        if os.path.isfile(os.path.join(self.panddaDir,'ground_state_sf.mmcif')):
+            f = open('ground_state_sf_tmp.mmcif','w')
+            for n,line in enumerate(open(os.path.join(self.panddaDir,'ground_state_sf.mmcif'))):
+                if line.startswith('data_rxxxxsf') and not foundFirstLine:
+                    foundFirstLine = True
+                    a += 1
+                    f.write(line)
+                elif line.startswith('data_rxxxxsf') and foundFirstLine:
+                    if a == len(x):
+                        a = 1
+                        b += 1
+                    if b == len(x):
+                        a = 1
+                        b = 1
+                        c += 1
+                    newLine = line.replace('xsf','s%ssf' %str(x[a]+x[b]+x[c]))
+                    datasetCounter += 1
+                    f.write(newLine)
+                    a += 1
+                    if datasetCounter % 50 == 0:
+                        self.Logfile.insert('%s data_rxxxxsf records edited...' %str(datasetCounter))
+                else:
+                    f.write(line)
+            f.close()
+        os.chdir(self.panddaDir)
+        os.system('/bin/mv ground_state_sf_tmp.mmcif ground_state_sf.mmcif')
+        return True
 
 
     def event_maps_exist_in_sf_mmcif(self,xtal):

@@ -324,7 +324,8 @@ class run_pandda_export(QtCore.QThread):
             else:
 
                 Cmds = (
-                    'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
+                    'source /dls/science/groups/i04-1/software/pandda-update/ccp4/ccp4-7.0/bin/ccp4.setup-sh\n'
+#                    'source '+os.path.join(os.getenv('XChemExplorer_DIR'),'setup-scripts','pandda.setup-sh')+'\n'
                     'pandda.export'
                     ' pandda_dir=%s' %self.panddas_directory+
                     ' export_dir={0!s}'.format(self.initial_model_directory)+

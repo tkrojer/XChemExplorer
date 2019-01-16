@@ -1029,7 +1029,7 @@ class create_png_and_cif_of_compound(QtCore.QThread):
                 self.Logfile.insert('WARNING: this could potentially lead to a crash...')
                 for i in range(counter):
                     self.Logfile.insert('qsub -q medium.q -N acedrg xce_acedrg_{0!s}.sh'.format((str(i+1))))
-                    os.system('qsub -q medium.q -N acedrg xce_acedrg_{0!s}.sh'.format((str(i+1))))
+                    os.system('qsub -N acedrg xce_acedrg_{0!s}.sh'.format((str(i+1))))
             else:
                 self.Logfile.insert('running %s consecutive ACEDRG jobs on your local machine')
                 for i in range(counter):
@@ -1288,7 +1288,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
             self.Logfile.insert('WARNING: this could potentially lead to a crash...')
             for i in range(n+1):
                 self.Logfile.insert('qsub -q medium.q -N dimple xce_dimple_{0!s}.sh'.format((str(i+1))))
-                os.system('qsub -q medium.q -N dimple xce_dimple_{0!s}.sh'.format((str(i+1))))
+                os.system('qsub -N dimple xce_dimple_{0!s}.sh'.format((str(i+1))))
         else:
             self.Logfile.insert('running %s consecutive DIMPLE jobs on your local machine')
             for i in range(n+1):
