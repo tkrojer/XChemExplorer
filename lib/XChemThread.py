@@ -14,6 +14,7 @@ from datetime import datetime
 import time
 import getpass
 import csv
+import tarfile
 
 from iotbx import mtz
 from iotbx.reflection_file_reader import any_reflection_file
@@ -2134,6 +2135,12 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
                 [   os.path.join('autoPROC', '*'),
                     '*staraniso_alldata-unique.table1',
                     '*staraniso_alldata-unique.mtz'],
+                [   os.path.join('autoPROC'),
+                    '*aimless.log',
+                    '*truncate-unique.mtz'],
+                [   os.path.join('autoPROC'),
+                    '*summary.tar.gz',                  # staraniso_alldata-unique.table1 only available in tar archive
+                    '*staraniso_alldata-unique.mtz'],
                 [   os.path.join('*'),
                     os.path.join('LogFiles', '*aimless.log'),
                     os.path.join('DataFiles', '*free.mtz')]
@@ -2165,6 +2172,15 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
                 os.path.join(self.projectDir,xtal,'autoprocessing', self.visit + '-' + run + autoproc)):
             os.mkdir(os.path.join(self.projectDir,xtal,'autoprocessing', self.visit + '-' + run + autoproc))
 
+    def cleanUpDir(self,xtal,run,autoproc,mtzfile,logfile):
+        toKeep = ['staraniso_alldata-unique.mtz','staraniso_alldata-unique.table1',
+                  'staraniso_alldata.log',xtal+'.mtz',xtal+'.log']
+        os.chdir(os.path.join(self.projectDir,xtal,'autoprocessing', self.visit + '-' + run + autoproc))
+        for files in glob.glob('*'):
+            if files not in toKeep:
+                os.system('/bin/rm -f ' + files)
+
+
     def copyMTZandLOGfiles(self,xtal,run,autoproc,mtzfile,logfile):
         mtzNew = ''
         logNew = ''
@@ -2181,6 +2197,11 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
         if not os.path.isfile(logfile[logfile.rfind('/')+1:]):
             self.Logfile.insert('%s: copying %s' % (xtal, logfile))
             os.system('/bin/cp ' + logfile + ' .')
+            if logfile.endswith('summary.tar.gz'):
+                self.Logfile.insert('unpacking summary.tar.gz')
+                os.system('tar -xzvf summary.tar.gz')
+                logfile = logfile.replace('summary.tar.gz','staraniso_alldata-unique.table1')
+                self.cleanUpDir(xtal,run,autoproc,mtzfile,logfile)
         if os.path.isfile(logfile[logfile.rfind('/')+1:]) and not os.path.isfile(xtal+'.log'):
             os.symlink(logfile[logfile.rfind('/')+1:], xtal + '.log')
         if os.path.isfile(logfile[logfile.rfind('/') + 1:]):
@@ -2207,7 +2228,7 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
         return jpgDict
 
 
-    def readProcessingResults(self,xtal,folder,log,mtz,timestamp,current_run,autoproc):
+    def readProcessingUpdateResults(self,xtal,folder,log,mtz,timestamp,current_run,autoproc):
         db_dict = {}
         for mtzfile in glob.glob(os.path.join(folder,mtz)):
             for logfile in glob.glob(os.path.join(folder, log)):
@@ -2224,9 +2245,10 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
                             'DataCollectionOutcome':            'success',  # success in collection Table only means that a logfile was found
                             'ProteinName':                      target     }
                 db_dict.update(parse().read_aimless_logfile(logNew))
-        db_dict.update(self.findJPGs(xtal,current_run))     # image exist even if data processing failed
-        db_dict['DataCollectionBeamline'] = self.beamline
-        return db_dict
+                db_dict.update(self.findJPGs(xtal,current_run))     # image exist even if data processing failed
+                db_dict['DataCollectionBeamline'] = self.beamline
+                self.update_data_collection_table(xtal,current_run,autoproc,db_dict)
+#        return db_dict
 
     def getAutoProc(self,folder):
         autoproc='unkown'
@@ -2312,14 +2334,15 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
                             continue
                         if self.empty_folder(xtal,folder):
                             continue
-                        if 'staraniso' in logfile:
+                        if 'staraniso' in logfile or 'summary.tar.gz' in logfile:
                             autoproc = 'aP_staraniso'
                         else:
                             autoproc = self.getAutoProc(folder)
                         if self.alreadyParsed(xtal,current_run,autoproc):
                             continue
-                        db_dict = self.readProcessingResults(xtal,folder,logfile,mtzfile,timestamp,current_run,autoproc)
-                        self.update_data_collection_table(xtal,current_run,autoproc,db_dict)
+                        self.readProcessingUpdateResults(xtal,folder,logfile,mtzfile,timestamp,current_run,autoproc)
+#                        db_dict = self.readProcessingResults(xtal,folder,logfile,mtzfile,timestamp,current_run,autoproc)
+#                        self.update_data_collection_table(xtal,current_run,autoproc,db_dict)
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
