@@ -84,6 +84,7 @@ sudo chown <yourUID>:<yourGID) /dls
 ```
 
 2. Mount the Diamond filesystem
+
 When you need it, run this from your own user account:
 ```
 sshfs -o reconnect <your_fed_id>@nx.diamond.ac.uk:/dls /dls
@@ -95,6 +96,7 @@ ServerAliveInterval 15
 ServerAliveCountMax 3
 ```
 (The “reconnect” option is meant to do this too, but it slows down and eventually drops it anyway.)
+
 3. Fire up XCE
 ```
 cd <your-labxchem-visit-dir>
