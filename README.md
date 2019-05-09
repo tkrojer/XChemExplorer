@@ -61,45 +61,74 @@ cd XChemExplorer/
 alias xce="<full_path_to_local_git_repository>/XChemExplorer_local.sh"
 ```
 
-## For Diamond users: Accessing your data on your local machine
+## Remote running of XCE and model building on Diamond’s filesystem
+NX latency is a killer when trying to do anything graphical, like model building during pandda.inspect or during refinement.  So instead use Filesystem in Userspace (FUSE), which mounts Diamond’s disk from your computer using the ssh protocol.  All you need is root privileges, or bribe your IT team.
 
-For XChemExplorer to work with your data from Diamond, you will need to mirror diamond's filesystem on your local machine. This can be done in a number of ways, but here is our reccommended route. (NB: sudo access - i.e. your system administrators - may be required)
-
-1. Install FUSE (Filesystem in Userspace) - more info: https://github.com/libfuse/libfuse
-
-Linux distributions:
+1. Setup fuse (requires admin rights)
+Install FUSE (http://github.com/libfuse/libfuse)
+Centos:
 ```
 sudo yum install fuse-utils sshfs
 ```
+Ubuntu:
+```
+sudo apt-get install sshfs
+```
+See https://gist.github.com/cstroe/e83681e3510b43e3f618 for details.  FUSE is also available for Mac.  Avoid building from source unless you really have to.
 
-MacOS: https://osxfuse.github.io
-
-2. Create a mountpoint for the diamond filesystem in your root directory (may require root/sudo access):
+Create a /dls mount point and give your user ownership:
 ```
 sudo mkdir /dls
+sudo chown <yourUID>:<yourGID) /dls
 ```
 
-3. Change ownership of /dls from sudo/root to yourself:
+2. Mount the Diamond filesystem
+When you need it, run this from your own user account:
 ```
-sudo chown <user>:<group> /dls
+sshfs -o reconnect <your_fed_id>@nx.diamond.ac.uk:/dls /dls
+e.g. sshfs -o reconnect zqr16691@nx.diamond.ac.uk:/dls /dls
 ```
+(Recommended):  make your ssh client to keep the link alive by editing ~/.ssh/config and adding these lines:
+```
+ServerAliveInterval 15
+ServerAliveCountMax 3
+```
+(The “reconnect” option is meant to do this too, but it slows down and eventually drops it anyway.)
+3. Fire up XCE
+```
+cd <your-labxchem-visit-dir>
+```
+e.g. cd /dls/labxchem/data/2017/lb18145-3/processing
+```
+/dls/science/groups/i04-1/software/XChem/xce
+```
+(See Note 1 below.)
 
-4. Now, you should be able to mount the Diamond filesytem with:
-```
-sshfs <fed_id>@nx.diamond.ac.uk:/dls /dls
-```
-
-5. To run XCE: change directory to your project directory, and then launch your local version (described in installation section):
-```
-# change to project directory
-cd /dls/labxchem/data/2016/lb13385-10/processing
-
-# launch XCE with local version script
-<path-to-local-install>/XChemExplorer_local.sh
-
-```
-
-6. And finally, when you are done unmount Diamond's drives:
+4. When you’re done, unmount the file system
 ```
 fusermount -u /dls
 ```
+
+### Notes:
+1. Launching XCE this way avoids insane installation issues, because it runs the software directly off Diamond’s drives, i.e. it’s exactly what you use if physically at Diamond or through NX.  This is therefore supported.
+The trade-offs are currently (but we’re trying to fix):
+
+a. It takes a very long time (up to 10 minutes in the UK and up to an hour(!) in North America) to launch XCE and pandda.inspect.  After that they are fully responsive.
+
+b. The xce-coot plugin does not always work, due to a library mismatch.
+
+2. IF YOU KNOW WHAT YOU’RE DOING and really hate (!) the lag on startup:
+
+a. install XCE locally: https://github.com/xchem/XChemExplorer
+
+b. update your PanDDA installation (the ccp4 version is outdated):
+
+```
+ccp4-python -m pip uninstall panddas
+ccp4-python -m pip install pip –upgrade
+ccp4-python -m pip install numpy –upgrade
+ccp4-python -m pip install panddas
+```
+(Note, this is not supported – you really are on your own!  Recommended only for geeks.)
+
+3. If your IT team doesn’t want to help you, try setting up a virtual machine – then you have root permissions and can do whatever you like.  Performance ought to be okay.
