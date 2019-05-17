@@ -49,14 +49,15 @@ class run_xia2(QtCore.QThread):
                 script += 'setenv XChemExplorer_DIR '+os.getenv('XChemExplorer_DIR')+'\n'
 
             if os.getcwd().startswith('/dls'):
-#                script += 'module load ccp4\n'
+                script += 'module load ccp4\n'
+                script += 'module load XDS\n'
 #                script += 'module load phenix\n'
 
 # 2018-09-19 - removed this for Joe's test
 #                script += 'module load ccp4\n'
 #                script += 'module load XDS\n'
 #                script += 'module load ccp4 xia2\n'
-                print 'hallo'
+#                print 'hallo'
 
             if not self.spg:
                 spg_option=''
@@ -91,7 +92,7 @@ class run_xia2(QtCore.QThread):
 #            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,'processed','run_in_progress')):
 #                self.Logfile.insert('data processing is in progress; skipping...')
 #                continue
-            f = False
+            f = True
             if f:
                 print 'hallo'
             else:

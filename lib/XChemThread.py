@@ -1042,7 +1042,8 @@ class create_png_and_cif_of_compound(QtCore.QThread):
 
 class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
     def __init__(self,sample_list,initial_model_directory,external_software,ccp4_scratch_directory,database_directory,
-                 data_source_file,max_queue_jobs,xce_logfile, remote_submission, remote_submission_string, dimple_twin_mode):
+                 data_source_file,max_queue_jobs,xce_logfile, remote_submission, remote_submission_string,
+                 dimple_twin_mode,pipeline):
         QtCore.QThread.__init__(self)
         self.sample_list=sample_list
         self.initial_model_directory=initial_model_directory
@@ -1054,7 +1055,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
         self.max_queue_jobs=max_queue_jobs
         self.xce_logfile=xce_logfile
         self.Logfile=XChemLog.updateLog(xce_logfile)
-        self.pipeline='dimple'
+        self.pipeline=pipeline
         self.using_remote_qsub_submission = remote_submission
         self.remote_qsub_submission = remote_submission_string
         self.dimple_twin_mode = dimple_twin_mode
@@ -1299,7 +1300,9 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
         self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
 
 class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
-    def __init__(self,sample_list,initial_model_directory,external_software,ccp4_scratch_directory,database_directory,data_source_file,max_queue_jobs,xce_logfile):
+    def __init__(self,sample_list,initial_model_directory,external_software,ccp4_scratch_directory,database_directory,
+                 data_source_file,max_queue_jobs,xce_logfile, remote_submission, remote_submission_string,
+                 dimple_twin_mode,pipeline):
         QtCore.QThread.__init__(self)
         self.sample_list=sample_list
         self.initial_model_directory=initial_model_directory
@@ -1308,18 +1311,18 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
         self.ccp4_scratch_directory=ccp4_scratch_directory
         self.database_directory=database_directory
         self.data_source_file=data_source_file
-
         self.db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
-        self.database=os.path.join(self.database_directory,self.data_source_file)
-
         self.max_queue_jobs=max_queue_jobs
         self.xce_logfile=xce_logfile
         self.Logfile=XChemLog.updateLog(xce_logfile)
+        self.pipeline=pipeline
+        self.using_remote_qsub_submission = remote_submission
+        self.remote_qsub_submission = remote_submission_string
+        self.dimple_twin_mode = dimple_twin_mode
 
-        self.n=0
+        self.n=1
 
-        self.pipeline='dimple'
-
+        self.Logfile.insert('running initial refinement with the following pipeline: '+self.pipeline)
 
     def run(self):
         progress_step=1
@@ -1345,9 +1348,9 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
                 if self.pipeline=='dimple':
                     self.prepare_dimple_shell_script(xtal,visit_run_autoproc,mtzin,ref_pdb,ref_mtz,ref_cif)
                 elif self.pipeline=='pipedream':
-                    self.prepare_pipedream_shell_script()
+                    self.prepare_pipedream_shell_script(xtal,visit_run_autoproc,mtzin,ref_pdb,ref_mtz,ref_cif)
                 elif self.pipeline=='phenix.ligand_pipeline':
-                    self.prepare_phenix_ligand_pipeline_shell_script()
+                    self.prepare_phenix_ligand_pipeline_shell_script(xtal,visit_run_autoproc,mtzin,ref_pdb,ref_mtz,ref_cif)
             else:
                 self.prepare_dimple_shell_script(xtal,visit_run_autoproc,mtzin,ref_pdb,ref_mtz,ref_cif)
 
@@ -1386,12 +1389,11 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
 
         if not os.path.isdir(os.path.join(self.initial_model_directory,xtal)):
             os.mkdir(os.path.join(self.initial_model_directory,xtal))
-        if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'phenix.ligand_pipeline')):
-            os.mkdir(os.path.join(self.initial_model_directory,xtal,'phenix.ligand_pipeline'))
-        os.chdir(os.path.join(self.initial_model_directory,xtal,'phenix.ligand_pipeline'))
-        os.system('touch dimple_run_in_progress')
-        os.system('/bin/rm final.mtz 2> /dev/null')
-        os.system('/bin/rm final.pdb 2> /dev/null')
+        os.chdir(os.path.join(self.initial_model_directory,xtal))
+        if os.path.isdir(os.path.join(self.initial_model_directory,xtal,'phenix.ligand_pipeline')):
+            os.system('/bin/rm -fr phenix.ligand_pipeline')
+        os.mkdir(os.path.join(self.initial_model_directory,xtal,'phenix.ligand_pipeline'))
+        os.system('touch phenix.ligand_pipeline_run_in_progress')
 
         if self.queueing_system_available:
             top_line='#PBS -joe -N XCE_{0!s}\n'.format(self.pipeline)
@@ -1407,6 +1409,12 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
 
         if os.path.isdir('/dls'):
             ccp4_scratch+='module load phenix\n'
+            ccp4_scratch+='module load ccp4\n'
+
+        mtz_column_list=mtztools(mtzin).get_all_columns_as_list()
+        rfree = ''
+        if 'FreeR_flag' in mtz_column_list:
+            rfree = ' xray_data.r_free_flags.label="FreeR_flag"'
 
         Cmds = (
                 '{0!s}\n'.format(top_line)+
@@ -1417,11 +1425,9 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
                 '\n'
                 'source $XChemExplorer_DIR/setup-scripts/xce.setup-sh\n'
                 '\n'
-                'module unload ccp4\n'
-                'source /dls/science/groups/i04-1/software/pandda_0.2.12/ccp4/ccp4-7.0/bin/ccp4.setup-sh\n'
                 +ccp4_scratch+
                 '\n'
-                '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(database,xtal,'DimpleStatus','running') +
+                '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(os.path.join(self.database_directory,self.data_source_file),xtal,'DimpleStatus','running') +
                 '\n'
                 'phenix.ligand_pipeline %s %s' %(ref_pdb,mtzin)+
                 ' mr=False'
@@ -1431,33 +1437,49 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
                 ' remove_waters=False'
                 ' stop_if_r_free_greater_than=0.4'
                 ' update_waters=False'
+                + rfree +
                 ' build_hydrogens=False\n'
+                '\n'
+                'fft hklin pipeline_1/refine_final.mtz mapout 2fofc.map << EOF\n'
+                ' labin F1=2FOFCWT_filled PHI=PH2FOFCWT\n'
+                'EOF\n'
+                '\n'
+                'fft hklin pipeline_1/refine_final.mtz mapout fofc.map << EOF\n'
+                ' labin F1=FOFCWT PHI=PHFOFCWT\n'
+                'EOF\n'
                 '\n'
                 'cd %s\n' %os.path.join(self.initial_model_directory,xtal) +
                 '\n'
-                'ln -s phenix.ligand_pipeline/pipeline_1/refine_final.pdb dimple.pdb'
-                'ln -s phenix.ligand_pipeline/pipeline_1/refine_final.mtz dimple.mtz'
+                '/bin/rm phenix.ligand_pipeline.pdb\n'
+                '/bin/rm phenix.ligand_pipeline.mtz\n'
                 '\n'
-                'fft hklin dimple.mtz mapout 2fofc.map << EOF\n'
-                ' labin F1=2FOFCWT PHI=PH2FOFCWT\n'
-                'EOF\n'
+                'ln -s phenix.ligand_pipeline/pipeline_1/refine_final.pdb phenix.ligand_pipeline.pdb\n'
+                'ln -s phenix.ligand_pipeline/pipeline_1/refine_final.mtz phenix.ligand_pipeline.mtz\n'
                 '\n'
-                'fft hklin dimple.mtz mapout fofc.map << EOF\n'
-                ' labin F1=FOFCWT PHI=PHFOFCWT\n'
-                'EOF\n'
+                '/bin/rm init.pdb\n'
+                '/bin/rm init.mtz\n'
+                '\n'
+                'ln -s phenix.ligand_pipeline.pdb init.pdb\n'
+                'ln -s phenix.ligand_pipeline.mtz init.mtz\n'
+                '\n'
+                '/bin/rm 2fofc.map\n'
+                '/bin/rm fofc.map\n'
+                '\n'
+                'ln -s phenix.ligand_pipeline/2fofc.map .\n'
+                'ln -s phenix.ligand_pipeline/fofc.map .\n'
                 '\n'
                 '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_for_new_dimple_pdb.py')+
                 ' {0!s} {1!s} {2!s}\n'.format(os.path.join(self.database_directory,self.data_source_file), xtal, self.initial_model_directory)+
                 '\n'
-                '/bin/rm dimple_run_in_progress\n'
+                '/bin/rm phenix.ligand_pipeline_run_in_progress\n'
                 )
 
         os.chdir(self.ccp4_scratch_directory)
-        f = open('xce_{0!s}_{1!s}.sh'.format(self.pipeline, str(n+1)),'w')
+        f = open('xce_{0!s}_{1!s}.sh'.format(self.pipeline, str(self.n)),'w')
         f.write(Cmds)
         f.close()
+        os.system('chmod +x xce_{0!s}_{1!s}.sh'.format(self.pipeline, str(self.n)))
         self.n+=1
-        os.system('chmod +x xce_{0!s}_{1!s}.sh'.format(self.pipeline, str(n+1)))
         db_dict= {'DimpleStatus': 'started'}
         self.Logfile.insert('{0!s}: setting DataProcessingStatus flag to started'.format(xtal))
         self.db.update_data_source(xtal,db_dict)
@@ -1465,33 +1487,13 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
 
     def prepare_pipedream_shell_script(self,xtal,visit_run_autoproc,mtzin,ref_pdb,ref_mtz,ref_cif):
 
-        # check if reference mtzfile has an Rfree column; if not, then ignore
-        # DIMPLE assumes an Rfree column and barfs if it is not present
-        # note: ref_mtz looks like this: ref mtz  -R reference.mtz
-#        if os.path.isfile(ref_mtz):
-#            mtz_column_dict=mtztools(ref_mtz).get_all_columns_as_dict()
-#            if 'FreeR_flag' not in mtz_column_dict['RFREE']:
-#                self.Logfile.insert('cannot find FreeR_flag in reference mtz file: %s -> ignoring reference mtzfile!!!' %ref_mtz)
-#                ref_mtz = ''
-#                if mtz_column_dict['RFREE'] != []:
-#                    self.Logfile.insert('found Rfree set with other column name though: %s' %str(mtz_column_dict['RFREE']))
-#                    self.Logfile.insert('try renaming Rfree column to FreeR_flag with CAD!')
-#
-#        db_dict={}
-#        db_dict['DimpleReferencePDB']=ref_pdb
-#        self.db.update_data_source(xtal,db_dict)
-#
-#        self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'creating input script for '+xtal+' in '+visit_run_autoproc)
-#
-
         if not os.path.isdir(os.path.join(self.initial_model_directory,xtal)):
             os.mkdir(os.path.join(self.initial_model_directory,xtal))
-        if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'pipedream')):
-            os.mkdir(os.path.join(self.initial_model_directory,xtal,'pipedream'))
-        os.chdir(os.path.join(self.initial_model_directory,xtal,'pipedream'))
-        os.system('touch dimple_run_in_progress')
-        os.system('/bin/rm final.mtz 2> /dev/null')
-        os.system('/bin/rm final.pdb 2> /dev/null')
+        if os.path.isdir(os.path.join(self.initial_model_directory,xtal,'pipedream')):
+            os.chdir(os.path.join(self.initial_model_directory,xtal))
+            os.system('/bin/rm -fr pipedream')
+        os.mkdir(os.path.join(self.initial_model_directory,xtal,'pipedream'))
+        os.system('touch pipedream_run_in_progress')
 
         if self.queueing_system_available:
             top_line='#PBS -joe -N XCE_{0!s}\n'.format(self.pipeline)
@@ -1507,11 +1509,12 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
 
         if os.path.isdir('/dls'):
             ccp4_scratch+='module load buster\n'
+            ccp4_scratch+='module load ccp4\n'
 
         if os.path.isfile(ref_mtz):
             hklref_line=' -hklref {0!s}'.format(ref_mtz)
         else:
-            hklref_line=''
+            hklref_line=' -nofreeref'
 
         Cmds = (
                 '{0!s}\n'.format(top_line)+
@@ -1524,40 +1527,57 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
                 '\n'
                 +ccp4_scratch+
                 '\n'
-                '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(database,xtal,'DimpleStatus','running') +
+                '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(os.path.join(self.database_directory,self.data_source_file),xtal,'DimpleStatus','running') +
+                '\n'
+                'pointless hklin {0!s} xyzin {1!s} hklout pointless.mtz > pointless.log\n'.format(mtzin,ref_pdb)+
                 '\n'
                 'pipedream '
                 ' -d pipedreamDir'
                 ' -xyzin %s' %ref_pdb+
                 hklref_line+
-                ' -hklin {0!s}'.format(mtzin)+
+                ' -hklin pointless.mtz'
                 ' -keepwater\n'
+                '\n'
+                'fft hklin pipedreamDir/refine/refine.mtz mapout 2fofc.map << EOF\n'
+                ' labin F1=2FOFCWT PHI=PH2FOFCWT\n'
+                'EOF\n'
+                '\n'
+                'fft hklin pipedreamDir/refine/refine.mtz mapout fofc.map << EOF\n'
+                ' labin F1=FOFCWT PHI=PHFOFCWT\n'
+                'EOF\n'
                 '\n'
                 'cd %s\n' %os.path.join(self.initial_model_directory,xtal) +
                 '\n'
-                'ln -s phenix.ligand_pipeline/pipeline_1/refine_final.pdb dimple.pdb'
-                'ln -s phenix.ligand_pipeline/pipeline_1/refine_final.mtz dimple.mtz'
+                '/bin/rm pipedream.pdb\n'
+                '/bin/rm pipedream.mtz\n'
                 '\n'
-                'fft hklin dimple.mtz mapout 2fofc.map << EOF\n'
-                ' labin F1=FWT PHI=PHWT\n'
-                'EOF\n'
+                'ln -s pipedream/pipedreamDir/refine/refine.pdb pipedream.pdb\n'
+                'ln -s pipedream/pipedreamDir/refine/refine.mtz pipedream.mtz\n'
                 '\n'
-                'fft hklin dimple.mtz mapout fofc.map << EOF\n'
-                ' labin F1=DELFWT PHI=PHDELWT\n'
-                'EOF\n'
+                '/bin/rm init.pdb\n'
+                '/bin/rm init.mtz\n'
+                '\n'
+                'ln -s pipedream.pdb init.pdb\n'
+                'ln -s pipedream.mtz init.mtz\n'
+                '\n'
+                '/bin/rm 2fofc.map\n'
+                '/bin/rm fofc.map\n'
+                '\n'
+                'ln -s pipedream/2fofc.map .\n'
+                'ln -s pipedream/fofc.map .\n'
                 '\n'
                 '$CCP4/libexec/python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_for_new_dimple_pdb.py')+
                 ' {0!s} {1!s} {2!s}\n'.format(os.path.join(self.database_directory,self.data_source_file), xtal, self.initial_model_directory)+
                 '\n'
-                '/bin/rm dimple_run_in_progress\n'
+                '/bin/rm pipedream_run_in_progress\n'
                 )
 
         os.chdir(self.ccp4_scratch_directory)
-        f = open('xce_{0!s}_{1!s}.sh'.format(self.pipeline, str(n+1)),'w')
+        f = open('xce_{0!s}_{1!s}.sh'.format(self.pipeline, str(self.n)),'w')
         f.write(Cmds)
         f.close()
+        os.system('chmod +x xce_{0!s}_{1!s}.sh'.format(self.pipeline, str(self.n)))
         self.n+=1
-        os.system('chmod +x xce_{0!s}_{1!s}.sh'.format(self.pipeline, str(n+1)))
         db_dict= {'DimpleStatus': 'started'}
         self.Logfile.insert('{0!s}: setting DataProcessingStatus flag to started'.format(xtal))
         self.db.update_data_source(xtal,db_dict)
@@ -1589,11 +1609,10 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
 
         if not os.path.isdir(os.path.join(self.initial_model_directory,xtal)):
             os.mkdir(os.path.join(self.initial_model_directory,xtal))
-        if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'dimple')):
-            os.mkdir(os.path.join(self.initial_model_directory,xtal,'dimple'))
-        if not os.path.isdir(os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc)):
-            os.mkdir(os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc))
-        os.chdir(os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc))
+        os.chdir(os.path.join(self.initial_model_directory,xtal))
+        if os.path.isdir(os.path.join(self.initial_model_directory,xtal,'dimple')):
+            os.system('/bin/rm -fr dimple')
+        os.mkdir(os.path.join(self.initial_model_directory,xtal,'dimple'))
         os.system('touch dimple_run_in_progress')
         os.system('/bin/rm final.mtz 2> /dev/null')
         os.system('/bin/rm final.pdb 2> /dev/null')
@@ -1610,65 +1629,103 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
         else:
             ccp4_scratch=''
 
-        if 'dimple_rerun_on_selected_file' in visit_run_autoproc:
-            additional_cmds = (
-                            'cd {0!s}\n'.format(os.path.join(self.initial_model_directory,xtal)) +
-                            '/bin/rm dimple.pdb\n'
-                            'ln -s dimple/dimple_rerun_on_selected_file/dimple/final.pdb dimple.pdb\n'
-                            '/bin/rm dimple.mtz\n'
-                            'ln -s dimple/dimple_rerun_on_selected_file/dimple/final.mtz dimple.mtz\n'
-                            '/bin/rm 2fofc.map\n'
-                            'ln -s dimple/dimple_rerun_on_selected_file/dimple/2fofc.map .\n'
-                            '/bin/rm fofc.map\n'
-                            'ln -s dimple/dimple_rerun_on_selected_file/dimple/fofc.map .\n'
-                            '\n'
-                            '$CCP4/libexec/python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_for_new_dimple_pdb.py')+
-                            ' {0!s} {1!s} {2!s}\n'.format(os.path.join(self.database_directory,self.data_source_file), xtal, self.initial_model_directory)  )
+        if os.path.isdir('/dls'):
+            ccp4_scratch+='module load ccp4\n'
 
+        hkl = any_reflection_file(file_name=mtzin)
+        miller_arrays = hkl.as_miller_arrays()
+        mtzFile = miller_arrays[0]
+
+        if mtzFile.space_group_info().symbol_and_number() ==  'R 3 :H (No. 146)':
+            symNoAbsence = 'H3'
         else:
-            additional_cmds=''
+            symNoAbsence = str([x[0] for x in str(mtzFile.space_group_info().symbol_and_number().split('(')[0]).split()]).replace('[','').replace(']','').replace("'","").replace(',','').replace(' ','')
+
+        twin = ''
+        if self.dimple_twin_mode:
+            twin = "--refmac-key 'TWIN'"
 
         Cmds = (
                 '{0!s}\n'.format(top_line)+
                 '\n'
                 'export XChemExplorer_DIR="'+os.getenv('XChemExplorer_DIR')+'"\n'
                 '\n'
-                'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc) +
+                'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple') +
                 '\n'
                 'source $XChemExplorer_DIR/setup-scripts/xce.setup-sh\n'
                 '\n'
                 +ccp4_scratch+
                 '\n'
-                '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(database,xtal,'DimpleStatus','running') +
+                '$CCP4/bin/ccp4-python $XChemExplorer_DIR/helpers/update_status_flag.py %s %s %s %s\n' %(os.path.join(self.database_directory,self.data_source_file),xtal,'DimpleStatus','running') +
                 '\n'
-                'dimple --no-cleanup %s %s %s %s dimple\n' %(mtzin,ref_pdb,ref_mtz,ref_cif) +
+                'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple') +
                 '\n'
-                'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc,'dimple') +
+                'unique hklout unique.mtz << eof\n'
+                ' cell %s\n' %str([round(float(i),2) for i in mtzFile.unit_cell().parameters()]).replace('[','').replace(']','')+
+                ' symmetry %s\n' %symNoAbsence+
+                ' resolution %s\n' %str(round(float(mtzFile.d_min()),3))+
+                'eof\n'
                 '\n'
-                'fft hklin final.mtz mapout 2fofc.map << EOF\n'
+#                    'freerflag hklin unique.mtz hklout free.mtz > freerflag.log\n'
+                '\n'
+                'sftools << eof > sftools.log\n'
+                ' read unique.mtz\n'
+                ' calc col F = 10.0\n'
+                ' calc col SIGF = 1.0\n'
+                ' write sftools.mtz\n'
+                'eof\n'
+                '\n'
+                'cad hklin1 sftools.mtz hklin2 %s hklout %s.999A.mtz << eof\n' %(mtzin,xtal) +
+                ' monitor BRIEF\n'
+                ' labin file 1 E1=F E2=SIGF\n'
+                ' labout file 1 E1=F_unique E2=SIGF_unique\n'
+                ' labin file 2 ALL\n'
+                ' resolution file 1 999.0 %s\n' %str(round(float(mtzFile.d_min()),2))+
+                'eof\n'
+                '\n'
+                "dimple --no-cleanup %s.999A.mtz %s %s %s %s dimple\n" % (xtal, ref_pdb, ref_mtz, ref_cif, twin) +
+                '\n'
+                'fft hklin dimple/final.mtz mapout 2fofc.map << EOF\n'
                 ' labin F1=FWT PHI=PHWT\n'
                 'EOF\n'
                 '\n'
-                'fft hklin final.mtz mapout fofc.map << EOF\n'
+                'fft hklin dimple/final.mtz mapout fofc.map << EOF\n'
                 ' labin F1=DELFWT PHI=PHDELWT\n'
                 'EOF\n'
                 '\n'
-                +additional_cmds+
+                'cd %s\n' %os.path.join(self.initial_model_directory,xtal) +
                 '\n'
-                'cd %s\n' %os.path.join(self.initial_model_directory,xtal,'dimple',visit_run_autoproc) +
+                '/bin/rm dimple.pdb\n'
+                '/bin/rm dimple.mtz\n'
+                '\n'
+                'ln -s dimple/dimple/final.pdb dimple.pdb\n'
+                'ln -s dimple/dimple/final.mtz dimple.mtz\n'
+                '\n'
+                '/bin/rm init.pdb\n'
+                '/bin/rm init.mtz\n'
+                '\n'
+                'ln -s dimple.pdb init.pdb\n'
+                'ln -s dimple.mtz init.mtz\n'
+                '\n'
+                '/bin/rm 2fofc.map\n'
+                '/bin/rm fofc.map\n'
+                '\n'
+                'ln -s dimple/2fofc.map .\n'
+                'ln -s dimple/fofc.map .\n'
+                '\n'
+                '$CCP4/bin/ccp4-python '+os.path.join(os.getenv('XChemExplorer_DIR'),'helpers','update_data_source_for_new_dimple_pdb.py')+
+                ' {0!s} {1!s} {2!s}\n'.format(os.path.join(self.database_directory,self.data_source_file), xtal, self.initial_model_directory) +
                 '\n'
                 '/bin/rm dimple_run_in_progress\n'
                 '\n'
-                'ln -s dimple/final.pdb .\n'
-                'ln -s dimple/final.mtz .\n'
                 )
 
         os.chdir(self.ccp4_scratch_directory)
-        f = open('xce_{0!s}_{1!s}.sh'.format(self.pipeline, str(n+1)),'w')
+        f = open('xce_{0!s}_{1!s}.sh'.format(self.pipeline, str(self.n)),'w')
         f.write(Cmds)
         f.close()
+        os.system('chmod +x xce_{0!s}_{1!s}.sh'.format(self.pipeline, str(self.n)))
         self.n+=1
-        os.system('chmod +x xce_{0!s}_{1!s}.sh'.format(self.pipeline, str(n+1)))
         db_dict= {'DimpleStatus': 'started'}
         self.Logfile.insert('{0!s}: setting DataProcessingStatus flag to started'.format(xtal))
         self.db.update_data_source(xtal,db_dict)
@@ -1690,31 +1747,32 @@ class run_dimple_on_all_autoprocessing_files_new(QtCore.QThread):
                 self.Logfile.insert('submitting array job with maximal 100 jobs running on cluster')
                 self.Logfile.insert('using the following command:')
                 self.Logfile.insert('qsub -P labxchem -q medium.q -t 1:{0!s} -tc {1!s} {2!s}_master.sh'.format(str(self.n), self.max_queue_jobs, self.pipeline))
-                os.system('qsub -P labxchem -q medium.q -t 1:{0!s} -tc {1!s} {2!s}_master.sh'.format(str(self.n), self.max_queue_jobs, self.pipeline))
+                os.system('qsub -P labxchem -q medium.q -t 1:{0!s} -tc {1!s} {2!s}_master.sh'.format(str(self.n-1), self.max_queue_jobs, self.pipeline))
             else:
                 self.Logfile.insert("cannot start ARRAY job: make sure that 'module load global/cluster' is in your .bashrc or .cshrc file")
         elif self.external_software['qsub']:
             self.Logfile.insert('submitting {0!s} individual jobs to cluster'.format((str(self.n))))
             self.Logfile.insert('WARNING: this could potentially lead to a crash...')
-            for i in range(self.n):
-                self.Logfile.insert('qsub -q medium.q xce_{0!s}_{1!s}.sh'.format(str(i+1), self.pipeline))
-                os.system('qsub -q medium.q xce_{0!s}_{1!s}.sh'.format(str(i+1), self.pipeline))
+            for i in range(1,self.n):
+                self.Logfile.insert('qsub -q medium.q xce_{0!s}_{1!s}.sh'.format(self.pipeline,str(i)))
+                os.system('qsub -q medium.q xce_{0!s}_{1!s}.sh'.format(self.pipeline,str(i)))
         else:
-            self.Logfile.insert('running {0!s} consecutive {1!s} jobs on your local machine'.format(*(self.pipeline)))
-            for i in range(self.n):
-                self.Logfile.insert('starting xce_{0!s}_{1!s}.sh'.format(str(i+1), self.pipeline))
-                os.system('./xce_{0!s}_{1!s}.sh'.format(str(i+1), self.pipeline))
+            self.Logfile.insert('running {0!s} consecutive {1!s} jobs on your local machine'.format(str(self.n-1),self.pipeline))
+            for i in range(1,self.n):
+                self.Logfile.insert('starting xce_{0!s}_{1!s}.sh'.format(self.pipeline,str(i)))
+                os.system('./xce_{0!s}_{1!s}.sh'.format(self.pipeline,str(i)))
 
 
 
 class remove_selected_dimple_files(QtCore.QThread):
-    def __init__(self,sample_list,initial_model_directory,xce_logfile,database_directory,data_source_file,):
+    def __init__(self,sample_list,initial_model_directory,xce_logfile,database_directory,data_source_file,pipeline):
         QtCore.QThread.__init__(self)
         self.sample_list=sample_list
         self.initial_model_directory=initial_model_directory
         self.xce_logfile=xce_logfile
         self.Logfile=XChemLog.updateLog(xce_logfile)
         self.db=XChemDB.data_source(os.path.join(database_directory,data_source_file))
+        self.pipeline = pipeline
 
     def run(self):
         progress_step=1
@@ -1729,29 +1787,172 @@ class remove_selected_dimple_files(QtCore.QThread):
                 self.Logfile.insert('{0!s}: directory does not exist'.format(xtal))
                 continue
             os.chdir(os.path.join(self.initial_model_directory,xtal))
-            self.Logfile.insert('{0!s}: removing dimple.pdb/dimple.mtz'.format(xtal))
-            os.system('/bin/rm dimple.pdb 2> /dev/null')
-            os.system('/bin/rm dimple.mtz 2> /dev/null')
-            if os.path.isdir(os.path.join(self.initial_model_directory,xtal,'dimple','dimple_rerun_on_selected_file')):
-                os.chdir('dimple')
-                self.Logfile.insert('{0!s} removing directory dimple/dimple_rerun_on_selected_file'.format(xtal))
-                os.system('/bin/rm -fr dimple_rerun_on_selected_file')
 
-            db_dict['DimpleResolutionHigh']=''
-            db_dict['DimpleRcryst']=''
-            db_dict['DimpleRfree']=''
-            db_dict['DimplePathToPDB']=''
-            db_dict['DimplePathToMTZ']=''
-            db_dict['DimpleReferencePDB']=''
-            db_dict['DimplePANDDAwasRun']='False'
-            db_dict['DimplePANDDAhit']='False'
-            db_dict['DimplePANDDAreject']='False'
-            db_dict['DimplePANDDApath']=''
-            db_dict['DimpleStatus']='pending'
+            if self.pipeline=='dimple':
+                if os.path.isfile('init.pdb'):
+                    if 'dimple' in os.path.realpath('init.pdb'):
+                        self.Logfile.warning('{0!s}: init.pdb & init.mtz is linked to dimple outcome'.format(xtal))
+                        self.Logfile.warning('{0!s}: removing init.pdb & init.mtz & (2)fofc maps'.format(xtal))
+                        db_dict = self.remove_init(db_dict)
+                else:
+                    db_dict = self.remove_init(db_dict)
+                self.Logfile.warning('{0!s}: removing dimple folder & dimple.pdb/dimple.mtz'.format(xtal))
+                os.system('/bin/rm dimple_run_in_progress 2> /dev/null')
+                os.system('/bin/rm dimple.pdb 2> /dev/null')
+                os.system('/bin/rm dimple.mtz 2> /dev/null')
+                os.system('/bin/rm -fr dimple')
+            elif self.pipeline=='pipedream':
+                if os.path.isfile('init.pdb'):
+                    if 'dimple' in os.path.realpath('init.pdb'):
+                        self.Logfile.warning('{0!s}: init.pdb & init.mtz is linked to pipedream outcome'.format(xtal))
+                        self.Logfile.warning('{0!s}: removing init.pdb & init.mtz & (2)fofc maps'.format(xtal))
+                        db_dict = self.remove_init(db_dict)
+                else:
+                    db_dict = self.remove_init(db_dict)
+                self.Logfile.warning('{0!s}: removing pipedream folder & pipedream.pdb/pipedream.mtz'.format(xtal))
+                os.system('/bin/rm pipedream_run_in_progress 2> /dev/null')
+                os.system('/bin/rm pipedream.pdb 2> /dev/null')
+                os.system('/bin/rm pipedream.mtz 2> /dev/null')
+                os.system('/bin/rm -fr pipedream')
+            elif self.pipeline=='phenix.ligand_pipeline':
+                if os.path.isfile('init.pdb'):
+                    if 'dimple' in os.path.realpath('init.pdb'):
+                        self.Logfile.warning('{0!s}: init.pdb & init.mtz is linked to phenix.ligand_pipeline outcome'.format(xtal))
+                        self.Logfile.warning('{0!s}: removing init.pdb & init.mtz & (2)fofc maps'.format(xtal))
+                        db_dict = self.remove_init(db_dict)
+                else:
+                    db_dict = self.remove_init(db_dict)
+                self.Logfile.warning('{0!s}: removing phenix.ligand_pipeline folder & phenix.ligand_pipeline.pdb/phenix.ligand_pipeline.mtz'.format(xtal))
+                os.system('/bin/rm phenix.ligand_pipeline_run_in_progress 2> /dev/null')
+                os.system('/bin/rm phenix.ligand_pipeline.pdb 2> /dev/null')
+                os.system('/bin/rm phenix.ligand_pipeline.mtz 2> /dev/null')
+                os.system('/bin/rm -fr phenix.ligand_pipeline')
+
+            if db_dict != {}:
+                self.Logfile.insert('{0!s}: updating database'.format(xtal))
+                self.db.update_data_source(xtal,db_dict)
+
+            progress += progress_step
+            self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+        self.emit(QtCore.SIGNAL('datasource_menu_reload_samples'))
+
+    def remove_init(self,db_dict):
+        os.system('/bin/rm init.pdb')
+        os.system('/bin/rm init.mtz')
+        os.system('/bin/rm 2fofc.map')
+        os.system('/bin/rm fofc.map')
+        db_dict['DimpleResolutionHigh']=''
+        db_dict['DimpleRcryst']=''
+        db_dict['DimpleRfree']=''
+        db_dict['DimplePathToPDB']=''
+        db_dict['DimplePathToMTZ']=''
+        db_dict['DimpleReferencePDB']=''
+        db_dict['DimplePANDDAwasRun']='False'
+        db_dict['DimplePANDDAhit']='False'
+        db_dict['DimplePANDDAreject']='False'
+        db_dict['DimplePANDDApath']=''
+        db_dict['DimpleStatus']='pending'
+        return db_dict
+
+
+class set_results_from_selected_pipeline(QtCore.QThread):
+    def __init__(self,sample_list,initial_model_directory,xce_logfile,database_directory,data_source_file,pipeline):
+        QtCore.QThread.__init__(self)
+        self.sample_list=sample_list
+        self.initial_model_directory=initial_model_directory
+        self.xce_logfile=xce_logfile
+        self.Logfile=XChemLog.updateLog(xce_logfile)
+        self.db=XChemDB.data_source(os.path.join(database_directory,data_source_file))
+        self.pipeline = pipeline
+
+    def run(self):
+        progress_step=1
+        if len(self.sample_list) != 0:
+            progress_step=100/float(len(self.sample_list))
+        progress=0
+        self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+        for n,xtal in enumerate(self.sample_list):
+            db_dict={}
+            if not os.path.isdir(os.path.join(self.initial_model_directory,xtal)):
+                self.Logfile.insert('{0!s}: directory does not exist'.format(xtal))
+                continue
+            os.chdir(os.path.join(self.initial_model_directory,xtal))
+
+            if os.path.isfile('init.pdb'):
+                self.Logfile.warning('{0!s}: init.pdb & init.mtz exist'.format(xtal))
+                self.Logfile.warning('{0!s}: removing init.pdb & init.mtz & (2)fofc maps'.format(xtal))
+                os.system('/bin/rm init.pdb')
+                os.system('/bin/rm init.mtz')
+                os.system('/bin/rm 2fofc.map')
+                os.system('/bin/rm fofc.map')
+                db_dict['DimpleResolutionHigh']=''
+                db_dict['DimpleRcryst']=''
+                db_dict['DimpleRfree']=''
+                db_dict['DimplePathToPDB']=''
+                db_dict['DimplePathToMTZ']=''
+                db_dict['DimpleReferencePDB']=''
+                db_dict['DimplePANDDAwasRun']='False'
+                db_dict['DimplePANDDAhit']='False'
+                db_dict['DimplePANDDAreject']='False'
+                db_dict['DimplePANDDApath']=''
+                db_dict['DimpleStatus']='pending'
+
+            if self.pipeline=='dimple':
+                if os.path.isfile('dimple.pdb'):
+                    self.Logfile.insert('%s: selecting output from dimple' %xtal)
+                    os.system('ln -s dimple.pdb init.pdb')
+                    pdb_info=parse().PDBheader('dimple.pdb')
+                    db_dict['DimpleRcryst']=pdb_info['Rcryst']
+                    db_dict['DimpleRfree']=pdb_info['Rfree']
+                    db_dict['DimpleResolutionHigh']=pdb_info['ResolutionHigh']
+                    db_dict['DimpleStatus']='finished'
+                    db_dict['DimplePathToPDB']=os.path.realpath('dimple.pdb')
+                if os.path.isfile('dimple.mtz'):
+                    os.system('ln -s dimple.mtz init.mtz')
+                    db_dict['DimplePathToMTZ']=os.path.realpath('dimple.mtz')
+                if os.path.isfile('dimple/2fofc.map'):
+                    os.system('ln -s dimple/2fofc.map .')
+                if os.path.isfile('dimple/fofc.map'):
+                    os.system('ln -s dimple/fofc.map .')
+            elif self.pipeline=='pipedream':
+                if os.path.isfile('pipedream.pdb'):
+                    self.Logfile.insert('%s: selecting output from pipedream' %xtal)
+                    os.system('ln -s pipedream.pdb init.pdb')
+                    pdb_info=parse().PDBheader('pipedream.pdb')
+                    db_dict['DimpleRcryst']=pdb_info['Rcryst']
+                    db_dict['DimpleRfree']=pdb_info['Rfree']
+                    db_dict['DimpleResolutionHigh']=pdb_info['ResolutionHigh']
+                    db_dict['DimpleStatus']='finished'
+                    db_dict['DimplePathToPDB']=os.path.realpath('pipedream.pdb')
+                if os.path.isfile('pipedream.mtz'):
+                    os.system('ln -s pipedream.mtz init.mtz')
+                    db_dict['DimplePathToMTZ']=os.path.realpath('pipedream.mtz')
+                if os.path.isfile('pipedream/2fofc.map'):
+                    os.system('ln -s pipedream/2fofc.map .')
+                if os.path.isfile('pipedream/fofc.map'):
+                    os.system('ln -s pipedream/fofc.map .')
+            elif self.pipeline=='phenix.ligand_pipeline':
+                if os.path.isfile('phenix.ligand_pipeline.pdb'):
+                    self.Logfile.insert('%s: selecting output from phenix.ligand_pipeline' %xtal)
+                    os.system('ln -s phenix.ligand_pipeline.pdb init.pdb')
+                    pdb_info=parse().PDBheader('phenix.ligand_pipeline.pdb')
+                    db_dict['DimpleRcryst']=pdb_info['Rcryst']
+                    db_dict['DimpleRfree']=pdb_info['Rfree']
+                    db_dict['DimpleResolutionHigh']=pdb_info['ResolutionHigh']
+                    db_dict['DimpleStatus']='finished'
+                    db_dict['DimplePathToPDB']=os.path.realpath('phenix.ligand_pipeline.pdb')
+                if os.path.isfile('phenix.ligand_pipeline.mtz'):
+                    os.system('ln -s phenix.ligand_pipeline.mtz init.mtz')
+                    db_dict['DimplePathToMTZ']=os.path.realpath('phenix.ligand_pipeline.mtz')
+                if os.path.isfile('phenix.ligand_pipeline/2fofc.map'):
+                    os.system('ln -s phenix.ligand_pipeline/2fofc.map .')
+                if os.path.isfile('phenix.ligand_pipeline/fofc.map'):
+                    os.system('ln -s phenix.ligand_pipeline/fofc.map .')
 
             self.Logfile.insert('{0!s}: updating database'.format(xtal))
             self.db.update_data_source(xtal,db_dict)
-
 
             progress += progress_step
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
@@ -1760,13 +1961,12 @@ class remove_selected_dimple_files(QtCore.QThread):
 
 
 
-
 class start_COOT(QtCore.QThread):
 
     def __init__(self,settings,interface):
         QtCore.QThread.__init__(self)
         self.settings=settings
-        if interface=='old':
+        if interface=='test':
             self.pylib='XChemCoot.py'
         elif interface=='new':
             self.pylib='XChemCootNew.py'

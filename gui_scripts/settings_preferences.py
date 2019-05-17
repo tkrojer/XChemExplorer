@@ -30,7 +30,7 @@ class setup():
 
     def settings(self, xce_object):
         # set XCE version
-        xce_object.xce_version = 'v1.3.2'
+        xce_object.xce_version = 'v1.3.8'
 
         # general settings
         xce_object.allowed_unitcell_difference_percent = 12
@@ -47,8 +47,18 @@ class setup():
 
         # if in the correct place, set the various directories
         if 'labxchem' in xce_object.current_directory:
-            xce_object.labxchem_directory = '/' + os.path.join(
-                *xce_object.current_directory.split('/')[1:6])  # need splat operator: *
+            if len(xce_object.current_directory.split('/')) >= 9 and xce_object.current_directory.split('/')[6] == 'processing' and xce_object.current_directory.split('/')[8] == 'processing':
+                xce_object.labxchem_directory = '/' + os.path.join(
+                        *xce_object.current_directory.split('/')[1:8])  # need splat operator: *
+                xce_object.labxchem_directory_current = '/' + os.path.join(
+                    *xce_object.current_directory.split('/')[1:9])  # labxchem_directory_current is where they actually have write permission
+            else:
+                xce_object.labxchem_directory = '/' + os.path.join(
+                        *xce_object.current_directory.split('/')[1:6])  # need splat operator: *
+                xce_object.labxchem_directory_current = '/' + os.path.join(
+                        *xce_object.current_directory.split('/')[1:7])  # need splat operator: *
+#            xce_object.labxchem_directory = '/' + os.path.join(
+#                *xce_object.current_directory.split('/')[1:6])  # need splat operator: *
             xce_object.beamline_directory = os.path.join(xce_object.labxchem_directory, 'processing', 'beamline')
             xce_object.initial_model_directory = os.path.join(xce_object.labxchem_directory, 'processing', 'analysis',
                                                               'initial_model')
@@ -87,6 +97,7 @@ class setup():
 
         # otherwise, use the current working directory
         else:
+            xce_object.labxchem_directory_current = xce_object.current_directory
             xce_object.beamline_directory = xce_object.current_directory
             xce_object.initial_model_directory = xce_object.current_directory
             xce_object.reference_directory = xce_object.current_directory
@@ -96,6 +107,7 @@ class setup():
             xce_object.panddas_directory = xce_object.current_directory
             xce_object.datasets_summary_file = ''
             xce_object.group_deposit_directory = xce_object.current_directory
+
 
         ## deposition
 
@@ -214,6 +226,10 @@ class setup():
         xce_object.max_queue_jobs = 100
         xce_object.dimple_twin_mode = False
 
+        xce_object.preferences_initial_refinement_pipeline = [  'dimple',
+                                                                'pipedream',
+                                                                'phenix.ligand_pipeline'    ]
+
         xce_object.preferences = {'processed_data_to_copy':                     'mtz_log_only',
                                   'dataset_selection_mechanism':                'IsigI*Comp*UniqueRefl',
                                   'allowed_unitcell_difference_percent':        12,
@@ -221,7 +237,9 @@ class setup():
                                   'acceptable_low_resolution_Rmerge':           0.1,
                                   'filename_root':                              '${samplename}',
                                   'max_queue_jobs':                             100,
-                                  'dimple_twin_mode':                           False   }
+                                  'dimple_twin_mode':                           False,
+                                  'initial_refinement_pipeline':                'dimple'    }
+
 
         ## settings
 
@@ -415,18 +433,18 @@ class setup():
                                                   [
                                                       ['Edit information', '', xce_object.deposition_data],
                                                       ['Export to HTML', '', xce_object.export_to_html],
-                                                      ['Find PanDDA apo structures', '',
-                                                       xce_object.create_missing_apo_records_in_depositTable],
+#                                                      ['Find PanDDA apo structures', '',
+#                                                       xce_object.create_missing_apo_records_in_depositTable],
 #                                                      ['Update file info of apo structures', '',
 #                                                       xce_object.update_file_information_of_apo_records],
-                                                      ['Prepare mmcif for apo structures', '',
-                                                       xce_object.prepare_models_for_deposition_apo],
-                                                      ['Prepare mmcif for ligand bound structures', '',
-                                                       xce_object.prepare_models_for_deposition_ligand_bound],
-                                                      ['Copy files to group deposition directory (ligand bound)', '',
-                                                       xce_object.prepare_for_group_deposition_upload_ligand_bound],
-                                                      ['Copy files to group deposition directory (ground state)', '',
-                                                       xce_object.prepare_for_group_deposition_upload_ground_state],
+#                                                      ['Prepare mmcif for apo structures', '',
+#                                                       xce_object.prepare_models_for_deposition_apo],
+#                                                      ['Prepare mmcif for ligand bound structures', '',
+#                                                       xce_object.prepare_models_for_deposition_ligand_bound],
+#                                                      ['Copy files to group deposition directory (ligand bound)', '',
+#                                                       xce_object.prepare_for_group_deposition_upload_ligand_bound],
+#                                                      ['Copy files to group deposition directory (ground state)', '',
+#                                                       xce_object.prepare_for_group_deposition_upload_ground_state],
                                                       ['Update DB with PDB codes', '', xce_object.enter_pdb_codes],
                                                       ['Check SMILES', '', xce_object.check_smiles_in_db_and_pdb]
                                                   ]],
@@ -568,11 +586,13 @@ class setup():
                                     'Run xia2 on selected datasets',
                                     'Run xia2 on selected datasets - overwrite']
 
-        xce_object.map_cif_file_tasks = ['Run DIMPLE on selected MTZ files',
-                                         'Remove selected DIMPLE PDB/MTZ files',
-                                         'Create CIF/PDB/PNG file of ALL compounds',
-                                         'Create CIF/PDB/PNG file of NEW compounds',
-                                         'Create CIF/PDB/PNG file of SELECTED compounds']
+        xce_object.map_cif_file_tasks = ['Run initial refinement on selected MTZ files',
+                                         'Remove selected initial refinement files',
+                                         'Set only results from selected pipeline',
+#                                         'Create CIF/PDB/PNG file of ALL compounds',
+#                                         'Create CIF/PDB/PNG file of NEW compounds',
+                                         'Create CIF/PDB/PNG file of SELECTED compounds'
+                                         ]
 
         xce_object.panddas_file_tasks = ['pandda.analyse',
                                          'pandda.inspect',
@@ -589,6 +609,10 @@ class setup():
                                          'Build ground state model']
 
         xce_object.refine_file_tasks = ['Open COOT',
-                                        'Open COOT for old PanDDA',
-                                        'Update Deposition Table',
-                                        'Prepare Group Deposition']
+                                        'Open COOT - test -']
+
+#        xce_object.refine_file_tasks = ['Open COOT',
+#                                        'Open COOT for old PanDDA',
+#                                        'Update Deposition Table',
+#                                        'Prepare Group Deposition']
+

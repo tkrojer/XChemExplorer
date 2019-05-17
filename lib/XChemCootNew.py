@@ -948,7 +948,8 @@ class GUI(object):
         self.db_dict_mainTable['RefinementOutcome'] = data
         print '==> XCE: setting Refinement Outcome for ' + self.xtalID + ' to ' + str(
             data) + ' in mainTable of datasource'
-        self.db.update_data_source(self.xtalID, self.db_dict_mainTable)
+#        self.db.update_data_source(self.xtalID, self.db_dict_mainTable)
+        self.db.create_or_remove_missing_records_in_depositTable(self.xce_logfile,self.xtalID,'ligand_bound',self.db_dict_mainTable)
 
     def ligand_confidence_button_clicked(self, widget, data=None):
         print 'PANDDA_index', self.pandda_index
@@ -1018,6 +1019,13 @@ class GUI(object):
                 XChemUtils.parse().update_datasource_with_PDBheader(self.xtalID, self.data_source,
                                                                     os.path.join(self.project_directory, self.xtalID,
                                                                                  self.pdb_style))
+                XChemUtils.parse().update_datasource_with_phenix_validation_summary(self.xtalID, self.data_source,
+                                                                                    '')  # '' because file does not exist
+            elif os.path.isfile(os.path.join(self.project_directory, self.xtalID, 'init.pdb')):
+                print '==> XCE: updating quality indicators in data source for ' + self.xtalID
+                XChemUtils.parse().update_datasource_with_PDBheader(self.xtalID, self.data_source,
+                                                                    os.path.join(self.project_directory, self.xtalID,
+                                                                                 'init.pdb'))
                 XChemUtils.parse().update_datasource_with_phenix_validation_summary(self.xtalID, self.data_source,
                                                                                     '')  # '' because file does not exist
             elif os.path.isfile(os.path.join(self.project_directory, self.xtalID, 'dimple.pdb')):
@@ -1116,6 +1124,10 @@ class GUI(object):
                 os.chdir(os.path.join(self.project_directory, self.xtalID))
                 imol = coot.handle_read_draw_molecule_with_recentre(
                     os.path.join(self.project_directory, self.xtalID, self.pdb_style), 0)
+            elif os.path.isfile(os.path.join(self.project_directory, self.xtalID, 'init.pdb')):
+                os.chdir(os.path.join(self.project_directory, self.xtalID))
+                imol = coot.handle_read_draw_molecule_with_recentre(
+                    os.path.join(self.project_directory, self.xtalID, 'init.pdb'), 0)
             elif os.path.isfile(os.path.join(self.project_directory, self.xtalID, 'dimple.pdb')):
                 os.chdir(os.path.join(self.project_directory, self.xtalID))
                 imol = coot.handle_read_draw_molecule_with_recentre(
@@ -1162,6 +1174,8 @@ class GUI(object):
             #                        os.symlink('dimple.mtz',self.mtz_style)
             if os.path.isfile(os.path.join(self.project_directory, self.xtalID, self.mtz_style)):
                 coot.auto_read_make_and_draw_maps(os.path.join(self.project_directory, self.xtalID, self.mtz_style))
+            elif os.path.isfile(os.path.join(self.project_directory, self.xtalID, 'init.mtz')):
+                coot.auto_read_make_and_draw_maps(os.path.join(self.project_directory, self.xtalID, 'init.mtz'))
             elif os.path.isfile(os.path.join(self.project_directory, self.xtalID, 'dimple.mtz')):
                 coot.auto_read_make_and_draw_maps(os.path.join(self.project_directory, self.xtalID, 'dimple.mtz'))
 
@@ -1259,7 +1273,10 @@ class GUI(object):
             if not os.path.isdir(os.path.join(self.project_directory, self.xtalID, 'cootOut')):
                 os.mkdir(os.path.join(self.project_directory, self.xtalID, 'cootOut'))
             # create folder for new refinement cycle
-            os.mkdir(os.path.join(self.project_directory, self.xtalID, 'cootOut', 'Refine_' + str(self.Serial)))
+            try:
+                os.mkdir(os.path.join(self.project_directory, self.xtalID, 'cootOut', 'Refine_' + str(self.Serial)))
+            except OSError:
+                print '==> XCE: WARNING -> folder exists; will overwrite contents!'
 
             #######################################################
             # write PDB file
@@ -1294,6 +1311,11 @@ class GUI(object):
             # note: the user has to make sure that the ligand file was merged into main file
             for item in coot_utils_XChem.molecule_number_list():
                 if coot.molecule_name(item).endswith(self.pdb_style):
+                    coot.write_pdb_file(item,
+                                        os.path.join(self.project_directory, self.xtalID, 'Refine_' + str(self.Serial),
+                                                     'in.pdb'))
+                    break
+                elif coot.molecule_name(item).endswith('init.pdb'):
                     coot.write_pdb_file(item,
                                         os.path.join(self.project_directory, self.xtalID, 'Refine_' + str(self.Serial),
                                                      'in.pdb'))

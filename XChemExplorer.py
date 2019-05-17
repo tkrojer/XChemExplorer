@@ -90,6 +90,25 @@ class XChemExplorer(QtGui.QApplication):
         LayoutObjects(self).main_layout(self)
         LayoutFuncs().add_widgets_layouts(self)
 
+        self.checkLabXChemDir()
+
+    def checkLabXChemDir(self):
+        dirCheck = QtGui.QMessageBox()
+        dirCheckLayout = dirCheck.layout()
+        vbox = QtGui.QVBoxLayout()
+        try:
+            warning = (
+                    'Are you sure you want to launch XCE here:\n\n'
+                    +self.labxchem_directory_current+'\n\n'
+                    'If this is not where you should be running XCE, please close!\n'
+                    )
+        except AttributeError:
+            return
+        vbox.addWidget(QtGui.QLabel(warning))
+        dirCheckLayout.addLayout(vbox, 0, 0)
+        dirCheck.exec_();
+
+
     # function to update datasource
     def datasource_menu_reload_samples(self):
         self.update_log.insert(
@@ -725,8 +744,22 @@ class XChemExplorer(QtGui.QApplication):
             self.preferences_selection_mechanism_combobox.addItem(item)
         self.preferences_selection_mechanism_combobox.currentIndexChanged.connect(
             self.preferences_selection_mechanism_combobox_changed)
+        index = self.preferences_selection_mechanism_combobox.findText(self.preferences['dataset_selection_mechanism'], QtCore.Qt.MatchFixedString)
+        self.preferences_selection_mechanism_combobox.setCurrentIndex(index)
         vbox_select.addWidget(self.preferences_selection_mechanism_combobox)
         vbox.addLayout(vbox_select)
+
+        vbox_inital_refinement = QtGui.QVBoxLayout()
+        vbox_inital_refinement.addWidget(QtGui.QLabel('Initial Refinement Pipeline:'))
+        self.preferences_initial_refinement_combobox = QtGui.QComboBox()
+        for item in self.preferences_initial_refinement_pipeline:
+            self.preferences_initial_refinement_combobox.addItem(item)
+        self.preferences_initial_refinement_combobox.currentIndexChanged.connect(
+            self.preferences_initial_refinement_combobox_changed)
+        index = self.preferences_initial_refinement_combobox.findText(self.preferences['initial_refinement_pipeline'], QtCore.Qt.MatchFixedString)
+        self.preferences_initial_refinement_combobox.setCurrentIndex(index)
+        vbox_inital_refinement.addWidget(self.preferences_initial_refinement_combobox)
+        vbox.addLayout(vbox_inital_refinement)
 
         vbox_restraints = QtGui.QVBoxLayout()
         vbox_restraints.addWidget(QtGui.QLabel('Restraints generation program:'))
@@ -915,12 +948,15 @@ class XChemExplorer(QtGui.QApplication):
 
     def prepare_models_for_deposition_ligand_bound(self,structureType):
 
+        ignore_event_map = False
         if structureType == 'ground-state':
             ground_state = [ str(self.ground_state_pdb_button_label.text()),
                              str(self.ground_state_mtz_button_label.text()),
                              self.panddas_directory ]
         else:
             ground_state = []
+            if self.deposition_bounnd_state_preparation_ignore_event_map.isChecked():
+                ignore_event_map = True
 
 #        structureType = "ligand_bound"
 
@@ -930,7 +966,8 @@ class XChemExplorer(QtGui.QApplication):
             self.xce_logfile,
             overwrite_existing_mmcif,
             self.initial_model_directory,
-            ground_state)
+            ground_state,
+            ignore_event_map)
         self.explorer_active = 1
         self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
         self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
@@ -1052,7 +1089,8 @@ class XChemExplorer(QtGui.QApplication):
 
         grid.addWidget(QtGui.QLabel('PI role'), 5, 0)
         self.contact_author_PI_role = QtGui.QComboBox()
-        PIroles = ['group leader', 'principal investigator/group leader', 'investigator']
+#        PIroles = ['group leader', 'principal investigator/group leader', 'investigator']
+        PIroles = ['principal investigator/group leader']
         for item in PIroles: self.contact_author_PI_role.addItem(item)
         grid.addWidget(self.contact_author_PI_role, 5, 1)
 
@@ -1505,8 +1543,136 @@ class XChemExplorer(QtGui.QApplication):
         grid.addWidget(self.Manipulated_source_details, 14, 1)
         grid.addWidget(QtGui.QLabel('(any other relevant information)'), 14, 2)
 
+        grid.addWidget(QtGui.QLabel('Chains'), 15, 0)
+        self.molecule_chain_one = QtGui.QLineEdit()
+        self.molecule_chain_one.setText('')
+        self.molecule_chain_one.setFixedWidth(300)
+        grid.addWidget(self.molecule_chain_one, 15, 1)
+        grid.addWidget(QtGui.QLabel('(e.g. A or A,B)'), 15, 2)
+
         frame.setLayout(grid)
         vb.addWidget(frame)
+
+        ### entity 2
+
+        frame = QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.StyledPanel)
+
+        grid = QtGui.QGridLayout()
+
+        grid.addWidget(QtGui.QLabel('Entity 2 (IMPORTANT: only fill in if you are working with a protein-protein complex!)'), 1, 0)
+
+        grid.addWidget(QtGui.QLabel('Molecule Name'), 2, 0)
+        self.molecule_name_two = QtGui.QLineEdit()
+        self.molecule_name_two.setText('')
+        self.molecule_name_two.setFixedWidth(300)
+        self.molecule_name_two.setStyleSheet("background-color: rgb(192, 192, 192);")
+        grid.addWidget(self.molecule_name_two, 2, 1)
+        grid.addWidget(QtGui.QLabel('(e.g. RNA Hammerhead Ribozyme)'), 2, 2)
+
+        grid.addWidget(QtGui.QLabel('Fragment Name'), 3, 0)
+        self.fragment_name_two = QtGui.QLineEdit()
+        self.fragment_name_two.setText('')
+        self.fragment_name_two.setFixedWidth(300)
+        self.fragment_name_two.setStyleSheet("background-color: rgb(192, 192, 192);")
+        grid.addWidget(self.fragment_name_two, 3, 1)
+        grid.addWidget(QtGui.QLabel('(e.g. ligand binding domain, hairpin)'), 3, 2)
+
+        grid.addWidget(QtGui.QLabel('Specific Mutation'), 4, 0)
+        self.fragment_name_two_specific_mutation = QtGui.QLineEdit()
+        self.fragment_name_two_specific_mutation.setText('')
+        self.fragment_name_two_specific_mutation.setFixedWidth(300)
+        self.fragment_name_two_specific_mutation.setStyleSheet("background-color: rgb(192, 192, 192);")
+        grid.addWidget(self.fragment_name_two_specific_mutation, 4, 1)
+        grid.addWidget(QtGui.QLabel('(e.g. C280S)'), 4, 2)
+
+        grid.addWidget(QtGui.QLabel('Enzyme Comission Number'), 5, 0)
+        self.fragment_name_two_enzyme_comission_number = QtGui.QLineEdit()
+        self.fragment_name_two_enzyme_comission_number.setText('')
+        self.fragment_name_two_enzyme_comission_number.setFixedWidth(300)
+        self.fragment_name_two_enzyme_comission_number.setStyleSheet("background-color: rgb(192, 192, 192);")
+        grid.addWidget(self.fragment_name_two_enzyme_comission_number, 5, 1)
+        grid.addWidget(QtGui.QLabel('(if known: e.g. 2.7.7.7)'), 5, 2)
+
+        grid.addWidget(QtGui.QLabel('Genetically Manipulated Source'), 6, 0)
+
+        grid.addWidget(QtGui.QLabel('Source organism scientific name'), 7, 0)
+
+        self.Source_organism_scientific_name_two = QtGui.QComboBox()
+        taxonomy_dict = XChemMain.NCBI_taxonomy_ID()
+        for item in taxonomy_dict:
+            self.Source_organism_scientific_name_two.addItem(taxonomy_dict[item])
+        grid.addWidget(self.Source_organism_scientific_name_two, 7, 1)
+
+        grid.addWidget(QtGui.QLabel('Source organism gene'), 8, 0)
+        self.Source_organism_gene_two = QtGui.QLineEdit()
+        self.Source_organism_gene_two.setText('')
+        self.Source_organism_gene_two.setFixedWidth(300)
+        grid.addWidget(self.Source_organism_gene_two, 8, 1)
+        grid.addWidget(QtGui.QLabel('(e.g. RPOD, ALKA...)'), 8, 2)
+
+        grid.addWidget(QtGui.QLabel('Source organism strain'), 9, 0)
+        self.Source_organism_strain_two = QtGui.QLineEdit()
+        self.Source_organism_strain_two.setText('')
+        self.Source_organism_strain_two.setFixedWidth(300)
+        self.Source_organism_strain_two.setStyleSheet("background-color: rgb(192, 192, 192);")
+        grid.addWidget(self.Source_organism_strain_two, 9, 1)
+        grid.addWidget(QtGui.QLabel('(e.g. BH10 ISOLATE, K-12...)'), 9, 2)
+
+        grid.addWidget(QtGui.QLabel('Expression system scientific name'), 10, 0)
+
+        self.Expression_system_scientific_name_two = QtGui.QComboBox()
+        for item in taxonomy_dict:
+            self.Expression_system_scientific_name_two.addItem(taxonomy_dict[item])
+        grid.addWidget(self.Expression_system_scientific_name_two, 10, 1)
+
+        grid.addWidget(QtGui.QLabel('Expression system strain'), 11, 0)
+        self.Expression_system_strain_two = QtGui.QLineEdit()
+        self.Expression_system_strain_two.setText('')
+        self.Expression_system_strain_two.setFixedWidth(300)
+        self.Expression_system_strain_two.setStyleSheet("background-color: rgb(192, 192, 192);")
+        grid.addWidget(self.Expression_system_strain_two, 11, 1)
+        grid.addWidget(QtGui.QLabel('(e.g. BL21(DE3))'), 11, 2)
+
+        grid.addWidget(QtGui.QLabel('Expression system vector type'), 12, 0)
+        self.Expression_system_vector_type_two = QtGui.QLineEdit()
+        self.Expression_system_vector_type_two.setText('')
+        self.Expression_system_vector_type_two.setFixedWidth(300)
+        self.Expression_system_vector_type_two.setStyleSheet("background-color: rgb(192, 192, 192);")
+        grid.addWidget(self.Expression_system_vector_type_two, 12, 1)
+        grid.addWidget(QtGui.QLabel('(e.g. plasmid)'), 12, 2)
+
+        grid.addWidget(QtGui.QLabel('Expression_system_plasmid_name'), 13, 0)
+        self.Expression_system_plasmid_name_two = QtGui.QLineEdit()
+        self.Expression_system_plasmid_name_two.setText('')
+        self.Expression_system_plasmid_name_two.setFixedWidth(300)
+        self.Expression_system_plasmid_name_two.setStyleSheet("background-color: rgb(192, 192, 192);")
+        grid.addWidget(self.Expression_system_plasmid_name_two, 13, 1)
+        grid.addWidget(QtGui.QLabel('(e.g. pET26)'), 13, 2)
+
+        grid.addWidget(QtGui.QLabel('Manipulated_source_details'), 14, 0)
+        self.Manipulated_source_details_two = QtGui.QLineEdit()
+        self.Manipulated_source_details_two.setText('')
+        self.Manipulated_source_details_two.setFixedWidth(300)
+        self.Manipulated_source_details_two.setStyleSheet("background-color: rgb(192, 192, 192);")
+        grid.addWidget(self.Manipulated_source_details_two, 14, 1)
+        grid.addWidget(QtGui.QLabel('(any other relevant information)'), 14, 2)
+
+        grid.addWidget(QtGui.QLabel('Chains'), 15, 0)
+        self.molecule_chain_two = QtGui.QLineEdit()
+        self.molecule_chain_two.setText('')
+        self.molecule_chain_two.setFixedWidth(300)
+        grid.addWidget(self.molecule_chain_two, 15, 1)
+        grid.addWidget(QtGui.QLabel('(e.g. A or A,B)'), 15, 2)
+
+        frame.setLayout(grid)
+
+        vb.addWidget(frame)
+
+        ### entity 2 --- END
+
+
+
 
         vb.addStretch(1)
 
@@ -1547,21 +1713,37 @@ class XChemExplorer(QtGui.QApplication):
         self.molecule_one_letter_sequence.setFixedWidth(300)
         grid.addWidget(self.molecule_one_letter_sequence, 4, 1, 7, 2)
 
-        grid.addWidget(QtGui.QLabel('Structural Genomic (optional)'), 8, 0)
+        grid.addWidget(QtGui.QLabel('Sequence information for entity 2 (Important: only fill in if you have a protein-protein complex'), 8, 0)
 
-        grid.addWidget(QtGui.QLabel('Project Name'), 9, 0)
+        grid.addWidget(QtGui.QLabel('Sequence UNIPROT ID (Entity 2)'), 9, 0)
+        self.molecule_one_letter_sequence_uniprot_id_two = QtGui.QLineEdit()
+        self.molecule_one_letter_sequence_uniprot_id_two.setText('')
+        self.molecule_one_letter_sequence_uniprot_id_two.setFixedWidth(300)
+        grid.addWidget(self.molecule_one_letter_sequence_uniprot_id_two, 9, 1)
+        grid.addWidget(QtGui.QLabel('(e.g.  Q6B0I6)'), 9, 2)
+
+        grid.addWidget(QtGui.QLabel('Sequence (Entity 2)'), 10, 0)
+        self.molecule_one_letter_sequence_two = QtGui.QTextEdit()
+        self.molecule_one_letter_sequence_two.setText('')
+        self.molecule_one_letter_sequence_two.setFixedWidth(300)
+        grid.addWidget(self.molecule_one_letter_sequence_two, 10, 1, 13, 2)
+
+
+        grid.addWidget(QtGui.QLabel('Structural Genomic (optional)'), 14, 0)
+
+        grid.addWidget(QtGui.QLabel('Project Name'), 15, 0)
         self.SG_project_name = QtGui.QLineEdit()
         self.SG_project_name.setText('')
         self.SG_project_name.setFixedWidth(300)
-        grid.addWidget(self.SG_project_name, 9, 1)
-        grid.addWidget(QtGui.QLabel('(e.g. PSI, Protein Structure Initiative)'), 9, 2)
+        grid.addWidget(self.SG_project_name, 15, 1)
+        grid.addWidget(QtGui.QLabel('(e.g. SGC, Structural Genomics Consortium)'), 15, 2)
 
-        grid.addWidget(QtGui.QLabel('Full Name'), 10, 0)
+        grid.addWidget(QtGui.QLabel('Full Name'), 16, 0)
         self.full_name_of_SG_center = QtGui.QLineEdit()
         self.full_name_of_SG_center.setText('')
         self.full_name_of_SG_center.setFixedWidth(300)
-        grid.addWidget(self.full_name_of_SG_center, 10, 1)
-        grid.addWidget(QtGui.QLabel('(e.g. Berkeley Structural Genomic Center)'), 10, 2)
+        grid.addWidget(self.full_name_of_SG_center, 16, 1)
+        grid.addWidget(QtGui.QLabel('(e.g. Structural Genomics Consortium)'), 16, 2)
 
         frame.setLayout(grid)
         vb.addWidget(frame)
@@ -1758,6 +1940,7 @@ class XChemExplorer(QtGui.QApplication):
                                                                     '*.deposit')
         file_name = tuple(file_name_temp)[0]
         self.deposit_dict = pickle.load(open(file_name, "rb"))
+        print self.deposit_dict
         self.update_deposit_input()
 
     def load_deposit_from_database(self):
@@ -1848,6 +2031,8 @@ class XChemExplorer(QtGui.QApplication):
             for n, name in enumerate(self.deposit_dict['primary_citation_author_name'].split(';')):
                 self.primary_citation_author_name_List[n].setText(name)
 
+            ### entity 1
+
             self.molecule_name.setText(self.deposit_dict['molecule_name'])
             self.fragment_name_one_specific_mutation.setText(self.deposit_dict['fragment_name_one_specific_mutation'])
             index = self.Source_organism_scientific_name.findText(self.deposit_dict['Source_organism_scientific_name'],
@@ -1864,6 +2049,47 @@ class XChemExplorer(QtGui.QApplication):
             self.Expression_system_vector_type.setText(self.deposit_dict['Expression_system_vector_type'])
             self.Expression_system_plasmid_name.setText(self.deposit_dict['Expression_system_plasmid_name'])
             self.Manipulated_source_details.setText(self.deposit_dict['Manipulated_source_details'])
+
+#            try:
+            self.molecule_chain_one.setText(self.deposit_dict['molecule_chain_one'])
+            ### entity 2
+            self.molecule_name_two.setText(self.deposit_dict['molecule_name_two'])
+            self.fragment_name_two_specific_mutation.setText(self.deposit_dict['fragment_name_two_specific_mutation'])
+            index = self.Source_organism_scientific_name_two.findText(self.deposit_dict['Source_organism_scientific_name_two'],
+                                                                      QtCore.Qt.MatchFixedString)
+            self.Source_organism_scientific_name_two.setCurrentIndex(index)
+            self.Source_organism_gene_two.setText(self.deposit_dict['Source_organism_gene_two'])
+            self.Source_organism_strain_two.setText(self.deposit_dict['Source_organism_strain_two'])
+            index = self.Expression_system_scientific_name_two.findText(
+                    self.deposit_dict['Expression_system_scientific_name_two'], QtCore.Qt.MatchFixedString)
+            self.Expression_system_scientific_name_two.setCurrentIndex(index)
+
+            self.Expression_system_strain_two.setText(self.deposit_dict['Expression_system_strain_two'])
+            self.Expression_system_vector_type_two.setText(self.deposit_dict['Expression_system_vector_type_two'])
+            self.Expression_system_plasmid_name_two.setText(self.deposit_dict['Expression_system_plasmid_name_two'])
+            self.Manipulated_source_details_two.setText(self.deposit_dict['Manipulated_source_details_two'])
+            self.molecule_chain_two.setText(self.deposit_dict['molecule_chain_two'])
+            self.molecule_one_letter_sequence_uniprot_id_two.setText(
+                    self.deposit_dict['molecule_two_letter_sequence_uniprot_id'])
+            self.molecule_one_letter_sequence_two.setText(self.deposit_dict['molecule_two_letter_sequence'])
+#            except KeyError:
+#                self.molecule_chain_one.setText('')
+#                ### entity 2
+#                self.molecule_name_two.setText('')
+#                self.fragment_name_two_specific_mutation.setText('')
+#                self.Source_organism_scientific_name_two.setCurrentIndex(0)
+#                self.Source_organism_gene_two.setText('')
+#                self.Source_organism_strain_two.setText('')
+#                self.Expression_system_scientific_name_two.setCurrentIndex(0)
+#                self.Expression_system_strain_two.setText('')
+#                self.Expression_system_vector_type_two.setText('')
+#                self.Expression_system_plasmid_name_two.setText('')
+#                self.Manipulated_source_details_two.setText('')
+#                self.molecule_chain_two.setText('')
+#                self.molecule_one_letter_sequence_uniprot_id_two.setText('')
+#                self.molecule_one_letter_sequence_two.setText('')
+
+            ###
 
             self.structure_keywords.setText(self.deposit_dict['structure_keywords'])
             self.biological_assembly_chain_number.setText(self.deposit_dict['biological_assembly_chain_number'])
@@ -1959,7 +2185,7 @@ class XChemExplorer(QtGui.QApplication):
             'primary_citation_journal_volume': str(self.primary_citation_journal_volume.text()),
             'primary_citation_page_first': str(self.primary_citation_page_first.text()),
             'primary_citation_page_last': str(self.primary_citation_page_last.text()),
-
+            ### entity 1
             'molecule_name': str(self.molecule_name.text()),
             'Source_organism_scientific_name': str(self.Source_organism_scientific_name.currentText()),
             'Source_organism_gene': str(self.Source_organism_gene.text()),
@@ -1970,13 +2196,31 @@ class XChemExplorer(QtGui.QApplication):
             'Expression_system_vector_type': str(self.Expression_system_vector_type.text()),
             'Manipulated_source_details': str(self.Manipulated_source_details.text()),
             'fragment_name_one_specific_mutation': str(self.fragment_name_one_specific_mutation.text()),
+            'molecule_chain_one': str(self.molecule_chain_one.text()),
+
+            ### entity 2
+            'molecule_name_two': str(self.molecule_name_two.text()),
+            'Source_organism_scientific_name_two': str(self.Source_organism_scientific_name_two.currentText()),
+            'Source_organism_gene_two': str(self.Source_organism_gene_two.text()),
+            'Source_organism_strain_two': str(self.Source_organism_strain_two.text()),
+            'Expression_system_scientific_name_two': str(self.Expression_system_scientific_name_two.currentText()),
+            'Expression_system_strain_two': str(self.Expression_system_strain_two.text()),
+            'Expression_system_plasmid_name_two': str(self.Expression_system_plasmid_name_two.text()),
+            'Expression_system_vector_type_two': str(self.Expression_system_vector_type_two.text()),
+            'Manipulated_source_details_two': str(self.Manipulated_source_details_two.text()),
+            'fragment_name_two_specific_mutation': str(self.fragment_name_two_specific_mutation.text()),
+            'molecule_chain_two': str(self.molecule_chain_two.text()),
 
             'structure_keywords': str(self.structure_keywords.text()),
             'biological_assembly_chain_number': str(self.biological_assembly_chain_number.text()),
             'molecule_one_letter_sequence_uniprot_id': str(self.molecule_one_letter_sequence_uniprot_id.text()),
+            'molecule_two_letter_sequence_uniprot_id': str(self.molecule_one_letter_sequence_uniprot_id_two.text()),
             'SG_project_name': str(self.SG_project_name.text()),
             'full_name_of_SG_center': str(self.full_name_of_SG_center.text()),
             'molecule_one_letter_sequence': str(self.molecule_one_letter_sequence.toPlainText()).replace(' ',
+                                                                                                         '').replace(
+                '\n', '').replace('\r', ''),
+            'molecule_two_letter_sequence': str(self.molecule_one_letter_sequence_two.toPlainText()).replace(' ',
                                                                                                          '').replace(
                 '\n', '').replace('\r', ''),
 
@@ -2429,7 +2673,7 @@ class XChemExplorer(QtGui.QApplication):
 
         if job_list:
             msgBox = QtGui.QMessageBox()
-            msgBox.setText("Do you really want to delete {0!s} Dimple files?".format(len(job_list)))
+            msgBox.setText("Do you really want to delete {0!s} {1!s} files?".format(len(job_list),self.preferences['initial_refinement_pipeline']))
             msgBox.addButton(QtGui.QPushButton('Go'), QtGui.QMessageBox.YesRole)
             msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
             reply = msgBox.exec_();
@@ -2441,7 +2685,8 @@ class XChemExplorer(QtGui.QApplication):
                                                                             self.initial_model_directory,
                                                                             self.xce_logfile,
                                                                             self.database_directory,
-                                                                            self.data_source_file)
+                                                                            self.data_source_file,
+                                                                            self.preferences['initial_refinement_pipeline'])
                 self.explorer_active = 1
                 self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
                 self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
@@ -2450,6 +2695,31 @@ class XChemExplorer(QtGui.QApplication):
                 self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),
                              self.datasource_menu_reload_samples)
                 self.work_thread.start()
+
+    def set_results_from_selected_pipeline(self):
+        self.update_log.warning('selecting initial refinement results from '+self.preferences['initial_refinement_pipeline'])
+
+        job_list = []
+        for xtal in sorted(self.initial_model_dimple_dict):
+            if self.initial_model_dimple_dict[xtal][0].isChecked():
+                job_list.append(xtal)
+
+        self.work_thread = XChemThread.set_results_from_selected_pipeline(job_list,
+                                                                    self.initial_model_directory,
+                                                                    self.xce_logfile,
+                                                                    self.database_directory,
+                                                                    self.data_source_file,
+                                                                    self.preferences['initial_refinement_pipeline'])
+        self.explorer_active = 1
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("update_status_bar(QString)"), self.update_status_bar)
+        self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
+        self.connect(self.work_thread, QtCore.SIGNAL("datasource_menu_reload_samples"),
+                             self.datasource_menu_reload_samples)
+        self.work_thread.start()
+
+
 
     def run_xia2_on_selected_datasets(self, overwrite):
 
@@ -2580,8 +2850,8 @@ class XChemExplorer(QtGui.QApplication):
 
         msgBox = QtGui.QMessageBox()
         msgBox.setText(
-            "Do you really want to run {0!s} Dimple jobs?\nNote: we will not run more than 100 at once on the cluster!".format(
-                len(job_list)))
+            "Do you really want to run {0!s} {1!s} jobs?\nNote: we will not run more than {2!s} at once on the cluster!".format(
+                len(job_list),self.preferences['initial_refinement_pipeline'],self.preferences['max_queue_jobs']))
         msgBox.addButton(QtGui.QPushButton('Go'), QtGui.QMessageBox.YesRole)
         msgBox.addButton(QtGui.QPushButton('Cancel'), QtGui.QMessageBox.RejectRole)
         reply = msgBox.exec_();
@@ -2597,7 +2867,7 @@ class XChemExplorer(QtGui.QApplication):
                 self.update_log.insert(
                     'you can change this in the PREFERENCES menu, but be warned that to high a number might break the cluster!')
             self.update_log.insert('preparing input files for DIMPLE...')
-            self.work_thread = XChemThread.run_dimple_on_all_autoprocessing_files(job_list,
+            self.work_thread = XChemThread.run_dimple_on_all_autoprocessing_files_new(job_list,
                                                                                   self.initial_model_directory,
                                                                                   self.external_software,
                                                                                   self.ccp4_scratch_directory,
@@ -2607,7 +2877,8 @@ class XChemExplorer(QtGui.QApplication):
                                                                                   self.xce_logfile,
                                                                                   self.using_remote_qsub_submission,
                                                                                   self.remote_qsub_submission,
-                                                                                  self.preferences['dimple_twin_mode']  )
+                                                                                  self.preferences['dimple_twin_mode'],
+                                                                                  self.preferences['initial_refinement_pipeline'])
             self.explorer_active = 1
             self.connect(self.work_thread, QtCore.SIGNAL("finished()"), self.thread_finished)
             self.connect(self.work_thread, QtCore.SIGNAL("update_progress_bar"), self.update_progress_bar)
@@ -2867,20 +3138,23 @@ class XChemExplorer(QtGui.QApplication):
         elif instruction == 'Run xia2 on selected datasets - overwrite':
             self.run_xia2_on_selected_datasets(True)
 
-        elif instruction == 'Run DIMPLE on All Autoprocessing MTZ files':
-            self.rerun_dimple_on_all_autoprocessing_files()
+#        elif instruction == 'Run DIMPLE on All Autoprocessing MTZ files':
+#            self.rerun_dimple_on_all_autoprocessing_files()
 
-        elif instruction == 'Run DIMPLE on selected MTZ files':
+        elif instruction == 'Run initial refinement on selected MTZ files':
             self.run_dimple_on_selected_autoprocessing_file()
 
-        elif instruction == 'Remove selected DIMPLE PDB/MTZ files':
+        elif instruction == 'Remove selected initial refinement files':
             self.remove_selected_dimple_files()
 
-        elif instruction == 'Create CIF/PDB/PNG file of ALL compounds':
-            self.create_cif_pdb_png_files('ALL')
+        elif instruction == 'Set only results from selected pipeline':
+            self.set_results_from_selected_pipeline()
 
-        elif instruction == 'Create CIF/PDB/PNG file of NEW compounds':
-            self.create_cif_pdb_png_files('NEW')
+#        elif instruction == 'Create CIF/PDB/PNG file of ALL compounds':
+#            self.create_cif_pdb_png_files('ALL')
+
+#        elif instruction == 'Create CIF/PDB/PNG file of NEW compounds':
+#            self.create_cif_pdb_png_files('NEW')
 
         elif instruction == 'Create CIF/PDB/PNG file of SELECTED compounds':
             self.create_cif_pdb_png_files('SELECTED')
@@ -2932,6 +3206,8 @@ class XChemExplorer(QtGui.QApplication):
                 self.update_log.insert('starting coot...')
                 if instruction == "Open COOT":
                     interface = 'new'
+                elif instruction == "Open COOT - test -":
+                    interface = 'test'
                 elif instruction == "Open COOT for old PanDDA":
                     interface = 'panddaV1'
                 elif instruction == 'Build ground state model':
@@ -3610,6 +3886,12 @@ class XChemExplorer(QtGui.QApplication):
     def preferences_selection_mechanism_combobox_changed(self, i):
         text = str(self.preferences_selection_mechanism_combobox.currentText())
         self.preferences['dataset_selection_mechanism'] = text
+        self.update_log.insert('setting datasets selection mechanism to ' + text)
+
+    def preferences_initial_refinement_combobox_changed(self, i):
+        text = str(self.preferences_initial_refinement_combobox.currentText())
+        self.preferences['initial_refinement_pipeline'] = text
+        self.update_log.insert('setting initial refinement pipeline to ' + text)
 
     def preferences_restraints_generation_combobox_changed(self):
         text = str(self.preferences_restraints_generation_combobox.currentText())

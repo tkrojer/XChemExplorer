@@ -108,6 +108,89 @@ class templates:
                 counter = 0
             counter+=1
 
+        if depositDict['molecule_name_two'].replace(' ','') == '' or depositDict['molecule_name_two'].replace(' ','').lower() == 'none':
+            entity = (
+                    'loop_\n'
+                    '_entity.id\n'
+                    '_entity.type\n'
+                    '_entity.src_method\n'
+                    '_entity.pdbx_description\n'
+                    '_entity.pdbx_mutation\n'
+                    '1 polymer     man "%s" %s\n' % (depositDict['Source_organism_gene'], depositDict['fragment_name_one_specific_mutation']) +
+                    '#\n'
+                    'loop_\n'
+                    '_entity_poly.entity_id\n'
+                    '_entity_poly.type\n'
+                    '_entity_poly.pdbx_seq_one_letter_code\n'
+                    '_entity_poly.pdbx_strand_id\n'
+                    '_entity_poly.pdbx_seq_db_id\n'
+                    '_entity_poly.pdbx_seq_db_name\n'
+                    '1 "polypeptide(L)"\n'
+                    + molecule_one_letter_sequence + '\n'
+                                                     ';\n'
+                    '%s %s UNP\n'                                        %(depositDict['protein_chains'],depositDict['molecule_one_letter_sequence_uniprot_id'])+
+                    '#\n'
+                    'loop_\n'
+                    '_entity_src_gen.entity_id\n'
+                    '_entity_src_gen.gene_src_strain\n'
+                    '_entity_src_gen.pdbx_gene_src_scientific_name\n'
+                    '_entity_src_gen.pdbx_gene_src_ncbi_taxonomy_id\n'
+                    '_entity_src_gen.pdbx_host_org_scientific_name\n'
+                    '_entity_src_gen.pdbx_host_org_ncbi_taxonomy_id\n'
+                    '1 ? "%s" %s  "%s" %s\n' % (depositDict['Source_organism_scientific_name'], pdbx_gene_src_ncbi_taxonomy_id,depositDict['Expression_system_scientific_name'], pdbx_host_org_ncbi_taxonomy_id) +
+                    '#\n'
+            )
+        else:
+            molecule_two_letter_sequence=';'
+            counter=1
+            for aa in depositDict['molecule_two_letter_sequence']:
+                if counter < 70:
+                    molecule_two_letter_sequence+=aa
+                if counter == 70:
+                    molecule_two_letter_sequence+='\n'+aa
+                    counter = 0
+                counter+=1
+
+            entity = (
+                    'loop_\n'
+                    '_entity.id\n'
+                    '_entity.type\n'
+                    '_entity.src_method\n'
+                    '_entity.pdbx_description\n'
+                    '_entity.pdbx_mutation\n'
+                    '1 polymer     man "%s" %s\n' % (depositDict['Source_organism_gene'], depositDict['fragment_name_one_specific_mutation']) +
+                    '2 polymer     man "%s" %s\n' % (depositDict['Source_organism_gene_two'], depositDict['fragment_name_two_specific_mutation']) +
+                    '#\n'
+                    'loop_\n'
+                    '_entity_poly.entity_id\n'
+                    '_entity_poly.type\n'
+                    '_entity_poly.pdbx_seq_one_letter_code\n'
+                    '_entity_poly.pdbx_strand_id\n'
+                    '_entity_poly.pdbx_seq_db_id\n'
+                    '_entity_poly.pdbx_seq_db_name\n'
+                    '1 "polypeptide(L)"\n'
+                    + molecule_one_letter_sequence + '\n'
+                    ';\n'
+                    '%s %s UNP\n'                                        %(depositDict['molecule_chain_one'],depositDict['molecule_one_letter_sequence_uniprot_id'])+
+#                    ';\n'
+                    '2 "polypeptide(L)"\n'
+                    + molecule_two_letter_sequence + '\n'
+                    ';\n'
+                    '%s %s UNP\n'                                        %(depositDict['molecule_chain_two'],depositDict['molecule_two_letter_sequence_uniprot_id'])+
+                    '#\n'
+                    'loop_\n'
+                    '_entity_src_gen.entity_id\n'
+                    '_entity_src_gen.gene_src_strain\n'
+                    '_entity_src_gen.pdbx_gene_src_scientific_name\n'
+                    '_entity_src_gen.pdbx_gene_src_ncbi_taxonomy_id\n'
+                    '_entity_src_gen.pdbx_host_org_scientific_name\n'
+                    '_entity_src_gen.pdbx_host_org_ncbi_taxonomy_id\n'
+                    '1 ? "%s" %s  "%s" %s\n' % (depositDict['Source_organism_scientific_name'], pdbx_gene_src_ncbi_taxonomy_id,depositDict['Expression_system_scientific_name'], pdbx_host_org_ncbi_taxonomy_id) +
+                    '2 ? "%s" %s  "%s" %s\n' % (depositDict['Source_organism_scientific_name'], pdbx_gene_src_ncbi_taxonomy_id,depositDict['Expression_system_scientific_name'], pdbx_host_org_ncbi_taxonomy_id) +
+                    '#\n'
+            )
+
+
         data_template_cif = (
             'data_UNNAMED\n'
             '#\n'
@@ -148,35 +231,36 @@ class templates:
             '_diffrn_radiation_wavelength.wavelength   %s\n'                                    %depositDict['radiation_wavelengths']+
             '#\n'
             '#\n'
-            'loop_\n'
-            '_entity.id\n'
-            '_entity.type\n'
-            '_entity.src_method\n'
-            '_entity.pdbx_description\n'
-            '_entity.pdbx_mutation\n'
-            '1 polymer     man "%s" %s\n'                                                          %(depositDict['Source_organism_gene'],depositDict['fragment_name_one_specific_mutation'])+
-            '#\n'
-            'loop_\n'
-            '_entity_poly.entity_id\n'
-            '_entity_poly.type\n'
-            '_entity_poly.pdbx_seq_one_letter_code\n'
-            '_entity_poly.pdbx_strand_id\n'
-            '_entity_poly.pdbx_seq_db_id\n'
-            '_entity_poly.pdbx_seq_db_name\n'
-            '1 "polypeptide(L)"\n'
-            +molecule_one_letter_sequence+'\n'
-            ';\n'
-            '%s %s UNP\n'                                        %(depositDict['protein_chains'],depositDict['molecule_one_letter_sequence_uniprot_id'])+
-            '#\n'
-            'loop_\n'
-            '_entity_src_gen.entity_id\n'
-            '_entity_src_gen.gene_src_strain\n'
-            '_entity_src_gen.pdbx_gene_src_scientific_name\n'
-            '_entity_src_gen.pdbx_gene_src_ncbi_taxonomy_id\n'
-            '_entity_src_gen.pdbx_host_org_scientific_name\n'
-            '_entity_src_gen.pdbx_host_org_ncbi_taxonomy_id\n'
-            '1 ? "%s" %s  "%s" %s\n'                %(depositDict['Source_organism_scientific_name'],pdbx_gene_src_ncbi_taxonomy_id,depositDict['Expression_system_scientific_name'],pdbx_host_org_ncbi_taxonomy_id)+
-            '#\n'
+            + entity +
+#            'loop_\n'
+#            '_entity.id\n'
+#            '_entity.type\n'
+#            '_entity.src_method\n'
+#            '_entity.pdbx_description\n'
+#            '_entity.pdbx_mutation\n'
+#            '1 polymer     man "%s" %s\n'                                                          %(depositDict['Source_organism_gene'],depositDict['fragment_name_one_specific_mutation'])+
+#            '#\n'
+#            'loop_\n'
+#            '_entity_poly.entity_id\n'
+#            '_entity_poly.type\n'
+#            '_entity_poly.pdbx_seq_one_letter_code\n'
+#            '_entity_poly.pdbx_strand_id\n'
+#            '_entity_poly.pdbx_seq_db_id\n'
+#            '_entity_poly.pdbx_seq_db_name\n'
+#            '1 "polypeptide(L)"\n'
+#            +molecule_one_letter_sequence+'\n'
+#            ';\n'
+#            '%s %s UNP\n'                                        %(depositDict['protein_chains'],depositDict['molecule_one_letter_sequence_uniprot_id'])+
+#            '#\n'
+#            'loop_\n'
+#            '_entity_src_gen.entity_id\n'
+#            '_entity_src_gen.gene_src_strain\n'
+#            '_entity_src_gen.pdbx_gene_src_scientific_name\n'
+#            '_entity_src_gen.pdbx_gene_src_ncbi_taxonomy_id\n'
+#            '_entity_src_gen.pdbx_host_org_scientific_name\n'
+#            '_entity_src_gen.pdbx_host_org_ncbi_taxonomy_id\n'
+#            '1 ? "%s" %s  "%s" %s\n'                %(depositDict['Source_organism_scientific_name'],pdbx_gene_src_ncbi_taxonomy_id,depositDict['Expression_system_scientific_name'],pdbx_host_org_ncbi_taxonomy_id)+
+#            '#\n'
             'loop_\n'
             '_pdbx_contact_author.id                  \n'
             "_pdbx_contact_author.address_1           \n"
@@ -288,7 +372,7 @@ class update_depositTable(QtCore.QThread):
 
 class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
-    def __init__(self,database,xce_logfile,overwrite_existing_mmcif,projectDir,ground_state):
+    def __init__(self,database,xce_logfile,overwrite_existing_mmcif,projectDir,ground_state,ignore_event_map):
         QtCore.QThread.__init__(self)
         self.database=database
         self.xce_logfile=xce_logfile
@@ -310,6 +394,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         self.ground_state_pdb = ''
         self.ground_state_mean_mtz = ''
         self.panddaDir = ''
+        self.ignore_event_map = ignore_event_map
         if ground_state:
             self.ground_state = True
             self.ground_state_pdb = ground_state[0]
@@ -413,6 +498,8 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                 if not self.event_maps_exist_in_sf_mmcif(xtal):
                     continue
 
+                self.make_table_one(xtal)
+
 
         self.print_errorlist()
         self.Logfile.insert('======= finished preparing mmcif files for wwPDB deposition =======')
@@ -440,6 +527,23 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             dictStatus = True
         return  dictStatus
 
+    def update_beamline_info_data_template_dict(self,xtal):
+        dls_beamlines=['i02','i03','i04','i04-1','i23','i24']
+        dls_beamline_dict = {   'i02':      ['DIAMOND BEAMLINE I02',    'DECTRIS PILATUS 6M'],
+                                'i03':      ['DIAMOND BEAMLINE I03',    'DECTRIS PILATUS 6M'],
+                                'i04':      ['DIAMOND BEAMLINE I04',    'DECTRIS PILATUS 6M'],
+                                'i04-1':    ['DIAMOND BEAMLINE I04-1',  'DECTRIS PILATUS 6M'],
+                                'i23':      ['DIAMOND BEAMLINE I23',    'DECTRIS PILATUS 12M'],
+                                'i24':      ['DIAMOND BEAMLINE I24',    'DECTRIS PILATUS 6M'] ,     }
+
+        if self.db_dict['DataCollectionBeamline'] in dls_beamlines:
+            self.data_template_dict['radiation_source_type']=    dls_beamline_dict[self.db_dict['DataCollectionBeamline']][0]
+            self.data_template_dict['radiation_detector_type']=  dls_beamline_dict[self.db_dict['DataCollectionBeamline']][1]
+            self.data_template_dict['radiation_detector']=       'PIXEL'
+            self.data_template_dict['radiation_source']=         'SYNCHROTRON'
+            self.Logfile.insert(('%s: setting data collection beamline to %s' %(xtal,self.data_template_dict['radiation_source_type'])))
+
+
     def db_dict_exists(self,xtal):
         dictStatus = False
         self.db_dict = None
@@ -450,6 +554,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             self.add_to_errorList(xtal)
         else:
             self.Logfile.insert('%s: found db_dict dictionary in mainTable' % xtal)
+            self.update_beamline_info_data_template_dict(xtal)
             dictStatus = True
         return  dictStatus
 
@@ -558,6 +663,9 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         if os.path.isfile('no_pandda_analysis_performed'):
             self.Logfile.warning('%s: found empty file named "no_pandda_analysis_performed" which suggests we will ignore event maps for this sample' %xtal)
             eventMTZexists = True
+        elif self.ignore_event_map:
+            self.Logfile.warning('%s: user selected to not include event map in SF mmcif file' %xtal)
+            eventMTZexists = True
         else:
             for mtz in glob.glob('*event*.native*P1.mtz'):
                 eventMTZlist.append(mtz[mtz.rfind('/')+1:])
@@ -575,7 +683,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         self.Logfile.insert('%s: trying to find fitting event maps for modelled ligands' %xtal)
         ligList = self.pdb.save_residues_with_resname(os.path.join(self.projectDir,xtal), 'LIG')
         foundMatchingMap = None
-        if os.path.isfile('no_pandda_analysis_performed'):
+        if os.path.isfile('no_pandda_analysis_performed') or self.ignore_event_map:
             self.Logfile.warning('%s: found empty file named "no_pandda_analysis_performed" which suggests we will ignore event maps for this sample' %xtal)
             foundMatchingMap = True
             ligList = []
@@ -649,10 +757,11 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
         noError = True
         self.Logfile.insert('%s: preparing data_template.cif file' %xtal)
         if self.overwrite_existing_mmcif:
-
+            self.data_template_dict['radiation_wavelengths'] = self.mtz.get_wavelength()
+            self.Logfile.insert('%s: experimental wavelength according to %s is %s' %(xtal,self.mtz,self.data_template_dict['radiation_wavelengths']))
             if self.ground_state:
                 os.chdir(self.projectDir)
-                self.data_template_dict['radiation_wavelengths'] = '1.000'
+#                self.data_template_dict['radiation_wavelengths'] = '1.000'
                 self.data_template_dict['group_type'] = 'ground state'
                 self.data_template_dict['group_title'] = 'PanDDA analysis group deposition of ground-state model'
                 self.data_template_dict['group_description'] = self.data_template_dict['group_description'].replace('$ProteinName',
@@ -664,7 +773,7 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             else:
                 os.chdir(os.path.join(self.projectDir, xtal))
                 # edit wavelength
-                self.data_template_dict['radiation_wavelengths'] = self.mtz.get_wavelength()
+#                self.data_template_dict['radiation_wavelengths'] = self.mtz.get_wavelength()
 
                 title = self.data_template_dict['structure_title'].replace('$ProteinName', self.data_template_dict[
                     'Source_organism_gene']).replace('$CompoundName', self.db_dict['CompoundCode'])
@@ -801,6 +910,20 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 
             elif '_refine.pdbx_method_to_determine_struct' in line:
                 sys.stdout.write("_refine.pdbx_method_to_determine_struct          'FOURIER SYNTHESIS'\n")
+            elif '_struct.title      ---' in line:
+#                self.Logfile.warning('structure title was not created by pdb_extract; there might be an issue with REFMAC 5.8.0238')
+#                self.Logfile.insert('trying to get title from data_template.cif file')
+                Title = ''
+                foundTitle = False
+                for li in open('data_template.cif'):
+                    if li.startswith('_struct.title'):
+                        foundTitle = True
+                    if foundTitle:
+                        if li.replace(' ','').replace('\n','').replace('\r','') == ';':
+                            Title += li
+                            break
+                        Title += li
+                sys.stdout.write(Title)
             elif amendSoftwareBlock:
                 cifItem = (
                     "{0!s} {1!s} ? ? program ? ? 'data reduction' ? ?\n".format(str(max(softwareEntry) + 1),
@@ -837,6 +960,32 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
 #
 #            elif '_refine.ls_d_res_low' in line and len(line.split()) == 2:
 #                sys.stdout.write('_refine.ls_d_res_low                             {0!s}\n'.format(min(low_reso_list)))
+
+
+    def make_table_one(self,xtal):
+        os.chdir(os.path.join(self.projectDir, xtal))
+        if os.path.isfile(xtal + '.mmcif') and os.path.getsize(xtal + '.mmcif') > 20000:
+            self.Logfile.insert('making table_1 for %s.mmcif' %xtal)
+            if os.path.isdir('/dls'):
+                extract_table_init = 'source /dls/science/groups/i04-1/software/pdb-extract-prod/setup.sh\n'
+                extract_table_init += '/dls/science/groups/i04-1/software/pdb-extract-prod/bin/extract_table'
+            else:
+                extract_table_init = 'source ' + os.path.join(os.getenv('XChemExplorer_DIR'),
+                                                                'pdb_extract/pdb-extract-prod/setup.sh') + '\n'
+                extract_table_init += +os.path.join(os.getenv('XChemExplorer_DIR'),
+                                                      'pdb_extract/pdb-extract-prod/bin/extract_table')
+
+            Cmd = extract_table_init + ' ' + xtal + '.mmcif'
+
+            self.Logfile.insert(xtal + ': running sf_convert: ' + Cmd)
+            os.system(Cmd)
+
+            if os.path.isfile('cryst-table-1.out'):
+                os.system('/bin/mv cryst-table-1.out %s-table-1.txt' %xtal)
+                self.Logfile.insert('%s: table_1 successfully created; updating database...' %xtal)
+                self.db.execute_statement("update mainTable set table_one='{0!s}-table-1.txt' where CrystalName is '{1!s}'".format(xtal,xtal))
+            else:
+                self.Logfile.warning('%s: could not create table_1' %xtal)
 
 
     def create_sf_mmcif(self,xtal):
@@ -1063,7 +1212,14 @@ class prepare_for_group_deposition_upload(QtCore.QThread):
         # ligand bound structures
         if self.type == 'ligand_bound':
             self.Logfile.insert('checking depositionTable for mmcif files of ligand-bound structures')
-            toDeposit=self.db.execute_statement("select CrystalName,mmCIF_model_file,mmCIF_SF_file,DimplePANDDApath from depositTable where StructureType is 'ligand_bound';")
+            depositList = self.db.execute_statement("select CrystalName from mainTable where RefinementOutcome like '5%';")
+            xtalString = '('
+            for item in depositList:
+                xtal=str(item[0])
+                self.Logfile.insert('%s: adding mmcif files to final tar.bz2 file' %xtal)
+                xtalString += "CrystalName = '"+xtal+"' or "
+            xtalString = xtalString[:-4] + ')'
+            toDeposit=self.db.execute_statement("select CrystalName,mmCIF_model_file,mmCIF_SF_file,DimplePANDDApath from depositTable where StructureType is 'ligand_bound' and %s;" %xtalString)
         elif self.type == 'ground_state':
             self.Logfile.insert('checking depositionTable for mmcif files of ground-state structures')
             toDeposit = self.db.execute_statement("select CrystalName,mmCIF_model_file,mmCIF_SF_file,DimplePANDDApath from depositTable where StructureType is 'ground_state';")
@@ -1104,6 +1260,19 @@ class prepare_for_group_deposition_upload(QtCore.QThread):
         f = open('index.txt','w')
         f.write(TextIndex)
         f.close()
+
+        # checking of tar.bz2 files exisit
+        fileList = []
+        for i in sorted(glob.glob('%s_structures.tar.bz2.*' %self.type)):
+            fileList.append(int(i[i.rfind('.')+1:]))
+
+        if os.path.isfile('%s_structures.tar.bz2' %self.type):
+            if fileList == []:
+                self.Logfile.warning('moving existing %s_structures.tar.bz2 to %s_structures.tar.bz2.1' %(self.type,self.type))
+                os.system('/bin/mv %s_structures.tar.bz2 %s_structures.tar.bz2.1' %(self.type,self.type))
+            else:
+                self.Logfile.warning('moving existing %s_structures.tar.bz2 %s_structures.tar.bz2.%s' %(self.type,self.type,str(max(fileList)+1)))
+                os.system('/bin/mv %s_structures.tar.bz2 %s_structures.tar.bz2.%s' %(self.type,self.type,str(max(fileList)+1)))
 
         self.Logfile.insert('preparing tar archive...')
         os.system('tar -cvf {0!s}_structures.tar *mmcif index.txt'.format(self.type))
