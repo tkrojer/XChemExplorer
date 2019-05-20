@@ -74,13 +74,13 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                 progress_step=100/float(len(glob.glob(os.path.join(self.initial_model_directory,'*'))))
             self.Logfile.insert('found '+str(len(glob.glob(os.path.join(self.initial_model_directory,'*'))))+' samples in project directory')
             for directory in sorted(glob.glob(os.path.join(self.initial_model_directory,'*'))):
-                if os.listdir(directory) == []:
-                    self.Logfile.warning(directory + ' is empty; skipping...')
-                    continue
                 try:
                     os.chdir(directory)
                 except OSError:
                     # this could happen if the user accidentaly left a file in the project directory
+                    continue
+                if os.listdir(directory) == []:
+                    self.Logfile.warning(directory + ' is empty; skipping...')
                     continue
                 xtal=directory[directory.rfind('/')+1:]
                 self.xtal_list.append(xtal)
@@ -749,7 +749,8 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                 if db_pandda_dict != {}:
 #            self.db.update_panddaTable(xtal, site_index, db_pandda_dict)
                     self.db.update_site_event_panddaTable(xtal, site_index, event_index, db_pandda_dict)
-                    self.Logfile.insert('updating panddaTable for xtal: {0!s}, site: {1!s}'.format(xtal, site_index))
+                    self.Logfile.insert('updating panddaTable for xtal: {0!s}, site: {1!s}, event: {2!s}'.format(xtal, site_index,event_index))
+                    self.Logfile.insert('-> panddaDict: ' + str(db_pandda_dict))
 
 #                progress += progress_step
 #                self.emit(QtCore.SIGNAL('update_progress_bar'), progress)

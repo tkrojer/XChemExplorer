@@ -30,7 +30,7 @@ class setup():
 
     def settings(self, xce_object):
         # set XCE version
-        xce_object.xce_version = 'v1.3.8.1'
+        xce_object.xce_version = 'v1.3.8.2'
 
         # general settings
         xce_object.allowed_unitcell_difference_percent = 12
@@ -600,7 +600,7 @@ class setup():
                                          'Export NEW PANDDA models',
                                          'Export ALL PANDDA models',
                                          'Show HTML summary',
-                                         'Update datasource with results from pandda.inspect',
+#                                         'Update datasource with results from pandda.inspect',
                                          'cluster datasets',
                                          'Event Map -> SF',
                                          'apo -> mmcif',
