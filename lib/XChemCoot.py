@@ -15,6 +15,7 @@ sys.path.append(os.getenv('XChemExplorer_DIR') + '/lib')
 import XChemDB
 import XChemRefine
 import XChemUtils
+import XChemLog
 
 # libraries from COOT
 import pygtk, gtk, pango
@@ -40,6 +41,8 @@ class GUI(object):
         remote_qsub_submission = self.settings['remote_qsub']
         self.database_directory = self.settings['database_directory']
         self.xce_logfile = self.settings['xce_logfile']
+        self.Logfile = XChemLog.updateLog(self.xce_logfile)
+        self.Logfile.insert('==> COOT: starting coot plugin...')
         self.data_source = self.settings['data_source']
         self.db = XChemDB.data_source(self.data_source)
 
@@ -163,6 +166,14 @@ class GUI(object):
                              'TLS': '',
                              'NCS': '',
                              'TWIN': ''}
+
+        # XCE menu
+        menu = coot_menubar_menu("XCE")
+
+        add_simple_coot_menu_menuitem(
+            menu, "set all occupanicies to 1",
+            lambda func: self.reset_occupancy())
+
 
     def StartGUI(self):
 
@@ -1489,6 +1500,24 @@ class GUI(object):
                 if 'ground-state-mean-map' in coot.molecule_name(imol):
                     coot.set_map_displayed(imol, 0)
             widget.set_label('Show ground state mean map')
+
+    def reset_occupancy(self):
+        self.Logfile.warning('==> COOT: trying to set occupancies of all residues to 1.0')
+        if self.refinementProtocol.startswith('pandda'):
+            self.Logfile.warning('==> COOT: you cannot reset occupancies while working in PanDDA refine mode')
+        else:
+            for imol in coot_utils_XChem.molecule_number_list():
+                if coot.molecule_name(imol).endswith(self.pdb_style) or \
+                   coot.molecule_name(imol).endswith('refine.split.bound-state.pdb') or \
+                   coot.molecule_name(imol).endswith('ini.pdb') or \
+                   coot.molecule_name(imol).endswith('dimple.pdb'):
+                    self.Logfile.warning('==> COOT: setting occupancies of all protein residues in %s to 1.0' %coot.molecule_name(imol))
+                    coot.fill_occupancy_residue_range(imol,"A",1,10000)
+                    chains = chain_ids(imol)
+                    for chain in chains:
+                        print residues_in_chain(imol, chain)
+#                        for residue in residues_in_chain(imol, chain):
+#                            print residue
 
 
 if __name__ == '__main__':

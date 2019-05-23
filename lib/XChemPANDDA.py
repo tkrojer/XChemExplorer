@@ -73,11 +73,18 @@ class run_pandda_export(QtCore.QThread):
 
 
     def refine_exported_models(self,samples_to_export):
-        sample_list=self.db.execute_statement("select CrystalName,CompoundCode from mainTable where RefinementOutcome='2 - PANDDA model';")
-        for item in sample_list:
-            xtal=str(item[0])
-            compoundID=str(item[1])
-            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.free.mtz')) and xtal in samples_to_export:
+        self.Logfile.insert('will try to refine the following crystals:')
+        for xtal in samples_to_export: self.Logfile.insert(xtal)
+#        sample_list=self.db.execute_statement("select CrystalName,CompoundCode from mainTable where RefinementOutcome='2 - PANDDA model';")
+#        for item in sample_list:
+#            xtal=str(item[0])
+        for xtal in sorted(samples_to_export):
+            self.Logfile.insert('%s: getting compound code from database' %xtal)
+            query=self.db.execute_statement("select CompoundCode from mainTable where CrystalName='%s';" %xtal)
+            compoundID=str(query[0][0])
+            self.Logfile.insert('%s: compounds code = %s' %(xtal,compoundID))
+#            compoundID=str(item[1])
+            if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'.free.mtz')):
                 if os.path.isfile(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb')):
                     self.Logfile.insert('running inital refinement on PANDDA model of '+xtal)
                     Serial=XChemRefine.GetSerial(self.initial_model_directory,xtal)
@@ -98,12 +105,12 @@ class run_pandda_export(QtCore.QThread):
                     os.symlink(os.path.join(self.initial_model_directory,xtal,xtal+'-ensemble-model.pdb'),xtal+'-ensemble-model.pdb')
                     Refine.RunQuickRefine(Serial,self.RefmacParams,self.external_software,self.xce_logfile,'pandda_refmac')
 
-            elif xtal in os.path.join(self.panddas_directory,'processed_datasets',xtal,'modelled_structures',
-                                      '{}-pandda-model.pdb'.format(xtal)):
-                self.Logfile.insert('{}: cannot start refinement because {}'.format(xtal,xtal) +
-                                   ' does not have a modelled structure. Check whether you expect this dataset to ' +
-                                   ' have a modelled structure, compare pandda.inspect and datasource,'
-                                   ' then tell XCHEMBB ')
+#            elif xtal in os.path.join(self.panddas_directory,'processed_datasets',xtal,'modelled_structures',
+#                                      '{}-pandda-model.pdb'.format(xtal)):
+#                self.Logfile.insert('{}: cannot start refinement because {}'.format(xtal,xtal) +
+#                                   ' does not have a modelled structure. Check whether you expect this dataset to ' +
+#                                   ' have a modelled structure, compare pandda.inspect and datasource,'
+#                                   ' then tell XCHEMBB ')
 
             elif xtal in samples_to_export and not os.path.isfile(
                     os.path.join(self.initial_model_directory, xtal, xtal + '.free.mtz')):
@@ -157,7 +164,7 @@ class run_pandda_export(QtCore.QThread):
                 db_dict={}
                 sampleID=line['dtag']
                 if sampleID not in samples_to_export:
-                    self.Logfile.warning('%s: not to be exported; will not add to panddaTable...')
+                    self.Logfile.warning('%s: not to be exported; will not add to panddaTable...' %sampleID)
                     continue
                 if sampleID not in pandda_hit_list:
                     pandda_hit_list.append(sampleID)
@@ -235,10 +242,11 @@ class run_pandda_export(QtCore.QThread):
         # finally find all samples which do not have a pandda hit
         os.chdir(os.path.join(self.panddas_directory,'processed_datasets'))
         self.Logfile.insert('check which datasets are not interesting')
-        for xtal in glob.glob('*'):
-            if xtal not in pandda_hit_list:
-                self.Logfile.insert(xtal+': not in interesting_datasets; updating database...')
-                self.db.execute_statement("update mainTable set DimplePANDDAhit = 'False' where CrystalName is '{0!s}'".format(xtal))
+        # DimplePANDDAhit
+#        for xtal in glob.glob('*'):
+#            if xtal not in pandda_hit_list:
+#                self.Logfile.insert(xtal+': not in interesting_datasets; updating database...')
+#                self.db.execute_statement("update mainTable set DimplePANDDAhit = 'False' where CrystalName is '{0!s}'".format(xtal))
 
 
     def export_models(self):
