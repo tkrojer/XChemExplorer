@@ -154,4 +154,7 @@ rachael.skyner@diamond.ac.uk
 # Resources
 
 * <a href="https://github.com/tkrojer/XChemExplorer/blob/gh-pages/example.deposit">example.deposit file</a>
+* <a href="https://github.com/tkrojer/XChemExplorer/blob/gh-pages/data_template.cif">data_template.cif file</a>
+* <a href="https://github.com/tkrojer/XChemExplorer/blob/gh-pages/index.txt">index.txt file</a>
+* <a href="https://github.com/tkrojer/XChemExplorer/blob/gh-pages/NUDT7A.tar.bz2">NUDT7A.tar.bz2 file</a>
 
