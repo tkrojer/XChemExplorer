@@ -1,0 +1,11 @@
+label: NUDT7A-x0140-ligand_bound
+description: ligand_bound structure of NUDT7A-x0140
+model: NUDT7A-x0140.mmcif
+sf: NUDT7A-x0140_sf.mmcif
+
+label: NUDT7A-x0149-ligand_bound
+description: ligand_bound structure of NUDT7A-x0149
+model: NUDT7A-x0149.mmcif
+sf: NUDT7A-x0149_sf.mmcif
+
+

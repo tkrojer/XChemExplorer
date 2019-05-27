@@ -1,0 +1,147 @@
+data_UNNAMED
+#
+_pdbx_database_status.entry_id                       UNNAMED
+_pdbx_database_status.dep_release_code_coordinates   'RELEASE NOW'
+_pdbx_database_status.dep_release_code_sequence      'RELEASE NOW'
+#
+_pdbx_deposit_group.group_id	   UNNAMED
+_pdbx_deposit_group.group_description  "human NUDT7 screened against the 3D-Fragment Consortium Library by X-ray Crystallography at the XChem facility of Diamond Light Source beamline I04-1"
+_pdbx_deposit_group.group_title        "PanDDA analysis group deposition of models with modelled events (e.g. bound ligands)"
+_pdbx_deposit_group.group_type         "changed state"
+#
+_exptl_crystal_grow.crystal_id      1
+_exptl_crystal_grow.method          'VAPOR DIFFUSION, SITTING DROP'
+_exptl_crystal_grow.pH              5.5
+_exptl_crystal_grow.temp            293
+_exptl_crystal_grow.pdbx_details    "0.1M bis-tris pH 5.5 -- 0.1M ammonium acetate -- 5%(w/v) PEG10K"
+#
+_diffrn.id                     1
+_diffrn.ambient_temp           100
+_diffrn.crystal_id             1
+#
+_diffrn_source.diffrn_id                       1
+_diffrn_source.source                          SYNCHROTRON
+_diffrn_source.type                            "DIAMOND BEAMLINE I04-1"
+_diffrn_source.pdbx_wavelength_list            0.92819
+#
+_diffrn_detector.detector               PIXEL
+_diffrn_detector.type                   'DECTRIS PILATUS 6M'
+_diffrn_detector.pdbx_collection_date   2017-05-11
+_diffrn_detector.diffrn_id              1
+#
+_diffrn_radiation.diffrn_id                        1
+_diffrn_radiation.wavelength_id                    1
+_diffrn_radiation.pdbx_diffrn_protocol             'SINGLE WAVELENGTH'
+#
+_diffrn_radiation_wavelength.id           1
+_diffrn_radiation_wavelength.wavelength   0.92819
+#
+#
+loop_
+_entity.id
+_entity.type
+_entity.src_method
+_entity.pdbx_description
+_entity.pdbx_mutation
+1 polymer     man "NUDT7" ?
+#
+loop_
+_entity_poly.entity_id
+_entity_poly.type
+_entity_poly.pdbx_seq_one_letter_code
+_entity_poly.pdbx_strand_id
+_entity_poly.pdbx_seq_db_id
+_entity_poly.pdbx_seq_db_name
+1 "polypeptide(L)"
+;SMLDDAKARLRKYDIGGKYSHLPYNKYSVLLPLVAKEGKLHLLFTVRSEKLRRAPGEVCFPGGKRDPTD
+MDDAATALREAQEEVGLR(HYP)HQVEVV(CSO)CLVPCLIDTDTLITPFVGLIDHNFQAQPNPAEVKDV
+FLVPLAYFLHPQVHDQINHIFEYTNPEDGVTYQIKGMTANLAVLVAFIILEKKPT
+;
+A P0C024 UNP
+#
+loop_
+_entity_src_gen.entity_id
+_entity_src_gen.gene_src_strain
+_entity_src_gen.pdbx_gene_src_scientific_name
+_entity_src_gen.pdbx_gene_src_ncbi_taxonomy_id
+_entity_src_gen.pdbx_host_org_scientific_name
+_entity_src_gen.pdbx_host_org_ncbi_taxonomy_id
+1 ? "homo sapiens" 9606  "escherichia coli" 562
+#
+loop_
+_pdbx_contact_author.id                  
+_pdbx_contact_author.address_1           
+_pdbx_contact_author.address_2           
+_pdbx_contact_author.city                
+_pdbx_contact_author.state_province      
+_pdbx_contact_author.postal_code         
+_pdbx_contact_author.email               
+_pdbx_contact_author.name_first          
+_pdbx_contact_author.name_last           
+_pdbx_contact_author.country             
+_pdbx_contact_author.phone               
+_pdbx_contact_author.role                
+_pdbx_contact_author.organization_type   
+1 'Roosevelt Drive' 'Structural Genomics Consortium' 'Oxford' 'None' 'OX3 7DQ' frank.vondelft@sgc.ox.ac.uk Frank 'von Delft' 'United Kingdom' '+44-1865-617576' 'principal investigator/group leader' academic
+2 'Roosevelt Drive' 'Structural Genomics Consortium' 'Oxford' 'None' 'OX37DQ' tobias.krojer@sgc.ox.ac.uk Tobias 'Krojer' 'United Kingdom' '+44-1865-617576' 'responsible scientist' academic
+#
+loop_
+_audit_author.name
+'Krojer, T.'
+'Talon, R.'
+'Fairhead, M.'
+'Diaz Saez, L.'
+'Bradley, A.R.'
+'Aimon, A.'
+'Collins, P.'
+'Brandao-Neto, J.'
+'Douangamath, A.'
+'Spencer, J.'
+'London, N.'
+'Nelson, A.'
+'Brennan, P.E.'
+'Huber, K.'
+'Bountra, C.'
+'Arrowsmith, C.H.'
+'Edwards, A.'
+'von Delft, F.'
+#
+_citation.id                        primary
+_citation.title                     'PanDDA analysis group deposition of models with modelled events (e.g. bound ligands)'
+_citation.journal_abbrev            'To Be Published'
+#
+loop_
+_citation_author.citation_id
+_citation_author.name
+primary 'Krojer, T.'
+primary 'Talon, R.'
+primary 'Fairhead, M.'
+primary 'Diaz Saez, L.'
+primary 'Bradley, A.R.'
+primary 'Aimon, A.'
+primary 'Collins, P.'
+primary 'Brandao-Neto, J.'
+primary 'Douangamath, A.'
+primary 'Spencer, J.'
+primary 'London, N.'
+primary 'Nelson, A.'
+primary 'Brennan, P.E.'
+primary 'Huber, K.'
+primary 'Bountra, C.'
+primary 'Arrowsmith, C.H.'
+primary 'Edwards, A.'
+primary 'von Delft, F.'
+#
+_struct.entry_id                     UNNAMED
+_struct.title
+;PanDDA analysis group deposition of models with modelled events (e.g. bound ligands) -- Crystal Structure of NUDT7 in complex with FMOPL000693a
+;
+#
+_struct_keywords.entry_id        UNNAMED
+_struct_keywords.text            "PanDDA,SGC - Diamond I04-1 fragment screening,NUDIX domain,XChemExplorer"
+#
+_pdbx_struct_assembly_depositor_info.id                   1
+_pdbx_struct_assembly_depositor_info.method_details       PISA
+_pdbx_struct_assembly_depositor_info.oligomeric_count     1
+#
+#
