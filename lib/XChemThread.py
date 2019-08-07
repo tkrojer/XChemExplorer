@@ -1967,7 +1967,8 @@ class choose_autoprocessing_outcome(QtCore.QThread):
                 preferences,
                 projectDir,
                 rescore,
-                xce_logfile):
+                xce_logfile,
+                agamemnon):
         QtCore.QThread.__init__(self)
         self.visit = visit
         self.projectDir = projectDir
@@ -1977,12 +1978,19 @@ class choose_autoprocessing_outcome(QtCore.QThread):
         self.acceptable_unitcell_volume_difference = preferences['allowed_unitcell_difference_percent']
         self.acceptable_low_resolution_limit_for_data = preferences['acceptable_low_resolution_limit_for_data']
         self.acceptable_low_resolution_Rmerge = preferences['acceptable_low_resolution_Rmerge']
-
+        self.agamemnon = agamemnon
         self.xce_logfile = xce_logfile
         self.Logfile = XChemLog.updateLog(xce_logfile)
 
         self.db = XChemDB.data_source(os.path.join(database))
-        self.allSamples = self.db.collected_xtals_during_visit_for_scoring(visit)
+        if self.agamemnon:
+            self.allSamples = []
+            for v in self.visit:
+                x = self.db.collected_xtals_during_visit_for_scoring(v)
+                for e in x:
+                    self.allSamples.append(e)
+        else:
+            self.allSamples = self.db.collected_xtals_during_visit_for_scoring(visit)
 #        self.allSamples = self.db.collected_xtals_during_visit_for_scoring(visit,rescore)
 
 
@@ -2164,7 +2172,8 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
                  database,
                  projectDir,
                  xce_logfile,
-                 target):
+                 target,
+                 agamemnon):
         QtCore.QThread.__init__(self)
 #        self.target = target
         self.processedDir =  processedDir
@@ -2172,6 +2181,9 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
         self.projectDir = projectDir
         self.Logfile = XChemLog.updateLog(xce_logfile)
         self.target = target
+        self.agamemnon = agamemnon
+        if self.agamemnon:
+            self.visit = 'agamemnon'        # this is for trouble-shooting only
 
         self.db = XChemDB.data_source(os.path.join(database))
         self.exisitingSamples = self.getExistingSamples()
@@ -2271,13 +2283,16 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
             os.mkdir(os.path.join(self.projectDir,xtal,'jpg', self.visit + '-' + run))
 
     def copyJPGs(self,xtal,run):
-        for img in glob.glob(os.path.join(self.processedDir.replace('processed','jpegs'),xtal,run+'*t.png')):
+#        for img in glob.glob(os.path.join(self.processedDir.replace('processed','jpegs'),xtal,run+'*t.png')):
+#        for img in glob.glob(os.path.join(self.processedDir.replace('processed', 'jpegs'), run + '*t.png')):
+        for img in glob.glob(os.path.join(self.processedDir.replace('processed', 'jpegs'), run + '*.0.png')):
             if not os.path.isfile(os.path.join(self.projectDir,xtal,'jpg', self.visit +'-'+ run,img[img.rfind('/')+1:])):
                 os.system('/bin/cp %s %s' %(img,os.path.join(self.projectDir,xtal,'jpg', self.visit + '-' + run)))
 
     def findJPGs(self,xtal,run):
         jpgDict={}
-        for n,img in enumerate(glob.glob(os.path.join(self.projectDir,xtal,'jpg', self.visit +'-'+ run,'*t.png'))):
+#        for n,img in enumerate(glob.glob(os.path.join(self.projectDir,xtal,'jpg', self.visit +'-'+ run,'*t.png'))):
+        for n,img in enumerate(glob.glob(os.path.join(self.projectDir,xtal,'jpg', self.visit +'-'+ run,'*.0.png'))):
             if n <= 3: jpgDict['DataCollectionCrystalImage'+str(n+1)]=img
         return jpgDict
 
@@ -2354,7 +2369,9 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
         progress = 0
         progress_step = XChemMain.getProgressSteps(len(glob.glob(os.path.join(self.processedDir,'*'))))
 
+        runList = []
         for collected_xtals in sorted(glob.glob(os.path.join(self.processedDir,'*'))):
+            self.visit = collected_xtals.split('/')[5]
             if 'tmp' in collected_xtals or 'results' in collected_xtals or 'scre' in collected_xtals:
                 continue
             if not os.path.isdir(collected_xtals):
@@ -2362,16 +2379,26 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
                 continue
 
             xtal = collected_xtals[collected_xtals.rfind('/')+1:]
+            if self.agamemnon:
+                tmp = xtal[:xtal.rfind('_')]
+                xtal = tmp[:tmp.rfind('_')]
+
             self.Logfile.insert('%s: checking auto-processing results' %xtal)
             self.createSampleDir(xtal)
 
             if self.target == '=== project directory ===':
                 runDir = os.path.join(collected_xtals,'processed','*')
+            elif self.agamemnon:
+                tmpDir = collected_xtals[:collected_xtals.rfind('/')]
+                runDir = os.path.join(tmpDir,xtal+'_*_')
             else:
                 runDir = os.path.join(collected_xtals,'*')
 
             for run in sorted(glob.glob(runDir)):
                 current_run=run[run.rfind('/')+1:]
+                if current_run in runList:
+                    continue
+                self.Logfile.insert('%s -> run: %s -> current run: %s' %(xtal,run,current_run))
                 timestamp=datetime.fromtimestamp(os.path.getmtime(run)).strftime('%Y-%m-%d %H:%M:%S')
 
                 # create directory for crystal aligment images in projectDir
@@ -2395,10 +2422,10 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
                         if self.alreadyParsed(xtal,current_run,autoproc):
                             continue
                         self.readProcessingUpdateResults(xtal,folder,logfile,mtzfile,timestamp,current_run,autoproc)
-#                        db_dict = self.readProcessingResults(xtal,folder,logfile,mtzfile,timestamp,current_run,autoproc)
-#                        self.update_data_collection_table(xtal,current_run,autoproc,db_dict)
+                runList.append(current_run)
 
             progress += progress_step
+            self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'parsing auto-processing results for '+xtal)
             self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
 
         self.Logfile.insert('====== finished parsing beamline directory ======')
