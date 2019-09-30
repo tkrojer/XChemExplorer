@@ -2258,6 +2258,10 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
         self.target = target
         self.agamemnon = agamemnon
         if self.agamemnon:
+            print 'procDir',self.processedDir
+#            if len(procDir.split('/')) >= 8:
+#                if procDir.split('/')[7] == 'agamemnon'
+#            quit()
             self.visit = 'agamemnon'        # this is for trouble-shooting only
 
         self.db = XChemDB.data_source(os.path.join(database))
@@ -2288,7 +2292,10 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
                         ]
 
     def run(self):
-        self.parse_file_system()
+        if self.agamemnon:
+            self.parse_agamemnon_file_system()
+        else:
+            self.parse_file_system()
 
     def getExistingSamples(self):
         existingSamples={}
@@ -2357,21 +2364,31 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
                 os.path.join(self.projectDir,xtal,'jpg', self.visit + '-' + run)):
             os.mkdir(os.path.join(self.projectDir,xtal,'jpg', self.visit + '-' + run))
 
-    def copyJPGs(self,xtal,run):
+    def copyJPGs(self,xtal,run,auto):
 #        for img in glob.glob(os.path.join(self.processedDir.replace('processed','jpegs'),xtal,run+'*t.png')):
 #        for img in glob.glob(os.path.join(self.processedDir.replace('processed', 'jpegs'), run + '*t.png')):
         self.Logfile.insert('%s: trying to copy crystal snapshots...' %xtal)
         found = False
-        for img in glob.glob(os.path.join(self.processedDir.replace('processed', 'jpegs'), run + '*.0.png')):
-            found = True
-            if not os.path.isfile(os.path.join(self.projectDir,xtal,'jpg', self.visit +'-'+ run,img[img.rfind('/')+1:])):
-                self.Logfile.insert('%s: copying %s' % (xtal, img))
-                os.system('/bin/cp %s %s' %(img,os.path.join(self.projectDir,xtal,'jpg', self.visit + '-' + run)))
-        if not found:
-            for img in glob.glob(os.path.join(self.processedDir.replace('processed', 'jpegs'), xtal, run + '*.0.png')):
-                if not os.path.isfile(os.path.join(self.projectDir, xtal, 'jpg', self.visit + '-' + run, img[img.rfind('/') + 1:])):
+        if self.agamemnon:
+            proposal = self.visit.split('-')[0]
+            self.Logfile.insert('looking for images in '+os.path.join(self.processedDir.replace(proposal,self.visit),'jpegs',auto,self.target,xtal,run + '*.0.png'))
+            for img in glob.glob(os.path.join(self.processedDir.replace(proposal,self.visit),'jpegs',auto,self.target,xtal,run + '*.0.png')):
+                if not os.path.isfile(os.path.join(self.projectDir,xtal,'jpg', self.visit +'-'+ run,img[img.rfind('/')+1:])):
                     self.Logfile.insert('%s: copying %s' % (xtal, img))
-                    os.system('/bin/cp %s %s' % (img, os.path.join(self.projectDir, xtal, 'jpg', self.visit + '-' + run)))
+                    os.system('/bin/cp %s %s' %(img,os.path.join(self.projectDir,xtal,'jpg', self.visit + '-' + run)))
+        else:
+            for img in glob.glob(os.path.join(self.processedDir.replace('processed', 'jpegs'), run + '*.0.png')):
+                found = True
+                if not os.path.isfile(os.path.join(self.projectDir,xtal,'jpg', self.visit +'-'+ run,img[img.rfind('/')+1:])):
+                    self.Logfile.insert('%s: copying %s' % (xtal, img))
+                    os.system('/bin/cp %s %s' %(img,os.path.join(self.projectDir,xtal,'jpg', self.visit + '-' + run)))
+            if not found:
+                for img in glob.glob(os.path.join(self.processedDir.replace('processed', 'jpegs'), xtal, run + '*.0.png')):
+                    if not os.path.isfile(os.path.join(self.projectDir, xtal, 'jpg', self.visit + '-' + run, img[img.rfind('/') + 1:])):
+                        self.Logfile.insert('%s: copying %s' % (xtal, img))
+                        os.system('/bin/cp %s %s' % (img, os.path.join(self.projectDir, xtal, 'jpg', self.visit + '-' + run)))
+
+
 
     def findJPGs(self,xtal,run):
         jpgDict={}
@@ -2488,7 +2505,7 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
 
                 # create directory for crystal aligment images in projectDir
                 self.makeJPGdir(xtal,current_run)
-                self.copyJPGs(xtal, current_run)
+                self.copyJPGs(xtal, current_run, 'non-auto')    # 'non-auto' is irrelevant here
 
                 for item in self.toParse:
                     procDir = os.path.join(run,item[0])
@@ -2516,3 +2533,89 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
         self.Logfile.insert('====== finished parsing beamline directory ======')
         self.emit(QtCore.SIGNAL('read_pinIDs_from_gda_logs'))
         self.emit(QtCore.SIGNAL("finished()"))
+
+    def parse_agamemnon_file_system(self):
+        self.Logfile.insert('checking for new data processing results in '+self.processedDir)
+        progress = 0
+        progress_step = 1
+
+        autoDir = ['auto','agamemnon']
+
+        c = 0
+        for auto in autoDir:
+            for collected_xtals in sorted(glob.glob(os.path.join(self.processedDir+'-*','processed',auto,self.target,'*'))):
+                if 'tmp' in collected_xtals or 'results' in collected_xtals or 'scre' in collected_xtals:
+                    continue
+                c += 1
+
+        if c > 0:
+            progress_step = 100/float(c)
+            self.Logfile.insert('found %s samples of target %s' %(str(c),self.target))
+        else:
+            self.Logfile.warning('found %s samples of target %s' %(str(c),self.target))
+
+        runList = []
+
+        autoDir = ['auto','agamemnon']
+
+        for auto in autoDir:
+            for collected_xtals in sorted(glob.glob(os.path.join(self.processedDir+'-*','processed',auto,self.target,'*'))):
+                self.visit = collected_xtals.split('/')[5]
+                if 'tmp' in collected_xtals or 'results' in collected_xtals or 'scre' in collected_xtals:
+                    continue
+                if not os.path.isdir(collected_xtals):
+                    continue
+
+                xtal = collected_xtals[collected_xtals.rfind('/')+1:]
+                if xtal.endswith('_'):
+                    continue    # happened sometime during testing, but should not happen anymore
+
+                self.Logfile.insert('%s: checking auto-processing results' %xtal)
+                self.createSampleDir(xtal)
+
+                for run in sorted(glob.glob(os.path.join(collected_xtals,'*'))):
+                    current_run=run[run.rfind('/')+1:]
+                    if current_run not in runList:
+                        runList.append(current_run)
+                    else:
+                        continue
+                    self.Logfile.insert('%s -> run: %s -> current run: %s' %(xtal,run,current_run))
+                    timestamp=datetime.fromtimestamp(os.path.getmtime(run)).strftime('%Y-%m-%d %H:%M:%S')
+
+                    # create directory for crystal aligment images in projectDir
+                    self.makeJPGdir(xtal,current_run)
+                    self.copyJPGs(xtal, current_run, auto)
+
+                    for item in self.toParse:
+                        procDir = os.path.join(run,item[0])
+                        logfile = item[1]
+                        mtzfile = item[2]
+
+                        for folder in glob.glob(procDir):
+                            for mtz in glob.glob(os.path.join(procDir,mtzfile)):
+                                print mtz
+
+                        for folder in glob.glob(procDir):
+                            if self.junk(folder):
+                                continue
+                            if self.empty_folder(xtal,folder):
+                                continue
+                            if 'staraniso' in logfile or 'summary.tar.gz' in logfile:
+                                autoproc = 'aP_staraniso'
+                            else:
+                                autoproc = self.getAutoProc(folder)
+                            if self.alreadyParsed(xtal,current_run,autoproc):
+                                continue
+                            self.readProcessingUpdateResults(xtal,folder,logfile,mtzfile,timestamp,current_run,autoproc)
+
+
+
+
+                    progress += progress_step
+                    self.emit(QtCore.SIGNAL('update_status_bar(QString)'), 'parsing auto-processing results for '+collected_xtals)
+                    self.emit(QtCore.SIGNAL('update_progress_bar'), progress)
+
+        self.Logfile.insert('====== finished parsing beamline directory ======')
+        self.emit(QtCore.SIGNAL('read_pinIDs_from_gda_logs'))
+        self.emit(QtCore.SIGNAL("finished()"))
+
