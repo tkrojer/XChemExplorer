@@ -125,9 +125,6 @@ Krojer, T., Talon, R., Pearce, N., Collins, P., Douangamath, A., Brandao-Neto, J
 Tobias Krojer
 tobias.krojer@sgc.ox.ac.uk
 
-Rachael Skyner
-rachael.skyner@diamond.ac.uk
-
 # Feature Requests
 
 *** under construction ***
@@ -154,8 +151,11 @@ rachael.skyner@diamond.ac.uk
 
 # Resources
 
+Example files for PDB group deposition
 * <a href="https://github.com/tkrojer/XChemExplorer/blob/gh-pages/example.deposit">example.deposit file</a>
 * <a href="https://github.com/tkrojer/XChemExplorer/blob/gh-pages/data_template.cif">data_template.cif file</a>
 * <a href="https://github.com/tkrojer/XChemExplorer/blob/gh-pages/index.txt">index.txt file</a>
 * <a href="https://github.com/tkrojer/XChemExplorer/blob/gh-pages/NUDT7A.tar.bz2">NUDT7A.tar.bz2 file</a>
 
+Example of XCE directory structure
+* <a href="https://github.com/tkrojer/XChemExplorer/blob/gh-pages/xce_tutorial_data.zip">xce_tutorial_data.zip</a>
