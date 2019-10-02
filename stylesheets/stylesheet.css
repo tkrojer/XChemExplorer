@@ -315,16 +315,6 @@ Full-Width Styles
   text-shadow: #111 0px 0px 10px;
 }
 
-#xce_logo {
-  position: absolute;
-  width: 210px;
-  z-index: 10;
-  bottom: 0px;
-  right: 0;
-  height: 70px;
-  background: url('https://github.com/tkrojer/XChemExplorer/blob/gh-pages/XChemExplorer_logo.png') no-repeat 0% 90%;
-}
-
 #downloads {
   position: absolute;
   width: 210px;
