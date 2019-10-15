@@ -105,6 +105,8 @@ class GUI(object):
         self.pdb_style = 'refine.pdb'
         self.mtz_style = 'refine.mtz'
 
+        self.ligandList = []
+
         self.label = None
 
         # stores imol of currently loaded molecules and maps
@@ -112,7 +114,8 @@ class GUI(object):
                          'ligand': -1,
                          '2fofc': -1,
                          'fofc': -1,
-                         'event': -1}
+                         'event': -1,
+                         'ligand_stereo': []}
 
         # two dictionaries which are flushed when a new crystal is loaded
         # and which contain information to update the data source if necessary
@@ -687,6 +690,9 @@ class GUI(object):
         self.place_ligand_here_button.connect("clicked", self.place_ligand_here)
         self.hbox_for_modeling.add(self.merge_ligand_button)
         self.merge_ligand_button.connect("clicked", self.merge_ligand_into_protein)
+        self.select_cpd_cb = gtk.combo_box_new_text()
+        self.select_cpd_cb.connect("changed", self.select_cpd)
+        self.hbox_for_modeling.add(self.select_cpd_cb)
         frame.add(self.hbox_for_modeling)
         self.vbox.pack_start(frame)
 
@@ -767,6 +773,21 @@ class GUI(object):
 #            self.update_label_radiobutton()
 
         self.RefreshData()
+
+    def select_cpd(self, widget):
+        cpd = str(widget.get_active_text())
+        for imol in coot_utils_XChem.molecule_number_list():
+            if imol not in self.mol_dict['ligand_stereo']:
+                continue
+            molName = coot.molecule_name(imol)[coot.molecule_name(imol).rfind('/')+1:].replace('.pdb','')
+            print cpd,'-',imol,'-',coot.molecule_name(imol)
+            if molName == cpd:
+                coot.set_mol_displayed(imol, 1)
+                print 'reading',os.path.join(self.project_directory,self.xtalID,'compound',molName+'.cif')
+                coot.read_cif_dictionary(os.path.join(self.project_directory,self.xtalID,'compound',molName+'.cif'))
+            else:
+                coot.set_mol_displayed(imol, 0)
+
 
     def update_RefinementOutcome_radiobutton(self):
         # updating dataset outcome radiobuttons
@@ -1065,6 +1086,15 @@ class GUI(object):
         #        self.canvas.show()
 
         #########################################################################################
+        # ligand files
+        # first remove old samples if present
+        print '>>>',self.mol_dict['ligand_stereo']
+        for n, item in enumerate(self.mol_dict['ligand_stereo']):
+            print '__',item
+            self.select_cpd_cb.remove_text(0)
+        print 'done'
+
+        #########################################################################################
         # update pdb & maps
 
         #########################################################################################
@@ -1085,6 +1115,24 @@ class GUI(object):
                 os.path.join(self.project_directory, self.xtalID, self.compoundID + '.pdb'), 0)
             self.mol_dict['ligand'] = imol
             coot.read_cif_dictionary(os.path.join(self.project_directory, self.xtalID, self.compoundID + '.cif'))
+            self.select_cpd_cb.append_text(self.compoundID)
+            self.mol_dict['ligand_stereo'] = []
+            self.mol_dict['ligand_stereo'].append(imol)
+            for cifFile in sorted(glob.glob(os.path.join(self.project_directory,self.xtalID,'compound',self.compoundID+'_*.pdb'))):
+                cif = cifFile[cifFile.rfind('/')+1:]
+                if '_with_H' in cif:
+                    continue
+                self.select_cpd_cb.append_text(cif.replace('.pdb',''))
+                imol = coot.handle_read_draw_molecule_with_recentre(cifFile, 0)
+                self.mol_dict['ligand_stereo'].append(imol)
+                coot.set_mol_displayed(imol,0)
+            self.select_cpd_cb.set_sensitive(True)
+            self.select_cpd_cb.set_active(0)
+        else:
+            print 'no compound found in sample directory'
+#            self.select_cpd_cb.append_text('')
+            self.select_cpd_cb.set_sensitive(False)
+
         if not os.path.isfile(os.path.join(self.project_directory, self.xtalID, self.pdb_style)):
             os.chdir(os.path.join(self.project_directory, self.xtalID))
 
@@ -1409,17 +1457,52 @@ class GUI(object):
         return fig
 
     def place_ligand_here(self, widget):
-        print '===> XCE: moving ligand to pointer'
-        #        coot.move_molecule_here(<molecule_number>)
-        print 'LIGAND: ', self.mol_dict['ligand']
-        coot_utils_XChem.move_molecule_here(self.mol_dict['ligand'])
+        cpd = str(self.select_cpd_cb.get_active_text())
+        for imol in coot_utils_XChem.molecule_number_list():
+            if imol not in self.mol_dict['ligand_stereo']:
+                continue
+            molName = coot.molecule_name(imol)[coot.molecule_name(imol).rfind('/')+1:].replace('.pdb','')
+            if molName == cpd:
+                print '===> XCE: moving ligand to pointer'
+                coot_utils_XChem.move_molecule_here(imol)
+                print 'LIGAND: ', molName
+#        print '===> XCE: moving ligand to pointer'
+#        #        coot.move_molecule_here(<molecule_number>)
+#        print 'LIGAND: ', self.mol_dict['ligand']
+#        coot_utils_XChem.move_molecule_here(self.mol_dict['ligand'])
+
 
     def merge_ligand_into_protein(self, widget):
-        print '===> XCE: merge ligand into protein structure'
-        # merge_molecules(list(imols), imol) e.g. merge_molecules([1],0)
-        coot.merge_molecules_py([self.mol_dict['ligand']], self.mol_dict['protein'])
-        print '===> XCE: deleting ligand molecule'
-        coot.close_molecule(self.mol_dict['ligand'])
+        cpd = str(self.select_cpd_cb.get_active_text())
+        for imol in coot_utils_XChem.molecule_number_list():
+            if imol not in self.mol_dict['ligand_stereo']:
+                continue
+            molName = coot.molecule_name(imol)[coot.molecule_name(imol).rfind('/')+1:].replace('.pdb','')
+            if molName == cpd:
+                print '===> XCE: merge ligand into protein structure -->',cpd
+                coot.merge_molecules_py([imol], self.mol_dict['protein'])
+            print '===> XCE: deleting ligand molecule',molName
+            coot.close_molecule(imol)
+
+        self.select_cpd_cb.set_sensitive(False)
+        if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.cif')):
+            os.system('/bin/rm %s' %os.path.join(self.project_directory,self.xtalID,self.compoundID+'.cif'))
+            print 'changing directory',os.path.join(self.project_directory,self.xtalID)
+            os.chdir(os.path.join(self.project_directory,self.xtalID))
+            print 'changing symlink ln -s %s %s.cif' %(os.path.join('compound',cpd+'.cif'),self.compoundID)
+            os.system('ln -s %s %s.cif' %(os.path.join('compound',cpd+'.cif'),self.compoundID))
+        if os.path.isfile(os.path.join(self.project_directory,self.xtalID,self.compoundID+'.pdb')):
+            os.system('/bin/rm %s' %os.path.join(self.project_directory,self.xtalID,self.compoundID+'.pdb'))
+            print 'changing directory',os.path.join(self.project_directory,self.xtalID)
+            os.chdir(os.path.join(self.project_directory,self.xtalID))
+            print 'changing symlink ln -s %s %s.pdb' %(os.path.join('compound',cpd+'.pdb'),self.compoundID)
+            os.system('ln -s %s %s.pdb' %(os.path.join('compound',cpd+'.pdb'),self.compoundID))
+
+#        print '===> XCE: merge ligand into protein structure'
+#        # merge_molecules(list(imols), imol) e.g. merge_molecules([1],0)
+#        coot.merge_molecules_py([self.mol_dict['ligand']], self.mol_dict['protein'])
+#        print '===> XCE: deleting ligand molecule'
+#        coot.close_molecule(self.mol_dict['ligand'])
 
     def show_molprobity_to_do(self, widget):
         print self.panddaSerial
