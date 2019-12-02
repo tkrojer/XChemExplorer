@@ -30,7 +30,7 @@ class setup():
 
     def settings(self, xce_object):
         # set XCE version
-        xce_object.xce_version = 'v1.3.8.18'
+        xce_object.xce_version = 'v1.3.8.19'
 
         # general settings
         xce_object.allowed_unitcell_difference_percent = 12
@@ -301,7 +301,7 @@ class setup():
         #                                            - appears in create_widgets_for_autoprocessing_results_only()
 
         xce_object.datasets_summary_table_columns = ['Sample ID',
-                                                     'Resolution\n[Mn<I/sig(I)> = 1.5]',
+                                                     'Resolution\n[Mn<I/sig(I)> = 2.0]',
                                                      'DataProcessing\nSpaceGroup',
                                                      'DataProcessing\nRfree',
                                                      'SoakDB\nBarcode',

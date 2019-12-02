@@ -1152,7 +1152,7 @@ class run_dimple_on_all_autoprocessing_files(QtCore.QThread):
         db=XChemDB.data_source(os.path.join(self.database_directory,self.data_source_file))
         database=os.path.join(self.database_directory,self.data_source_file)
 
-        print(self.sample_list)
+#        print(self.sample_list)
 
         for n,item in enumerate(self.sample_list):
 
@@ -2150,7 +2150,7 @@ class read_pinIDs_from_gda_logs(QtCore.QThread):
         self.xce_logfile = xce_logfile
         self.Logfile = XChemLog.updateLog(xce_logfile)
 
-        self.db = XChemDB.data_source(os.path.join(database))
+        self.db = XChemDB.data_source(database)
         self.allSamples = self.db.collected_xtals_during_visit_for_scoring(visit)
 
         self.gdaLogInstructions = gdaLogInstructions
@@ -2178,9 +2178,10 @@ class read_pinIDs_from_gda_logs(QtCore.QThread):
     def update_database(self,pinDict):
         self.Logfile.insert('updating database with pinDIs from GDA logfiles')
         for sample in pinDict:
-            dbDict = {'DataCollectionPinBarcode': pinDict[sample]}
-            self.db.update_data_source(sample,dbDict)
-
+            dbDict = {}
+            dbDict['DataCollectionPinBarcode'] = pinDict[sample]
+#            self.db.update_data_source(sample,dbDict)
+            self.db.update_specified_table(sample,dbDict,'collectionTable')
 
 
 class choose_autoprocessing_outcome(QtCore.QThread):
@@ -2215,7 +2216,7 @@ class choose_autoprocessing_outcome(QtCore.QThread):
                     self.allSamples.append(e)
         else:
             self.allSamples = self.db.collected_xtals_during_visit_for_scoring(visit)
-        print 'here', self.allSamples
+#        print 'here', self.allSamples
 #        self.allSamples = self.db.collected_xtals_during_visit_for_scoring(visit,rescore)
 
 
@@ -2403,13 +2404,13 @@ class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
 #        self.target = target
         self.processedDir =  processedDir
         self.visit,self.beamline = XChemMain.getVisitAndBeamline(self.processedDir)
-        print 'visit'
+#        print 'visit'
         self.projectDir = projectDir
         self.Logfile = XChemLog.updateLog(xce_logfile)
         self.target = target
         self.agamemnon = agamemnon
         if self.agamemnon:
-            print 'procDir',self.processedDir
+#            print 'procDir',self.processedDir
 #            if len(procDir.split('/')) >= 8:
 #                if procDir.split('/')[7] == 'agamemnon'
 #            quit()
