@@ -5,7 +5,7 @@ XChemExplorer (XCE) is a data management and workflow tool for the parallel dete
 
 # [](#header-1)Download
 
-[v1.3.8.11](https://github.com/xchem/XChemExplorer/archive/v1.3.8.11.tar.gz)
+[v1.4.0](https://github.com/xchem/XChemExplorer/archive/v1.4.0.tar.gz)
 
 
 # [](#header-1)Mailing List
@@ -132,6 +132,7 @@ tobias.krojer@sgc.ox.ac.uk
 
 # Version History
 
+* v1.4.0 - 03/12/2019
 * v1.8.8.11 - 04/09/2019
 * v1.3 - 20/12/2018
 * v1.2.1 - 20/06/2018
