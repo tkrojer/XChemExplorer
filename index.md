@@ -111,7 +111,7 @@ alias XChemExplorer='/Users/tobiaskrojer/Downloads/XChemExplorer-1.1/XChemExplor
 
 # Manual - under development -
 
-* [XChemExplorer v1.4.2](https://github.com/tkrojer/XChemExplorer/blob/gh-pages/XCE_manual_2019-12-23.pdf)
+* [XChemExplorer v1.4.4](https://github.com/tkrojer/XChemExplorer/blob/gh-pages/XCE_manual_1.4.4.pdf)
 
 
 
