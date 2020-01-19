@@ -1,3 +1,5 @@
+
+!<img src="XChemExplorer_banner.png" alt="hi" class="inline"/>
 # [](#header-1)Introduction
 
 XChemExplorer (XCE) is a data management and workflow tool for the parallel determination of protein-ligand structures. It was initially written to support crystallographic fragment screening at [beamline I04-1 at the Diamond Light Source](http://www.diamond.ac.uk/Beamlines/Mx/Fragment-Screening.html), but it is a generic program that can be used to facilitate any structure-based drug design project.
