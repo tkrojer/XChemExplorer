@@ -120,7 +120,7 @@ alias XChemExplorer='/Users/tobiaskrojer/Downloads/XChemExplorer-1.1/XChemExplor
 
 # [](#header-1)Presentations
 
-* [10/07/2020 XCE updates ZOOM seminar](https://github.com/tkrojer/XChemExplorer/presentations/XCE_updates_2020-07-10.pptx)
+* [10/07/2020 XCE updates ZOOM seminar](https://github.com/tkrojer/XChemExplorer/blob/gh-pages/presentations/XCE_updates_2020-07-10.pptx)
 
 
 # Reference
