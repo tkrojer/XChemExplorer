@@ -23,6 +23,7 @@ For questions, suggestions, hints, bug reports, please sign up to XCHEMBB@jiscma
 
 # [](#header-1)Prerequisites:
 * CCP4 version 7.0 (or higher)
+* from v1.7.0 onwards: CCP4 version 7.1 (or higher)
 * PHENIX (optional, but recommended)
 
 
@@ -137,15 +138,9 @@ tobias.krojer@sgc.ox.ac.uk
 *** under construction ***
 
 
-# Version History
+# Current VersionVersion History
 
-* v1.4.0 - 03/12/2019
-* v1.8.8.11 - 04/09/2019
-* v1.3 - 20/12/2018
-* v1.2.1 - 20/06/2018
-* v1.2 - 18/06/2018
-* v1.1 - 31/01/2018
-* v1.0 - 10/08/2017
+* v1.6.29 (28/06/2020)
 
 
 # Links
