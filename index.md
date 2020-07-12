@@ -142,8 +142,6 @@ tobias.krojer@sgc.ox.ac.uk
 
 * v1.6.29 (28/06/2020)
 
-[ChangeLog](https://github.com/tkrojer/XChemExplorer/blob/gh-pages/ChangeLog.md)
-
 
 # Links
 
