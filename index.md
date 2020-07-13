@@ -5,6 +5,10 @@
 
 XChemExplorer (XCE) is a data management and workflow tool for the parallel determination of protein-ligand structures. It was initially written to support crystallographic fragment screening at [beamline I04-1 at the Diamond Light Source](http://www.diamond.ac.uk/Beamlines/Mx/Fragment-Screening.html), but it is a generic program that can be used to facilitate any structure-based drug design project.
 
+# Current Version
+
+* v1.7.1 (13/07/2020)
+
 
 # [](#header-1)Download
 
@@ -25,6 +29,13 @@ For questions, suggestions, hints, bug reports, please sign up to XCHEMBB@jiscma
 * CCP4 version 7.0 (or higher)
 * from v1.7.0 onwards: CCP4 version 7.1 (or higher)
 * PHENIX (optional, but recommended)
+
+
+# [](#header-1)Presentations
+
+* [10/07/2020 XCE updates ZOOM seminar](https://github.com/tkrojer/XChemExplorer/blob/gh-pages/presentations/XCE_updates_2020-07-10.pptx)
+* [13/07/2020 XCE updates (v1.7.1)](https://github.com/tkrojer/XChemExplorer/blob/gh-pages/presentations/XCE_updates_2020-07-13.pptx)
+
 
 
 # [](#header-1)Installation
@@ -118,11 +129,6 @@ alias XChemExplorer='/Users/tobiaskrojer/Downloads/XChemExplorer-1.1/XChemExplor
 * [XChemExplorer v1.4.4](https://github.com/tkrojer/XChemExplorer/blob/gh-pages/XCE_manual_1.4.4.pdf)
 
 
-# [](#header-1)Presentations
-
-* [10/07/2020 XCE updates ZOOM seminar](https://github.com/tkrojer/XChemExplorer/blob/gh-pages/presentations/XCE_updates_2020-07-10.pptx)
-
-
 # Reference
 
 Krojer, T., Talon, R., Pearce, N., Collins, P., Douangamath, A., Brandao-Neto, J., Dias, A., Marsden, B., and von Delft, F. (2017). The XChemExplorer graphical workflow tool for routine or large-scale protein–ligand structure determination. _Acta Cryst D_ 73, 267–278.
@@ -136,11 +142,6 @@ tobias.krojer@sgc.ox.ac.uk
 # Feature Requests
 
 *** under construction ***
-
-
-# Current Version
-
-* v1.6.29 (28/06/2020)
 
 
 # Links
