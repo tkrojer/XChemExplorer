@@ -38,6 +38,7 @@ For questions, suggestions, hints, bug reports, please sign up to XCHEMBB@jiscma
 * [16/07/2020 XCE updates (v1.7.2)](https://github.com/tkrojer/XChemExplorer/blob/gh-pages/presentations/XCE_updates_2020-07-16.pptx)
 * [22/09/2020 Refinement of low occupancy models](https://github.com/tkrojer/XChemExplorer/blob/gh-pages/presentations/2020-09-22_refinement_of_low_occupancy_models.pptx)
 * [22/09/2020 quick project setup](https://github.com/tkrojer/XChemExplorer/blob/gh-pages/presentations/2020-09-22_quick_XCE_project_setup.pptx)
+* [08/10/2020 XCE updates (v1.7.16)](https://github.com/tkrojer/XChemExplorer/blob/gh-pages/presentations/2020-10-08_XCE_updates.pptx)
 
 
 
