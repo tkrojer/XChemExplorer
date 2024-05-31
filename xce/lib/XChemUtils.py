@@ -646,16 +646,16 @@ class parse:
             if resolution_at_15_sigma_line_overall_found:
                 if "from Mn(I/sd)" in line and len(line.split()) >= 7:
                     if "1.5" in line.split()[3]:
-                        self.aimless[
-                            "DataProcessingResolutionHigh15sigma"
-                        ] = line.split()[6][:-1]
+                        self.aimless["DataProcessingResolutionHigh15sigma"] = (
+                            line.split()[6][:-1]
+                        )
                         resolution_at_15_sigma_line_overall_found = False
             if resolution_at_20_sigma_line_overall_found:
                 if "from Mn(I/sd)" in line and len(line.split()) >= 7:
                     if "2.0" in line.split()[3]:
-                        self.aimless[
-                            "DataProcessingResolutionHigh20sigma"
-                        ] = line.split()[6][:-1]
+                        self.aimless["DataProcessingResolutionHigh20sigma"] = (
+                            line.split()[6][:-1]
+                        )
                         resolution_at_20_sigma_line_overall_found = False
             if (
                 line.startswith("Average unit cell:")
@@ -687,15 +687,15 @@ class parse:
                     self.aimless["DataProcessingSpaceGroup"] = line.replace(
                         "Space group: ", ""
                     )[:-1]
-                self.aimless[
-                    "DataProcessingLattice"
-                ] = self.get_lattice_from_space_group(
-                    self.aimless["DataProcessingSpaceGroup"]
+                self.aimless["DataProcessingLattice"] = (
+                    self.get_lattice_from_space_group(
+                        self.aimless["DataProcessingSpaceGroup"]
+                    )
                 )
-                self.aimless[
-                    "DataProcessingPointGroup"
-                ] = self.get_pointgroup_from_space_group(
-                    self.aimless["DataProcessingSpaceGroup"]
+                self.aimless["DataProcessingPointGroup"] = (
+                    self.get_pointgroup_from_space_group(
+                        self.aimless["DataProcessingSpaceGroup"]
+                    )
                 )
 
     def json_logfile(self, logfile):
@@ -891,10 +891,10 @@ class parse:
                     self.aimless["DataProcessingSpaceGroup"] = "H32"
                 if "R3:H" in self.aimless["DataProcessingSpaceGroup"]:
                     self.aimless["DataProcessingSpaceGroup"] = "H3"
-                self.aimless[
-                    "DataProcessingPointGroup"
-                ] = self.get_pointgroup_from_space_group(
-                    self.aimless["DataProcessingSpaceGroup"]
+                self.aimless["DataProcessingPointGroup"] = (
+                    self.get_pointgroup_from_space_group(
+                        self.aimless["DataProcessingSpaceGroup"]
+                    )
                 )
             elif line.startswith("_space_group.crystal_system"):
                 self.aimless["DataProcessingLattice"] = line.split()[1]
@@ -1100,16 +1100,16 @@ class parse:
                         and gamma != "n/a"
                         and PDBinfo["Lattice"] != "n/a"
                     ):
-                        PDBinfo[
-                            "UnitCellVolume"
-                        ] = self.calc_unitcell_volume_from_logfile(
-                            float(a),
-                            float(b),
-                            float(c),
-                            math.radians(float(alpha)),
-                            math.radians(float(beta)),
-                            math.radians(float(gamma)),
-                            PDBinfo["Lattice"],
+                        PDBinfo["UnitCellVolume"] = (
+                            self.calc_unitcell_volume_from_logfile(
+                                float(a),
+                                float(b),
+                                float(c),
+                                math.radians(float(alpha)),
+                                math.radians(float(beta)),
+                                math.radians(float(gamma)),
+                                PDBinfo["Lattice"],
+                            )
                         )
 
         return PDBinfo
@@ -1987,9 +1987,9 @@ class logtools:
                             if float(line.split()[3]) < 0.3:
                                 QualityIndicators["RamachandranOutliersColor"] = "green"
                             if 0.3 <= float(line.split()[3]) < 1:
-                                QualityIndicators[
-                                    "RamachandranOutliersColor"
-                                ] = "orange"
+                                QualityIndicators["RamachandranOutliersColor"] = (
+                                    "orange"
+                                )
                             if float(line.split()[3]) >= 1:
                                 QualityIndicators["RamachandranOutliersColor"] = "red"
                         except ValueError:

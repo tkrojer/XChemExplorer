@@ -20,7 +20,6 @@ from xce.lib import XChemUtils
 
 
 class GUI(object):
-
     """
     main class which opens the actual GUI
     """

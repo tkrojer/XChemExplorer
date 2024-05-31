@@ -16,7 +16,6 @@ from iotbx.reflection_file_reader import any_reflection_file
 
 
 class synchronise_db_and_filesystem(QtCore.QThread):
-
     """
     - remove broken links
     - insert new samples in DB
@@ -536,9 +535,9 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                             "trying to find which apo structures were used to calculate"
                             " the event maps in " + panddaPATH
                         )
-                        db_pandda_dict[
-                            "ApoStructures"
-                        ] = self.find_apo_structures_for_PanDDA(panddaPATH)
+                        db_pandda_dict["ApoStructures"] = (
+                            self.find_apo_structures_for_PanDDA(panddaPATH)
+                        )
                     else:
                         self.Logfile.insert(
                             "pandda path for " + xtal + " is empty in database"
@@ -690,9 +689,9 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                     )
                     db_pandda_dict["PANDDA_site_ligand_resname"] = residue_name
                     db_pandda_dict["PANDDA_site_ligand_chain"] = residue_chain
-                    db_pandda_dict[
-                        "PANDDA_site_ligand_sequence_number"
-                    ] = residue_number
+                    db_pandda_dict["PANDDA_site_ligand_sequence_number"] = (
+                        residue_number
+                    )
                     db_pandda_dict["PANDDA_site_ligand_altLoc"] = residue_altLoc
                     db_pandda_dict["PANDDA_site_ligand_placed"] = "True"
                     db_pandda_dict["PANDDA_site_ligand_id"] = (
@@ -713,9 +712,9 @@ class synchronise_db_and_filesystem(QtCore.QThread):
                             residue_chain + "-" + residue_number + ".png",
                         ).replace(" ", "")
                         if os.path.isfile(spider_plot):
-                            db_pandda_dict[
-                                "PANDDA_site_spider_plot"
-                            ] = os.path.realpath(spider_plot)
+                            db_pandda_dict["PANDDA_site_spider_plot"] = (
+                                os.path.realpath(spider_plot)
+                            )
                         if os.path.isfile(
                             os.path.join(tmp[: tmp.rfind("/")], "residue_scores.csv")
                         ):
@@ -2591,7 +2590,6 @@ class choose_autoprocessing_outcome(QtCore.QThread):
 
 
 class read_write_autoprocessing_results_from_to_disc(QtCore.QThread):
-
     """
     major changes:
     - pkl file is obsolete

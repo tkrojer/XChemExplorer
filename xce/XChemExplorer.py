@@ -2872,9 +2872,9 @@ class XChemExplorer(QtGui.QApplication):
         primary_citation_author_name = ""
         for widget in self.primary_citation_author_name_List:
             primary_citation_author_name += str(widget.text()) + ";"
-        self.deposit_dict[
-            "primary_citation_author_name"
-        ] = primary_citation_author_name[:-1]
+        self.deposit_dict["primary_citation_author_name"] = (
+            primary_citation_author_name[:-1]
+        )
 
     def get_deposit_dict_template(self):
         deposit_dict_template = {
@@ -3738,9 +3738,9 @@ class XChemExplorer(QtGui.QApplication):
     def change_allowed_unitcell_difference_percent(self, text):
         try:
             self.allowed_unitcell_difference_percent = int(text)
-            self.settings[
-                "unitcell_difference"
-            ] = self.allowed_unitcell_difference_percent
+            self.settings["unitcell_difference"] = (
+                self.allowed_unitcell_difference_percent
+            )
             self.update_log.insert(
                 "changing max allowed unit cell difference between reference and xtal"
                 " to {0!s} percent".format(self.allowed_unitcell_difference_percent)
@@ -3750,9 +3750,9 @@ class XChemExplorer(QtGui.QApplication):
                 self.allowed_unitcell_difference_percent = int(
                     str(text)[: str(text).find(".")]
                 )
-                self.settings[
-                    "unitcell_difference"
-                ] = self.allowed_unitcell_difference_percent
+                self.settings["unitcell_difference"] = (
+                    self.allowed_unitcell_difference_percent
+                )
                 self.update_log.insert(
                     "changing max allowed unit cell difference between reference and"
                     " xtal to {0!s} percent".format(
@@ -3784,9 +3784,9 @@ class XChemExplorer(QtGui.QApplication):
     def change_acceptable_low_resolution_limit(self, text):
         try:
             self.acceptable_low_resolution_limit_for_data = float(text)
-            self.settings[
-                "too_low_resolution_data"
-            ] = self.acceptable_low_resolution_limit_for_data
+            self.settings["too_low_resolution_data"] = (
+                self.acceptable_low_resolution_limit_for_data
+            )
         except ValueError:
             pass
 

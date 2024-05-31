@@ -971,9 +971,9 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
                     "%s: trying to find it from %s.free.mtz..." % (xtal, xtal)
                 )
                 if os.path.isfile("%s.free.mtz" % xtal):
-                    self.data_template_dict[
-                        "radiation_wavelengths"
-                    ] = XChemUtils.mtztools(xtal + ".free.mtz").get_wavelength()
+                    self.data_template_dict["radiation_wavelengths"] = (
+                        XChemUtils.mtztools(xtal + ".free.mtz").get_wavelength()
+                    )
                     self.Logfile.warning(
                         "%s: found the following wavelength -> %s"
                         % (xtal, str(self.data_template_dict["radiation_wavelengths"]))
@@ -985,9 +985,9 @@ class prepare_mmcif_files_for_deposition(QtCore.QThread):
             if self.ground_state:
                 os.chdir(self.projectDir)
                 self.data_template_dict["group_type"] = "ground state"
-                self.data_template_dict[
-                    "group_title"
-                ] = "PanDDA analysis group deposition of ground-state model"
+                self.data_template_dict["group_title"] = (
+                    "PanDDA analysis group deposition of ground-state model"
+                )
                 self.data_template_dict["group_description"] = self.data_template_dict[
                     "group_description"
                 ].replace(
